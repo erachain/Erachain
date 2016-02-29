@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Qora Web Server">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>Qora Web</title>
+    <link href="/index/libs/bootstrap/3/css/theme.css" rel="stylesheet">
+    <link href="/index/libs/css/style.css" rel="stylesheet">
+    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
+    <!-- External Lib -->
+    <!-- <link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css"> -->
+    <!-- External Lib -->
+    <style type="text/css">
+      body {
+      padding-top: 50px;
+      }
+      .sub-header {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      }
+      .navbar-fixed-top {
+      border: 0;
+      z-index: 9999;
+      }
+      .sidebar {
+      display: none;
+      }
+      @media (min-width: 768px) {
+      .sidebar {
+      position: fixed;
+      top: 51px;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: block;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background-color: #f5f5f5;
+      border-right: 1px solid #eee;
+      }
+      }
+      .nav-sidebar {
+      margin-right: -21px;
+      margin-bottom: 20px;
+      margin-left: -20px;
+      }
+      .nav-sidebar > li > a {
+      padding-right: 20px;
+      padding-left: 20px;
+      }
+      .nav-sidebar > .active > a,
+      .nav-sidebar > .active > a:hover,
+      .nav-sidebar > .active > a:focus {
+      color: #fff;
+      background-color: #428bca;
+      }
+      .main {
+      padding-top: 40px;
+      }
+      .main-tabs {
+      width: 100%;
+      padding-top: 15px;
+      padding-left: 0px;
+      padding-right: 0px;
+      background-color: lightgray;
+      display: none;
+      }
+      img.logo-header {
+      background-color: transparent;
+      height: 100%;
+      }
+      .col-lg-8 {
+      padding-left: 0px;
+      }
+      @media (min-width: 768px) {
+      .main {
+      padding-right: 40px;
+      }
+      }
+      .main .page-header {
+      margin-top: 0;
+      }
+      .placeholders {
+      margin-bottom: 30px;
+      text-align: center;
+      }
+      .placeholders h4 {
+      margin-bottom: 0;
+      }
+      .placeholder {
+      margin-bottom: 20px;
+      }
+      .placeholder img {
+      display: inline-block;
+      border-radius: 50%;
+      }
+      .r-t {
+      margin: 0px;
+      }
+      .r-l {
+      margin: 0px;
+      }
+      span.label.label-default {
+      background-color: #fff;
+      color: lightgray;
+      font-size: 90%;
+      line-height: 1;
+      }
+      span.label.label-default a {
+      color: #ddd;
+      text-decoration: none;
+      }
+      a.r-l:hover,
+      a.r-l:focus {
+      color: #6467FF;
+      text-decoration: none;
+      }
+      .navbar-header {
+      width: 110px;
+      }
+      .col-centered {
+      float: none;
+      margin: 0 auto;
+      padding: 30px;
+      /*box-shadow: 0px 1px 1px 1px #ddd;*/
+      border: 1px solid #ddd;
+      position: relative;
+      -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+      }
+      .file{
+      visibility:hidden;
+      position:absolute;
+      }
+    </style>
+  </head>
+  <body>
+    {{navbar}}
+    <div class="container">
+      <div class="row">
+        <div class="main">
+          <div class="col-sm-20 col-centered">
+                    <div class="form-horizontal">
+            <legend>Create or update keys in namestorage
+
+
+         <div class="col-sm-4 col-xs-6 pull-right">
+                      <div class="menu pull-right">
+                        <!-- <span class="label label-primary"> -->
+                          <span class="label label-default"><a href="http://docs.qora.org/#namestorage" target="blank"><i class="glyphicon glyphicon-info-sign"></i></a></span>
+                          <span class="label label-default"><a href="http://docs.qora.org/#deploy-a-website" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a></span>
+                        <!-- </span> -->
+                      </div>
+                  </div></legend>
+          <!-- <fieldset> -->
+			<div id=result></div>
+            	{{result}}
+            <div class="form-group">
+              <label for="select-name" class="col-lg-2 control-label">Name</label>
+              <div class="col-lg-10">
+                <select class="form-control" id="select-name">
+                  {% for name in names %}
+					<option value={{name.name}}>
+						{{name.NameBalanceString}}</option>
+					{% endfor %}
+                </select>
+              </div>
+            <label for="title" class="col-lg-2 control-label">Key</label>
+            <div class="col-lg-10">
+              <input id="key" type="text" placeholder="Key (use key website or leave it blank to create a website)" class="form-control">
+            </div>
+          </div>
+            <div class="form-group">
+            <label for="website" class="col-lg-2 control-label"><br>Data</label>
+			<div class="col-lg-10">
+			  <div style="text-align: right;"><input name="WYSIWYG" id="WYSIWYG" type="checkbox"><label for="WYSIWYG">Visual editor</label></div>
+              <pre><textarea id="website" rows="10" class="form-control">{{website}}</textarea></pre>
+            </div>
+          </div>
+
+<div class="form-group" id="divfile">
+  <label for="file" class="col-lg-2 control-label">File</label>
+<form action="/index/encodefile.html" method="post" enctype="multipart/form-data" id="form">
+  <input type="file" name="file" class="file">
+<div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+  <input type="text" class="form-control" disabled placeholder="Upload File">
+  <span class="input-group-btn">
+    <button class="browse btn btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+    <button class="submit btn btn-primary" type="submit" ><i class="glyphicon glyphicon-upload"></i> Upload</button>
+  </span>
+</div>
+</form>
+</div>
+
+
+
+
+
+          <!-- </fieldset> -->
+
+        <div class="form-group">
+              <div class="col-lg-10 col-lg-offset-2">
+                <button type="reset" id="btncancel" onclick="javascript:reload()" class="btn btn-default">Cancel</button>
+            	 <button type="preview" id="btnpreview" onclick="javascript:previewValue()" class="btn btn-primary pull-default">Preview</button>
+            	 <button type="submit" id="btnsubmit" onclick="javascript:updateValue()" class="btn btn-primary pull-right">Submit</button>
+              </div>
+        </div>
+      </div>
+      </div>
+      </div>
+    </div>
+    </div>
+    <script src="/index/libs/jquery/jquery.2.js"></script>
+    <script src="/index/libs/third-party/jquery.form.min.js"></script>
+    <script src="/index/libs/bootstrap/3/js/bootstrap.min.js"></script>
+    <script src="/index/libs/angular/angular.1.4.js"></script>
+	<script src="/index/libs/ckeditor/ckeditor.js"></script>
+    <script src="/index/libs/js/sidebar.js"></script>
+    <script type="text/javascript">
+    var transformToAssocArray;
+    transformToAssocArray = function(prmstr) {
+        var i, params, prmarr, tmparr;
+        params = {};
+        prmarr = prmstr.split('&');
+        i = 0;
+        while (i < prmarr.length) {
+            tmparr = prmarr[i].split('=');
+            params[tmparr[0]] = tmparr[1];
+            i++;
+        }
+        return params;
+    };
+    var getSearchParameters;
+    getSearchParameters = function() {
+        var prmstr;
+        prmstr = decodeURIComponent(window.location.search.substr(1));
+        if (prmstr != null && prmstr != '') {
+            return transformToAssocArray(prmstr);
+        } else {
+            return {};
+        }
+    };
+
+    var updateValue;
+    updateValue = function() {
+
+		document.getElementById('result').innerHTML = '<div class=\"alert alert-info\" role=\"alert\">Saving...please confirm the security call and then wait until you get a success message! If the transaction amount is high this may take some time...<br></div>';
+
+		var websitebuf;
+		
+		if(typeof CKEDITOR.instances.website != 'undefined') {
+			websitebuf = CKEDITOR.instances.website.getData();
+		} else {
+			websitebuf = document.getElementById('website').value;
+		}
+		
+		$.post(
+			"/index/websitesave.html",
+			{
+				name: document.getElementById('select-name').value,
+				website: websitebuf,
+				key: document.getElementById('key').value
+			})
+			.done( function(data) {
+				if (data.type == 'settingsSuccessfullySaved')
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-success\" role=\"alert\">Key successfully saved.<br></div>";
+				}
+				else if(data.type == 'parametersMissing')
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">Some parameters are missing.<br></div>";
+				}
+				else if(data.type == 'badKey')
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">This key is an internal qora key and can't be edited this way!<br></div>";
+				}
+				else if (data.type == 'error')
+				{
+					try {
+						var error = JSON.parse(data.error);
+						message = error.message;
+					} catch (e) {
+						message = data.error;
+					}
+
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">An error occurred while saving the website.<br>"+message+"<br></div>";
+				}
+				else
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">Unknown response:<br>"+data+"<br></div>";
+				}
+			})
+			.fail( function(xhr, textStatus, errorThrown) {
+				try {
+						var error = JSON.parse(xhr.responseText);
+						message = error.message;
+				} catch (e) {
+						message = xhr.responseText;
+				}
+
+				document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">An error occurred while saving the website.<br>"+message+"<br></div>";
+			});
+    };
+
+     var previewValue;
+    previewValue = function() {
+		var website;
+		
+		if(typeof CKEDITOR.instances.website != 'undefined') {
+			website = CKEDITOR.instances.website.getData();
+		} else {
+			website = document.getElementById('website').value;
+		}
+		
+		open('POST', '/index/websitepreview.html', {website:website}, '_blank');
+    };
+
+    open = function(verb, url, data, target) {
+  var form = document.createElement("form");
+  form.action = url;
+  form.method = verb;
+  form.target = target || "_self";
+  if (data) {
+    for (var key in data) {
+      var input = document.createElement("textarea");
+      input.name = key;
+      input.value = typeof data[key] === "object" ? JSON.stringify(data[key]) : data[key];
+      form.appendChild(input);
+    }
+  }
+  form.style.display = 'none';
+  document.body.appendChild(form);
+  form.submit();
+};
+
+      var updateValue;
+    reload = function() {
+    var name;
+    name = document.getElementById('select-name').value;
+        document.location.href = '/index/namestorage.html?name=' + name;
+    };
+
+      $(function(){
+      // bind change event to select
+      $('#select-name').on('change', function () {
+          var url = $(this).val(); // get selected value
+          if (url) { // require a URL
+              window.location = '/index/namestorage.html?name=' + url; // redirect
+          }
+          return false;
+      });
+    });
+
+      $(function(){
+      // bind change event to select
+      $('#key').on('change', function () {
+          var url = $(this).val(); // get selected value
+          if (url) { // require a URL
+              window.location = '/index/namestorage.html?name=' + $('#select-name').val() + "&key="+ url; // redirect
+          }else
+          {
+          window.location = '/index/namestorage.html?name=' + $('#select-name').val();
+          }
+
+          return false;
+      });
+    });
+
+    $(document).ready(function() {
+        var searchval;
+		$("#select-name").val('{{name}}');
+		$("#key").val('{{key}}');
+ 	{% autoescape true %}
+ 	 $('#form').ajaxForm(
+    {
+       beforeSubmit: function() {
+         $('#results').html('Submitting...');
+       },
+       success: function(data) {
+
+       			if (data.type == 'success')
+				{
+			       document.getElementById('website').value = data.result + "";
+			         document.getElementById('result').innerHTML = "<div class=\"alert alert-success\" role=\"alert\">The file has been added to the key! You still need to submit the result to make it persistent!<br></div>";
+				}
+				else  if(data.type =='error')
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">"+data.result+"<br></div>";
+				}else
+				{
+					document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">Unknown response:<br>"+data+"<br></div>";
+				}
+
+        },
+        error:function(){
+                document.getElementById('result').innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">An error occured:<br></div>";
+            }
+    });
+
+		var searchval
+		$('#name').change(function() {
+            $('ul.nav-tabs > li:nth-child(1) > a').attr('href', '/index/main.html?search=' + $('#name').val());
+            $('ul.nav-tabs > li:nth-child(2) > a').attr('href', '/index/blogsearch.html?search=' + $('#name').val());
+        });
+		  $('#name').val(getSearchParameters().search);
+        if (getSearchParameters().search === void 0) {
+            $('#name').val('');
+        }
+        $('#name').bind('oninput', function() {
+            $('#name').val(this);
+        });
+
+        $('#button').click(function() {
+            var url;
+            url = void 0;
+            searchval = $('#name').val();
+            document.location.href = '/index/main.html?search=' + searchval;
+        });
+
+        $('#button').click(function() {
+            var url;
+            url = void 0;
+            searchval = $('#name').val();
+            document.location.href = '/index/main.html?search=' + searchval;
+        });
+        $('#name').keypress(function(e) {
+            if (e.which === 13) {
+                $('#button').trigger('click');
+            }
+        });
+		 $('ul.nav-tabs > li:nth-child(1) > a').attr('href', '/index/main.html?search=' + $('#name').val());
+        	$('ul.nav-tabs > li:nth-child(2) > a').attr('href', '/index/blogsearch.html?search=' + $('#name').val());
+		
+		$("#WYSIWYG").attr("checked",false);			
+    });
+    {% endautoescape %}
+
+	function Add(){
+		AddValue("");
+	};
+
+    </script>
+    <script type="text/javascript">
+    var myApp = angular.module('myApp', []);
+    myApp.controller('AppController', function($scope) {
+        $scope.steps = {};
+    });
+    </script>
+    <script type="text/javascript">
+    $(document).on('click', '.browse', function(){
+  var file = $(this).parent().parent().parent().find('.file');
+  file.trigger('click');
+});
+$(document).on('change', '.file', function(){
+  $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+});
+$(document).on('change', '#WYSIWYG', function(){
+  
+  if($("#WYSIWYG").prop("checked"))
+  {
+
+	CKEDITOR.replace( 'website', {
+		removeButtons: 'Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField'
+	});
+	$("pre").css("padding","0px");
+	$("#divfile").hide();
+  }
+  else
+  {
+	//var rawdata = CKEDITOR.instances.website.getData();
+	
+	if(typeof CKEDITOR.instances.website != 'undefined') {
+		CKEDITOR.instances.website.updateElement();
+		CKEDITOR.instances.website.destroy();
+	}
+	
+	//$("#website").val(rawdata);
+	//$(".website").show();
+	$("pre").css("padding","11px");
+	$("#divfile").show();
+  }
+  
+});
+
+    </script>
+
+    <!-- External Libs  -->
+        <!--
+    <script src="http://codemirror.net/lib/codemirror.js"></script>
+    <script src="http://codemirror.net/addon/selection/selection-pointer.js"></script>
+    <script src="http://codemirror.net/mode/xml/xml.js"></script>
+    <script src="http://codemirror.net/mode/javascript/javascript.js"></script>
+    <script src="http://codemirror.net/mode/css/css.js"></script>
+    <script src="http://codemirror.net/mode/vbscript/vbscript.js"></script>
+    <script src="http://codemirror.net/mode/htmlmixed/htmlmixed.js"></script>
+    <script>
+    var mixedMode = {
+      name: "htmlmixed",
+      scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache/i,
+                   mode: null},
+                  {matches: /(text|application)\/(x-)?vb(a|script)/i,
+                   mode: "vbscript"}]
+                 };
+    var editor = CodeMirror.fromTextArea(document.getElementById("website"), {
+      mode: mixedMode,
+      lineNumbers: true,
+      selectionPointer: true
+    });
+    </script>
+    -->
+    <!-- External Libs  -->
+  </body>
+</html>
