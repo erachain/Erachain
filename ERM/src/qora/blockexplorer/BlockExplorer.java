@@ -59,6 +59,7 @@ import utils.DateTimeFormat;
 import utils.GZIP;
 import utils.Pair;
 import utils.ReverseComparator;
+import lang.Lang;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class BlockExplorer
@@ -88,6 +89,8 @@ public class BlockExplorer
 		Map output = new LinkedHashMap();
 
 		try {
+			
+			
 
 			if(info.getQueryParameters().containsKey("balance"))
 			{
@@ -185,7 +188,7 @@ public class BlockExplorer
 					{
 						output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
 					} catch (Exception e) {
-						output.put("error", "Check with given key is missing!");
+						output.put("error", "Asset with given key is missing!");
 						return output;
 					}
 				}
@@ -410,8 +413,8 @@ public class BlockExplorer
 		help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
 		help.put("Assets List", "blockexplorer.json?assets");
 		help.put("Assets List Lite", "blockexplorer.json?assetsLite");
-		help.put("Check", "blockexplorer.json?asset={asset}");
-		help.put("Check Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
+		help.put("Asset", "blockexplorer.json?asset={asset}");
+		help.put("Asset Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
 		help.put("Polls List", "blockexplorer.json?polls");
 		help.put("Poll", "blockexplorer.json?poll={poll}");
 		help.put("AT TX", "blockexplorer.json?atTx={atTx}");
@@ -1270,6 +1273,22 @@ public class BlockExplorer
 		output.put("maxHeight", block.getHeight());
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
+		//Translate
+		output.put("Label_Height", Lang.getInstance().translate("Height"));
+		output.put("Label_Time", Lang.getInstance().translate("Timestamp"));
+		output.put("Label_Generator", Lang.getInstance().translate("Generator"));
+		output.put("Label_Gen_balance", Lang.getInstance().translate("Generating Balance"));
+		output.put("Label_TXs", Lang.getInstance().translate("TXs"));
+		output.put("Label_Fee", Lang.getInstance().translate("Fee"));
+		output.put("Label_AT_Amount", Lang.getInstance().translate("AT Amount"));
+		output.put("Label_Amount", Lang.getInstance().translate("Amount"));
+		output.put("Label_Unconfirmed_transactions", Lang.getInstance().translate("Unconfirmed transactions"));
+		output.put("Label_Later", Lang.getInstance().translate("Later"));
+		output.put("Label_Previous", Lang.getInstance().translate("Previous"));
+		
+
+		
+		
 
 		int counter = start; 
 
@@ -1332,6 +1351,7 @@ public class BlockExplorer
 
 		output.put("timezone", Settings.getInstance().getTimeZone());
 		output.put("timeformat", Settings.getInstance().getTimeFormat());
+		output.put("Label_Last_processed_block", Lang.getInstance().translate("Last processed block"));
 
 		return output;
 	}
