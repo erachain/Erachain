@@ -14,7 +14,7 @@ public class Start {
 
 	public static void main(String args[])
 	{	
-		//qjhghg 
+		
 		boolean cli = false;
 		
 		for(String arg: args)
