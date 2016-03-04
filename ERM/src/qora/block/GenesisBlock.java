@@ -10,6 +10,7 @@ import com.google.common.primitives.Longs;
 import database.DBSet;
 import qora.account.Account;
 import qora.account.PublicKeyAccount;
+import qora.assets.Asset;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
@@ -86,6 +87,9 @@ public class GenesisBlock extends Block{
 			this.addTransaction(new GenesisTransaction(new Account("QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk"),
 					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
 			
+			//CREATE JOB ASSET
+			//Asset asset = new Asset(sender, "JOB", "Fee dust", 999999999l, true, new byte[64]);
+
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(generateHash());
 		}

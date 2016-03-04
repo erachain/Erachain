@@ -70,42 +70,54 @@ public abstract class Transaction {
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES
+	public static final int EXTENDED = 0;
 	public static final int GENESIS_TRANSACTION = 1;
-	public static final int PAYMENT_TRANSACTION = 2;
-	
-	public static final int REGISTER_NAME_TRANSACTION = 3;
-	public static final int UPDATE_NAME_TRANSACTION = 4;
-	public static final int SELL_NAME_TRANSACTION = 5;
-	public static final int CANCEL_SELL_NAME_TRANSACTION = 6;
-	public static final int BUY_NAME_TRANSACTION = 7;
-	
-	public static final int CREATE_POLL_TRANSACTION = 8;
-	public static final int VOTE_ON_POLL_TRANSACTION = 9;
-	
-	public static final int ARBITRARY_TRANSACTION = 10;
-	
-	public static final int ISSUE_ASSET_TRANSACTION = 11;
-	public static final int TRANSFER_ASSET_TRANSACTION = 12;
-	public static final int CREATE_ORDER_TRANSACTION = 13;
-	public static final int CANCEL_ORDER_TRANSACTION = 14;
-	public static final int MULTI_PAYMENT_TRANSACTION = 15;
+	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 2;
+	public static final int REERVED_3 = 3;
+	public static final int REERVED_4 = 4;
 
-	public static final int DEPLOY_AT_TRANSACTION = 16;
+	public static final int PAYMENT_TRANSACTION = 5;
 	
-	public static final int MESSAGE_TRANSACTION = 17;
-	public static final int ACCOUNTING_TRANSACTION = 18;
+	public static final int REGISTER_NAME_TRANSACTION = 6;
+	public static final int UPDATE_NAME_TRANSACTION = 7;
+	public static final int SELL_NAME_TRANSACTION = 8;
+	public static final int CANCEL_SELL_NAME_TRANSACTION = 9;
+	public static final int BUY_NAME_TRANSACTION = 10;
+	
+	public static final int CREATE_POLL_TRANSACTION =11;
+	public static final int VOTE_ON_POLL_TRANSACTION = 12;
+	public static final int REERVED_13 = 13;
+	public static final int REERVED_14 = 14;
+	
+	public static final int ARBITRARY_TRANSACTION = 15;
+	public static final int REERVED_16 = 16;
+	
+	public static final int ISSUE_ASSET_TRANSACTION = 17;
+	public static final int TRANSFER_ASSET_TRANSACTION = 18;
+	public static final int CREATE_ORDER_TRANSACTION = 19;
+	public static final int CANCEL_ORDER_TRANSACTION = 20;
+
+	public static final int MULTI_PAYMENT_TRANSACTION = 21;
+	public static final int REERVED_22 = 22;
+
+	public static final int DEPLOY_AT_TRANSACTION = 23;
+	public static final int REERVED_24 = 24;
+	
+	public static final int MESSAGE_TRANSACTION = 25;
+	public static final int ACCOUNTING_TRANSACTION = 26;
+	public static final int JSON_TRANSACTION = 27;
 	
 	//MINIMUM FEE
 	public static final BigDecimal MINIMUM_FEE = BigDecimal.ONE;
 	
 	//RELEASES
-	private static final long VOTING_RELEASE = 1403715600000l;
-	private static final long ARBITRARY_TRANSACTIONS_RELEASE = 1405702800000l;
+	private static final long VOTING_RELEASE = 0l;
+	private static final long ARBITRARY_TRANSACTIONS_RELEASE = 0l;
 	private static final int AT_BLOCK_HEIGHT_RELEASE = 0;
 	private static final int MESSAGE_BLOCK_HEIGHT_RELEASE = 0;
 	//public static final long ASSETS_RELEASE = 1411308000000l;
 	private static final long ASSETS_RELEASE = 0l;
-	private static final long POWFIX_RELEASE = 1456426800000L; // Block Version 3 // 2016-02-25T19:00:00+00:00
+	private static final long POWFIX_RELEASE = 0L; // Block Version 3 // 2016-02-25T19:00:00+00:00
 											   
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
