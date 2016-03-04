@@ -7,11 +7,13 @@ import java.util.logging.Logger;
 
 import controller.Controller;
 import database.DBSet;
+import ntp.NTP;
 import qora.account.Account;
 import qora.assets.Asset;
 import qora.block.Block;
 import qora.block.GenesisBlock;
 import qora.transaction.ArbitraryTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
@@ -23,36 +25,61 @@ public class BlockChain
 	public BlockChain()
 	{	
 		//CREATE GENESIS BLOCK
-		Block genesisBlock = new GenesisBlock();
+		GenesisBlock genesisBlock = new GenesisBlock();
+		DBSet db = DBSet.getInstance();
 
 		if(Settings.getInstance().isTestnet()) {
 			Logger.getGlobal().info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
-		if(	!DBSet.getInstance().getBlockMap().contains(genesisBlock.getSignature())
+		if(	!db.getBlockMap().contains(genesisBlock.getSignature())
 			||
-			DBSet.getInstance().getBlockMap().get(genesisBlock.getSignature()).getTimestamp() != genesisBlock.getTimestamp()) 
+			db.getBlockMap().get(genesisBlock.getSignature()).getTimestamp() != genesisBlock.getTimestamp())
+		// process genesis block
 		{
-			if(DBSet.getInstance().getBlockMap().getLastBlockSignature() != null)
+			if(db.getBlockMap().getLastBlockSignature() != null)
 			{
 				Logger.getGlobal().info("reCreate Database...");	
 		
 	        	try {
-	        		DBSet.getInstance().close();
+	        		db.close();
 					Controller.getInstance().reCreateDB(false);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
+
         	//PROCESS
         	genesisBlock.process();
         	
         	//ADD QORA ASSET
-        	// Asset qoraAsset = new Asset(genesisBlock.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, true, genesisBlock.getGeneratorSignature());
-			Asset qoraAsset = new Asset(genesisBlock.getGenerator(), "ERM", "This is the simulated ERM asset.",      10000000000L, true, genesisBlock.getGeneratorSignature());
-
-			DBSet.getInstance().getIssueAssetMap().set(genesisBlock.getGeneratorSignature(), 0l);
+        	Asset qoraAsset = genesisBlock.makeERM(genesisBlock.getGeneratorSignature());
+        	DBSet.getInstance().getIssueAssetMap().set(genesisBlock.getGeneratorSignature(), 0l);
         	DBSet.getInstance().getAssetMap().set(0l, qoraAsset);
+
+        	// ASSETS
+        	/*
+			Asset asset;
+        	byte[] signature;
+    		long time = NTP.getTime();
+
+        	signature = genesisBlock.getGeneratorSignature();
+        	//ADD MAIN ASSET
+			asset = genesisBlock.makeERM(signature);
+			db.getIssueAssetMap().set(signature, 0l);
+        	db.getAssetMap().set(0l, asset);
+			asset = genesisBlock.makeOil(signature);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, time);
+			asset = genesisBlock.makeOil(signature);
+			db.getIssueAssetMap().set(signature, 1l);
+			db.getAssetMap().set(1l, asset);
+
+			asset = genesisBlock.makeGem(signature);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, time);
+			db.getIssueAssetMap().set(signature, 2l);
+			db.getAssetMap().set(2l, asset);
+			*/
+
         }
 	}
 	

@@ -2882,13 +2882,13 @@ public class TransactionTests {
 		long timestamp = NTP.getTime();
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction genesisIssueAssetTransaction1 = new GenesisIssueAssetTransaction(sender, asset, timestamp);
+		Transaction genesisIssueAssetTransaction1 = new GenesisIssueAssetTransaction(asset, timestamp);
 		
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
 		assertEquals(true, genesisIssueAssetTransaction1.isSignatureValid());
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		GenesisIssueAssetTransaction genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(sender, asset, timestamp);
+		GenesisIssueAssetTransaction genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset, timestamp);
 		//CONVERT TO BYTES
 		byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes();
 		
