@@ -93,6 +93,7 @@ public abstract class Transaction {
 	public static final int DEPLOY_AT_TRANSACTION = 16;
 	
 	public static final int MESSAGE_TRANSACTION = 17;
+	public static final int ACCOUNTING_TRANSACTION = 18;
 	
 	//MINIMUM FEE
 	public static final BigDecimal MINIMUM_FEE = BigDecimal.ONE;

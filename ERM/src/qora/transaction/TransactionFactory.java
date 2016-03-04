@@ -135,6 +135,13 @@ public class TransactionFactory {
 				return MessageTransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));
 			}
 			
+		case Transaction.ACCOUNTING_TRANSACTION:
+
+			
+				// PARSE ACCOUNTING TRANSACTION V3
+				return AccountingTransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));
+			
+			
 		}
 
 		throw new Exception("Invalid transaction type");
