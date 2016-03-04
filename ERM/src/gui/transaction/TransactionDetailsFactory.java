@@ -2,6 +2,7 @@ package gui.transaction;
 
 import javax.swing.JFrame;
 
+import qora.transaction.AccountingTransaction;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -116,6 +117,10 @@ public class TransactionDetailsFactory
 		case Transaction.MESSAGE_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
+		
+		case Transaction.ACCOUNTING_TRANSACTION:
+			AccountingTransaction accountingTransaction = (AccountingTransaction)transaction;
+			return new AccountingTransactionDetailsFrame(accountingTransaction);
 
 		}
 		
