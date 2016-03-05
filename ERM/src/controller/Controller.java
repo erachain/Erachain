@@ -1800,7 +1800,15 @@ public class Controller extends Observable {
 
 	}
 	
-	
+	public Pair<Transaction, Integer> sendJson1(PrivateKeyAccount sender,
+			Account recipient, long key, BigDecimal amount, BigDecimal fee,
+			byte[] isText, byte[] message, byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createJson1(sender, recipient,
+					key, amount, fee, message, isText, encryptMessage);
+		}
+
+	}
 	
 	
 	public Block getBlockByHeight(int parseInt) {

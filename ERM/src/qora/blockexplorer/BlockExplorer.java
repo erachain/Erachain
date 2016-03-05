@@ -36,6 +36,7 @@ import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.payment.Payment;
 import qora.transaction.AccountingTransaction;
+import qora.transaction.Json1Transaction;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -1568,6 +1569,11 @@ public class BlockExplorer
 			if(transaction.getType() == Transaction.ACCOUNTING_TRANSACTION) 
 			{
 				transactionDataJSON.put("assetName", assetNamesByKey.getNameByKey(((AccountingTransaction)unit).getKey()));
+			}
+			
+			if(transaction.getType() == Transaction.JSON_TRANSACTION) 
+			{
+				transactionDataJSON.put("assetName", assetNamesByKey.getNameByKey(((Json1Transaction)unit).getKey()));
 			}
 			
 			if(transaction.getType() == Transaction.MULTI_PAYMENT_TRANSACTION) 

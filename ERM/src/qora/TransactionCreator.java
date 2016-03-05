@@ -20,6 +20,7 @@ import qora.naming.Name;
 import qora.naming.NameSale;
 import qora.payment.Payment;
 import qora.transaction.AccountingTransactionV3;
+import qora.transaction.Json1TransactionV3;
 import qora.transaction.ArbitraryTransactionV1;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.BuyNameTransaction;
@@ -719,7 +720,24 @@ public class TransactionCreator
 		return afterCreate(messageTx);
 	}
 	
-	
+	public Pair<Transaction, Integer> createJson1(PrivateKeyAccount sender,
+			Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] isText,
+			byte[] message, byte[] encryptMessage) {
+		
+		this.checkUpdate();
+		
+		Transaction messageTx;
+
+		long timestamp = NTP.getTime();
+		
+		
+			//CREATE MESSAGE TRANSACTION V3
+			byte[] signature = Json1TransactionV3.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
+			messageTx = new Json1TransactionV3(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
+		
+			
+		return afterCreate(messageTx);
+	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Pair<BigDecimal, Integer> calcRecommendedFeeForMessage(byte[] message) 
