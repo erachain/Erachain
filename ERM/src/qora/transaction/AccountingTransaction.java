@@ -35,7 +35,6 @@ public class AccountingTransaction extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	//public AccountingTransaction(BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
 	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 
 		super(ACCOUNTING_TRANSACTION, fee, timestamp, reference, signature);
@@ -165,7 +164,7 @@ public class AccountingTransaction extends Transaction {
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 
-		//WRITE KEY
+		//WRITE HKEY
 		data = Bytes.concat(data, this.hkey);
 		
 		//WRITE AMOUNT
@@ -285,12 +284,6 @@ public class AccountingTransaction extends Transaction {
 		//REMOVE FEE
 		DBSet fork = db.fork();
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
-
-		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-		if(this.creator.getConfirmedBalance(this.hkey, fork).compareTo(this.amount) == -1)
-		{
-			return NO_BALANCE;
-		}
 		
 		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
 		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
@@ -303,14 +296,7 @@ public class AccountingTransaction extends Transaction {
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF AMOUNT IS POSITIVE. 
-		//NOW IN V3 MAY BE ZERO
-		if(this.amount.compareTo(BigDecimal.ZERO) < 0)
-		{
-			return NEGATIVE_AMOUNT;
-		}
-		
+				
 		//CHECK IF FEE IS POSITIVE
 		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
 		{
@@ -377,12 +363,12 @@ public class AccountingTransaction extends Transaction {
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
 
-		//READ SENDER
+		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;
 
-		//READ KEY
+		//READ HKEY
 		byte[] hkey = Arrays.copyOfRange(data, position, position + HKEY_LENGTH);
 		position += HKEY_LENGTH;
 		

@@ -2,7 +2,7 @@ package gui;
 
 import gui.models.AccountingsTableModel;
 import gui.models.AccountsComboBoxModel;
-import gui.models.AssetsComboBoxModel;
+//import gui.models.AssetsComboBoxModel;
 //import gui.models.MessagesTableModel;
 import lang.Lang;
 //import ntp.NTP;
@@ -40,11 +40,11 @@ import javax.swing.event.DocumentListener;
 
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
+//import qora.assets.Asset;
 import qora.crypto.AEScrypto;
 import qora.crypto.Crypto;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.Converter;
 //import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -357,7 +357,7 @@ public class SendAccountingPanel extends JPanel
 		feetxtGBC.gridy = 6;
 
 		txtFee = new JTextField();
-		txtFee.setText("1.00000000");
+		txtFee.setText("0.00000333");
 		txtFee.setPreferredSize(new Dimension(130,22));
 		this.add(txtFee, feetxtGBC);
 		
@@ -555,42 +555,7 @@ public class SendAccountingPanel extends JPanel
 			//READ AMOUNT
 			parsing = 1;
 			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
-			
-			//READ FEE
-			parsing = 2;
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				
-				return;
-			}
-			
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				} else {
-					
-					txtFee.setText("1.00000000");
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
-				}
-			}
-			
+									
 			String message = txtMessage.getText();
 			
 			boolean isTextB = isText.isSelected();
@@ -659,51 +624,10 @@ public class SendAccountingPanel extends JPanel
 				
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
-
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForMessage(messageBytes).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1.00000000"); // Return to the default fee for the next message.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this message.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
-				}
-			}
 						
 			//CREATE TX MESSAGE
+			//BigDecimal fee = new BigDecimal.ZERO
+			BigDecimal fee = new BigDecimal('0').setScale(8);
 			result = Controller.getInstance().sendAccounting(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, hkey, amount, fee, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE

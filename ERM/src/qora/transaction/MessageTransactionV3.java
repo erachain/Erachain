@@ -20,16 +20,6 @@ import qora.crypto.Crypto;
 
 public class MessageTransactionV3 extends MessageTransaction {
 
-	private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	private static final int KEY_LENGTH = 8;
-	private static final int AMOUNT_LENGTH = 8;
-	protected static final int CREATOR_LENGTH = 32;
-	protected static final int DATA_SIZE_LENGTH = 4;
-	protected static final int REFERENCE_LENGTH = 64;
-	protected static final int FEE_LENGTH = 8;
-	protected static final int SIGNATURE_LENGTH = 64;
-	protected static final int ENCRYPTED_LENGTH = 1;
-	protected static final int IS_TEXT_LENGTH = 1;
 	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
 	public MessageTransactionV3(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
@@ -68,7 +58,7 @@ public class MessageTransactionV3 extends MessageTransaction {
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
 
-		//READ SENDER
+		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;

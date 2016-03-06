@@ -37,6 +37,7 @@ import qora.transaction.PaymentTransaction;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
+//import qora.transaction.Transaction.*;
 import qora.transaction.TransactionFactory;
 import qora.transaction.TransferAssetTransaction;
 import qora.transaction.UpdateNameTransaction;
@@ -138,9 +139,9 @@ public class TransactionCreator
 		PublicKeyAccount sender = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE PAYMENT
-		PaymentTransaction payment = new PaymentTransaction(sender, sender, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, time, signature, signature);
+		PaymentTransaction payment = new PaymentTransaction(sender, sender, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
 					
-		return new Pair(payment.calcRecommendedFee(), payment.getDataLength());
+		return new Pair(payment.calcFee(1), payment.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount registrant, Name name, BigDecimal fee)
@@ -174,9 +175,9 @@ public class TransactionCreator
 		PublicKeyAccount registrant = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE NAME UPDATE
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(registrant, name, Transaction.MINIMUM_FEE, time, signature, signature);
+		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(registrant, name, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(nameRegistration.calcRecommendedFee(), nameRegistration.getDataLength());
+		return new Pair(nameRegistration.calcFee(1), nameRegistration.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createNameUpdate(PrivateKeyAccount owner, Name name, BigDecimal fee)
@@ -210,9 +211,9 @@ public class TransactionCreator
 		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(owner, name, Transaction.MINIMUM_FEE, time, signature, signature);
+		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(owner, name, Transaction.FEE_PER_BYTE, time, signature, signature);
 				
-		return new Pair(nameUpdate.calcRecommendedFee(), nameUpdate.getDataLength());
+		return new Pair(nameUpdate.calcFee(1), nameUpdate.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createNameSale(PrivateKeyAccount owner, NameSale nameSale, BigDecimal fee)
@@ -246,9 +247,9 @@ public class TransactionCreator
 		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE NAME SALE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(owner, nameSale, Transaction.MINIMUM_FEE, time, signature, signature);
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(owner, nameSale, Transaction.FEE_PER_BYTE, time, signature, signature);
 					
-		return new Pair(nameSaleTransaction.calcRecommendedFee(), nameSaleTransaction.getDataLength());
+		return new Pair(nameSaleTransaction.calcFee(1), nameSaleTransaction.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createCancelNameSale(PrivateKeyAccount owner, NameSale nameSale, BigDecimal fee)
@@ -282,9 +283,9 @@ public class TransactionCreator
 		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(owner, nameSale.getKey(), Transaction.MINIMUM_FEE, time, signature, signature);
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(owner, nameSale.getKey(), Transaction.FEE_PER_BYTE, time, signature, signature);
 				
-		return new Pair(cancelNameSaleTransaction.calcRecommendedFee(), cancelNameSaleTransaction.getDataLength());
+		return new Pair(cancelNameSaleTransaction.calcFee(1), cancelNameSaleTransaction.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createNamePurchase(PrivateKeyAccount buyer, NameSale nameSale, BigDecimal fee)
@@ -318,9 +319,9 @@ public class TransactionCreator
 		PublicKeyAccount buyer = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE NAME UPDATE
-		BuyNameTransaction namePurchase = new BuyNameTransaction(buyer, nameSale, nameSale.getName().getOwner(), Transaction.MINIMUM_FEE, time, signature, signature);
+		BuyNameTransaction namePurchase = new BuyNameTransaction(buyer, nameSale, nameSale.getName().getOwner(), Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(namePurchase.calcRecommendedFee(), namePurchase.getDataLength());
+		return new Pair(namePurchase.calcFee(1), namePurchase.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createPollCreation(PrivateKeyAccount creator, Poll poll, BigDecimal fee) 
@@ -354,12 +355,12 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE NAME UPDATE
-		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, Transaction.MINIMUM_FEE, time, signature, signature);
+		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(pollCreation.calcRecommendedFee(), pollCreation.getDataLength());
+		return new Pair(pollCreation.calcFee(1), pollCreation.getDataLength());
 	}
 
-	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, String poll, int optionIndex, BigDecimal fee)
+	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, String poll, int optionIndex, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -368,10 +369,10 @@ public class TransactionCreator
 		long time = NTP.getTime();
 						
 		//CREATE SIGNATURE
-		byte[] signature = VoteOnPollTransaction.generateSignature(this.fork, creator, poll, optionIndex, fee, time);
+		byte[] signature = VoteOnPollTransaction.generateSignature(this.fork, creator, poll, optionIndex, feePow, time);
 					
 		//CREATE POLL VOTE
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, fee, time, creator.getLastReference(this.fork), signature);
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, feePow, time, creator.getLastReference(this.fork), signature);
 						
 		//VALIDATE AND PROCESS
 		return this.afterCreate(pollVote);
@@ -390,9 +391,9 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
 		
 		//CREATE VOTE
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, 0, Transaction.MINIMUM_FEE, time, signature, signature);
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, 0, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(pollVote.calcRecommendedFee(), pollVote.getDataLength());
+		return new Pair(pollVote.calcFee(1), pollVote.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createArbitraryTransaction(PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data, BigDecimal fee) 
@@ -443,15 +444,15 @@ public class TransactionCreator
 		if(time < Transaction.getPOWFIX_RELEASE())
 		{
 			//CREATE ARBITRARY TRANSACTION V1
-			arbitraryTransaction = new ArbitraryTransactionV1(creator, 0, data, Transaction.MINIMUM_FEE, time, signature, signature);
+			arbitraryTransaction = new ArbitraryTransactionV1(creator, 0, data, Transaction.FEE_PER_BYTE, time, signature, signature);
 		}
 		else
 		{
 			//CREATE ARBITRARY TRANSACTION V3
-			arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, 0, data, Transaction.MINIMUM_FEE, time, signature, signature);			
+			arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, 0, data, Transaction.FEE_PER_BYTE, time, signature, signature);			
 		}
 		
-		return new Pair(arbitraryTransaction.calcRecommendedFee(), arbitraryTransaction.getDataLength());
+		return new Pair(arbitraryTransaction.calcFee(1), arbitraryTransaction.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, boolean divisible, BigDecimal fee) 
@@ -488,9 +489,9 @@ public class TransactionCreator
 		
 		//CREATE ARBITRARY TRANSACTION
 		Asset asset = new Asset(creator, name, description, 10000, true, signature);
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, Transaction.MINIMUM_FEE, time, signature, signature);
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(issueAssetTransaction.calcRecommendedFee(), issueAssetTransaction.getDataLength());
+		return new Pair(issueAssetTransaction.calcFee(1), issueAssetTransaction.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, Asset have, Asset want, BigDecimal amount, BigDecimal price, BigDecimal fee)
@@ -524,9 +525,9 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, 0, 0, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, time, signature, signature);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, 0, 0, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(createOrderTransaction.calcRecommendedFee(), createOrderTransaction.getDataLength());
+		return new Pair(createOrderTransaction.calcFee(1), createOrderTransaction.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, BigDecimal fee)
@@ -560,9 +561,9 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, BigInteger.ONE, Transaction.MINIMUM_FEE, time, signature, signature);
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, BigInteger.ONE, Transaction.FEE_PER_BYTE, time, signature, signature);
 		
-		return new Pair(cancelOrderTransaction.calcRecommendedFee(), cancelOrderTransaction.getDataLength());
+		return new Pair(cancelOrderTransaction.calcFee(1), cancelOrderTransaction.getDataLength());
 	}
 
 	
@@ -597,9 +598,9 @@ public class TransactionCreator
 		PublicKeyAccount sender = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(sender, sender, 0l, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, time, signature, signature);
+		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(sender, sender, 0l, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
 				
-		return new Pair(assetTransfer.calcRecommendedFee(), assetTransfer.getDataLength());
+		return new Pair(assetTransfer.calcFee(1), assetTransfer.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount sender, List<Payment> payments, BigDecimal fee)
@@ -633,9 +634,9 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//CREATE MULTI PAYMENTS
-		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, Transaction.MINIMUM_FEE, time, signature, signature);
+		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, Transaction.FEE_PER_BYTE, time, signature, signature);
 				
-		return new Pair(multiPayment.calcRecommendedFee(), multiPayment.getDataLength());
+		return new Pair(multiPayment.calcFee(1), multiPayment.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> deployATTransaction(PrivateKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal amount, BigDecimal fee )
@@ -669,9 +670,9 @@ public class TransactionCreator
 		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
 		
 		//DEPLOY AT
-		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, time, signature, signature);
+		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
 				
-		return new Pair(deployAT.calcRecommendedFee(), deployAT.getDataLength());
+		return new Pair(deployAT.calcFee(1), deployAT.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createMessage(PrivateKeyAccount sender,
@@ -712,7 +713,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		
-			//CREATE MESSAGE TRANSACTION V3
+			//CREATE ACCOunting TRANSACTION
 			byte[] signature = AccountingTransaction.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
 			messageTx = new AccountingTransaction(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
 		
@@ -753,20 +754,12 @@ public class TransactionCreator
 		
 		Transaction messageTx;
 		
-		long timestamp = NTP.getTime();
+		//long timestamp = NTP.getTime();
 		
-		if(timestamp < Transaction.getPOWFIX_RELEASE())
-		{
-			//CREATE MESSAGE TRANSACTION V1
-			messageTx = new MessageTransactionV1(sender, sender, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, message, new byte[1], new byte[1], time, signature, signature );
-		}
-		else
-		{
-			//CREATE MESSAGE TRANSACTION V3
-			messageTx = new MessageTransactionV3(sender, sender, 0l, Transaction.MINIMUM_FEE, Transaction.MINIMUM_FEE, message, new byte[1], new byte[1], time, signature, signature );
-		}
+		//CREATE MESSAGE TRANSACTION V3
+		messageTx = new MessageTransactionV3(sender, sender, 0l, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, message, new byte[1], new byte[1], time, signature, signature );
 			
-		return new Pair(messageTx.calcRecommendedFee(), messageTx.getDataLength());
+		return new Pair(messageTx.calcFee(1), messageTx.getDataLength());
 	}
 	
 	public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData)
@@ -794,7 +787,7 @@ public class TransactionCreator
 		if(valid == Transaction.VALIDATE_OK)
 		{
 			//CHECK IF FEE BELOW MINIMUM
-			if(!Settings.getInstance().isAllowFeeLessRequired() && !transaction.hasMinimumFeePerByte())
+			if(!Settings.getInstance().isAllowFeeLessRequired() && !transaction.hasMinimumFee())
 			{
 				valid = Transaction.FEE_LESS_REQUIRED;
 			}
