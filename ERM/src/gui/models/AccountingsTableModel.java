@@ -404,7 +404,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				transaction.getRecipient().getAddress(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),
-				transaction.getKey(),
+				transaction.getHKey(),
 				transaction.getFee(),
 				transaction.getSignature(),
 				transaction.getCreator().getPublicKey(),
@@ -561,11 +561,11 @@ public class AccountingsTableModel extends JTable implements Observer{
 		private byte[] recipientPublicKey;
 		private long timestamp;
 		private BigDecimal amount;
-		private long assetKey;
+		private byte[] hKey;
 		private BigDecimal fee;
 		private byte[] signature;
 		
-		public MessageBuf( byte[] rawMessage, boolean encrypted, String sender, String recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
+		public MessageBuf( byte[] rawMessage, boolean encrypted, String sender, String recipient, long timestamp, BigDecimal amount, byte[] hKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
 		{
 			this.rawMessage = rawMessage;
 			this.encrypted = encrypted;	
@@ -575,7 +575,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 			this.recipient = recipient;
 			this.timestamp = timestamp;
 			this.amount = amount;
-			this.assetKey = assetKey;
+			this.hKey = hKey;
 			this.fee = fee;
 			this.senderPublicKey = senderPublicKey;
 			this.recipientPublicKey = null;
@@ -622,9 +622,9 @@ public class AccountingsTableModel extends JTable implements Observer{
 		{
 			return this.amount;
 		}
-		public long getAssetKey()
+		public byte[] getHKey()
 		{
-			return this.assetKey;
+			return this.hKey;
 		}
 		public byte[] getSignature()
 		{
@@ -764,7 +764,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 			}
 			
 
-			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort();
+			String strAsset = this.getHKey().toString();
 		
 			return	  "<html>\n"
 					+ "<body width='" + width + "'>\n"
@@ -829,7 +829,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				strConfirmations = strConfirmations + " !";
 			}
 			
-			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort();
+			String strAsset = this.getHKey().toString();
 			
 			return 	  Lang.getInstance().translate("Date:" + " " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
 					+ Lang.getInstance().translate("Sender:") + " " + this.sender + "\n"

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gui.assets.AssetsPanel;
+import gui.check.CheckPanel;
 import gui.at.ATPanel;
 import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;
@@ -47,6 +48,9 @@ public class GeneralTabPane extends JTabbedPane{
 		//Accounting
 	   this.addTab(Lang.getInstance().translate("Accounting"), new SendAccountingPanel());
 		
+		//Json1
+	   this.addTab(Lang.getInstance().translate("Json"), new SendJson1Panel());
+	   
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new JTable(this.transactionsModel);
@@ -106,6 +110,10 @@ public class GeneralTabPane extends JTabbedPane{
         
         //ASSETS
         this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());
+        
+      //CHECK
+        this.addTab(Lang.getInstance().translate("Check"), new CheckPanel());
+        
 
 		//ATs
 		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());

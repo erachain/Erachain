@@ -1,49 +1,54 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
 import org.json.simple.JSONObject;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import database.BalanceMap;
+//import database.BalanceMapHKey;
 import database.DBSet;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
+import qora.crypto.Base58;
+import qora.crypto.Crypto;
 import utils.Converter;
 
 
-
-public abstract class AccountingTransaction extends Transaction {
-
-	private int version; 
+public class AccountingTransaction extends Transaction {
 	
+	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+
 	protected PublicKeyAccount creator;
 	protected byte[] data;
 
 	protected Account recipient;
 	protected BigDecimal amount;
-	protected long key;
+	protected byte[] hkey;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	public AccountingTransaction(BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
-		super(ACCOUNTING_TRANSACTION, fee, timestamp, reference, signature);
-		
-		if(timestamp < Transaction.getPOWFIX_RELEASE()) {
-			version = 1;
-		} else {
-			version = 3;
-		}
-	}
+	//public AccountingTransaction(BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 
-	public int getVersion()
-	{
-		return this.version;
+		super(ACCOUNTING_TRANSACTION, fee, timestamp, reference, signature);
+
+		this.creator = creator;
+		this.recipient = recipient;
+		this.hkey = hkey;
+		this.amount = amount;
+
+		this.data = data;
+		this.encrypted = encrypted;
+		this.isText = isText;
+
 	}
 	
 	public Account getSender()
@@ -61,9 +66,9 @@ public abstract class AccountingTransaction extends Transaction {
 		return this.recipient;
 	}
 
-	public long getKey()
+	public byte[] getHKey()
 	{
-		return this.key;
+		return this.hkey;
 	}
 	
 	public BigDecimal getAmount()
@@ -98,7 +103,7 @@ public abstract class AccountingTransaction extends Transaction {
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("creator", this.creator.getAddress());
 		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("asset", this.key);
+		transaction.put("hkey", this.hkey);
 		transaction.put("amount", this.amount.toPlainString());
 		if ( this.isText() && !this.isEncrypted() )
 		{
@@ -137,89 +142,351 @@ public abstract class AccountingTransaction extends Transaction {
 	}
 	
 	@Override
-	public abstract byte[] toBytes();
+	public byte[] toBytes() {
+
+		byte[] data = new byte[0];
+
+		//WRITE TYPE
+		byte[] typeBytes = Ints.toByteArray(ACCOUNTING_TRANSACTION);
+		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, typeBytes);
+
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+
+		//WRITE REFERENCE
+		data = Bytes.concat(data, this.reference);
+
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
+
+		//WRITE RECIPIENT
+		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+
+		//WRITE KEY
+		data = Bytes.concat(data, this.hkey);
+		
+		//WRITE AMOUNT
+		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+		amountBytes = Bytes.concat(fill, amountBytes);
+		data = Bytes.concat(data, amountBytes);
+
+		//WRITE DATA SIZE
+		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
+		data = Bytes.concat(data, dataSizeBytes);
+
+		//WRITE DATA
+		data = Bytes.concat(data, this.data);
+		
+		//WRITE ENCRYPTED
+		data = Bytes.concat(data, this.encrypted);
+		
+		//WRITE ISTEXT
+		data = Bytes.concat(data, this.isText);
+
+		//WRITE FEE
+		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
+		fill = new byte[FEE_LENGTH - feeBytes.length];
+		feeBytes = Bytes.concat(fill, feeBytes);
+		data = Bytes.concat(data, feeBytes);
+
+		//SIGNATURE
+		data = Bytes.concat(data, this.signature);
+
+		return data;	
+	}
 
 	@Override
-	public abstract int getDataLength();
+	public int getDataLength() {
+		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
+	}
 
 	@Override
-	public abstract boolean isSignatureValid();
-	@Override
-	public abstract int isValid(DBSet db);
-
-	@Override
-	public abstract void process(DBSet db);
+	public boolean isSignatureValid() {
+		byte[] data = new byte[0];
+		
+		//WRITE TYPE
+		byte[] typeBytes = Ints.toByteArray(ACCOUNTING_TRANSACTION);
+		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, typeBytes);
+		
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+		
+		//WRITE REFERENCE
+		data = Bytes.concat(data, this.reference);
+		
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
+		
+		try
+		{
+			//WRITE RECIPIENT
+			data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+		}
+		catch(Exception e)
+		{
+			//ERROR DECODING ADDRESS
+			System.out.println("Error decoding recipient " + this.recipient.getAddress());
+		}
+		
+		//WRITE KEY
+		data = Bytes.concat(data, this.hkey);
+		
+		//WRITE AMOUNT
+		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+		amountBytes = Bytes.concat(fill, amountBytes);
+		data = Bytes.concat(data, amountBytes);
+		
+		//WRITE DATA SIZE
+		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
+		data = Bytes.concat(data, dataSizeBytes);
+		
+		//WRITE DATA
+		data = Bytes.concat(data, this.data);
+		
+		//WRITE ENCRYPTED
+		data = Bytes.concat(data, this.encrypted);
+		
+		//WRITE ISTEXT
+		data = Bytes.concat(data, this.isText );
+		
+		//WRITE FEE
+		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
+		fill = new byte[FEE_LENGTH - feeBytes.length];
+		feeBytes = Bytes.concat(fill, feeBytes);
+		data = Bytes.concat(data, feeBytes);
+		
+		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	
+	}
+
 	@Override
-	public abstract void orphan(DBSet db);
+	public int isValid(DBSet db) {
+		
+		//CHECK DATA SIZE
+		if(data.length > 4000 || data.length < 1)
+		{
+			return INVALID_DATA_LENGTH;
+		}
+	
+		//CHECK IF RECIPIENT IS VALID ADDRESS
+		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
+		{
+			return INVALID_ADDRESS;
+		}
+		
+		//REMOVE FEE
+		DBSet fork = db.fork();
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
+
+		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
+		if(this.creator.getConfirmedBalance(this.hkey, fork).compareTo(this.amount) == -1)
+		{
+			return NO_BALANCE;
+		}
+		
+		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
+		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
+		{
+			return NO_BALANCE;
+		}
+		
+		//CHECK IF REFERENCE IS OK
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
+		{
+			return INVALID_REFERENCE;
+		}
+		
+		//CHECK IF AMOUNT IS POSITIVE. 
+		//NOW IN V3 MAY BE ZERO
+		if(this.amount.compareTo(BigDecimal.ZERO) < 0)
+		{
+			return NEGATIVE_AMOUNT;
+		}
+		
+		//CHECK IF FEE IS POSITIVE
+		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
+		{
+			return NEGATIVE_FEE;
+		}
+
+		return VALIDATE_OK;
+	}
+
+	@Override
+	public void process(DBSet db) {
+		//UPDATE SENDER
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+						
+		//UPDATE RECIPIENT
+		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+		
+		//UPDATE REFERENCE OF SENDER
+		this.creator.setLastReference(this.signature, db);
+		
+	}
+
+	@Override
+	public void orphan(DBSet db) {
+		//UPDATE SENDER
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+						
+		//UPDATE RECIPIENT
+		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+		
+		//UPDATE REFERENCE OF SENDER
+		this.creator.setLastReference(this.reference, db);
+		
+	}
 
 	@Override
 	public BigDecimal getAmount(Account account) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
 		
-		//IF SENDER
-		if(address.equals(this.creator.getAddress()))
-		{
-			amount = amount.subtract(this.fee);
-		}
-
-		//IF QORA ASSET
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			//IF SENDER
-			if(address.equals(this.creator.getAddress()))
-			{
-				amount = amount.subtract(this.amount);
-			}
-			
-			//IF RECIPIENT
-			if(address.equals(this.recipient.getAddress()))
-			{
-				amount = amount.add(this.amount);
-			}
-		}
-		
-		return amount;
+		return this.amount;
 	}
 	
 	public static Transaction Parse(byte[] data) throws Exception
 	{
-		// READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
+		if (data.length < BASE_LENGTH)
+		{
+			throw new Exception("Data does not match block length");
+		}
+
+		int position = 0;
+
+		//READ TIMESTAMP
+		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+		long timestamp = Longs.fromByteArray(timestampBytes);	
+		position += TIMESTAMP_LENGTH;
+
+		//READ REFERENCE
+		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		position += REFERENCE_LENGTH;
+
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
+
+		//READ SENDER
+		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
+		Account recipient = new Account(Base58.encode(recipientBytes));
+		position += RECIPIENT_LENGTH;
+
+		//READ KEY
+		byte[] hkey = Arrays.copyOfRange(data, position, position + HKEY_LENGTH);
+		position += HKEY_LENGTH;
+		
+		//READ AMOUNT
+		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
+		position += AMOUNT_LENGTH;
+
+		//READ DATA SIZE
+		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+		int dataSize = Ints.fromByteArray(dataSizeBytes);	
+		position += DATA_SIZE_LENGTH;
+
+		//READ DATA
+		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
+		position += dataSize;
+		
+		byte[] encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
+		position += ENCRYPTED_LENGTH;
+		
+		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
+		position += IS_TEXT_LENGTH;
 		
 		
-			return AccountingTransactionV3.Parse(data);
-		
-	}
-	
-	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return AccountingTransactionV3.generateSignature(creator, recipient, 0L, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-		
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return AccountingTransactionV3.generateSignature(db, creator, recipient, 0L, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-		
+		//READ FEE
+		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
+		position += FEE_LENGTH;
+
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+
+		return new AccountingTransaction(creator, recipient, hkey, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+
 	}
 
-	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
+	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, byte[] key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
 	{
-		
-			return AccountingTransactionV3.generateSignature(creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
+	
+		return AccountingTransaction.generateSignature(creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
 			
 	}
 	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
+	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
 	{
+		byte[] data = new byte[0];
 		
-			return AccountingTransactionV3.generateSignature(db, creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
+		//WRITE TYPE
+		byte[] typeBytes = Ints.toByteArray(ACCOUNTING_TRANSACTION);
+		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, typeBytes);
 		
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+		
+		//WRITE REFERENCE
+		data = Bytes.concat(data, creator.getLastReference(db));
+		
+		//WRITE CREATOR
+		data = Bytes.concat(data, creator.getPublicKey());
+		
+		try
+		{
+			//WRITE RECIPIENT
+			data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
+		}
+		catch(Exception e)
+		{
+			//ERROR DECODING ADDRESS
+			System.out.println("Error decoding address");
+		}
+		
+		//WRITE HKEY
+		data = Bytes.concat(data, hkey);
+		
+		//WRITE AMOUNT
+		byte[] amountBytes = amount.unscaledValue().toByteArray();
+		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+		amountBytes = Bytes.concat(fill, amountBytes);
+		data = Bytes.concat(data, amountBytes);
+		
+		//WRITE DATA SIZE
+		byte[] dataSizeBytes = Ints.toByteArray(arbitraryData.length);
+		data = Bytes.concat(data, dataSizeBytes);
+		
+		//WRITE DATA
+		data = Bytes.concat(data, arbitraryData);
+		
+		//WRITE ENCRYPTED
+		data = Bytes.concat(data, encrypted);
+		
+		//WRITE ISTEXT
+		data = Bytes.concat(data, isText);
+		
+		//WRITE FEE
+		byte[] feeBytes = fee.unscaledValue().toByteArray();
+		fill = new byte[FEE_LENGTH - feeBytes.length];
+		feeBytes = Bytes.concat(fill, feeBytes);
+		data = Bytes.concat(data, feeBytes);
+		
+		return Crypto.getInstance().sign(creator, data);
 	}
+
 }
 

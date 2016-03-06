@@ -29,6 +29,7 @@ import qora.transaction.CancelSellNameTransaction;
 import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
@@ -2856,6 +2857,101 @@ public class TransactionTests {
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(transaction.getSignature(), sender.getLastReference(databaseSet)));
 	}
+	
+	// GENESIS ISSUE
+	@Test
+	public void validateGenesisIssueAssetTransaction() 
+	{
+		
+		//CREATE EMPTY MEMORY DATABASE
+		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+				
+		//CREATE KNOWN ACCOUNT
+		byte[] seed = Crypto.getInstance().digest("test".getBytes());
+		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
+		
+		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
+		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		transaction.process(databaseSet);
+		
+		//CREATE ASSET
+		Asset asset = new Asset(sender, "test", "strontje", 50000l, false, new byte[64]);
+		
+		//CREATE SIGNATURE
+		long timestamp = NTP.getTime();
+		
+		//CREATE ISSUE ASSET TRANSACTION
+		Transaction genesisIssueAssetTransaction1 = new GenesisIssueAssetTransaction(asset, timestamp);
+		
+		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
+		assertEquals(true, genesisIssueAssetTransaction1.isSignatureValid());
+		
+		//CREATE ISSUE ASSET TRANSACTION
+		GenesisIssueAssetTransaction genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset, timestamp);
+		//CONVERT TO BYTES
+		byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes();
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength());
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction);
+			
+			//CHECK INSTANCE
+			assertEquals(true, parsedGenesisIssueAssetTransaction instanceof GenesisIssueAssetTransaction);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), parsedGenesisIssueAssetTransaction.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(genesisIssueAssetTransaction.getIssuer().getAddress(), parsedGenesisIssueAssetTransaction.getIssuer().getAddress());
+						
+			//CHECK NAME
+			assertEquals(genesisIssueAssetTransaction.getAsset().getName(), parsedGenesisIssueAssetTransaction.getAsset().getName());
+				
+			//CHECK DESCRIPTION
+			assertEquals(genesisIssueAssetTransaction.getAsset().getDescription(), parsedGenesisIssueAssetTransaction.getAsset().getDescription());
+				
+			//CHECK QUANTITY
+			assertEquals(genesisIssueAssetTransaction.getAsset().getQuantity(), parsedGenesisIssueAssetTransaction.getAsset().getQuantity());
+			
+			//DIVISIBLE
+			assertEquals(genesisIssueAssetTransaction.getAsset().isDivisible(), parsedGenesisIssueAssetTransaction.getAsset().isDivisible());
+			
+			//CHECK FEE
+			assertEquals(genesisIssueAssetTransaction.getFee(), parsedGenesisIssueAssetTransaction.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), parsedGenesisIssueAssetTransaction.getReference()));	
+			
+			//CHECK TIMESTAMP
+			assertEquals(genesisIssueAssetTransaction.getTimestamp(), parsedGenesisIssueAssetTransaction.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction.");
+		}
+		
+		//PARSE TRANSACTION FROM WRONG BYTES
+		rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength()];
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction);
+			
+			//FAIL
+			fail("this should throw an exception");
+		}
+		catch (Exception e) 
+		{
+			//EXCEPTION IS THROWN OK
+		}	
+	}
+
 	
 	//ISSUE ASSET TRANSACTION
 	

@@ -3,6 +3,7 @@ package gui.transaction;
 import javax.swing.JFrame;
 
 import qora.transaction.AccountingTransaction;
+import qora.transaction.Json1Transaction;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -10,6 +11,7 @@ import qora.transaction.CancelSellNameTransaction;
 import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
@@ -39,10 +41,6 @@ public class TransactionDetailsFactory
 	{
 		switch(transaction.getType())
 		{
-		case Transaction.GENESIS_TRANSACTION:
-			
-			GenesisTransaction genesis = (GenesisTransaction) transaction;
-			return new GenesisDetailsFrame(genesis);
 		
 		case Transaction.PAYMENT_TRANSACTION:
 		
@@ -121,7 +119,20 @@ public class TransactionDetailsFactory
 		case Transaction.ACCOUNTING_TRANSACTION:
 			AccountingTransaction accountingTransaction = (AccountingTransaction)transaction;
 			return new AccountingTransactionDetailsFrame(accountingTransaction);
+			
+		case Transaction.JSON_TRANSACTION:
+			Json1Transaction json1Transaction = (Json1Transaction)transaction;
+			return new Json1TransactionDetailsFrame(json1Transaction);
 
+		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
+			
+			GenesisIssueAssetTransaction genesisIssueAssetTransaction = (GenesisIssueAssetTransaction) transaction;
+			return new GenesisIssueAssetDetailsFrame(genesisIssueAssetTransaction);	
+
+		case Transaction.GENESIS_TRANSACTION:
+			
+			GenesisTransaction genesis = (GenesisTransaction) transaction;
+			return new GenesisDetailsFrame(genesis);
 		}
 		
 		return null;

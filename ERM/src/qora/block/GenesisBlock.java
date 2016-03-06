@@ -10,9 +10,12 @@ import com.google.common.primitives.Longs;
 import database.DBSet;
 import qora.account.Account;
 import qora.account.PublicKeyAccount;
+import qora.assets.Asset;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.IssueAssetTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
@@ -23,7 +26,7 @@ public class GenesisBlock extends Block{
 	private static byte[] genesisReference =  new byte[]{1,1,1,1,1,1,1,1};
 	private static long genesisGeneratingBalance = 10000000L;
 	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-	
+
 	private String testnetInfo; 
 	
 	public GenesisBlock()
@@ -86,11 +89,48 @@ public class GenesisBlock extends Block{
 			this.addTransaction(new GenesisTransaction(new Account("QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk"),
 					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
 			
+			///////////
+			Asset asset;
+			byte[] signature;
+			/*
+			//CREATE JOB ASSET
+			asset = makeERM(new byte[64]);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
+			asset = makeERM(signature);
+			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
+			*/
+			//CREATE JOB ASSET
+			asset = makeOil(new byte[64]);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
+			asset = makeOil(signature);
+			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
+			
+			//CREATE VOTE ASSET
+			asset = makeGem(new byte[64]);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
+			asset = makeGem(signature);
+			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
+
+
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(generateHash());
 		}
 	}
-	
+
+	// make assets
+	public Asset makeERM(byte[] signature) 
+	{
+		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, true, signature);
+	}
+	public Asset makeOil(byte[] signature) 
+	{
+		return new Asset(genesisGenerator, "oil", "Fee oil", 99999999L, true, signature);
+	}
+	public Asset makeGem(byte[] signature) 
+	{
+		return new Asset(genesisGenerator, "GEM", "Vote gem", 999999999999999999L, false, signature);
+	}
+
 	public String getTestNetInfo() 
 	{
 		return this.testnetInfo;
