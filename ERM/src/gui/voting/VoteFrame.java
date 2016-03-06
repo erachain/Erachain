@@ -270,19 +270,8 @@ public class VoteFrame extends JFrame
 		try
 		{
 			//READ FEE
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.voteButton.setEnabled(true);
-				
-				return;
-			}
-		
+			int feePow = Integer.parseInt(txtFee.getText());
+					
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			PollOption option = (PollOption) this.cbxOptions.getSelectedItem();

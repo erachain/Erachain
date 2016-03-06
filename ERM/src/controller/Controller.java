@@ -1671,7 +1671,7 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> createPoll(PrivateKeyAccount creator,
 			String name, String description, List<String> options,
-			BigDecimal fee) {
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			// CREATE POLL OPTIONS
@@ -1684,19 +1684,19 @@ public class Controller extends Observable {
 			Poll poll = new Poll(creator, name, description, pollOptions);
 
 			return this.transactionCreator.createPollCreation(creator, poll,
-					fee);
+					feePow);
 		}
 	}
 
 	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator,
-			Poll poll, PollOption option, BigDecimal fee) {
+			Poll poll, PollOption option, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			// GET OPTION INDEX
 			int optionIndex = poll.getOptions().indexOf(option);
 
 			return this.transactionCreator.createPollVote(creator,
-					poll.getName(), optionIndex, fee);
+					poll.getName(), optionIndex, feePow);
 		}
 	}
 

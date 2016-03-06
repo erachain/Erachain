@@ -9,6 +9,6 @@ public class TransactionFeeComparator implements Comparator<Transaction> {
 	@Override
 	public int compare(Transaction one, Transaction two) 
 	{
-		return two.feePerByte().compareTo(one.feePerByte());
+		return two.getMinFee().compareTo(one.getMinFee());
 	}
 }

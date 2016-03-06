@@ -216,7 +216,7 @@ public class ATResource
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
 
 			}
-			if ( fee.compareTo( Transaction.MINIMUM_FEE ) == -1 )
+			if ( hasMinimumFee() == -1 )
 			{
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
 			}
