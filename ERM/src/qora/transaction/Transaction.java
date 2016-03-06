@@ -1,7 +1,7 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
+//import java.math.MathContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -108,7 +108,7 @@ public abstract class Transaction {
 	public static final int JSON_TRANSACTION = 27;
 	
 	//MINIMUM FEE
-	public static final BigDecimal MINIMUM_FEE = BigDecimal.ONE;
+	public static final BigDecimal FEE_PER_BYTE = new BigDecimal(0.00000001);
 	
 	//RELEASES
 	private static final long VOTING_RELEASE = 0l;
@@ -225,31 +225,33 @@ public abstract class Transaction {
 	{
 		return this.reference;
 	}
-	
-	public BigDecimal feePerByte()
-	{
-		return this.fee.divide(new BigDecimal(this.getDataLength()), MathContext.DECIMAL32);
-	}
-	
+		
 	public boolean hasMinimumFee()
 	{
-		return this.fee.compareTo(MINIMUM_FEE) >= 0;
+		return this.fee.compareTo(getMinFee()) >= 0;
 	}
-	
-	public boolean hasMinimumFeePerByte()
-	{
-		BigDecimal minFeePerByte = BigDecimal.ONE.divide(BigDecimal.valueOf(Settings.getInstance().getMaxBytePerFee()), MathContext.DECIMAL32);
 		
-		return this.feePerByte().compareTo(minFeePerByte) >= 0;
+	public BigDecimal getMinFee()
+	{		
+		BigDecimal fee =  new BigDecimal(this.getDataLength() + 100).multiply(FEE_PER_BYTE).setScale(8);
+		if (this.getDataLength() <= 1000) {
+			return fee;
+		} else {
+			// add overheat
+			return fee.add(new BigDecimal(this.getDataLength() - 1000).multiply(FEE_PER_BYTE)).setScale(8);
+		}
 	}
-	
+	// calc FEE by recommended and feePOW
+	public BigDecimal calcFee(int feePow)
+	{	
+		return calcRecommendedFee().multiply(new BigDecimal(2^feePow)).setScale(8);
+	}
+	// calc recommended FEE
 	public BigDecimal calcRecommendedFee()
-	{
-		long recommendedFee = (this.getDataLength() + 100);
-		
-		return new BigDecimal(recommendedFee).multiply(new BigDecimal(0.00000001)).setScale(8);
+	{	
+		return getMinFee().multiply(new BigDecimal(2)).setScale(8);
 	}
-	
+
 	public Block getParent() {
 		
 		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);

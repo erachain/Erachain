@@ -236,88 +236,13 @@ public class CreatePollFrame extends JFrame
 		
 		try
 		{
-			//READ FEE
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.createButton.setEnabled(true);
-				
-				return;
-			}
-		
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				}
-				if (n == JOptionPane.NO_OPTION) {
-					
-					txtFee.setText("1");
-					
-					//ENABLE
-					this.createButton.setEnabled(true);
-					
-					return;
-				}
-			}
-			
-
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForPoll(this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions()).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1.00000000"); // Return to the default fee for the next message.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this message.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.createButton.setEnabled(true);
-					
-					return;
-				}
-			}
+			//READ FEE POWER
+			int feePow = Integer.parseInt(txtFee.getText());
+								
 			
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())
