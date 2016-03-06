@@ -19,7 +19,7 @@ import qora.block.Block;
 import qora.naming.Name;
 import qora.naming.NameSale;
 import qora.payment.Payment;
-import qora.transaction.AccountingTransactionV3;
+import qora.transaction.AccountingTransaction;
 import qora.transaction.Json1TransactionV3;
 import qora.transaction.ArbitraryTransactionV1;
 import qora.transaction.ArbitraryTransactionV3;
@@ -702,7 +702,7 @@ public class TransactionCreator
 
 	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] isText,
+			Account recipient, byte[] key, BigDecimal amount, BigDecimal fee, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
 		this.checkUpdate();
@@ -713,8 +713,8 @@ public class TransactionCreator
 		
 		
 			//CREATE MESSAGE TRANSACTION V3
-			byte[] signature = AccountingTransactionV3.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
-			messageTx = new AccountingTransactionV3(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
+			byte[] signature = AccountingTransaction.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
+			messageTx = new AccountingTransaction(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
 		
 			
 		return afterCreate(messageTx);

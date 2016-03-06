@@ -269,16 +269,18 @@ public class AccountingTransactionDetailsFrame extends JFrame
 		MenuPopupUtil.installContextMenu(amount);
 		this.add(amount, detailGBC);	
 		
-		//ASSET
+		//HKEY
+		componentLevel ++;
+		labelGBC.gridy = componentLevel;
+		JLabel hkeyLabel = new JLabel(Lang.getInstance().translate("Hash Key:"));
+		this.add(hkeyLabel, labelGBC);
+		
+		//RECIPIENT
 		detailGBC.gridy = componentLevel;
-		detailGBC.gridx = 3;
-		detailGBC.gridwidth = 1;
-		JTextField asset = new JTextField(Controller.getInstance().getAsset( accountingTransaction.getKey()).toString());
-		asset.setEditable(false);
-		MenuPopupUtil.installContextMenu(asset);
-		this.add(asset, detailGBC);	
-		detailGBC.gridx = 1;
-		detailGBC.gridwidth = 3;
+		JTextField hkey = new JTextField(accountingTransaction.getHKey().toString());
+		recipient.setEditable(false);
+		MenuPopupUtil.installContextMenu(hkey);
+		this.add(hkey, detailGBC);		
 		
 		//LABEL FEE
 		componentLevel ++;

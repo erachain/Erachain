@@ -134,7 +134,7 @@ public class TransactionFactory {
 
 			
 				// PARSE ACCOUNTING TRANSACTION V3
-				return AccountingTransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));
+				return AccountingTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 				
 		case Transaction.JSON_TRANSACTION:
 

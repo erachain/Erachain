@@ -163,8 +163,19 @@ public abstract class Transaction {
 	
 	//PROPERTIES LENGTH
 	protected static final int TYPE_LENGTH = 4;
-	public static final int TIMESTAMP_LENGTH = 8;
+	protected static final int PROP_LENGTH = 2; // properties
+	protected static final int TIMESTAMP_LENGTH = 8;
 	protected static final int REFERENCE_LENGTH = 64;
+	protected static final int DATA_SIZE_LENGTH = 4;
+	protected static final int ENCRYPTED_LENGTH = 1;
+	protected static final int IS_TEXT_LENGTH = 1;
+	protected static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
+	protected static final int KEY_LENGTH = 8;
+	protected static final int HKEY_LENGTH = 20;
+	protected static final int AMOUNT_LENGTH = 8;
+	protected static final int CREATOR_LENGTH = 32;
+	protected static final int FEE_LENGTH = 8;
+	protected static final int SIGNATURE_LENGTH = 64;
 		
 	protected byte[] reference;
 	protected BigDecimal fee;
@@ -174,8 +185,9 @@ public abstract class Transaction {
 	
 	protected Transaction(int type, BigDecimal fee, long timestamp, byte[] reference, byte[] signature)
 	{
-		this.fee = fee;
 		this.type = type;
+		//this.props = props;
+		this.fee = fee;
 		this.signature = signature;
 		this.timestamp = timestamp;
 		this.reference = reference;
@@ -233,20 +245,9 @@ public abstract class Transaction {
 	
 	public BigDecimal calcRecommendedFee()
 	{
-		BigDecimal recommendedFee = BigDecimal.valueOf(this.getDataLength()).divide(BigDecimal.valueOf(Settings.getInstance().getMaxBytePerFee()), MathContext.DECIMAL32).setScale(8);
-
-		//security margin
-		recommendedFee = recommendedFee.add(new BigDecimal("0.0000001"));
-		if(recommendedFee.compareTo(MINIMUM_FEE) <= 0)
-		{
-			recommendedFee = MINIMUM_FEE;
-		}
-		else
-		{
-			recommendedFee = recommendedFee.setScale(0, BigDecimal.ROUND_UP); 
-		}
+		long recommendedFee = (this.getDataLength() + 100);
 		
-		return recommendedFee.setScale(8);
+		return new BigDecimal(recommendedFee).multiply(new BigDecimal(0.00000001)).setScale(8);
 	}
 	
 	public Block getParent() {

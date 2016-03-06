@@ -1791,7 +1791,7 @@ public class Controller extends Observable {
 
 	
 	public Pair<Transaction, Integer> sendAccounting(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, BigDecimal fee,
+			Account recipient, byte[] key, BigDecimal amount, BigDecimal fee,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createAccounting(sender, recipient,

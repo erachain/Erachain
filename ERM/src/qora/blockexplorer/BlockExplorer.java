@@ -1568,7 +1568,7 @@ public class BlockExplorer
 			}
 			if(transaction.getType() == Transaction.ACCOUNTING_TRANSACTION) 
 			{
-				transactionDataJSON.put("assetName", assetNamesByKey.getNameByKey(((AccountingTransaction)unit).getKey()));
+				transactionDataJSON.put("hkeyName", ((AccountingTransaction)unit).getHKey()).toString();
 			}
 			
 			if(transaction.getType() == Transaction.JSON_TRANSACTION) 
