@@ -210,7 +210,7 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);		
 				
-			case Transaction.INVALID_NAME_OWNER:
+			case Transaction.INVALID_NAME_CREATOR:
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);		
 			
@@ -320,7 +320,7 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);		
 				
-			case Transaction.INVALID_NAME_OWNER:
+			case Transaction.INVALID_NAME_CREATOR:
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);		
 			

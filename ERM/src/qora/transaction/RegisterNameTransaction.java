@@ -10,7 +10,7 @@ import java.util.List;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
 import qora.naming.Name;
@@ -23,30 +23,33 @@ import database.DBSet;
 
 public class RegisterNameTransaction extends Transaction 
 {
-	private static final int REGISTRANT_LENGTH = 32;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + REGISTRANT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount registrant;
+	private PublicKeyAccount creator;
 	private Name name;
 	
-	public RegisterNameTransaction(PublicKeyAccount registrant, Name name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, long timestamp, byte[] reference) 
 	{
-		super(REGISTER_NAME_TRANSACTION, fee, timestamp, reference, signature);
+		super(REGISTER_NAME_TRANSACTION, creator, timestamp, reference);
 		
-		this.registrant = registrant;
+		this.creator = creator;
 		this.name = name;
+	}
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, name, timestamp, reference);
+		
+		this.fee = fee;
+		this.signature = signature;
+	}
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, name, timestamp, reference);
+		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
-	
-	public PublicKeyAccount getRegistrant()
-	{
-		return this.registrant;
-	}
-	
+		
 	public Name getName()
 	{
 		return this.name;
@@ -73,10 +76,10 @@ public class RegisterNameTransaction extends Transaction
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 		
-		//READ REGISTRANT
-		byte[] registrantBytes = Arrays.copyOfRange(data, position, position + REGISTRANT_LENGTH);
-		PublicKeyAccount registrant = new PublicKeyAccount(registrantBytes);
-		position += REGISTRANT_LENGTH;
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
 		
 		//READ NAME
 		Name name = Name.Parse(Arrays.copyOfRange(data, position, data.length));
@@ -90,7 +93,7 @@ public class RegisterNameTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new RegisterNameTransaction(registrant, name, fee, timestamp, reference, signatureBytes);
+		return new RegisterNameTransaction(creator, name, fee, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -100,9 +103,9 @@ public class RegisterNameTransaction extends Transaction
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 				
-		//ADD REGISTRANT/NAME/VALUE
-		transaction.put("registrant", this.registrant.getAddress());
-		transaction.put("owner", this.name.getOwner().getAddress());
+		//ADD CREATOR/NAME/VALUE
+		transaction.put("creator", this.creator.getAddress());
+		//transaction.put("owner", this.name.getOwner().getAddress());
 		transaction.put("name", this.name.getName());
 		transaction.put("value", this.name.getValue());
 				
@@ -110,7 +113,7 @@ public class RegisterNameTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -127,8 +130,8 @@ public class RegisterNameTransaction extends Transaction
 		//WRITE REFERENCE
 		data = Bytes.concat(data, this.reference);
 		
-		//WRITE REGISTRANT
-		data = Bytes.concat(data, this.registrant.getPublicKey());
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE NAME
 		data = Bytes.concat(data , this.name.toBytes());
@@ -140,7 +143,7 @@ public class RegisterNameTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -152,38 +155,6 @@ public class RegisterNameTransaction extends Transaction
 	}
 	
 	//VALIDATE
-	
-	public boolean isSignatureValid()
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(REGISTER_NAME_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE REGISTRANT
-		data = Bytes.concat(data, this.registrant.getPublicKey());
-		
-		//WRITE NAME
-		data = Bytes.concat(data , this.name.toBytes());
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.registrant.getPublicKey(), this.signature, data);
-	}
 	
 	@Override
 	public int isValid(DBSet db) 
@@ -220,14 +191,14 @@ public class RegisterNameTransaction extends Transaction
 			return NAME_ALREADY_REGISTRED;
 		}
 		
-		//CHECK IF REGISTRANT HAS ENOUGH MONEY
-		if(this.registrant.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF CREATOR HAS ENOUGH MONEY
+		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
 		{
 			return NO_BALANCE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.registrant.getLastReference(db), this.reference))
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -247,10 +218,10 @@ public class RegisterNameTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		//UPDATE OWNER
-		this.registrant.setConfirmedBalance(this.registrant.getConfirmedBalance(db).subtract(this.fee), db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
 								
 		//UPDATE REFERENCE OF OWNER
-		this.registrant.setLastReference(this.signature, db);
+		this.creator.setLastReference(this.signature, db);
 		
 		//INSERT INTO DATABASE
 		db.getNameMap().add(this.name);
@@ -261,19 +232,13 @@ public class RegisterNameTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE OWNER
-		this.registrant.setConfirmedBalance(this.registrant.getConfirmedBalance(db).add(this.fee), db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
 										
 		//UPDATE REFERENCE OF OWNER
-		this.registrant.setLastReference(this.reference, db);
+		this.creator.setLastReference(this.reference, db);
 				
 		//INSERT INTO DATABASE
 		db.getNameMap().delete(this.name);		
-	}
-
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.registrant;
 	}
 
 
@@ -281,7 +246,7 @@ public class RegisterNameTransaction extends Transaction
 	public List<Account> getInvolvedAccounts() 
 	{
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.registrant);
+		accounts.add(this.creator);
 		accounts.add(this.name.getOwner());
 		return accounts;
 	}
@@ -292,7 +257,7 @@ public class RegisterNameTransaction extends Transaction
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.registrant.getAddress()) || address.equals(this.name.getOwner().getAddress()))
+		if(address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress()))
 		{
 			return true;
 		}
@@ -304,43 +269,11 @@ public class RegisterNameTransaction extends Transaction
 	@Override
 	public BigDecimal getAmount(Account account) 
 	{
-		if(account.getAddress().equals(this.registrant.getAddress()))
+		if(account.getAddress().equals(this.creator.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
 		}
 		
 		return BigDecimal.ZERO;
-	}
-
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Name name, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(REGISTER_NAME_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-		
-		//WRITE REGISTRANT
-		data = Bytes.concat(data, creator.getPublicKey());
-		
-		//WRITE NAME
-		data = Bytes.concat(data , name.toBytes());
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(creator, data);
 	}
 }

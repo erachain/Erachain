@@ -15,7 +15,7 @@ import com.google.common.primitives.Longs;
 //import database.BalanceMapHKey;
 import database.DBSet;
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
@@ -26,7 +26,6 @@ public class AccountingTransaction extends Transaction {
 	
 	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
-	protected PublicKeyAccount creator;
 	protected byte[] data;
 
 	protected Account recipient;
@@ -35,11 +34,10 @@ public class AccountingTransaction extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 
-		super(ACCOUNTING_TRANSACTION, fee, timestamp, reference, signature);
+		super(ACCOUNTING_TRANSACTION, creator, timestamp, reference);
 
-		this.creator = creator;
 		this.recipient = recipient;
 		this.hkey = hkey;
 		this.amount = amount;
@@ -49,11 +47,26 @@ public class AccountingTransaction extends Transaction {
 		this.isText = isText;
 
 	}
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+
+		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+		this.fee = fee;
+		this.signature = signature;
+
+	}
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+
+		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+		this.calcFee();
+
+	}
 	
+	/*
 	public Account getSender()
 	{
 		return this.creator;
 	}
+	*/
 
 	public byte[] getData() 
 	{
@@ -118,10 +131,6 @@ public class AccountingTransaction extends Transaction {
 		return transaction;	
 	}
 	
-	@Override
-	public PublicKeyAccount getCreator() {
-		return this.creator;
-	}
 
 	@Override
 	public List<Account> getInvolvedAccounts() {
@@ -140,8 +149,8 @@ public class AccountingTransaction extends Transaction {
 		return false;
 	}
 	
-	@Override
-	public byte[] toBytes() {
+	//@Override
+	public byte[] toBytes(boolean withSign) {
 
 		byte[] data = new byte[0];
 
@@ -193,7 +202,7 @@ public class AccountingTransaction extends Transaction {
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 
 		return data;	
 	}
@@ -203,68 +212,17 @@ public class AccountingTransaction extends Transaction {
 		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
 	}
 
+	/*
 	@Override
 	public boolean isSignatureValid() {
-		byte[] data = new byte[0];
 		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ACCOUNTING_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		
-		try
-		{
-			//WRITE RECIPIENT
-			data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-		}
-		catch(Exception e)
-		{
-			//ERROR DECODING ADDRESS
-			System.out.println("Error decoding recipient " + this.recipient.getAddress());
-		}
-		
-		//WRITE KEY
-		data = Bytes.concat(data, this.hkey);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE DATA SIZE
-		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-		data = Bytes.concat(data, dataSizeBytes);
-		
-		//WRITE DATA
-		data = Bytes.concat(data, this.data);
-		
-		//WRITE ENCRYPTED
-		data = Bytes.concat(data, this.encrypted);
-		
-		//WRITE ISTEXT
-		data = Bytes.concat(data, this.isText );
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return false;
+			
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	
 	}
+	*/
 
 	@Override
 	public int isValid(DBSet db) {
@@ -295,12 +253,6 @@ public class AccountingTransaction extends Transaction {
 		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
-		}
-				
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
 		}
 
 		return VALIDATE_OK;
@@ -403,75 +355,6 @@ public class AccountingTransaction extends Transaction {
 
 		return new AccountingTransaction(creator, recipient, hkey, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
-	}
-
-	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, byte[] key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
-	{
-	
-		return AccountingTransaction.generateSignature(creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-			
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ACCOUNTING_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-		
-		try
-		{
-			//WRITE RECIPIENT
-			data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
-		}
-		catch(Exception e)
-		{
-			//ERROR DECODING ADDRESS
-			System.out.println("Error decoding address");
-		}
-		
-		//WRITE HKEY
-		data = Bytes.concat(data, hkey);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE DATA SIZE
-		byte[] dataSizeBytes = Ints.toByteArray(arbitraryData.length);
-		data = Bytes.concat(data, dataSizeBytes);
-		
-		//WRITE DATA
-		data = Bytes.concat(data, arbitraryData);
-		
-		//WRITE ENCRYPTED
-		data = Bytes.concat(data, encrypted);
-		
-		//WRITE ISTEXT
-		data = Bytes.concat(data, isText);
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(creator, data);
 	}
 
 }

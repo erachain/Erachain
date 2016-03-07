@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ntp.NTP;
+//import ntp.NTP;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
 import qora.payment.Payment;
@@ -26,30 +26,29 @@ import database.DBSet;
 
 public class MultiPaymentTransaction extends Transaction {
 
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int SENDER_LENGTH = 32;
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + SENDER_LENGTH + PAYMENTS_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + PAYMENTS_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount sender;
 	private List<Payment> payments;
 	
-	public MultiPaymentTransaction(PublicKeyAccount sender, List<Payment> payments, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, long timestamp, byte[] reference) 
 	{
-		super(MULTI_PAYMENT_TRANSACTION, fee, timestamp, reference, signature);
-		
-		this.sender = sender;
+		super(MULTI_PAYMENT_TRANSACTION, creator, timestamp, reference);		
 		this.payments = payments;
+	}
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, payments, timestamp, reference);
+		this.signature = signature;
+		this.fee = fee;
+	}
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, payments, timestamp, reference);		
+		this.calcFee();
 	}
 	
 	//GETTERS/SETTERS
-	
-	public Account getSender()
-	{
-		return this.sender;
-	}
 	
 	public List<Payment> getPayments()
 	{
@@ -77,10 +76,10 @@ public class MultiPaymentTransaction extends Transaction {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 		
-		//READ SENDER
-		byte[] senderBytes = Arrays.copyOfRange(data, position, position + SENDER_LENGTH);
-		PublicKeyAccount sender = new PublicKeyAccount(senderBytes);
-		position += SENDER_LENGTH;
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
 		
 		//READ PAYMENTS SIZE
 		byte[] paymentsLengthBytes = Arrays.copyOfRange(data, position, position + PAYMENTS_SIZE_LENGTH);
@@ -110,7 +109,7 @@ public class MultiPaymentTransaction extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new MultiPaymentTransaction(sender, payments, fee, timestamp, reference, signatureBytes);	
+		return new MultiPaymentTransaction(creator, payments, fee, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -120,8 +119,8 @@ public class MultiPaymentTransaction extends Transaction {
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 				
-		//ADD SENDER/PAYMENTS
-		transaction.put("sender", this.sender.getAddress());
+		//ADD CREATOR/PAYMENTS
+		transaction.put("creator", this.creator.getAddress());
 		
 		JSONArray payments = new JSONArray();
 		for(Payment payment: this.payments)
@@ -134,7 +133,7 @@ public class MultiPaymentTransaction extends Transaction {
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -151,8 +150,8 @@ public class MultiPaymentTransaction extends Transaction {
 		//WRITE REFERENCE
 		data = Bytes.concat(data, this.reference);
 		
-		//WRITE SENDER
-		data = Bytes.concat(data , this.sender.getPublicKey());
+		//WRITE CREATOR
+		data = Bytes.concat(data , this.creator.getPublicKey());
 	
 		//WRITE PAYMENTS SIZE
 		int paymentsLength = this.payments.size();
@@ -172,7 +171,7 @@ public class MultiPaymentTransaction extends Transaction {
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -191,54 +190,9 @@ public class MultiPaymentTransaction extends Transaction {
 	
 	//VALIDATE
 	
-	public boolean isSignatureValid()
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(MULTI_PAYMENT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE SENDER
-		data = Bytes.concat(data , this.sender.getPublicKey());
-	
-		//WRITE PAYMENTS SIZE
-		int paymentsLength = this.payments.size();
-		byte[] paymentsLengthBytes = Ints.toByteArray(paymentsLength);
-		data = Bytes.concat(data, paymentsLengthBytes);
-		
-		//WRITE PAYMENTS
-		for(Payment payment: this.payments)
-		{
-			data = Bytes.concat(payment.toBytes());
-		}
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.sender.getPublicKey(), this.signature, data);
-	}
-	
 	@Override
 	public int isValid(DBSet db) 
 	{
-		//CHECK IF RELEASED
-		if(NTP.getTime() < Transaction.getASSETS_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
 		
 		//CHECK PAYMENTS SIZE
 		if(this.payments.size() < 1 || this.payments.size() > 400)
@@ -248,12 +202,12 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.sender.setConfirmedBalance(this.sender.getConfirmedBalance(fork).subtract(this.fee), fork);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
 		
 		//ONLY AFTER POWFIX_RELEASE TO SAVE THE OLD NETWORK
 		if(this.timestamp >= Transaction.getPOWFIX_RELEASE()) {
-			//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-			if(this.sender.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
+			//CHECK IF CREATOR HAS ENOUGH QORA BALANCE
+			if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
 			{
 				return NO_BALANCE;
 			}	
@@ -274,8 +228,8 @@ public class MultiPaymentTransaction extends Transaction {
 				return NEGATIVE_AMOUNT;
 			}
 			
-			//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-			if(this.sender.getConfirmedBalance(payment.getAsset(), fork).compareTo(payment.getAmount()) == -1)
+			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+			if(this.creator.getConfirmedBalance(payment.getAsset(), fork).compareTo(payment.getAmount()) == -1)
 			{
 				return NO_BALANCE;
 			}
@@ -292,11 +246,11 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 			
 			//PROCESS PAYMENT IN FORK
-			payment.process(this.sender, fork);
+			payment.process(this.creator, fork);
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.sender.getLastReference(db), this.reference))
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -315,16 +269,16 @@ public class MultiPaymentTransaction extends Transaction {
 	@Override
 	public void process(DBSet db) 
 	{
-		//UPDATE SENDER
-		this.sender.setConfirmedBalance(this.sender.getConfirmedBalance(db).subtract(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
 						
-		//UPDATE REFERENCE OF SENDER
-		this.sender.setLastReference(this.signature, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.signature, db);
 		
 		//PROCESS PAYMENTS
 		for(Payment payment: this.payments)
 		{
-			payment.process(this.sender, db);
+			payment.process(this.creator, db);
 			
 			//UPDATE REFERENCE OF RECIPIENT
 			if(Arrays.equals(payment.getRecipient().getLastReference(db), new byte[0]))
@@ -337,16 +291,16 @@ public class MultiPaymentTransaction extends Transaction {
 	@Override
 	public void orphan(DBSet db) 
 	{
-		//UPDATE SENDER
-		this.sender.setConfirmedBalance(this.sender.getConfirmedBalance(db).add(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
 						
-		//UPDATE REFERENCE OF SENDER
-		this.sender.setLastReference(this.reference, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.reference, db);
 		
 		//ORPHAN PAYMENTS
 		for(Payment payment: this.payments)
 		{
-			payment.orphan(this.sender, db);
+			payment.orphan(this.creator, db);
 								
 			//UPDATE REFERENCE OF RECIPIENT
 			if(Arrays.equals(payment.getRecipient().getLastReference(db), this.signature))
@@ -359,16 +313,10 @@ public class MultiPaymentTransaction extends Transaction {
 	//REST
 	
 	@Override
-	public PublicKeyAccount getCreator()
-	{
-		return this.sender;
-	}
-	
-	@Override
 	public List<Account> getInvolvedAccounts()
 	{
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.sender);
+		accounts.add(this.creator);
 		
 		for(Payment payment: this.payments)
 		{
@@ -400,8 +348,8 @@ public class MultiPaymentTransaction extends Transaction {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 		
-		//IF SENDER
-		if(address.equals(this.sender.getAddress()))
+		//IF CREATOR
+		if(address.equals(this.creator.getAddress()))
 		{
 			amount = amount.subtract(this.fee);
 		}
@@ -412,8 +360,8 @@ public class MultiPaymentTransaction extends Transaction {
 			//IF QORA ASSET
 			if(payment.getAsset() == BalanceMap.QORA_KEY)
 			{
-				//IF SENDER
-				if(address.equals(this.sender.getAddress()))
+				//IF CREATOR
+				if(address.equals(this.creator.getAddress()))
 				{
 					amount = amount.subtract(payment.getAmount());
 				}
@@ -427,46 +375,5 @@ public class MultiPaymentTransaction extends Transaction {
 		}
 		
 		return amount;
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount sender, List<Payment> payments, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(MULTI_PAYMENT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, sender.getLastReference(db));
-		
-		//WRITE SENDER
-		data = Bytes.concat(data , sender.getPublicKey());
-		
-		//WRITE PAYMENTS SIZE
-		int paymentsLength = payments.size();
-		byte[] paymentsLengthBytes = Ints.toByteArray(paymentsLength);
-		data = Bytes.concat(data, paymentsLengthBytes);
-		
-		//WRITE PAYMENTS
-		for(Payment payment: payments)
-		{
-			data = Bytes.concat(payment.toBytes());
-		}
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		//SIGN
-		return Crypto.getInstance().sign(sender, data);
 	}
 }

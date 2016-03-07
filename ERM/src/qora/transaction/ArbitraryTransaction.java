@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Charsets;
-import com.google.common.primitives.Longs;
+//import com.google.common.primitives.Longs;
 
 import api.BlogPostResource;
 import database.BalanceMap;
@@ -27,28 +27,19 @@ import utils.StorageUtils;
 
 public abstract class ArbitraryTransaction extends Transaction {
 
-	private int version; 
 	protected PublicKeyAccount creator;
 	protected int service;
 	protected byte[] data;
 
 	protected List<Payment> payments;
 	
-	public ArbitraryTransaction(BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
-		super(ARBITRARY_TRANSACTION, fee, timestamp, reference, signature);
+	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
+		super(ARBITRARY_TRANSACTION, creator, timestamp, reference);		
+	}
+	public ArbitraryTransaction(PublicKeyAccount creator, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
+		super(ARBITRARY_TRANSACTION, creator, fee, timestamp, reference, signature);		
+	}
 		
-		if(timestamp < Transaction.getPOWFIX_RELEASE()) {
-			version = 1;
-		} else {
-			version = 3;
-		}
-	}
-	
-	public int getVersion()
-	{
-		return this.version;
-	}
-	
 	// GETTERS/SETTERS
 
 	public int getService() {
@@ -92,31 +83,13 @@ public abstract class ArbitraryTransaction extends Transaction {
 		return transaction;
 	}
 	
-	@Override
-	public abstract byte[] toBytes();
-
-	@Override
-	public abstract int getDataLength();
-
-	// VALIDATE
-
-	@Override
-	public abstract boolean isSignatureValid();
-
-	@Override
-	public abstract int isValid(DBSet db);
-	
 	public static Transaction Parse(byte[] data) throws Exception
 	{
 		// READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
+		//byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
+		//long timestamp = Longs.fromByteArray(timestampBytes);
 	
-		if(timestamp < Transaction.getPOWFIX_RELEASE()) {
-			return ArbitraryTransactionV1.Parse(data);			
-		} else {
-			return ArbitraryTransactionV3.Parse(data);
-		}
+		return ArbitraryTransactionV3.Parse(data);
 	}
 	
 	@Override

@@ -8,7 +8,7 @@ import java.util.List;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
@@ -21,44 +21,31 @@ import database.DBSet;
 
 public class PaymentTransaction extends Transaction {
 
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int SENDER_LENGTH = 32;
-	private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	private static final int AMOUNT_LENGTH = 8;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + SENDER_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount sender;
-	private Account recipient;
 	private BigDecimal amount;
-	
-	/*public PaymentTransaction(PublicKeyAccount sender, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp, byte[] signature) 
-	{
-		this(sender, recipient, amount, fee, timestamp, sender.getLastReference(), signature);
-	}*/
-	
-	public PaymentTransaction(PublicKeyAccount sender, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
-	{
-		super(PAYMENT_TRANSACTION, fee, timestamp, reference, signature);
+	private Account recipient;
 		
-		this.sender = sender;
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, long timestamp, byte[] reference) 
+	{
+		super(PAYMENT_TRANSACTION, creator, timestamp, reference);
+		
 		this.recipient = recipient;
 		this.amount = amount;
 	}
-	
-	//GETTERS/SETTERS
-	
-	public Account getSender()
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
 	{
-		return this.sender;
+		this(creator, recipient, amount, timestamp, reference);		
+		this.fee = fee;
+		this.signature = signature;
+	}
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, recipient, amount, timestamp, reference);
+		this.calcFee();
 	}
 	
-	public Account getRecipient()
-	{
-		return this.recipient;
-	}
-	
+	//GETTERS/SETTERS	
 	public BigDecimal getAmount() 
 	{
 		return this.amount;
@@ -85,10 +72,10 @@ public class PaymentTransaction extends Transaction {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 		
-		//READ SENDER
-		byte[] senderBytes = Arrays.copyOfRange(data, position, position + SENDER_LENGTH);
-		PublicKeyAccount sender = new PublicKeyAccount(senderBytes);
-		position += SENDER_LENGTH;
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
 		
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
@@ -108,7 +95,7 @@ public class PaymentTransaction extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new PaymentTransaction(sender, recipient, amount, fee, timestamp, reference, signatureBytes);	
+		return new PaymentTransaction(creator, recipient, amount, fee, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -118,8 +105,8 @@ public class PaymentTransaction extends Transaction {
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 				
-		//ADD SENDER/RECIPIENT/AMOUNT
-		transaction.put("sender", this.sender.getAddress());
+		//ADD CREATOR/RECIPIENT/AMOUNT
+		transaction.put("creator", this.creator.getAddress());
 		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("amount", this.amount.toPlainString());
 				
@@ -127,7 +114,7 @@ public class PaymentTransaction extends Transaction {
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -144,8 +131,8 @@ public class PaymentTransaction extends Transaction {
 		//WRITE REFERENCE
 		data = Bytes.concat(data, this.reference);
 		
-		//WRITE SENDER
-		data = Bytes.concat(data , this.sender.getPublicKey());
+		//WRITE CREATOR
+		data = Bytes.concat(data , this.creator.getPublicKey());
 		
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
@@ -163,7 +150,7 @@ public class PaymentTransaction extends Transaction {
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -174,54 +161,7 @@ public class PaymentTransaction extends Transaction {
 		return TYPE_LENGTH + BASE_LENGTH;
 	}
 	
-	//VALIDATE
-	
-	public boolean isSignatureValid()
-	{
-		//CHECK SIGNATURE
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(PAYMENT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE SENDER
-		data = Bytes.concat(data , this.sender.getPublicKey());
-		
-		try
-		{
-			//WRITE RECIPIENT
-			data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-		}
-		catch(Exception e)
-		{
-			//ERROR DECODING ADDRESS
-		}
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.sender.getPublicKey(), this.signature, data);
-	}
-	
+	//VALIDATE	
 	@Override
 	public int isValid(DBSet db) 
 	{
@@ -231,14 +171,14 @@ public class PaymentTransaction extends Transaction {
 			return INVALID_ADDRESS;
 		}
 		
-		//CHECK IF SENDER HAS ENOUGH MONEY
-		if(this.sender.getBalance(1, db).compareTo(this.amount.add(this.fee)) == -1)
+		//CHECK IF CREATOR HAS ENOUGH MONEY
+		if(this.creator.getBalance(1, db).compareTo(this.amount.add(this.fee)) == -1)
 		{
 			return NO_BALANCE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.sender.getLastReference(db), this.reference))
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -263,14 +203,14 @@ public class PaymentTransaction extends Transaction {
 	@Override
 	public void process(DBSet db) 
 	{
-		//UPDATE SENDER
-		this.sender.setConfirmedBalance(this.sender.getConfirmedBalance(db).subtract(this.amount).subtract(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount).subtract(this.fee), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.recipient.getConfirmedBalance(db).add(this.amount), db);
 		
-		//UPDATE REFERENCE OF SENDER
-		this.sender.setLastReference(this.signature, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.signature, db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
@@ -282,14 +222,14 @@ public class PaymentTransaction extends Transaction {
 	@Override
 	public void orphan(DBSet db) 
 	{
-		//UPDATE SENDER
-		this.sender.setConfirmedBalance(this.sender.getConfirmedBalance(db).add(this.amount).add(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount).add(this.fee), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.recipient.getConfirmedBalance(db).subtract(this.amount), db);
 		
-		//UPDATE REFERENCE OF SENDER
-		this.sender.setLastReference(this.reference, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.reference, db);
 		
 		///UPDATE REFERENCE OF RECIPIENT
 		if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
@@ -299,17 +239,11 @@ public class PaymentTransaction extends Transaction {
 	}
 
 	//REST
-	
-	@Override
-	public PublicKeyAccount getCreator()
-	{
-		return this.sender;
-	}
-	
+		
 	@Override
 	public List<Account> getInvolvedAccounts()
 	{
-		return Arrays.asList(this.sender, this.recipient);
+		return Arrays.asList(this.creator, this.recipient);
 	}
 	
 	@Override
@@ -317,7 +251,7 @@ public class PaymentTransaction extends Transaction {
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(sender.getAddress()) || address.equals(recipient.getAddress()))
+		if(address.equals(creator.getAddress()) || address.equals(recipient.getAddress()))
 		{
 			return true;
 		}
@@ -330,14 +264,14 @@ public class PaymentTransaction extends Transaction {
 	{
 		String address = account.getAddress();
 		
-		//CHECK OF BOTH SENDER AND RECIPIENT
-		if(address.equals(sender.getAddress()) && address.equals(recipient.getAddress()))
+		//CHECK OF BOTH CREATOR AND RECIPIENT
+		if(address.equals(creator.getAddress()) && address.equals(recipient.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
 		}
 		
-		//CHECK IF ONLY SENDER
-		if(address.equals(sender.getAddress()))
+		//CHECK IF ONLY CREATOR
+		if(address.equals(creator.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.amount).subtract(this.fee);
 		}
@@ -351,54 +285,4 @@ public class PaymentTransaction extends Transaction {
 		return BigDecimal.ZERO;
 	}
 	
-	public static byte[] generateSignature(PrivateKeyAccount sender, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp) 
-	{
-		return generateSignature(DBSet.getInstance(), sender, recipient, amount, fee, timestamp);
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount sender, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(PAYMENT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, sender.getLastReference(db));
-		
-		//WRITE SENDER
-		data = Bytes.concat(data , sender.getPublicKey());
-		
-		try
-		{
-			//WRITE RECIPIENT
-			data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
-		}
-		catch(Exception e)
-		{
-			//ERROR DECODING ADDRESS
-		}
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		//SIGN
-		return Crypto.getInstance().sign(sender, data);
-	}
 }

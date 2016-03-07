@@ -14,7 +14,7 @@ import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
@@ -33,20 +33,15 @@ import database.DBSet;
 public class DeployATTransaction extends Transaction
 {
 
-	private static final int CREATOR_LENGTH = 32;
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int DESCRIPTION_SIZE_LENGTH = 4;
 	private static final int TYPE_SIZE_LENGTH = 4;
 	private static final int TAGS_SIZE_LENGTH = 4;
 	private static final int CREATION_BYTES_SIZE_LENGTH = 4;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int AMOUNT_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
+	//private static final int AMOUNT_LENGTH = 8;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH + TYPE_SIZE_LENGTH + TAGS_SIZE_LENGTH + CREATION_BYTES_SIZE_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
 
-	private PublicKeyAccount creator;
 	private String name;
 	private String description;
 	private String type;
@@ -54,17 +49,28 @@ public class DeployATTransaction extends Transaction
 	private BigDecimal amount;
 	private byte[] creationBytes;
 
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
 	{
-		super(DEPLOY_AT_TRANSACTION, fee, timestamp, reference, signature);
+		super(DEPLOY_AT_TRANSACTION, creator, timestamp, reference);
 
-		this.creator = creator;
 		this.name = name;
 		this.description = description;
 		this.creationBytes = creationBytes;
 		this.type = type;
 		this.tags = tags;
 		this.amount = quantity;
+	}
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
+
+		this.signature = signature;
+		this.fee = fee;
+	}
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
+		this.calcFee();
 	}
 
 	//PARSE/CONVERT
@@ -196,7 +202,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 
@@ -273,7 +279,7 @@ public class DeployATTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 
 		return data;
 	}
@@ -290,68 +296,6 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//VALIDATE
-
-	@Override
-	public boolean isSignatureValid() 
-	{
-		byte[] data = new byte[0];
-
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(DEPLOY_AT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-
-		//WRITE NAME SIZE
-		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
-		int nameLength = nameBytes.length;
-		byte[] nameLengthBytes = Ints.toByteArray(nameLength);
-		data = Bytes.concat(data, nameLengthBytes);
-
-		//WRITE NAME
-		data = Bytes.concat(data, nameBytes);
-
-		//WRITE DESCRIPTION SIZE
-		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
-		int descriptionLength = descriptionBytes.length;
-		byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
-		data = Bytes.concat(data, descriptionLengthBytes);
-
-		//WRITE DESCRIPTION
-		data = Bytes.concat(data, descriptionBytes);
-
-		//WRITE CREATIONBYTES SIZE
-		int creationBytesLength = this.creationBytes.length;
-		byte[] creationLengthBytes = Ints.toByteArray(creationBytesLength);
-		data = Bytes.concat(data, creationLengthBytes);
-
-		//WRITE DESCRIPTION
-		data = Bytes.concat(data, this.creationBytes);
-
-		//WRITE FEE
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fillAmount = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fillAmount, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	}
 
 	@Override
 	public int isValid(DBSet db)
@@ -549,12 +493,6 @@ public class DeployATTransaction extends Transaction
 	}
 	
 	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.creator;
-	}
-
-	@Override
 	public List<Account> getInvolvedAccounts() 
 	{
 		List<Account> accounts = new ArrayList<Account>();
@@ -586,65 +524,4 @@ public class DeployATTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, String name, String description, byte[] creationBytes, BigDecimal amount, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(DEPLOY_AT_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-
-		//WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-
-		//WRITE NAME SIZE
-		byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
-		int nameLength = nameBytes.length;
-		byte[] nameLengthBytes = Ints.toByteArray(nameLength);
-		data = Bytes.concat(data, nameLengthBytes);
-
-		//WRITE NAME
-		data = Bytes.concat(data, nameBytes);
-
-		//WRITE DESCRIPTION SIZE
-		byte[] descriptionBytes = description.getBytes(StandardCharsets.UTF_8);
-		int descriptionLength = descriptionBytes.length;
-		byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
-		data = Bytes.concat(data, descriptionLengthBytes);
-
-		//WRITE DESCRIPTION
-		data = Bytes.concat(data, descriptionBytes);
-
-		//WRITE CREATIONBYTES SIZE
-		int creationBytesLength = creationBytes.length;
-		byte[] creationLengthBytes = Ints.toByteArray(creationBytesLength);
-		data = Bytes.concat(data, creationLengthBytes);
-
-		//WRITE CREATIONBYTES
-		data = Bytes.concat(data, creationBytes);
-
-		//WRITE FEE
-		byte[] amountBytes = amount.unscaledValue().toByteArray();
-		byte[] fillAmount = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fillAmount, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-
-		return Crypto.getInstance().sign(creator, data);
-	}
-	
 }

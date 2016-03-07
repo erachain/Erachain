@@ -7,10 +7,13 @@ import java.util.LinkedHashMap;
 
 import org.mapdb.Fun.Tuple2;
 
+//import com.google.common.primitives.Bytes;
+
 import at.AT_Transaction;
 import controller.Controller;
 import qora.BlockGenerator;
 import qora.block.Block;
+import qora.crypto.Base58;
 import qora.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
@@ -31,6 +34,10 @@ public class Account {
 	
 	public Account(String address)
 	{
+
+		// test address
+		assert(Base58.decode(address) instanceof byte[] );
+
 		this.address = address;
 	}
 	

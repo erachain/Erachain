@@ -9,11 +9,11 @@ import java.util.List;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
 import qora.assets.Order;
-import qora.crypto.Crypto;
+//import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -23,25 +23,31 @@ import database.DBSet;
 
 public class CreateOrderTransaction extends Transaction 
 {
-	private static final int CREATOR_LENGTH = 32;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;
-	private static final int AMOUNT_LENGTH = 12;
 	private static final int PRICE_LENGTH = 12;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount creator;
 	private Order order;
 	
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, long timestamp, byte[] reference) 
 	{
-		super(CREATE_ORDER_TRANSACTION, fee, timestamp, reference, signature);
+		super(CREATE_ORDER_TRANSACTION, creator, timestamp, reference);
 		
 		this.creator = creator;
 		this.order = new Order(new BigInteger(this.signature), creator, have, want, amount, price, timestamp);
+	}
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, have, want, amount, price, timestamp, reference);
+		
+		this.signature = signature;
+		this.fee = fee;
+	}
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, have, want, amount, price, timestamp, reference);
+		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
@@ -130,7 +136,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign)
 	{
 		byte[] data = new byte[0];
 		
@@ -179,7 +185,7 @@ public class CreateOrderTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -191,58 +197,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 	
 	//VALIDATE
-	
-	public boolean isSignatureValid()
-	{
-		byte[] data = new byte[0];
 		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(CREATE_ORDER_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		
-		//WRITE HAVE
-		byte[] haveBytes = Longs.toByteArray(this.order.getHave());
-		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
-		data = Bytes.concat(data, haveBytes);
-		
-		//WRITE WANT
-		byte[] wantBytes = Longs.toByteArray(this.order.getWant());
-		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
-		data = Bytes.concat(data, wantBytes);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.order.getAmount().unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE PRICE
-		byte[] priceBytes = this.order.getPrice().unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - priceBytes.length];
-		priceBytes = Bytes.concat(fill, priceBytes);
-		data = Bytes.concat(data, priceBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	}
-	
 	@Override
 	public int isValid(DBSet db) 
 	{
@@ -356,12 +311,6 @@ public class CreateOrderTransaction extends Transaction
 		this.order.copy().orphan(db);
 	}
 
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.creator;
-	}
-
 
 	@Override
 	public List<Account> getInvolvedAccounts() 
@@ -395,58 +344,5 @@ public class CreateOrderTransaction extends Transaction
 		}
 		
 		return BigDecimal.ZERO;
-	}
-
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		Order order = new Order(null, creator, have, want, amount, price, timestamp);
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(CREATE_ORDER_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-		
-		//WRITE HAVE
-		byte[] haveBytes = Longs.toByteArray(order.getHave());
-		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
-		data = Bytes.concat(data, haveBytes);
-		
-		//WRITE WANT
-		byte[] wantBytes = Longs.toByteArray(order.getWant());
-		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
-		data = Bytes.concat(data, wantBytes);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = order.getAmount().unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//WRITE PRICE
-		byte[] priceBytes = order.getPrice().unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - priceBytes.length];
-		priceBytes = Bytes.concat(fill, priceBytes);
-		data = Bytes.concat(data, priceBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(creator, data);
 	}
 }

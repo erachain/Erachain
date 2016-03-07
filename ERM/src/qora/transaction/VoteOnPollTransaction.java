@@ -12,7 +12,7 @@ import ntp.NTP;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
 import qora.voting.Poll;
@@ -26,25 +26,32 @@ import database.DBSet;
 
 public class VoteOnPollTransaction extends Transaction 
 {
-	private static final int CREATOR_LENGTH = 32;
 	private static final int POLL_SIZE_LENGTH = 4;
 	private static final int OPTION_SIZE_LENGTH = 4;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + POLL_SIZE_LENGTH + OPTION_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
 	private String poll;
 	public int option;
 	
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, long timestamp, byte[] reference) 
 	{
-		super(VOTE_ON_POLL_TRANSACTION, fee, timestamp, reference, signature);
+		super(VOTE_ON_POLL_TRANSACTION, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
 		this.option = option;
+	}
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, poll, option, timestamp, reference);
+		this.calcFee();
+	}
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, poll, option, timestamp, reference);
+		this.fee = fee;
+		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
@@ -132,7 +139,7 @@ public class VoteOnPollTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -173,7 +180,7 @@ public class VoteOnPollTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -188,43 +195,8 @@ public class VoteOnPollTransaction extends Transaction
 	
 	public boolean isSignatureValid()
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(VOTE_ON_POLL_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		
-		//WRITE POLL SIZE
-		byte[] pollBytes = this.poll.getBytes(StandardCharsets.UTF_8);
-		int pollLength = pollBytes.length;
-		byte[] pollLengthBytes = Ints.toByteArray(pollLength);
-		data = Bytes.concat(data, pollLengthBytes);
-				
-		//WRITE NAME
-		data = Bytes.concat(data, pollBytes);
-		
-		//WRITE OPTION
-		byte[] optionBytes = Ints.toByteArray(this.option);
-		optionBytes = Bytes.ensureCapacity(optionBytes, OPTION_SIZE_LENGTH, 0);
-		data = Bytes.concat(data, optionBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return false;
 				
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
@@ -381,46 +353,4 @@ public class VoteOnPollTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, String poll, int option, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(VOTE_ON_POLL_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-		
-		//WRITE POLL SIZE
-		byte[] pollBytes = poll.getBytes(StandardCharsets.UTF_8);
-		int pollLength = pollBytes.length;
-		byte[] pollLengthBytes = Ints.toByteArray(pollLength);
-		data = Bytes.concat(data, pollLengthBytes);
-				
-		//WRITE NAME
-		data = Bytes.concat(data, pollBytes);
-		
-		//WRITE OPTION
-		byte[] optionBytes = Ints.toByteArray(option);
-		optionBytes = Bytes.ensureCapacity(optionBytes, OPTION_SIZE_LENGTH, 0);
-		data = Bytes.concat(data, optionBytes);
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(creator, data);
-	}
 }

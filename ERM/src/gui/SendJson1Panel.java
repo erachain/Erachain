@@ -1,5 +1,6 @@
 package gui;
 
+import qora.transaction.Transaction;
 import gui.models.Json1sTableModel;
 import gui.models.AccountsComboBoxModel;
 import gui.models.AssetsComboBoxModel;
@@ -63,7 +64,7 @@ public class SendJson1Panel extends JPanel
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;
 	private JTextField txtAmount;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	public JTextArea txtMessage;
 	private JCheckBox encrypted;
 	private JCheckBox isText;
@@ -360,10 +361,10 @@ public class SendJson1Panel extends JPanel
 		feetxtGBC.gridx = 3;	
 		feetxtGBC.gridy = 6;
 
-		txtFee = new JTextField();
-		txtFee.setText("1.00000000");
-		txtFee.setPreferredSize(new Dimension(130,22));
-		this.add(txtFee, feetxtGBC);
+		txtFeePow = new JTextField();
+		txtFeePow.setText("1.00000000");
+		txtFeePow.setPreferredSize(new Dimension(130,22));
+		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();
@@ -414,7 +415,7 @@ public class SendJson1Panel extends JPanel
 
         //CONTEXT MENU
 		MenuPopupUtil.installContextMenu(txtTo);
-		MenuPopupUtil.installContextMenu(txtFee);
+		MenuPopupUtil.installContextMenu(txtFeePow);
 		MenuPopupUtil.installContextMenu(txtAmount);
 		MenuPopupUtil.installContextMenu(txtMessage);
 		MenuPopupUtil.installContextMenu(txtRecDetails);
@@ -565,39 +566,21 @@ public class SendJson1Panel extends JPanel
 			parsing = 1;
 			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
 			
-			//READ FEE
+			//READ FEE PPOWER
 			parsing = 2;
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
+			int feePow = Integer.parseInt(txtFeePow.getText());
 			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
+			//CHECK MIMIMUM FEE_POW
+			String is = Transaction.checkFeePow(feePow);
+			if(is != null)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(is), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				
+				txtFeePow.setText("0");
 				//ENABLE
 				this.sendButton.setEnabled(true);
 				
 				return;
-			}
-			
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				} else {
-					
-					txtFee.setText("1.00000000");
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
-				}
 			}
 			
 			String message = txtMessage.getText();
@@ -667,58 +650,9 @@ public class SendJson1Panel extends JPanel
 				
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
-
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForMessage(messageBytes).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1.00000000"); // Return to the default fee for the next message.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this message.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
-				}
-			}
-			
-			if(key != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
-			{	
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets transactions will be enabled at %ss%!").replace("%ss%", DateTimeFormat.timestamptoString(Transaction.getPOWFIX_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				return;
-			}
 			
 			//CREATE TX MESSAGE
-			result = Controller.getInstance().sendJson1(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, fee, messageBytes, isTextByte, encrypted);
+			result = Controller.getInstance().sendJson1(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

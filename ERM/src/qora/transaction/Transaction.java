@@ -5,14 +5,20 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+//import javax.swing.JFrame;
+//import javax.swing.JOptionPane;
+
 import org.json.simple.JSONObject;
 
 import controller.Controller;
 import database.DBSet;
+//import lang.Lang;
 import qora.account.Account;
+import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.block.Block;
 import qora.crypto.Base58;
+import qora.crypto.Crypto;
 import settings.Settings;
 
 public abstract class Transaction {
@@ -30,7 +36,7 @@ public abstract class Transaction {
 	public static final int NAME_ALREADY_REGISTRED = 9;
 	
 	public static final int NAME_DOES_NOT_EXIST = 10;
-	public static final int INVALID_NAME_OWNER = 11;
+	public static final int INVALID_NAME_CREATOR = 11;
 	public static final int NAME_ALREADY_FOR_SALE = 12;
 	public static final int NAME_NOT_FOR_SALE = 13;
 	public static final int BUYER_ALREADY_OWNER = 14;
@@ -178,21 +184,43 @@ public abstract class Transaction {
 	protected static final int SIGNATURE_LENGTH = 64;
 		
 	protected byte[] reference;
-	protected BigDecimal fee;
+	protected BigDecimal fee = BigDecimal.ZERO.setScale(8);
+	protected int feePow = 0;
 	protected int type;
 	protected byte[] signature;
 	protected long timestamp;
+	protected PublicKeyAccount creator;
 	
-	protected Transaction(int type, BigDecimal fee, long timestamp, byte[] reference, byte[] signature)
+	// need for calculate fee
+	protected Transaction(int type, PublicKeyAccount creator, long timestamp, byte[] reference)
 	{
 		this.type = type;
+		this.creator = creator;
 		//this.props = props;
-		this.fee = fee;
-		this.signature = signature;
 		this.timestamp = timestamp;
 		this.reference = reference;
 	}
-	
+	// need for calculate fee
+	protected Transaction(int type, PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature)
+	{
+		this(type, creator, timestamp, reference);
+		this.signature = signature;
+	}
+	// need for NEW from blockhain
+	protected Transaction(int type, PublicKeyAccount creator, BigDecimal fee, long timestamp, byte[] reference, byte[] signature)
+	{
+		this(type, creator, timestamp, reference, signature);
+		if (fee.compareTo(BigDecimal.ZERO) > 0 ) this.fee = fee.setScale(8);
+	}
+	// need for calculate fee by feePow into GUI
+	protected Transaction(int type, PublicKeyAccount creator, int feePow, long timestamp, byte[] reference, byte[] signature)
+	{
+		this(type, creator, timestamp, reference, signature);
+		if (feePow < -4 ) feePow = -4;
+		else if (feePow >4 ) feePow = 4;
+		this.feePow = feePow;
+	}
+
 	//GETTERS/SETTERS
 	
 	public int getType()
@@ -200,6 +228,11 @@ public abstract class Transaction {
 		return this.type;
 	}
 	
+	public PublicKeyAccount getCreator() 
+	{
+		return this.creator;
+	}
+
 	public long getTimestamp()
 	{
 		return this.timestamp;
@@ -226,7 +259,7 @@ public abstract class Transaction {
 		return this.reference;
 	}
 		
-	public boolean hasMinimumFee()
+	public boolean isValidFee()
 	{
 		return this.fee.compareTo(getMinFee()) >= 0;
 	}
@@ -242,14 +275,24 @@ public abstract class Transaction {
 		}
 	}
 	// calc FEE by recommended and feePOW
-	public BigDecimal calcFee(int feePow)
+	public void calcFee()
 	{	
-		return calcRecommendedFee().multiply(new BigDecimal(2^feePow)).setScale(8);
+		this.fee = calcRecommendedFee().multiply(new BigDecimal(2^this.feePow)).setScale(8);
 	}
 	// calc recommended FEE
 	public BigDecimal calcRecommendedFee()
 	{	
-		return getMinFee().multiply(new BigDecimal(2)).setScale(8);
+		int feePower = 2; // will be calc in future
+		return getMinFee().multiply(new BigDecimal(feePower)).setScale(8);
+	}
+	
+	//CHECK MIMIMUM FEE_POW
+	public static String checkFeePow(int feePow) {
+		
+	if(feePow < -4 || feePow > 4) {
+		return "Fee Power must be in -4..4!";
+		}
+	return null;
 	}
 
 	public Block getParent() {
@@ -274,15 +317,31 @@ public abstract class Transaction {
 		return transaction;
 	}
 	
+	// PrivateKeyAccount
+	public void sign(PrivateKeyAccount creator)
+	{
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return;
+
+		this.signature = Crypto.getInstance().sign(creator, data);
+	}
+
 	public abstract JSONObject toJson();
 	
-	public abstract byte[] toBytes();
+	public abstract byte[] toBytes(boolean withSign);
 	
 	public abstract int getDataLength();
 	
 	//VALIDATE
 	
-	public abstract boolean isSignatureValid();
+	public boolean isSignatureValid() {
+
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return false;
+
+		return Crypto.getInstance().verify(this.creator.getPublicKey(),
+				this.signature, data);
+	}
 	
 	public int isValid()
 	{
@@ -308,9 +367,7 @@ public abstract class Transaction {
 	public abstract void orphan(DBSet db);
 	
 	//REST
-	
-	public abstract PublicKeyAccount getCreator();
-	
+		
 	public abstract List<Account> getInvolvedAccounts();
 		
 	public abstract boolean isInvolved(Account account);

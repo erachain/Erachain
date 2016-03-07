@@ -63,7 +63,7 @@ public class SendAccountingPanel extends JPanel
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;
 	private JTextField txtAmount;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	public JTextArea txtMessage;
 	private JCheckBox encrypted;
 	private JCheckBox isText;
@@ -356,10 +356,10 @@ public class SendAccountingPanel extends JPanel
 		feetxtGBC.gridx = 3;	
 		feetxtGBC.gridy = 6;
 
-		txtFee = new JTextField();
-		txtFee.setText("0.00000333");
-		txtFee.setPreferredSize(new Dimension(130,22));
-		this.add(txtFee, feetxtGBC);
+		txtFeePow = new JTextField();
+		txtFeePow.setText("0.00000333");
+		txtFeePow.setPreferredSize(new Dimension(130,22));
+		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();
@@ -410,7 +410,7 @@ public class SendAccountingPanel extends JPanel
 
         //CONTEXT MENU
 		MenuPopupUtil.installContextMenu(txtTo);
-		MenuPopupUtil.installContextMenu(txtFee);
+		MenuPopupUtil.installContextMenu(txtFeePow);
 		MenuPopupUtil.installContextMenu(txtAmount);
 		MenuPopupUtil.installContextMenu(txtMessage);
 		MenuPopupUtil.installContextMenu(txtRecDetails);
@@ -627,8 +627,8 @@ public class SendAccountingPanel extends JPanel
 						
 			//CREATE TX MESSAGE
 			//BigDecimal fee = new BigDecimal.ZERO
-			BigDecimal fee = new BigDecimal('0').setScale(8);
-			result = Controller.getInstance().sendAccounting(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, hkey, amount, fee, messageBytes, isTextByte, encrypted);
+			int feePow = 0;
+			result = Controller.getInstance().sendAccounting(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, hkey, amount, feePow, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

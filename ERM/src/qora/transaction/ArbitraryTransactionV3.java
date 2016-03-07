@@ -12,18 +12,13 @@ import com.google.common.primitives.Longs;
 
 import database.DBSet;
 import ntp.NTP;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
 import qora.payment.Payment;
 
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
-	protected static final int CREATOR_LENGTH = 32;
 	protected static final int SERVICE_LENGTH = 4;
-	protected static final int DATA_SIZE_LENGTH = 4;
-	protected static final int REFERENCE_LENGTH = 64;
-	protected static final int FEE_LENGTH = 8;
-	protected static final int SIGNATURE_LENGTH = 64;
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
 	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH
 			+ REFERENCE_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
@@ -31,18 +26,32 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			+ PAYMENTS_SIZE_LENGTH;
 
 	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, BigDecimal fee,
-			long timestamp, byte[] reference, byte[] signature) {
-		super(fee, timestamp, reference, signature);
+			List<Payment> payments, int service, byte[] data, long timestamp, byte[] reference) {
+		super(creator, timestamp, reference);
 
-		this.service = service;
-		this.data = data;
-		this.payments = payments;
+		this.creator = creator;
 		if(payments == null)
 		{
 			this.payments = new ArrayList<Payment>();
+		} else {
+			this.payments = payments;
 		}
-		this.creator = creator;
+		this.service = service;
+		this.data = data;
+	}
+	public ArbitraryTransactionV3(PublicKeyAccount creator,
+			List<Payment> payments, int service, byte[] data, int feePow,
+			long timestamp, byte[] reference) 
+	{
+		this(creator, payments, service, data, timestamp, reference);
+		this.feePow = feePow;
+	}
+	public ArbitraryTransactionV3(PublicKeyAccount creator,
+			List<Payment> payments, int service, byte[] data, BigDecimal fee,
+			long timestamp, byte[] reference, byte[] signature) {
+		this(creator, payments, service, data, timestamp, reference);
+		this.fee = fee;
+		this.reference = reference;
 	}
 
 	// PARSE CONVERT
@@ -124,7 +133,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 
 	@Override
-	public byte[] toBytes() {
+	public byte[] toBytes(boolean withSign) {
 		byte[] data = new byte[0];
 
 		// WRITE TYPE
@@ -172,7 +181,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		data = Bytes.concat(data, feeBytes);
 
 		// SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 
 		return data;
 	}
@@ -193,51 +202,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	@Override
 	public boolean isSignatureValid() {
-		byte[] data = new byte[0];
 
-		// WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ARBITRARY_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-
-		// WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH,
-				0);
-		data = Bytes.concat(data, timestampBytes);
-
-		// WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-
-		// WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-
-		// WRITE PAYMENTS SIZE
-		int paymentsLength = this.payments.size();
-		byte[] paymentsLengthBytes = Ints.toByteArray(paymentsLength);
-		data = Bytes.concat(data, paymentsLengthBytes);
-
-		// WRITE PAYMENTS
-		for (Payment payment : this.payments) {
-			data = Bytes.concat(payment.toBytes());
-		}
-
-		// WRITE SERVICE
-		byte[] serviceBytes = Ints.toByteArray(this.service);
-		data = Bytes.concat(data, serviceBytes);
-
-		// WRITE DATA SIZE
-		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-		data = Bytes.concat(data, dataSizeBytes);
-
-		// WRITE DATA
-		data = Bytes.concat(data, this.data);
-
-		// WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return false;
 
 		return Crypto.getInstance().verify(this.creator.getPublicKey(),
 				this.signature, data);
@@ -318,65 +285,5 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		}
 
 		return VALIDATE_OK;
-	}
-
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator,
-			List<Payment> payments, int service, byte[] arbitraryData,
-			BigDecimal fee, long timestamp) {
-		
-		List<Payment> paymentsBuf = payments;
-		
-		if(paymentsBuf == null)
-		{
-			paymentsBuf = new ArrayList<Payment>();
-		}
-		
-		byte[] data = new byte[0];
-
-		// WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ARBITRARY_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-
-		// WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH,
-				0);
-		data = Bytes.concat(data, timestampBytes);
-
-		// WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-
-		// WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-
-		// WRITE PAYMENTS SIZE
-		int paymentsLength = paymentsBuf.size();
-		byte[] paymentsLengthBytes = Ints.toByteArray(paymentsLength);
-		data = Bytes.concat(data, paymentsLengthBytes);
-
-		// WRITE PAYMENTS
-		for (Payment payment : paymentsBuf) {
-			data = Bytes.concat(payment.toBytes());
-		}
-
-		// WRITE SERVICE
-		byte[] serviceBytes = Ints.toByteArray(service);
-		data = Bytes.concat(data, serviceBytes);
-
-		// WRITE DATA SIZE
-		byte[] dataSizeBytes = Ints.toByteArray(arbitraryData.length);
-		data = Bytes.concat(data, dataSizeBytes);
-
-		// WRITE DATA
-		data = Bytes.concat(data, arbitraryData);
-
-		// WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-
-		return Crypto.getInstance().sign(creator, data);
 	}
 }

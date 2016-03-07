@@ -22,6 +22,28 @@ public class MessageTransactionV3 extends MessageTransaction {
 
 	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
+	public MessageTransactionV3(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		super(fee, timestamp, reference, signature);
+
+		this.data = data;
+		this.creator = creator;
+		this.recipient = recipient;
+		this.key = key;
+		this.amount = amount;
+		this.encrypted = encrypted;
+		this.isText = isText;
+	}
+	public MessageTransactionV3(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		super(fee, timestamp, reference, signature);
+
+		this.data = data;
+		this.creator = creator;
+		this.recipient = recipient;
+		this.key = key;
+		this.amount = amount;
+		this.encrypted = encrypted;
+		this.isText = isText;
+	}
 	public MessageTransactionV3(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 		super(fee, timestamp, reference, signature);
 

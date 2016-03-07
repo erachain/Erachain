@@ -17,38 +17,50 @@ import qora.transaction.Transaction;
 
 public class Asset {
 
-	private static final int OWNER_LENGTH = 25;
+	private static final int CREATOR_LENGTH = Account.ADDRESS_LENGTH;
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int DESCRIPTION_SIZE_LENGTH = 4;
 	private static final int QUANTITY_LENGTH = 8;
+	private static final byte SCALE_LENGTH = 1;
 	private static final int DIVISIBLE_LENGTH = 1;
 	private static final int REFERENCE_LENGTH = 64;
 	
-	private Account owner;
+	private Account creator;
 	private String name;
 	private String description;
 	private long quantity;
+	private byte scale;
 	private boolean divisible;
+	// from signature of new IssueAssetTransaction. -> 
+	//qora.TransactionCreator.createIssueAssetTransaction(PrivateKeyAccount, String, String, long, byte, boolean, int)
 	private byte[] reference;
 	
-	public Asset(Account owner, String name, String description, long quantity, boolean divisible, byte[] reference)
+	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
 	{
-		this.owner = owner;
+		this.creator = creator;
 		this.name = name;
 		this.description = description;
 		this.quantity = quantity;
 		this.divisible = divisible;
-		this.reference = reference;
+		this.scale = scale;
+	}
+	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible, byte[] reference)
+	{		
+		this(creator, name, description, quantity, scale, divisible);
+		this.reference = reference; // as signature from transaction IssueAsset
 	}
 	
 	//GETTERS/SETTERS
 	
-	public Account getOwner() {
-		return this.owner;
+	public Account getCreator() {
+		return this.creator;
 	}
 	
 	public String getName() {
 		return this.name;
+	}
+	public int getScale() {
+		return this.scale;
 	}
 	
 	public String getDescription() {
@@ -82,10 +94,10 @@ public class Asset {
 	{	
 		int position = 0;
 		
-		//READ OWNER
-		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-		Account owner = new Account(Base58.encode(ownerBytes));
-		position += OWNER_LENGTH;
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		Account creator = new Account(Base58.encode(creatorBytes));
+		position += CREATOR_LENGTH;
 		
 		//READ NAME
 		byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -120,6 +132,11 @@ public class Asset {
 		long quantity = Longs.fromByteArray(quantityBytes);	
 		position += QUANTITY_LENGTH;
 		
+		//READ SCALE
+		byte[] scaleBytes = Arrays.copyOfRange(data, position, position + SCALE_LENGTH);
+		byte scale = scaleBytes[0];
+		position += SCALE_LENGTH;
+
 		//READ DIVISABLE
 		byte[] divisibleBytes = Arrays.copyOfRange(data, position, position + DIVISIBLE_LENGTH);
 		boolean divisable = divisibleBytes[0] == 1;
@@ -129,17 +146,17 @@ public class Asset {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		
 		//RETURN
-		return new Asset(owner, name, description, quantity, divisable, reference);
+		return new Asset(creator, name, description, quantity, scale, divisable, reference);
 	}
 	
 	public byte[] toBytes(boolean includeReference)
 	{
 		byte[] data = new byte[0];
 		
-		//WRITE OWNER
+		//WRITE CREATOR
 		try
 		{
-			data = Bytes.concat(data , Base58.decode(this.owner.getAddress()));
+			data = Bytes.concat(data , Base58.decode(this.creator.getAddress()));
 		}
 		catch(Exception e)
 		{
@@ -168,6 +185,10 @@ public class Asset {
 		byte[] quantityBytes = Longs.toByteArray(this.quantity);
 		data = Bytes.concat(data, quantityBytes);
 		
+		//WRITE SCALE_LENGTH
+		byte[] scaleBytes = new byte[this.scale];
+		data = Bytes.concat(data, scaleBytes);
+
 		//WRITE DIVISIBLE
 		byte[] divisibleBytes = new byte[1];
 		divisibleBytes[0] = (byte) (this.divisible == true ? 1 : 0);
@@ -189,22 +210,13 @@ public class Asset {
 
 	public int getDataLength() 
 	{
-		return OWNER_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + QUANTITY_LENGTH + DIVISIBLE_LENGTH + REFERENCE_LENGTH;
+		return CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + SCALE_LENGTH + QUANTITY_LENGTH + DIVISIBLE_LENGTH + REFERENCE_LENGTH;
 	}	
 	
 	//OTHER
 	
 	public String toString()
-	{
-		/*
-		if(this.getKey() == 0)
-		{
-			return "Qora";
-		}
-		else
-		{
-		*/	
-		
+	{		
 		return "(" + this.getKey() + ") " + this.getName();
 	}
 	
@@ -222,8 +234,9 @@ public class Asset {
 		assetJSON.put("key", this.getKey());
 		assetJSON.put("name", this.getName());
 		assetJSON.put("description", this.getDescription());
-		assetJSON.put("owner", this.getOwner().getAddress());
+		assetJSON.put("creator", this.getCreator().getAddress());
 		assetJSON.put("quantity", this.getQuantity());
+		assetJSON.put("scale", this.getScale());
 		assetJSON.put("isDivisible", this.isDivisible());
 		assetJSON.put("isConfirmed", this.isConfirmed());
 		assetJSON.put("reference", Base58.encode(this.getReference()));

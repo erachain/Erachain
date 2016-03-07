@@ -1,7 +1,7 @@
 package qora;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import database.DBSet;
 import ntp.NTP;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
+//import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
 import qora.assets.Order;
 import qora.block.Block;
@@ -21,7 +21,7 @@ import qora.naming.NameSale;
 import qora.payment.Payment;
 import qora.transaction.AccountingTransaction;
 import qora.transaction.Json1TransactionV3;
-import qora.transaction.ArbitraryTransactionV1;
+import qora.transaction.MessageTransaction;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -30,8 +30,8 @@ import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.DeployATTransaction;
 import qora.transaction.IssueAssetTransaction;
-import qora.transaction.MessageTransactionV1;
-import qora.transaction.MessageTransactionV3;
+//import qora.transaction.MessageTransactionV1;
+//import qora.transaction.MessageTransactionV3;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
 import qora.transaction.RegisterNameTransaction;
@@ -43,7 +43,7 @@ import qora.transaction.TransferAssetTransaction;
 import qora.transaction.UpdateNameTransaction;
 import qora.transaction.VoteOnPollTransaction;
 import qora.voting.Poll;
-import settings.Settings;
+//import settings.Settings;
 import utils.Pair;
 import utils.TransactionTimestampComparator;
 
@@ -108,7 +108,7 @@ public class TransactionCreator
 		}
 	}
 	
-	public Pair<Transaction, Integer> createPayment(PrivateKeyAccount sender, Account recipient, BigDecimal amount, BigDecimal fee)
+	public Pair<Transaction, Integer> createPayment(PrivateKeyAccount sender, Account recipient, BigDecimal amount, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -116,35 +116,16 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 		
-		//CREATE SIGNATURE
-		byte[] signature = PaymentTransaction.generateSignature(this.fork, sender, recipient, amount, fee, time);
-		
 		//CREATE PAYMENT
-		PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, fee, time, sender.getLastReference(this.fork), signature);
+		//PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, feePow, time, sender.getLastReference(this.fork));
+		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, feePow, time, sender.getLastReference(this.fork));
+		
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(payment);
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForPayment() 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount sender = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE PAYMENT
-		PaymentTransaction payment = new PaymentTransaction(sender, sender, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
-					
-		return new Pair(payment.calcFee(1), payment.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount registrant, Name name, BigDecimal fee)
+	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -152,196 +133,93 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 		
-		//CREATE SIGNATURE
-		byte[] signature = RegisterNameTransaction.generateSignature(this.fork, registrant, name, fee, time);
-		
 		//CREATE NAME REGISTRATION
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(registrant, name, fee, time, registrant.getLastReference(this.fork), signature);
+		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, feePow, time, creator.getLastReference(this.fork));
+		nameRegistration.sign(creator);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(nameRegistration);
 	}
-	 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameRegistration(Name name) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount registrant = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
-		
-		//CREATE NAME UPDATE
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(registrant, name, Transaction.FEE_PER_BYTE, time, signature, signature);
-		
-		return new Pair(nameRegistration.calcFee(1), nameRegistration.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createNameUpdate(PrivateKeyAccount owner, Name name, BigDecimal fee)
+
+	public Pair<Transaction, Integer> createNameUpdate(PrivateKeyAccount creator, Name name, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 		
 		//TIME
 		long time = NTP.getTime();
-		
-		//CREATE SIGNATURE
-		byte[] signature = UpdateNameTransaction.generateSignature(this.fork, owner, name, fee, time);
-		
+				
 		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(owner, name, fee, time, owner.getLastReference(this.fork), signature);
+		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, feePow, time, creator.getLastReference(this.fork));
+		nameUpdate.sign(creator);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(nameUpdate);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameUpdate(Name name) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(owner, name, Transaction.FEE_PER_BYTE, time, signature, signature);
-				
-		return new Pair(nameUpdate.calcFee(1), nameUpdate.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createNameSale(PrivateKeyAccount owner, NameSale nameSale, BigDecimal fee)
+	public Pair<Transaction, Integer> createNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 				
 		//TIME
 		long time = NTP.getTime();
-				
-		//CREATE SIGNATURE
-		byte[] signature = SellNameTransaction.generateSignature(this.fork, owner, nameSale, fee, time);
-				
+								
 		//CREATE NAME SALE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(owner, nameSale, fee, time, owner.getLastReference(this.fork), signature);
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, feePow, time, creator.getLastReference(this.fork));
+		nameSaleTransaction.sign(creator);
 				
 		//VALIDATE AND PROCESS
 		return this.afterCreate(nameSaleTransaction);
 	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameSale(NameSale nameSale) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
-		
-		//CREATE NAME SALE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(owner, nameSale, Transaction.FEE_PER_BYTE, time, signature, signature);
-					
-		return new Pair(nameSaleTransaction.calcFee(1), nameSaleTransaction.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createCancelNameSale(PrivateKeyAccount owner, NameSale nameSale, BigDecimal fee)
+	public Pair<Transaction, Integer> createCancelNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 				
 		//TIME
 		long time = NTP.getTime();
-				
-		//CREATE SIGNATURE
-		byte[] signature = CancelSellNameTransaction.generateSignature(this.fork, owner, nameSale.getKey(), fee, time);
-				
+								
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(owner, nameSale.getKey(), fee, time, owner.getLastReference(this.fork), signature);
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), feePow, time, creator.getLastReference(this.fork));
+		cancelNameSaleTransaction.sign(creator);
 				
 		//VALIDATE AND PROCESS
 		return this.afterCreate(cancelNameSaleTransaction);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelNameSale(NameSale nameSale) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount owner = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
-		
-		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(owner, nameSale.getKey(), Transaction.FEE_PER_BYTE, time, signature, signature);
-				
-		return new Pair(cancelNameSaleTransaction.calcFee(1), cancelNameSaleTransaction.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createNamePurchase(PrivateKeyAccount buyer, NameSale nameSale, BigDecimal fee)
+	public Pair<Transaction, Integer> createNamePurchase(PrivateKeyAccount creator, NameSale nameSale, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 				
 		//TIME
 		long time = NTP.getTime();
-				
-		//CREATE SIGNATURE
-		byte[] signature = BuyNameTransaction.generateSignature(this.fork, buyer, nameSale, nameSale.getName().getOwner(), fee, time);
-				
+								
 		//CREATE NAME PURCHASE
-		BuyNameTransaction namePurchase = new BuyNameTransaction(buyer, nameSale, nameSale.getName().getOwner(), fee, time, buyer.getLastReference(this.fork), signature);
+		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), feePow, time, creator.getLastReference(this.fork));
+		namePurchase.sign(creator);
 				
 		//VALIDATE AND PROCESS
 		return this.afterCreate(namePurchase);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNamePurchase(NameSale nameSale) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
 		
-		//GENESIS ACCOUNT
-		PublicKeyAccount buyer = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1}); 
-		
-		//CREATE NAME UPDATE
-		BuyNameTransaction namePurchase = new BuyNameTransaction(buyer, nameSale, nameSale.getName().getOwner(), Transaction.FEE_PER_BYTE, time, signature, signature);
-		
-		return new Pair(namePurchase.calcFee(1), namePurchase.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createPollCreation(PrivateKeyAccount creator, Poll poll, BigDecimal fee) 
+	public Pair<Transaction, Integer> createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 						
 		//TIME
 		long time = NTP.getTime();
-						
-		//CREATE SIGNATURE
-		byte[] signature = CreatePollTransaction.generateSignature(this.fork, creator, poll, fee, time);
 					
 		//CREATE POLL CREATION
-		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, fee, time, creator.getLastReference(this.fork), signature);
+		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, feePow, time, creator.getLastReference(this.fork));
+		pollCreation.sign(creator);
 						
 		//VALIDATE AND PROCESS
 		return this.afterCreate(pollCreation);
 	}
 	
+	/*
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Pair<BigDecimal, Integer> calcRecommendedFeeForPollCreation(Poll poll) 
 	{
@@ -359,6 +237,7 @@ public class TransactionCreator
 		
 		return new Pair(pollCreation.calcFee(1), pollCreation.getDataLength());
 	}
+	*/
 
 	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, String poll, int optionIndex, int feePow)
 	{
@@ -368,16 +247,16 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 						
-		//CREATE SIGNATURE
-		byte[] signature = VoteOnPollTransaction.generateSignature(this.fork, creator, poll, optionIndex, feePow, time);
 					
 		//CREATE POLL VOTE
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, feePow, time, creator.getLastReference(this.fork), signature);
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, feePow, time, creator.getLastReference(this.fork));
+		pollVote.sign(creator);
 						
 		//VALIDATE AND PROCESS
 		return this.afterCreate(pollVote);
 	}
 	
+	/*
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Pair<BigDecimal, Integer> calcRecommendedFeeForPollVote(String poll) 
 	{
@@ -395,38 +274,25 @@ public class TransactionCreator
 		
 		return new Pair(pollVote.calcFee(1), pollVote.getDataLength());
 	}
+	*/
 	
-	public Pair<Transaction, Integer> createArbitraryTransaction(PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data, BigDecimal fee) 
+	public Pair<Transaction, Integer> createArbitraryTransaction(PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 			
-		Transaction arbitraryTransaction;
-		
 		//TIME
 		long time = NTP.getTime();
-		
-		if(time < Transaction.getPOWFIX_RELEASE())
-		{
-			//CREATE SIGNATURE
-			byte[] signature = ArbitraryTransactionV1.generateSignature(this.fork, creator, service, data, fee, time);
-							
-			//CREATE ARBITRARY TRANSACTION V1
-			arbitraryTransaction = new ArbitraryTransactionV1(creator, service, data, fee, time, creator.getLastReference(this.fork), signature);
-		}
-		else
-		{
-			//CREATE SIGNATURE
-			byte[] signature = ArbitraryTransactionV3.generateSignature(this.fork, creator, payments, service, data, fee, time);
-							
-			//CREATE ARBITRARY TRANSACTION V3
-			arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, fee, time, creator.getLastReference(this.fork), signature);
-		}
+
+		Transaction arbitraryTransaction;
+		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, feePow, time, creator.getLastReference(this.fork));
+		arbitraryTransaction.sign(creator);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(arbitraryTransaction);
 	}
 	
+	/*
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Pair<BigDecimal, Integer> calcRecommendedFeeForArbitraryTransaction(byte[] data, List<Payment> payments) 
 	{	
@@ -454,8 +320,9 @@ public class TransactionCreator
 		
 		return new Pair(arbitraryTransaction.calcFee(1), arbitraryTransaction.getDataLength());
 	}
+	*/
 	
-	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, boolean divisible, BigDecimal fee) 
+	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -463,220 +330,104 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		//CREATE SIGNATURE
-		Asset asset = new Asset(creator, name, description, quantity, divisible, new byte[64]);
-		byte[] signature = IssueAssetTransaction.generateSignature(this.fork, creator, asset, fee, time);
+		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
-		asset = new Asset(creator, name, description, quantity, divisible, signature);
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, fee, time, creator.getLastReference(this.fork), signature);
+		// calculate signature and use it as reference for Asset
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
+		issueAssetTransaction.sign(creator);
+		
+		byte[] signature = issueAssetTransaction.getSignature();
+		asset = new Asset(creator, name, description, quantity, scale, divisible, signature);
+		issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
+		issueAssetTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueAssetTransaction);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForIssueAssetTransaction(String name, String description) 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
 		
-		//GENESIS ACCOUNT
-		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE ARBITRARY TRANSACTION
-		Asset asset = new Asset(creator, name, description, 10000, true, signature);
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, Transaction.FEE_PER_BYTE, time, signature, signature);
-		
-		return new Pair(issueAssetTransaction.calcFee(1), issueAssetTransaction.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, Asset have, Asset want, BigDecimal amount, BigDecimal price, BigDecimal fee)
+	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, Asset have, Asset want, BigDecimal amount, BigDecimal price, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 								
 		//TIME
 		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = CreateOrderTransaction.generateSignature(this.fork, creator, have.getKey(), want.getKey(), amount, price, fee, time);
-							
+															
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, fee, time, creator.getLastReference(this.fork), signature);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, feePow, time, creator.getLastReference(this.fork));
+		createOrderTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
 		return this.afterCreate(createOrderTransaction);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForOrderTransaction() 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
 		
-		//GENESIS ACCOUNT
-		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, 0, 0, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
-		
-		return new Pair(createOrderTransaction.calcFee(1), createOrderTransaction.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, BigDecimal fee)
+	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 								
 		//TIME
 		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = CancelOrderTransaction.generateSignature(this.fork, creator, order.getId(), fee, time);
-							
+															
 		//CREATE PRDER TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), fee, time, creator.getLastReference(this.fork), signature);
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), feePow, time, creator.getLastReference(this.fork));
+		cancelOrderTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
 		return this.afterCreate(cancelOrderTransaction);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelOrderTransaction() 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
 		
-		//GENESIS ACCOUNT
-		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, BigInteger.ONE, Transaction.FEE_PER_BYTE, time, signature, signature);
-		
-		return new Pair(cancelOrderTransaction.calcFee(1), cancelOrderTransaction.getDataLength());
-	}
-
-	
-	public Pair<Transaction, Integer> createAssetTransfer(PrivateKeyAccount sender, Account recipient, Asset asset, BigDecimal amount, BigDecimal fee)
+	public Pair<Transaction, Integer> createAssetTransfer(PrivateKeyAccount creator, Account recipient, Asset asset, BigDecimal amount, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 		
 		//TIME
 		long time = NTP.getTime();
-		
-		//CREATE SIGNATURE
-		byte[] signature = TransferAssetTransaction.generateSignature(this.fork, sender, recipient, asset.getKey(), amount, fee, time);
-		
+				
 		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(sender, recipient, asset.getKey(), amount, fee, time, sender.getLastReference(this.fork), signature);
+		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(creator, recipient, asset.getKey(), amount, feePow, time, creator.getLastReference(this.fork));
+		assetTransfer.sign(creator);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(assetTransfer);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForAssetTransfer() 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
 		
-		//GENESIS ACCOUNT
-		PublicKeyAccount sender = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(sender, sender, 0l, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
-				
-		return new Pair(assetTransfer.calcFee(1), assetTransfer.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount sender, List<Payment> payments, BigDecimal fee)
+	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 		
 		//TIME
 		long time = NTP.getTime();
-		
-		//CREATE SIGNATURE
-		byte[] signature = MultiPaymentTransaction.generateSignature(this.fork, sender, payments, fee, time);
-		
+				
 		//CREATE MULTI PAYMENTS
-		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(sender, payments, fee, time, sender.getLastReference(this.fork), signature);
+		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, feePow, time, creator.getLastReference(this.fork));
+		multiPayment.sign(creator);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(multiPayment);
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForMultiPayment(List<Payment> payments) 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//CREATE MULTI PAYMENTS
-		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, Transaction.FEE_PER_BYTE, time, signature, signature);
-				
-		return new Pair(multiPayment.calcFee(1), multiPayment.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> deployATTransaction(PrivateKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal amount, BigDecimal fee )
+	public Pair<Transaction, Integer> deployATTransaction(PrivateKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal amount, int feePow )
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 		
 		//TIME
 		long time = NTP.getTime();
-		
-		//CREATE SIGNATURE
-		byte[] signature = DeployATTransaction.generateSignature(this.fork, creator, name, description, creationBytes, amount, fee, time);
-		
+				
 		//DEPLOY AT
-		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, fee, time, creator.getLastReference(this.fork), signature);
+		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, feePow, time, creator.getLastReference(this.fork));
+		deployAT.sign(creator);
 		
 		return this.afterCreate(deployAT);
 		
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForDeployATTransaction(String name, String description, String type, String tags, byte[] creationBytes) 
-	{	
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount creator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		//DEPLOY AT
-		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, time, signature, signature);
-				
-		return new Pair(deployAT.calcFee(1), deployAT.getDataLength());
-	}
-	
-	public Pair<Transaction, Integer> createMessage(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] isText,
+	public Pair<Transaction, Integer> createMessage(PrivateKeyAccount creator,
+			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
 		this.checkUpdate();
@@ -685,81 +436,43 @@ public class TransactionCreator
 
 		long timestamp = NTP.getTime();
 		
-		if(timestamp < Transaction.getPOWFIX_RELEASE())
-		{
-			//CREATE MESSAGE TRANSACTION V1
-			byte[] signature = MessageTransactionV1.generateSignature(this.fork, sender, recipient, amount, fee, message, isText, encryptMessage, timestamp);
-			messageTx = new MessageTransactionV1(sender, recipient, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
-		}
-		else
-		{
-			//CREATE MESSAGE TRANSACTION V3
-			byte[] signature = MessageTransactionV3.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
-			messageTx = new MessageTransactionV3(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
-		}
+		//CREATE MESSAGE TRANSACTION
+		messageTx = new MessageTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx.sign(creator);
 			
 		return afterCreate(messageTx);
 	}
 
 	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
-			Account recipient, byte[] key, BigDecimal amount, BigDecimal fee, byte[] isText,
+			Account recipient, byte[] hkey, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
 		this.checkUpdate();
-		
-		Transaction messageTx;
 
 		long timestamp = NTP.getTime();
-		
-		
-			//CREATE ACCOunting TRANSACTION
-			byte[] signature = AccountingTransaction.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
-			messageTx = new AccountingTransaction(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
+				
+		//CREATE ACCOunting TRANSACTION
+		Transaction messageTx = new AccountingTransaction(sender, recipient, hkey, amount, feePow, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));		
+		messageTx.sign(sender);
 		
 			
 		return afterCreate(messageTx);
 	}
 	
-	public Pair<Transaction, Integer> createJson1(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] isText,
+	public Pair<Transaction, Integer> createJson1(PrivateKeyAccount creator,
+			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
 		this.checkUpdate();
 		
-		Transaction messageTx;
-
 		long timestamp = NTP.getTime();
-		
-		
-			//CREATE MESSAGE TRANSACTION V3
-			byte[] signature = Json1TransactionV3.generateSignature(this.fork, sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp);
-			messageTx = new Json1TransactionV3(sender, recipient, key, amount, fee, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork), signature );
-		
-			
-		return afterCreate(messageTx);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForMessage(byte[] message) 
-	{
-		//TIME
-		long time = NTP.getTime();
-								
-		//CREATE SIGNATURE
-		byte[] signature = new byte[64];
-		
-		//GENESIS ACCOUNT
-		PublicKeyAccount sender = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
-		
-		Transaction messageTx;
-		
-		//long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION V3
-		messageTx = new MessageTransactionV3(sender, sender, 0l, Transaction.FEE_PER_BYTE, Transaction.FEE_PER_BYTE, message, new byte[1], new byte[1], time, signature, signature );
+		Transaction messageTx = new Json1TransactionV3(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx.sign(creator);
 			
-		return new Pair(messageTx.calcFee(1), messageTx.getDataLength());
+		return afterCreate(messageTx);
 	}
 	
 	public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData)
@@ -786,19 +499,11 @@ public class TransactionCreator
 		
 		if(valid == Transaction.VALIDATE_OK)
 		{
-			//CHECK IF FEE BELOW MINIMUM
-			if(!Settings.getInstance().isAllowFeeLessRequired() && !transaction.hasMinimumFee())
-			{
-				valid = Transaction.FEE_LESS_REQUIRED;
-			}
-			else
-			{
-				//PROCESS IN FORK
-				transaction.process(this.fork);
-						
-				//CONTROLLER ONTRANSACTION
-				Controller.getInstance().onTransactionCreate(transaction);
-			}
+			//PROCESS IN FORK
+			transaction.process(this.fork);
+					
+			//CONTROLLER ONTRANSACTION
+			Controller.getInstance().onTransactionCreate(transaction);
 		}
 				
 		//RETURN

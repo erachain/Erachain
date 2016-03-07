@@ -822,7 +822,7 @@ public class TransactionTests {
 		nameRegistration.process(databaseSet);	
 		
 		//CHECK IF NAME UPDATE IS INVALID
-		assertEquals(Transaction.INVALID_NAME_OWNER, nameUpdate.isValid(databaseSet));
+		assertEquals(Transaction.INVALID_NAME_CREATOR, nameUpdate.isValid(databaseSet));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		name = new Name(invalidOwner, "test2", "this is the value");
@@ -1128,7 +1128,7 @@ public class TransactionTests {
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		nameSaleTransaction = new SellNameTransaction(sender, nameSale, BigDecimal.ONE.setScale(8), timestamp, sender.getLastReference(databaseSet), signature);
-		assertEquals(Transaction.INVALID_NAME_OWNER, nameSaleTransaction.isValid(databaseSet));
+		assertEquals(Transaction.INVALID_NAME_CREATOR, nameSaleTransaction.isValid(databaseSet));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		nameSale = new NameSale("test2", BigDecimal.ONE.setScale(8));
@@ -1442,7 +1442,7 @@ public class TransactionTests {
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		cancelNameSaleTransaction = new CancelSellNameTransaction(sender, "test2", BigDecimal.ONE.setScale(8), timestamp, sender.getLastReference(databaseSet), signature);
-		assertEquals(Transaction.INVALID_NAME_OWNER, cancelNameSaleTransaction.isValid(databaseSet));
+		assertEquals(Transaction.INVALID_NAME_CREATOR, cancelNameSaleTransaction.isValid(databaseSet));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		cancelNameSaleTransaction = new CancelSellNameTransaction(invalidOwner, "test2", BigDecimal.ONE.setScale(8), timestamp, sender.getLastReference(databaseSet), signature);

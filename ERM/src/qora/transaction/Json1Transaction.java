@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 
-import com.google.common.primitives.Longs;
+//import com.google.common.primitives.Longs;
 
 import database.BalanceMap;
-import database.DBSet;
+//import database.DBSet;
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import utils.Converter;
 
@@ -31,14 +31,15 @@ public abstract class Json1Transaction extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
+	public Json1Transaction( long timestamp, byte[] reference) {
+		super(JSON_TRANSACTION, timestamp, reference);
+	}
 	public Json1Transaction(BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
 		super(JSON_TRANSACTION, fee, timestamp, reference, signature);
-		
-		if(timestamp < Transaction.getPOWFIX_RELEASE()) {
-			version = 1;
-		} else {
-			version = 3;
-		}
+	}
+	public Json1Transaction(int feePow, long timestamp, byte[] reference, byte[] signature) {
+		super(JSON_TRANSACTION, feePow, timestamp, reference, signature);
+		calcFee();
 	}
 
 	public int getVersion()
@@ -135,10 +136,8 @@ public abstract class Json1Transaction extends Transaction {
 		
 		return false;
 	}
-	
-	@Override
-	public abstract byte[] toBytes();
 
+	/*
 	@Override
 	public abstract int getDataLength();
 
@@ -152,6 +151,7 @@ public abstract class Json1Transaction extends Transaction {
 	
 	@Override
 	public abstract void orphan(DBSet db);
+	*/
 
 	@Override
 	public BigDecimal getAmount(Account account) {
@@ -185,41 +185,8 @@ public abstract class Json1Transaction extends Transaction {
 	
 	public static Transaction Parse(byte[] data) throws Exception
 	{
-		// READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		
-		
-			return Json1TransactionV3.Parse(data);
-		
+			return Json1TransactionV3.Parse(data);		
 	}
 	
-	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return Json1TransactionV3.generateSignature(creator, recipient, 0L, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-		
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return Json1TransactionV3.generateSignature(db, creator, recipient, 0L, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-		
-	}
-
-	public static byte[] generateSignature(PrivateKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData, byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return Json1TransactionV3.generateSignature(creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-			
-	}
-	
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] arbitraryData,byte[] isText, byte[] encrypted, long timestamp) 
-	{
-		
-			return Json1TransactionV3.generateSignature(db, creator, recipient, key, amount, fee, arbitraryData, isText, encrypted, timestamp);	
-		
-	}
 }
 

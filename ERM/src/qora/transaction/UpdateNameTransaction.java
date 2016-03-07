@@ -23,30 +23,32 @@ import database.DBSet;
 
 public class UpdateNameTransaction extends Transaction 
 {
-	private static final int OWNER_LENGTH = 32;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + OWNER_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount owner;
 	private Name name;
 	
-	public UpdateNameTransaction(PublicKeyAccount owner, Name name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, long timestamp, byte[] reference) 
 	{
-		super(UPDATE_NAME_TRANSACTION, fee, timestamp, reference, signature);
+		super(UPDATE_NAME_TRANSACTION, creator, timestamp, reference);
 		
-		this.owner = owner;
+		this.creator = creator;
 		this.name = name;
+	}
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, name, timestamp, reference);
+		
+		this.signature = signature;
+		this.fee = fee;
+	}
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, int feeOpw, long timestamp, byte[] reference) 
+	{
+		this(creator, name, timestamp, reference);
+		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
-	
-	public PublicKeyAccount getOwner()
-	{
-		return this.owner;
-	}
-	
+		
 	public Name getName()
 	{
 		return this.name;
@@ -73,10 +75,10 @@ public class UpdateNameTransaction extends Transaction
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 		
-		//READ OWNER
-		byte[] registrantBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-		PublicKeyAccount owner = new PublicKeyAccount(registrantBytes);
-		position += OWNER_LENGTH;
+		//READ CREATOR
+		byte[] registrantBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(registrantBytes);
+		position += CREATOR_LENGTH;
 		
 		//READ NAME
 		Name name = Name.Parse(Arrays.copyOfRange(data, position, data.length));
@@ -90,7 +92,7 @@ public class UpdateNameTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new UpdateNameTransaction(owner, name, fee, timestamp, reference, signatureBytes);
+		return new UpdateNameTransaction(creator, name, fee, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -101,7 +103,7 @@ public class UpdateNameTransaction extends Transaction
 		JSONObject transaction = this.getJsonBase();
 				
 		//ADD REGISTRANT/NAME/VALUE
-		transaction.put("owner", this.owner.getAddress());
+		transaction.put("creator", this.creator.getAddress());
 		transaction.put("newOwner", this.name.getOwner().getAddress());
 		transaction.put("name", this.name.getName());
 		transaction.put("newValue", this.name.getValue());
@@ -110,7 +112,7 @@ public class UpdateNameTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -127,8 +129,8 @@ public class UpdateNameTransaction extends Transaction
 		//WRITE REFERENCE
 		data = Bytes.concat(data, this.reference);
 		
-		//WRITE OWNER
-		data = Bytes.concat(data, this.owner.getPublicKey());
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE NAME
 		data = Bytes.concat(data , this.name.toBytes());
@@ -140,7 +142,7 @@ public class UpdateNameTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -152,39 +154,7 @@ public class UpdateNameTransaction extends Transaction
 	}
 	
 	//VALIDATE
-	
-	public boolean isSignatureValid()
-	{
-		byte[] data = new byte[0];
 		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(UPDATE_NAME_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE OWNER
-		data = Bytes.concat(data, this.owner.getPublicKey());
-		
-		//WRITE NAME
-		data = Bytes.concat(data , this.name.toBytes());
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.owner.getPublicKey(), this.signature, data);
-	}
-	
 	@Override
 	public int isValid(DBSet db) 
 	{
@@ -202,7 +172,7 @@ public class UpdateNameTransaction extends Transaction
 			return INVALID_VALUE_LENGTH;
 		}
 		
-		//CHECK OWNER
+		//CHECK CREATOR
 		if(!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddress()))
 		{
 			return INVALID_ADDRESS;
@@ -220,20 +190,20 @@ public class UpdateNameTransaction extends Transaction
 			return NAME_ALREADY_FOR_SALE;
 		}
 		
-		//CHECK IF OWNER IS OWNER
-		if(!db.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.owner.getAddress()))
+		//CHECK IF CREATOR IS CREATOR
+		if(!db.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress()))
 		{
-			return INVALID_NAME_OWNER;
+			return INVALID_NAME_CREATOR;
 		}
 		
 		//CHECK IF REGISTRANT HAS ENOUGH MONEY
-		if(this.owner.getBalance(1, db).compareTo(this.fee) == -1)
+		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
 		{
 			return NO_BALANCE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.owner.getLastReference(db), this.reference))
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -252,11 +222,11 @@ public class UpdateNameTransaction extends Transaction
 	@Override
 	public void process(DBSet db)
 	{
-		//UPDATE OWNER
-		this.owner.setConfirmedBalance(this.owner.getConfirmedBalance(db).subtract(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
 								
-		//UPDATE REFERENCE OF OWNER
-		this.owner.setLastReference(this.signature, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.signature, db);
 		
 		//SET ORPHAN DATA
 		Name oldName = db.getNameMap().get(this.name.getName());
@@ -269,11 +239,11 @@ public class UpdateNameTransaction extends Transaction
 	@Override
 	public void orphan(DBSet db) 
 	{
-		//UPDATE OWNER
-		this.owner.setConfirmedBalance(this.owner.getConfirmedBalance(db).add(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
 										
-		//UPDATE REFERENCE OF OWNER
-		this.owner.setLastReference(this.reference, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.reference, db);
 			
 		//RESTORE ORPHAN DATA
 		Name oldName = db.getUpdateNameMap().get(this);
@@ -283,17 +253,12 @@ public class UpdateNameTransaction extends Transaction
 		db.getUpdateNameMap().delete(this);
 	}
 
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.owner;
-	}
 
 	@Override
 	public List<Account> getInvolvedAccounts() 
 	{
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.owner);
+		accounts.add(this.creator);
 		accounts.add(this.name.getOwner());
 		return accounts;
 	}
@@ -303,7 +268,7 @@ public class UpdateNameTransaction extends Transaction
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.owner.getAddress()) || address.equals(this.name.getOwner().getAddress()))
+		if(address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress()))
 		{
 			return true;
 		}
@@ -314,7 +279,7 @@ public class UpdateNameTransaction extends Transaction
 	@Override
 	public BigDecimal getAmount(Account account) 
 	{
-		if(account.getAddress().equals(this.owner.getAddress()))
+		if(account.getAddress().equals(this.creator.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
 		}
@@ -322,35 +287,4 @@ public class UpdateNameTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount owner, Name name, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(UPDATE_NAME_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, owner.getLastReference(db));
-		
-		//WRITE OWNER
-		data = Bytes.concat(data, owner.getPublicKey());
-		
-		//WRITE NAME
-		data = Bytes.concat(data , name.toBytes());
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(owner, data);
-	}
 }

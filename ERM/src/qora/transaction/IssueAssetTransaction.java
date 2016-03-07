@@ -12,7 +12,7 @@ import ntp.NTP;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
 import qora.crypto.Crypto;
@@ -25,30 +25,31 @@ import database.DBSet;
 
 public class IssueAssetTransaction extends Transaction 
 {
-	private static final int ISSUER_LENGTH = 32;
-	private static final int REFERENCE_LENGTH = 64;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + ISSUER_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount issuer;
 	private Asset asset;
 	
-	public IssueAssetTransaction(PublicKeyAccount issuer, Asset asset, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp, byte[] reference) 
 	{
-		super(ISSUE_ASSET_TRANSACTION, fee, timestamp, reference, signature);
+		super(ISSUE_ASSET_TRANSACTION, creator, timestamp, reference);
 		
-		this.issuer = issuer;
 		this.asset = asset;
+	}
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(creator, asset, timestamp, reference);
+		
+		this.signature = signature;
+		this.fee = fee;
+	}
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, asset, timestamp, reference);
+		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
-	
-	public PublicKeyAccount getIssuer()
-	{
-		return this.issuer;
-	}
-	
+		
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -75,10 +76,10 @@ public class IssueAssetTransaction extends Transaction
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 		
-		//READ ISSUER
-		byte[] issuerBytes = Arrays.copyOfRange(data, position, position + ISSUER_LENGTH);
-		PublicKeyAccount issuer = new PublicKeyAccount(issuerBytes);
-		position += ISSUER_LENGTH;
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
 		
 		//READ ASSET
 		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
@@ -92,7 +93,7 @@ public class IssueAssetTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new IssueAssetTransaction(issuer, asset, fee, timestamp, reference, signatureBytes);
+		return new IssueAssetTransaction(creator, asset, fee, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -103,17 +104,18 @@ public class IssueAssetTransaction extends Transaction
 		JSONObject transaction = this.getJsonBase();
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put("creator", this.getAsset().getOwner().getAddress());
+		transaction.put("creator", this.getAsset().getCreator().getAddress());
 		transaction.put("name", this.getAsset().getName());
 		transaction.put("description", this.getAsset().getDescription());
 		transaction.put("quantity", this.getAsset().getQuantity());
+		transaction.put("scale", this.getAsset().getScale());
 		transaction.put("divisible", this.getAsset().isDivisible());
 				
 		return transaction;	
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -130,8 +132,8 @@ public class IssueAssetTransaction extends Transaction
 		//WRITE REFERENCE
 		data = Bytes.concat(data, this.reference);
 		
-		//WRITE ISSUER
-		data = Bytes.concat(data, this.issuer.getPublicKey());
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE ASSET
 		data = Bytes.concat(data , this.asset.toBytes(true));
@@ -143,7 +145,7 @@ public class IssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
-		data = Bytes.concat(data, this.signature);
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 	}
@@ -155,39 +157,7 @@ public class IssueAssetTransaction extends Transaction
 	}
 	
 	//VALIDATE
-	
-	public boolean isSignatureValid()
-	{
-		byte[] data = new byte[0];
 		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ISSUE_ASSET_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE ISSUER
-		data = Bytes.concat(data, this.issuer.getPublicKey());
-		
-		//WRITE ASSET
-		data = Bytes.concat(data , this.asset.toBytes(false));
-		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-				
-		return Crypto.getInstance().verify(this.issuer.getPublicKey(), this.signature, data);
-	}
-	
 	@Override
 	public int isValid(DBSet db) 
 	{
@@ -218,20 +188,20 @@ public class IssueAssetTransaction extends Transaction
 			return INVALID_QUANTITY;
 		}
 		
-		//CHECK ISSUER
-		if(!Crypto.getInstance().isValidAddress(this.asset.getOwner().getAddress()))
+		//CHECK CREATOR
+		if(!Crypto.getInstance().isValidAddress(this.asset.getCreator().getAddress()))
 		{
 			return INVALID_ADDRESS;
 		}
 		
-		//CHECK IF ISSUER HAS ENOUGH MONEY
-		if(this.issuer.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF CREATOR HAS ENOUGH MONEY
+		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
 		{
 			return NO_BALANCE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.issuer.getLastReference(db), this.reference))
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -250,17 +220,17 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public void process(DBSet db)
 	{
-		//UPDATE ISSUER
-		this.issuer.setConfirmedBalance(this.issuer.getConfirmedBalance(db).subtract(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
 								
-		//UPDATE REFERENCE OF ISSUER
-		this.issuer.setLastReference(this.signature, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.signature, db);
 		
 		//INSERT INTO DATABASE
 		long key = db.getAssetMap().add(this.asset);
 		
 		//ADD ASSETS TO OWNER
-		this.asset.getOwner().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this, key);
@@ -270,27 +240,21 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public void orphan(DBSet db) 
 	{
-		//UPDATE ISSUER
-		this.issuer.setConfirmedBalance(this.issuer.getConfirmedBalance(db).add(this.fee), db);
+		//UPDATE CREATOR
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
 										
-		//UPDATE REFERENCE OF ISSUER
-		this.issuer.setLastReference(this.reference, db);
+		//UPDATE REFERENCE OF CREATOR
+		this.creator.setLastReference(this.reference, db);
 				
 		//DELETE FROM DATABASE
 		long key = db.getIssueAssetMap().get(this);
 		db.getAssetMap().delete(key);	
 		
 		//REMOVE ASSETS FROM OWNER
-		this.asset.getOwner().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
 		
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
-	}
-
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.issuer;
 	}
 
 
@@ -298,8 +262,8 @@ public class IssueAssetTransaction extends Transaction
 	public List<Account> getInvolvedAccounts() 
 	{
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.issuer);
-		accounts.add(this.asset.getOwner());
+		accounts.add(this.creator);
+		accounts.add(this.asset.getCreator());
 		return accounts;
 	}
 
@@ -309,7 +273,7 @@ public class IssueAssetTransaction extends Transaction
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.issuer.getAddress()) || address.equals(this.asset.getOwner().getAddress()))
+		if(address.equals(this.creator.getAddress()) || address.equals(this.asset.getCreator().getAddress()))
 		{
 			return true;
 		}
@@ -321,43 +285,11 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public BigDecimal getAmount(Account account) 
 	{
-		if(account.getAddress().equals(this.issuer.getAddress()))
+		if(account.getAddress().equals(this.creator.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
 		}
 		
 		return BigDecimal.ZERO;
-	}
-
-	public static byte[] generateSignature(DBSet db, PrivateKeyAccount creator, Asset asset, BigDecimal fee, long timestamp) 
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ISSUE_ASSET_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, creator.getLastReference(db));
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, creator.getPublicKey());
-		
-		//WRITE ASSET
-		data = Bytes.concat(data , asset.toBytes(false));
-		
-		//WRITE FEE
-		byte[] feeBytes = fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
-		
-		return Crypto.getInstance().sign(creator, data);
 	}
 }
