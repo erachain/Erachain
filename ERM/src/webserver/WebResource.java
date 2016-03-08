@@ -1271,6 +1271,7 @@ public class WebResource {
 
 			try {
 
+				/* icreator TODO calcRecommendedFeeForArbitraryTransaction
 				jsonBlogPost.put(
 						"fee",
 						Controller
@@ -1278,6 +1279,8 @@ public class WebResource {
 								.calcRecommendedFeeForArbitraryTransaction(
 										jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null)
 								.getA().toPlainString());
+				*/
+
 
 				String result;
 				//COMMENT OR REAL BLOGPOST?
@@ -1820,10 +1823,13 @@ public class WebResource {
 					// TODO create blogpost json in method --> move to BlogUtils
 					// (for every kind delete/share and so on)
 					jsonBlogPost.put("creator", creator);
+					
+					/* icreator 
 					Pair<BigDecimal, Integer> fee = Controller.getInstance()
 							.calcRecommendedFeeForArbitraryTransaction(
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null);
 					jsonBlogPost.put("fee", fee.getA().toPlainString());
+					*/
 					// I am not author, but am I the owner of the blog?
 				} else if (blognameOpt != null
 						&& Controller.getInstance().getNamesAsListAsString()
@@ -1958,11 +1964,12 @@ public class WebResource {
 					jsonBlogPost.put(BlogPostResource.SHARE_KEY, signature);
 					jsonBlogPost.put("body", "share");
 
+					/* icreator TODO calcRecommendedFeeForArbitraryTransaction
 					Pair<BigDecimal, Integer> fee = Controller.getInstance()
 							.calcRecommendedFeeForArbitraryTransaction(
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null);
 					jsonBlogPost.put("fee", fee.getA().toPlainString());
-
+		 			*/
 					try {
 
 						String result = new BlogPostResource().addBlogEntry(

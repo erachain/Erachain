@@ -113,7 +113,7 @@ public class CancelSellNameDetailsFrame extends JFrame
 		
 		//REGISTRANT
 		detailGBC.gridy = 4;
-		JTextField registrant = new JTextField(cancelNameSale.getOwner().getAddress());
+		JTextField registrant = new JTextField(cancelNameSale.getCreator().getAddress());
 		registrant.setEditable(false);
 		MenuPopupUtil.installContextMenu(registrant);
 		this.add(registrant, detailGBC);

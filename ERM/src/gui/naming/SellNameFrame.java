@@ -25,7 +25,7 @@ import controller.Controller;
 import qora.account.PrivateKeyAccount;
 import qora.naming.Name;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -34,7 +34,7 @@ public class SellNameFrame extends JFrame
 	private JComboBox<Name> cbxName;
 	private JTextField txtOwner;
 	private JTextField txtPrice;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JButton sellButton;
 	
 	public SellNameFrame(Name name)
@@ -143,9 +143,9 @@ public class SellNameFrame extends JFrame
       		
       	//TXT FEE
       	txtGBC.gridy = 4;
-      	txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(txtFeePow, txtGBC);
 		           
         //BUTTON SELL
         buttonGBC.gridy = 5;
@@ -220,39 +220,7 @@ public class SellNameFrame extends JFrame
 						
 			//READ FEE
 			parsing = 2;
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.sellButton.setEnabled(true);
-				
-				return;
-			}
-		
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				}
-				if (n == JOptionPane.NO_OPTION) {
-					
-					txtFee.setText("1");
-					
-					//ENABLE
-					this.sellButton.setEnabled(true);
-					
-					return;
-				}
-			}
+			int fee = Integer.parseInt(txtFeePow.getText());
 			
 			//CREATE NAME UPDATE
 			PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(name.getOwner().getAddress());

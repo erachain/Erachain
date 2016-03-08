@@ -1,6 +1,6 @@
 package api;
 
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -110,20 +110,11 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			String registrant = (String) jsonObject.get("registrant");
 			String name = (String) jsonObject.get("name");
 			String value = (String) jsonObject.get("value");
 
-			// PARSE FEE
-			BigDecimal bdFee;
-			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
-			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(registrant)) {
@@ -155,7 +146,7 @@ public class NamesResource {
 
 			// CREATE NAME
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.registerName(account, account, name, value, bdFee);
+					.registerName(account, account, name, value, feePow);
 
 			switch (result.getB()) {
 			case Transaction.VALIDATE_OK:
@@ -215,21 +206,12 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			String key = (String) jsonObject.get("key");
 
 			// keys are always lowercase!
 			key = key.toLowerCase();
 
-			// PARSE FEE
-			BigDecimal bdFee;
-			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
-			}
 
 			APIUtils.askAPICallAllowed("DELETE names/key/" + nameName + "\n"
 				                           + x, request);
@@ -309,7 +291,7 @@ public class NamesResource {
 			// UPDATE NAME
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.updateName(account, account, nameName,
-							GZIP.compress(resultString), bdFee);
+							GZIP.compress(resultString), feePow);
 
 			return checkNameTransaction(result);
 
@@ -333,7 +315,7 @@ public class NamesResource {
 
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			String key = (String) jsonObject.get("key");
 			String value = (String) jsonObject.get("value");
 			String updateString = (String) jsonObject.get("update");
@@ -351,16 +333,6 @@ public class NamesResource {
 					throw ApiErrorFactory.getInstance().createError(
 							ApiErrorFactory.ERROR_INVALID_UPDATE_VALUE);
 				}
-			}
-
-			// PARSE FEE
-			BigDecimal bdFee;
-			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
 			APIUtils.askAPICallAllowed("POST names/key/" + nameName + "\n" + x,
@@ -424,7 +396,7 @@ public class NamesResource {
 			// UPDATE NAME
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.updateName(account, account, nameName,
-							GZIP.compress(resultString), bdFee);
+							GZIP.compress(resultString), feePow);
 
 			return checkNameTransaction(result);
 
@@ -447,19 +419,11 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			String newOwner = (String) jsonObject.get("newowner");
 			String newValue = (String) jsonObject.get("newvalue");
 
 			// PARSE FEE
-			BigDecimal bdFee;
-			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
-			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(newOwner)) {
@@ -501,7 +465,7 @@ public class NamesResource {
 			// UPDATE NAME
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.updateName(account, new Account(newOwner), nameName,
-							newValue, bdFee);
+							newValue, feePow);
 
 			return checkNameTransaction(result);
 		} catch (NullPointerException e) {

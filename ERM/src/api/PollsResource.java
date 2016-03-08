@@ -1,6 +1,6 @@
 package api;
 
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,14 +48,13 @@ public class PollsResource
 			String name = (String) jsonObject.get("name");
 			String description = (String) jsonObject.get("description");
 			JSONArray optionsJSON = (JSONArray) jsonObject.get("options");
-			String fee = (String) jsonObject.get("fee");
+			String feePow = (String) jsonObject.get("feePow");
 			
-			//PARSE FEE
-			BigDecimal bdFee;
+			//PARSE FEE POWER
+			int feePowInt;
 			try
 			{
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
+				feePowInt = Integer.getInteger(feePow);
 			}
 			catch(Exception e)
 			{
@@ -105,7 +104,7 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, feePowInt);
 				
 			switch(result.getB())
 			{
@@ -190,14 +189,13 @@ public class PollsResource
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String voter = (String) jsonObject.get("voter");
 			String option = (String) jsonObject.get("option");
-			String fee = (String) jsonObject.get("fee");
+			String feePow = (String) jsonObject.get("feePow");
 			
-			//PARSE FEE
-			BigDecimal bdFee;
+			//PARSE FEE POWER
+			int feePowInt;
 			try
 			{
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
+				feePowInt = Integer.getInteger(feePow);
 			}
 			catch(Exception e)
 			{
@@ -246,7 +244,7 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, feePowInt);
 				
 			switch(result.getB())
 			{
@@ -396,5 +394,6 @@ public class PollsResource
 		
 		return array.toJSONString();
 	}
+	
 	
 }

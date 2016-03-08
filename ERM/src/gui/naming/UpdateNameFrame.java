@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +49,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.naming.Name;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.Pair;
@@ -64,7 +64,7 @@ public class UpdateNameFrame extends JFrame
 	private JTextField txtOwner;
 	private JTextField txtKey;
 	private JTextArea txtareaValue;	
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JButton updateButton;
 	private JButton removeButton;
 	private JButton addButton;
@@ -308,9 +308,9 @@ public class UpdateNameFrame extends JFrame
       		
       	//TXT FEE
       	txtGBC.gridy = 9;
-      	txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(txtFeePow, txtGBC);
 		           
         //BUTTON Register
         buttonGBC.gridy = 10;
@@ -390,7 +390,7 @@ public class UpdateNameFrame extends JFrame
       	MenuPopupUtil.installContextMenu(txtOwner);
 		MenuPopupUtil.installContextMenu(txtKey);
       	MenuPopupUtil.installContextMenu(txtareaValue);
-      	MenuPopupUtil.installContextMenu(txtFee);
+      	MenuPopupUtil.installContextMenu(txtFeePow);
       	
 		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 		service.scheduleWithFixedDelay(	new Runnable() { 
@@ -492,40 +492,7 @@ public class UpdateNameFrame extends JFrame
 		try
 		{
 			//READ FEE
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.updateButton.setEnabled(true);
-				
-				return;
-			}
-		
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				}
-				if (n == JOptionPane.NO_OPTION) {
-					
-					txtFee.setText("1");
-					
-					//ENABLE
-					this.updateButton.setEnabled(true);
-					
-					return;
-				}
-			}
-			
+			int feePow = Integer.parseInt(txtFeePow.getText());
 			
 			Pair<Boolean, String> isUpdatable = namesModel.checkUpdateable();
 			if(!isUpdatable.getA())
@@ -556,50 +523,7 @@ public class UpdateNameFrame extends JFrame
 			currentValueAsJsonStringOpt = GZIP.compress(currentValueAsJsonStringOpt);
 			
 			
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForNameUpdate(name.getName(), currentValueAsJsonStringOpt).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1"); // Return to the default fee for the next name.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this name.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.updateButton.setEnabled(true);
-					
-					return;
-				}
-			}
-			
-			Pair<Transaction, Integer> result = Controller.getInstance().updateName(owner, new Account(this.txtOwner.getText()), name.getName(), currentValueAsJsonStringOpt, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().updateName(owner, new Account(this.txtOwner.getText()), name.getName(), currentValueAsJsonStringOpt, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

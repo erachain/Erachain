@@ -110,13 +110,14 @@ public class BlogPostResource {
 				dataStructure.put(BLOGNAME_KEY, blognameOpt);
 			}
 
-			byte[] resultbyteArray = dataStructure.toJSONString().getBytes(
-					StandardCharsets.UTF_8);
+			//byte[] resultbyteArray = dataStructure.toJSONString().getBytes(
+			//		StandardCharsets.UTF_8);
+			/*
 			BigDecimal bdFee = Controller
 					.getInstance()
 					.calcRecommendedFeeForArbitraryTransaction(resultbyteArray,
 							null).getA();
-
+			*/
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.createArbitraryTransaction(
@@ -124,7 +125,7 @@ public class BlogPostResource {
 							null,
 							BlogUtils.COMMENT_SERVICE_ID,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), bdFee);
+									StandardCharsets.UTF_8), 0);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);
@@ -256,7 +257,7 @@ public class BlogPostResource {
 							null,
 							BlogUtils.COMMENT_SERVICE_ID,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), bdFee);
+									StandardCharsets.UTF_8), 0);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);
@@ -378,7 +379,7 @@ public class BlogPostResource {
 							null,
 							777,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), bdFee);
+									StandardCharsets.UTF_8), 0);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);

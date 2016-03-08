@@ -3,7 +3,9 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import ntp.NTP;
 
@@ -358,5 +360,18 @@ public class TransferAssetTransaction extends Transaction {
 		}
 		
 		return amount;
+	}
+
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		
+		return assetAmount;
 	}
 }

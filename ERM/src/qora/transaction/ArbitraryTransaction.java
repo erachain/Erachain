@@ -3,7 +3,9 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -27,7 +29,6 @@ import utils.StorageUtils;
 
 public abstract class ArbitraryTransaction extends Transaction {
 
-	protected PublicKeyAccount creator;
 	protected int service;
 	protected byte[] data;
 
@@ -155,6 +156,22 @@ public abstract class ArbitraryTransaction extends Transaction {
 		return amount;
 	}
 	
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		
+		for(Payment payment: this.payments)
+		{
+			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), payment.getAsset(), payment.getAmount());
+			assetAmount = addAssetAmount(assetAmount, payment.getRecipient().getAddress(), payment.getAsset(), payment.getAmount());
+		}
+		
+		return assetAmount;
+	}
+
 	// PROCESS/ORPHAN
 	@Override
 	public void process(DBSet db) {

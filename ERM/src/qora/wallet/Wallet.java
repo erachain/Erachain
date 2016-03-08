@@ -1052,14 +1052,14 @@ public class Wallet extends Observable implements Observer
 	private void processNameUpdate(UpdateNameTransaction nameUpdate)
 	{
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(nameUpdate.getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER CHANGED
-			if(!nameUpdate.getOwner().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
 			{
 				//DELETE PREVIOUS NAME
 				Name name = DBSet.getInstance().getUpdateNameMap().get(nameUpdate);
-				this.database.getNameMap().delete(nameUpdate.getOwner(), name);
+				this.database.getNameMap().delete(nameUpdate.getCreator(), name);
 			}
 		}
 		
@@ -1074,10 +1074,10 @@ public class Wallet extends Observable implements Observer
 	private void orphanNameUpdate(UpdateNameTransaction nameUpdate)
 	{
 		//CHECK IF WE WERE OWNER
-		if(this.accountExists(nameUpdate.getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER WAS CHANGED
-			if(!nameUpdate.getOwner().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
 			{
 				//ADD PREVIOUS  NAME
 				Name name = DBSet.getInstance().getNameMap().get(nameUpdate.getName().getName());
@@ -1117,7 +1117,7 @@ public class Wallet extends Observable implements Observer
 	private void processCancelNameSale(CancelSellNameTransaction cancelNameSaleTransaction)
 	{
 		//CHECK IF WE ARE SELLER
-		if(this.accountExists(cancelNameSaleTransaction.getOwner().getAddress()))
+		if(this.accountExists(cancelNameSaleTransaction.getCreator().getAddress()))
 		{
 			//REMOVE FROM DATABASE
 			BigDecimal amount = DBSet.getInstance().getCancelSellNameMap().get(cancelNameSaleTransaction);
@@ -1129,7 +1129,7 @@ public class Wallet extends Observable implements Observer
 	private void orphanCancelNameSale(CancelSellNameTransaction cancelNameSaleTransaction)
 	{
 		//CHECK IF WE ARE SELLER
-		if(this.accountExists(cancelNameSaleTransaction.getOwner().getAddress()))
+		if(this.accountExists(cancelNameSaleTransaction.getCreator().getAddress()))
 		{
 			//ADD TO DATABASE
 			NameSale nameSale = DBSet.getInstance().getNameExchangeMap().getNameSale(cancelNameSaleTransaction.getName());
@@ -1194,7 +1194,7 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getAsset().getOwner().getAddress()))
+		if(this.accountExists(assetIssue.getAsset().getCreator().getAddress()))
 		{
 			//ADD POLL
 			this.database.getAssetMap().add(assetIssue.getAsset());
@@ -1210,7 +1210,7 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getAsset().getOwner().getAddress()))
+		if(this.accountExists(assetIssue.getAsset().getCreator().getAddress()))
 		{
 			//DELETE ASSET
 			this.database.getAssetMap().delete(assetIssue.getAsset());

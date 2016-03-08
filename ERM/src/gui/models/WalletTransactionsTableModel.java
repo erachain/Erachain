@@ -173,7 +173,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 							PlaySound.getInstance().playSound("receivepayment.wav", ((Transaction) message.getValue()).getSignature());
 						}
 						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + paymentTransaction.getSender().getAddress() + "\nTo: " + account.getAddress() + "\nAmount: " + paymentTransaction.getAmount().toPlainString(), MessageType.INFO);
+						SysTray.getInstance().sendMessage("Payment received", "From: " + paymentTransaction.getCreator().getAddress() + "\nTo: " + account.getAddress() + "\nAmount: " + paymentTransaction.getAmount().toPlainString(), MessageType.INFO);
 						
 					}
 					else if(Settings.getInstance().isSoundNewTransactionEnabled())

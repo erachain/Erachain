@@ -209,7 +209,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 	        			}
 	        		}
 	
-	        		Account account = Controller.getInstance().getAccountByAddress(messageTransaction.getSender().getAddress());	
+	        		Account account = Controller.getInstance().getAccountByAddress(messageTransaction.getCreator().getAddress());	
 	        		
 	        		byte[] privateKey = null; 
 	        		byte[] publicKey = null;

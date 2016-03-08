@@ -178,7 +178,7 @@ public class AssetMap extends DBMap<Tuple2<String, String>, Asset>
 	
 	public void delete(Asset asset)
 	{
-		this.delete(asset.getOwner(), asset);
+		this.delete(asset.getCreator(), asset);
 	}
 	
 	public void delete(Account account, Asset asset) 
@@ -196,7 +196,7 @@ public class AssetMap extends DBMap<Tuple2<String, String>, Asset>
 	
 	public boolean add(Asset asset)
 	{
-		return this.set(new Tuple2<String, String>(asset.getOwner().getAddress(), new String(asset.getReference())), asset);
+		return this.set(new Tuple2<String, String>(asset.getCreator().getAddress(), new String(asset.getReference())), asset);
 	}
 	
 	public void addAll(Map<Account, List<Asset>> assets)

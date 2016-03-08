@@ -30,7 +30,7 @@ import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
 import qora.crypto.Base58;
 //import qora.transaction.MessageTransaction;
-import qora.transaction.Json1Transaction;
+import qora.transaction.JsonTransaction;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -41,7 +41,7 @@ public class Json1TransactionDetailsFrame extends JFrame
 {
 	private JTextField messageText;
 	
-	public Json1TransactionDetailsFrame(final Json1Transaction json1Transaction)
+	public Json1TransactionDetailsFrame(final JsonTransaction json1Transaction)
 	{
 		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
@@ -210,7 +210,7 @@ public class Json1TransactionDetailsFrame extends JFrame
 	        			}
 	        		}
 	
-	        		Account account = Controller.getInstance().getAccountByAddress(json1Transaction.getSender().getAddress());	
+	        		Account account = Controller.getInstance().getAccountByAddress(json1Transaction.getCreator().getAddress());	
 	        		
 	        		byte[] privateKey = null; 
 	        		byte[] publicKey = null;

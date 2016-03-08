@@ -34,7 +34,7 @@ public class TransactionMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.transaction.toBytes();
+		byte[] blockBytes = this.transaction.toBytes(true);
 		data = Bytes.concat(data, blockBytes);
 		
 		//ADD CHECKSUM

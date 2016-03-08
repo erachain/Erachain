@@ -5,7 +5,9 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 //import ntp.NTP;
 
@@ -21,6 +23,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+//import database.BalanceMap;
 import database.DBSet;
 
 public class GenesisIssueAssetTransaction extends Transaction 
@@ -31,18 +34,15 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	public GenesisIssueAssetTransaction(Asset asset, long timestamp) 
 	{
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, BigDecimal.ZERO, timestamp, new byte[]{}, generateSignature(asset, timestamp));
-		
+		// new reference = byte[]{}
+		super(GENESIS_ISSUE_ASSET_TRANSACTION, null, timestamp, null);
 		this.asset = asset;
+		this.signature = generateSignature(asset, timestamp);
+
 	}
 
 	//GETTERS/SETTERS
-	
-	public PublicKeyAccount getIssuer()
-	{
-		return null;
-	}
-	
+		
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -89,7 +89,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -104,7 +104,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 				
 		//WRITE ASSET
-		data = Bytes.concat(data , this.asset.toBytes(true));
+		if (withSign) data = Bytes.concat(data , this.asset.toBytes(true));
 				
 		return data;
 	}
@@ -180,7 +180,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		long key = db.getAssetMap().add(this.asset);
 		
 		//ADD ASSETS TO OWNER
-		this.asset.getOwner().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this, key);
@@ -196,7 +196,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		db.getAssetMap().delete(key);	
 		
 		//REMOVE ASSETS FROM OWNER
-		this.asset.getOwner().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
 		
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
@@ -213,7 +213,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	public List<Account> getInvolvedAccounts() 
 	{
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.asset.getOwner());
+		accounts.add(this.asset.getCreator());
 		return accounts;
 	}
 
@@ -223,7 +223,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.asset.getOwner().getAddress()))
+		if(address.equals(this.asset.getCreator().getAddress()))
 		{
 			return true;
 		}
@@ -260,5 +260,15 @@ public class GenesisIssueAssetTransaction extends Transaction
 		digest = Bytes.concat(digest, digest);
 				
 		return digest;
+	}
+	
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+				
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), this.asset.getKey(), new BigDecimal(this.asset.getQuantity()).setScale(8));
+
+		return assetAmount;
 	}
 }

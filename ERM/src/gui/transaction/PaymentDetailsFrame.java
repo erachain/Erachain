@@ -114,7 +114,7 @@ public class PaymentDetailsFrame extends JFrame
 		
 		//SENDER
 		detailGBC.gridy = 4;
-		JTextField sender = new JTextField(payment.getSender().getAddress());
+		JTextField sender = new JTextField(payment.getCreator().getAddress());
 		sender.setEditable(false);
 		MenuPopupUtil.installContextMenu(sender);
 		this.add(sender, detailGBC);

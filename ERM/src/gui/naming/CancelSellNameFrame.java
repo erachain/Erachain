@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class CancelSellNameFrame extends JFrame
 	private JComboBox<NameSale> cbxNameSale;
 	private JTextField txtOwner;
 	private JTextField txtPrice;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JButton cancelSaleButton;
 	
 	public CancelSellNameFrame(NameSale nameSale)
@@ -142,9 +142,9 @@ public class CancelSellNameFrame extends JFrame
       		
       	//TXT FEE
       	txtGBC.gridy = 4;
-      	txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(txtFeePow, txtGBC);
 		           
         //BUTTON CANCEL SALE
         buttonGBC.gridy = 5;
@@ -213,22 +213,11 @@ public class CancelSellNameFrame extends JFrame
 		
 		try
 		{
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.cancelSaleButton.setEnabled(true);
-				
-				return;
-			}
-		
+			int feePow = Integer.parseInt(txtFeePow.getText());
+					
 			//CREATE NAME UPDATE
 			PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(owner, nameSale, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(owner, nameSale, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

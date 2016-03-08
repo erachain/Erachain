@@ -104,7 +104,7 @@ public class MultiPaymentFrame extends JFrame
       		
       	//TXT ACCOUNT
       	txtGBC.gridy = 0;
-      	this.txtAccount = new JTextField(asset.getOwner().getAddress());
+      	this.txtAccount = new JTextField(asset.getCreator().getAddress());
       	this.txtAccount.setEditable(false);
         this.add(this.txtAccount, txtGBC);
         
@@ -197,21 +197,10 @@ public class MultiPaymentFrame extends JFrame
 		{
 			//READ FEE
 			parsing = 2;
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
+			int feePow = Integer.parseInt(txtFee.getText());
 			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				
-				return;
-			}
-		
 			//CREATE MULTI PAYMENT
-			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress()), this.payments, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getCreator().getAddress()), this.payments, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

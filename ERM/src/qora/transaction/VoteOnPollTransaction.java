@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import ntp.NTP;
 
@@ -14,7 +15,7 @@ import org.json.simple.JSONObject;
 import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.crypto.Crypto;
+//import qora.crypto.Crypto;
 import qora.voting.Poll;
 import qora.voting.PollOption;
 
@@ -22,6 +23,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.BalanceMap;
 import database.DBSet;
 
 public class VoteOnPollTransaction extends Transaction 
@@ -30,28 +32,27 @@ public class VoteOnPollTransaction extends Transaction
 	private static final int OPTION_SIZE_LENGTH = 4;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + POLL_SIZE_LENGTH + OPTION_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
-	private PublicKeyAccount creator;
 	private String poll;
 	public int option;
 	
 	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, long timestamp, byte[] reference) 
 	{
-		super(VOTE_ON_POLL_TRANSACTION, timestamp, reference);
+		super(VOTE_ON_POLL_TRANSACTION, creator, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
 		this.option = option;
-	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, int feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, poll, option, timestamp, reference);
-		this.calcFee();
 	}
 	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, poll, option, timestamp, reference);
 		this.fee = fee;
 		this.signature = signature;
+	}
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, int feePow, long timestamp, byte[] reference) 
+	{
+		this(creator, poll, option, timestamp, reference);
+		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
@@ -193,14 +194,6 @@ public class VoteOnPollTransaction extends Transaction
 	
 	//VALIDATE
 	
-	public boolean isSignatureValid()
-	{
-		byte[] data = this.toBytes( false );
-		if ( data == null ) return false;
-				
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	}
-	
 	@Override
 	public int isValid(DBSet db) 
 	{
@@ -312,12 +305,6 @@ public class VoteOnPollTransaction extends Transaction
 		db.getPollMap().add(poll);
 	}
 
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.creator;
-	}
-
 
 	@Override
 	public List<Account> getInvolvedAccounts() 
@@ -353,4 +340,9 @@ public class VoteOnPollTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+	}
 }

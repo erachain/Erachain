@@ -49,7 +49,7 @@ public class MultiPaymentResource
 			if(jsonObject.containsKey("asset")) {
 				lgAsset = ((Long) jsonObject.get("asset")).intValue();
 			}
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			
 			Asset defaultAsset;
 			try {
@@ -86,24 +86,8 @@ public class MultiPaymentResource
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_SENDER);
 			}
-			
-			BigDecimal bdFee;
-			if(fee != null) {
-				try
-				{
-					bdFee = new BigDecimal(fee);
-					bdFee = bdFee.setScale(8);
-				}
-				catch(Exception e)
-				{
-					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
-				}	
-			} else {
-				Pair<BigDecimal, Integer> recommendedFee = Controller.getInstance().calcRecommendedFeeForMultiPayment(payments);
-				bdFee = recommendedFee.getA();
-			}
-			
-			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(account, payments, bdFee);
+						
+			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(account, payments, feePow);
 			
 			switch (result.getB()) {
 			case Transaction.VALIDATE_OK:

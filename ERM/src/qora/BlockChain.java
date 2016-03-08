@@ -7,13 +7,13 @@ import java.util.logging.Logger;
 
 import controller.Controller;
 import database.DBSet;
-import ntp.NTP;
+//import ntp.NTP;
 import qora.account.Account;
 import qora.assets.Asset;
 import qora.block.Block;
 import qora.block.GenesisBlock;
 import qora.transaction.ArbitraryTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
+//import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;

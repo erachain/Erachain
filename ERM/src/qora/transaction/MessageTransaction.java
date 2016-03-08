@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -25,25 +27,25 @@ import utils.Converter;
 
 public class MessageTransaction extends Transaction {
 
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
 	protected byte[] data;
-
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
+	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+
 	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		super(MESSAGE_TRANSACTION, creator, timestamp, reference);
+
 		this.data = data;
 		this.recipient = recipient;
 		this.key = key;
 		this.amount = amount;
 		this.encrypted = encrypted;
 		this.isText = isText;
-
 	}
 	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
@@ -54,7 +56,7 @@ public class MessageTransaction extends Transaction {
 	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.calcFee();
-		
+
 	}
 
 	public byte[] getData() 
@@ -228,7 +230,7 @@ public class MessageTransaction extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new MessageTransactionV3(creator, recipient, key, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new MessageTransaction(creator, recipient, key, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -404,5 +406,17 @@ public class MessageTransaction extends Transaction {
 		}
 	}
 
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		
+		return assetAmount;
+	}
 }
 

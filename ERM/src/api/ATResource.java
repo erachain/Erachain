@@ -31,6 +31,7 @@ import at.AT_Constants;
 import at.AT_Transaction;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -205,20 +206,15 @@ public class ATResource
 			{
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_TAGS_LENGTH );
 			}
-			BigDecimal fee;
+			Integer feePow;
 			try
 			{
-				String feeString = (String) jsonObject.get("fee");
-				fee = new BigDecimal(feeString).setScale(8);
+				feePow = (int) jsonObject.get("feePow");
 			}
 			catch (Exception e)
 			{
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
 
-			}
-			if ( hasMinimumFee() == -1 )
-			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
 			}
 			
 			BigDecimal quantity;
@@ -264,7 +260,8 @@ public class ATResource
 
 			}
 			
-			byte[] balanceBytes = fee.unscaledValue().toByteArray();
+			//byte[] balanceBytes = feePow.toByteArray();
+			byte[] balanceBytes = Ints.toByteArray(feePow);
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
@@ -324,7 +321,7 @@ public class ATResource
 
 			PrivateKeyAccount sender = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
 			
-			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(sender, name, desc , type , tags , creationBytes, quantity, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(sender, name, desc , type , tags , creationBytes, quantity, feePow);
 
 			switch(result.getB())
 			{

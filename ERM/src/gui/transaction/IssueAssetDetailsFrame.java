@@ -128,7 +128,7 @@ public class IssueAssetDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(assetIssue.getAsset().getOwner().getAddress());
+		JTextField owner = new JTextField(assetIssue.getAsset().getCreator().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);

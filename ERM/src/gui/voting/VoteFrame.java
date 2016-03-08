@@ -16,7 +16,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class VoteFrame extends JFrame
 	private JComboBox<Account> cbxAccount;
 	private JComboBox<PollOption> cbxOptions;
 	private JButton voteButton;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JComboBox<Asset> cbxAssets;
 	
 	public VoteFrame(Poll poll, int option, Asset asset)
@@ -206,9 +206,9 @@ public class VoteFrame extends JFrame
       		
       	//TXT FEE
       	detailGBC.gridy = 6;
-      	this.txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(this.txtFee, detailGBC);
+      	this.txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(this.txtFeePow, detailGBC);
 		
 		//ADD EXCHANGE BUTTON
 		detailGBC.gridy = 7;
@@ -270,13 +270,13 @@ public class VoteFrame extends JFrame
 		try
 		{
 			//READ FEE
-			int feePow = Integer.parseInt(txtFee.getText());
+			int feePow = Integer.parseInt(txtFeePow.getText());
 					
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			PollOption option = (PollOption) this.cbxOptions.getSelectedItem();
 			
-			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(creator, poll, option, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(creator, poll, option, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

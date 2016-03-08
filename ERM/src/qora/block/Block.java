@@ -454,7 +454,7 @@ public class Block {
 			data = Bytes.concat(data, transactionLengthBytes);
 
 			//WRITE TRANSACTION
-			data = Bytes.concat(data, transaction.toBytes());
+			data = Bytes.concat(data, transaction.toBytes(true));
 		}
 
 		return data;
@@ -755,7 +755,7 @@ public class Block {
 		int seq = 1;
 		for(Transaction transaction: this.getTransactions())
 		{
-			db.getTransactionFinalMap().add( height , seq, transaction);
+			db.getTransactionFinalMap().add( height, seq, transaction);
 			seq++;
 		}
 
@@ -842,6 +842,33 @@ public class Block {
 			Transaction transaction = transactions.get(i);
 			transaction.orphan(db);
 		}
+	}
+	public int getTransactionSeq(byte[] signature)
+	{
+		int seq = 1;
+		for(Transaction transaction: this.getTransactions())
+		{
+			if(Arrays.equals(transaction.getSignature(), signature))
+			{
+				return seq;
+			}
+			seq ++;
+		}
+
+		return -1;
+	}
+	
+	@Override 
+	public boolean equals(Object otherObject)
+	{
+		if(otherObject instanceof Block)
+		{
+			Block otherBlock = (Block) otherObject;
+			
+			return Arrays.equals(this.getSignature(), otherBlock.getSignature());
+		}
+		
+		return false;
 	}
 
 }

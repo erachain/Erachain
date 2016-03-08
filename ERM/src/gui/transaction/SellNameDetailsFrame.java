@@ -114,7 +114,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//REGISTRANT
 		detailGBC.gridy = 4;
-		JTextField registrant = new JTextField(nameSale.getOwner().getAddress());
+		JTextField registrant = new JTextField(nameSale.getCreator().getAddress());
 		registrant.setEditable(false);
 		MenuPopupUtil.installContextMenu(registrant);
 		this.add(registrant, detailGBC);

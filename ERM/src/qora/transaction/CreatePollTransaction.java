@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import ntp.NTP;
 
@@ -23,6 +24,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.BalanceMap;
 import database.DBSet;
 
 public class CreatePollTransaction extends Transaction 
@@ -34,7 +36,7 @@ public class CreatePollTransaction extends Transaction
 	
 	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, long timestamp, byte[] reference) 
 	{
-		super(CREATE_POLL_TRANSACTION, timestamp, reference);
+		super(CREATE_POLL_TRANSACTION, creator, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
@@ -328,7 +330,6 @@ public class CreatePollTransaction extends Transaction
 		return false;
 	}
 
-
 	@Override
 	public BigDecimal getAmount(Account account) 
 	{
@@ -338,6 +339,12 @@ public class CreatePollTransaction extends Transaction
 		}
 		
 		return BigDecimal.ZERO;
+	}
+	
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
 }

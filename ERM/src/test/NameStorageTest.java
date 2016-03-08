@@ -15,8 +15,7 @@ import org.junit.Test;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.Crypto;
 import qora.naming.Name;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.ArbitraryTransactionV1;
+import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.GenesisTransaction;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.Transaction;
@@ -60,14 +59,12 @@ public class NameStorageTest {
 		// CREATE SIGNATURE
 		long timestamp = NTP.getTime();
 		Name name = new Name(sender, "drizzt", "this is the value");
-		byte[] signature = RegisterNameTransaction.generateSignature(
-				databaseSet, sender, name, BigDecimal.valueOf(1).setScale(8),
-				timestamp);
 
 		// CREATE NAME REGISTRATION
 		Transaction nameRegistration = new RegisterNameTransaction(sender,
-				name, BigDecimal.ONE.setScale(8), timestamp,
-				sender.getLastReference(databaseSet), signature);
+				name, 0, timestamp,
+				sender.getLastReference(databaseSet));
+		//nameRegistration.sign(sender);
 		
 
 		// CHECK IF NAME REGISTRATION IS VALID
@@ -93,11 +90,11 @@ public class NameStorageTest {
 		byte[] data = storageJsonObject.toString().getBytes();
 
 		// ADDING KEY COMPLETE WITH YES
-		byte[] signature = ArbitraryTransactionV1.generateSignature(databaseSet,
-				sender, 10, data, BigDecimal.valueOf(1).setScale(8), timestamp);
-		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV1(
-				sender, 10, data, BigDecimal.ONE.setScale(8), timestamp,
-				sender.getLastReference(databaseSet), signature);
+		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(
+				sender, 10, data, 0, timestamp,
+				sender.getLastReference(databaseSet));
+		arbitraryTransaction.sign(sender);
+		
 		arbitraryTransaction.process(databaseSet);
 
 		// KEY IS THERE!
@@ -120,11 +117,9 @@ public class NameStorageTest {
 			 data = storageJsonObject.toString().getBytes();
 
 			// ADDING KEY COMPLETE WITH YES
-			 signature = ArbitraryTransactionV1.generateSignature(databaseSet,
-					badSender, 10, data, BigDecimal.valueOf(1).setScale(8), timestamp);
-			arbitraryTransaction = new ArbitraryTransactionV1(
-					badSender, 10, data, BigDecimal.ONE.setScale(8), timestamp,
-					badSender.getLastReference(databaseSet), signature);
+			arbitraryTransaction = new ArbitraryTransactionV3(
+					badSender, 10, data, 0, timestamp,
+					badSender.getLastReference(databaseSet));
 			
 			
 			arbitraryTransaction.process(databaseSet);

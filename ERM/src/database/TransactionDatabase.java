@@ -110,7 +110,7 @@ public class TransactionDatabase extends Observable implements Observer {
 	{
 		try
 		{			
-			this.transactionMap.put(transaction.getSignature(), transaction.toBytes());
+			this.transactionMap.put(transaction.getSignature(), transaction.toBytes(true));
 			
 			//COMMIT
 			if(this.databaseSet != null)

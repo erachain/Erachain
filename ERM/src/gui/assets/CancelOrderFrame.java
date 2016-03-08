@@ -11,7 +11,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,7 @@ import controller.Controller;
 public class CancelOrderFrame extends JFrame
 {
 	private Order order;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JButton cancelOrderButton;
 	
 	public CancelOrderFrame(Order order)
@@ -159,9 +159,9 @@ public class CancelOrderFrame extends JFrame
       		
       	//TXT FEE
       	txtGBC.gridy = 7;
-      	txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(txtFeePow, txtGBC);
 		           
         //BUTTON CANCEL SALE
         buttonGBC.gridy = 8;
@@ -219,22 +219,11 @@ public class CancelOrderFrame extends JFrame
 		
 		try
 		{
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.cancelOrderButton.setEnabled(true);
-				
-				return;
-			}
-		
+			int feePow = Integer.parseInt(txtFeePow.getText());
+					
 			//CREATE NAME UPDATE
 			PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(owner, order, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(owner, order, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

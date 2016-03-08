@@ -1,6 +1,6 @@
 package api;
 
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +45,7 @@ public class ArbitraryTransactionsResource
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			int service = ((Long) jsonObject.get("service")).intValue();
 			String data = (String) jsonObject.get("data");
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			String creator = (String) jsonObject.get("creator");
 			
 			long lgAsset = 0L;
@@ -75,24 +75,9 @@ public class ArbitraryTransactionsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA);
 			}
 				
-			//PARSE FEE
-			
-			BigDecimal bdFee;
-			if(fee != null) {
-				try
-				{
-					bdFee = new BigDecimal(fee);
-					bdFee = bdFee.setScale(8);
-				}
-				catch(Exception e)
-				{
-					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
-				}	
-			} else {
-				Pair<BigDecimal, Integer> recommendedFee = Controller.getInstance().calcRecommendedFeeForArbitraryTransaction(dataBytes, payments);
-				
-				bdFee = recommendedFee.getA();
-			}
+			//PARSE FEE			
+			//Pair<BigDecimal, Integer> recommendedFee = Controller.getInstance().calcRecommendedFeeForArbitraryTransaction(dataBytes, payments);				
+			//bdFee = recommendedFee.getA();
 			
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(creator))
@@ -122,7 +107,7 @@ public class ArbitraryTransactionsResource
 			}
 				
 			//SEND PAYMENT
-			Pair<Transaction, Integer> result = Controller.getInstance().createArbitraryTransaction(account, payments, service, dataBytes, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().createArbitraryTransaction(account, payments, service, dataBytes, feePow);
 				
 			return checkArbitraryTransaction(result);
 		}

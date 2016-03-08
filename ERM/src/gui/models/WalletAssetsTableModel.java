@@ -80,7 +80,7 @@ public class WalletAssetsTableModel extends QoraTableModel<Tuple2<String, String
 		
 		case COLUMN_ADDRESS:
 			
-			return asset.getOwner().getAddress();
+			return asset.getCreator().getAddress();
 			
 		case COLUMN_AMOUNT:
 			

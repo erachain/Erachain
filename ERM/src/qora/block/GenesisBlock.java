@@ -14,7 +14,7 @@ import qora.assets.Asset;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
-import qora.transaction.IssueAssetTransaction;
+//import qora.transaction.IssueAssetTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
@@ -120,15 +120,15 @@ public class GenesisBlock extends Block{
 	// make assets
 	public Asset makeERM(byte[] signature) 
 	{
-		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, true, signature);
+		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, (byte)6, true, signature);
 	}
 	public Asset makeOil(byte[] signature) 
 	{
-		return new Asset(genesisGenerator, "oil", "Fee oil", 99999999L, true, signature);
+		return new Asset(genesisGenerator, "oil", "Fee oil", 99999999L, (byte) 8, true, signature);
 	}
 	public Asset makeGem(byte[] signature) 
 	{
-		return new Asset(genesisGenerator, "GEM", "Vote gem", 999999999999999999L, false, signature);
+		return new Asset(genesisGenerator, "GEM", "Vote gem", 999999999999999999L, (byte) 0, false, signature);
 	}
 
 	public String getTestNetInfo() 

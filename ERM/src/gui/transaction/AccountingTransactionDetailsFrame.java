@@ -210,7 +210,7 @@ public class AccountingTransactionDetailsFrame extends JFrame
 	        			}
 	        		}
 	
-	        		Account account = Controller.getInstance().getAccountByAddress(accountingTransaction.getSender().getAddress());	
+	        		Account account = Controller.getInstance().getAccountByAddress(accountingTransaction.getCreator().getAddress());	
 	        		
 	        		byte[] privateKey = null; 
 	        		byte[] publicKey = null;

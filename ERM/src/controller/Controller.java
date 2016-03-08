@@ -89,11 +89,11 @@ import webserver.WebService;
 
 public class Controller extends Observable {
 
-	private String version = "0.26.0 beta";
-	private String buildTime = "2016-02-28 00:00:00 UTC";
+	private String version = "0.3.0 beta";
+	private String buildTime = "2016-03-07 00:00:00 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "0.26.0";
+	public static final String releaseVersion = "0.3.0";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -1608,12 +1608,12 @@ public class Controller extends Observable {
 	}
 	
 	public Pair<Transaction, Integer> issueAsset(PrivateKeyAccount creator,
-			String name, String description, long quantity, boolean divisible,
-			int feePow) {
+			String name, String description, long quantity, byte scale,
+			boolean divisible, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueAssetTransaction(creator,
-					name, description, quantity, null, divisible, feePow);
+					name, description, quantity, scale, divisible, feePow);
 		}
 	}
 

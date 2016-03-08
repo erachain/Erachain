@@ -20,8 +20,7 @@ import qora.naming.Name;
 import qora.naming.NameSale;
 import qora.payment.Payment;
 import qora.transaction.AccountingTransaction;
-import qora.transaction.Json1TransactionV3;
-import qora.transaction.MessageTransaction;
+import qora.transaction.JsonTransaction;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -30,8 +29,7 @@ import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.DeployATTransaction;
 import qora.transaction.IssueAssetTransaction;
-//import qora.transaction.MessageTransactionV1;
-//import qora.transaction.MessageTransactionV3;
+import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
 import qora.transaction.RegisterNameTransaction;
@@ -468,8 +466,8 @@ public class TransactionCreator
 		
 		long timestamp = NTP.getTime();
 		
-		//CREATE MESSAGE TRANSACTION V3
-		Transaction messageTx = new Json1TransactionV3(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		//CREATE MESSAGE TRANSACTION
+		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator);
 			
 		return afterCreate(messageTx);

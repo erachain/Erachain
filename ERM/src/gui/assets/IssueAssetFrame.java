@@ -12,7 +12,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ import javax.swing.border.EmptyBorder;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
@@ -41,7 +41,8 @@ import controller.Controller;
 public class IssueAssetFrame extends JFrame
 {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFee;
+	private JTextField txtScale;
+	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
 	private JTextField txtQuantity;
@@ -149,33 +150,44 @@ public class IssueAssetFrame extends JFrame
       	//TXT QUANTITY
       	txtGBC.gridy = 3;
       	this.txtQuantity = new JTextField();
-      	this.txtQuantity.setText("1");
+      	this.txtQuantity.setText("9999999");
         this.add(this.txtQuantity, txtGBC);
         
-      	//LABEL DIVISIBLE
+        //LABEL SCALE
       	labelGBC.gridy = 4;
+      	JLabel scaleLabel = new JLabel(Lang.getInstance().translate("Scale:"));
+      	this.add(scaleLabel, labelGBC);
+      		
+      	//TXT SCALE
+      	txtGBC.gridy = 4;
+      	this.txtScale = new JTextField();
+      	this.txtScale.setText("2");
+        this.add(this.txtScale, txtGBC);
+
+        //LABEL DIVISIBLE
+      	labelGBC.gridy = 5;
       	JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible:"));
       	this.add(divisibleLabel, labelGBC);
       		
       	//CHECKBOX DIVISIBLE
-      	txtGBC.gridy = 4;
+      	txtGBC.gridy = 5;
       	this.chkDivisible = new JCheckBox();
       	this.chkDivisible.setSelected(true);
       	this.add(this.chkDivisible, txtGBC);
       	
-        //LABEL FEE
-      	labelGBC.gridy = 5;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+        //LABEL FEE POW
+      	labelGBC.gridy = 6;
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
-      	txtGBC.gridy = 5;
-      	this.txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(this.txtFee, txtGBC);
+      	txtGBC.gridy = 6;
+      	this.txtFeePow = new JTextField();
+      	this.txtFeePow.setText("0");
+        this.add(this.txtFeePow, txtGBC);
 		           
         //BUTTON Register
-        buttonGBC.gridy = 6;
+        buttonGBC.gridy = 7;
         this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
         this.issueButton.setPreferredSize(new Dimension(100, 25));
         this.issueButton.addActionListener(new ActionListener()
@@ -234,91 +246,19 @@ public class IssueAssetFrame extends JFrame
 		long parse = 0;
 		try
 		{
-			//READ FEE
-			BigDecimal fee = new BigDecimal(this.txtFee.getText()).setScale(8);
+			//READ SCALSE
+			byte scale = Byte.parseByte(this.txtScale.getText());
+			
+			//READ FEE POW
+			int feePow = Integer.parseInt(this.txtFeePow.getText());
 			
 			//READ QUANTITY
 			parse = 1;
-			long quantity = Long.parseLong(this.txtQuantity.getText());
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.issueButton.setEnabled(true);
-				
-				return;
-			}
-			
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				}
-				if (n == JOptionPane.NO_OPTION) {
-					
-					txtFee.setText("1");
-					
-					//ENABLE
-					this.issueButton.setEnabled(true);
-					
-					return;
-				}
-			}
-		
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForIssueAssetTransaction(this.txtName.getText(), this.txtareaDescription.getText()).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1"); // Return to the default fee for the next name.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this name.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.issueButton.setEnabled(true);
-					
-					return;
-				}
-			}
+			long quantity = Long.parseLong(this.txtQuantity.getText());		
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), quantity, this.chkDivisible.isSelected(), fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), quantity, scale, this.chkDivisible.isSelected(), feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

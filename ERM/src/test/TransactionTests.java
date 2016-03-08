@@ -888,7 +888,7 @@ public class TransactionTests {
 			assertEquals(nameUpdate.getAmount(sender), parsedUpdate.getAmount(sender));	
 			
 			//CHECK OWNER
-			assertEquals(nameUpdate.getOwner().getAddress(), parsedUpdate.getOwner().getAddress());	
+			assertEquals(nameUpdate.getCreator().getAddress(), parsedUpdate.getCreator().getAddress());	
 			
 			//CHECK NAME OWNER
 			assertEquals(nameUpdate.getName().getOwner().getAddress(), parsedUpdate.getName().getOwner().getAddress());	
@@ -1201,7 +1201,7 @@ public class TransactionTests {
 			assertEquals(nameSaleTransaction.getAmount(sender), parsedNameSale.getAmount(sender));	
 			
 			//CHECK OWNER
-			assertEquals(nameSaleTransaction.getOwner().getAddress(), parsedNameSale.getOwner().getAddress());	
+			assertEquals(nameSaleTransaction.getCreator().getAddress(), parsedNameSale.getCreator().getAddress());	
 			
 			//CHECK NAMESALE NAME
 			assertEquals(nameSaleTransaction.getNameSale().getKey(), parsedNameSale.getNameSale().getKey());	
@@ -1511,7 +1511,7 @@ public class TransactionTests {
 			assertEquals(cancelNameSaleTransaction.getAmount(sender), parsedCancelNameSale.getAmount(sender));	
 			
 			//CHECK OWNER
-			assertEquals(cancelNameSaleTransaction.getOwner().getAddress(), parsedCancelNameSale.getOwner().getAddress());	
+			assertEquals(cancelNameSaleTransaction.getCreator().getAddress(), parsedCancelNameSale.getCreator().getAddress());	
 			
 			//CHECK NAME
 			assertEquals(cancelNameSaleTransaction.getName(), parsedCancelNameSale.getName());	
@@ -2907,7 +2907,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), parsedGenesisIssueAssetTransaction.getSignature()));
 			
 			//CHECK ISSUER
-			assertEquals(genesisIssueAssetTransaction.getIssuer().getAddress(), parsedGenesisIssueAssetTransaction.getIssuer().getAddress());
+			assertEquals(genesisIssueAssetTransaction.getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getCreator().getAddress());
 						
 			//CHECK NAME
 			assertEquals(genesisIssueAssetTransaction.getAsset().getName(), parsedGenesisIssueAssetTransaction.getAsset().getName());
@@ -3091,10 +3091,10 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), parsedIssueAssetTransaction.getSignature()));
 			
 			//CHECK ISSUER
-			assertEquals(issueAssetTransaction.getIssuer().getAddress(), parsedIssueAssetTransaction.getIssuer().getAddress());
+			assertEquals(issueAssetTransaction.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueAssetTransaction.getAsset().getOwner().getAddress(), parsedIssueAssetTransaction.getAsset().getOwner().getAddress());
+			assertEquals(issueAssetTransaction.getAsset().getCreator().getAddress(), parsedIssueAssetTransaction.getAsset().getCreator().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueAssetTransaction.getAsset().getName(), parsedIssueAssetTransaction.getAsset().getName());

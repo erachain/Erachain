@@ -13,7 +13,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -42,7 +42,7 @@ import javax.swing.event.ListSelectionListener;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
@@ -55,7 +55,7 @@ import controller.Controller;
 public class RegisterNameFrame extends JFrame
 {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaValue;
 	private JLabel countLabel;
@@ -320,9 +320,9 @@ public class RegisterNameFrame extends JFrame
       	
       	//TXT FEE
       	txtGBC.gridy = 9;
-      	this.txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(this.txtFee, txtGBC);
+      	this.txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(this.txtFeePow, txtGBC);
 		           
         //BUTTON Register
         buttonGBC.gridy = 10;
@@ -349,7 +349,7 @@ public class RegisterNameFrame extends JFrame
       	MenuPopupUtil.installContextMenu(this.txtareaValue);
 		MenuPopupUtil.installContextMenu(this.txtKey);
       	MenuPopupUtil.installContextMenu(this.txtRecDetails);
-      	MenuPopupUtil.installContextMenu(this.txtFee);
+      	MenuPopupUtil.installContextMenu(this.txtFeePow);
       	
       	
 		txtKey.getDocument().addDocumentListener(new DocumentListener() {
@@ -488,40 +488,8 @@ public class RegisterNameFrame extends JFrame
 		
 		try
 		{
-			//READ FEE
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.registerButton.setEnabled(true);
-				
-				return;
-			}
-			
-			//CHECK BIG FEE
-			if(fee.compareTo(Settings.getInstance().getBigFee()) >= 0)
-			{
-				int n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Do you really want to set such a large fee?\nThese coins will go to the forgers."),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION) {
-					
-				}
-				if (n == JOptionPane.NO_OPTION) {
-					
-					txtFee.setText("1");
-					
-					//ENABLE
-					this.registerButton.setEnabled(true);
-					
-					return;
-				}
-			}
+			//READ FEE POOW
+			int fee = Integer.parseInt(txtFeePow.getText());						
 			
 			Pair<Boolean, String> isUpdatable = namesModel.checkUpdateable();
 			if(!isUpdatable.getA())
@@ -548,50 +516,7 @@ public class RegisterNameFrame extends JFrame
 			}
 			
 			
-			currentValueAsJsonStringOpt = GZIP.compress(currentValueAsJsonStringOpt);
-		
-			BigDecimal recommendedFee = Controller.getInstance().calcRecommendedFeeForNameRegistration(this.txtName.getText(), currentValueAsJsonStringOpt).getA();
-			if(fee.compareTo(recommendedFee) < 0)
-			{
-				int n = -1;
-				if(Settings.getInstance().isAllowFeeLessRequired())
-				{
-					n = JOptionPane.showConfirmDialog(
-						new JFrame(), Lang.getInstance().translate("Fee less than the recommended values!\nChange to recommended?\n"
-									+ "Press Yes to turn on recommended %fee%"
-									+ ",\nor No to leave, but then the transaction may be difficult to confirm.").replace("%fee%", recommendedFee.toPlainString()),
-						Lang.getInstance().translate("Confirmation"),
-		                JOptionPane.YES_NO_CANCEL_OPTION);
-				}
-				else
-				{
-					n = JOptionPane.showConfirmDialog(
-							new JFrame(), Lang.getInstance().translate("Fee less required!\n"
-										+ "Press OK to turn on required %fee%.").replace("%fee%", recommendedFee.toPlainString()),
-							Lang.getInstance().translate("Confirmation"),
-			                JOptionPane.OK_CANCEL_OPTION);
-				}
-				if (n == JOptionPane.YES_OPTION || n == JOptionPane.OK_OPTION) {
-					
-					if(fee.compareTo(new BigDecimal(1.0)) == 1) //IF MORE THAN ONE
-					{
-						this.txtFee.setText("1"); // Return to the default fee for the next name.
-					}
-					
-					fee = recommendedFee; // Set recommended fee for this name.
-					
-				}
-				else if (n == JOptionPane.NO_OPTION) {
-					
-				}	
-				else {
-					
-					//ENABLE
-					this.registerButton.setEnabled(true);
-					
-					return;
-				}
-			}
+			currentValueAsJsonStringOpt = GZIP.compress(currentValueAsJsonStringOpt);		
 			
 			//CREATE NAME REGISTRATION
 			PrivateKeyAccount registrant = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());

@@ -44,6 +44,7 @@ import at.AT_Constants;
 import at.AT_Error;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -331,7 +332,7 @@ public class InitiateAcctFrame extends JFrame {
 		try
 		{
 			//READ FEE
-			BigDecimal fee = new BigDecimal(this.txtFee.getText()).setScale(8);
+			int feePow = Integer.parseInt(this.txtFee.getText());
 
 			//READ QUANTITY
 			parse = 1;
@@ -339,17 +340,6 @@ public class InitiateAcctFrame extends JFrame {
 			
 			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText()).setScale(8);
 			
-
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-				//ENABLE
-				this.deployButton.setEnabled(true);
-
-				return;
-			}
 
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -467,7 +457,7 @@ public class InitiateAcctFrame extends JFrame {
 				return;
 			}
 
-			byte[] balanceBytes = fee.unscaledValue().toByteArray();
+			byte[] balanceBytes = Ints.toByteArray(feePow);
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
@@ -533,7 +523,7 @@ public class InitiateAcctFrame extends JFrame {
 			String type = "acct";
 			String tags = "acct,atomic cross chain tx,initiate,initiator";
 
-			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(creator, name, desc , type , tags , creationBytes, quantity, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(creator, name, desc , type , tags , creationBytes, quantity, feePow);
 
 			//CHECK VALIDATE MESSAGE
 			if (result.getB() > 1000)

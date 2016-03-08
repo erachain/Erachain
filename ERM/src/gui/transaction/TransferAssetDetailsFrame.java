@@ -115,7 +115,7 @@ public class TransferAssetDetailsFrame extends JFrame
 		
 		//SENDER
 		detailGBC.gridy = 4;
-		JTextField sender = new JTextField(assetTransfer.getSender().getAddress());
+		JTextField sender = new JTextField(assetTransfer.getCreator().getAddress());
 		sender.setEditable(false);
 		MenuPopupUtil.installContextMenu(sender);
 		this.add(sender, detailGBC);

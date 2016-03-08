@@ -240,11 +240,14 @@ public class NameStorageResource {
 
 						byte[] resultbyteArray = jsonStringForMultipleTx
 								.getBytes(StandardCharsets.UTF_8);
+						
+						/*
 						BigDecimal currentFee = Controller
 								.getInstance()
 								.calcRecommendedFeeForArbitraryTransaction(
 										resultbyteArray, null).getA();
-
+						*/
+						BigDecimal currentFee = Transaction.calcFee(resultbyteArray.length, 0);
 						completeFee = completeFee.add(currentFee);
 
 						allTxPairs.add(new Pair<>(resultbyteArray, currentFee));
@@ -266,7 +269,7 @@ public class NameStorageResource {
 					//recalculating qora amount
 					BigDecimal newCompleteFee = BigDecimal.ZERO;
 					BigDecimal oldAmount = BigDecimal.ZERO;
-					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[],BigDecimal>>();
+					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[], BigDecimal>>();
 					for (Pair<byte[], BigDecimal> pair : allTxPairs) {
 						if(oldAmount.equals(BigDecimal.ZERO))
 						{
@@ -329,7 +332,7 @@ public class NameStorageResource {
 					for (Pair<byte[], BigDecimal> pair : newPairs) {
 						result = Controller.getInstance()
 								.createArbitraryTransaction(account, null, 10,
-										pair.getA(), pair.getB());
+										pair.getA(), 0); //pair.getB());
 
 						results += ArbitraryTransactionsResource
 								.checkArbitraryTransaction(result) + "\n";
@@ -339,8 +342,9 @@ public class NameStorageResource {
 
 				}
 			}
-			BigDecimal fee = Controller.getInstance()
-					.calcRecommendedFeeForArbitraryTransaction(bytes, null).getA();
+			//BigDecimal fee = Controller.getInstance()
+			//		.calcRecommendedFeeForArbitraryTransaction(bytes, null).getA();
+			BigDecimal fee = Transaction.calcFee(bytes.length, 0);
 			APIUtils.askAPICallAllowed(
 					"POST namestorage/update/" + name + "\n"
 							+ GZIP.webDecompress(jsonString) + "\nfee: "
@@ -362,7 +366,7 @@ public class NameStorageResource {
 			
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.createArbitraryTransaction(account, null, 10, bytes, fee);
+					.createArbitraryTransaction(account, null, 10, bytes, 0);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);

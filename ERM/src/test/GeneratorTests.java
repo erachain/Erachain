@@ -95,10 +95,10 @@ public class GeneratorTests {
 		for(int i=0; i<10; i++)
 		{
 			long timestamp = NTP.getTime();
-			byte[] signature = PaymentTransaction.generateSignature(snapshot, generator, recipient, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(1).setScale(8), timestamp);
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot), signature);
+			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), 0, timestamp, generator.getLastReference(snapshot));
+			payment.sign(generator);
 		
 			//PROCESS IN DB
 			payment.process(snapshot);
@@ -143,10 +143,10 @@ public class GeneratorTests {
 		for(int i=0; i<10000; i++)
 		{
 			long timestamp = NTP.getTime();
-			byte[] signature = PaymentTransaction.generateSignature(snapshot, generator, recipient, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(1).setScale(8), timestamp);
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot), signature);
+			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), 0, timestamp, generator.getLastReference(snapshot));
+			payment.sign(generator);
 		
 			//PROCESS IN DB
 			payment.process(snapshot);

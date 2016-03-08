@@ -21,7 +21,7 @@ import settings.Settings;
 
 public class APIUtils {
 
-	public static String processPayment(String assetKeyString, String amount, String fee,
+	public static String processPayment(String assetKeyString, String amount, String feePowTxt,
 			String sender, String recipient, String x,
 			HttpServletRequest request) {
 		
@@ -52,11 +52,10 @@ public class APIUtils {
 					ApiErrorFactory.ERROR_INVALID_AMOUNT);
 		}
 
-		// PARSE FEE
-		BigDecimal bdFee;
+		// PARSE FEE POWER
+		int feePow;
 		try {
-			bdFee = new BigDecimal(fee);
-			bdFee = bdFee.setScale(8);
+			feePow = Integer.parseInt(feePowTxt);
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_INVALID_FEE);
@@ -95,13 +94,13 @@ public class APIUtils {
 		{
 			// SEND QORA PAYMENT
 			result = Controller.getInstance()
-				.sendPayment(account, new Account(recipient), bdAmount, bdFee);
+				.sendPayment(account, new Account(recipient), bdAmount, feePow);
 		}
 		else
 		{
 			// SEND ASSET PAYMENT
 			result = Controller.getInstance()
-				.transferAsset(account, new Account(recipient), asset, bdAmount, bdFee);
+				.transferAsset(account, new Account(recipient), asset, bdAmount, feePow);
 		}
 			
 		switch (result.getB()) {

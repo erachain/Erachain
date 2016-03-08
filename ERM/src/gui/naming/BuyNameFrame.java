@@ -12,7 +12,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class BuyNameFrame extends JFrame
 	private JTextField txtName;
 	private JComboBox<Account> cbxBuyer;
 	private JTextField txtPrice;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JButton buyButton;
 	
 	private NameSale nameSale;
@@ -134,9 +134,9 @@ public class BuyNameFrame extends JFrame
       		
       	//TXT FEE
       	txtGBC.gridy = 4;
-      	txtFee = new JTextField();
-      	this.txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	this.txtFeePow.setText("1");
+        this.add(txtFeePow, txtGBC);
 		           
         //BUTTON BUY
         buttonGBC.gridy = 5;
@@ -198,22 +198,11 @@ public class BuyNameFrame extends JFrame
 		try
 		{
 			//READ FEE
-			BigDecimal fee = new BigDecimal(txtFee.getText()).setScale(8);
-			
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.buyButton.setEnabled(true);
-				
-				return;
-			}
-		
+			int feePow = Integer.parseInt(txtFeePow.getText());
+					
 			//CREATE NAME PURCHASE
 			PrivateKeyAccount buyerPKA = Controller.getInstance().getPrivateKeyAccountByAddress(buyer.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(buyerPKA, nameSale, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(buyerPKA, nameSale, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

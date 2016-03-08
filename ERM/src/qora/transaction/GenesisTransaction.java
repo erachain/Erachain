@@ -3,7 +3,9 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -16,6 +18,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.BalanceMap;
 import database.DBSet;
 
 public class GenesisTransaction extends Transaction {
@@ -29,10 +32,11 @@ public class GenesisTransaction extends Transaction {
 	
 	public GenesisTransaction(Account recipient, BigDecimal amount, long timestamp)
 	{
-		super(GENESIS_TRANSACTION, BigDecimal.ZERO, timestamp, new byte[]{}, generateSignature(recipient, amount, timestamp));
-		
+		//super(GENESIS_TRANSACTION, BigDecimal.ZERO, timestamp, new byte[]{}, generateSignature(recipient, amount, timestamp));
+		super(GENESIS_ISSUE_ASSET_TRANSACTION, null, timestamp, null);
 		this.recipient = recipient;
 		this.amount = amount;
+		this.signature = generateSignature(recipient, amount, timestamp);
 	}
 
 	//GETTERS/SETTERS
@@ -97,7 +101,7 @@ public class GenesisTransaction extends Transaction {
 	}
 	
 	@Override
-	public byte[] toBytes() 
+	public byte[] toBytes(boolean withSign) 
 	{
 		byte[] data = new byte[0];
 		
@@ -131,6 +135,7 @@ public class GenesisTransaction extends Transaction {
 
 	//VALIDATE
 	
+	/*
 	public boolean isSignatureValid()
 	{
 		byte[] data = new byte[0];
@@ -161,6 +166,7 @@ public class GenesisTransaction extends Transaction {
 		//CHECK IF EQUAL
 		return Arrays.equals(digest, this.signature);
 	}
+	*/
 	
 	@Override
 	public int isValid(DBSet db) 
@@ -205,29 +211,11 @@ public class GenesisTransaction extends Transaction {
 	
 	//REST
 
-	private static byte[] generateSignature(Account recipient, BigDecimal amount, long timestamp)
+	//@Override
+	private byte[] generateSignature(Account recipient, BigDecimal amount, long timestamp)
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-				
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-				
-		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
-				
-		//WRITE AMOUNT
-		byte[] amountBytes = amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
+
+		byte[] data = this.toBytes(false);
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
 		digest = Bytes.concat(digest, digest);
@@ -262,5 +250,15 @@ public class GenesisTransaction extends Transaction {
 		}
 		
 		return BigDecimal.ZERO;
+	}
+
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<String, Map<Long, BigDecimal>>();
+		
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), BalanceMap.QORA_KEY, this.amount);
+		
+		return assetAmount;
 	}
 }

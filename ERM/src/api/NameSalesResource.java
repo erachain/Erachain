@@ -134,7 +134,7 @@ public class NameSalesResource
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
 			String amount = (String) jsonObject.get("amount");
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			
 			//PARSE AMOUNT
 			BigDecimal bdAmount;
@@ -153,7 +153,7 @@ public class NameSalesResource
 			BigDecimal bdFee;
 			try
 			{
-				bdFee = new BigDecimal(fee);
+				bdFee = new BigDecimal(feePow);
 				bdFee = bdFee.setScale(8);
 			}
 			catch(Exception e)
@@ -190,7 +190,7 @@ public class NameSalesResource
 			}
 				
 			//CREATE NAME SALE
-			Pair<Transaction, Integer> result = Controller.getInstance().sellName(account, nameName, bdAmount, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().sellName(account, nameName, bdAmount, feePow);
 				
 			switch(result.getB())
 			{
@@ -254,25 +254,15 @@ public class NameSalesResource
 	@DELETE
 	@Path("/{name}/{fee}")
 	@Consumes(MediaType.WILDCARD)
-	public String cancelNameSale(@PathParam("name") String nameName, @PathParam("fee") String fee)
+	public String cancelNameSale(@PathParam("name") String nameName, @PathParam("feePow") int feePow)
 	{
 		try
 		{
 			//PARSE FEE
-			BigDecimal bdFee;
-			try
-			{
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			}
-			catch(Exception e)
-			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
-			}	
 			
 			NameSale nameSale = Controller.getInstance().getNameSale(nameName);
 
-			APIUtils.askAPICallAllowed("DELETE namesales/"+nameName+"/"+ fee, request );
+			APIUtils.askAPICallAllowed("DELETE namesales/"+nameName+"/"+ feePow, request );
 
 			//CHECK IF WALLET EXISTS
 			if(!Controller.getInstance().doesWalletExists())
@@ -300,7 +290,7 @@ public class NameSalesResource
 			}
 			
 			//CREATE NAME SALE
-			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(account, nameSale, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(account, nameSale, feePow);
 				
 			switch(result.getB())
 			{
@@ -367,19 +357,9 @@ public class NameSalesResource
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
 			String buyer = (String) jsonObject.get("buyer");
-			String fee = (String) jsonObject.get("fee");
+			int feePow = (int) jsonObject.get("feePow");
 			
 			//PARSE FEE
-			BigDecimal bdFee;
-			try
-			{
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
-			}
-			catch(Exception e)
-			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
-			}
 
 			APIUtils.askAPICallAllowed("POST namesales/buy/" + nameName + "\n" + x, request);
 
@@ -417,7 +397,7 @@ public class NameSalesResource
 			}
 			
 			//CREATE NAME SALE
-			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(account, nameSale, bdFee);
+			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(account, nameSale, feePow);
 				
 			switch(result.getB())
 			{

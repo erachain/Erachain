@@ -3,7 +3,7 @@ package qora.transaction;
 import java.util.Arrays;
 
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
+//import com.google.common.primitives.Longs;
 
 public class TransactionFactory {
 
@@ -30,8 +30,8 @@ public class TransactionFactory {
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, Transaction.TYPE_LENGTH);
 		int type = Ints.fromByteArray(typeBytes);
 		
-		byte[] timeStampBytes = Arrays.copyOfRange(data, 4, 4 + Transaction.TIMESTAMP_LENGTH);
-		long timeStamp = Longs.fromByteArray(timeStampBytes);
+		//byte[] timeStampBytes = Arrays.copyOfRange(data, 4, 4 + Transaction.TIMESTAMP_LENGTH);
+		//long timeStamp = Longs.fromByteArray(timeStampBytes);
 		
 		switch(type)
 		{
@@ -77,17 +77,8 @@ public class TransactionFactory {
 			
 		case Transaction.ARBITRARY_TRANSACTION:
 			
-			if(timeStamp < Transaction.getPOWFIX_RELEASE())
-			{
-				//PARSE ARBITRARY TRANSACTION V1
-				return ArbitraryTransactionV1.Parse(Arrays.copyOfRange(data, 4, data.length));			
-
-			}
-			else
-			{
-				//PARSE ARBITRARY TRANSACTION V3
-				return ArbitraryTransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));			
-			}
+			//PARSE ARBITRARY TRANSACTION
+			return ArbitraryTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));			
 			
 		case Transaction.ISSUE_ASSET_TRANSACTION:
 			
@@ -119,16 +110,8 @@ public class TransactionFactory {
 
 		case Transaction.MESSAGE_TRANSACTION:
 
-			if(timeStamp < Transaction.getPOWFIX_RELEASE())
-			{
-				// PARSE MESSAGE TRANSACTION V1
-				return MessageTransactionV1.Parse(Arrays.copyOfRange(data, 4, data.length));
-			}
-			else
-			{
-				// PARSE MESSAGE TRANSACTION V3
-				return MessageTransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));
-			}
+			// PARSE MESSAGE TRANSACTION
+			return MessageTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			
 		case Transaction.ACCOUNTING_TRANSACTION:
 
@@ -139,8 +122,8 @@ public class TransactionFactory {
 		case Transaction.JSON_TRANSACTION:
 
 			
-			// PARSE JSON1 TRANSACTION V3
-			return Json1TransactionV3.Parse(Arrays.copyOfRange(data, 4, data.length));
+			// PARSE JSON1 TRANSACTION
+			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			

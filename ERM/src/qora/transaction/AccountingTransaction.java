@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+//import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -12,6 +14,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.BalanceMap;
 //import database.BalanceMapHKey;
 import database.DBSet;
 import qora.account.Account;
@@ -41,7 +44,6 @@ public class AccountingTransaction extends Transaction {
 		this.recipient = recipient;
 		this.hkey = hkey;
 		this.amount = amount;
-
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
@@ -357,5 +359,11 @@ public class AccountingTransaction extends Transaction {
 
 	}
 
-}
+	@Override
+	// TODO hkey
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+	}
 
+}

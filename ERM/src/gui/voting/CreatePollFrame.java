@@ -13,7 +13,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ import javax.swing.table.DefaultTableModel;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.transaction.Transaction;
-import settings.Settings;
+//import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;

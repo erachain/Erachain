@@ -184,9 +184,9 @@ public class MessageResource {
 						publicKey);
 			}
 			
-			BigDecimal bdFee = Controller.getInstance().calcRecommendedFeeForMessage(messageBytes).getA();
+			//BigDecimal bdFee = Controller.getInstance().calcRecommendedFeeForMessage(messageBytes).getA();
 
-			APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee: "+ bdFee.toPlainString(), request);
+			//APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee: "+ bdFee.toPlainString(), request);
 
 			byte[] encrypted = (encrypt) ? new byte[] { 1 } : new byte[] { 0 };
 			byte[] isTextByte = (isTextMessage) ? new byte[] { 1 }
@@ -196,7 +196,7 @@ public class MessageResource {
 					.sendMessage(
 							Controller.getInstance()
 									.getPrivateKeyAccountByAddress(sender),
-							recipientAccount, assetKey, bdAmount, bdFee, messageBytes,
+							recipientAccount, assetKey, bdAmount, 0, messageBytes,
 							isTextByte, encrypted);
 
 			switch (result.getB()) {

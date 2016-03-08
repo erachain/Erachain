@@ -80,7 +80,7 @@ public class AssetsTableModel extends QoraTableModel<Long, Asset> implements Obs
 		
 		case COLUMN_ADDRESS:
 			
-			return asset.getOwner().getAddress();
+			return asset.getCreator().getAddress();
 			
 		case COLUMN_AMOUNT:
 			

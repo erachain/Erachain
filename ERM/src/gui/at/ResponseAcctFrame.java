@@ -2,6 +2,7 @@ package gui.at;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -46,7 +47,7 @@ import database.DBSet;
 @SuppressWarnings("serial")
 public class ResponseAcctFrame extends JFrame {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFee;
+	private JTextField txtFeeЗщц;
 	private JTextField txtHashSecret;
 	private JTextField txtExpirationBlocks;
 	private JTextField txtRecipient;
@@ -215,9 +216,9 @@ public class ResponseAcctFrame extends JFrame {
 		//TXT FEE
 		txtGBC.gridy = 6;
 		txtGBC.gridx = 1;
-		this.txtFee = new JTextField();
-		this.txtFee.setText("20.00000000");
-		this.add(this.txtFee, txtGBC);
+		this.txtFeeЗщц = new JTextField();
+		this.txtFeeЗщц.setText("20.00000000");
+		this.add(this.txtFeeЗщц, txtGBC);
 
 		//LABEL FEES ALERT
 		labelGBC.gridx = 2;
@@ -318,24 +319,13 @@ public class ResponseAcctFrame extends JFrame {
 		try
 		{
 			//READ FEE
-			BigDecimal fee = new BigDecimal(this.txtFee.getText()).setScale(8);
+			int feePow = Integer.parseInt(this.txtFeeЗщц.getText());
 
 			//READ QUANTITY
 			parse = 1;
 			BigDecimal quantity = new BigDecimal(this.txtAmount.getText()).setScale(8);
 			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText()).setScale(8);
 
-
-			//CHECK MIMIMUM FEE
-			if(fee.compareTo(Transaction.MINIMUM_FEE) == -1)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-				//ENABLE
-				this.deployButton.setEnabled(true);
-
-				return;
-			}
 
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -415,7 +405,7 @@ public class ResponseAcctFrame extends JFrame {
 				return;
 			}
 
-			byte[] balanceBytes = fee.unscaledValue().toByteArray();
+			byte[] balanceBytes = Ints.toByteArray(feePow);
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
@@ -482,7 +472,7 @@ public class ResponseAcctFrame extends JFrame {
 			String tags = "acct,atomic cross chain tx,respond,responder";
 
 
-			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(creator, name, desc , type , tags , creationBytes, quantity, fee);
+			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(creator, name, desc , type , tags , creationBytes, quantity, feePow);
 
 			//CHECK VALIDATE MESSAGE
 			if (result.getB() > 1000)

@@ -8,7 +8,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
@@ -28,6 +30,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.BalanceMap;
 import database.DBSet;
 
 public class DeployATTransaction extends Transaction
@@ -522,6 +525,18 @@ public class DeployATTransaction extends Transaction
 		}
 
 		return BigDecimal.ZERO;
+	}
+	@Override
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.getATaccount().getAddress(), BalanceMap.QORA_KEY, this.amount);
+		
+		return assetAmount;
 	}
 
 }

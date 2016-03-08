@@ -400,7 +400,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
-				transaction.getSender().getAddress(),
+				transaction.getCreator().getAddress(),
 				transaction.getRecipient().getAddress(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),

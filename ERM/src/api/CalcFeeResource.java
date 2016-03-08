@@ -21,10 +21,12 @@ import utils.Pair;
 import controller.Controller;
 import api.BlogPostResource;
 
+
 @Path("calcfee")
 @Produces(MediaType.APPLICATION_JSON)
 public class CalcFeeResource {
 
+	/*
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/arbitrarytransactions")
@@ -186,6 +188,6 @@ public class CalcFeeResource {
 		}
 
 	}
-	
+	*/
 }
 

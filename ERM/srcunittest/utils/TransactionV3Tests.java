@@ -104,7 +104,7 @@ public class TransactionV3Tests {
 			e.printStackTrace();
 		}
 		assertEquals(new String(messageTransactionV3.getData()), new String(messageTransactionV3_2.getData()));
-		assertEquals(messageTransactionV3.getCreator(), messageTransactionV3_2.getCreator());
+		assertEquals(messageTransactionV3.getOwner(), messageTransactionV3_2.getOwner());
 		assertEquals(messageTransactionV3.getRecipient(), messageTransactionV3_2.getRecipient());
 		assertEquals(messageTransactionV3.getKey(), messageTransactionV3_2.getKey());
 		assertEquals(messageTransactionV3.getAmount(), messageTransactionV3_2.getAmount());

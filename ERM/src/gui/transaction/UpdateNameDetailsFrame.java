@@ -119,7 +119,7 @@ public class UpdateNameDetailsFrame extends JFrame
 		
 		//REGISTRANT
 		detailGBC.gridy = 4;
-		JTextField registrant = new JTextField(nameUpdate.getOwner().getAddress());
+		JTextField registrant = new JTextField(nameUpdate.getCreator().getAddress());
 		registrant.setEditable(false);
 		MenuPopupUtil.installContextMenu(registrant);
 		this.add(registrant, detailGBC);

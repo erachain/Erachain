@@ -42,7 +42,7 @@ import lang.Lang;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
-import qora.transaction.Json1Transaction;
+import qora.transaction.JsonTransaction;
 //import qora.transaction.MessageTransaction;
 import qora.transaction.Transaction;
 import qora.wallet.Wallet;
@@ -105,7 +105,7 @@ public class Json1sTableModel extends JTable implements Observer{
 			}
 			if(!is)
 			{
-				addMessage(messageBufs.size(),(Json1Transaction)messagetx);
+				addMessage(messageBufs.size(),(JsonTransaction)messagetx);
 			} 
 		}
 				
@@ -366,7 +366,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
 				for (MessageBuf messageBuf : messageBufs) {
-					if(Arrays.equals(((Json1Transaction) message.getValue()).getSignature(), messageBuf.getSignature()))
+					if(Arrays.equals(((JsonTransaction) message.getValue()).getSignature(), messageBuf.getSignature()))
 					{
 						is = true;
 						break;
@@ -374,7 +374,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				}
 				if(!is)
 				{
-					addMessage(0, (Json1Transaction) message.getValue());
+					addMessage(0, (JsonTransaction) message.getValue());
 					
 					messagesModel.setRowCount( messageBufs.size() );
 					
@@ -395,12 +395,12 @@ public class Json1sTableModel extends JTable implements Observer{
 		}
 	}
 
-	private void addMessage(int pos, Json1Transaction transaction)
+	private void addMessage(int pos, JsonTransaction transaction)
 	{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
-				transaction.getSender().getAddress(),
+				transaction.getCreator().getAddress(),
 				transaction.getRecipient().getAddress(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),
