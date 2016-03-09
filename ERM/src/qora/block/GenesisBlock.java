@@ -101,13 +101,13 @@ public class GenesisBlock extends Block{
 			*/
 			//CREATE JOB ASSET
 			asset = makeOil(new byte[64]);
-			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
+			signature = asset.generateReference();
 			asset = makeOil(signature);
 			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
 			asset = makeGem(new byte[64]);
-			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
+			signature = asset.generateReference();
 			asset = makeGem(signature);
 			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
 

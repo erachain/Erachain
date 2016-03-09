@@ -1,5 +1,6 @@
 package qora.assets;
 
+//import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import controller.Controller;
 import database.DBSet;
 import qora.account.Account;
 import qora.crypto.Base58;
+import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 
 public class Asset {
@@ -212,9 +214,21 @@ public class Asset {
 			data = Bytes.concat(data, new byte[64]);
 		}
 		
-		///Logger.getGlobal().info("Asset [" + this.name + "] toBytes data.len:" + data.length);
+		//Logger.getGlobal().info("Asset [" + this.name + "] toBytes data.len:" + data.length);
 
 		return data;
+	}
+
+	// random - self init reference
+	public byte[] generateReference()
+	{
+
+		byte[] data = this.toBytes(false);
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+				
+		return digest;
 	}
 
 	public int getDataLength() 

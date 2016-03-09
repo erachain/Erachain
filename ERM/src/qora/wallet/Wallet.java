@@ -1,4 +1,5 @@
 package qora.wallet;
+// 09/03
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -578,7 +579,7 @@ public class Wallet extends Observable implements Observer
 	  	this.database.getPollMap().addAll(polls);
 	  	
 	  	//SCAN ASSETS
-		Map<Account, List<Check>> assets;
+		Map<Account, List<Asset>> assets;
 	  	synchronized(accounts)
 	  	{
 	  		assets = Controller.getInstance().scanAssets(accounts);

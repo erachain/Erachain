@@ -189,19 +189,25 @@ public class CancelSellNameTransaction extends Transaction
 			return NAME_DOES_NOT_EXIST;
 		}
 		
-		//CHECK creator
+		//CHECK OWNER
 		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
 		{
 			return INVALID_ADDRESS;
 		}
-						
+				
+		//CHECK IF OWNER IS OWNER
+		if(!name.getOwner().getAddress().equals(this.creator.getAddress()))
+		{
+			return INVALID_NAME_CREATOR;
+		}
+		
 		//CHECK IF NAME FOR SALE ALREADY
 		if(!db.getNameExchangeMap().contains(this.name))
 		{
 			return NAME_NOT_FOR_SALE;
 		}
 		
-		//CHECK IF creator HAS ENOUGH MONEY
+		//CHECK IF OWNER HAS ENOUGH MONEY
 		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
 		{
 			return NO_BALANCE;

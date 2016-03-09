@@ -33,7 +33,7 @@ public class GenesisTransaction extends Transaction {
 	public GenesisTransaction(Account recipient, BigDecimal amount, long timestamp)
 	{
 		//super(GENESIS_TRANSACTION, BigDecimal.ZERO, timestamp, new byte[]{}, generateSignature(recipient, amount, timestamp));
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, null, timestamp, null);
+		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.signature = generateSignature(recipient, amount, timestamp);

@@ -52,6 +52,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		this(creator, payments, service, data, timestamp, reference);
 		this.fee = fee;
 		this.reference = reference;
+		this.signature = signature;
 	}
 
 	// PARSE CONVERT
@@ -200,6 +201,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	
 	// VALIDATE
 
+	/*
 	@Override
 	public boolean isSignatureValid() {
 
@@ -209,6 +211,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		return Crypto.getInstance().verify(this.creator.getPublicKey(),
 				this.signature, data);
 	}
+	*/
 
 	@Override
 	public int isValid(DBSet db) {

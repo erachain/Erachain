@@ -1,5 +1,6 @@
 package qora.transaction;
 
+import java.util.logging.Logger;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 //import java.math.MathContext;
@@ -194,7 +195,12 @@ public abstract class Transaction {
 	protected long timestamp;
 	protected PublicKeyAccount creator;
 	
-	// need for calculate fee
+	// need for genesis
+	protected Transaction(int type, long timestamp)
+	{
+		this.type = type;
+		this.timestamp = timestamp;
+	}
 	protected Transaction(int type, PublicKeyAccount creator, long timestamp, byte[] reference)
 	{
 		this.type = type;
@@ -348,6 +354,10 @@ public abstract class Transaction {
 	
 	public boolean isSignatureValid() {
 
+		//Logger.getGlobal().info("isSignatureValid  this.signature:" + this.signature);
+
+		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
+		
 		byte[] data = this.toBytes( false );
 		if ( data == null ) return false;
 

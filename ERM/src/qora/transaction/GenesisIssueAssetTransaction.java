@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 //import ntp.NTP;
 
@@ -35,14 +36,20 @@ public class GenesisIssueAssetTransaction extends Transaction
 	public GenesisIssueAssetTransaction(Asset asset, long timestamp) 
 	{
 		// new reference = byte[]{}
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, null, timestamp, null);
+		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
+
 		this.asset = asset;
 		this.signature = generateSignature(asset, timestamp);
 
 	}
 
 	//GETTERS/SETTERS
+	@Override
+	public byte[] getSignature() {
 		
+		return this.signature;
+	}
+	
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -58,6 +65,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
+		//Logger.getGlobal().info("Gen Issue Asset PARSE data.len:" + data.length);
+
 		int position = 0;
 		
 		//READ TIMESTAMP
@@ -66,8 +75,10 @@ public class GenesisIssueAssetTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 						
 		//READ ASSET
+		Logger.getGlobal().info("Gen Issue Asset - PARSE - asset.data.len:" + (data.length - position));
 		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
-		position += asset.getDataLength();
+		Logger.getGlobal().info("Gen Issue Asset: " + asset.getName());
+		//position += asset.getDataLength();
 						
 		return new GenesisIssueAssetTransaction(asset, timestamp);
 	}	
@@ -104,7 +115,9 @@ public class GenesisIssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 				
 		//WRITE ASSET
-		if (withSign) data = Bytes.concat(data , this.asset.toBytes(true));
+		data = Bytes.concat(data, this.asset.toBytes(true));
+
+		Logger.getGlobal().info("Gen Issue Asset [" + this.asset.getName() + "] toBytes data.len:" + data.length);
 				
 		return data;
 	}
@@ -119,20 +132,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	public boolean isSignatureValid()
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_ISSUE_ASSET_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE ASSET
-		data = Bytes.concat(data , this.asset.toBytes(false));
+		byte[] data = this.toBytes(false);
 						
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
@@ -238,22 +238,9 @@ public class GenesisIssueAssetTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	public static byte[] generateSignature(Asset asset, long timestamp) 
+	public byte[] generateSignature(Asset asset, long timestamp) 
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_ISSUE_ASSET_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-						
-		//WRITE ASSET
-		data = Bytes.concat(data , asset.toBytes(false));
+		byte[] data = this.toBytes(false);
 				
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
