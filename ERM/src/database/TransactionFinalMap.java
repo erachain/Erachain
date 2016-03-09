@@ -1,5 +1,5 @@
 package database;
-
+// update 09.03
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 			@Override
 			public String run(Tuple2<Integer, Integer> key, Transaction val) {
 				// TODO Auto-generated method stub
-				if ( val instanceof GenesisTransaction | val instanceof GenesisIssueAssetTransaction )
+				if ( val instanceof GenesisTransaction | val instanceof GenesisIssueAssetTransaction)
 					return "genesis";
 				return val.getCreator().getAddress();
 			}

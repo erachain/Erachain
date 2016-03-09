@@ -1,5 +1,5 @@
 package controller;
-
+// upd 09/03
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.TrayIcon.MessageType;
@@ -89,11 +89,11 @@ import webserver.WebService;
 
 public class Controller extends Observable {
 
-	private String version = "0.3.0 beta";
+	private String version = "0.26.0 beta";
 	private String buildTime = "2016-03-07 00:00:00 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "0.3.0";
+	public static final String releaseVersion = "0.26.0";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -910,7 +910,10 @@ public class Controller extends Observable {
 					return;
 				}
 
+				// CHECK IF TRANSACTION HAS MINIMUM FEE AND MINIMUM FEE PER BYTE
 				// AND UNCONFIRMED
+				// TODO fee
+				// transaction.calcFee();
 				if (!DBSet.getInstance().getTransactionParentMap()
 								.contains(transaction.getSignature())) {
 					// ADD TO UNCONFIRMED TRANSACTIONS
@@ -1500,7 +1503,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> sendPayment(PrivateKeyAccount sender,
-			Account recipient, BigDecimal amount, int feePow) {
+			Account recipient, BigDecimal amount,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createPayment(sender, recipient,
@@ -1510,7 +1513,7 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> registerName(
 			PrivateKeyAccount registrant, Account owner, String name,
-			String value, int feePow) {
+			String value,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createNameRegistration(registrant,
@@ -1518,8 +1521,122 @@ public class Controller extends Observable {
 		}
 	}
 
+	/*
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameRegistration(
+			String name, String value) {
+		return this.transactionCreator
+				.calcRecommendedFeeForNameRegistration(new Name(new Account(
+						"QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"), name, value)); // FOR
+																				// GENESIS
+																				// ADDRESS
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameUpdate(
+			String name, String value) {
+		return this.transactionCreator
+				.calcRecommendedFeeForNameUpdate(new Name(new Account(
+						"QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"), name, value)); // FOR
+																				// GENESIS
+																				// ADDRESS
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForPoll(String name,
+			String description, List<String> options) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+
+		// CREATE POLL OPTIONS
+		List<PollOption> pollOptions = new ArrayList<PollOption>();
+		for (String option : options) {
+			pollOptions.add(new PollOption(option));
+		}
+
+		// CREATE POLL
+		Poll poll = new Poll(new Account("QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"),
+				name, description, pollOptions);
+
+		return this.transactionCreator.calcRecommendedFeeForPollCreation(poll);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForArbitraryTransaction(
+			byte[] data, List<Payment> payments) {
+		
+		if(payments == null) {
+			payments = new ArrayList<Payment>();
+		}
+		
+		return this.transactionCreator
+				.calcRecommendedFeeForArbitraryTransaction(data, payments);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForMessage(byte[] message) {
+		return this.transactionCreator.calcRecommendedFeeForMessage(message);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForPayment() {
+		return this.transactionCreator.calcRecommendedFeeForPayment();
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForAssetTransfer() {
+		return this.transactionCreator.calcRecommendedFeeForAssetTransfer();
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForOrderTransaction() {
+		return this.transactionCreator.calcRecommendedFeeForOrderTransaction();
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelOrderTransaction() {
+		return this.transactionCreator
+				.calcRecommendedFeeForCancelOrderTransaction();
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameSale(String name) {
+		return this.transactionCreator
+				.calcRecommendedFeeForNameSale(new NameSale(name,
+						Transaction.MINIMUM_FEE));
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForNamePurchase(
+			String name) {
+		return this.transactionCreator
+				.calcRecommendedFeeForNamePurchase(new NameSale(name,
+						Transaction.MINIMUM_FEE));
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelNameSale(
+			String name) {
+		return this.transactionCreator
+				.calcRecommendedFeeForCancelNameSale(new NameSale(name,
+						Transaction.MINIMUM_FEE));
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForPollVote(
+			String pollName) {
+		return this.transactionCreator.calcRecommendedFeeForPollVote(pollName);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForIssueAssetTransaction(
+			String name, String description) {
+		return this.transactionCreator
+				.calcRecommendedFeeForIssueAssetTransaction(name, description);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForMultiPayment(
+			List<Payment> payments) {
+		return this.transactionCreator
+				.calcRecommendedFeeForMultiPayment(payments);
+	}
+
+	public Pair<BigDecimal, Integer> calcRecommendedFeeForDeployATTransaction(
+			String name, String description, String type, String tags,
+			byte[] creationBytes) {
+		return this.transactionCreator
+				.calcRecommendedFeeForDeployATTransaction(name, description,
+						type, tags, creationBytes);
+	}
+	*/
+
 	public Pair<Transaction, Integer> updateName(PrivateKeyAccount owner,
-			Account newOwner, String name, String value, int feePow) {
+			Account newOwner, String name, String value,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createNameUpdate(owner, new Name(
@@ -1528,7 +1645,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> sellName(PrivateKeyAccount owner,
-			String name, BigDecimal amount, int feePow) {
+			String name, BigDecimal amount,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createNameSale(owner, new NameSale(
@@ -1537,7 +1654,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> cancelSellName(PrivateKeyAccount owner,
-			NameSale nameSale, int feePow) {
+			NameSale nameSale,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createCancelNameSale(owner,
@@ -1546,7 +1663,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> BuyName(PrivateKeyAccount buyer,
-			NameSale nameSale, int feePow) {
+			NameSale nameSale,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createNamePurchase(buyer, nameSale,
@@ -1574,7 +1691,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator,
-			Poll poll, PollOption option, int feePow) {
+			Poll poll, PollOption option,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			// GET OPTION INDEX
@@ -1586,7 +1703,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> createArbitraryTransaction(
-			PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data, int feePow) {
+			PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data,int feePow) {
 		
 		if(payments == null) {
 			payments = new ArrayList<Payment>();
@@ -1608,8 +1725,8 @@ public class Controller extends Observable {
 	}
 	
 	public Pair<Transaction, Integer> issueAsset(PrivateKeyAccount creator,
-			String name, String description, long quantity, byte scale,
-			boolean divisible, int feePow) {
+			String name, String description, long quantity, byte scale, boolean divisible,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueAssetTransaction(creator,
@@ -1628,7 +1745,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator,
-			Order order, int feePow) {
+			Order order,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createCancelOrderTransaction(
@@ -1637,7 +1754,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> transferAsset(PrivateKeyAccount sender,
-			Account recipient, Asset asset, BigDecimal amount, int feePow) {
+			Account recipient, Asset asset, BigDecimal amount,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createAssetTransfer(sender,
@@ -1647,7 +1764,7 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator,
 			String name, String description, String type, String tags,
-			byte[] creationBytes, BigDecimal quantity, int feePow) {
+			byte[] creationBytes, BigDecimal quantity,int feePow) {
 
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.deployATTransaction(creator, name,
@@ -1656,7 +1773,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> sendMultiPayment(
-			PrivateKeyAccount sender, List<Payment> payments, int feePow) {
+			PrivateKeyAccount sender, List<Payment> payments,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.sendMultiPayment(sender, payments,
@@ -1665,36 +1782,30 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> sendMessage(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, int feePow,
+			Account recipient, long key, BigDecimal amount,int feePow,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createMessage(sender, recipient,
 					key, amount, feePow, message, isText, encryptMessage);
 		}
-
 	}
-
-	
+	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
+			Account recipient, long key, BigDecimal amount,int feePow,
+			byte[] isText, byte[] message, byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createJson(sender, recipient,
+					key, amount, feePow, message, isText, encryptMessage);
+		}
+	}
 	public Pair<Transaction, Integer> sendAccounting(PrivateKeyAccount sender,
-			Account recipient, byte[] key, BigDecimal amount, int feePow,
+			Account recipient, byte[] hkey, BigDecimal amount,int feePow,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createAccounting(sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
+					hkey, amount, feePow, message, isText, encryptMessage);
 		}
 
 	}
-	
-	public Pair<Transaction, Integer> sendJson1(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, int feePow,
-			byte[] isText, byte[] message, byte[] encryptMessage) {
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createJson1(sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
-		}
-
-	}
-	
 	
 	public Block getBlockByHeight(int parseInt) {
 		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);

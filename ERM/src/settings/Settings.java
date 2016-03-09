@@ -42,7 +42,7 @@ public class Settings {
 
 	//TESTNET 
 	//public static final long DEFAULT_MAINNET_STAMP = 1400247274336L; // QORA RELEASE
-	public static final long DEFAULT_MAINNET_STAMP = 1456740966336L; // 1455087244336L;
+	public static final long DEFAULT_MAINNET_STAMP =   1457512062336L; // 1455087244336L;
 	private long genesisStamp = -1;
 	
 	//RPC

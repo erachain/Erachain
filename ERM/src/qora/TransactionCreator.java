@@ -440,6 +440,22 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx);
 	}
+	public Pair<Transaction, Integer> createJson(PrivateKeyAccount creator,
+			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
+			byte[] message, byte[] encryptMessage) {
+		
+		this.checkUpdate();
+		
+		Transaction messageTx;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE MESSAGE TRANSACTION
+		messageTx = new JsonTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx.sign(creator);
+			
+		return afterCreate(messageTx);
+	}
 
 	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,

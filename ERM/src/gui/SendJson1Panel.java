@@ -1,7 +1,7 @@
 package gui;
 
 import qora.transaction.Transaction;
-import gui.models.Json1sTableModel;
+import gui.models.JsonTableModel;
 import gui.models.AccountsComboBoxModel;
 import gui.models.AssetsComboBoxModel;
 //import gui.models.MessagesTableModel;
@@ -379,7 +379,7 @@ public class SendJson1Panel extends JPanel
 		
 		//MESSAGES HISTORY TABLE
 
-    	table = new Json1sTableModel ();
+    	table = new JsonTableModel ();
     	
     	table.setTableHeader(null);
     	table.setSelectionBackground(new Color(209, 232, 255, 255));
@@ -409,7 +409,7 @@ public class SendJson1Panel extends JPanel
     	{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	((Json1sTableModel) table).CryptoOpenBoxAll();
+		    	((JsonTableModel) table).CryptoOpenBoxAll();
 		    }
 		});	
 
@@ -652,7 +652,7 @@ public class SendJson1Panel extends JPanel
 			}
 			
 			//CREATE TX MESSAGE
-			result = Controller.getInstance().sendJson1(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);
+			result = Controller.getInstance().sendJson(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

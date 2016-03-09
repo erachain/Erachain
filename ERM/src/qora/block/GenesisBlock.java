@@ -120,7 +120,7 @@ public class GenesisBlock extends Block{
 	// make assets
 	public Asset makeERM(byte[] signature) 
 	{
-		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, (byte)6, true, signature);
+		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, (byte) 6, true, signature);
 	}
 	public Asset makeOil(byte[] signature) 
 	{

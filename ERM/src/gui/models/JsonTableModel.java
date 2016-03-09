@@ -53,7 +53,7 @@ import utils.ObserverMessage;
 import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class Json1sTableModel extends JTable implements Observer{
+public class JsonTableModel extends JTable implements Observer{
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
@@ -66,7 +66,7 @@ public class Json1sTableModel extends JTable implements Observer{
 	int width;
 	int fontHeight;
 	
-	public Json1sTableModel()
+	public JsonTableModel()
 	{
 		this.setShowGrid(false);
 
@@ -129,7 +129,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
-		        Json1sTableModel invokerAsJComponent = (Json1sTableModel) invoker;
+		        JsonTableModel invokerAsJComponent = (JsonTableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -168,7 +168,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Json1sTableModel invokerAsJComponent = (Json1sTableModel) invoker;
+		        JsonTableModel invokerAsJComponent = (JsonTableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -188,7 +188,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Json1sTableModel invokerAsJComponent = (Json1sTableModel) invoker;
+		        JsonTableModel invokerAsJComponent = (JsonTableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -209,7 +209,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Json1sTableModel invokerAsJComponent = (Json1sTableModel) invoker;
+		        JsonTableModel invokerAsJComponent = (JsonTableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -231,7 +231,7 @@ public class Json1sTableModel extends JTable implements Observer{
 				{
 					if(e.getClickCount() == 2) 
 					{
-						Json1sTableModel tableModelparent = (Json1sTableModel) e.getSource();
+						JsonTableModel tableModelparent = (JsonTableModel) e.getSource();
 						
 				        Point p = e.getPoint();
 					    int row = tableModelparent.rowAtPoint(p);

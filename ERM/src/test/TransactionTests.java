@@ -2927,6 +2927,9 @@ public class TransactionTests {
 		
 		//CREATE ASSET
 		Asset asset = new Asset(sender, "test", "strontje", 50000l, (byte) 2, false, new byte[64]);
+		//byte[] data = asset.toBytes(false);
+		//Asset asset2 = Asset.parse(data);
+		
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();

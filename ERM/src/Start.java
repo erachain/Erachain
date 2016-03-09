@@ -1,5 +1,5 @@
 import java.util.Scanner;
-
+// upd 09/03
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -14,11 +14,9 @@ public class Start {
 
 	public static void main(String args[])
 	{	
-		
 		boolean cli = false;
 		
 		for(String arg: args)
-			
 		{
 			if(arg.equals("-cli"))
 			{

@@ -2,6 +2,7 @@ package qora.assets;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
 
@@ -21,7 +22,7 @@ public class Asset {
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int DESCRIPTION_SIZE_LENGTH = 4;
 	private static final int QUANTITY_LENGTH = 8;
-	private static final byte SCALE_LENGTH = 1;
+	private static final int SCALE_LENGTH = 1;
 	private static final int DIVISIBLE_LENGTH = 1;
 	private static final int REFERENCE_LENGTH = 64;
 	
@@ -92,6 +93,7 @@ public class Asset {
 	
 	public static Asset parse(byte[] data) throws Exception
 	{	
+
 		int position = 0;
 		
 		//READ CREATOR
@@ -112,6 +114,8 @@ public class Asset {
 		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
+		
+		///Logger.getGlobal().info("Asset [" + name +"] parse data.len:" + data.length);
 		
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -186,8 +190,11 @@ public class Asset {
 		data = Bytes.concat(data, quantityBytes);
 		
 		//WRITE SCALE_LENGTH
-		byte[] scaleBytes = new byte[this.scale];
+		//byte[] scaleBytes = new byte[this.scale];
+		byte[] scaleBytes = new byte[1];
+		scaleBytes[0] = this.scale;
 		data = Bytes.concat(data, scaleBytes);
+		
 
 		//WRITE DIVISIBLE
 		byte[] divisibleBytes = new byte[1];
@@ -205,6 +212,8 @@ public class Asset {
 			data = Bytes.concat(data, new byte[64]);
 		}
 		
+		///Logger.getGlobal().info("Asset [" + this.name + "] toBytes data.len:" + data.length);
+
 		return data;
 	}
 

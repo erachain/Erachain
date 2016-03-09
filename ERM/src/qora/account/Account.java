@@ -84,7 +84,8 @@ public class Account {
 	
 	public BigDecimal getConfirmedBalance(byte[] hkey, DBSet db)
 	{
-		return db.getBalanceMapHKey().get(getAddress(), hkey);
+		// TODO return db.getBalanceMapHKey().get(getAddress(), hkey);
+		return db.getBalanceMap().get(getAddress(), 2l);
 	}
 
 	public void setConfirmedBalance(BigDecimal amount)
@@ -106,7 +107,8 @@ public class Account {
 	public void setConfirmedBalance(byte[] hkey, BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceMapHKey().set(getAddress(), hkey, amount);
+		// TODO db.getBalanceMapHKey().set(getAddress(), hkey, amount);
+		this.setConfirmedBalance(2l, amount, DBSet.getInstance());
 	}
 
 	public void setConfirmedBalance(byte[] hkey, BigDecimal amount)
