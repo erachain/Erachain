@@ -117,7 +117,7 @@ public class TransactionCreator
 		//CREATE PAYMENT
 		//PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, feePow, time, sender.getLastReference(this.fork));
 		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, feePow, time, sender.getLastReference(this.fork));
-		
+		payment.sign(sender);
 		
 		//VALIDATE AND PROCESS
 		return this.afterCreate(payment);

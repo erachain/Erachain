@@ -32,20 +32,27 @@ public class CreateOrderTransaction extends Transaction
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
 	private Order order;
+	private long have;
+	private long want;
+	private BigDecimal amount;
+	private BigDecimal price;
 	
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, long timestamp, byte[] reference) 
 	{
 		super(CREATE_ORDER_TRANSACTION, creator, timestamp, reference);
 		
-		this.creator = creator;
-		this.order = new Order(new BigInteger(this.signature), creator, have, want, amount, price, timestamp);
+		this.have = have;
+		this.want = want;
+		this.amount = amount;
+		this.price = price;
 	}
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, have, want, amount, price, timestamp, reference);
-		
 		this.signature = signature;
 		this.fee = fee;
+		this.order = new Order(new BigInteger(this.signature), creator, have, want, amount, price, timestamp);
+		
 	}
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, int feePow, long timestamp, byte[] reference) 
 	{
@@ -54,7 +61,13 @@ public class CreateOrderTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
-	
+
+	public void makeOrder()
+	{
+		if (this.order == null) this.order = new Order(new BigInteger(this.signature),
+				this.creator, this.have, this.want, this.amount, this.price, this.timestamp);
+	}
+
 	public Order getOrder()
 	{
 		return this.order;

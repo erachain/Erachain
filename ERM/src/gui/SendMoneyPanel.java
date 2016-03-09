@@ -34,7 +34,7 @@ public class SendMoneyPanel extends JPanel
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;
 	private JTextField txtAmount;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JTextField txtRecDetails;
 	private JButton sendButton;
 	private AccountsComboBoxModel accountsModel;
@@ -166,16 +166,16 @@ public class SendMoneyPanel extends JPanel
       	txtAmount = new JTextField();
         this.add(txtAmount, txtGBC);
         
-        //LABEL FEE
+        //LABEL FEE POWER
       	labelGBC.gridy = 6;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
-      	this.add(feeLabel, labelGBC);
+      	JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
+      	this.add(feePowLabel, labelGBC);
       		
-      	//TXT AMOUNT
+      	//TXT FEE POWER
       	txtGBC.gridy = 6;
-      	txtFee = new JTextField();
-      	txtFee.setText("1");
-        this.add(txtFee, txtGBC);
+      	txtFeePow = new JTextField();
+      	txtFeePow.setText("0");
+        this.add(txtFeePow, txtGBC);
         
         //BUTTON SEND
         buttonGBC.gridy = 7;
@@ -198,7 +198,7 @@ public class SendMoneyPanel extends JPanel
       	//CONTEXT MENU
       	MenuPopupUtil.installContextMenu(txtTo);
       	MenuPopupUtil.installContextMenu(txtAmount);
-      	MenuPopupUtil.installContextMenu(txtFee);
+      	MenuPopupUtil.installContextMenu(txtFeePow);
       	MenuPopupUtil.installContextMenu(txtRecDetails);
 	}
 	
@@ -317,8 +317,7 @@ public class SendMoneyPanel extends JPanel
 			
 			//READ FEE
 			parsing = 2;
-			int feePow = Integer.parseInt(txtFee.getText());
-			
+			int feePow = Integer.parseInt(txtFeePow.getText());
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			Asset asset = (Asset) this.cbxFavorites.getSelectedItem();
