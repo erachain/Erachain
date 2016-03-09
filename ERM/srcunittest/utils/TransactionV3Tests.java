@@ -69,18 +69,11 @@ public class TransactionV3Tests {
 				);
 		messageTransactionV3.sign(creator);
 		
-		if( messageTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE() || databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet) < Transaction.getMESSAGE_BLOCK_HEIGHT_RELEASE())
-		{
-			assertEquals(messageTransactionV3.isValid(databaseSet), Transaction.NOT_YET_RELEASED);
-		}
-		else
-		{
-			assertEquals(messageTransactionV3.isValid(databaseSet), Transaction.VALIDATE_OK);
-		}
+		assertEquals(messageTransactionV3.isValid(databaseSet), Transaction.VALIDATE_OK);
 		
 		messageTransactionV3.process(databaseSet);
 		
-		assertEquals(BigDecimal.valueOf(999).setScale(8), creator.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(999.99998660).setScale(8), creator.getConfirmedBalance(databaseSet));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(61l, databaseSet));
 		
@@ -164,7 +157,7 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(databaseSet);
 		
-		assertEquals(BigDecimal.valueOf(999).setScale(8), creator.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(999.99998260).setScale(8), creator.getConfirmedBalance(databaseSet));
 		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, databaseSet));
@@ -174,7 +167,8 @@ public class TransactionV3Tests {
 		
 		ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
 		try {
-			arbitraryTransactionV3_2 = (ArbitraryTransactionV3) ArbitraryTransactionV3.Parse(Arrays.copyOfRange(rawArbitraryTransactionV3, 4, rawArbitraryTransactionV3.length));
+			arbitraryTransactionV3_2 = (ArbitraryTransactionV3) ArbitraryTransactionV3.Parse(Arrays.copyOfRange(rawArbitraryTransactionV3, 0, rawArbitraryTransactionV3.length));
+			// already SIGNED - arbitraryTransactionV3_2.sign(creator);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -247,7 +241,7 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(databaseSet);
 		
-		assertEquals(BigDecimal.valueOf(999).setScale(8), creator.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(999.999988).setScale(8), creator.getConfirmedBalance(databaseSet));
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 
 		

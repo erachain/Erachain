@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import ntp.NTP;
 
@@ -2326,9 +2327,9 @@ public class TransactionTests {
 		transaction.process(databaseSet);
 		
 		//CREATE SIGNATURE
+		//Logger.getGlobal().info("asdasd");
 		long timestamp = NTP.getTime();
 		Poll poll = new Poll(sender, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test2")));
-				
 		//CREATE POLL CREATION
 		Transaction pollCreation = new CreatePollTransaction(sender, poll, FEE_POWER, timestamp, sender.getLastReference(databaseSet));	
 		
@@ -2422,6 +2423,7 @@ public class TransactionTests {
 		long timestamp = NTP.getTime();
 				
 		//CREATE POLL Vote
+		
 		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(sender, "test", 0, FEE_POWER, timestamp, sender.getLastReference(databaseSet));	
 		
 		//CONVERT TO BYTES

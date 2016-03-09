@@ -1,6 +1,7 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -268,22 +269,22 @@ public abstract class Transaction {
 		
 	public BigDecimal getMinFee()
 	{		
-		BigDecimal fee =  new BigDecimal(this.getDataLength() + 100).multiply(FEE_PER_BYTE).setScale(8);
+		BigDecimal fee =  new BigDecimal(this.getDataLength() + 100).multiply(FEE_PER_BYTE).setScale(8, RoundingMode.HALF_UP);
 		if (this.getDataLength() <= 1000) {
 			return fee;
 		} else {
 			// add overheat
-			return fee.add(new BigDecimal(this.getDataLength() - 1000).multiply(FEE_PER_BYTE)).setScale(8);
+			return fee.add(new BigDecimal(this.getDataLength() - 1000).multiply(FEE_PER_BYTE)).setScale(8, RoundingMode.HALF_UP);
 		}
 	}
 	// calc FEE by recommended and feePOW
 	public void calcFee()
 	{	
-		this.fee = calcRecommendedFee().multiply(new BigDecimal(2^this.feePow)).setScale(8);
+		this.fee = calcRecommendedFee().multiply(new BigDecimal(2^this.feePow)).setScale(8, RoundingMode.UP);
 	}
 	public static BigDecimal calcFee(int lenght, int feePow)
 	{	
-		return calcRecommendedFee(lenght).multiply(new BigDecimal(2^feePow)).setScale(8);
+		return calcRecommendedFee(lenght).multiply(new BigDecimal(2^feePow)).setScale(8, RoundingMode.UP);
 	}
 	// calc recommended FEE
 	public BigDecimal calcRecommendedFee()

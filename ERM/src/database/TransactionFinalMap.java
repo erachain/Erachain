@@ -28,6 +28,7 @@ import database.serializer.TransactionSerializer;
 import qora.account.Account;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.Transaction;
 import utils.BlExpUnit;
 
@@ -77,7 +78,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 			@Override
 			public String run(Tuple2<Integer, Integer> key, Transaction val) {
 				// TODO Auto-generated method stub
-				if ( val instanceof GenesisTransaction )
+				if ( val instanceof GenesisTransaction | val instanceof GenesisIssueAssetTransaction )
 					return "genesis";
 				return val.getCreator().getAddress();
 			}
