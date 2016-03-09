@@ -44,7 +44,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			long timestamp, byte[] reference) 
 	{
 		this(creator, payments, service, data, timestamp, reference);
-		this.feePow = feePow;
+		this.calcFee();
 	}
 	public ArbitraryTransactionV3(PublicKeyAccount creator,
 			List<Payment> payments, int service, byte[] data, BigDecimal fee,

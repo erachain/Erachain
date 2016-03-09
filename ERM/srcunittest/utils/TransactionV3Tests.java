@@ -20,7 +20,7 @@ import qora.crypto.Crypto;
 import qora.payment.Payment;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.GenesisTransaction;
-import qora.transaction.MessageTransactionV3;
+import qora.transaction.MessageTransaction;
 import qora.transaction.Transaction;
 
 
@@ -34,7 +34,7 @@ public class TransactionV3Tests {
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, true, new byte[64]);
+		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
 		databaseSet.getAssetMap().set(0l, qoraAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
@@ -56,29 +56,18 @@ public class TransactionV3Tests {
 		transaction.process(databaseSet);
 		
 		creator.setConfirmedBalance(61l, BigDecimal.valueOf(100).setScale(8), databaseSet);
-		
-		byte[] signature = MessageTransactionV3.generateSignature(
-				databaseSet, 
-				creator, recipient, 61l, //	ATFunding
-				BigDecimal.valueOf(10).setScale(8), 
-				BigDecimal.valueOf(1).setScale(8), 
-				data, 
-				new byte[] { 1 },
-				new byte[] { 0 },
-				timestamp
-				);
-		
-		MessageTransactionV3 messageTransactionV3 = new MessageTransactionV3(
+				
+		MessageTransaction messageTransactionV3 = new MessageTransaction(
 				creator, recipient, 61l, //	ATFunding 
 				BigDecimal.valueOf(10).setScale(8), 
-				BigDecimal.valueOf(1).setScale(8), 
+				0, 
 				data, 
 				new byte[] { 1 },
 				new byte[] { 0 },
 				timestamp,
-				creator.getLastReference(databaseSet),
-				signature
+				creator.getLastReference(databaseSet)
 				);
+		messageTransactionV3.sign(creator);
 		
 		if( messageTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE() || databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet) < Transaction.getMESSAGE_BLOCK_HEIGHT_RELEASE())
 		{
@@ -95,16 +84,16 @@ public class TransactionV3Tests {
 		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(61l, databaseSet));
 		
-		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes();
+		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true);
 		
-		MessageTransactionV3 messageTransactionV3_2 = null;
+		MessageTransaction messageTransactionV3_2 = null;
 		try {
-			messageTransactionV3_2 = (MessageTransactionV3) MessageTransactionV3.Parse(Arrays.copyOfRange(rawMessageTransactionV3, 4, rawMessageTransactionV3.length));
+			messageTransactionV3_2 = (MessageTransaction) MessageTransaction.Parse(Arrays.copyOfRange(rawMessageTransactionV3, 4, rawMessageTransactionV3.length));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		assertEquals(new String(messageTransactionV3.getData()), new String(messageTransactionV3_2.getData()));
-		assertEquals(messageTransactionV3.getOwner(), messageTransactionV3_2.getOwner());
+		assertEquals(messageTransactionV3.getCreator(), messageTransactionV3_2.getCreator());
 		assertEquals(messageTransactionV3.getRecipient(), messageTransactionV3_2.getRecipient());
 		assertEquals(messageTransactionV3.getKey(), messageTransactionV3_2.getKey());
 		assertEquals(messageTransactionV3.getAmount(), messageTransactionV3_2.getAmount());
@@ -124,8 +113,8 @@ public class TransactionV3Tests {
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, true, new byte[64]);
-		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, true, new byte[64]);
+		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
+		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true, new byte[64]);
 		databaseSet.getAssetMap().set(0l, qoraAsset);
 		databaseSet.getAssetMap().set(61l, aTFundingAsset);
     	
@@ -155,21 +144,14 @@ public class TransactionV3Tests {
 		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
 		payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(8)));
 		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(8)));
-		
-		byte[] signature = ArbitraryTransactionV3.generateSignature(
-				databaseSet, 
-				creator, payments, 111, data,
-				BigDecimal.valueOf(1).setScale(8), 
-				timestamp
-				);
-		
+				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				creator, payments, 111, data,
-				BigDecimal.valueOf(1).setScale(8), 
+				0, 
 				timestamp,
-				creator.getLastReference(databaseSet),
-				signature
+				creator.getLastReference(databaseSet)
 				);
+		arbitraryTransactionV3.sign(creator);
 		
 		if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		{
@@ -188,7 +170,7 @@ public class TransactionV3Tests {
 		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getConfirmedBalance(61l, databaseSet));
 		
-		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes();
+		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true);
 		
 		ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
 		try {
@@ -220,8 +202,8 @@ public class TransactionV3Tests {
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, true, new byte[64]);
-		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, true, new byte[64]);
+		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
+		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true, new byte[64]);
 		databaseSet.getAssetMap().set(0l, qoraAsset);
 		databaseSet.getAssetMap().set(61l, aTFundingAsset);
     	
@@ -245,21 +227,14 @@ public class TransactionV3Tests {
 		creator.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), databaseSet);
 		
 		List<Payment> payments = new ArrayList<Payment>();
-		
-		byte[] signature = ArbitraryTransactionV3.generateSignature(
-				databaseSet, 
-				creator, payments, 111, data,
-				BigDecimal.valueOf(1).setScale(8), 
-				timestamp
-				);
-		
+				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				creator, payments, 111, data,
-				BigDecimal.valueOf(1).setScale(8), 
+				0, 
 				timestamp,
-				creator.getLastReference(databaseSet),
-				signature
+				creator.getLastReference(databaseSet)
 				);
+		arbitraryTransactionV3.sign(creator);
 		
 		if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		{
@@ -276,7 +251,7 @@ public class TransactionV3Tests {
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 
 		
-		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes();
+		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true);
 		
 		ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
 		try {

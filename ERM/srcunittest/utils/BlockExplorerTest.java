@@ -165,12 +165,12 @@ public class BlockExplorerTest {
 		String showWithout = "";
 		
 		DBSet.getInstance();
-		
+		/*
 		for(int i = 0; i < addrs.size(); i++) {
 			
 			String addr = addrs.get(i);
 		
-			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(addr, start, txOnPage, filter, allOnOnePage, withoutBlocks, showOnly, showWithout);
+			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(addrs, start, txOnPage, filter, withoutBlocks, showOnly, showWithout);
 	
 			Map<Object, Map> totalBalance = output.get("totalBalance");
 			
@@ -204,6 +204,7 @@ public class BlockExplorerTest {
 				}
 			}
 		}
+		*/
 		
 		DBSet.getInstance().close();
 	}
