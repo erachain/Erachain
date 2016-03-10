@@ -215,18 +215,6 @@ public class Asset {
 		return data;
 	}
 
-	// random - self init reference
-	public byte[] generateReference()
-	{
-
-		byte[] data = this.toBytes(false);
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		return digest;
-	}
-
 	public int getDataLength() 
 	{
 		return CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + SCALE_LENGTH + QUANTITY_LENGTH + DIVISIBLE_LENGTH + REFERENCE_LENGTH;

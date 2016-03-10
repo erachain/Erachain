@@ -54,6 +54,7 @@ public class BlockChain
         	
         	//ADD QORA ASSET
         	Asset qoraAsset = genesisBlock.makeERM(genesisBlock.getGeneratorSignature());
+        	//Asset qoraAsset = genesisBlock.makeERM(genesisBlock.getTimestamp());
         	DBSet.getInstance().getIssueAssetMap().set(genesisBlock.getGeneratorSignature(), 0l);
         	DBSet.getInstance().getAssetMap().set(0l, qoraAsset);
 

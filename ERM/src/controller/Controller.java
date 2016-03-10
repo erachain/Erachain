@@ -89,11 +89,11 @@ import webserver.WebService;
 
 public class Controller extends Observable {
 
-	private String version = "0.26.0 beta";
-	private String buildTime = "2016-03-07 00:00:00 UTC";
+	private String version = "0.03.0 beta";
+	private String buildTime = "2016-03-10 00:00:00 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "0.26.0";
+	public static final String releaseVersion = "0.03.0";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;

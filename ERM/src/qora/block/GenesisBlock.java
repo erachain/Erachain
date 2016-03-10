@@ -88,19 +88,18 @@ public class GenesisBlock extends Block{
 
 			Asset asset;
 			byte[] signature;
-
 			//CREATE JOB ASSET
 			asset = makeOil(new byte[64]);
-			signature = asset.generateReference();
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
 			asset = makeOil(signature);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
 			asset = makeGem(new byte[64]);
-			signature = asset.generateReference();
+			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
 			asset = makeGem(signature);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
-
+			
 			/*
 			for(String address: recipients)
 			{
@@ -115,17 +114,20 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public Asset makeERM(byte[] signature) 
+	public Asset makeERM(byte[] reference) 
 	{
-		return new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, (byte) 6, true, signature);
+		Asset asset = new Asset(genesisGenerator, "ERM", "Main unit", 10000000000L, (byte) 6, true, reference);
+		return asset;
 	}
-	public Asset makeOil(byte[] signature) 
+	public Asset makeOil(byte[] reference) 
 	{
-		return new Asset(genesisGenerator, "oil", "Fee oil", 99999999L, (byte) 8, true, signature);
+		Asset asset = new Asset(genesisGenerator, "oil", "Fees oil", 99999999L, (byte) 8, true, reference);
+		return asset;
 	}
-	public Asset makeGem(byte[] signature) 
+	public Asset makeGem(byte[] reference) 
 	{
-		return new Asset(genesisGenerator, "GEM", "Vote gem", 999999999999999999L, (byte) 0, false, signature);
+		Asset asset = new Asset(genesisGenerator, "GEM", "Votes gem", 999999999999999999L, (byte) 0, false, reference);
+		return asset;
 	}
 
 	public String getTestNetInfo() 

@@ -196,6 +196,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 		
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this, key);
+    	//db.getAssetMap().set(key, this.asset);
+
 	}
 
 
@@ -248,9 +250,32 @@ public class GenesisIssueAssetTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	public byte[] generateSignature(Asset asset, long timestamp) 
+	public byte[] generateSignature1(Asset asset, long timestamp) 
 	{
 		byte[] data = this.toBytes(false);
+				
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+				
+		return digest;
+	}
+	public static byte[] generateSignature(Asset asset, long timestamp) 
+	{
+		byte[] data = new byte[0];
+		
+		//WRITE TYPE
+		byte[] typeBytes = Ints.toByteArray(GENESIS_ISSUE_ASSET_TRANSACTION);
+		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, typeBytes);
+		
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+						
+		//WRITE ASSET
+		data = Bytes.concat(data , asset.toBytes(false));
 				
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);

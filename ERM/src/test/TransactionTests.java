@@ -13,6 +13,8 @@ import ntp.NTP;
 
 import org.junit.Test;
 
+import com.google.common.primitives.Longs;
+
 import database.DBSet;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
@@ -3215,8 +3217,6 @@ public class TransactionTests {
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
 		Asset asset = new Asset(sender, "test", "strontje", 50000l, (byte) 2, false, new byte[64]);
-		byte[] signature = asset.generateReference();
-		asset = new Asset(sender, "test", "strontje", 50000l, (byte) 2, false, signature);
 
 				
 		//CREATE ISSUE ASSET TRANSACTION
