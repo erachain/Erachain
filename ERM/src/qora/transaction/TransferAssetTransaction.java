@@ -26,12 +26,12 @@ import database.DBSet;
 
 public class TransferAssetTransaction extends Transaction {
 
-	private static final int CREATOR_LENGTH = 32;
-	private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	private static final int KEY_LENGTH = 8;
-	private static final int AMOUNT_LENGTH = 12;
-	private static final int FEE_LENGTH = 8;
-	private static final int SIGNATURE_LENGTH = 64;
+	//private static final int CREATOR_LENGTH = 32;
+	//private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
+	//private static final int KEY_LENGTH = 8;
+	//private static final int AMOUNT_LENGTH = 12;
+	//private static final int FEE_LENGTH = 8;
+	//private static final int SIGNATURE_LENGTH = 64;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
 
 	private Account recipient;

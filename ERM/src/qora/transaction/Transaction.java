@@ -83,7 +83,7 @@ public abstract class Transaction {
 	public static final int EXTENDED = 0;
 	public static final int GENESIS_TRANSACTION = 1;
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 2;
-	public static final int REERVED_3 = 3;
+	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 3;
 	public static final int REERVED_4 = 4;
 
 	public static final int PAYMENT_TRANSACTION = 5;
@@ -451,7 +451,7 @@ public abstract class Transaction {
 		}
 	}
 
-	public int getBlockVersion()
+	public int getBlockVersion1()
 	{
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
 		if(this.isConfirmed())

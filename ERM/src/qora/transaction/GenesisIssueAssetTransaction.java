@@ -32,10 +32,10 @@ public class GenesisIssueAssetTransaction extends Transaction
 {
 	private static final int BASE_LENGTH = RECIPIENT_LENGTH + TIMESTAMP_LENGTH;
 
-	private Account recipient;
+	private PublicKeyAccount recipient;
 	private Asset asset;
 	
-	public GenesisIssueAssetTransaction(Account recipient, Asset asset, long timestamp) 
+	public GenesisIssueAssetTransaction(PublicKeyAccount recipient, Asset asset, long timestamp) 
 	{
 		// new reference = byte[]{}
 		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
@@ -62,8 +62,24 @@ public class GenesisIssueAssetTransaction extends Transaction
 		return this.asset;
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject toJson() 
+	{
+		//GET BASE
+		JSONObject transaction = this.getJsonBase();
+				
+		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
+		transaction.put("recipient", this.recipient.getAddress());
+		transaction.put("name", this.getAsset().getName());
+		transaction.put("description", this.getAsset().getDescription());
+		transaction.put("quantity", this.getAsset().getQuantity());
+		transaction.put("divisible", this.getAsset().isDivisible());
+				
+		return transaction;	
+	}
+
 	//PARSE CONVERT
-	
 	public static Transaction Parse(byte[] data) throws Exception
 	{	
 		//CHECK IF WE MATCH BLOCK LENGTH
@@ -81,7 +97,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 						
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-		Account recipient = new Account(Base58.encode(recipientBytes));
+		PublicKeyAccount recipient = new PublicKeyAccount(recipientBytes);
 		position += RECIPIENT_LENGTH;
 
 		//READ ASSET
@@ -91,22 +107,6 @@ public class GenesisIssueAssetTransaction extends Transaction
 		return new GenesisIssueAssetTransaction(recipient, asset, timestamp);
 	}	
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject toJson() 
-	{
-		//GET BASE
-		JSONObject transaction = this.getJsonBase();
-				
-		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("name", this.getAsset().getName());
-		transaction.put("description", this.getAsset().getDescription());
-		transaction.put("quantity", this.getAsset().getQuantity());
-		transaction.put("divisible", this.getAsset().isDivisible());
-				
-		return transaction;	
-	}
 	
 	@Override
 	public byte[] toBytes(boolean withSign) 
@@ -124,7 +124,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 				
 		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+		data = Bytes.concat(data, this.recipient.getPublicKey());
 
 		//WRITE ASSET
 		data = Bytes.concat(data, this.asset.toBytes(true));

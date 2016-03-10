@@ -162,7 +162,7 @@ public class BlockTests
 		assertEquals(false, newBlock.isSignatureValid());
 		
 		//INVALID GENERATOR SIGNATURE
-		newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), newBlock.getTimestamp(), newBlock.getGeneratingBalance(), generator, new byte[32]);
+		newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), newBlock.getTimestamp(), newBlock.getGeneratingBalance(), generator, new byte[32], null, 0);
 		transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
 		newBlock.setTransactionsSignature(transactionsSignature);
 		
@@ -232,19 +232,19 @@ public class BlockTests
 		assertEquals(true, newBlock.isValid(databaseSet));
 		
 		//CHANGE REFERENCE
-		Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getTimestamp(), newBlock.getGeneratingBalance(), newBlock.getGenerator(), newBlock.getGeneratorSignature());
+		Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getTimestamp(), newBlock.getGeneratingBalance(), newBlock.getGenerator(), newBlock.getGeneratorSignature(), null, 0);
 		
 		//CHECK IF INVALID
 		assertEquals(false, invalidBlock.isValid(databaseSet));
 		
 		//CHANGE TIMESTAMP
-		invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), 1L, newBlock.getGeneratingBalance(), newBlock.getGenerator(), newBlock.getGeneratorSignature());
+		invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), 1L, newBlock.getGeneratingBalance(), newBlock.getGenerator(), newBlock.getGeneratorSignature(), null, 0);
 		
 		//CHECK IF INVALID
 		assertEquals(false, invalidBlock.isValid(databaseSet));
 		
 		//CHANGE BASETARGET
-		invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), newBlock.getTimestamp(), 1L, newBlock.getGenerator(), newBlock.getGeneratorSignature());
+		invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), newBlock.getTimestamp(), 1L, newBlock.getGenerator(), newBlock.getGeneratorSignature(), null, 0);
 				
 		//CHECK IF INVALID
 		assertEquals(false, invalidBlock.isValid(databaseSet));

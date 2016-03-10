@@ -1,5 +1,7 @@
 package qora.block;
 
+import java.util.logging.Logger;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -15,10 +17,9 @@ import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
-import qora.payment.Payment;
 import qora.transaction.GenesisTransaction;
-//import qora.transaction.IssueAssetTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
+import qora.transaction.GenesisTransferAssetTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
@@ -28,14 +29,14 @@ public class GenesisBlock extends Block{
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference =  new byte[]{1,1,1,1,1,1,1,1};
 	private static long genesisGeneratingBalance = 10000000L;
-	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,1,1,1,1,1,1,1});
+	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,3,1,3,1,3,1,3});
 
 	private String testnetInfo; 
 	
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp() , genesisGeneratingBalance, genesisGenerator, generateHash());
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance, genesisGenerator, generateHash(), null, 0);
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		
@@ -78,35 +79,36 @@ public class GenesisBlock extends Block{
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
-				this.addTransaction(new GenesisTransaction(recipient, bdAmount , genesisTimestamp));
+				this.addTransaction(new GenesisTransaction(recipient, bdAmount, genesisTimestamp));
 			}
-			
-			///////////
-			byte[] seed = Crypto.getInstance().digest("Generic Assets".getBytes());
-			byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-			PrivateKeyAccount issuer = new PrivateKeyAccount(privateKey);
-
-			Asset asset;
+						
+			Asset asset1;
 			byte[] signature;
 			//CREATE JOB ASSET
-			asset = makeOil(new byte[64]);
-			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
-			asset = makeOil(signature);
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
+			asset1 = makeOil(new byte[64]);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset1, genesisTimestamp);
+			asset1 = makeOil(signature);
+			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
+
+			this.addTransaction(new GenesisIssueAssetTransaction(genesisGenerator, asset1, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
-			asset = makeGem(new byte[64]);
-			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
-			asset = makeGem(signature);
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
+			Asset asset2;
+			asset2 = makeGem(new byte[64]);
+			signature = GenesisIssueAssetTransaction.generateSignature(asset2, genesisTimestamp);
+			asset2 = makeGem(signature);
+			this.addTransaction(new GenesisIssueAssetTransaction(genesisGenerator, asset2, genesisTimestamp));
 			
-			/*
+			//Logger.getGlobal().info("amount " + new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(11)));
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
-				this.addTransaction(new GenesisIssueAssetTransaction(recipient, bdAmount , genesisTimestamp));
+				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
+				this.addTransaction(new GenesisTransferAssetTransaction(genesisGenerator, recipient, 1l, bdAmount, genesisTimestamp));
+				
+				bdAmount = new BigDecimal(asset2.getQuantity()).divide(new BigDecimal(9));
+				this.addTransaction(new GenesisTransferAssetTransaction(genesisGenerator, recipient, 2l, bdAmount, genesisTimestamp));
 			}
-			*/
 
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(generateHash());

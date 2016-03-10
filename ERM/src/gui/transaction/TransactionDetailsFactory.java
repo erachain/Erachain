@@ -12,6 +12,7 @@ import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
+import qora.transaction.GenesisTransferAssetTransaction;
 import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
@@ -124,6 +125,11 @@ public class TransactionDetailsFactory
 			JsonTransaction json1Transaction = (JsonTransaction)transaction;
 			return new Json1TransactionDetailsFrame(json1Transaction);
 
+		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
+			
+			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
+			return new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);		
+			
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			GenesisIssueAssetTransaction genesisIssueAssetTransaction = (GenesisIssueAssetTransaction) transaction;

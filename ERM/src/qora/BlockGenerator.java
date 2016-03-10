@@ -287,7 +287,17 @@ public class BlockGenerator extends Thread implements Observer
 
 		//CALCULATE HASH
 		byte[] hash;
-		if (version < 3)
+		if (version > 0)
+		{
+			byte[] data = Bytes.concat(block.getSignature(), account.getPublicKey());
+			hash = Crypto.getInstance().digest(data);
+		}
+		else
+		{
+			hash = null;
+		}
+		/*
+		if ((version < 3)
 		{
 			hash = Crypto.getInstance().digest(signature);
 		}
@@ -297,6 +307,7 @@ public class BlockGenerator extends Thread implements Observer
 			byte[] data = Bytes.concat(block.getSignature(), account.getPublicKey());
 			hash = Crypto.getInstance().digest(data);
 		}
+		*/
 
 		//CONVERT HASH TO BIGINT
 		BigInteger hashValue = new BigInteger(1, hash);
@@ -329,7 +340,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		//CREATE NEW BLOCK
 		Block newBlock;
-		if ( version > 1 )
+		if ( version > 0 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK( block.getHeight() ) , block.getHeight() + 1 );
 			byte[] atBytes = atBlock.getBytesForBlock();
@@ -337,7 +348,8 @@ public class BlockGenerator extends Thread implements Observer
 		}
 		else
 		{
-			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature);
+			//newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature);
+			newBlock = null;
 		}
 		return newBlock;
 	}

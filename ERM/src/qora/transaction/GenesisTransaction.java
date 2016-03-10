@@ -36,7 +36,7 @@ public class GenesisTransaction extends Transaction {
 		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
-		this.signature = generateSignature(recipient, amount, timestamp);
+		//this.signature = generateSignature(); //recipient, amount, timestamp);
 	}
 
 	//GETTERS/SETTERS
@@ -182,8 +182,9 @@ public class GenesisTransaction extends Transaction {
 	
 	//REST
 
+	/*
 	//@Override
-	private byte[] generateSignature(Account recipient, BigDecimal amount, long timestamp)
+	private byte[] generateSignature() //Account recipient, BigDecimal amount, long timestamp)
 	{
 
 		byte[] data = this.toBytes(false);
@@ -193,6 +194,7 @@ public class GenesisTransaction extends Transaction {
 				
 		return digest;
 	}
+	*/
 	
 	@Override
 	public PublicKeyAccount getCreator()

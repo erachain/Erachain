@@ -74,7 +74,7 @@ public class Block {
 	protected byte[] atBytes;
 	protected Long atFees;
 
-	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
+	// VERSION 1
 	public Block(int version, byte[] reference, long timestamp, long generatingBalance, PublicKeyAccount generator, byte[] generatorSignature, byte[] atBytes, long atFees)
 	{
 		this.version = version;
@@ -88,12 +88,6 @@ public class Block {
 
 		this.atBytes = atBytes;
 		this.atFees = atFees;
-	}
-
-	// VERSION 1 BLOCKS
-	public Block(int version, byte[] reference, long timestamp, long generatingBalance, PublicKeyAccount generator, byte[] generatorSignature)
-	{
-		this(version, reference, timestamp, generatingBalance, generator, generatorSignature, new byte[0], 0);
 	}
 
 	//GETTERS/SETTERS
@@ -310,27 +304,20 @@ public class Block {
  
 		//CREATE BLOCK
 		Block block;
-		if(version > 1)
-		{
-			//ADD ATs BYTES
-			byte[] atBytesCountBytes = Arrays.copyOfRange(data, position, position + AT_BYTES_LENGTH);
-			int atBytesCount = Ints.fromByteArray(atBytesCountBytes);
-			position += AT_BYTES_LENGTH;
-	
-			byte[] atBytes = Arrays.copyOfRange( data , position, position + atBytesCount);
-			position += atBytesCount;
-	
-			byte[] atFees = Arrays.copyOfRange( data , position , position + 8 );
-			position += 8;
-	
-			long atFeesL = Longs.fromByteArray(atFees);
+		//ADD ATs BYTES
+		byte[] atBytesCountBytes = Arrays.copyOfRange(data, position, position + AT_BYTES_LENGTH);
+		int atBytesCount = Ints.fromByteArray(atBytesCountBytes);
+		position += AT_BYTES_LENGTH;
 
-			block = new Block(version, reference, timestamp, generatingBalance, generator, generatorSignature, atBytes, atFeesL);
-		}
-		else
-		{
-			block = new Block(version, reference, timestamp, generatingBalance, generator, generatorSignature);
-		}
+		byte[] atBytes = Arrays.copyOfRange( data , position, position + atBytesCount);
+		position += atBytesCount;
+
+		byte[] atFees = Arrays.copyOfRange( data , position , position + 8 );
+		position += 8;
+
+		long atFeesL = Longs.fromByteArray(atFees);
+
+		block = new Block(version, reference, timestamp, generatingBalance, generator, generatorSignature, atBytes, atFeesL);
 
 		//READ TRANSACTIONS COUNT
 		byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
@@ -419,7 +406,7 @@ public class Block {
 		data = Bytes.concat(data, this.generatorSignature);
 
 		//ADD ATs BYTES
-		if(this.version >= 2)
+		if(this.version > 0 )
 		{
 			if (atBytes!=null)
 			{
@@ -465,7 +452,7 @@ public class Block {
 
 		int length = BASE_LENGTH;
 
-		if(this.version >= 2)
+		if(this.version > 0)
 		{
 			length += AT_LENGTH;
 			if (this.atBytes!=null)
@@ -484,16 +471,15 @@ public class Block {
 
 	public byte[] getProofHash()
 	{
-		if(this.version < 3)
-		{
-			return Crypto.getInstance().digest(this.generatorSignature);
-		}
-		else
+		if(this.version > 0)
 		{
 			//newSig = sha256(prevSig || pubKey)
 			byte[] data = Bytes.concat(this.reference, generator.getPublicKey());
-
 			return Crypto.getInstance().digest(data);
+		}
+		else
+		{
+			return null;
 		}
 	}
 
@@ -548,6 +534,8 @@ public class Block {
 	{
 		int height = getHeight(db);
 
+		return 1;
+		/*
 		if(height < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
 		{
 			return 1;
@@ -560,6 +548,7 @@ public class Block {
 		{
 			return 3;
 		}
+		*/
 	}
 
 	public boolean isValid()
@@ -598,7 +587,7 @@ public class Block {
 		{
 			return false;
 		}
-		if(this.version < 2 && (this.atBytes.length > 0 || this.atFees != 0))
+		if(this.version < 1)
 		{
 			return false;
 		}

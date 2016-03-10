@@ -126,6 +126,11 @@ public class TransactionFactory {
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			
+		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
+			
+			//PARSE TRANSFER ASSET TRANSACTION
+			return GenesisTransferAssetTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));	
+		
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION
