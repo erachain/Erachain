@@ -116,9 +116,7 @@ public class Asset {
 		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
-		
-		///Logger.getGlobal().info("Asset [" + name +"] parse data.len:" + data.length);
-		
+				
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
@@ -214,8 +212,6 @@ public class Asset {
 			data = Bytes.concat(data, new byte[64]);
 		}
 		
-		//Logger.getGlobal().info("Asset [" + this.name + "] toBytes data.len:" + data.length);
-
 		return data;
 	}
 

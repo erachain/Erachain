@@ -28,12 +28,9 @@ public class TransactionFactory {
 	public Transaction parse(byte[] data) throws Exception
 	{
 		//READ TYPE
-		//Logger.getGlobal().info("TransactionFactory data.len: " + data.length);
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, Transaction.TYPE_LENGTH);
 		int type = Ints.fromByteArray(typeBytes);
 		
-		//Logger.getGlobal().info("TransactionFactory TYRPE:" + type);
-
 		//byte[] timeStampBytes = Arrays.copyOfRange(data, 4, 4 + Transaction.TIMESTAMP_LENGTH);
 		//long timeStamp = Longs.fromByteArray(timeStampBytes);
 		
@@ -132,7 +129,6 @@ public class TransactionFactory {
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION
-			//Logger.getGlobal().info("Transaction Factory GENESIS_ISSUE_ASSET_TRANSACTION data.len:" + data.length);
 			return GenesisIssueAssetTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 
 		case Transaction.GENESIS_TRANSACTION:

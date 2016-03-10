@@ -18,6 +18,7 @@ import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
@@ -29,15 +30,17 @@ import database.DBSet;
 
 public class GenesisIssueAssetTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH;
+	private static final int BASE_LENGTH = RECIPIENT_LENGTH + TIMESTAMP_LENGTH;
 
+	private Account recipient;
 	private Asset asset;
 	
-	public GenesisIssueAssetTransaction(Asset asset, long timestamp) 
+	public GenesisIssueAssetTransaction(Account recipient, Asset asset, long timestamp) 
 	{
 		// new reference = byte[]{}
 		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
 
+		this.recipient = recipient;
 		this.asset = asset;
 		this.signature = generateSignature(asset, timestamp);
 
@@ -50,6 +53,10 @@ public class GenesisIssueAssetTransaction extends Transaction
 		return this.signature;
 	}
 	
+	public Account getRecipient()
+	{
+		return this.recipient;
+	}
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -65,8 +72,6 @@ public class GenesisIssueAssetTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		//Logger.getGlobal().info("Gen Issue Asset PARSE data.len:" + data.length);
-
 		int position = 0;
 		
 		//READ TIMESTAMP
@@ -74,13 +79,16 @@ public class GenesisIssueAssetTransaction extends Transaction
 		long timestamp = Longs.fromByteArray(timestampBytes);	
 		position += TIMESTAMP_LENGTH;
 						
+		//READ RECIPIENT
+		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
+		Account recipient = new Account(Base58.encode(recipientBytes));
+		position += RECIPIENT_LENGTH;
+
 		//READ ASSET
-		Logger.getGlobal().info("Gen Issue Asset - PARSE - asset.data.len:" + (data.length - position));
 		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
-		Logger.getGlobal().info("Gen Issue Asset: " + asset.getName());
 		//position += asset.getDataLength();
 						
-		return new GenesisIssueAssetTransaction(asset, timestamp);
+		return new GenesisIssueAssetTransaction(recipient, asset, timestamp);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -91,6 +99,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		JSONObject transaction = this.getJsonBase();
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
+		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("name", this.getAsset().getName());
 		transaction.put("description", this.getAsset().getDescription());
 		transaction.put("quantity", this.getAsset().getQuantity());
@@ -114,10 +123,11 @@ public class GenesisIssueAssetTransaction extends Transaction
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 				
+		//WRITE RECIPIENT
+		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+
 		//WRITE ASSET
 		data = Bytes.concat(data, this.asset.toBytes(true));
-
-		Logger.getGlobal().info("Gen Issue Asset [" + this.asset.getName() + "] toBytes data.len:" + data.length);
 				
 		return data;
 	}
@@ -132,20 +142,19 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	public boolean isSignatureValid()
 	{
-		byte[] data = this.toBytes(false);
-						
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		//CHECK IF EQUAL
-		return Arrays.equals(digest, this.signature);
+		return true;
 	}
 	
 	@Override
 	public int isValid(DBSet db) 
 	{
 		
+		//CHECK IF ADDRESS IS VALID
+		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
+		{
+			return INVALID_ADDRESS;
+		}
+
 		//CHECK NAME LENGTH
 		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
 		if(nameLength > 400 || nameLength < 1)
@@ -179,8 +188,11 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//INSERT INTO DATABASE
 		long key = db.getAssetMap().add(this.asset);
 		
+		//UPDATE REFERENCE OF CREATOR
+		this.recipient.setLastReference(this.signature, db);
+
 		//ADD ASSETS TO OWNER
-		this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		this.recipient.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this, key);
@@ -190,22 +202,20 @@ public class GenesisIssueAssetTransaction extends Transaction
 	@Override
 	public void orphan(DBSet db) 
 	{
+														
+		//UPDATE REFERENCE OF CREATOR
+		this.recipient.setLastReference(this.reference, db);
 				
 		//DELETE FROM DATABASE
 		long key = db.getIssueAssetMap().get(this);
 		db.getAssetMap().delete(key);	
 		
 		//REMOVE ASSETS FROM OWNER
-		this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		this.recipient.setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
 		
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
-	}
 
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return null;
 	}
 
 

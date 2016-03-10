@@ -2,6 +2,7 @@ package qora.block;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -9,10 +10,12 @@ import com.google.common.primitives.Longs;
 
 import database.DBSet;
 import qora.account.Account;
+import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
+import qora.payment.Payment;
 import qora.transaction.GenesisTransaction;
 //import qora.transaction.IssueAssetTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
@@ -65,52 +68,46 @@ public class GenesisBlock extends Block{
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(generateHash());
 		} else {
-			
+			Account recipient;
+			BigDecimal bdAmount = new BigDecimal("1111111111.").setScale(8);
+			List<String> recipients = Arrays.asList(					
+					"QStUHLofuyCBy3UR2Rr8WRNnPc56WZYzWu","QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc","QYgYu43QEMv2cf1QC8nq5PwVRQrNVk81MM",
+					"Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP","QiZSovPpdyAhLW66P2KkF5UynR9RtVsLPN","QYMA8MopsHnWx4B28zUFArAsCmZoPx3ooG",
+					"QXuzwBv17fmDQD3y5Emhu7qiFoRYCDE8jS","QVcP2HUjxrGrb6ARWmu6h6x1fCTxatFw2H","QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk");
 			//ADD MAINNET GENESIS TRANSACTIONS
-			
-			this.addTransaction(new GenesisTransaction(new Account("QStUHLofuyCBy3UR2Rr8WRNnPc56WZYzWu"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QYgYu43QEMv2cf1QC8nq5PwVRQrNVk81MM"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-
-			this.addTransaction(new GenesisTransaction(new Account("Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QiZSovPpdyAhLW66P2KkF5UynR9RtVsLPN"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QYMA8MopsHnWx4B28zUFArAsCmZoPx3ooG"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-
-			this.addTransaction(new GenesisTransaction(new Account("QXuzwBv17fmDQD3y5Emhu7qiFoRYCDE8jS"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QVcP2HUjxrGrb6ARWmu6h6x1fCTxatFw2H"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
-			this.addTransaction(new GenesisTransaction(new Account("QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk"),
-					new BigDecimal("1111111111.").setScale(8), genesisTimestamp));
+			for(String address: recipients)
+			{
+				recipient = new Account(address);
+				this.addTransaction(new GenesisTransaction(recipient, bdAmount , genesisTimestamp));
+			}
 			
 			///////////
+			byte[] seed = Crypto.getInstance().digest("Generic Assets".getBytes());
+			byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+			PrivateKeyAccount issuer = new PrivateKeyAccount(privateKey);
+
 			Asset asset;
 			byte[] signature;
-			/*
-			//CREATE JOB ASSET
-			asset = makeERM(new byte[64]);
-			signature = GenesisIssueAssetTransaction.generateSignature(asset, genesisTimestamp);
-			asset = makeERM(signature);
-			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
-			*/
+
 			//CREATE JOB ASSET
 			asset = makeOil(new byte[64]);
 			signature = asset.generateReference();
 			asset = makeOil(signature);
-			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
 			asset = makeGem(new byte[64]);
 			signature = asset.generateReference();
 			asset = makeGem(signature);
-			this.addTransaction(new GenesisIssueAssetTransaction(asset, genesisTimestamp));
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset, genesisTimestamp));
 
+			/*
+			for(String address: recipients)
+			{
+				recipient = new Account(address);
+				this.addTransaction(new GenesisIssueAssetTransaction(recipient, bdAmount , genesisTimestamp));
+			}
+			*/
 
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(generateHash());

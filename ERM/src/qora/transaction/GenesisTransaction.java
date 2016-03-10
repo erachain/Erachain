@@ -23,8 +23,8 @@ import database.DBSet;
 
 public class GenesisTransaction extends Transaction {
 
-	private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	private static final int AMOUNT_LENGTH = 8;
+	//private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
+	//private static final int AMOUNT_LENGTH = 8;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH;
 	
 	private Account recipient;

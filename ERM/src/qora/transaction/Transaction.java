@@ -354,8 +354,6 @@ public abstract class Transaction {
 	
 	public boolean isSignatureValid() {
 
-		//Logger.getGlobal().info("isSignatureValid  this.signature:" + this.signature);
-
 		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
 		
 		byte[] data = this.toBytes( false );
