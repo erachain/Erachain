@@ -154,13 +154,13 @@ public class CancelOrderFrame extends JFrame
       	
       	//LABEL FEE
       	labelGBC.gridy = 7;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
       	txtGBC.gridy = 7;
       	txtFeePow = new JTextField();
-      	this.txtFeePow.setText("1");
+      	this.txtFeePow.setText("0");
         this.add(txtFeePow, txtGBC);
 		           
         //BUTTON CANCEL SALE

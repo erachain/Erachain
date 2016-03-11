@@ -46,7 +46,7 @@ import utils.Pair;
 @SuppressWarnings("serial")
 public class DeployATFrame extends JFrame {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
 	private JTextField txtType;
@@ -247,14 +247,14 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL FEE
 		labelGBC.gridy = 12;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
 		this.add(feeLabel, labelGBC);
 
 		//TXT FEE
 		txtGBC.gridy = 12;
-		this.txtFee = new JTextField();
-		this.txtFee.setText("1");
-		this.add(this.txtFee, txtGBC);
+		this.txtFeePow = new JTextField();
+		this.txtFeePow.setText("0");
+		this.add(this.txtFeePow, txtGBC);
 
 		//BUTTON Register
 		buttonGBC.gridy = 13;
@@ -317,7 +317,7 @@ public class DeployATFrame extends JFrame {
 		try
 		{
 			//READ FEE POW
-			int feePow = Integer.parseInt(this.txtFee.getText());
+			int feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ QUANTITY
 			parse = 1;

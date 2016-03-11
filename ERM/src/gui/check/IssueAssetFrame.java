@@ -177,13 +177,13 @@ public class IssueAssetFrame extends JFrame
       	
         //LABEL FEE
       	labelGBC.gridy = 6;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
       	txtGBC.gridy = 6;
       	this.txtFeePow = new JTextField();
-      	this.txtFeePow.setText("1");
+      	this.txtFeePow.setText("0");
         this.add(this.txtFeePow, txtGBC);
 		           
         //BUTTON Register

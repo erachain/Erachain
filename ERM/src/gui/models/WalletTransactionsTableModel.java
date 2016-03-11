@@ -35,7 +35,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Address", "Amount"});
-	private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
+	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	public WalletTransactionsTableModel()
 	{
@@ -101,7 +101,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 				
 			case COLUMN_TYPE:
 				
-				return this.transactionTypes[transaction.getType()];
+				return Lang.transactionTypes[transaction.getType()];
 				
 			case COLUMN_ADDRESS:
 				

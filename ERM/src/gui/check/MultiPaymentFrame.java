@@ -125,16 +125,14 @@ public class MultiPaymentFrame extends JFrame
 		 
 		//LABEL FEE
       	labelGBC.gridy = 2;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
       	this.add(feeLabel, labelGBC);
       		
       	//TXT AMOUNT
       	txtGBC.gridy = 2;
       	txtFee = new JTextField();
       	
-      	BigDecimal fee = BigDecimal.ONE.setScale(8);
-      	fee = fee.add(BigDecimal.valueOf(this.payments.size()).divide(BigDecimal.valueOf(5)));
-      	txtFee.setText(fee.toPlainString());
+      	txtFee.setText("0");
       	
         this.add(txtFee, txtGBC);
 		

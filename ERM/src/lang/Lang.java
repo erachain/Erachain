@@ -19,6 +19,15 @@ import utils.Pair;
 
 public class Lang {
 
+	public static String[] transactionTypes = Lang.getInstance().translate(new String[]{"Extended",
+			"Genesis", "Genesis Issue", "Genesis Send", "Reserved_4", "Payment",
+			"Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase",
+			"Poll Creation", "Poll Vote", "Reserved", "Reserved",
+			"Arbitrary Transaction", "Reserved", 
+			"Issue Asset", "Transfer Asset", "Order Creation", "Cancel Order",
+			"Multi Payment", "Reserved", "Deploy AT", "Reserved", "Message Transaction",
+			"Accounting", "JsonSend"});
+
 	private static Lang instance;
 	private Map<String, String> noTranslateMap;
 	

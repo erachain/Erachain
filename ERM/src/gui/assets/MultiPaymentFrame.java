@@ -36,7 +36,7 @@ public class MultiPaymentFrame extends JFrame
 	
 	private JTextField txtAccount;
 	private JButton sendButton;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 
 	@SuppressWarnings("unchecked")
 	public MultiPaymentFrame(Asset asset, List<Payment> payments)
@@ -125,18 +125,18 @@ public class MultiPaymentFrame extends JFrame
 		 
 		//LABEL FEE
       	labelGBC.gridy = 2;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
       	this.add(feeLabel, labelGBC);
       		
       	//TXT AMOUNT
       	txtGBC.gridy = 2;
-      	txtFee = new JTextField();
+      	txtFeePow = new JTextField();
       	
-      	BigDecimal fee = BigDecimal.ONE.setScale(8);
-      	fee = fee.add(BigDecimal.valueOf(this.payments.size()).divide(BigDecimal.valueOf(5)));
-      	txtFee.setText(fee.toPlainString());
+      	//BigDecimal fee = BigDecimal.ONE.setScale(8);
+      	//fee = fee.add(BigDecimal.valueOf(this.payments.size()).divide(BigDecimal.valueOf(5)));
+      	txtFeePow.setText("0");
       	
-        this.add(txtFee, txtGBC);
+        this.add(txtFeePow, txtGBC);
 		
         //BUTTON GENERATE
         buttonGBC.gridy = 3;
@@ -197,7 +197,7 @@ public class MultiPaymentFrame extends JFrame
 		{
 			//READ FEE
 			parsing = 2;
-			int feePow = Integer.parseInt(txtFee.getText());
+			int feePow = Integer.parseInt(txtFeePow.getText());
 			
 			//CREATE MULTI PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getCreator().getAddress()), this.payments, feePow);

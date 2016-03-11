@@ -160,7 +160,7 @@ public class CancelOrderFrame extends JFrame
       	//TXT FEE
       	txtGBC.gridy = 7;
       	txtFeePow = new JTextField();
-      	this.txtFeePow.setText("1");
+      	this.txtFeePow.setText("0");
         this.add(txtFeePow, txtGBC);
 		           
         //BUTTON CANCEL SALE

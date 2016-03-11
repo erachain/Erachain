@@ -59,7 +59,12 @@ public class CreatePollTransaction extends Transaction
 	{
 		return this.poll;
 	}
-	
+	public BigDecimal getMinFee()
+	{
+		BigDecimal fee = super.getMinFee();
+		return fee.multiply(BigDecimal.TEN);
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception

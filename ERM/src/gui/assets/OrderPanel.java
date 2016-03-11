@@ -232,12 +232,12 @@ public class OrderPanel extends JPanel
 		
 		//LABEL FEE
 		labelGBC.gridy++;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
 		this.add(feeLabel, labelGBC);
 		           
 		//FEE
 		detailGBC.gridy++;
-		txtFeePow = new JTextField("1");
+		txtFeePow = new JTextField("0");
 		this.add(txtFeePow, detailGBC);		
 		
 		//ASSET HINT

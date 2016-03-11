@@ -47,7 +47,7 @@ import database.DBSet;
 @SuppressWarnings("serial")
 public class ResponseAcctFrame extends JFrame {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFeeЗщц;
+	private JTextField txtFeePow;
 	private JTextField txtHashSecret;
 	private JTextField txtExpirationBlocks;
 	private JTextField txtRecipient;
@@ -210,15 +210,15 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL FEE
 		labelGBC.gridy = 6;
 		labelGBC.gridx = 0;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
 		this.add(feeLabel, labelGBC);
 
 		//TXT FEE
 		txtGBC.gridy = 6;
 		txtGBC.gridx = 1;
-		this.txtFeeЗщц = new JTextField();
-		this.txtFeeЗщц.setText("20.00000000");
-		this.add(this.txtFeeЗщц, txtGBC);
+		this.txtFeePow = new JTextField();
+		this.txtFeePow.setText("2");
+		this.add(this.txtFeePow, txtGBC);
 
 		//LABEL FEES ALERT
 		labelGBC.gridx = 2;
@@ -235,7 +235,7 @@ public class ResponseAcctFrame extends JFrame {
 		//TXT NAME
 		txtGBC.gridy = 7;
 		txtGBC.gridx = 1;
-		this.txtExpirationBlocks = new JTextField("200");
+		this.txtExpirationBlocks = new JTextField("20");
 		this.add(this.txtExpirationBlocks, txtGBC);
 
 		//LABEL BLOCKS
@@ -253,7 +253,7 @@ public class ResponseAcctFrame extends JFrame {
 
 		//TXT NAME
 		txtGBC.gridy = 8;
-		this.txtMinActivationAmount = new JTextField("20.00000000");
+		this.txtMinActivationAmount = new JTextField("2.00000000");
 		this.add(this.txtMinActivationAmount, txtGBC);
 
 
@@ -319,7 +319,7 @@ public class ResponseAcctFrame extends JFrame {
 		try
 		{
 			//READ FEE
-			int feePow = Integer.parseInt(this.txtFeeЗщц.getText());
+			int feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ QUANTITY
 			parse = 1;

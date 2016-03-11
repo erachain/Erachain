@@ -53,7 +53,7 @@ import database.DBSet;
 @SuppressWarnings("serial")
 public class InitiateAcctFrame extends JFrame {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtFee;
+	private JTextField txtFeePow;
 	private JPasswordField txtPlainSecret;
 	private JPasswordField txtRetypePass;
 	private JTextField txtExpirationBlocks;
@@ -223,20 +223,20 @@ public class InitiateAcctFrame extends JFrame {
 		//LABEL FEE
 		labelGBC.gridy = 6;
 		labelGBC.gridx = 0;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
 		this.add(feeLabel, labelGBC);
 
 		//TXT FEE
 		txtGBC.gridy = 6;
 		txtGBC.gridx = 1;
-		this.txtFee = new JTextField();
-		this.txtFee.setText("20.00000000");
-		this.add(this.txtFee, txtGBC);
+		this.txtFeePow = new JTextField();
+		this.txtFeePow.setText("0");
+		this.add(this.txtFeePow, txtGBC);
 		
 		//LABEL FEES ALERT
 		labelGBC.gridx = 2;
 		labelGBC.gridwidth = 3;
-		JLabel feesAlertLabel = new JLabel(Lang.getInstance().translate("( fees should be at least 20 )"));
+		JLabel feesAlertLabel = new JLabel(Lang.getInstance().translate("( fees should be at // )"));
 		this.add(feesAlertLabel, labelGBC);
 		
 		//LABEL NAME
@@ -332,7 +332,7 @@ public class InitiateAcctFrame extends JFrame {
 		try
 		{
 			//READ FEE
-			int feePow = Integer.parseInt(this.txtFee.getText());
+			int feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ QUANTITY
 			parse = 1;

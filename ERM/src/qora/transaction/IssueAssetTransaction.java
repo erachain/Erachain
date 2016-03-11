@@ -58,6 +58,12 @@ public class IssueAssetTransaction extends Transaction
 		return this.asset;
 	}
 	
+	public BigDecimal getMinFee()
+	{
+		BigDecimal fee = super.getMinFee();
+		return fee.multiply(BigDecimal.TEN);
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception
