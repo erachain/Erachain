@@ -27,7 +27,7 @@ import database.DBSet;
 public class GenesisTransferAssetTransaction extends Transaction {
 
 	
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
+	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
 	private Account recipient;
 	private BigDecimal amount;
@@ -39,11 +39,24 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
-		//this.signature = generateSignature(); //creator, recipient, key, amount, timestamp);
+		this.signature = this.getSignature(); //  setLastReference not change in PROCCESS
 	}
 	
 	//GETTERS/SETTERS
-	
+	@Override
+	public byte[] getSignature() {
+		
+		//return generateSignature1(this.recipient, this.amount, this.timestamp);
+		byte[] data = this.toBytes( false );
+
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+				
+		return digest;
+
+	}
+
 	public Account getRecipient()
 	{
 		return this.recipient;
@@ -167,24 +180,13 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		return TYPE_LENGTH + BASE_LENGTH;
 	}
 
-	/*
-	//@Override
-	private byte[] generateSignature() //PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long timestamp
-	{
-
-		byte[] data = this.toBytes(false);
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		return digest;
-	}
-	*/
 
 	//VALIDATE
 	public boolean isSignatureValid()
-	{		
-		return true;
+	{
+		
+		byte[] digest = this.getSignature();
+		return Arrays.equals(digest, this.signature);
 	}
 
 	@Override
@@ -217,11 +219,13 @@ public class GenesisTransferAssetTransaction extends Transaction {
 			}
 		}
 		
+		/*
 		//CHECK IF REFERENCE IS OK
 		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
+		*/
 		
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -243,6 +247,8 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
+		/* icreator - not need change references for genesis block
+		*/
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
 		
@@ -265,6 +271,8 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 		
+		/* icreator - not need change references for genesis block
+		*/
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
 		

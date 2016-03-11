@@ -36,7 +36,7 @@ public class Asset {
 	private boolean divisible;
 	// from signature of new IssueAssetTransaction. -> 
 	//qora.TransactionCreator.createIssueAssetTransaction(PrivateKeyAccount, String, String, long, byte, boolean, int)
-	private byte[] reference;
+	private byte[] reference = new byte[REFERENCE_LENGTH];
 	
 	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
 	{
@@ -47,12 +47,13 @@ public class Asset {
 		this.divisible = divisible;
 		this.scale = scale;
 	}
+
 	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible, byte[] reference)
 	{		
 		this(creator, name, description, quantity, scale, divisible);
 		this.reference = reference; // as signature from transaction IssueAsset
 	}
-	
+
 	//GETTERS/SETTERS
 	
 	public Account getCreator() {

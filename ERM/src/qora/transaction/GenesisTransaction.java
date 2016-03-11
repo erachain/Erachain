@@ -32,11 +32,11 @@ public class GenesisTransaction extends Transaction {
 	
 	public GenesisTransaction(Account recipient, BigDecimal amount, long timestamp)
 	{
-		//super(GENESIS_TRANSACTION, BigDecimal.ZERO, timestamp, new byte[]{}, generateSignature(recipient, amount, timestamp));
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
+		//super(GENESIS_TRANSACTION, null, timestamp, generateSignature(recipient, amount, timestamp));
+		super(GENESIS_TRANSACTION, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
-		//this.signature = generateSignature(); //recipient, amount, timestamp);
+		this.signature = this.getSignature();
 	}
 
 	//GETTERS/SETTERS
@@ -44,7 +44,15 @@ public class GenesisTransaction extends Transaction {
 	@Override
 	public byte[] getSignature() {
 		
-		return this.signature;
+		//return generateSignature1(this.recipient, this.amount, this.timestamp);
+		byte[] data = this.toBytes( false );
+
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+				
+		return digest;
+
 	}
 	
 	public Account getRecipient()
@@ -122,7 +130,9 @@ public class GenesisTransaction extends Transaction {
 		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
 		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
 		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		
+		
+		if (withSign) data = Bytes.concat(data, amountBytes);
 		
 		return data;
 	}
@@ -136,7 +146,8 @@ public class GenesisTransaction extends Transaction {
 	//VALIDATE
 	public boolean isSignatureValid()
 	{		
-		return true;
+		byte[] digest = this.getSignature();
+		return Arrays.equals(digest, this.signature);
 	}
 
 	@Override
@@ -182,12 +193,32 @@ public class GenesisTransaction extends Transaction {
 	
 	//REST
 
+	/* NEED for setLastReference */
 	/*
 	//@Override
-	private byte[] generateSignature() //Account recipient, BigDecimal amount, long timestamp)
+	private static byte[] generateSignature1(Account recipient, BigDecimal amount, long timestamp)
 	{
-
-		byte[] data = this.toBytes(false);
+		byte[] data = new byte[0];
+		
+		//WRITE TYPE
+		byte[] typeBytes = Ints.toByteArray(GENESIS_TRANSACTION);
+		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, typeBytes);
+				
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+				
+		//WRITE RECIPIENT
+		data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
+				
+		//WRITE AMOUNT
+		byte[] amountBytes = amount.unscaledValue().toByteArray();
+		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+		amountBytes = Bytes.concat(fill, amountBytes);
+		data = Bytes.concat(data, amountBytes);
+		
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
 		digest = Bytes.concat(digest, digest);

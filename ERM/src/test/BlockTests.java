@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import ntp.NTP;
 
@@ -28,8 +29,15 @@ public class BlockTests
 	{
 		Block genesisBlock = new GenesisBlock();
 		
-		//CHECK IF SIGNATURE VALID
+		//CHECK IF SIGNATURE VALID  this.transactionsSignature [B@5ecddf8f [B@6c629d6e
+		// [B@5ecddf8f [B@6c629d6e
+		//Logger.getGlobal().info("getGeneratorSignature " + genesisBlock.getGeneratorSignature());
 		assertEquals(true, genesisBlock.isSignatureValid());
+		
+		//ADD TRANSACTION SIGNATURE
+		Logger.getGlobal().info("getGeneratorSignature " + genesisBlock.getGeneratorSignature());
+		//newBlock.setTransactionsSignature(transactionsSignature);
+
 	}
 	
 	@Test

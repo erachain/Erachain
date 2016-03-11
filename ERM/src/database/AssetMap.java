@@ -73,6 +73,8 @@ public class AssetMap extends DBMap<Long, Asset>
 	
 	public long add(Asset asset)
 	{
+		
+		
 		//INCREMENT ATOMIC KEY IF EXISTS
 		if(this.atomicKey != null)
 		{

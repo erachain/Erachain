@@ -328,17 +328,17 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
+		Asset asset = new Asset(creator, name, description, quantity, scale, divisible, creator.getLastReference(this.fork));
 							
 		//CREATE ISSUE ASSET TRANSACTION
-		// calculate signature and use it as reference for Asset
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
 		issueAssetTransaction.sign(creator);
 		
-		byte[] signature = issueAssetTransaction.getSignature();
-		asset = new Asset(creator, name, description, quantity, scale, divisible, signature);
-		issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
-		issueAssetTransaction.sign(creator);
+//		byte[] signature = issueAssetTransaction.getSignature();
+//		asset.se
+		//asset = new Asset(creator, name, description, quantity, scale, divisible, signature);
+		//issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
+		//issueAssetTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueAssetTransaction);
