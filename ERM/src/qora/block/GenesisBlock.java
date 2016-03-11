@@ -88,39 +88,40 @@ public class GenesisBlock extends Block{
 			}
 						
 			
+			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 			Asset asset1;
 			GenesisIssueAssetTransaction trans;
 			byte[] signature;
 			//CREATE JOB ASSET
 			asset1 = makeOil(new byte[64]);
-			trans = new GenesisIssueAssetTransaction(genesisGenerator, asset1, genesisTimestamp);
+			trans = new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp);
 			signature = trans.getSignature();
 			asset1 = makeOil(signature);
 			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
 
-			this.addTransaction(new GenesisIssueAssetTransaction(genesisGenerator, asset1, genesisTimestamp));
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
 			Asset asset2;
 			// asset with empty ref
 			asset2 = makeGem(new byte[64]);
 			// make ref as GenesisIssueAssetTransaction.sign
-			trans = new GenesisIssueAssetTransaction(genesisGenerator, asset2, genesisTimestamp);
+			trans = new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp);
 			signature = trans.getSignature();
 			// make asset wit TRUE REFFERENCE
 			asset2 = makeGem(signature);
 			
-			this.addTransaction(new GenesisIssueAssetTransaction(genesisGenerator, asset2, genesisTimestamp));
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp));
 			
 			//Logger.getGlobal().info("amount " + new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(11)));
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
 				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
-				//this.addTransaction(new GenesisTransferAssetTransaction(genesisGenerator, recipient, 1l, bdAmount, timestamp));
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp));
 				
 				bdAmount = new BigDecimal(asset2.getQuantity()).divide(new BigDecimal(9));
-				//this.addTransaction(new GenesisTransferAssetTransaction(genesisGenerator, recipient, 2l, bdAmount, timestamp));
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 2l, bdAmount, timestamp));
 				timestamp +=1; // for unique signature
 			}
 
