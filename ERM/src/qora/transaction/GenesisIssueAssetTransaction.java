@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
+import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
@@ -41,23 +42,25 @@ public class GenesisIssueAssetTransaction extends Transaction
 		super(GENESIS_ISSUE_ASSET_TRANSACTION, creator, timestamp, null);
 
 		this.asset = asset;
-		this.signature = this.getSignature();
+		this.generateSignature();
 
 	}
 
 	//GETTERS/SETTERS
-	@Override
-	public byte[] getSignature() {
+	public void generateSignature() {
 		
-		byte[] data = this.toBytes(false);
-		
+		//return generateSignature1(this.recipient, this.amount, this.timestamp);
+		byte[] data = this.toBytes( false );
+
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
 		digest = Bytes.concat(digest, digest);
 				
-		return digest;
+		this.signature = digest;		
+		this.asset.setReference(digest);
+
 	}
-	
+		
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -143,8 +146,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	public boolean isSignatureValid()
 	{
-		byte[] digest = this.getSignature();
-		return Arrays.equals(digest, this.signature);
+		return true;
 	}
 	
 	@Override
@@ -186,6 +188,9 @@ public class GenesisIssueAssetTransaction extends Transaction
 	@Override
 	public void process(DBSet db)
 	{
+		
+
+		//this.sign();
 		
 		//INSERT INTO DATABASE
 		long key = db.getAssetMap().add(this.asset);

@@ -181,7 +181,7 @@ public abstract class Transaction {
 	protected static final int IS_TEXT_LENGTH = 1;
 	protected static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 	protected static final int KEY_LENGTH = 8;
-	protected static final int HKEY_LENGTH = 20;
+	//protected static final int HKEY_LENGTH = 20;
 	protected static final int AMOUNT_LENGTH = 8;
 	protected static final int CREATOR_LENGTH = 32;
 	protected static final int FEE_LENGTH = 8;
@@ -335,7 +335,6 @@ public abstract class Transaction {
 		return transaction;
 	}
 	
-	// PrivateKeyAccount
 	public void sign(PrivateKeyAccount creator)
 	{
 		byte[] data = this.toBytes( false );

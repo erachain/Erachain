@@ -14,6 +14,7 @@ import ntp.NTP;
 import org.json.simple.JSONObject;
 
 import qora.account.Account;
+import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
@@ -43,6 +44,7 @@ public class IssueAssetTransaction extends Transaction
 		this(creator, asset, timestamp, reference);
 		
 		this.signature = signature;
+		this.asset.setReference(signature);
 		this.fee = fee;
 	}
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, int feePow, long timestamp, byte[] reference) 
@@ -62,6 +64,17 @@ public class IssueAssetTransaction extends Transaction
 	{
 		BigDecimal fee = super.getMinFee();
 		return fee.multiply(BigDecimal.TEN);
+	}
+
+	
+	@Override
+	public void sign(PrivateKeyAccount creator)
+	{
+		byte[] data = this.toBytes( false );
+		if ( data == null ) return;
+
+		this.signature = Crypto.getInstance().sign(creator, data);
+		this.asset.setReference(signature);
 	}
 
 	//PARSE CONVERT
@@ -123,6 +136,22 @@ public class IssueAssetTransaction extends Transaction
 		return transaction;	
 	}
 	
+	/*
+	public void generateSignature() {
+		
+		//return generateSignature1(this.recipient, this.amount, this.timestamp);
+		byte[] data = this.toBytes( false );
+
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+				
+		this.signature = digest;		
+		this.asset.setReference(digest);
+
+	}
+	*/
+
 	@Override
 	public byte[] toBytes(boolean withSign) 
 	{
@@ -145,7 +174,7 @@ public class IssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE ASSET
-		data = Bytes.concat(data , this.asset.toBytes(true));
+		data = Bytes.concat(data , this.asset.toBytes(withSign));
 		
 		//WRITE FEE
 		byte[] feeBytes = this.fee.unscaledValue().toByteArray();

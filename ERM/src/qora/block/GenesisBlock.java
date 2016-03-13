@@ -29,10 +29,8 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference =  new byte[]{1,2,3,4,1,1,1,3};
-	private static long genesisGeneratingBalance = 777L;
+	private static long genesisGeneratingBalance = 1111111111L; // starting max volume for generating
 	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,3,1,3,1,3,1,3});
-	//private static byte[] asset1_Ref;
-	//private static byte[] asset2_Ref;
 
 	private String testnetInfo; 
 	
@@ -91,25 +89,17 @@ public class GenesisBlock extends Block{
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 			Asset asset1;
 			GenesisIssueAssetTransaction trans;
-			byte[] signature;
 			//CREATE JOB ASSET
-			asset1 = makeOil(new byte[64]);
+			asset1 = makeOil(); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp);
-			signature = trans.getSignature();
-			asset1 = makeOil(signature);
 			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
 
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp));
 			
 			//CREATE VOTE ASSET
 			Asset asset2;
-			// asset with empty ref
-			asset2 = makeGem(new byte[64]);
-			// make ref as GenesisIssueAssetTransaction.sign
+			asset2 = makeGem(); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp);
-			signature = trans.getSignature();
-			// make asset wit TRUE REFFERENCE
-			asset2 = makeGem(signature);
 			
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp));
 			
@@ -135,19 +125,19 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public Asset makeERM(byte[] reference) 
+	public Asset makeERM() //byte[] reference) 
 	{
-		Asset asset = new Asset(genesisGenerator, "ERM", "Main unit1", 10000000000L, (byte) 6, true, reference);
+		Asset asset = new Asset(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 10000000000L, (byte) 6, true);
 		return asset;
 	}
-	public Asset makeOil(byte[] reference) 
+	public Asset makeOil() //byte[] reference) 
 	{
-		Asset asset = new Asset(genesisGenerator, "oil", "Fees oil", 99999999L, (byte) 8, true, reference);
+		Asset asset = new Asset(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
 		return asset;
 	}
-	public Asset makeGem(byte[] reference) 
+	public Asset makeGem() //byte[] reference) 
 	{
-		Asset asset = new Asset(genesisGenerator, "GEM", "Votes gem1", 999999999999999999L, (byte) 0, false, reference);
+		Asset asset = new Asset(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
 		return asset;
 	}
 
@@ -155,14 +145,6 @@ public class GenesisBlock extends Block{
 	{
 		return this.testnetInfo;
 	}
-	/*
-	public byte[] getAsset1_Ref() { 
-		return this.asset1_Ref; 
-	}
-	public byte[] getAsset2_Ref() { 
-		return this.asset2_Ref; 
-	}
-	*/
 	
 	//GETTERS
 	
@@ -201,7 +183,11 @@ public class GenesisBlock extends Block{
 			//WRITE TRANSACTION SIGNATURE
 			for(Transaction transaction: transactions)
 			{
-				data = Bytes.concat(data, transaction.toBytes(true));
+				//data = Bytes.concat(data, transaction.toBytes(true));
+				//Logger.getGlobal().info("tx type " + transaction.getType());
+				//Logger.getGlobal().info("tx ref " + transaction.getReference());
+				//Logger.getGlobal().info("tx sign " + transaction.getSignature());
+				data = Bytes.concat(data, transaction.getSignature());
 			}
 		}
 		

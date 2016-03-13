@@ -1,11 +1,10 @@
 package gui;
 
-import gui.models.AccountingsTableModel;
 import gui.models.AccountsComboBoxModel;
-//import gui.models.AssetsComboBoxModel;
-//import gui.models.MessagesTableModel;
+import gui.models.AssetsComboBoxModel;
+import gui.models.AccountingsTableModel;
 import lang.Lang;
-//import ntp.NTP;
+import ntp.NTP;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -40,13 +39,14 @@ import javax.swing.event.DocumentListener;
 
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-//import qora.assets.Asset;
+import qora.assets.Asset;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.Converter;
-//import utils.DateTimeFormat;
+import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
@@ -69,8 +69,7 @@ public class SendAccountingPanel extends JPanel
 	private JCheckBox isText;
 	private JButton sendButton;
 	private AccountsComboBoxModel accountsModel;
-	//private JComboBox<Asset> cbxFavorites;
-	private JTextField txtHKey;
+	private JComboBox<Asset> cbxFavorites;
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
@@ -85,31 +84,19 @@ public class SendAccountingPanel extends JPanel
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		      	
-		//LABEL HKEY
-		GridBagConstraints labelHKeyGBC = new GridBagConstraints();
-		labelHKeyGBC.gridy = 0;
-		labelHKeyGBC.insets = new Insets(5,5,5,5);
-		labelHKeyGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelHKeyGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelHKeyGBC.weightx = 0;	
-		labelHKeyGBC.gridx = 0;
-		JLabel toLabel = new JLabel(Lang.getInstance().translate("Hash Key:"));
-		this.add(toLabel, labelHKeyGBC);
-      	
-      	//TXT HKey
-		GridBagConstraints txtHKeyGBC = new GridBagConstraints();
-		txtHKeyGBC.gridy = 0;
-		txtHKeyGBC.gridwidth = 4;
-		txtHKeyGBC.insets = new Insets(5, 5, 5, 0);
-		txtHKeyGBC.fill = GridBagConstraints.HORIZONTAL;   
-		txtHKeyGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtHKeyGBC.weightx = 0;	
-		txtHKeyGBC.gridx = 1;
-
-		txtHKey = new JTextField();
-		this.add(txtHKey, txtHKeyGBC);
-
+		
+		//ASSET FAVORITES
+		GridBagConstraints favoritesGBC = new GridBagConstraints();
+		favoritesGBC.insets = new Insets(5, 5, 5, 0);
+		favoritesGBC.fill = GridBagConstraints.BOTH;  
+		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
+		favoritesGBC.weightx = 1;
+		favoritesGBC.gridwidth = 5;
+		favoritesGBC.gridx = 0;	
+		favoritesGBC.gridy = 0;	
+		
+		cbxFavorites = new JComboBox<Asset>(new AssetsComboBoxModel());
+		this.add(cbxFavorites, favoritesGBC);
 		this.accountsModel = new AccountsComboBoxModel();
         
 		//LABEL FROM
@@ -137,7 +124,24 @@ public class SendAccountingPanel extends JPanel
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
 		this.add(this.cbxFrom, cbxFromGBC);
-				
+		
+		//ON FAVORITES CHANGE
+
+		cbxFavorites.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+
+		    	Asset asset = ((Asset) cbxFavorites.getSelectedItem());
+
+		    	if(asset != null)
+		    	{
+		    		((AccountRenderer)cbxFrom.getRenderer()).setAsset(asset.getKey());
+		    		cbxFrom.repaint();
+		    		refreshReceiverDetails();
+		    	}
+
+		    }
+		});
+		
 		//LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
 		labelToGBC.gridy = 2;
@@ -146,8 +150,8 @@ public class SendAccountingPanel extends JPanel
 		labelToGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelToGBC.weightx = 0;	
 		labelToGBC.gridx = 0;
-		JLabel hkeyLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
-		this.add(hkeyLabel, labelToGBC);
+		JLabel toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
+		this.add(toLabel, labelToGBC);
       	
       	//TXT TO
 		GridBagConstraints txtToGBC = new GridBagConstraints();
@@ -357,7 +361,7 @@ public class SendAccountingPanel extends JPanel
 		feetxtGBC.gridy = 6;
 
 		txtFeePow = new JTextField();
-		txtFeePow.setText("0.00000333");
+		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
@@ -374,7 +378,7 @@ public class SendAccountingPanel extends JPanel
 		
 		//MESSAGES HISTORY TABLE
 
-    	table = new AccountingsTableModel ();
+    	table = new AccountingsTableModel();
     	
     	table.setTableHeader(null);
     	table.setSelectionBackground(new Color(209, 232, 255, 255));
@@ -427,6 +431,7 @@ public class SendAccountingPanel extends JPanel
 	private void refreshReceiverDetails()
 	{
 		String toValue = txtTo.getText();
+		Asset asset = ((Asset) cbxFavorites.getSelectedItem());
 		
 		if(toValue.isEmpty())
 		{
@@ -450,7 +455,7 @@ public class SendAccountingPanel extends JPanel
 			if(nameToAdress.getB() == NameResult.OK)
 			{
 				account = nameToAdress.getA();
-				txtRecDetails.setText(account.toString());
+				txtRecDetails.setText(account.toString(asset.getKey()));
 			}
 			else
 			{
@@ -460,8 +465,12 @@ public class SendAccountingPanel extends JPanel
 		{
 			account = new Account(toValue);
 			
-			txtRecDetails.setText(account.toString());
+			txtRecDetails.setText(account.toString(asset.getKey()));
 			
+			if(account.toString(asset.getKey()).equals("0.00000000"))
+			{
+				txtRecDetails.setText(txtRecDetails.getText()+ " - " + Lang.getInstance().translate("Warning!"));
+			}
 		}
 		
 		if(account!=null && account.getAddress().startsWith("A"))
@@ -555,7 +564,11 @@ public class SendAccountingPanel extends JPanel
 			//READ AMOUNT
 			parsing = 1;
 			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
-									
+			
+			//READ FEE
+			parsing = 2;
+			int feePow = Integer.parseInt(txtFeePow.getText());			
+			
 			String message = txtMessage.getText();
 			
 			boolean isTextB = isText.isSelected();
@@ -572,13 +585,19 @@ public class SendAccountingPanel extends JPanel
 				{
 					messageBytes = Converter.parseHexString( message );
 				}
-				catch (Exception e)
+				catch (Exception g)
 				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
+					try
+					{
+						messageBytes = Base58.decode(message);
+					}
+					catch (Exception e)
+					{
+						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						
+						//ENABLE
+						this.sendButton.setEnabled(true);
+					}
 					return;
 				}
 			}
@@ -598,9 +617,8 @@ public class SendAccountingPanel extends JPanel
 			byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
-			//byte[] hkey = (byte[]) this.cbxFavorites.getSelectedItem();
-			//long key = asset.getKey();
-			byte[] hkey = new byte[]{1,1,1,1,1,1,1,1};
+			Asset asset = (Asset) this.cbxFavorites.getSelectedItem();
+			long key = asset.getKey(); 
 			
 			Pair<Transaction, Integer> result;
 			
@@ -624,11 +642,16 @@ public class SendAccountingPanel extends JPanel
 				
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
-						
+
+			
+			if(key != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
+			{	
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets transactions will be enabled at %ss%!").replace("%ss%", DateTimeFormat.timestamptoString(Transaction.getPOWFIX_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
 			//CREATE TX MESSAGE
-			//BigDecimal fee = new BigDecimal.ZERO
-			int feePow = 0;
-			result = Controller.getInstance().sendAccounting(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, hkey, amount, feePow, messageBytes, isTextByte, encrypted);
+			result = Controller.getInstance().sendAccounting(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

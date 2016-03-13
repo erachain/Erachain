@@ -96,6 +96,7 @@ public class UpdateUtil {
 		DBSet.getInstance().getTransactionFinalMap().reset();
 		DBSet.getInstance().commit();
 		Block b = new GenesisBlock();
+		//b.process(); // icreator - for make sign and ref in Assets
 		do
 		{
 			List<Transaction> txs = b.getTransactions();

@@ -26,6 +26,9 @@ import qora.transaction.Transaction;
 
 public class TransactionV3Tests {
 
+	int FEE_POWER = 2;
+	byte[] assetReference = new byte[64];
+
 	@Test
 	public void validateMessageTransactionV3() 
 	{
@@ -34,7 +37,8 @@ public class TransactionV3Tests {
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
+		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
+		qoraAsset.setReference(assetReference);
 		databaseSet.getAssetMap().set(0l, qoraAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
@@ -106,8 +110,10 @@ public class TransactionV3Tests {
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
-		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true, new byte[64]);
+		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
+		qoraAsset.setReference(assetReference);
+		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true);
+		aTFundingAsset.setReference(assetReference);
 		databaseSet.getAssetMap().set(0l, qoraAsset);
 		databaseSet.getAssetMap().set(61l, aTFundingAsset);
     	
@@ -194,16 +200,18 @@ public class TransactionV3Tests {
 		
 		//CREATE EMPTY MEMORY DATABASE
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		
-		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true, new byte[64]);
-		Asset aTFundingAsset = new Asset(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true, new byte[64]);
-		databaseSet.getAssetMap().set(0l, qoraAsset);
-		databaseSet.getAssetMap().set(61l, aTFundingAsset);
-    	
+		    	
 		GenesisBlock genesisBlock = new GenesisBlock();
 		genesisBlock.process(databaseSet);
-		
+
+		//ADD QORA ASSET
+		Asset qoraAsset = new Asset(genesisBlock.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
+		qoraAsset.setReference(assetReference);
+		Asset aTFundingAsset = new Asset(genesisBlock.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true);
+		aTFundingAsset.setReference(genesisBlock.getGeneratorSignature());
+		databaseSet.getAssetMap().set(0l, qoraAsset);
+		databaseSet.getAssetMap().set(61l, aTFundingAsset);
+
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();

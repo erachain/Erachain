@@ -114,7 +114,7 @@ public class MessageTransaction extends Transaction {
 		}
 		else
 		{
-			transaction.put("data", Converter.toHex(this.data));
+			transaction.put("data", Base58.encode(this.data));
 		}
 		transaction.put("encrypted", this.isEncrypted());
 		transaction.put("isText", this.isText());
@@ -301,16 +301,6 @@ public class MessageTransaction extends Transaction {
 
 	@Override
 	public int isValid(DBSet db) {
-		//CHECK IF RELEASED
-		if( db.getBlockMap().getLastBlock().getHeight(db) < Transaction.getMESSAGE_BLOCK_HEIGHT_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
-		
-		if( this.getTimestamp() < Transaction.getPOWFIX_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
 		
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)

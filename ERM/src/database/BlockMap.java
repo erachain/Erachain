@@ -101,10 +101,12 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 		generatorMap = database.createTreeMap("generators_index").makeOrGet();
 		
+		// TODO Base58 instead HEX format
 		Bind.secondaryKey((BTreeMap)this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, byte[], Block>() {
 			@Override
 			public Tuple2<String, String> run(byte[] b, Block block) {
-				return new Tuple2<String, String>(block.getGenerator().getAddress(), Converter.toHex(block.getSignature()));
+				return new Tuple2<String, String>(block.getGenerator().getAddress(), 
+						Converter.toHex(block.getSignature()));
 			}
 		});
 	}

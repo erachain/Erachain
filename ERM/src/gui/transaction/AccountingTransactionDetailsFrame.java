@@ -29,7 +29,6 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
 import qora.crypto.Base58;
-//import qora.transaction.MessageTransaction;
 import qora.transaction.AccountingTransaction;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -39,7 +38,7 @@ import controller.Controller;
 @SuppressWarnings("serial")
 public class AccountingTransactionDetailsFrame extends JFrame
 {
-	private JTextField messageText;
+	private JTextField accountingText;
 	
 	public AccountingTransactionDetailsFrame(final AccountingTransaction accountingTransaction)
 	{
@@ -90,7 +89,7 @@ public class AccountingTransactionDetailsFrame extends JFrame
 		
 		//TYPE
 		detailGBC.gridy = componentLevel;
-		JLabel type = new JLabel(Lang.getInstance().translate("Accounding Transaction"));
+		JLabel type = new JLabel(Lang.getInstance().translate("Accountin Transaction"));
 		this.add(type, detailGBC);
 		
 		//LABEL SIGNATURE
@@ -167,10 +166,10 @@ public class AccountingTransactionDetailsFrame extends JFrame
 		//ISTEXT
 		detailGBC.gridy = componentLevel;
 		detailGBC.gridwidth = 2;
-		messageText = new JTextField( ( accountingTransaction.isText() ) ? new String(accountingTransaction.getData(), Charset.forName("UTF-8")) : Converter.toHex(accountingTransaction.getData()));
-		messageText.setEditable(false);
-		MenuPopupUtil.installContextMenu(messageText);
-		this.add(messageText, detailGBC);			
+		accountingText = new JTextField( ( accountingTransaction.isText() ) ? new String(accountingTransaction.getData(), Charset.forName("UTF-8")) : Base58.encode(accountingTransaction.getData()));
+		accountingText.setEditable(false);
+		MenuPopupUtil.installContextMenu(accountingText);
+		this.add(accountingText, detailGBC);			
 		detailGBC.gridwidth = 3;
 		
 		//ENCRYPTED CHECKBOX
@@ -232,7 +231,7 @@ public class AccountingTransactionDetailsFrame extends JFrame
 	        		}
 	        		
 	        		try {
-	        			messageText.setText(new String(AEScrypto.dataDecrypt(accountingTransaction.getData(), privateKey, publicKey), "UTF-8"));
+	        			accountingText.setText(new String(AEScrypto.dataDecrypt(accountingTransaction.getData(), privateKey, publicKey), "UTF-8"));
 					} catch (UnsupportedEncodingException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -244,7 +243,7 @@ public class AccountingTransactionDetailsFrame extends JFrame
         		else
         		{
         			try {
-        				messageText.setText(new String(accountingTransaction.getData(), "UTF-8"));
+        				accountingText.setText(new String(accountingTransaction.getData(), "UTF-8"));
 					} catch (UnsupportedEncodingException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -269,18 +268,16 @@ public class AccountingTransactionDetailsFrame extends JFrame
 		MenuPopupUtil.installContextMenu(amount);
 		this.add(amount, detailGBC);	
 		
-		//HKEY
-		componentLevel ++;
-		labelGBC.gridy = componentLevel;
-		JLabel hkeyLabel = new JLabel(Lang.getInstance().translate("Hash Key:"));
-		this.add(hkeyLabel, labelGBC);
-		
-		//RECIPIENT
+		//ASSET
 		detailGBC.gridy = componentLevel;
-		JTextField hkey = new JTextField(accountingTransaction.getHKey().toString());
-		recipient.setEditable(false);
-		MenuPopupUtil.installContextMenu(hkey);
-		this.add(hkey, detailGBC);		
+		detailGBC.gridx = 3;
+		detailGBC.gridwidth = 1;
+		JTextField asset = new JTextField(Controller.getInstance().getAsset( accountingTransaction.getKey()).toString());
+		asset.setEditable(false);
+		MenuPopupUtil.installContextMenu(asset);
+		this.add(asset, detailGBC);	
+		detailGBC.gridx = 1;
+		detailGBC.gridwidth = 3;
 		
 		//LABEL FEE
 		componentLevel ++;

@@ -36,13 +36,12 @@ public class GenesisTransaction extends Transaction {
 		super(GENESIS_TRANSACTION, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
-		this.signature = this.getSignature();
+		this.signature = this.generateSignature();
 	}
 
 	//GETTERS/SETTERS
 	
-	@Override
-	public byte[] getSignature() {
+	public byte[] generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
 		byte[] data = this.toBytes( false );

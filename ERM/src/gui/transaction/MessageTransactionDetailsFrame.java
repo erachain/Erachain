@@ -166,7 +166,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//ISTEXT
 		detailGBC.gridy = componentLevel;
 		detailGBC.gridwidth = 2;
-		messageText = new JTextField( ( messageTransaction.isText() ) ? new String(messageTransaction.getData(), Charset.forName("UTF-8")) : Converter.toHex(messageTransaction.getData()));
+		messageText = new JTextField( ( messageTransaction.isText() ) ? new String(messageTransaction.getData(), Charset.forName("UTF-8")) : Base58.encode(messageTransaction.getData()));
 		messageText.setEditable(false);
 		MenuPopupUtil.installContextMenu(messageText);
 		this.add(messageText, detailGBC);			

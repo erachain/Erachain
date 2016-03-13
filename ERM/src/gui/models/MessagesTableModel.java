@@ -42,6 +42,7 @@ import lang.Lang;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.transaction.MessageTransaction;
 import qora.transaction.Transaction;
 import qora.wallet.Wallet;
@@ -503,7 +504,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				}
 				else
 				{
-					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Converter.toHex(decrypt));
+					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Base58.encode(decrypt));
 					messageBufs.get(row).setOpend(true);
 					menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
 				}
@@ -600,7 +601,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				}
 				if( !this.encrypted )
 				{
-					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Converter.toHex( this.rawMessage );
+					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Base58.encode( this.rawMessage );
 				}
 			}
 			return this.decryptedMessage;

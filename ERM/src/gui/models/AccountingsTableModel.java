@@ -42,6 +42,7 @@ import lang.Lang;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.transaction.AccountingTransaction;
 //import qora.transaction.MessageTransaction;
 import qora.transaction.Transaction;
@@ -54,15 +55,15 @@ import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class AccountingsTableModel extends JTable implements Observer{
-	private ArrayList<MessageBuf> messageBufs;
-	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
-	    public int compare(MessageBuf c1, MessageBuf c2) {
+	private ArrayList<AccountingBuf> messageBufs;
+	Comparator<AccountingBuf> comparator = new Comparator<AccountingBuf>() {
+	    public int compare(AccountingBuf c1, AccountingBuf c2) {
 	        return (int) (c2.getTimestamp() - c1.getTimestamp());
 	    }
 	};
 
 	JMenuItem menuDecrypt;
-	private DefaultTableModel messagesModel;
+	private DefaultTableModel accountingModel;
 	int width;
 	int fontHeight;
 	
@@ -72,10 +73,10 @@ public class AccountingsTableModel extends JTable implements Observer{
 
 		fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
-		messageBufs = new ArrayList<MessageBuf>();
-		messagesModel = new DefaultTableModel();
-		this.setModel(messagesModel);
-		messagesModel.addColumn("");
+		messageBufs = new ArrayList<AccountingBuf>();
+		accountingModel = new DefaultTableModel();
+		this.setModel(accountingModel);
+		accountingModel.addColumn("");
 		
 		DefaultTableCellRenderer topRenderer = new DefaultTableCellRenderer();
 		topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
@@ -96,7 +97,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 		
 		for (Transaction messagetx : transactions) {
 			boolean is = false;
-			for (MessageBuf message : messageBufs) {
+			for (AccountingBuf message : messageBufs) {
 				if(Arrays.equals(messagetx.getSignature(), message.getSignature()))
 				{
 					is = true;
@@ -111,7 +112,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				
 		Collections.sort(messageBufs, comparator);
 		
-		messagesModel.setRowCount(messageBufs.size());
+		accountingModel.setRowCount(messageBufs.size());
 		for ( int j = messageBufs.size()-1; j >= 0; j-- )
 		{
 			setHeight(j);	
@@ -365,7 +366,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 			{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
-				for (MessageBuf messageBuf : messageBufs) {
+				for (AccountingBuf messageBuf : messageBufs) {
 					if(Arrays.equals(((AccountingTransaction) message.getValue()).getSignature(), messageBuf.getSignature()))
 					{
 						is = true;
@@ -376,7 +377,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				{
 					addMessage(0, (AccountingTransaction) message.getValue());
 					
-					messagesModel.setRowCount( messageBufs.size() );
+					accountingModel.setRowCount( messageBufs.size() );
 					
 					for ( int j = messageBufs.size()-1; j >= 0; j-- )
 					{
@@ -397,14 +398,14 @@ public class AccountingsTableModel extends JTable implements Observer{
 
 	private void addMessage(int pos, AccountingTransaction transaction)
 	{
-		messageBufs.add(pos, new MessageBuf(
+		messageBufs.add(pos, new AccountingBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
 				transaction.getCreator().getAddress(),
 				transaction.getRecipient().getAddress(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),
-				transaction.getHKey(),
+				transaction.getKey(),
 				transaction.getFee(),
 				transaction.getSignature(),
 				transaction.getCreator().getPublicKey(),
@@ -504,7 +505,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				}
 				else
 				{
-					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Converter.toHex(decrypt));
+					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Base58.encode(decrypt));
 					messageBufs.get(row).setOpend(true);
 					menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
 				}
@@ -548,7 +549,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 		return lineCount;
 	}
 
-	public class MessageBuf
+	public class AccountingBuf
 	{
 		private byte[] rawMessage;
 		private String decryptedMessage;
@@ -561,11 +562,11 @@ public class AccountingsTableModel extends JTable implements Observer{
 		private byte[] recipientPublicKey;
 		private long timestamp;
 		private BigDecimal amount;
-		private byte[] hKey;
+		private long key;
 		private BigDecimal fee;
 		private byte[] signature;
 		
-		public MessageBuf( byte[] rawMessage, boolean encrypted, String sender, String recipient, long timestamp, BigDecimal amount, byte[] hKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
+		public AccountingBuf( byte[] rawMessage, boolean encrypted, String sender, String recipient, long timestamp, BigDecimal amount, long key, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
 		{
 			this.rawMessage = rawMessage;
 			this.encrypted = encrypted;	
@@ -575,7 +576,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 			this.recipient = recipient;
 			this.timestamp = timestamp;
 			this.amount = amount;
-			this.hKey = hKey;
+			this.key = key;
 			this.fee = fee;
 			this.senderPublicKey = senderPublicKey;
 			this.recipientPublicKey = null;
@@ -601,7 +602,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				}
 				if( !this.encrypted )
 				{
-					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Converter.toHex( this.rawMessage );
+					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Base58.encode( this.rawMessage );
 				}
 			}
 			return this.decryptedMessage;
@@ -622,9 +623,9 @@ public class AccountingsTableModel extends JTable implements Observer{
 		{
 			return this.amount;
 		}
-		public byte[] getHKey()
+		public long getKey()
 		{
-			return this.hKey;
+			return this.key;
 		}
 		public byte[] getSignature()
 		{
@@ -764,7 +765,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 			}
 			
 
-			String strAsset = this.getHKey().toString();
+			String strAsset = "" + this.getKey();
 		
 			return	  "<html>\n"
 					+ "<body width='" + width + "'>\n"
@@ -829,7 +830,7 @@ public class AccountingsTableModel extends JTable implements Observer{
 				strConfirmations = strConfirmations + " !";
 			}
 			
-			String strAsset = this.getHKey().toString();
+			String strAsset = "" + this.getKey();
 			
 			return 	  Lang.getInstance().translate("Date:" + " " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
 					+ Lang.getInstance().translate("Sender:") + " " + this.sender + "\n"

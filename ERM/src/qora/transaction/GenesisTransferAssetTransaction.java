@@ -39,12 +39,11 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
-		this.signature = this.getSignature(); //  setLastReference not change in PROCCESS
+		this.generateSignature();
 	}
 	
 	//GETTERS/SETTERS
-	@Override
-	public byte[] getSignature() {
+	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
 		byte[] data = this.toBytes( false );
@@ -53,7 +52,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		byte[] digest = Crypto.getInstance().digest(data);
 		digest = Bytes.concat(digest, digest);
 				
-		return digest;
+		this.signature = digest;		
 
 	}
 

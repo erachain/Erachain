@@ -21,6 +21,7 @@ import ntp.NTP;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.transaction.Transaction;
@@ -153,10 +154,14 @@ public class MessageResource {
 			} else {
 				try {
 					messageBytes = Converter.parseHexString(message);
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
+				} catch (Exception g) {
+					try {
+						messageBytes = Base58.decode(message);
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw ApiErrorFactory.getInstance().createError(
+								ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
+					}
 				}
 			}
 

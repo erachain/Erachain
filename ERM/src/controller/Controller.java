@@ -1798,11 +1798,11 @@ public class Controller extends Observable {
 		}
 	}
 	public Pair<Transaction, Integer> sendAccounting(PrivateKeyAccount sender,
-			Account recipient, byte[] hkey, BigDecimal amount,int feePow,
+			Account recipient, long key, BigDecimal amount,int feePow,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createAccounting(sender, recipient,
-					hkey, amount, feePow, message, isText, encryptMessage);
+					key, amount, feePow, message, isText, encryptMessage);
 		}
 
 	}

@@ -70,7 +70,8 @@ public class BlockExplorerTest {
 		Stopwatch stopwatchAll = new Stopwatch();
 		
 		//ADD QORA ASSET
-    	Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 0, true, block.getGeneratorSignature());
+    	//Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 0, true, block.getGeneratorSignature());
+		Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 0, true);
     	databaseSet.getIssueAssetMap().set(block.getGeneratorSignature(), 0l);
     	databaseSet.getAssetMap().set(0l, qoraAsset);
     	

@@ -167,7 +167,7 @@ public class Json1TransactionDetailsFrame extends JFrame
 		//ISTEXT
 		detailGBC.gridy = componentLevel;
 		detailGBC.gridwidth = 2;
-		messageText = new JTextField( ( json1Transaction.isText() ) ? new String(json1Transaction.getData(), Charset.forName("UTF-8")) : Converter.toHex(json1Transaction.getData()));
+		messageText = new JTextField( ( json1Transaction.isText() ) ? new String(json1Transaction.getData(), Charset.forName("UTF-8")) : Base58.encode(json1Transaction.getData()));
 		messageText.setEditable(false);
 		MenuPopupUtil.installContextMenu(messageText);
 		this.add(messageText, detailGBC);			

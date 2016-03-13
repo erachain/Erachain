@@ -41,6 +41,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.assets.Asset;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 //import settings.Settings;
@@ -360,7 +361,7 @@ public class SendMessagePanel extends JPanel
 		feetxtGBC.gridy = 6;
 
 		txtFeePow = new JTextField();
-		txtFeePow.setText("1.00000000");
+		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
@@ -584,13 +585,19 @@ public class SendMessagePanel extends JPanel
 				{
 					messageBytes = Converter.parseHexString( message );
 				}
-				catch (Exception e)
+				catch (Exception g)
 				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
+					try
+					{
+						messageBytes = Base58.decode(message);
+					}
+					catch (Exception e)
+					{
+						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						
+						//ENABLE
+						this.sendButton.setEnabled(true);
+					}
 					return;
 				}
 			}

@@ -114,7 +114,7 @@ public class JsonTransaction extends Transaction {
 		}
 		else
 		{
-			transaction.put("data", Converter.toHex(this.data));
+			transaction.put("data", Base58.encode(this.data));
 		}
 		transaction.put("encrypted", this.isEncrypted());
 		transaction.put("isText", this.isText());

@@ -36,7 +36,7 @@ public class Asset {
 	private boolean divisible;
 	// from signature of new IssueAssetTransaction. -> 
 	//qora.TransactionCreator.createIssueAssetTransaction(PrivateKeyAccount, String, String, long, byte, boolean, int)
-	private byte[] reference = new byte[REFERENCE_LENGTH];
+	private byte[] reference; // to issued record = new byte[REFERENCE_LENGTH];
 	
 	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
 	{
@@ -48,12 +48,13 @@ public class Asset {
 		this.scale = scale;
 	}
 
+	/*
 	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible, byte[] reference)
 	{		
 		this(creator, name, description, quantity, scale, divisible);
 		this.reference = reference; // as signature from transaction IssueAsset
 	}
-
+	*/
 	//GETTERS/SETTERS
 	
 	public Account getCreator() {
@@ -81,6 +82,9 @@ public class Asset {
 	
 	public byte[] getReference() {
 		return this.reference;
+	}
+	public void setReference(byte[] reference) {
+		this.reference = reference;
 	}
 	
 	public long getKey() {
@@ -151,7 +155,9 @@ public class Asset {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		
 		//RETURN
-		return new Asset(creator, name, description, quantity, scale, divisable, reference);
+		Asset asset = new Asset(creator, name, description, quantity, scale, divisable);
+		asset.setReference(reference);
+		return asset;
 	}
 	
 	public byte[] toBytes(boolean includeReference)
@@ -210,7 +216,7 @@ public class Asset {
 		else
 		{
 			//WRITE EMPTY REFERENCE
-			data = Bytes.concat(data, new byte[64]);
+			// data = Bytes.concat(data, new byte[64]);
 		}
 		
 		return data;

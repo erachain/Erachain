@@ -70,7 +70,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Issue Check Transaction"));
+		JLabel type = new JLabel(Lang.getInstance().translate("Issue Asset Transaction"));
 		this.add(type, detailGBC);
 		
 		//LABEL SIGNATURE

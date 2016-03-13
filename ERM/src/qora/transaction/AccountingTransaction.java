@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-//import java.util.LinkedHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import database.BalanceMap;
-//import database.BalanceMapHKey;
 import database.DBSet;
 import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
@@ -25,50 +24,40 @@ import qora.crypto.Crypto;
 import utils.Converter;
 
 
+
 public class AccountingTransaction extends Transaction {
-	
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+
 
 	protected byte[] data;
-
 	protected Account recipient;
 	protected BigDecimal amount;
-	protected byte[] hkey;
+	protected long key;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		super(ACCOUNTING_TRANSACTION, creator, timestamp, reference);
 
-		this.recipient = recipient;
-		this.hkey = hkey;
-		this.amount = amount;
 		this.data = data;
+		this.recipient = recipient;
+		this.key = key;
+		this.amount = amount;
 		this.encrypted = encrypted;
 		this.isText = isText;
-
 	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 
-		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
-		this.fee = fee;
 		this.signature = signature;
-
+		this.fee = fee;
 	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-
-		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.calcFee();
 
 	}
-	
-	/*
-	public Account getSender()
-	{
-		return this.creator;
-	}
-	*/
 
 	public byte[] getData() 
 	{
@@ -80,9 +69,9 @@ public class AccountingTransaction extends Transaction {
 		return this.recipient;
 	}
 
-	public byte[] getHKey()
+	public long getKey()
 	{
-		return this.hkey;
+		return this.key;
 	}
 	
 	public BigDecimal getAmount()
@@ -117,7 +106,7 @@ public class AccountingTransaction extends Transaction {
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("creator", this.creator.getAddress());
 		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("hkey", this.hkey);
+		transaction.put("asset", this.key);
 		transaction.put("amount", this.amount.toPlainString());
 		if ( this.isText() && !this.isEncrypted() )
 		{
@@ -125,7 +114,7 @@ public class AccountingTransaction extends Transaction {
 		}
 		else
 		{
-			transaction.put("data", Converter.toHex(this.data));
+			transaction.put("data", Base58.encode(this.data));
 		}
 		transaction.put("encrypted", this.isEncrypted());
 		transaction.put("isText", this.isText());
@@ -133,7 +122,6 @@ public class AccountingTransaction extends Transaction {
 		return transaction;	
 	}
 	
-
 	@Override
 	public List<Account> getInvolvedAccounts() {
 		return Arrays.asList(this.creator, this.recipient);
@@ -151,7 +139,102 @@ public class AccountingTransaction extends Transaction {
 		return false;
 	}
 	
-	//@Override
+	@Override
+	public BigDecimal getAmount(Account account) {
+		BigDecimal amount = BigDecimal.ZERO.setScale(8);
+		String address = account.getAddress();
+		
+		//IF SENDER
+		if(address.equals(this.creator.getAddress()))
+		{
+			amount = amount.subtract(this.fee);
+		}
+
+		//IF QORA ASSET
+		if(this.key == BalanceMap.QORA_KEY)
+		{
+			//IF SENDER
+			if(address.equals(this.creator.getAddress()))
+			{
+				amount = amount.subtract(this.amount);
+			}
+			
+			//IF RECIPIENT
+			if(address.equals(this.recipient.getAddress()))
+			{
+				amount = amount.add(this.amount);
+			}
+		}
+		
+		return amount;
+	}	
+	public static Transaction Parse(byte[] data) throws Exception
+	{
+		if (data.length < BASE_LENGTH)
+		{
+			throw new Exception("Data does not match block length");
+		}
+
+		int position = 0;
+
+		//READ TIMESTAMP
+		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+		long timestamp = Longs.fromByteArray(timestampBytes);	
+		position += TIMESTAMP_LENGTH;
+
+		//READ REFERENCE
+		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		position += REFERENCE_LENGTH;
+
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
+
+		//READ RECIPIENT
+		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
+		Account recipient = new Account(Base58.encode(recipientBytes));
+		position += RECIPIENT_LENGTH;
+
+		//READ KEY
+		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+		long key = Longs.fromByteArray(keyBytes);	
+		position += KEY_LENGTH;
+		
+		//READ AMOUNT
+		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
+		position += AMOUNT_LENGTH;
+
+		//READ DATA SIZE
+		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+		int dataSize = Ints.fromByteArray(dataSizeBytes);	
+		position += DATA_SIZE_LENGTH;
+
+		//READ DATA
+		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
+		position += dataSize;
+		
+		byte[] encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
+		position += ENCRYPTED_LENGTH;
+		
+		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
+		position += IS_TEXT_LENGTH;
+		
+		
+		//READ FEE
+		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
+		position += FEE_LENGTH;
+
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+
+		return new AccountingTransaction(creator, recipient, key, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+
+	}
+
+	@Override
 	public byte[] toBytes(boolean withSign) {
 
 		byte[] data = new byte[0];
@@ -175,8 +258,10 @@ public class AccountingTransaction extends Transaction {
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 
-		//WRITE HKEY
-		data = Bytes.concat(data, this.hkey);
+		//WRITE KEY
+		byte[] keyBytes = Longs.toByteArray(this.key);
+		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+		data = Bytes.concat(data, keyBytes);
 		
 		//WRITE AMOUNT
 		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
@@ -214,27 +299,15 @@ public class AccountingTransaction extends Transaction {
 		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
 	}
 
-	/*
-	@Override
-	public boolean isSignatureValid() {
-		
-		byte[] data = this.toBytes( false );
-		if ( data == null ) return false;
-			
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	
-	}
-	*/
-
 	@Override
 	public int isValid(DBSet db) {
-		
+
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}
-	
+
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
 		{
@@ -244,6 +317,12 @@ public class AccountingTransaction extends Transaction {
 		//REMOVE FEE
 		DBSet fork = db.fork();
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
+
+		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
+		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
+		{
+			return NO_BALANCE;
+		}
 		
 		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
 		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
@@ -256,6 +335,21 @@ public class AccountingTransaction extends Transaction {
 		{
 			return INVALID_REFERENCE;
 		}
+		
+		/* accouning
+		//CHECK IF AMOUNT IS POSITIVE. 
+		//NOW IN V3 MAY BE ZERO
+		if(this.amount.compareTo(BigDecimal.ZERO) < 0)
+		{
+			return NEGATIVE_AMOUNT;
+		}
+		*/
+		
+		//CHECK IF FEE IS POSITIVE
+		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
+		{
+			return NEGATIVE_FEE;
+		}
 
 		return VALIDATE_OK;
 	}
@@ -264,106 +358,57 @@ public class AccountingTransaction extends Transaction {
 	public void process(DBSet db) {
 		//UPDATE SENDER
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
-		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.signature, db);
 		
+		//UPDATE REFERENCE OF RECIPIENT
+		if(this.key == BalanceMap.QORA_KEY)
+		{
+			if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
+			{
+				this.recipient.setLastReference(this.signature, db);
+			}
+		}
 	}
 
 	@Override
 	public void orphan(DBSet db) {
 		//UPDATE SENDER
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
-		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 		
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.reference, db);
 		
-	}
-
-	@Override
-	public BigDecimal getAmount(Account account) {
-		
-		return this.amount;
-	}
-	
-	public static Transaction Parse(byte[] data) throws Exception
-	{
-		if (data.length < BASE_LENGTH)
+		//UPDATE REFERENCE OF RECIPIENT
+		if(this.key == BalanceMap.QORA_KEY)
 		{
-			throw new Exception("Data does not match block length");
+			if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
+			{
+				this.recipient.removeReference(db);
+			}	
 		}
-
-		int position = 0;
-
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
-
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
-
-		//READ RECIPIENT
-		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-		Account recipient = new Account(Base58.encode(recipientBytes));
-		position += RECIPIENT_LENGTH;
-
-		//READ HKEY
-		byte[] hkey = Arrays.copyOfRange(data, position, position + HKEY_LENGTH);
-		position += HKEY_LENGTH;
-		
-		//READ AMOUNT
-		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
-		position += AMOUNT_LENGTH;
-
-		//READ DATA SIZE
-		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
-		int dataSize = Ints.fromByteArray(dataSizeBytes);	
-		position += DATA_SIZE_LENGTH;
-
-		//READ DATA
-		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
-		position += dataSize;
-		
-		byte[] encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
-		position += ENCRYPTED_LENGTH;
-		
-		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
-		position += IS_TEXT_LENGTH;
-		
-		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;
-
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-
-		return new AccountingTransaction(creator, recipient, hkey, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
-
 	}
 
 	@Override
-	// TODO hkey
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		
+		return assetAmount;
 	}
-
 }
+

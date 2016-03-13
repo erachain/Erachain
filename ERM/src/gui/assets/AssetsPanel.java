@@ -132,7 +132,7 @@ public class AssetsPanel extends JPanel
 		this.add(new JScrollPane(table), tableGBC);
 		
 		//ADD REGISTER BUTTON
-		JButton issueButton = new JButton(Lang.getInstance().translate("Issue Check"));
+		JButton issueButton = new JButton(Lang.getInstance().translate("Issue Asset"));
 		issueButton.setPreferredSize(new Dimension(120, 25));
 		issueButton.addActionListener(new ActionListener()
 		{

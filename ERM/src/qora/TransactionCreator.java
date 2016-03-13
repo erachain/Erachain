@@ -328,7 +328,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		Asset asset = new Asset(creator, name, description, quantity, scale, divisible, creator.getLastReference(this.fork));
+		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
@@ -459,7 +459,7 @@ public class TransactionCreator
 
 	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
-			Account recipient, byte[] hkey, BigDecimal amount, int feePow, byte[] isText,
+			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
 		this.checkUpdate();
@@ -467,7 +467,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 				
 		//CREATE ACCOunting TRANSACTION
-		Transaction messageTx = new AccountingTransaction(sender, recipient, hkey, amount, feePow, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));		
+		Transaction messageTx = new AccountingTransaction(sender, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));		
 		messageTx.sign(sender);
 		
 			

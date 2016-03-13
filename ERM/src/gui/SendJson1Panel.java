@@ -43,6 +43,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.assets.Asset;
 import qora.crypto.AEScrypto;
+import qora.crypto.Base58;
 import qora.crypto.Crypto;
 //import qora.transaction.Transaction;
 //import settings.Settings;
@@ -599,14 +600,21 @@ public class SendJson1Panel extends JPanel
 				{
 					messageBytes = Converter.parseHexString( message );
 				}
-				catch (Exception e)
-				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
+					catch (Exception g)
+					{
+						try
+						{
+							messageBytes = Base58.decode(message);
+						}
+					catch (Exception e)
+					{
+						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						
+						//ENABLE
+						this.sendButton.setEnabled(true);
+						
+						return;
+					}
 				}
 			}
 			if ( messageBytes.length < 1 || messageBytes.length > 4000 )
