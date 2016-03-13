@@ -203,7 +203,7 @@ public class ATWebResource {
 			{
 				return (message.isText())? 
 						new String(message.getData(), Charset.forName("UTF-8")) :
-							Base58.encode(message.getData());
+							Converter.toHex(message.getData());
 			}
 			else
 			{

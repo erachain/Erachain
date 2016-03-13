@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -46,9 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -68,6 +65,7 @@ import qora.blockexplorer.BlockExplorer;
 import qora.crypto.Base58;
 import qora.crypto.Base64;
 import qora.naming.Name;
+import qora.payment.Payment;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.Transaction;
 import qora.web.BlogBlackWhiteList;
@@ -85,7 +83,6 @@ import settings.Settings;
 import utils.AccountBalanceComparator;
 import utils.BlogUtils;
 import utils.DiffHelper;
-import utils.JSonWriter;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
@@ -173,7 +170,7 @@ public class WebResource {
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
-				.entity(StrJSonFine.convert(JSONValue.toJSONString(output)))
+				.entity(StrJSonFine.convert(output))
 				.build();
 	}
 
@@ -739,7 +736,7 @@ public class WebResource {
 
 			try {
 
-				profile.saveProfile();
+				profile.saveProfile(null);
 
 				json.put("type", "settingsSuccessfullySaved");
 				return Response
@@ -1130,6 +1127,18 @@ public class WebResource {
 		}
 	}
 
+	@Path("index/libs/js/clipboard.js")
+	@GET
+	public Response clipboard() {
+		File file = new File("web/libs/js/clipboard.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+
 	@Path("index/libs/js/third-party/ZeroClipboard.min.js")
 	@GET
 	public Response ZeroClipboardmin() {
@@ -1141,7 +1150,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-
+	
 	@Path("index/libs/js/third-party/ZeroClipboard.swf")
 	@GET
 	public Response ZeroClipboard() {
@@ -1271,16 +1280,16 @@ public class WebResource {
 
 			try {
 
-				/* icreator TODO calcRecommendedFeeForArbitraryTransaction
 				jsonBlogPost.put(
 						"fee",
+						/* TODO FeePOW
 						Controller
 								.getInstance()
 								.calcRecommendedFeeForArbitraryTransaction(
 										jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null)
-								.getA().toPlainString());
-				*/
-
+								.getA().toPlainString()
+								*/
+								"0.0");
 
 				String result;
 				//COMMENT OR REAL BLOGPOST?
@@ -1573,7 +1582,7 @@ public class WebResource {
 							try {
 
 								activeProfileOpt.addFollowedBlog(blogname);
-								result = activeProfileOpt.saveProfile();
+								result = activeProfileOpt.saveProfile(null);
 								result = "<div class=\"alert alert-success\" role=\"alert\">You follow this blog now<br>"
 										+ result + "</div>";
 
@@ -1614,7 +1623,7 @@ public class WebResource {
 							activeProfileOpt.removeFollowedBlog(blogname);
 							String result;
 							try {
-								result = activeProfileOpt.saveProfile();
+								result = activeProfileOpt.saveProfile(null);
 								result = "<div class=\"alert alert-success\" role=\"alert\">Unfollow successful<br>"
 										+ result + "</div>";
 
@@ -1823,8 +1832,7 @@ public class WebResource {
 					// TODO create blogpost json in method --> move to BlogUtils
 					// (for every kind delete/share and so on)
 					jsonBlogPost.put("creator", creator);
-					
-					/* icreator 
+					/* TODO FeePOW
 					Pair<BigDecimal, Integer> fee = Controller.getInstance()
 							.calcRecommendedFeeForArbitraryTransaction(
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null);
@@ -1964,12 +1972,13 @@ public class WebResource {
 					jsonBlogPost.put(BlogPostResource.SHARE_KEY, signature);
 					jsonBlogPost.put("body", "share");
 
-					/* icreator TODO calcRecommendedFeeForArbitraryTransaction
+					/* TODO FeePow
 					Pair<BigDecimal, Integer> fee = Controller.getInstance()
 							.calcRecommendedFeeForArbitraryTransaction(
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null);
 					jsonBlogPost.put("fee", fee.getA().toPlainString());
-		 			*/
+					*/
+
 					try {
 
 						String result = new BlogPostResource().addBlogEntry(
@@ -2073,7 +2082,15 @@ public class WebResource {
 						activeProfileOpt.addLikePost(signature);
 						try {
 
-							result = activeProfileOpt.saveProfile();
+							String creator = blogEntryOpt.getCreator();
+							List<Payment> payments = new ArrayList<>();
+							if(creator != null)
+							{
+								BigDecimal amount = BigDecimal.TEN;
+								amount = amount.setScale(8);
+								payments.add(new Payment(new Account(creator), 0L,amount ));
+							}
+							result = activeProfileOpt.saveProfile(payments);
 
 							json.put("type", "LikeSuccessful");
 							json.put("result", result);
@@ -2096,7 +2113,7 @@ public class WebResource {
 							activeProfileOpt.removeLikeProfile(signature);
 							String result;
 							try {
-								result = activeProfileOpt.saveProfile();
+								result = activeProfileOpt.saveProfile(null);
 
 								json.put("type", "LikeRemovedSuccessful");
 								json.put("result", result);
@@ -3011,6 +3028,31 @@ public class WebResource {
 		}
 	}
 	
+	@Path("index/translation.json")
+	@GET
+	public Response translationjson() {
+		
+		File file = new File("languages\\" + Settings.getInstance().getLang());
+		
+		if (file.exists()) {
+			return Response.ok(file, "application/json").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/translation.js")
+	@GET
+	public Response translationjs() {
+		File file = new File("web\\libs\\js\\translation.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
 	public Response error404(HttpServletRequest request, String titleOpt) {
 
 		try {
@@ -3084,27 +3126,6 @@ public class WebResource {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "ERROR";
-		}
-	}
-
-	public String jsonToFineSting(String str) {
-		Writer writer = new JSonWriter();
-		Object jsonResult = JSONValue.parse(str);
-
-		try {
-			if (jsonResult instanceof JSONArray) {
-				((JSONArray) jsonResult).writeJSONString(writer);
-				return writer.toString();
-			}
-			if (jsonResult instanceof JSONObject) {
-				((JSONObject) jsonResult).writeJSONString(writer);
-				return writer.toString();
-			}
-			writer.close();
-			return "";
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "";
 		}
 	}
 

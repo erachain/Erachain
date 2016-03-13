@@ -7,7 +7,11 @@
 	<script src="/index/libs/bootstrap/3/js/bootstrap.min.js"></script>
 	<link href="/index/libs/css/style.css" rel="stylesheet">
 	<script src="/index/libs/js/sidebar.js"></script>
+	
 	<script src="/index/libs/js/common.js"></script>
+	<script src="/index/libs/js/translation.js"></script>
+	
+	<script src="/index/libs/js/clipboard.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 	<style type="text/css">
@@ -135,35 +139,6 @@
 var loading = true;
 var params;
 
-function getXmlHttp(){
-	var xmlhttp;
-	try {
-		xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-	} catch (e) {
-		try {
-			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-		} catch (E) {
-			xmlhttp = false;
-		}
-	}
-	if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
-		xmlhttp = new XMLHttpRequest();
-	}
-	return xmlhttp;
-}
-
-function getResponseJson (url){
-	var xmlhttp = getXmlHttp()
-	xmlhttp.open('GET', url, false);
-	xmlhttp.send(null);
-	
-	if (xmlhttp.readyState == 4) {
-		if (xmlhttp.status == 200) {
-			return JSON.parse(xmlhttp.responseText);
-		}
-	}
-}
-
 function asyncAjax (url, type){
 	var xmlhttp = getXmlHttp()
 	xmlhttp.open('GET', url, true);
@@ -256,11 +231,16 @@ function secToFine(time) {
 	ret = "";
 
 	if (hrs > 0)
-		ret += "" + hrs + (hrs > 1 ? " hours " : " hour ");
+		ret += "" + hrs + (hrs > 1 ? " " + Lang.getInstance().translate("hours") + " " : " " + Lang.getInstance().translate("hour") + " ");
 
-	ret += "" + mins + (mins > 1 ? " mins " : " min ");
-	ret += "" + secs + ' secs';
+	ret += "" + mins + (mins > 1 ? " " + Lang.getInstance().translate("mins") + " " : " " + Lang.getInstance().translate("min") + " ");
+	ret += "" + secs + " " + Lang.getInstance().translate("secs");
 	return ret;
+}
+
+function isIn(elem, array)
+{
+	return (array && array.indexOf(elem) > -1);
 }
 
 function getAssetNameMini(assetKey, assetName) {
@@ -377,10 +357,10 @@ function blocks(data)
 
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
 	output += '<tr><td align=left>';
-	output += '<a href=?unconfirmed>Unconfirmed transactions: ' + data.unconfirmedTxs + '</a>.';
+	output += '<a href=?unconfirmed>' + Lang.getInstance().translate("Unconfirmed transactions:") + ' ' + data.unconfirmedTxs + '</a>.';
 	
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr><td><b>Height<td><b>Time<td><b>Generator<td><b>Gen.balance<td><b>TXs<td><b>Fee<td><b>AT Amount<td><b>Amount'; 
+	output += '<tr><td><b>' + Lang.getInstance().translate("Height") + '<td><b>' + Lang.getInstance().translate("Time") + '<td><b>' + Lang.getInstance().translate("Generator") + '<td><b>' + Lang.getInstance().translate("Gen.Balance") + '<td><b>TX<td><b>' + Lang.getInstance().translate("Fees")+'<td><b>' + Lang.getInstance().translate("AT Amount") + '<td><b>' + Lang.getInstance().translate("Amount"); 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 	for(var i = data.maxHeight; i >= minHeight; i--)
@@ -396,17 +376,17 @@ function blocks(data)
 	{
 		if (data.lastBlock.height < data.maxHeight + 21)
 		{
-			output += '<a href=?startBlock=' + (data.lastBlock.height) + '>Later';
+			output += '<a href=?startBlock=' + (data.lastBlock.height) + '>' + Lang.getInstance().translate("Later");
 		}
 		else
 		{
-			output += '<a href=?startBlock=' + (data.maxHeight+21) + '>Later';
+			output += '<a href=?startBlock=' + (data.maxHeight+21) + '>' + Lang.getInstance().translate("Later");
 		}
 	}
 	
 	output += '<td colspan=4 align=right>';
 	if (minHeight > 1) {
-		output += '<a href=?startBlock=' + (data.maxHeight-21) + '>Previous'
+		output += '<a href=?startBlock=' + (data.maxHeight-21) + '>' + Lang.getInstance().translate("Previous");
 	}
 	
 	return output;
@@ -1483,7 +1463,7 @@ function mainQuery(data) {
 					var img1 = '';
 					var img2 = '';
 					
-					if (data[i].trade.targetCreator == data.address)
+					if (isIn(data[i].trade.targetCreator, data.addresses))
 					{
 						output += '<td><font color="dimgray">' + data[i].trade.targetCreator + '</font>';
 						img1 = 'img/redright.png';
@@ -1509,7 +1489,7 @@ function mainQuery(data) {
 					
 					output += '</td>';
 					
-					if (data[i].trade.initiatorCreator == data.address)
+					if (isIn(data[i].trade.initiatorCreator, data.addresses))
 					{
 						output += '<td><font color="dimgray">' + data[i].trade.initiatorCreator + '</font><br>';
 						img2 = 'img/redleft.png';
@@ -1604,7 +1584,7 @@ function mainQuery(data) {
 					output += '</tr>';
 					output += '<tr><td align="center" rowspan=2>';
 					
-					if (data[i].atTransaction.sender == data.address)
+					if (isIn(data[i].atTransaction.sender, data.addresses))
 					{
 						output += '<img src=img/at_tx_out.png>';
 					}
@@ -1614,7 +1594,7 @@ function mainQuery(data) {
 					}
 					output += '<br><font size="-2">Automated Transaction</font></td>';
 					
-					if (data[i].atTransaction.sender == data.address)
+					if (isIn(data[i].atTransaction.sender, data.addresses))
 					{
 						output += '<td rowspan=2><font color="dimgray">' + data[i].atTransaction.sender + '</font></td>';
 					}
@@ -1624,7 +1604,7 @@ function mainQuery(data) {
 					}
 					output += '<td>' + addCommas(data[i].atTransaction.amount) + ' <font size="-2">Qora</font>';
 					
-					if (data[i].atTransaction.recipient == data.address)
+					if (isIn(data[i].atTransaction.recipient, data.addresses))
 					{
 						output += '<td><font color="dimgray">' + data[i].atTransaction.recipient + '</font></td>';
 					}
@@ -1706,7 +1686,7 @@ function mainQuery(data) {
 						output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">Qora</font>';
 						output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
 						
-						if (data[i].transaction.recipient == data.address)
+						if (isIn(data[i].transaction.recipient, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
 						}
@@ -1755,7 +1735,7 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '<tr><td align="center" valign="top">';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<img src=img/02_payment_out.png>';
 						}
@@ -1765,7 +1745,7 @@ function mainQuery(data) {
 						}
 						output += '<br><font size="-2">Payment</font></td>';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.sender + '</font></td>';
 						}
@@ -1776,7 +1756,7 @@ function mainQuery(data) {
 						output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">Qora</font>';
 						output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
 						
-						if (data[i].transaction.recipient == data.address)
+						if (isIn(data[i].transaction.recipient, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
 						}
@@ -1827,7 +1807,7 @@ function mainQuery(data) {
 						output += '<img src=img/03_name_registration.png>';
 						output += '<br><font size="-2">Name Registration</font></td>';
 						
-						if (data[i].transaction.owner == data.address)
+						if (isIn(data[i].transaction.owner, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
 						}
@@ -1889,7 +1869,7 @@ function mainQuery(data) {
 						output += '<img src=img/04_name_update.png>';
 						output += '<br><font size="-2">Name Update</font></td>';
 						
-						if (data[i].transaction.newOwner == data.address)
+						if (isIn(data[i].transaction.newOwner, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.newOwner + '</font>';
 						}
@@ -1951,7 +1931,7 @@ function mainQuery(data) {
 						output += '<img src=img/05_name_sale.png>';
 						output += '<br><font size="-2">Name to Sale</font></td>';
 						
-						if (data[i].transaction.owner == data.address)
+						if (isIn(data[i].transaction.owner, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
 						}
@@ -2007,7 +1987,7 @@ function mainQuery(data) {
 						output += '<img src=img/06_cancel_name_sale.png>';
 						output += '<br><font size="-2">Cancel Name Sale</font></td>';
 						
-						if (data[i].transaction.owner == data.address)
+						if (isIn(data[i].transaction.owner, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.owner + '</font></td>';
 						}
@@ -2059,7 +2039,7 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '<tr><td align="center" valign="top">';
 						
-						if (data[i].transaction.seller == data.address)
+						if (isIn(data[i].transaction.seller, data.addresses))
 						{
 							output += '<img src=img/07_name_purchase_in.png>';
 							output += '<br><font size="-2">Name Selling</font></td>';
@@ -2070,7 +2050,7 @@ function mainQuery(data) {
 							output += '<br><font size="-2">Name Buying</font></td>';
 						}
 						
-						if (data[i].transaction.seller == data.address)
+						if (isIn(data[i].transaction.seller, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.seller + '</font></td>';
 						}
@@ -2084,7 +2064,7 @@ function mainQuery(data) {
 						output += '<td>' + addCommas(data[i].transaction.amount) + ' <font size="-2">Qora</font>';
 						output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
 						
-						if (data[i].transaction.buyer == data.address)
+						if (isIn(data[i].transaction.buyer, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.buyer + '</font></td>';
 						}
@@ -2135,7 +2115,7 @@ function mainQuery(data) {
 						output += '<img src=img/08_poll_creation.jpg>';
 						output += '<br><font size="-2">Poll Creation</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td rowspan=2><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2200,7 +2180,7 @@ function mainQuery(data) {
 						output += '<img src=img/09_poll_vote.jpg>';
 						output += '<br><font size="-2">Poll Vote</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2245,7 +2225,17 @@ function mainQuery(data) {
 						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
 						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=150><b>Fee:</b> ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font>' + '</td>';
-						output += '<td><b>Data Base58</b></td>';
+						output += '<td><b>Data Base58</b>';
+						
+						dataText = uintToString(Base58.decode(data[i].transaction.data));
+
+						dataText = dataText.replace(/"/g, '&quot;');
+						
+						output += ' <button class="btn copybtn btn-sm" style="text-transform: capitalize;" data-clipboard-action="copy" data-clipboard-text="'+dataText+'">';
+						output += 'Copy Text';
+						output += '</button>';
+						output += '</td>';
+						
 						if (data[i].hasOwnProperty('tXbalance'))
 						{
 							output += '<td width=180><b>Balance</b></td>';
@@ -2256,7 +2246,7 @@ function mainQuery(data) {
 						output += '<img src=img/10_arbitrary_transaction.png>';
 						output += '<br><font size="-2">Arbitrary Transaction</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2267,11 +2257,7 @@ function mainQuery(data) {
 						
 						output += '<td><b>Service:</b> ' + data[i].transaction.service + '</td>';
 						
-						dataText = uintToString(Base58.decode(data[i].transaction.data));
-
-						dataText = dataText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g, '&quot;');
-						
-						output += '<td rowspan=3><abbr title="' + dataText + '"><pre>' + wordwrap(data[i].transaction.data, 70, '\n', true) + '</pre></abbr>';
+						output += '<td rowspan=3><abbr id=datatext title="' + htmlFilter(dataText) + '"><pre>' + wordwrap(data[i].transaction.data, 70, '\n', true) + '</pre></abbr>';
 						
 						if (data[i].hasOwnProperty('tXbalance'))
 						{
@@ -2281,14 +2267,14 @@ function mainQuery(data) {
 						
 						if (data[i].transaction.hasOwnProperty('payments'))
 						{
-							assetsAmounts = data[i].transaction.assetsAmounts;
+							amounts = data[i].transaction.amounts;
 
 							output += '<tr><td colspan=2><b>Payments:</b><br>';
 							payments = data[i].transaction.payments;
 							for(key in payments) {
 								output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset, 
 									data.assetNames[payments[key].asset]) + ' -> ';					
-								if (data.addresses.indexOf(payments[key].recipient) > -1)
+								if (isIn(payments[key].recipient, data.addresses))
 								{
 									output += '<font color="dimgray">' + payments[key].recipient + '</font>';
 								}
@@ -2301,8 +2287,8 @@ function mainQuery(data) {
 							
 							output += '<tr><td colspan=2 height=99%><b>Amount:</b><br>';
 							
-							for (key in assetsAmounts) {
-								output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, data.assetNames[key]) + '<br>';
+							for (key in amounts) {
+								output += addCommas(amounts[key]) + ' ' + getAssetNameMini(key, data.assetNames[key]) + '<br>';
 							}
 						}
 						
@@ -2356,7 +2342,7 @@ function mainQuery(data) {
 						output += '<img src=img/11_asset_issue.png>';
 						output += '<br><font size="-2">Asset Issue</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2411,7 +2397,7 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '<tr><td align="center" valign="top">';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<img src=img/12_asset_transfer_out.png>';
 						}
@@ -2422,7 +2408,7 @@ function mainQuery(data) {
 						
 						output += '<br><font size="-2">Asset Transfer</font></td>';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.sender + '</font></td>';
 						}
@@ -2437,7 +2423,7 @@ function mainQuery(data) {
 						
 						output += '<td>' + ' <a href=?asset=' + data[i].transaction.asset + '>' + getAssetName(data[i].transaction.asset, data.assetNames[data[i].transaction.asset]) + '</a>';
 						
-						if (data[i].transaction.recipient == data.address)
+						if (isIn(data[i].transaction.recipient, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
 						}
@@ -2489,7 +2475,7 @@ function mainQuery(data) {
 						output += '<img src=img/13_order_creation.png>';
 						output += '<br><font size="-2">Order Creation</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2556,7 +2542,7 @@ function mainQuery(data) {
 						output += '<img src=img/14_cancel_order.png>';
 						output += '<br><font size="-2">Cancel Order</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2619,7 +2605,7 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '<tr><td align="center" valign="top">';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<img src=img/15_multi_payment_out.png>';
 						}
@@ -2629,7 +2615,7 @@ function mainQuery(data) {
 						}
 						output += '<br><font size="-2">Multi Payment</font></td>';
 						
-						if (data[i].transaction.sender == data.address)
+						if (isIn(data[i].transaction.sender, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.sender + '</font></td>';
 						}
@@ -2640,9 +2626,9 @@ function mainQuery(data) {
 						
 						output += '<td>';
 						
-						assetsAmounts = data[i].transaction.assetsAmounts;
-						for(key in assetsAmounts) {
-							output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, data.assetNames[key]) + '<br>';
+						amounts = data[i].transaction.amounts;
+						for(key in amounts) {
+							output += addCommas(amounts[key]) + ' ' + getAssetNameMini(key, data.assetNames[key]) + '<br>';
 						}
 						
 						output += 'fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
@@ -2652,7 +2638,7 @@ function mainQuery(data) {
 						for(key in payments) {
 							output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset, 
 								data.assetNames[payments[key].asset]) + ' -> ';					
-							if (data.addresses.indexOf(payments[key].recipient) > -1)
+							if (isIn(payments[key].recipient, data.addresses))
 							{
 								output += '<font color="dimgray">' + payments[key].recipient + '</font>';
 							}
@@ -2708,7 +2694,7 @@ function mainQuery(data) {
 						output += '<img src=img/16_deploy_at.png>';
 						output += '<br><font size="-2">Deploy AT</font></td>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2720,7 +2706,7 @@ function mainQuery(data) {
 						output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
 						
 						output += '<td><b>Name: </b>' + data[i].transaction.name;
-						if (data[i].transaction.atAddress == data.address)
+						if (isIn(data[i].transaction.atAddress, data.addresses))
 						{
 							output += '<br><b>AT Account: </b> <font color="dimgray">' + data[i].transaction.atAddress + '</font>';
 						}
@@ -2778,7 +2764,7 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '<tr><td align="center" valign="top" rowspan=2>';
 						
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<img src=img/17_message_out.png>';
 						}
@@ -2789,7 +2775,7 @@ function mainQuery(data) {
 						}
 						output += '<br><font size="-2">Message</font></td>';
 							
-						if (data[i].transaction.creator == data.address)
+						if (isIn(data[i].transaction.creator, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.creator + '</font></td>';
 						}
@@ -2811,7 +2797,7 @@ function mainQuery(data) {
 						
 						output += '<br>fee: ' + addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font></td>';
 						
-						if (data[i].transaction.recipient == data.address)
+						if (isIn(data[i].transaction.recipient, data.addresses))
 						{
 							output += '<td><font color="dimgray">' + data[i].transaction.recipient + '</font></td>';
 						}
@@ -3135,8 +3121,8 @@ function lastBlock(lastBlock)
 		return "";
 	
 	var output = '';
-	output += 'Last processed block: <a href=?block=' + lastBlock.height + '>' + lastBlock.height + '</a>';
-	output += ' (' + lastBlock.dateTime  + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp) + ' ago' +  ') ';
+	output += Lang.getInstance().translate("Last processed block") + ': <a href=?block=' + lastBlock.height + '>' + lastBlock.height + '</a>';
+	output += ' (' + lastBlock.dateTime  + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp) + ' ' + Lang.getInstance().translate("ago") + ') ';
 	output += '<br><br>';
 	
 	return output;
@@ -3179,13 +3165,15 @@ function start() {
 	document.getElementById('main').innerHTML = '';
 	 
 	document.getElementById('home').href = document.location.pathname;
-	document.getElementById('home2').href = document.location.pathname;
+	document.getElementById('linkBlocks').href = document.location.pathname;
 	
 	document.getElementById('menuBlocks').setAttribute('class', '');
 	document.getElementById('menuTop100Richest').setAttribute('class', '');
 	document.getElementById('menuPolls').setAttribute('class', '');
 	document.getElementById('menuAssets').setAttribute('class', '');
 	document.getElementById('menuATs').setAttribute('class', '');
+
+	var clipboard = new Clipboard('.copybtn');
 	
 	params = parseUrlQuery();
 	
@@ -3553,11 +3541,11 @@ function start() {
           <div class="container">
             <div class="row">
               <ul role="tablist" class="nav nav-tabs">
-                <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
-				<li id=menuTop100Richest><a href="?top=100">Top 100 Richest</a></li>
-				<li id=menuPolls><a href="?polls">Polls</a></li>
-				<li id=menuAssets><a href="?assets">Assets</a></li>
-				<li id=menuATs><a href="?aTs">ATs</a></li>				
+                <li id=menuBlocks><a href="#" id=linkBlocks>Blocks</a></li>
+				<li id=menuTop100Richest><a href="?top=100" id=linkTop100Richest>Top 100 Richest</a></li>
+				<li id=menuPolls><a href="?polls" id=linkPolls>Polls</a></li>
+				<li id=menuAssets><a href="?assets" id=linkAssets>Assets</a></li>
+				<li id=menuATs><a href="?aTs" id=linkATs>ATs</a></li>				
               </ul>
             </div>
           </div>
@@ -3591,3 +3579,11 @@ function start() {
 </table>
 </body>
 </html>
+
+<script>
+	document.getElementById('linkBlocks').innerHTML = Lang.getInstance().translate("Blocks");
+	document.getElementById('linkTop100Richest').innerHTML = Lang.getInstance().translate("Top 100 Richest");
+	document.getElementById('linkPolls').innerHTML = Lang.getInstance().translate("Polls");
+	document.getElementById('linkAssets').innerHTML = Lang.getInstance().translate("Assets");
+	document.getElementById('linkATs').innerHTML = Lang.getInstance().translate("AT");
+</script>

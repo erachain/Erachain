@@ -21,25 +21,31 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
-import controller.Controller;
-import database.DBSet;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
+import qora.assets.Asset;
 import qora.crypto.Crypto;
 import qora.naming.Name;
+import qora.payment.Payment;
 import qora.transaction.Transaction;
 import utils.APIUtils;
 import utils.GZIP;
 import utils.Pair;
 import utils.StorageUtils;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
+import controller.Controller;
+import database.DBSet;
+
 @Path("namestorage")
 @Produces(MediaType.APPLICATION_JSON)
 public class NameStorageResource {
 
+	public static final String ASSET_JSON_KEY = "asset";
+	public static final String AMOUNT_JSON_KEY = "amount";
+	public static final String PAYMENTS_JSON_KEY = "payments";
 	@Context
 	HttpServletRequest request;
 
@@ -176,8 +182,66 @@ public class NameStorageResource {
 			}
 
 			jsonObject.put("name", name);
-			String jsonString = jsonObject.toJSONString();
+			
+			String paymentsOpt = (String) jsonObject.get(PAYMENTS_JSON_KEY);
+			
+			List<Payment> resultPayments = new ArrayList<>();
+			if(paymentsOpt != null)
+			{
+				// READ JSON
+				JSONObject paymentsJson = (JSONObject) JSONValue.parse(paymentsOpt);
+				Set<String> addresses = paymentsJson.keySet();
+				
+				
+				for (String address : addresses) {
+					
+					if (!Crypto.getInstance().isValidAddress(address)) {
+						throw ApiErrorFactory.getInstance().createError(
+								ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					}
+					
+					String amountAssetJson = (String) paymentsJson.get(address);
+					
+					JSONObject amountAssetJsonObject = (JSONObject) JSONValue.parse(amountAssetJson);
+					
+					String amount = (String) amountAssetJsonObject.get(AMOUNT_JSON_KEY);
+					
+					BigDecimal bdAmount;
+					try 
+					{
+						bdAmount = new BigDecimal(amount);
+						bdAmount = bdAmount.setScale(8);
+					} catch (Exception e) {
+						throw ApiErrorFactory.getInstance().createError(
+							ApiErrorFactory.ERROR_INVALID_AMOUNT);
+					}
+					
+					Asset paymentAsset = Controller.getInstance().getAsset(new Long(0L));
+					
+					if(amountAssetJsonObject.containsKey(ASSET_JSON_KEY)) {
+						try {
+							paymentAsset = Controller.getInstance().getAsset(new Long(amountAssetJsonObject.get(ASSET_JSON_KEY).toString()));
+						} catch (Exception e) {
+							throw ApiErrorFactory.getInstance().createError(
+								ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+						}
+					}
+					
+					Payment payment = new Payment(new Account(address), paymentAsset.getKey(), bdAmount);
+					resultPayments.add(payment);
+					
+				}
+				
+				
+				
+//				remove payments from json
+				jsonObject.remove(PAYMENTS_JSON_KEY);
+				
+			}
+			
+			List<Payment> paymentsForCalculation = new ArrayList<>(resultPayments);
 
+			String jsonString = jsonObject.toJSONString();
 			String compressedJsonString = GZIP.compress(jsonString);
 
 			if (compressedJsonString.length() < jsonString.length()) {
@@ -188,6 +252,7 @@ public class NameStorageResource {
 			List<String> askApicalls = new ArrayList<String>();	
 			List<String> decompressedValue = new ArrayList<String>();
 			JSONObject jsonObjectForCheck = (JSONObject) JSONValue.parse(x);
+			// TODO IN CASE OF MULTIPAYMENT 4000 CAN BE A PROBLEM, THE FIRST TX CAN CONTAIN MULTIPAYMENTS WHICH NEED EXTRA SPACE
 			// IF VALUE TOO LARGE FOR ONE ARB TX AND WE ONLY HAVE ADDCOMPLETE
 			// WITH ONE KEY
 			if (bytes.length > 4000
@@ -240,23 +305,24 @@ public class NameStorageResource {
 
 						byte[] resultbyteArray = jsonStringForMultipleTx
 								.getBytes(StandardCharsets.UTF_8);
-						
-						/*
-						BigDecimal currentFee = Controller
+						/* BigDecimal currentFee = Controller
 								.getInstance()
 								.calcRecommendedFeeForArbitraryTransaction(
-										resultbyteArray, null).getA();
-						*/
-						BigDecimal currentFee = Transaction.calcFee(resultbyteArray.length, 0);
-						completeFee = completeFee.add(currentFee);
+										resultbyteArray, paymentsForCalculation).getA();
+										*/
+						//multipayment only for first tx
+						paymentsForCalculation = null;
 
-						allTxPairs.add(new Pair<>(resultbyteArray, currentFee));
+						//completeFee = completeFee.add(currentFee);
+
+						//allTxPairs.add(new Pair<>(resultbyteArray, currentFee));
 
 						String decompressed = GZIP.webDecompress(jsonStringForMultipleTx);
 						askApicalls.add("POST namestorage/update/" + name
 								+ "\n"
 								+ decompressed
-								+ "\nfee: " + currentFee.toPlainString());
+								//+ "\nfee: " + currentFee.toPlainString()
+								);
 						decompressedValue.add(decompressed);
 					}
 					
@@ -269,7 +335,7 @@ public class NameStorageResource {
 					//recalculating qora amount
 					BigDecimal newCompleteFee = BigDecimal.ZERO;
 					BigDecimal oldAmount = BigDecimal.ZERO;
-					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[], BigDecimal>>();
+					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[],BigDecimal>>();
 					for (Pair<byte[], BigDecimal> pair : allTxPairs) {
 						if(oldAmount.equals(BigDecimal.ZERO))
 						{
@@ -296,8 +362,10 @@ public class NameStorageResource {
 								+ decompressedValue.get(i)
 								+ "\nfee: " + newPairs.get(i).getB().toPlainString()+"\n";
 					}
+					
+					String basicInfo = getMultiPaymentsWarning(resultPayments);
 
-					String basicInfo = "Because of the size of the data this call will create "
+					basicInfo = "Because of the size of the data this call will create "
 							+ allTxPairs.size()
 							+ " transactions.\nAll Arbitrary Transactions will cost: "
 							+ newCompleteFee.toPlainString() + " Qora.\nDetails:\n\n";
@@ -327,28 +395,45 @@ public class NameStorageResource {
 								ApiErrorFactory.ERROR_NO_BALANCE);
 					}
 					
-					Pair<Transaction, Integer> result;
+					
 					String results = "";
+					/*
+					Pair<Transaction, Integer> result;
 					for (Pair<byte[], BigDecimal> pair : newPairs) {
 						result = Controller.getInstance()
-								.createArbitraryTransaction(account, null, 10,
-										pair.getA(), 0); //pair.getB());
+								.createArbitraryTransaction(account,
+										resultPayments.size() > 0 ? resultPayments : null, 10,
+										pair.getA(), pair.getB());
+						//add multipayments only to first tx
+						resultPayments.clear();
 
 						results += ArbitraryTransactionsResource
 								.checkArbitraryTransaction(result) + "\n";
+								
 					}
+					*/
 
 					return results;
 
 				}
 			}
+			
+			
+			
+			String basicInfo = getMultiPaymentsWarning(resultPayments);
+			
+			
 			//BigDecimal fee = Controller.getInstance()
-			//		.calcRecommendedFeeForArbitraryTransaction(bytes, null).getA();
-			BigDecimal fee = Transaction.calcFee(bytes.length, 0);
-			APIUtils.askAPICallAllowed(
+			//		.calcRecommendedFeeForArbitraryTransaction(bytes, resultPayments).getA();
+			BigDecimal fee = BigDecimal.ZERO;
+			
+			
+			
+			APIUtils.askAPICallAllowed(basicInfo +
 					"POST namestorage/update/" + name + "\n"
 							+ GZIP.webDecompress(jsonString) + "\nfee: "
-							+ fee.toPlainString(), request);
+							+ fee.toPlainString(),
+							request);
 
 			//CHECK WALLET UNLOCKED
 			if (!Controller.getInstance().isWalletUnlocked()) {
@@ -366,7 +451,7 @@ public class NameStorageResource {
 			
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.createArbitraryTransaction(account, null, 10, bytes, 0);
+					.createArbitraryTransaction(account,resultPayments, 10, bytes, 0);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);
@@ -381,6 +466,20 @@ public class NameStorageResource {
 					ApiErrorFactory.ERROR_JSON);
 		}
 
+	}
+
+	public String getMultiPaymentsWarning(List<Payment> resultPayments) {
+		
+		if(resultPayments.size() == 0)
+		{
+			return "";
+		}
+		String basicInfo = "WARNING : This call contains multipayments:\n";
+		for (Payment payment : resultPayments) {
+			basicInfo +=  "Recipient " + payment.getRecipient().getAddress() + " Amount: " + payment.getAmount().toPlainString() + " AssetID " + payment.getAsset() + (payment.getAsset() == 0L ? "(Qora)\n" : "\n");
+		}
+		basicInfo +="\n";
+		return basicInfo;
 	}
 
 }

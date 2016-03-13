@@ -12,18 +12,16 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Serializer;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import database.serializer.BlockSerializer;
 import qora.block.Block;
 import utils.Converter;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
-import database.DBSet;
-import database.serializer.BlockSerializer;
 
 public class BlockMap extends DBMap<byte[], Block> 
 {
@@ -48,26 +46,11 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BLOCK_TYPE);
 		
 		//LAST BLOCK
-		if(database.exists("lastBlock"))
-		{
-			this.lastBlockVar = database.getAtomicVar("lastBlock");
-		}
-		else
-		{
-			this.lastBlockVar = database.createAtomicVar("lastBlock", new byte[0], Serializer.BYTE_ARRAY);
-		}
+		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
 		
 		//PROCESSING
-		if(database.exists("processingBlock"))
-		{
-			this.processingVar = database.getAtomicVar("processingBlock");
-		}
-		else
-		{
-			this.processingVar = database.createAtomicVar("processingBlock", false, Serializer.BOOLEAN);
-		}
-		
+		this.processingVar = database.getAtomicVar("processingBlock");
 		this.processing = this.processingVar.get();
 	}
 
@@ -101,12 +84,10 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 		generatorMap = database.createTreeMap("generators_index").makeOrGet();
 		
-		// TODO Base58 instead HEX format
 		Bind.secondaryKey((BTreeMap)this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, byte[], Block>() {
 			@Override
 			public Tuple2<String, String> run(byte[] b, Block block) {
-				return new Tuple2<String, String>(block.getGenerator().getAddress(), 
-						Converter.toHex(block.getSignature()));
+				return new Tuple2<String, String>(block.getGenerator().getAddress(), Converter.toHex(block.getSignature()));
 			}
 		});
 	}
