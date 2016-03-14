@@ -18,11 +18,12 @@ import lang.Lang;
 public class AccountsTableModel extends AbstractTableModel implements Observer
 {
 	private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_BALANCE = 1;
-	public static final int COLUMN_CONFIRMED_BALANCE = 2;
+//	public static final int COLUMN_BALANCE = 1;
+	public static final int COLUMN_CONFIRMED_BALANCE = 1;
+	public static final int COLUMN_WAINTING_BALANCE = 2;
 	public static final int COLUMN_GENERATING_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance", "Confirmed Balance", "Generating Balance"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance","Waiting", "Fee"});
 	private List<Account> accounts;
 	private Asset asset = null;
 	
@@ -78,7 +79,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			
 			return account.getAddress();
 			
-		case COLUMN_BALANCE:
+/*		case COLUMN_BALANCE:
 			
 			if(this.asset == null || this.asset.getKey() == 0l)
 			{
@@ -88,7 +89,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			{
 				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));
 			}
-			
+			*/
 		case COLUMN_CONFIRMED_BALANCE:
 			
 			if(this.asset == null || this.asset.getKey() == 0l)
@@ -100,6 +101,20 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));
 			}
 			
+		case COLUMN_WAINTING_BALANCE:
+			
+			if(this.asset == null || this.asset.getKey() == 0l)
+			{
+				return NumberAsString.getInstance().numberAsString(account.getBalance(0).subtract(account.getConfirmedBalance()));	
+			}
+			else
+			{
+				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).subtract(account.getConfirmedBalance(this.asset.getKey())));
+			}
+			
+			
+		/*	
+			
 		case COLUMN_GENERATING_BALANCE:
 			
 			if(this.asset == null || this.asset.getKey() == 0l)
@@ -110,6 +125,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			{
 				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(8));
 			}
+			*/
 			
 		}
 		
