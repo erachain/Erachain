@@ -1,10 +1,9 @@
-/data
+/data*
 /Data Files
-/wallet
-/ACCOUNTS.txt
-/settings.ini
+/wallet*
 /bin/
-/dataBak/
-ERM.jar
+/languages/
+settings.json
+/ACCOUNTS.txt
 *.zip
 /ERM.iml
