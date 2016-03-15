@@ -117,7 +117,8 @@ public abstract class Transaction {
 	public static final int ACCOUNTING_TRANSACTION = 26;
 	public static final int JSON_TRANSACTION = 27;
 	
-	//MINIMUM FEE
+	// FEE KEY = OIL
+	public static final int FEE_KEY = 1;
 	public static final BigDecimal FEE_PER_BYTE = new BigDecimal(0.00000001);
 	
 	//RELEASES
@@ -184,7 +185,7 @@ public abstract class Transaction {
 	//protected static final int HKEY_LENGTH = 20;
 	protected static final int AMOUNT_LENGTH = 8;
 	protected static final int CREATOR_LENGTH = 32;
-	protected static final int FEE_LENGTH = 8;
+	// not need now protected static final int FEE_LENGTH = 8;
 	protected static final int SIGNATURE_LENGTH = 64;
 		
 	protected byte[] reference;
@@ -270,10 +271,11 @@ public abstract class Transaction {
 		
 	public boolean isValidFee()
 	{
-		return this.fee.compareTo(getMinFee()) >= 0;
+		// must be equal - fee calced by FeePower
+		return this.fee.compareTo(calcBaseFee()) >= 0;
 	}
 		
-	public BigDecimal getMinFee()
+	public BigDecimal calcCommonFee()
 	{		
 		BigDecimal fee =  new BigDecimal(this.getDataLength() + 100).multiply(FEE_PER_BYTE).setScale(8, RoundingMode.HALF_UP);
 		if (this.getDataLength() <= 1000) {
@@ -283,25 +285,14 @@ public abstract class Transaction {
 			return fee.add(new BigDecimal(this.getDataLength() - 1000).multiply(FEE_PER_BYTE)).setScale(8, RoundingMode.HALF_UP);
 		}
 	}
+	
+	// get personal fee
+	public abstract BigDecimal calcBaseFee();
+	
 	// calc FEE by recommended and feePOW
 	public void calcFee()
 	{	
-		this.fee = calcRecommendedFee().multiply(new BigDecimal(2^this.feePow)).setScale(8, RoundingMode.UP);
-	}
-	public static BigDecimal calcFee(int lenght, int feePow)
-	{	
-		return calcRecommendedFee(lenght).multiply(new BigDecimal(2^feePow)).setScale(8, RoundingMode.UP);
-	}
-	// calc recommended FEE
-	public BigDecimal calcRecommendedFee()
-	{	
-		int feePower = 2; // will be calc in future
-		return getMinFee().multiply(new BigDecimal(feePower)).setScale(8);
-	}
-	public static BigDecimal calcRecommendedFee(int lenght)
-	{	
-		int feePower = 2; // will be calc in future
-		return new BigDecimal( lenght ).multiply(new BigDecimal(feePower)).setScale(8);
+		this.fee = calcBaseFee().multiply(new BigDecimal(2^this.feePow)).setScale(8, RoundingMode.UP);
 	}
 	
 	//CHECK MIMIMUM FEE_POW
@@ -375,12 +366,24 @@ public abstract class Transaction {
 	{
 		this.process(DBSet.getInstance());
 	}
+	public void process_fee(DBSet db)
+	{
+		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
+			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(this.fee), db);
+
+	}
 		
 	public abstract void process(DBSet db);
 
 	public void orphan()
 	{
 		this.orphan(DBSet.getInstance());
+	}
+	public void orphan_fee(DBSet db)
+	{
+		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
+			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
+
 	}
 	
 	public abstract void orphan(DBSet db);

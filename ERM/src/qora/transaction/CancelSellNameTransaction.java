@@ -234,7 +234,7 @@ public class CancelSellNameTransaction extends Transaction
 	public void process(DBSet db) 
 	{
 		//UPDATE creator
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 												
 		//UPDATE REFERENCE OF creator
 		this.creator.setLastReference(this.signature, db);
@@ -252,7 +252,7 @@ public class CancelSellNameTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE creator
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 												
 		//UPDATE REFERENCE OF creator
 		this.creator.setLastReference(this.reference, db);
@@ -306,4 +306,7 @@ public class CancelSellNameTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 	
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

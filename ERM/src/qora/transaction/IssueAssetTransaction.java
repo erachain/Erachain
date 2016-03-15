@@ -60,12 +60,6 @@ public class IssueAssetTransaction extends Transaction
 		return this.asset;
 	}
 	
-	public BigDecimal getMinFee()
-	{
-		BigDecimal fee = super.getMinFee();
-		return fee.multiply(BigDecimal.TEN);
-	}
-
 	
 	@Override
 	public void sign(PrivateKeyAccount creator)
@@ -259,7 +253,7 @@ public class IssueAssetTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -279,7 +273,7 @@ public class IssueAssetTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -341,5 +335,8 @@ public class IssueAssetTransaction extends Transaction
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), this.asset.getKey(), new BigDecimal(this.asset.getQuantity()).setScale(8));
 
 		return assetAmount;
+	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee().add(Transaction.FEE_PER_BYTE.multiply(new BigDecimal(1000)));
 	}
 }

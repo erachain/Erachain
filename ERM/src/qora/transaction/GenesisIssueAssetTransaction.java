@@ -266,4 +266,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		return assetAmount;
 	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

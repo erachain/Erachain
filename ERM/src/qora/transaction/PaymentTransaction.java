@@ -211,7 +211,8 @@ public class PaymentTransaction extends Transaction {
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount).subtract(this.fee), db);
+		process_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.recipient.getConfirmedBalance(db).add(this.amount), db);
@@ -230,7 +231,8 @@ public class PaymentTransaction extends Transaction {
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount).add(this.fee), db);
+		orphan_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.recipient.getConfirmedBalance(db).subtract(this.amount), db);
@@ -305,4 +307,7 @@ public class PaymentTransaction extends Transaction {
 		return assetAmount;
 	}
 	
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

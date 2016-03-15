@@ -195,9 +195,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 
 		// UPDATE CREATOR
-		this.getCreator().setConfirmedBalance(this.getCreator().getConfirmedBalance(db)
-				.subtract(this.fee), db);
-
+		process_fee(db);
+		
 		// UPDATE REFERENCE OF CREATOR
 		this.getCreator().setLastReference(this.signature, db);
 
@@ -225,9 +224,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// }
 
 		// UPDATE CREATOR
-		this.getCreator().setConfirmedBalance(this.getCreator().getConfirmedBalance(db)
-				.add(this.fee), db);
-
+		orphan_fee(db);
+		
 		// UPDATE REFERENCE OF CREATOR
 		this.getCreator().setLastReference(this.reference, db);
 
@@ -453,5 +451,9 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 			}
 		}
+	}
+
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 }

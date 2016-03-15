@@ -221,7 +221,7 @@ public class RegisterNameTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		//UPDATE OWNER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 								
 		//UPDATE REFERENCE OF OWNER
 		this.creator.setLastReference(this.signature, db);
@@ -235,7 +235,7 @@ public class RegisterNameTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE OWNER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 										
 		//UPDATE REFERENCE OF OWNER
 		this.creator.setLastReference(this.reference, db);
@@ -287,5 +287,9 @@ public class RegisterNameTransaction extends Transaction
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 		
 		return assetAmount;
+	}
+
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 }

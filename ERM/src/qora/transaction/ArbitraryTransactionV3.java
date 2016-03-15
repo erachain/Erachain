@@ -289,4 +289,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		return VALIDATE_OK;
 	}
+
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
+
 }

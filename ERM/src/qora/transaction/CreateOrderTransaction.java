@@ -304,7 +304,7 @@ public class CreateOrderTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -318,7 +318,7 @@ public class CreateOrderTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -370,5 +370,8 @@ public class CreateOrderTransaction extends Transaction
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(), this.order.getAmount());
 		
 		return assetAmount;
+	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 }

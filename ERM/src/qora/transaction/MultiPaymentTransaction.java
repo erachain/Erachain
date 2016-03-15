@@ -272,7 +272,7 @@ public class MultiPaymentTransaction extends Transaction {
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 						
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -294,7 +294,7 @@ public class MultiPaymentTransaction extends Transaction {
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 						
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -392,6 +392,9 @@ public class MultiPaymentTransaction extends Transaction {
 		}
 		
 		return assetAmount;
+	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 	
 }

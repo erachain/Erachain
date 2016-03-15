@@ -258,7 +258,8 @@ public class BuyNameTransaction extends Transaction
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee).subtract(this.nameSale.getAmount()), db);
+		process_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
@@ -280,7 +281,8 @@ public class BuyNameTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee).add(this.nameSale.getAmount()), db);
+		orphan_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		this.seller.setConfirmedBalance(this.seller.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
@@ -342,5 +344,8 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		return BigDecimal.ZERO.setScale(8);
+	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 }

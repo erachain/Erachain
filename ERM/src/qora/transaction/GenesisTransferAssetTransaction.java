@@ -312,12 +312,6 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 		
-		//IF CREATOR
-		if(address.equals(this.creator.getAddress()))
-		{
-			amount = amount.subtract(this.fee);
-		}
-
 		//IF QORA ASSET
 		if(this.key == BalanceMap.QORA_KEY)
 		{
@@ -341,12 +335,13 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
-		
+				
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
 		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
 		
 		return assetAmount;
+	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 }

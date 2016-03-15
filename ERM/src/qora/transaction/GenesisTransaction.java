@@ -264,4 +264,7 @@ public class GenesisTransaction extends Transaction {
 		
 		return assetAmount;
 	}
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

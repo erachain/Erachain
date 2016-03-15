@@ -402,7 +402,8 @@ public class DeployATTransaction extends Transaction
 	public void process(DBSet db) 
 	{
 		//UPDATE ISSUER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount.add(this.fee)), db);
+		process_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount), db);
 
 		//UPDATE REFERENCE OF ISSUER
 		this.creator.setLastReference(this.signature, db);
@@ -465,7 +466,8 @@ public class DeployATTransaction extends Transaction
 	@Override
 	public void orphan(DBSet db) {
 		//UPDATE ISSUER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount.add(this.fee)), db);
+		orphan_fee(db);
+		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount), db);
 
 		//UPDATE REFERENCE OF ISSUER
 		this.creator.setLastReference(this.reference, db);
@@ -539,4 +541,7 @@ public class DeployATTransaction extends Transaction
 		return assetAmount;
 	}
 
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

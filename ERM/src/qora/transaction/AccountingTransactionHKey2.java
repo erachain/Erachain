@@ -341,7 +341,7 @@ public class AccountingTransactionHKey2 extends Transaction {
 	@Override
 	public void process(DBSet db) {
 		//UPDATE SENDER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
@@ -355,7 +355,7 @@ public class AccountingTransactionHKey2 extends Transaction {
 	@Override
 	public void orphan(DBSet db) {
 		//UPDATE SENDER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
@@ -378,6 +378,10 @@ public class AccountingTransactionHKey2 extends Transaction {
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+	}
+
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
 	}
 
 }

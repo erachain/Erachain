@@ -59,11 +59,6 @@ public class CreatePollTransaction extends Transaction
 	{
 		return this.poll;
 	}
-	public BigDecimal getMinFee()
-	{
-		BigDecimal fee = super.getMinFee();
-		return fee.multiply(BigDecimal.TEN);
-	}
 
 	//PARSE CONVERT
 	
@@ -282,7 +277,7 @@ public class CreatePollTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -296,7 +291,7 @@ public class CreatePollTransaction extends Transaction
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -352,4 +347,7 @@ public class CreatePollTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee();
+	}
 }

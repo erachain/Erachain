@@ -35,7 +35,7 @@ public class AccountingTransaction extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
 	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		super(ACCOUNTING_TRANSACTION, creator, timestamp, reference);
@@ -221,12 +221,6 @@ public class AccountingTransaction extends Transaction {
 		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 		position += IS_TEXT_LENGTH;
 		
-		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;
-
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
@@ -354,10 +348,12 @@ public class AccountingTransaction extends Transaction {
 		return VALIDATE_OK;
 	}
 
-	@Override
+	//@Override
 	public void process(DBSet db) {
+
 		//UPDATE SENDER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.fee), db);
+		process_fee(db);
+
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
@@ -379,7 +375,8 @@ public class AccountingTransaction extends Transaction {
 	@Override
 	public void orphan(DBSet db) {
 		//UPDATE SENDER
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.fee), db);
+		orphan_fee(db);
+		
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
@@ -409,6 +406,10 @@ public class AccountingTransaction extends Transaction {
 		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
 		
 		return assetAmount;
+	}
+	
+	public BigDecimal calcBaseFee() {
+		return calcCommonFee().subtract(Transaction.FEE_PER_BYTE.multiply(new BigDecimal(70)));
 	}
 }
 
