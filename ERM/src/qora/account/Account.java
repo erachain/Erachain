@@ -279,7 +279,9 @@ public class Account {
 	
 	public String toString(long key)
 	{
-		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key)) + " - " + this.getAddress();
+		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
+				+ " [" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(1l)) + "]"
+				+ " - " + this.getAddress();
 	}
 	
 	//EQUALS
