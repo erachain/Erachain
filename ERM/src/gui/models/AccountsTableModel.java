@@ -21,9 +21,10 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 //	public static final int COLUMN_BALANCE = 1;
 	public static final int COLUMN_CONFIRMED_BALANCE = 1;
 	public static final int COLUMN_WAINTING_BALANCE = 2;
-	public static final int COLUMN_GENERATING_BALANCE = 3;
+	//public static final int COLUMN_GENERATING_BALANCE = 3;
+	public static final int COLUMN_OIL_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance","Waiting", "Fee"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", "OILs"});
 	private List<Account> accounts;
 	private Asset asset = null;
 	
@@ -111,6 +112,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			{
 				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).subtract(account.getConfirmedBalance(this.asset.getKey())));
 			}
+		case COLUMN_OIL_BALANCE:
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(1l));
 			
 			
 		/*	

@@ -89,9 +89,9 @@ public class AccountsPanel extends JPanel implements ItemListener
 		final JTable table = Gui.createSortableTable(tableModel, 1);
 		
 		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-		sorter.setComparator(AccountsTableModel.COLUMN_BALANCE, new BigDecimalStringComparator());
 		sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
-		sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
+		sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
+		sorter.setComparator(AccountsTableModel.COLUMN_OIL_BALANCE, new BigDecimalStringComparator());
 		
 		//ON FAVORITES CHANGE
 		cbxFavorites.addItemListener(this);
