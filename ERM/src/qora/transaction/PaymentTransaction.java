@@ -24,7 +24,7 @@ import database.DBSet;
 
 public class PaymentTransaction extends Transaction {
 
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
 
 	private BigDecimal amount;
 	private Account recipient;
@@ -36,15 +36,17 @@ public class PaymentTransaction extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 	}
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, recipient, amount, timestamp, reference);		
-		this.fee = fee;
 		this.signature = signature;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, int feePow, long timestamp, byte[] reference) 
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, recipient, amount, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -94,15 +96,15 @@ public class PaymentTransaction extends Transaction {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new PaymentTransaction(creator, recipient, amount, fee, timestamp, reference, signatureBytes);	
+		return new PaymentTransaction(creator, recipient, amount, feePow, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -150,11 +152,10 @@ public class PaymentTransaction extends Transaction {
 		amountBytes = Bytes.concat(fill, amountBytes);
 		data = Bytes.concat(data, amountBytes);
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

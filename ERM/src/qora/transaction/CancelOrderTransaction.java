@@ -27,7 +27,7 @@ import database.DBSet;
 public class CancelOrderTransaction extends Transaction
 {
 	private static final int ORDER_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + ORDER_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + ORDER_LENGTH + SIGNATURE_LENGTH;
 	
 	private BigInteger order;
 	
@@ -35,13 +35,15 @@ public class CancelOrderTransaction extends Transaction
 		super(CANCEL_ORDER_TRANSACTION, creator, timestamp, reference);
 		this.order = order;
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
 		this(creator, order, timestamp, reference);
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, int feeOpw, long timestamp, byte[] reference) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
 		this(creator, order, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -83,15 +85,15 @@ public class CancelOrderTransaction extends Transaction
 		BigInteger order = new BigInteger(orderBytes);
 		position += ORDER_LENGTH;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CancelOrderTransaction(creator, order, fee, timestamp, reference, signatureBytes);
+		return new CancelOrderTransaction(creator, order, feePow, timestamp, reference, signatureBytes);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -135,11 +137,10 @@ public class CancelOrderTransaction extends Transaction
 		orderBytes = Bytes.concat(fill, orderBytes);
 		data = Bytes.concat(data, orderBytes);
 				
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

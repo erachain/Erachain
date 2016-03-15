@@ -116,7 +116,7 @@ public class TransactionCreator
 		
 		//CREATE PAYMENT
 		//PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, feePow, time, sender.getLastReference(this.fork));
-		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, feePow, time, sender.getLastReference(this.fork));
+		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, (byte)feePow, time, sender.getLastReference(this.fork));
 		payment.sign(sender);
 		
 		//VALIDATE AND PROCESS
@@ -132,7 +132,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 		
 		//CREATE NAME REGISTRATION
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, feePow, time, creator.getLastReference(this.fork));
+		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameRegistration.sign(creator);
 		
 		//VALIDATE AND PROCESS
@@ -148,7 +148,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, feePow, time, creator.getLastReference(this.fork));
+		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameUpdate.sign(creator);
 		
 		//VALIDATE AND PROCESS
@@ -163,7 +163,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE NAME SALE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, feePow, time, creator.getLastReference(this.fork));
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameSaleTransaction.sign(creator);
 				
 		//VALIDATE AND PROCESS
@@ -178,7 +178,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), feePow, time, creator.getLastReference(this.fork));
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte)feePow, time, creator.getLastReference(this.fork));
 		cancelNameSaleTransaction.sign(creator);
 				
 		//VALIDATE AND PROCESS
@@ -194,7 +194,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE NAME PURCHASE
-		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), feePow, time, creator.getLastReference(this.fork));
+		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte)feePow, time, creator.getLastReference(this.fork));
 		namePurchase.sign(creator);
 				
 		//VALIDATE AND PROCESS
@@ -210,7 +210,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 					
 		//CREATE POLL CREATION
-		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, feePow, time, creator.getLastReference(this.fork));
+		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte)feePow, time, creator.getLastReference(this.fork));
 		pollCreation.sign(creator);
 						
 		//VALIDATE AND PROCESS
@@ -247,7 +247,7 @@ public class TransactionCreator
 						
 					
 		//CREATE POLL VOTE
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, feePow, time, creator.getLastReference(this.fork));
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, (byte)feePow, time, creator.getLastReference(this.fork));
 		pollVote.sign(creator);
 						
 		//VALIDATE AND PROCESS
@@ -283,7 +283,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 
 		Transaction arbitraryTransaction;
-		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, feePow, time, creator.getLastReference(this.fork));
+		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte)feePow, time, creator.getLastReference(this.fork));
 		arbitraryTransaction.sign(creator);
 		
 		//VALIDATE AND PROCESS
@@ -331,7 +331,7 @@ public class TransactionCreator
 		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueAssetTransaction.sign(creator);
 		
 //		byte[] signature = issueAssetTransaction.getSignature();
@@ -353,7 +353,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, feePow, time, creator.getLastReference(this.fork));
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, (byte)feePow, time, creator.getLastReference(this.fork));
 		createOrderTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
@@ -369,7 +369,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE PRDER TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), feePow, time, creator.getLastReference(this.fork));
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), (byte)feePow, time, creator.getLastReference(this.fork));
 		cancelOrderTransaction.sign(creator);
 								
 		//VALIDATE AND PROCESS
@@ -385,7 +385,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(creator, recipient, asset.getKey(), amount, feePow, time, creator.getLastReference(this.fork));
+		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(creator, recipient, asset.getKey(), amount, (byte)feePow, time, creator.getLastReference(this.fork));
 		assetTransfer.sign(creator);
 		
 		//VALIDATE AND PROCESS
@@ -401,7 +401,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//CREATE MULTI PAYMENTS
-		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, feePow, time, creator.getLastReference(this.fork));
+		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, (byte)feePow, time, creator.getLastReference(this.fork));
 		multiPayment.sign(creator);
 		
 		//VALIDATE AND PROCESS
@@ -417,7 +417,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//DEPLOY AT
-		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, feePow, time, creator.getLastReference(this.fork));
+		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte)feePow, time, creator.getLastReference(this.fork));
 		deployAT.sign(creator);
 		
 		return this.afterCreate(deployAT);
@@ -435,7 +435,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new MessageTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new MessageTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator);
 			
 		return afterCreate(messageTx);
@@ -451,7 +451,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new JsonTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator);
 			
 		return afterCreate(messageTx);
@@ -467,7 +467,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 				
 		//CREATE ACCOunting TRANSACTION
-		Transaction messageTx = new AccountingTransaction(sender, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));		
+		Transaction messageTx = new AccountingTransaction(sender, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));		
 		messageTx.sign(sender);
 		
 			
@@ -483,7 +483,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator);
 			
 		return afterCreate(messageTx);

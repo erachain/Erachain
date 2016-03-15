@@ -42,7 +42,7 @@ public class DeployATTransaction extends Transaction
 	private static final int TAGS_SIZE_LENGTH = 4;
 	private static final int CREATION_BYTES_SIZE_LENGTH = 4;
 	//private static final int AMOUNT_LENGTH = 8;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH + TYPE_SIZE_LENGTH + TAGS_SIZE_LENGTH + CREATION_BYTES_SIZE_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH + TYPE_SIZE_LENGTH + TAGS_SIZE_LENGTH + CREATION_BYTES_SIZE_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
 
 
 	private String name;
@@ -63,16 +63,17 @@ public class DeployATTransaction extends Transaction
 		this.tags = tags;
 		this.amount = quantity;
 	}
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
-
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, int feePow, long timestamp, byte[] reference) 
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -176,15 +177,15 @@ public class DeployATTransaction extends Transaction
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;	
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;	
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, fee, timestamp, reference, signatureBytes);
+		return new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, feePow, timestamp, reference, signatureBytes);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -275,11 +276,10 @@ public class DeployATTransaction extends Transaction
 		amountBytes = Bytes.concat(fillAmount, amountBytes);
 		data = Bytes.concat(data, amountBytes);
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

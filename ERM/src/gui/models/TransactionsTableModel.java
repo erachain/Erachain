@@ -17,11 +17,12 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 	
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
-	public static final int COLUMN_FEE = 2;
+	public static final int COLUMN_AMOUNT = 2;
+	public static final int COLUMN_FEE = 3;
 	
 	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "OIL"});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 	
 
@@ -85,6 +86,10 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 			case COLUMN_TYPE:
 				
 				return Lang.transactionTypes[transaction.getType()];
+				
+			case COLUMN_AMOUNT:
+				
+				return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
 				
 			case COLUMN_FEE:
 				

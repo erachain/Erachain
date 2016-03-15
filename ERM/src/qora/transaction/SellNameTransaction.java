@@ -25,7 +25,7 @@ import database.DBSet;
 
 public class SellNameTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
 	private NameSale nameSale;
@@ -37,16 +37,17 @@ public class SellNameTransaction extends Transaction
 		this.creator = creator;
 		this.nameSale = nameSale;
 	}
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, nameSale, timestamp, reference);
-
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, int feePow, long timestamp, byte[] reference) 
+	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, nameSale, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -86,15 +87,15 @@ public class SellNameTransaction extends Transaction
 		NameSale nameSale = NameSale.Parse(Arrays.copyOfRange(data, position, data.length));
 		position += nameSale.getDataLength();
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new SellNameTransaction(creator, nameSale, fee, timestamp, reference, signatureBytes);
+		return new SellNameTransaction(creator, nameSale, feePow, timestamp, reference, signatureBytes);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -136,11 +137,10 @@ public class SellNameTransaction extends Transaction
 		//WRITE NAMESALE
 		data = Bytes.concat(data, this.nameSale.toBytes());
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

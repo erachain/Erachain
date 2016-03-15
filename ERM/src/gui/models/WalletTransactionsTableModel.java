@@ -31,10 +31,11 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 	public static final int COLUMN_TYPE = 2;
 	public static final int COLUMN_ADDRESS = 3;
 	public static final int COLUMN_AMOUNT = 4;
+	public static final int COLUMN_FEE = 5;
 	
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Address", "Amount"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Address", "Amount", "Fee"});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	public WalletTransactionsTableModel()
@@ -110,6 +111,14 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 			case COLUMN_AMOUNT:
 				
 				return NumberAsString.getInstance().numberAsString(transaction.getAmount(account));			
+
+			case COLUMN_FEE:
+				
+				String address = account.getAddress();
+				
+				if(address.equals(transaction.getCreator().getAddress()))
+					return NumberAsString.getInstance().numberAsString(transaction.getFee());			
+				return "{" + NumberAsString.getInstance().numberAsString(transaction.getFee()) + "}";			
 			}
 			
 			return null;

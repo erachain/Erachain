@@ -21,7 +21,7 @@ import qora.account.Account;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
-import utils.Converter;
+//import utils.Converter;
 
 
 
@@ -35,11 +35,10 @@ public class AccountingTransaction extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
 	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		super(ACCOUNTING_TRANSACTION, creator, timestamp, reference);
-
 		this.data = data;
 		this.recipient = recipient;
 		this.key = key;
@@ -47,14 +46,14 @@ public class AccountingTransaction extends Transaction {
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
-
+		this.feePow = feePow;
 		this.signature = signature;
-		this.fee = fee;
 	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 
 	}
@@ -206,6 +205,11 @@ public class AccountingTransaction extends Transaction {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
+
 		//READ DATA SIZE
 		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
 		int dataSize = Ints.fromByteArray(dataSizeBytes);	
@@ -224,7 +228,7 @@ public class AccountingTransaction extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new AccountingTransaction(creator, recipient, key, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new AccountingTransaction(creator, recipient, key, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -263,6 +267,11 @@ public class AccountingTransaction extends Transaction {
 		amountBytes = Bytes.concat(fill, amountBytes);
 		data = Bytes.concat(data, amountBytes);
 
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
+
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
 		data = Bytes.concat(data, dataSizeBytes);
@@ -275,12 +284,6 @@ public class AccountingTransaction extends Transaction {
 		
 		//WRITE ISTEXT
 		data = Bytes.concat(data, this.isText);
-
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
@@ -308,9 +311,11 @@ public class AccountingTransaction extends Transaction {
 			return INVALID_ADDRESS;
 		}
 		
+		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
+		this.creator.setConfirmedBalance(FEE_KEY,
+				this.creator.getConfirmedBalance(FEE_KEY, fork).subtract(this.fee), fork);
 
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
@@ -318,8 +323,8 @@ public class AccountingTransaction extends Transaction {
 			return NO_BALANCE;
 		}
 		
-		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
+		//CHECK IF SENDER HAS ENOUGH OIL BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
 		}

@@ -29,7 +29,7 @@ import database.DBSet;
 
 public class CreatePollTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
 	private Poll poll;
@@ -41,15 +41,17 @@ public class CreatePollTransaction extends Transaction
 		this.creator = creator;
 		this.poll = poll;
 	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, poll, timestamp, reference);		
-		this.fee = fee;
 		this.signature = signature;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, int feePow, long timestamp, byte[] reference) 
+	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, poll, timestamp, reference);		
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -90,15 +92,15 @@ public class CreatePollTransaction extends Transaction
 		Poll poll = Poll.parse(Arrays.copyOfRange(data, position, data.length));
 		position += poll.getDataLength();
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CreatePollTransaction(creator, poll, fee, timestamp, reference, signatureBytes);
+		return new CreatePollTransaction(creator, poll, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -148,11 +150,10 @@ public class CreatePollTransaction extends Transaction
 		//WRITE POLL
 		data = Bytes.concat(data , this.poll.toBytes());
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

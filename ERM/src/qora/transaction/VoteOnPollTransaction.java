@@ -30,7 +30,7 @@ public class VoteOnPollTransaction extends Transaction
 {
 	private static final int POLL_SIZE_LENGTH = 4;
 	private static final int OPTION_SIZE_LENGTH = 4;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + POLL_SIZE_LENGTH + OPTION_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + POLL_SIZE_LENGTH + OPTION_SIZE_LENGTH + SIGNATURE_LENGTH;
 
 	private String poll;
 	public int option;
@@ -43,15 +43,17 @@ public class VoteOnPollTransaction extends Transaction
 		this.poll = poll;
 		this.option = option;
 	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, poll, option, timestamp, reference);
-		this.fee = fee;
 		this.signature = signature;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, int feePow, long timestamp, byte[] reference) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, poll, option, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -113,15 +115,15 @@ public class VoteOnPollTransaction extends Transaction
 		int option = Ints.fromByteArray(optionBytes);
 		position += OPTION_SIZE_LENGTH;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new VoteOnPollTransaction(creator, poll, option, fee, timestamp, reference, signatureBytes);
+		return new VoteOnPollTransaction(creator, poll, option, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -174,11 +176,10 @@ public class VoteOnPollTransaction extends Transaction
 		optionBytes = Bytes.ensureCapacity(optionBytes, OPTION_SIZE_LENGTH, 0);
 		data = Bytes.concat(data, optionBytes);
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

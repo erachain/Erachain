@@ -1,7 +1,7 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,9 +20,9 @@ import qora.payment.Payment;
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	protected static final int SERVICE_LENGTH = 4;
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH
+	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH
 			+ REFERENCE_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
-			+ DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH
+			+ DATA_SIZE_LENGTH + SIGNATURE_LENGTH
 			+ PAYMENTS_SIZE_LENGTH;
 
 	public ArbitraryTransactionV3(PublicKeyAccount creator,
@@ -40,19 +40,21 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		this.data = data;
 	}
 	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, int feePow,
+			List<Payment> payments, int service, byte[] data, byte feePow,
 			long timestamp, byte[] reference) 
 	{
 		this(creator, payments, service, data, timestamp, reference);
+		this.feePow = feePow; 
 		this.calcFee();
 	}
 	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, BigDecimal fee,
+			List<Payment> payments, int service, byte[] data, byte feePow,
 			long timestamp, byte[] reference, byte[] signature) {
 		this(creator, payments, service, data, timestamp, reference);
-		this.fee = fee;
+		this.feePow = feePow;
 		this.reference = reference;
 		this.signature = signature;
+		this.calcFee();
 	}
 
 	// PARSE CONVERT
@@ -119,18 +121,17 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 				+ dataSize);
 		position += dataSize;
 
-		// READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position
-				+ FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 
 		// READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position
 				+ SIGNATURE_LENGTH);
 
 		return new ArbitraryTransactionV3(creator, payments, service,
-				arbitraryData, fee, timestamp, reference, signatureBytes);
+				arbitraryData, feePow, timestamp, reference, signatureBytes);
 	}
 
 	@Override
@@ -175,11 +176,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		// WRITE DATA
 		data = Bytes.concat(data, this.data);
 
-		// WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		// SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

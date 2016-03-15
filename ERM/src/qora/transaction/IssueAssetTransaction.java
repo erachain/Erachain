@@ -29,7 +29,7 @@ import database.DBSet;
 
 public class IssueAssetTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private Asset asset;
 	
@@ -39,17 +39,18 @@ public class IssueAssetTransaction extends Transaction
 		
 		this.asset = asset;
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, asset, timestamp, reference);
-		
+		this(creator, asset, timestamp, reference);		
 		this.signature = signature;
 		this.asset.setReference(signature);
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, int feePow, long timestamp, byte[] reference) 
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, asset, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -101,15 +102,15 @@ public class IssueAssetTransaction extends Transaction
 		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
 		position += asset.getDataLength();
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new IssueAssetTransaction(creator, asset, fee, timestamp, reference, signatureBytes);
+		return new IssueAssetTransaction(creator, asset, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -170,11 +171,10 @@ public class IssueAssetTransaction extends Transaction
 		//WRITE ASSET
 		data = Bytes.concat(data , this.asset.toBytes(withSign));
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
@@ -227,7 +227,7 @@ public class IssueAssetTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NO_BALANCE;
 		}
@@ -237,13 +237,7 @@ public class IssueAssetTransaction extends Transaction
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-		
+				
 		return VALIDATE_OK;
 	}
 	
@@ -317,10 +311,12 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public BigDecimal getAmount(Account account) 
 	{
+		/* 
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
 			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
 		}
+		*/
 		
 		return BigDecimal.ZERO;
 	}

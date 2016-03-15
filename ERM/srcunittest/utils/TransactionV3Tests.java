@@ -26,7 +26,7 @@ import qora.transaction.Transaction;
 
 public class TransactionV3Tests {
 
-	int FEE_POWER = 2;
+	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 
 	@Test
@@ -64,7 +64,7 @@ public class TransactionV3Tests {
 		MessageTransaction messageTransactionV3 = new MessageTransaction(
 				creator, recipient, 61l, //	ATFunding 
 				BigDecimal.valueOf(10).setScale(8), 
-				0, 
+				FEE_POWER, 
 				data, 
 				new byte[] { 1 },
 				new byte[] { 0 },
@@ -146,7 +146,7 @@ public class TransactionV3Tests {
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				creator, payments, 111, data,
-				0, 
+				FEE_POWER, 
 				timestamp,
 				creator.getLastReference(databaseSet)
 				);
@@ -232,7 +232,7 @@ public class TransactionV3Tests {
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				creator, payments, 111, data,
-				0, 
+				FEE_POWER, 
 				timestamp,
 				creator.getLastReference(databaseSet)
 				);

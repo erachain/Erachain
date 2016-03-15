@@ -1,6 +1,6 @@
 package qora.transaction;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,12 +24,12 @@ import qora.account.Account;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
-import utils.Converter;
+//import utils.Converter;
 
 
 public class AccountingTransactionHKey2 extends Transaction {
 	
-	protected static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + 1;
+	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH;
 
 	protected byte[] data;
 
@@ -51,16 +51,18 @@ public class AccountingTransactionHKey2 extends Transaction {
 		this.isText = isText;
 
 	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, BigDecimal fee, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 
 		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
-		this.fee = fee;
+		this.feePow = feePow;
 		this.signature = signature;
+		this.calcFee();
 
 	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, int feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 
 		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 
 	}
@@ -198,6 +200,11 @@ public class AccountingTransactionHKey2 extends Transaction {
 		amountBytes = Bytes.concat(fill, amountBytes);
 		data = Bytes.concat(data, amountBytes);
 
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
+
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
 		data = Bytes.concat(data, dataSizeBytes);
@@ -210,12 +217,6 @@ public class AccountingTransactionHKey2 extends Transaction {
 		
 		//WRITE ISTEXT
 		data = Bytes.concat(data, this.isText);
-
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
@@ -264,6 +265,11 @@ public class AccountingTransactionHKey2 extends Transaction {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
+
 		//READ DATA SIZE
 		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
 		int dataSize = Ints.fromByteArray(dataSizeBytes);	
@@ -279,16 +285,10 @@ public class AccountingTransactionHKey2 extends Transaction {
 		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 		position += IS_TEXT_LENGTH;
 		
-		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;
-
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new AccountingTransactionHKey2(creator, recipient, hkey, amount, fee, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new AccountingTransactionHKey2(creator, recipient, hkey, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 

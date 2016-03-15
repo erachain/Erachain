@@ -32,6 +32,7 @@ public abstract class Transaction {
 	public static final int INVALID_ADDRESS = 2;
 	public static final int NEGATIVE_AMOUNT = 3;
 	public static final int NEGATIVE_FEE = 4;
+	//public static final int NOT_ENOUGH_FEE = 4;
 	public static final int NO_BALANCE = 5;
 	public static final int INVALID_REFERENCE = 6;
 	
@@ -189,8 +190,8 @@ public abstract class Transaction {
 	protected static final int SIGNATURE_LENGTH = 64;
 		
 	protected byte[] reference;
-	protected BigDecimal fee = BigDecimal.ZERO.setScale(8);
-	protected int feePow = 0;
+	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
+	protected byte feePow = 0;
 	protected int type;
 	protected byte[] signature;
 	protected long timestamp;
@@ -216,18 +217,12 @@ public abstract class Transaction {
 		this(type, creator, timestamp, reference);
 		this.signature = signature;
 	}
-	// need for NEW from blockhain
-	protected Transaction(int type, PublicKeyAccount creator, BigDecimal fee, long timestamp, byte[] reference, byte[] signature)
-	{
-		this(type, creator, timestamp, reference, signature);
-		if (fee.compareTo(BigDecimal.ZERO) > 0 ) this.fee = fee.setScale(8);
-	}
 	// need for calculate fee by feePow into GUI
-	protected Transaction(int type, PublicKeyAccount creator, int feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
 		this(type, creator, timestamp, reference, signature);
 		if (feePow < -4 ) feePow = -4;
-		else if (feePow >4 ) feePow = 4;
+		else if (feePow > 4 ) feePow = 4;
 		this.feePow = feePow;
 	}
 

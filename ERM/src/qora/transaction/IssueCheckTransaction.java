@@ -28,7 +28,7 @@ import database.DBSet;
 
 public class IssueCheckTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private Asset asset;
 	
@@ -39,16 +39,17 @@ public class IssueCheckTransaction extends Transaction
 		this.creator = creator;
 		this.asset = asset;
 	}
-	public IssueCheckTransaction(PublicKeyAccount creator, Asset asset, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public IssueCheckTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, asset, timestamp, reference);
-		
+		this(creator, asset, timestamp, reference);		
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public IssueCheckTransaction(PublicKeyAccount creator, Asset asset, int feePow, long timestamp, byte[] reference) 
+	public IssueCheckTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, asset, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -89,15 +90,15 @@ public class IssueCheckTransaction extends Transaction
 		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
 		position += asset.getDataLength();
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new IssueCheckTransaction(creator, asset, fee, timestamp, reference, signatureBytes);
+		return new IssueCheckTransaction(creator, asset, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -141,11 +142,10 @@ public class IssueCheckTransaction extends Transaction
 		//WRITE ASSET
 		data = Bytes.concat(data , this.asset.toBytes(true));
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

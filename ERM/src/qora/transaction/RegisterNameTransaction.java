@@ -1,7 +1,7 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ import database.DBSet;
 
 public class RegisterNameTransaction extends Transaction 
 {
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
 	private Name name;
@@ -38,16 +38,17 @@ public class RegisterNameTransaction extends Transaction
 		this.creator = creator;
 		this.name = name;
 	}
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(creator, name, timestamp, reference);
-		
-		this.fee = fee;
-		this.signature = signature;
+		this.signature = signature;		
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, int feePow, long timestamp, byte[] reference) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, name, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -88,15 +89,15 @@ public class RegisterNameTransaction extends Transaction
 		Name name = Name.Parse(Arrays.copyOfRange(data, position, data.length));
 		position += name.getDataLength();
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new RegisterNameTransaction(creator, name, fee, timestamp, reference, signatureBytes);
+		return new RegisterNameTransaction(creator, name, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -139,11 +140,10 @@ public class RegisterNameTransaction extends Transaction
 		//WRITE NAME
 		data = Bytes.concat(data , this.name.toBytes());
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

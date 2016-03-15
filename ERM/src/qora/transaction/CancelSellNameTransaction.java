@@ -27,7 +27,7 @@ import database.DBSet;
 public class CancelSellNameTransaction extends Transaction
 {
 	private static final int NAME_SIZE_LENGTH = 4;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + SIGNATURE_LENGTH;
 	
 	//private PublicKeyAccount owner;
 	private String name;
@@ -37,14 +37,16 @@ public class CancelSellNameTransaction extends Transaction
 	
 		this.name = name;
 	}
-	public CancelSellNameTransaction(PublicKeyAccount creator, String name, int feePow, long timestamp, byte[] reference) {
+	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference) {
 		this(creator, name, timestamp, reference);
+		this.feePow =feePow; 
 		this.calcFee();
 	}
-	public CancelSellNameTransaction(PublicKeyAccount creator, String name, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
-		super(CANCEL_SELL_NAME_TRANSACTION, creator, fee, timestamp, reference, signature);
-		
+	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+		super(CANCEL_SELL_NAME_TRANSACTION, creator, timestamp, reference, signature);
 		this.name = name;
+		this.feePow =feePow; 
+		this.calcFee();
 	}
 	
 	//GETTERS/SETTERS
@@ -94,15 +96,15 @@ public class CancelSellNameTransaction extends Transaction
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CancelSellNameTransaction(creator, name, fee, timestamp, reference, signatureBytes);
+		return new CancelSellNameTransaction(creator, name, feePow, timestamp, reference, signatureBytes);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -149,11 +151,10 @@ public class CancelSellNameTransaction extends Transaction
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);

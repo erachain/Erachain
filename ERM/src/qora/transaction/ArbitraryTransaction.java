@@ -35,10 +35,10 @@ public abstract class ArbitraryTransaction extends Transaction {
 	protected List<Payment> payments;
 	
 	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
-		super(ARBITRARY_TRANSACTION, creator, timestamp, reference);		
+		super(ARBITRARY_TRANSACTION, creator, timestamp, reference);	
 	}
-	public ArbitraryTransaction(PublicKeyAccount creator, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
-		super(ARBITRARY_TRANSACTION, creator, fee, timestamp, reference, signature);		
+	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
+		super(ARBITRARY_TRANSACTION, creator, timestamp, reference, signature);
 	}
 		
 	// GETTERS/SETTERS

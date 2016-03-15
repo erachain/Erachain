@@ -47,9 +47,9 @@ public class txWindowTest {
 		
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				creator, payments, 111, data,
-				BigDecimal.valueOf(1).setScale(8), 
+				//BigDecimal.valueOf(1).setScale(8), 
 				Transaction.getPOWFIX_RELEASE(),
-				new byte[]{0},
+				//new byte[]{0},
 				new byte[]{0}
 				);
 		

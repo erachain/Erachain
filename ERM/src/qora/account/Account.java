@@ -274,13 +274,19 @@ public class Account {
 	@Override
 	public String toString()
 	{
-		return NumberAsString.getInstance().numberAsString(this.getBalance(0)) + " - " + this.getAddress();
+		/*
+		return NumberAsString.getInstance().numberAsString(this.getBalance(0))
+				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
+				+ " - " + this.getAddress();
+				*/
+		return this.getConfirmedBalance(Transaction.FEE_KEY)
+				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " [" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(1l)) + "]"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.FEE_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	

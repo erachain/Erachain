@@ -26,13 +26,7 @@ import database.DBSet;
 
 public class TransferAssetTransaction extends Transaction {
 
-	//private static final int CREATOR_LENGTH = 32;
-	//private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	//private static final int KEY_LENGTH = 8;
-	//private static final int AMOUNT_LENGTH = 12;
-	//private static final int FEE_LENGTH = 8;
-	//private static final int SIGNATURE_LENGTH = 64;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
 
 	private Account recipient;
 	private BigDecimal amount;
@@ -45,16 +39,17 @@ public class TransferAssetTransaction extends Transaction {
 		this.amount = amount;
 		this.key = key;
 	}
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) 
+	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, recipient, key, amount, timestamp, reference);
-		
+		this(creator, recipient, key, amount, timestamp, reference);		
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, int feePow, long timestamp, byte[] reference) 
+	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(creator, recipient, key, amount, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 		
 	}
@@ -117,15 +112,15 @@ public class TransferAssetTransaction extends Transaction {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new TransferAssetTransaction(creator, recipient, key, amount, fee, timestamp, reference, signatureBytes);	
+		return new TransferAssetTransaction(creator, recipient, key, amount, feePow, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -179,11 +174,10 @@ public class TransferAssetTransaction extends Transaction {
 		amountBytes = Bytes.concat(fill, amountBytes);
 		data = Bytes.concat(data, amountBytes);
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
@@ -337,26 +331,14 @@ public class TransferAssetTransaction extends Transaction {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 		
-		//IF CREATOR
 		if(address.equals(this.creator.getAddress()))
 		{
-			amount = amount.subtract(this.fee);
-		}
-
-		//IF QORA ASSET
-		if(this.key == BalanceMap.QORA_KEY)
-		{
 			//IF CREATOR
-			if(address.equals(this.creator.getAddress()))
-			{
-				amount = amount.subtract(this.amount);
-			}
-			
+			amount = amount.subtract(this.amount);
+		} else if (address.equals(this.recipient.getAddress()))
+		{
 			//IF RECIPIENT
-			if(address.equals(this.recipient.getAddress()))
-			{
-				amount = amount.add(this.amount);
-			}
+			amount = amount.add(this.amount);
 		}
 		
 		return amount;

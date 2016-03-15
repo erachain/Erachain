@@ -1,7 +1,7 @@
 package qora.transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,25 +29,25 @@ import database.DBSet;
 public class BuyNameTransaction extends Transaction
 {
 	private static final int SELLER_LENGTH = RECIPIENT_LENGTH;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SELLER_LENGTH + FEE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SELLER_LENGTH + SIGNATURE_LENGTH;
 	
 	private NameSale nameSale;
 	private Account seller;
 	
 	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, long timestamp, byte[] reference) {
 		super(BUY_NAME_TRANSACTION, creator, timestamp, reference);
-		
 		this.nameSale = nameSale;
 		this.seller = seller;
 	}
-	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, BigDecimal fee, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, nameSale, seller, timestamp, reference);
-		
+	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+		this(creator, nameSale, seller, timestamp, reference);		
 		this.signature = signature;
-		this.fee = fee;
+		this.feePow = feePow;
+		this.calcFee();
 	}
-	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, int feePow, long timestamp, byte[] reference) {
+	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference) {
 		this(creator, nameSale, seller, timestamp, reference);
+		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -103,15 +103,15 @@ public class BuyNameTransaction extends Transaction
 		Account seller = new Account(Base58.encode(recipientBytes));
 		position += SELLER_LENGTH;
 		
-		//READ FEE
-		byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-		BigDecimal fee = new BigDecimal(new BigInteger(feeBytes), 8);
-		position += FEE_LENGTH;		
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new BuyNameTransaction(creator, nameSale, seller, fee, timestamp, reference, signatureBytes);
+		return new BuyNameTransaction(creator, nameSale, seller, feePow, timestamp, reference, signatureBytes);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -157,11 +157,10 @@ public class BuyNameTransaction extends Transaction
 		//WRITE SELLER
 		data = Bytes.concat(data, Base58.decode(this.seller.getAddress()));
 		
-		//WRITE FEE
-		byte[] feeBytes = this.fee.unscaledValue().toByteArray();
-		byte[] fill = new byte[FEE_LENGTH - feeBytes.length];
-		feeBytes = Bytes.concat(fill, feeBytes);
-		data = Bytes.concat(data, feeBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
