@@ -1,7 +1,12 @@
+// 17/03
+import java.io.File;
 import java.util.Scanner;
-// upd 09/03
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import api.ApiClient;
 import controller.Controller;
@@ -11,9 +16,14 @@ import settings.Settings;
 import utils.SysTray;
 
 public class Start {
+	
+	static Logger LOGGER = Logger.getLogger(Start.class.getName());
 
 	public static void main(String args[])
 	{	
+		
+		PropertyConfigurator.configure(new File( "log4j.properties").getAbsolutePath());
+		
 		boolean cli = false;
 		
 		for(String arg: args)
@@ -37,16 +47,17 @@ public class Start {
 		{			
 			try
 			{
+				
 				//ONE MUST BE ENABLED
 				if(!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled())
 				{
 					throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
 				}
 				
-				System.out.println(Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
+				System.out.println(Lang.getInstance().translate("Starting %qora% / version: %version% / build date: %builddate% / ...")
 						.replace("%version%", Controller.getInstance().getVersion())
 						.replace("%builddate%", Controller.getInstance().getBuildDateString())
-						.replace("%app%", Lang.getInstance().translate("ERMbase"))
+						.replace("%qora%", Lang.getInstance().translate("Qora"))
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC

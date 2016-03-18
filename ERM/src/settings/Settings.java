@@ -1,4 +1,5 @@
 package settings;
+// 17/03
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,11 +42,11 @@ public class Settings {
 	private static final String[] DEFAULT_PEERS = { };
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP =   1457800492336L;
+	public static final long DEFAULT_MAINNET_STAMP = 1458235285336L; // QORA RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
-	private static final int DEFAULT_RPC_PORT = 9183;
+	private static final int DEFAULT_RPC_PORT = 9085;
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_RPC_ENABLED = true;
 	
@@ -53,15 +54,12 @@ public class Settings {
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
 	
 	//WEB
-	private static final int DEFAULT_WEB_PORT = 9180;
+	private static final int DEFAULT_WEB_PORT = 9090;
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_WEB_ENABLED = true;
 	
 	//GUI
 	private static final boolean DEFAULT_GUI_ENABLED = true;
-	
-	//SETTINGS.JSON FILE
-	private static final String DEFAULT_SETTINGS_PATH = "settings.json";
 	
 	//DATA
 	private static final String DEFAULT_DATA_DIR = "data";
@@ -86,15 +84,14 @@ public class Settings {
 	private static final boolean DEFAULT_NS_UPDATE = false;
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
 	
-	private static String DEFAULT_LANGUAGE = "eng.lng";
+	public static String DEFAULT_LANGUAGE = "en.json";
 	
 	private static Settings instance;
 	
 	private JSONObject settingsJSON;
 	private JSONObject peersJSON;
 
-	private String currentSettingsPath;
-	private String currentPeersPath;
+	private String userPath = "";
 
 	private InetAddress localAddress;
 	
@@ -123,15 +120,14 @@ public class Settings {
 	{
 		this.localAddress = this.getCurrentIp();
 		int alreadyPassed = 0;
-		String settingsFilePath = "settings.json";
 		
+		File file = new File("");
 		try
 		{
 			while(alreadyPassed<2)
 			{
 				//OPEN FILE
-				File file = new File(settingsFilePath);
-				currentSettingsPath = settingsFilePath;
+				file = new File(this.userPath + "settings.json");
 				
 				//CREATE FILE IF IT DOESNT EXIST
 				if(!file.exists())
@@ -149,12 +145,18 @@ public class Settings {
 				
 				//CREATE JSON OBJECT
 				this.settingsJSON = (JSONObject) JSONValue.parse(jsonString);
+				settingsJSON =	settingsJSON == null ? new JSONObject() : settingsJSON;
 				
 				alreadyPassed++;
 				
-				if(this.settingsJSON.containsKey("settingspath"))
+				if(this.settingsJSON.containsKey("userpath"))
 				{
-					settingsFilePath = (String) this.settingsJSON.get("settingspath");
+					this.userPath = (String) this.settingsJSON.get("userpath");
+					
+					if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
+					{
+						this.userPath += "/"; 
+					}
 				}
 				else
 				{
@@ -165,7 +167,8 @@ public class Settings {
 		catch(Exception e)
 		{
 			//STOP
-			System.out.println("ERROR reading settings.json. closing");
+			System.out.println("Error while reading/creating settings.json " + file.getAbsolutePath());
+			e.printStackTrace();
 			System.exit(0);
 		}
 		
@@ -173,7 +176,7 @@ public class Settings {
 		try
 		{
 			//OPEN FILE
-			File file = new File(this.getCurrentPeersPath());
+			file = new File(this.getPeersPath());
 			
 			//CREATE FILE IF IT DOESNT EXIST
 			if(file.exists())
@@ -196,36 +199,45 @@ public class Settings {
 		catch(Exception e)
 		{
 			//STOP
-			System.out.println("ERROR reading peers.json.");
+			System.out.println("Error while reading peers.json " + file.getAbsolutePath());
+			e.printStackTrace();
 			System.exit(0);
 		}
 	}
 	
 	public JSONObject Dump()
 	{
-		return settingsJSON;
+		return (JSONObject) settingsJSON.clone();
 	}
 	
-	public String getCurrentSettingsPath()
+	public String getSettingsPath()
 	{
-		return currentSettingsPath;
+		return this.userPath + "settings.json";
 	}
 	
-	public String getCurrentPeersPath()
+	public String getPeersPath()
 	{
-		if(this.currentPeersPath == null) {
-			if(this.currentSettingsPath == "settings.json" || this.currentSettingsPath == "") {
-				this.currentPeersPath = "peers.json";
-			} else {
-				File file = new File(this.currentSettingsPath);
-			    if(file.exists()){
-			    	this.currentPeersPath = file.getAbsoluteFile().getParent() + "/peers.json";
-			    } else {
-			    	this.currentPeersPath = "peers.json";
-			    }
-			}
-		}
-		return this.currentPeersPath;
+		return this.userPath + "peers.json";
+	}
+	
+	public String getWalletDir()
+	{
+		return this.getUserPath() + DEFAULT_WALLET_DIR;
+	}
+	
+	public String getDataDir()
+	{
+		return this.getUserPath() + DEFAULT_DATA_DIR;
+	}
+	
+	public String getLangDir()
+	{
+		return this.getUserPath() + "languages";
+	}
+	
+	public String getUserPath()
+	{
+		return this.userPath;
 	}
 	
 	public JSONArray getPeersJson()
@@ -593,36 +605,6 @@ public class Settings {
 		}
 		
 		return DEFAULT_FORGING_ENABLED;
-	}
-	
-	public String getWalletDir()
-	{
-		if(this.settingsJSON.containsKey("walletdir"))
-		{
-			return (String) this.settingsJSON.get("walletdir");
-		}
-		
-		return DEFAULT_WALLET_DIR;
-	}
-	
-	public String getDataDir()
-	{
-		if(this.settingsJSON.containsKey("datadir"))
-		{
-			return (String) this.settingsJSON.get("datadir");
-		}
-		
-		return DEFAULT_DATA_DIR;
-	}
-	
-	public String getSettingsPath()
-	{
-		if(this.settingsJSON.containsKey("settingspath"))
-		{
-			return (String) this.settingsJSON.get("settingspath");
-		}
-		
-		return DEFAULT_SETTINGS_PATH;
 	}
 	
 	public int getPingInterval()

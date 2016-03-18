@@ -36,6 +36,8 @@ import database.DBSet;
 public class DeployATTransaction extends Transaction
 {
 
+	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
+
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int DESCRIPTION_SIZE_LENGTH = 4;
 	private static final int TYPE_SIZE_LENGTH = 4;
@@ -340,28 +342,22 @@ public class DeployATTransaction extends Transaction
 			return INVALID_TAGS_LENGTH;
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.amount.add(this.fee)) == -1)
-		{
-			return NO_BALANCE;
-		}
-
 		//CHECK IF REFERENCE IS OK
 		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
 
-		//CHECK IF FEE IS POSITIVE
+		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
 		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NEGATIVE_FEE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF CREATIONBYTES VALID
@@ -518,8 +514,8 @@ public class DeployATTransaction extends Transaction
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
@@ -528,7 +524,7 @@ public class DeployATTransaction extends Transaction
 
 		return BigDecimal.ZERO;
 	}
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

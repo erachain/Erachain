@@ -24,20 +24,15 @@ import com.google.common.primitives.Longs;
 import database.BalanceMap;
 import database.DBSet;
 
-public class TransferAssetTransaction extends Transaction {
+public class TransferAssetTransaction extends TransactionAmount {
 
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
-
-	private Account recipient;
-	private BigDecimal amount;
-	private long key;
+	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT; 
+			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
+	
 	
 	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference) 
 	{
-		super(TRANSFER_ASSET_TRANSACTION, creator, timestamp, reference);		
-		this.recipient = recipient;
-		this.amount = amount;
-		this.key = key;
+		super(TRANSFER_ASSET_TRANSACTION, creator, recipient, amount, key, timestamp, reference);		
 	}
 	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -55,22 +50,7 @@ public class TransferAssetTransaction extends Transaction {
 	}
 	
 	//GETTERS/SETTERS
-	
-	public Account getRecipient()
-	{
-		return this.recipient;
-	}
-	
-	public BigDecimal getAmount() 
-	{
-		return this.amount;
-	}
-	
-	public long getKey()
-	{
-		return this.key;
-	}
-	
+		
 	//PARSE/CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception{
@@ -130,12 +110,6 @@ public class TransferAssetTransaction extends Transaction {
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 				
-		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-		transaction.put("creator", this.creator.getAddress());
-		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("asset", this.key);
-		transaction.put("amount", this.amount.toPlainString());
-				
 		return transaction;	
 	}
 	
@@ -193,171 +167,9 @@ public class TransferAssetTransaction extends Transaction {
 	
 	//VALIDATE
 	
-	@Override
-	public int isValid(DBSet db) 
-	{
-		//CHECK IF RELEASED
-		if(NTP.getTime() < Transaction.getASSETS_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
-		
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-		
-		//REMOVE FEE
-		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
-
-		//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF CREATOR HAS ENOUGH QORA BALANCE
-		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF AMOUNT IS DIVISIBLE
-		if(!db.getAssetMap().get(this.key).isDivisible())
-		{
-			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if(this.getAmount().stripTrailingZeros().scale() > 0)
-			{
-				//AMOUNT HAS DECIMALS
-				return INVALID_AMOUNT;
-			}
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		
-		//CHECK IF AMOUNT IS POSITIVE
-		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_AMOUNT;
-		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-				
-		return VALIDATE_OK;
-	}
-
 	//PROCESS/ORPHAN
 	
-	@Override
-	public void process(DBSet db) 
-	{
-		//UPDATE CREATOR
-		process_fee(db);
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
-		
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
-			{
-				this.recipient.setLastReference(this.signature, db);
-			}
-		}
-	}
-
-	@Override
-	public void orphan(DBSet db) 
-	{
-		//UPDATE CREATOR
-		orphan_fee(db);		
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
-		
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
-			{
-				this.recipient.removeReference(db);
-			}	
-		}
-	}
 
 	//REST
 	
-	@Override
-	public List<Account> getInvolvedAccounts()
-	{
-		return Arrays.asList(this.creator, this.recipient);
-	}
-	
-	@Override
-	public boolean isInvolved(Account account) 
-	{
-		String address = account.getAddress();
-		
-		if(address.equals(creator.getAddress()) || address.equals(recipient.getAddress()))
-		{
-			return true;
-		}
-		
-		return false;
-	}
-
-	@Override
-	public BigDecimal getAmount(Account account) 
-	{
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
-		
-		if(address.equals(this.creator.getAddress()))
-		{
-			//IF CREATOR
-			amount = amount.subtract(this.amount);
-		} else if (address.equals(this.recipient.getAddress()))
-		{
-			//IF RECIPIENT
-			amount = amount.add(this.amount);
-		}
-		
-		return amount;
-	}
-
-	@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
-	{
-		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
-		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
-		
-		return assetAmount;
-	}
-
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee();
-	}
 }

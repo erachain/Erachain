@@ -28,7 +28,7 @@ import database.DBSet;
 
 public class BuyNameTransaction extends Transaction
 {
-	private static final int SELLER_LENGTH = RECIPIENT_LENGTH;
+	private static final int SELLER_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SELLER_LENGTH + SIGNATURE_LENGTH;
 	
 	private NameSale nameSale;
@@ -211,9 +211,15 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.nameSale.getAmount().add(this.fee)) == -1)
+		if(this.creator.getBalance(1, db).compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
+		}
+		
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+		{
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF PRICE MATCHES
@@ -229,21 +235,15 @@ public class BuyNameTransaction extends Transaction
 			return INVALID_REFERENCE;
 		}
 		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-
 		return VALIDATE_OK;
 	}
 
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.nameSale.getAmount());
 		
 		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), BalanceMap.QORA_KEY, this.nameSale.getAmount());
@@ -327,14 +327,14 @@ public class BuyNameTransaction extends Transaction
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		String address = account.getAddress();
 		
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.fee).subtract(this.nameSale.getAmount());
+			return BigDecimal.ZERO.setScale(8).subtract(this.nameSale.getAmount());
 		}
 		
 		if(address.equals(this.getSeller().getAddress()))

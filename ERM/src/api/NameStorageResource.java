@@ -305,24 +305,25 @@ public class NameStorageResource {
 
 						byte[] resultbyteArray = jsonStringForMultipleTx
 								.getBytes(StandardCharsets.UTF_8);
-						/* BigDecimal currentFee = Controller
+						/*
+						BigDecimal currentFee = Controller
 								.getInstance()
 								.calcRecommendedFeeForArbitraryTransaction(
 										resultbyteArray, paymentsForCalculation).getA();
 										*/
 						//multipayment only for first tx
+						BigDecimal currentFee = BigDecimal.ZERO;
 						paymentsForCalculation = null;
 
-						//completeFee = completeFee.add(currentFee);
+						completeFee = completeFee.add(currentFee);
 
-						//allTxPairs.add(new Pair<>(resultbyteArray, currentFee));
+						allTxPairs.add(new Pair<>(resultbyteArray, currentFee));
 
 						String decompressed = GZIP.webDecompress(jsonStringForMultipleTx);
 						askApicalls.add("POST namestorage/update/" + name
 								+ "\n"
 								+ decompressed
-								//+ "\nfee: " + currentFee.toPlainString()
-								);
+								+ "\nfee: " + currentFee.toPlainString());
 						decompressedValue.add(decompressed);
 					}
 					
@@ -395,23 +396,19 @@ public class NameStorageResource {
 								ApiErrorFactory.ERROR_NO_BALANCE);
 					}
 					
-					
-					String results = "";
-					/*
 					Pair<Transaction, Integer> result;
+					String results = "";
 					for (Pair<byte[], BigDecimal> pair : newPairs) {
 						result = Controller.getInstance()
-								.createArbitraryTransaction(account,
-										resultPayments.size() > 0 ? resultPayments : null, 10,
-										pair.getA(), pair.getB());
+								.createArbitraryTransaction(account, resultPayments.size() > 0 ? resultPayments : null, 10,
+										//pair.getA(), pair.getB());
+										pair.getA(), 0);
 						//add multipayments only to first tx
 						resultPayments.clear();
 
 						results += ArbitraryTransactionsResource
 								.checkArbitraryTransaction(result) + "\n";
-								
 					}
-					*/
 
 					return results;
 
@@ -419,21 +416,21 @@ public class NameStorageResource {
 			}
 			
 			
+			int feePow = 0;
 			
 			String basicInfo = getMultiPaymentsWarning(resultPayments);
 			
 			
-			//BigDecimal fee = Controller.getInstance()
-			//		.calcRecommendedFeeForArbitraryTransaction(bytes, resultPayments).getA();
-			BigDecimal fee = BigDecimal.ZERO;
-			
+			/*
+			BigDecimal fee = Controller.getInstance()
+					.calcRecommendedFeeForArbitraryTransaction(bytes, resultPayments).getA();
+			*/
 			
 			
 			APIUtils.askAPICallAllowed(basicInfo +
 					"POST namestorage/update/" + name + "\n"
 							+ GZIP.webDecompress(jsonString) + "\nfee: "
-							+ fee.toPlainString(),
-							request);
+							+ feePow, request);
 
 			//CHECK WALLET UNLOCKED
 			if (!Controller.getInstance().isWalletUnlocked()) {
@@ -451,7 +448,7 @@ public class NameStorageResource {
 			
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.createArbitraryTransaction(account,resultPayments, 10, bytes, 0);
+					.createArbitraryTransaction(account,resultPayments , 10, bytes, feePow);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);

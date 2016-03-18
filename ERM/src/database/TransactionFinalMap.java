@@ -97,7 +97,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 				List<String> recps = new ArrayList<String>();
 				for ( Account acc : val.getInvolvedAccounts())
 				{
-					if ( val.getAmount(acc).compareTo( BigDecimal.ZERO) < 0 )
+					if ( val.viewAmount(acc).compareTo( BigDecimal.ZERO) < 0 )
 					{
 						continue;
 					}

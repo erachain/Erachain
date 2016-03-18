@@ -1,6 +1,6 @@
 package api;
 
-//import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,6 +31,8 @@ import utils.Pair;
 public class ArbitraryTransactionsResource 
 {
 	
+	private static final Logger LOGGER = Logger
+			.getLogger(ArbitraryTransactionsResource.class);
 	@Context
 	HttpServletRequest request;
 	
@@ -45,7 +48,7 @@ public class ArbitraryTransactionsResource
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			int service = ((Long) jsonObject.get("service")).intValue();
 			String data = (String) jsonObject.get("data");
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String creator = (String) jsonObject.get("creator");
 			
 			long lgAsset = 0L;
@@ -75,9 +78,19 @@ public class ArbitraryTransactionsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA);
 			}
 				
-			//PARSE FEE			
-			//Pair<BigDecimal, Integer> recommendedFee = Controller.getInstance().calcRecommendedFeeForArbitraryTransaction(dataBytes, payments);				
-			//bdFee = recommendedFee.getA();
+			//PARSE FEE
+			
+			int feePow = 0;
+			if(feePowStr != null) {
+				try
+				{
+					feePow = Integer.parseInt(feePowStr);
+				}
+				catch(Exception e)
+				{
+					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				}	
+			}
 			
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(creator))
@@ -111,16 +124,10 @@ public class ArbitraryTransactionsResource
 				
 			return checkArbitraryTransaction(result);
 		}
-		catch(NullPointerException e)
+		catch(NullPointerException | ClassCastException e)
 		{
 			//JSON EXCEPTION
-			//e.printStackTrace();
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-		catch(ClassCastException e)
-		{
-			//JSON EXCEPTION
-			//e.printStackTrace();
+			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}
@@ -140,9 +147,9 @@ public class ArbitraryTransactionsResource
 			
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA_LENGTH);	
 
-		case Transaction.NEGATIVE_FEE:
+		case Transaction.NOT_ENOUGH_FEE:
 				
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 				
 		case Transaction.FEE_LESS_REQUIRED:
 			

@@ -27,24 +27,18 @@ import utils.Converter;
 
 
 
-public class JsonTransaction extends Transaction {
+public class JsonTransaction extends TransactionAmount {
 
 	protected byte[] data;
-	protected Account recipient;
-	protected BigDecimal amount;
-	protected long key;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
 	public JsonTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(JSON_TRANSACTION, creator, timestamp, reference);
+		super(JSON_TRANSACTION, creator, recipient, amount, key, timestamp, reference);
 
 		this.data = data;
-		this.recipient = recipient;
-		this.key = key;
-		this.amount = amount;
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
@@ -63,21 +57,6 @@ public class JsonTransaction extends Transaction {
 	public byte[] getData() 
 	{
 		return this.data;
-	}
-
-	public Account getRecipient()
-	{
-		return this.recipient;
-	}
-
-	public long getKey()
-	{
-		return this.key;
-	}
-	
-	public BigDecimal getAmount()
-	{
-		return this.amount;
 	}
 	
 	public byte[] getEncrypted()
@@ -105,10 +84,6 @@ public class JsonTransaction extends Transaction {
 		JSONObject transaction = this.getJsonBase();
 
 		//ADD CREATOR/SERVICE/DATA
-		transaction.put("creator", this.creator.getAddress());
-		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("asset", this.key);
-		transaction.put("amount", this.amount.toPlainString());
 		if ( this.isText() && !this.isEncrypted() )
 		{
 			transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
@@ -123,52 +98,6 @@ public class JsonTransaction extends Transaction {
 		return transaction;	
 	}
 	
-	@Override
-	public List<Account> getInvolvedAccounts() {
-		return Arrays.asList(this.creator, this.recipient);
-	}
-
-	@Override
-	public boolean isInvolved(Account account) {
-		String address = account.getAddress();
-		
-		if(address.equals(creator.getAddress()) || address.equals(recipient.getAddress()))
-		{
-			return true;
-		}
-		
-		return false;
-	}
-
-	@Override
-	public BigDecimal getAmount(Account account) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
-		
-		//IF SENDER
-		if(address.equals(this.creator.getAddress()))
-		{
-			amount = amount.subtract(this.fee);
-		}
-
-		//IF QORA ASSET
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			//IF SENDER
-			if(address.equals(this.creator.getAddress()))
-			{
-				amount = amount.subtract(this.amount);
-			}
-			
-			//IF RECIPIENT
-			if(address.equals(this.recipient.getAddress()))
-			{
-				amount = amount.add(this.amount);
-			}
-		}
-		
-		return amount;
-	}
 	public static Transaction Parse(byte[] data) throws Exception
 	{
 		if (data.length < BASE_LENGTH)
@@ -302,15 +231,6 @@ public class JsonTransaction extends Transaction {
 	@Override
 	public int isValid(DBSet db) {
 		//CHECK IF RELEASED
-		if( db.getBlockMap().getLastBlock().getHeight(db) < Transaction.getMESSAGE_BLOCK_HEIGHT_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
-		
-		if( this.getTimestamp() < Transaction.getPOWFIX_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
 		
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)
@@ -318,103 +238,11 @@ public class JsonTransaction extends Transaction {
 			return INVALID_DATA_LENGTH;
 		}
 	
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-		
-		//REMOVE FEE
-		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
-
-		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		
-		//CHECK IF AMOUNT IS POSITIVE. 
-		//NOW IN V3 MAY BE ZERO
-		if(this.amount.compareTo(BigDecimal.ZERO) < 0)
-		{
-			return NEGATIVE_AMOUNT;
-		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
+		int res = super.isValid(db);
+		if (res > 0) return res;
 
 		return VALIDATE_OK;
 	}
 
-	@Override
-	public void process(DBSet db) {
-		//UPDATE SENDER
-		process_fee(db);
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
-		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.signature, db);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
-			{
-				this.recipient.setLastReference(this.signature, db);
-			}
-		}
-	}
-
-	@Override
-	public void orphan(DBSet db) {
-		//UPDATE SENDER
-		orphan_fee(db);
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
-		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.reference, db);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
-			{
-				this.recipient.removeReference(db);
-			}	
-		}
-	}
-	
-	@Override
-	// TODO hkey
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
-	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
-	}
-
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee();
-	}
 }
 

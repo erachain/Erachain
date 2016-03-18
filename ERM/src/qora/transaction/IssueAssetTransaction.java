@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import ntp.NTP;
 
@@ -35,8 +36,7 @@ public class IssueAssetTransaction extends Transaction
 	
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp, byte[] reference) 
 	{
-		super(ISSUE_ASSET_TRANSACTION, creator, timestamp, reference);
-		
+		super(ISSUE_ASSET_TRANSACTION, creator, timestamp, reference);		
 		this.asset = asset;
 	}
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
@@ -62,14 +62,17 @@ public class IssueAssetTransaction extends Transaction
 	}
 	
 	
-	@Override
+	//@Override
 	public void sign(PrivateKeyAccount creator)
 	{
+		/*
 		byte[] data = this.toBytes( false );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);
-		this.asset.setReference(signature);
+		*/
+		super.sign(creator);
+		this.asset.setReference(this.signature);
 	}
 
 	//PARSE CONVERT
@@ -99,8 +102,9 @@ public class IssueAssetTransaction extends Transaction
 		position += CREATOR_LENGTH;
 		
 		//READ ASSET
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
-		position += asset.getDataLength();
+		// asset parse without reference - if is = signature
+		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		position += asset.getDataLength(false);
 		
 		//READ FEE POWER
 		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
@@ -169,7 +173,8 @@ public class IssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE ASSET
-		data = Bytes.concat(data , this.asset.toBytes(withSign));
+		// without reference
+		data = Bytes.concat(data, this.asset.toBytes(false));
 		
 		//WRITE FEE POWER
 		byte[] feePowBytes = new byte[1];
@@ -185,7 +190,8 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public int getDataLength()
 	{
-		return TYPE_LENGTH + BASE_LENGTH + this.asset.getDataLength();
+		// not include asset reference
+		return TYPE_LENGTH + BASE_LENGTH + this.asset.getDataLength(false);
 	}
 	
 	//VALIDATE
@@ -254,12 +260,16 @@ public class IssueAssetTransaction extends Transaction
 		
 		//INSERT INTO DATABASE
 		long key = db.getAssetMap().add(this.asset);
+		//this.asset.setKey(key);
 		
 		//ADD ASSETS TO OWNER
 		this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this, key);
+
+		Logger.getGlobal().info("issue ASSET KEY: " + key);
+
 	}
 
 
@@ -289,7 +299,7 @@ public class IssueAssetTransaction extends Transaction
 	{
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.add(this.creator);
-		accounts.add(this.asset.getCreator());
+		//accounts.add(this.asset.getCreator());
 		return accounts;
 	}
 
@@ -299,7 +309,9 @@ public class IssueAssetTransaction extends Transaction
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.creator.getAddress()) || address.equals(this.asset.getCreator().getAddress()))
+		if(address.equals(this.creator.getAddress())
+				//|| address.equals(this.asset.getCreator().getAddress())
+				)
 		{
 			return true;
 		}
@@ -308,8 +320,8 @@ public class IssueAssetTransaction extends Transaction
 	}
 
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		/* 
 		if(account.getAddress().equals(this.creator.getAddress()))
@@ -321,7 +333,7 @@ public class IssueAssetTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

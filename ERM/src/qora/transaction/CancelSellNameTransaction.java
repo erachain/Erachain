@@ -208,10 +208,10 @@ public class CancelSellNameTransaction extends Transaction
 			return NAME_NOT_FOR_SALE;
 		}
 		
-		//CHECK IF OWNER HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
@@ -220,11 +220,6 @@ public class CancelSellNameTransaction extends Transaction
 			return INVALID_REFERENCE;
 		}
 		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
 		
 		return VALIDATE_OK;
 	}
@@ -289,22 +284,23 @@ public class CancelSellNameTransaction extends Transaction
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		String address = account.getAddress();
 		
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
+			return BigDecimal.ZERO.setScale(8);
 		}
 		
 		return BigDecimal.ZERO;
 	}
-	@Override
+	
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 	
 	public BigDecimal calcBaseFee() {

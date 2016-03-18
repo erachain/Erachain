@@ -1,6 +1,6 @@
 package api;
 
-//import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -33,6 +34,10 @@ import controller.Controller;
 @Produces(MediaType.APPLICATION_JSON)
 public class PollsResource 
 {
+	
+	
+	private static final Logger LOGGER = Logger.getLogger(PollsResource.class);
+	
 	@Context
 	HttpServletRequest request;
 
@@ -48,13 +53,13 @@ public class PollsResource
 			String name = (String) jsonObject.get("name");
 			String description = (String) jsonObject.get("description");
 			JSONArray optionsJSON = (JSONArray) jsonObject.get("options");
-			String feePow = (String) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			
-			//PARSE FEE POWER
-			int feePowInt;
+			//PARSE FEE
+			int feePow;
 			try
 			{
-				feePowInt = Integer.getInteger(feePow);
+				feePow = Integer.parseInt(feePowStr);
 			}
 			catch(Exception e)
 			{
@@ -104,7 +109,7 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, feePowInt);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, feePow);
 				
 			switch(result.getB())
 			{
@@ -148,9 +153,9 @@ public class PollsResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_DUPLICATE_OPTION);		
 			
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 				
 			case Transaction.FEE_LESS_REQUIRED:
 				
@@ -165,15 +170,10 @@ public class PollsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);	
 			}
 		}
-		catch(NullPointerException e)
+		catch(NullPointerException | ClassCastException e)
 		{
 			//JSON EXCEPTION
-			//e.printStackTrace();
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-		catch(ClassCastException e)
-		{
-			//JSON EXCEPTION
+			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}
@@ -189,13 +189,13 @@ public class PollsResource
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String voter = (String) jsonObject.get("voter");
 			String option = (String) jsonObject.get("option");
-			String feePow = (String) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			
-			//PARSE FEE POWER
-			int feePowInt;
+			//PARSE FEE
+			int feePow;
 			try
 			{
-				feePowInt = Integer.getInteger(feePow);
+				feePow = Integer.parseInt(feePowStr);
 			}
 			catch(Exception e)
 			{
@@ -244,7 +244,7 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, feePowInt);
+			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, feePow);
 				
 			switch(result.getB())
 			{
@@ -276,9 +276,9 @@ public class PollsResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_ALREADY_VOTED_FOR_THAT_OPTION);	
 				
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 				
 			case Transaction.FEE_LESS_REQUIRED:
 				
@@ -293,15 +293,10 @@ public class PollsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);	
 			}
 		}
-		catch(NullPointerException e)
+		catch(NullPointerException | ClassCastException e)
 		{
 			//JSON EXCEPTION
-			//e.printStackTrace();
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-		catch(ClassCastException e)
-		{
-			//JSON EXCEPTION
+			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}
@@ -394,6 +389,5 @@ public class PollsResource
 		
 		return array.toJSONString();
 	}
-	
 	
 }

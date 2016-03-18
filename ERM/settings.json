@@ -1,5 +1,6 @@
 {
-	"checkpoint":true,
+	"lang":"en.json"
+}
 	"soundreceivepayment":true,
 	"rpcallowed":[
 		"127.0.0.1"
@@ -16,5 +17,5 @@
 	"rpcenabled":true,
 	"maxconnections":100,
 	"guienabled":true,
-	"lang":"rus.lng",
-}
+	"lang":"en.json"
+}}

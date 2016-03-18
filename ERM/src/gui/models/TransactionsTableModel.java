@@ -89,7 +89,7 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 				
 			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
+				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(transaction.getCreator()));
 				
 			case COLUMN_FEE:
 				

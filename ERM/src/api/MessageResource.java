@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -21,7 +22,6 @@ import ntp.NTP;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.transaction.Transaction;
@@ -33,6 +33,11 @@ import utils.Pair;
 @Produces(MediaType.APPLICATION_JSON)
 public class MessageResource {
 
+	
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(MessageResource.class);
+	
 	@Context
 	HttpServletRequest request;
 
@@ -154,14 +159,10 @@ public class MessageResource {
 			} else {
 				try {
 					messageBytes = Converter.parseHexString(message);
-				} catch (Exception g) {
-					try {
-						messageBytes = Base58.decode(message);
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
-					}
+				} catch (Exception e) {
+					LOGGER.error(e);
+					throw ApiErrorFactory.getInstance().createError(
+							ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
 				}
 			}
 
@@ -191,7 +192,7 @@ public class MessageResource {
 			
 			//BigDecimal bdFee = Controller.getInstance().calcRecommendedFeeForMessage(messageBytes).getA();
 
-			//APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee: "+ bdFee.toPlainString(), request);
+			//APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee Power: "+ bdFee.toPlainString(), request);
 
 			byte[] encrypted = (encrypt) ? new byte[] { 1 } : new byte[] { 0 };
 			byte[] isTextByte = (isTextMessage) ? new byte[] { 1 }
@@ -224,10 +225,10 @@ public class MessageResource {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_RECIPIENT);
 
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						ApiErrorFactory.ERROR_NO_BALANCE);
 
 			case Transaction.FEE_LESS_REQUIRED:
 
@@ -245,15 +246,11 @@ public class MessageResource {
 						ApiErrorFactory.ERROR_UNKNOWN);
 			}
 
-		} catch (NullPointerException e) {
+		} catch (NullPointerException | ClassCastException e) {
 			// JSON EXCEPTION
-			// e.printStackTrace();
+			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON);
-		} catch (ClassCastException e) {
-			// JSON EXCEPTION
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_JSON);
-		}
+		} 
 	}
 }

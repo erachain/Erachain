@@ -1,5 +1,5 @@
 package utils;
-// updt 09/03
+
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -96,7 +96,6 @@ public class UpdateUtil {
 		DBSet.getInstance().getTransactionFinalMap().reset();
 		DBSet.getInstance().commit();
 		Block b = new GenesisBlock();
-		//b.process(); // icreator - for make sign and ref in Assets
 		do
 		{
 			List<Transaction> txs = b.getTransactions();

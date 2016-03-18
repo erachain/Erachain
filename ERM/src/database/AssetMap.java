@@ -37,7 +37,7 @@ public class AssetMap extends DBMap<Long, Asset>
 		this.key = this.getKey();
 	}
 	
-	protected long getKey()
+	public long getKey()
 	{
 		return this.key;
 	}
@@ -73,8 +73,6 @@ public class AssetMap extends DBMap<Long, Asset>
 	
 	public long add(Asset asset)
 	{
-		
-		
 		//INCREMENT ATOMIC KEY IF EXISTS
 		if(this.atomicKey != null)
 		{

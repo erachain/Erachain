@@ -249,9 +249,9 @@ public class CancelOrderFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("You are not the creator this order!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.FEE_LESS_REQUIRED:

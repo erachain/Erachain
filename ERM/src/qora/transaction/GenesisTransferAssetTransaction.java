@@ -16,6 +16,7 @@ import qora.account.Account;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
+import qora.block.GenesisBlock;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -26,7 +27,9 @@ import database.DBSet;
 
 public class GenesisTransferAssetTransaction extends Transaction {
 
-	
+	//private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
+	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
+	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
 	private Account recipient;
@@ -197,18 +200,10 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		{
 			return INVALID_ADDRESS;
 		}
-		
-		//REMOVE FEE
-		DBSet fork = db.fork();
-
-		//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
-		{
-			return NO_BALANCE;
-		}
-				
+						
 		//CHECK IF AMOUNT IS DIVISIBLE
-		if(!db.getAssetMap().get(this.key).isDivisible())
+		// genesis assets not in DB yet and need take it from genesis maker
+		if(!GenesisBlock.makeAsset((int)this.key).isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 			if(this.getAmount().stripTrailingZeros().scale() > 0)
@@ -217,15 +212,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 				return INVALID_AMOUNT;
 			}
 		}
-		
-		/*
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		*/
-		
+				
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
@@ -246,19 +233,10 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
-		/* icreator - not need change references for genesis block
-		*/
 		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
-		
+		// not need this.creator.setLastReference(this.signature, db);
 		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
-			{
-				this.recipient.setLastReference(this.signature, db);
-			}
-		}
+		this.recipient.setLastReference(this.signature, db);
 	}
 
 	@Override
@@ -270,19 +248,10 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 		
-		/* icreator - not need change references for genesis block
-		*/
 		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
-		
+		// not needthis.creator.setLastReference(this.reference, db);		
 		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == BalanceMap.QORA_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
-			{
-				this.recipient.removeReference(db);
-			}	
-		}
+		this.recipient.removeReference(db);
 	}
 
 	//REST
@@ -306,8 +275,8 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
@@ -331,7 +300,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		return amount;
 	}
 
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

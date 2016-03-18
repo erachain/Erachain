@@ -1,5 +1,5 @@
 package qora.blockexplorer;
-
+/// 16/03
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -30,6 +30,7 @@ import controller.Controller;
 import database.BalanceMap;
 import database.DBSet;
 import database.SortableList;
+import lang.Lang;
 import qora.account.Account;
 import qora.assets.Asset;
 import qora.assets.Order;
@@ -53,6 +54,7 @@ import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
+import qora.transaction.TransactionAmount;
 import qora.transaction.TransferAssetTransaction;
 import qora.transaction.UpdateNameTransaction;
 import qora.transaction.VoteOnPollTransaction;
@@ -1324,7 +1326,7 @@ public class BlockExplorer
 			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
-					BigDecimal amount = transaction.getAmount(account); 
+					BigDecimal amount = transaction.viewAmount(account); 
 					if(amount.compareTo(BigDecimal.ZERO) > 0)
 					{
 						totalAmount = totalAmount.add(amount);
@@ -2022,9 +2024,11 @@ public class BlockExplorer
 	
 			for(Map.Entry<Tuple2<BigInteger, BigInteger>, Trade> trade : trades.entrySet())
 			{
-				Transaction tx = Controller.getInstance().getTransaction(trade.getValue().getInitiator().toByteArray());
+				Transaction txInitiator = Controller.getInstance().getTransaction(trade.getValue().getInitiator().toByteArray());
 				
-				all.add( new BlExpUnit(tx.getParent().getHeight(), tx.getSeq(), trade.getValue() ) );
+				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
+				
+				all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeq(), txTarget.getSeq(), trade.getValue() ) );
 			}
 			
 			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
@@ -2035,7 +2039,7 @@ public class BlockExplorer
 		
 		if(size == 0)
 		{
-			output.put("error", "No transactions found for this address.<br>It has probably not been used on the network yet.");
+			output.put("error", Lang.getInstance().translate("No transactions found for this address.<br>It has probably not been used on the network yet."));
 			return output;
 		}
 		
@@ -2063,9 +2067,14 @@ public class BlockExplorer
 			if (unit.getUnit() instanceof Transaction) {
 				
 				Transaction tx = (Transaction)unit.getUnit();
-				tXincome = tx.getAssetAmount();
+				if (tx instanceof TransactionAmount) {
+					TransactionAmount txAmo = (TransactionAmount)unit.getUnit();
+					tXincome = txAmo.getAssetAmount();
+				} else {
+					tXincome = null;
+				}
 				
-				if(addresses.contains(tx.getCreator().getAddress()))
+				if (tx.getCreator() != null && addresses.contains(tx.getCreator().getAddress()))
 				{
 					spentFee = spentFee.add(tx.getFee());
 				}
@@ -2637,8 +2646,11 @@ public class BlockExplorer
 		
 		for(Map.Entry<Tuple2<BigInteger, BigInteger>, Trade> trade : trades.entrySet())
 		{
-			Transaction tx = Controller.getInstance().getTransaction(trade.getValue().getInitiator().toByteArray());
-			all.add( new BlExpUnit(tx.getParent().getHeight(), tx.getParent().getTransactionSeq(tx.getSignature()), trade.getValue() ) );
+			Transaction txInitiator = Controller.getInstance().getTransaction(trade.getValue().getInitiator().toByteArray());
+			
+			Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
+			
+			all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeq(), txTarget.getSeq(), trade.getValue() ) );
 		}
 
 		int size = all.size();
@@ -2741,7 +2753,7 @@ public class BlockExplorer
 		BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
 		for (Transaction transaction : block.getTransactions()) {
 			for (Account account : transaction.getInvolvedAccounts()) {
-				BigDecimal amount = transaction.getAmount(account); 
+				BigDecimal amount = transaction.viewAmount(account); 
 				if(amount.compareTo(BigDecimal.ZERO) > 0)
 				{
 					totalAmount = totalAmount.add(amount);

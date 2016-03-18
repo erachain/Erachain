@@ -3,7 +3,10 @@
 /wallet*
 /bin/
 /languages/
-settings.json
 /ACCOUNTS.txt
-*.zip
 /ERM.iml
+
+/log.txt
+peers.json
+settings.json
+*.zip

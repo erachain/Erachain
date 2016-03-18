@@ -31,7 +31,6 @@ import at.AT_Constants;
 import at.AT_Transaction;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -206,10 +205,11 @@ public class ATResource
 			{
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_TAGS_LENGTH );
 			}
-			Integer feePow;
+			int feePow;
 			try
 			{
-				feePow = (int) jsonObject.get("feePow");
+				String feeString = (String) jsonObject.get("feePow");
+				feePow = Integer.parseInt(feeString);
 			}
 			catch (Exception e)
 			{
@@ -259,13 +259,18 @@ public class ATResource
 				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_NULL_PAGES );
 
 			}
-			
-			//byte[] balanceBytes = feePow.toByteArray();
-			byte[] balanceBytes = Ints.toByteArray(feePow);
+
+			/*
+			byte[] balanceBytes = feePow.toByteArray();
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
+			*/
+			byte[] feePowBytes = new byte[1];
+			feePowBytes[0] = (byte)feePow;
+			//data = Bytes.concat(data, feePowBytes);
+			
 
-			long lFee = Longs.fromByteArray(balanceBytes);
+			long lFee = Longs.fromByteArray(feePowBytes);
 			
 			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock().getHeight()) > lFee )
 			{
@@ -331,8 +336,8 @@ public class ATResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_CREATION_BYTES);
 			case Transaction.NOT_YET_RELEASED:
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);	
-			case Transaction.NEGATIVE_FEE:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+			case Transaction.NOT_ENOUGH_FEE:
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);	
 			case Transaction.FEE_LESS_REQUIRED:
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_FEE_LESS_REQUIRED);
 			case Transaction.NEGATIVE_AMOUNT:

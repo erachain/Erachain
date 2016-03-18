@@ -117,13 +117,7 @@ public class OrderTests
 			
 		//CHECK IF  ORDER CREATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(dbSet));
-				
-		//CREATE  ORDER CREATION INVALID FEE
-		orderCreation = new CreateOrderTransaction(account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
-				
-		//CHECK IF  ORDER CREATION IS INVALID
-		assertEquals(Transaction.NEGATIVE_FEE, orderCreation.isValid(dbSet));
-		
+										
 	}
 	
 	@Test

@@ -26,7 +26,7 @@ public class Asset {
 	private static final int QUANTITY_LENGTH = 8;
 	private static final int SCALE_LENGTH = 1;
 	private static final int DIVISIBLE_LENGTH = 1;
-	private static final int REFERENCE_LENGTH = 64;
+	private static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
 	
 	private Account creator;
 	private String name;
@@ -34,9 +34,8 @@ public class Asset {
 	private long quantity;
 	private byte scale;
 	private boolean divisible;
-	// from signature of new IssueAssetTransaction. -> 
-	//qora.TransactionCreator.createIssueAssetTransaction(PrivateKeyAccount, String, String, long, byte, boolean, int)
-	private byte[] reference; // to issued record = new byte[REFERENCE_LENGTH];
+	//private long key;
+	private byte[] reference; // this is signature of issued record
 	
 	public Asset(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
 	{
@@ -67,6 +66,15 @@ public class Asset {
 	public int getScale() {
 		return this.scale;
 	}
+	public long getKey() {
+		// -- return this.key;
+		return DBSet.getInstance().getIssueAssetMap().get(this.reference);
+	}
+	/*
+	public void setKey(long key) {
+		this.key = key;
+	}
+	*/
 	
 	public String getDescription() {
 		return this.description;
@@ -86,19 +94,14 @@ public class Asset {
 	public void setReference(byte[] reference) {
 		this.reference = reference;
 	}
-	
-	public long getKey() {
 		
-		return DBSet.getInstance().getIssueAssetMap().get(this.reference);
-	}
-	
 	public boolean isConfirmed() {
 		return DBSet.getInstance().getIssueAssetMap().contains(this.reference);
 	}
 	
 	//PARSE
-	
-	public static Asset parse(byte[] data) throws Exception
+	// includeReference - TRUE only for store in local DB
+	public static Asset parse(byte[] data, boolean includeReference) throws Exception
 	{	
 
 		int position = 0;
@@ -149,14 +152,17 @@ public class Asset {
 		//READ DIVISABLE
 		byte[] divisibleBytes = Arrays.copyOfRange(data, position, position + DIVISIBLE_LENGTH);
 		boolean divisable = divisibleBytes[0] == 1;
-		position += DIVISIBLE_LENGTH;
-		
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		position += DIVISIBLE_LENGTH;		
 		
 		//RETURN
 		Asset asset = new Asset(creator, name, description, quantity, scale, divisable);
-		asset.setReference(reference);
+
+		if (includeReference)
+		{
+			//READ REFERENCE
+			byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			asset.setReference(reference);
+		}
 		return asset;
 	}
 	
@@ -222,9 +228,10 @@ public class Asset {
 		return data;
 	}
 
-	public int getDataLength() 
+	public int getDataLength(boolean includeReference) 
 	{
-		return CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + SCALE_LENGTH + QUANTITY_LENGTH + DIVISIBLE_LENGTH + REFERENCE_LENGTH;
+		return CREATOR_LENGTH + NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + DESCRIPTION_SIZE_LENGTH + this.description.getBytes(StandardCharsets.UTF_8).length + SCALE_LENGTH + QUANTITY_LENGTH + DIVISIBLE_LENGTH
+				+ (includeReference? REFERENCE_LENGTH: 0);
 	}	
 	
 	//OTHER

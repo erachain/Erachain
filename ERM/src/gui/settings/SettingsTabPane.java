@@ -1,4 +1,5 @@
 package gui.settings;
+// 16/03
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -11,7 +12,7 @@ public class SettingsTabPane extends JTabbedPane{
 	private static final long serialVersionUID = 2198816415884720961L;
 	
 	public SettingsKnownPeersPanel settingsKnownPeersPanel;
-	public SettingsParametersPanel settingsParametersPanel;
+	public SettingsBasicPanel settingsBasicPanel;
 	public SettingsAllowedPanel settingsAllowedPanel;
 	
 	public SettingsTabPane()
@@ -20,8 +21,8 @@ public class SettingsTabPane extends JTabbedPane{
 		
 		//ADD TABS
 			
-        settingsParametersPanel = new SettingsParametersPanel();
-        JScrollPane scrollPane1 = new JScrollPane(settingsParametersPanel);
+		settingsBasicPanel = new SettingsBasicPanel();
+        JScrollPane scrollPane1 = new JScrollPane(settingsBasicPanel);
         this.addTab(Lang.getInstance().translate("Basic"), scrollPane1);
 
 		settingsKnownPeersPanel = new SettingsKnownPeersPanel();

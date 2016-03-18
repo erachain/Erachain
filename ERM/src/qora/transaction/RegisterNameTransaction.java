@@ -194,10 +194,10 @@ public class RegisterNameTransaction extends Transaction
 			return NAME_ALREADY_REGISTRED;
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
@@ -206,11 +206,6 @@ public class RegisterNameTransaction extends Transaction
 			return INVALID_REFERENCE;
 		}
 		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
 
 		return VALIDATE_OK;
 	}
@@ -269,8 +264,8 @@ public class RegisterNameTransaction extends Transaction
 	}
 
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
@@ -279,7 +274,7 @@ public class RegisterNameTransaction extends Transaction
 		
 		return BigDecimal.ZERO;
 	}
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

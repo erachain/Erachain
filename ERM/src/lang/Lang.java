@@ -1,5 +1,6 @@
 package lang;
 
+// 16/03
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class Lang {
 			"Issue Asset", "Transfer Asset", "Order Creation", "Cancel Order",
 			"Multi Payment", "Reserved", "Deploy AT", "Reserved", "Message Transaction",
 			"Accounting", "JsonSend"});
+
+	public static final String translationsUrl = "https://raw.githubusercontent.com/Qoracoin/translations/master/";
 
 	private static Lang instance;
 	private Map<String, String> noTranslateMap;
@@ -105,8 +108,7 @@ public class Lang {
 		
 		try 
 		{
-		
-			File file = new File( "lang/" + filename );
+			File file = new File( Settings.getInstance().getLangDir(), filename );
 			if ( !file.isFile() ) {
 				return (JSONObject) JSONValue.parse("");
 			}
@@ -140,28 +142,37 @@ public class Lang {
 		return langJsonObject;
 	};
 
-	public List<Pair<String, String>> getListOfAvailable()
+	public List<LangFile> getListOfAvailable()
 	{
-		List<Pair<String, String>> lngList = new ArrayList<>();
+		List<LangFile> lngList = new ArrayList<>();
 		
 		File[] fileList;        
-        File f = new File("lang");
-                
-        fileList = f.listFiles();
-                        
+        File dir = new File(Settings.getInstance().getLangDir());
+             
+        if(!dir.exists()){
+        	dir.mkdir();
+        }
+        
+        fileList = dir.listFiles();
+        
+		lngList.add( new LangFile() );
+
         for(int i=0; i<fileList.length; i++)           
         {
-        	if(fileList[i].isFile() && fileList[i].getName().endsWith(".lng")) {
-        		lngList.add(
-        				new Pair<>(
-        						fileList[i].getName(), 
-        						(String)openLangFile(fileList[i].getName()).get("lang_name")
-        						)
-        				);
+        	if(fileList[i].isFile() && fileList[i].getName().endsWith(".json")) {
+        		try {
+        			JSONObject langFile = openLangFile(fileList[i].getName());
+        			String lang_name = (String)langFile.get("_lang_name_");
+        			long time_of_translation = ((Long)langFile.get("_timestamp_of_translation_")).longValue();
+        			lngList.add( new LangFile( lang_name, fileList[i].getName(), time_of_translation) );
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
         	}
-        	
         }
         
         return lngList;
 	}
+	
+	
 }

@@ -16,7 +16,7 @@ public class AssetSerializer implements Serializer<Asset>, Serializable
 	@Override
 	public void serialize(DataOutput out, Asset value) throws IOException 
 	{
-		out.writeInt(value.getDataLength());
+		out.writeInt(value.getDataLength(true));
         out.write(value.toBytes(true));
     }
 
@@ -28,8 +28,8 @@ public class AssetSerializer implements Serializer<Asset>, Serializable
         in.readFully(bytes);
         try 
         {
-        	return Asset.parse(bytes);
-		} 
+        	return Asset.parse(bytes, true);
+		}
         catch (Exception e) 
         {
         	e.printStackTrace();

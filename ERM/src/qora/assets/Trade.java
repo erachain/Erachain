@@ -1,5 +1,5 @@
 package qora.assets;
-
+// 16/03
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -237,6 +237,7 @@ public class Trade {
 		//REMOVE FROM DATABASE
 		db.getTradeMap().delete(this);
 	}
+	
 	@Override 
 	public boolean equals(Object object)
 	{
@@ -244,10 +245,9 @@ public class Trade {
 		{
 			Trade trade = (Trade) object;
 			
-			return (trade.getInitiator().compareTo(this.getInitiator()) == 0) && (trade.getTarget().compareTo(this.getTarget()) == 0);
+			return (trade.getInitiator().equals(this.getInitiator()) && trade.getTarget().equals(this.getTarget()));
 		}
 		
 		return false;
 	}
-
 }

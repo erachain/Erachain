@@ -25,6 +25,9 @@ public class GenesisTransaction extends Transaction {
 
 	//private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 	//private static final int AMOUNT_LENGTH = 8;
+	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
+	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
+
 	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH;
 	
 	private Account recipient;
@@ -32,7 +35,6 @@ public class GenesisTransaction extends Transaction {
 	
 	public GenesisTransaction(Account recipient, BigDecimal amount, long timestamp)
 	{
-		//super(GENESIS_TRANSACTION, null, timestamp, generateSignature(recipient, amount, timestamp));
 		super(GENESIS_TRANSACTION, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
@@ -244,8 +246,8 @@ public class GenesisTransaction extends Transaction {
 		return this.recipient.getAddress().equals(account.getAddress());		
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{		
 		if(this.recipient.getAddress().equals(account.getAddress()))
 		{
@@ -255,7 +257,7 @@ public class GenesisTransaction extends Transaction {
 		return BigDecimal.ZERO;
 	}
 
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<String, Map<Long, BigDecimal>>();

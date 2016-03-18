@@ -151,7 +151,7 @@ public class Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.getAmount(this));
+					balance = balance.subtract(transaction.viewAmount(this));
 				}
 			}
 				
@@ -194,9 +194,9 @@ public class Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					if(transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1)
+					if(transaction.viewAmount(this).compareTo(BigDecimal.ZERO) == 1)
 					{
-						balance = balance.subtract(transaction.getAmount(this));
+						balance = balance.subtract(transaction.viewAmount(this));
 					}
 				}
 			}

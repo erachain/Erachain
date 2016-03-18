@@ -110,14 +110,10 @@ public class BlogPostResource {
 				dataStructure.put(BLOGNAME_KEY, blognameOpt);
 			}
 
-			//byte[] resultbyteArray = dataStructure.toJSONString().getBytes(
-			//		StandardCharsets.UTF_8);
-			/*
-			BigDecimal bdFee = Controller
-					.getInstance()
-					.calcRecommendedFeeForArbitraryTransaction(resultbyteArray,
-							null).getA();
-			*/
+			byte[] resultbyteArray = dataStructure.toJSONString().getBytes(
+					StandardCharsets.UTF_8);
+			int feePow = 0;
+
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.createArbitraryTransaction(
@@ -125,7 +121,7 @@ public class BlogPostResource {
 							null,
 							BlogUtils.COMMENT_SERVICE_ID,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), 0);
+									StandardCharsets.UTF_8), feePow);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);
@@ -145,7 +141,7 @@ public class BlogPostResource {
 
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String creator = (String) jsonObject.get("creator");
 			String authorOpt = (String) jsonObject.get(BlogPostResource.AUTHOR);
 			String title = (String) jsonObject.get("title");
@@ -173,13 +169,10 @@ public class BlogPostResource {
 			String blognameOpt = blogEntryOpt.getBlognameOpt();
 
 			// PARSE FEE
-			BigDecimal bdFee;
+			int feePow =0;
 			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
+				feePow = Integer.parseInt(feePowStr);
 			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
 			// CHECK ADDRESS
@@ -257,7 +250,7 @@ public class BlogPostResource {
 							null,
 							BlogUtils.COMMENT_SERVICE_ID,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), 0);
+									StandardCharsets.UTF_8), feePow);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);
@@ -277,7 +270,7 @@ public class BlogPostResource {
 
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String fee = (String) jsonObject.get("fee");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String creator = (String) jsonObject.get("creator");
 			String authorOpt = (String) jsonObject.get(BlogPostResource.AUTHOR);
 			String title = (String) jsonObject.get("title");
@@ -291,14 +284,11 @@ public class BlogPostResource {
 						ApiErrorFactory.ERROR_BODY_EMPTY);
 			}
 
-			// PARSE FEE
-			BigDecimal bdFee;
+			// PARSE FEE POW
+			int feePow=0;
 			try {
-				bdFee = new BigDecimal(fee);
-				bdFee = bdFee.setScale(8);
+				feePow = Integer.parseInt(feePowStr);
 			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
 			// CHECK ADDRESS
@@ -379,7 +369,7 @@ public class BlogPostResource {
 							null,
 							777,
 							dataStructure.toJSONString().getBytes(
-									StandardCharsets.UTF_8), 0);
+									StandardCharsets.UTF_8), feePow);
 
 			return ArbitraryTransactionsResource
 					.checkArbitraryTransaction(result);

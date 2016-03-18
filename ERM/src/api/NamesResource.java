@@ -1,6 +1,6 @@
 package api;
 
-//import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -110,11 +110,19 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String registrant = (String) jsonObject.get("registrant");
 			String name = (String) jsonObject.get("name");
 			String value = (String) jsonObject.get("value");
 
+			// PARSE FEE
+			int feePow;
+			try {
+				feePow = Integer.parseInt(feePowStr);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_INVALID_FEE);
+			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(registrant)) {
@@ -173,10 +181,10 @@ public class NamesResource {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_NAME_ALREADY_EXISTS);
 
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						ApiErrorFactory.ERROR_NO_BALANCE);
 
 			case Transaction.NO_BALANCE:
 
@@ -206,12 +214,20 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String key = (String) jsonObject.get("key");
 
 			// keys are always lowercase!
 			key = key.toLowerCase();
 
+			// PARSE FEE
+			int feePow;
+			try {
+				feePow = Integer.parseInt(feePowStr);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_INVALID_FEE);
+			}
 
 			APIUtils.askAPICallAllowed("DELETE names/key/" + nameName + "\n"
 				                           + x, request);
@@ -315,7 +331,7 @@ public class NamesResource {
 
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String key = (String) jsonObject.get("key");
 			String value = (String) jsonObject.get("value");
 			String updateString = (String) jsonObject.get("update");
@@ -333,6 +349,16 @@ public class NamesResource {
 					throw ApiErrorFactory.getInstance().createError(
 							ApiErrorFactory.ERROR_INVALID_UPDATE_VALUE);
 				}
+			}
+
+			// PARSE FEE
+			int feePow;
+			try {
+				feePow = Integer.parseInt(feePowStr);
+				//feePow = feePow.setScale(8);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
 			APIUtils.askAPICallAllowed("POST names/key/" + nameName + "\n" + x,
@@ -419,11 +445,18 @@ public class NamesResource {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			String newOwner = (String) jsonObject.get("newowner");
 			String newValue = (String) jsonObject.get("newvalue");
 
 			// PARSE FEE
+			int feePow;
+			try {
+				feePow = Integer.parseInt(feePowStr);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_INVALID_FEE);
+			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(newOwner)) {
@@ -505,10 +538,10 @@ public class NamesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);
 
-		case Transaction.NEGATIVE_FEE:
+		case Transaction.NOT_ENOUGH_FEE:
 
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_FEE);
+					ApiErrorFactory.ERROR_NO_BALANCE);
 
 		case Transaction.FEE_LESS_REQUIRED:
 			

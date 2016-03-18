@@ -77,6 +77,8 @@ public class GenesisBlock extends Block{
 					"QStUHLofuyCBy3UR2Rr8WRNnPc56WZYzWu","QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc","QYgYu43QEMv2cf1QC8nq5PwVRQrNVk81MM",
 					"Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP","QiZSovPpdyAhLW66P2KkF5UynR9RtVsLPN","QYMA8MopsHnWx4B28zUFArAsCmZoPx3ooG",
 					"QXuzwBv17fmDQD3y5Emhu7qiFoRYCDE8jS","QVcP2HUjxrGrb6ARWmu6h6x1fCTxatFw2H","QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk");
+
+			/*
 			//ADD MAINNET GENESIS TRANSACTIONS
 			for(String address: recipients)
 			{
@@ -84,29 +86,37 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransaction(recipient, bdAmount, timestamp));
 				timestamp +=1; // for unique signature
 			}
-						
+			*/
 			
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
-			Asset asset1;
 			GenesisIssueAssetTransaction trans;
+			
+			Asset asset0;
+			//CREATE ERM ASSET
+			asset0 = makeAsset(0);
+			trans = new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp);
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp));
+			
+
 			//CREATE JOB ASSET
-			asset1 = makeOil(); //new byte[64]);
+			Asset asset1 = makeAsset(1); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp);
 			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
-
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp));
+			this.addTransaction(trans);
 			
 			//CREATE VOTE ASSET
-			Asset asset2;
-			asset2 = makeGem(); //new byte[64]);
+			Asset asset2 = makeAsset(2); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp);
-			
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp));
+			this.addTransaction(trans);
 			
 			//Logger.getGlobal().info("amount " + new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(11)));
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
+				
+				bdAmount = new BigDecimal(asset0.getQuantity()).divide(new BigDecimal(9));
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp));
+
 				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp));
 				
@@ -125,20 +135,16 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public Asset makeERM() //byte[] reference) 
+	public static Asset makeAsset(int key) 
 	{
-		Asset asset = new Asset(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 10000000000L, (byte) 6, true);
-		return asset;
-	}
-	public Asset makeOil() //byte[] reference) 
-	{
-		Asset asset = new Asset(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
-		return asset;
-	}
-	public Asset makeGem() //byte[] reference) 
-	{
-		Asset asset = new Asset(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
-		return asset;
+		switch(key)
+		{
+		case 1:
+			return new Asset(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
+		case 2:
+			return new Asset(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
+		}
+		return new Asset(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
 	}
 
 	public String getTestNetInfo() 

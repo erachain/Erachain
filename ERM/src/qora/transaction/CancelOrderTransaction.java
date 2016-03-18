@@ -178,10 +178,10 @@ public class CancelOrderTransaction extends Transaction
 			return INVALID_ORDER_CREATOR;
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
@@ -189,13 +189,7 @@ public class CancelOrderTransaction extends Transaction
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-		
+				
 		return VALIDATE_OK;
 	}
 	
@@ -262,24 +256,27 @@ public class CancelOrderTransaction extends Transaction
 		return false;
 	}
 
+	/*
 	@Override
-	public BigDecimal getAmount(Account account) 
+	public BigDecimal Amount(Account account) 
 	{
 		String address = account.getAddress();
 		
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
+			return BigDecimal.ZERO.setScale(8);
 		}
 		
 		return BigDecimal.ZERO;
 	}
-	@Override
+	*/
+	
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
 		Order order;
 

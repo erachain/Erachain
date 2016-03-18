@@ -11,7 +11,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import database.DBSet;
-import ntp.NTP;
+//import ntp.NTP;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
@@ -215,14 +215,6 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	@Override
 	public int isValid(DBSet db) {
-		// CHECK IF RELEASED
-		if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE()) {
-			return NOT_YET_RELEASED;
-		}
-
-		if (this.getTimestamp() < Transaction.getPOWFIX_RELEASE()) {
-			return NOT_YET_RELEASED;
-		}
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -236,14 +228,13 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		// REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork)
-				.subtract(this.fee), fork);
+		process_fee(fork);
 
-		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.ZERO) == -1)
 		{
-			return NO_BALANCE;
-		}	
+			return NOT_ENOUGH_FEE;
+		}
 		
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
@@ -280,11 +271,6 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		// CHECK IF REFERENCE IS OKE
 		if (!Arrays.equals(this.creator.getLastReference(db), this.reference)) {
 			return INVALID_REFERENCE;
-		}
-
-		// CHECK IF FEE IS POSITIVE
-		if (this.fee.compareTo(BigDecimal.ZERO) <= 0) {
-			return NEGATIVE_FEE;
 		}
 
 		return VALIDATE_OK;

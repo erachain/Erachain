@@ -814,7 +814,7 @@ public class Wallet extends Observable implements Observer
 					if(!this.database.getTransactionMap().add(account, transaction))
 					{					
 						//UPDATE UNCONFIRMED BALANCE
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).add(transaction.getAmount(account));
+						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).add(transaction.viewAmount(account));
 						this.database.getAccountMap().update(account, unconfirmedBalance);
 					}
 				}
@@ -869,7 +869,7 @@ public class Wallet extends Observable implements Observer
 					this.database.getTransactionMap().delete(account, transaction);
 					
 					//UPDATE UNCONFIRMED BALANCE
-					BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).subtract(transaction.getAmount(account));
+					BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).subtract(transaction.viewAmount(account));
 					this.database.getAccountMap().update(account, unconfirmedBalance);
 				}
 			}

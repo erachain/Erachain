@@ -21,7 +21,7 @@ import settings.Settings;
 
 public class APIUtils {
 
-	public static String processPayment(String assetKeyString, String amount, String feePowTxt,
+	public static String processPayment(String assetKeyString, String amount, String feePowStr,
 			String sender, String recipient, String x,
 			HttpServletRequest request) {
 		
@@ -55,7 +55,7 @@ public class APIUtils {
 		// PARSE FEE POWER
 		int feePow;
 		try {
-			feePow = Integer.parseInt(feePowTxt);
+			feePow = Integer.parseInt(feePowStr);
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_INVALID_FEE);
@@ -134,10 +134,10 @@ public class APIUtils {
 		
 		
 			
-		case Transaction.NEGATIVE_FEE:
+		case Transaction.NOT_ENOUGH_FEE:
 
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_FEE);
+					ApiErrorFactory.ERROR_NO_BALANCE);
 
 		case Transaction.FEE_LESS_REQUIRED:
 

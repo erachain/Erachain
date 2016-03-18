@@ -1,5 +1,6 @@
 package utils;
 
+// 16/03
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -70,10 +71,9 @@ public class BlockExplorerTest {
 		Stopwatch stopwatchAll = new Stopwatch();
 		
 		//ADD QORA ASSET
-    	//Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 0, true, block.getGeneratorSignature());
-		Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 0, true);
-    	databaseSet.getIssueAssetMap().set(block.getGeneratorSignature(), 0l);
-    	databaseSet.getAssetMap().set(0l, qoraAsset);
+    	//Asset qoraAsset = new Asset(block.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, true, block.getGeneratorSignature());
+    	//databaseSet.getIssueAssetMap().set(block.getGeneratorSignature(), 0l);
+    	//databaseSet.getAssetMap().set(0l, qoraAsset);
     	
 		do {
 			
@@ -160,52 +160,49 @@ public class BlockExplorerTest {
 		int start = -1;
 		int txOnPage = 10;
 		String filter = "standart";
-		boolean withoutBlocks = false;
 		boolean allOnOnePage = false;
 		String showOnly = "";
 		String showWithout = "";
 		
 		DBSet.getInstance();
-		/*
+		
 		for(int i = 0; i < addrs.size(); i++) {
 			
 			String addr = addrs.get(i);
-		
-			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(addrs, start, txOnPage, filter, withoutBlocks, showOnly, showWithout);
+			List<String> listaddr = new ArrayList<>();
+			listaddr.add(addr);
+			
+			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
 	
-			Map<Object, Map> totalBalance = output.get("totalBalance");
+			Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 			
 			Account account = new Account(addr);
 			
 			System.out.println(addr);
-			for(Map.Entry<Object, Map> e : totalBalance.entrySet())
+			for(Map.Entry<Long, String> e : totalBalance.entrySet())
 			{
-				if(e.getKey() instanceof Long)
+				Long key = e.getKey();
+				
+				BigDecimal blockExplorerBalance =  new BigDecimal(e.getValue());
+				
+				System.out.print("(" + key + ") " + " BlockExplorerBalance: " + blockExplorerBalance);
+				
+				BigDecimal nativeBalance = account.getConfirmedBalance(key);
+				
+				System.out.print("; NantiveBalance: " + nativeBalance);
+				
+				if(blockExplorerBalance.equals(nativeBalance))
 				{
-					Long key = (Long) e.getKey();
-					
-					BigDecimal blockExplorerBalance =  new BigDecimal((String) e.getValue().get("amount"));
-					
-					System.out.print("(" + key + ") " + e.getValue().get("assetName") + " BlockExplorerBalance: " + blockExplorerBalance);
-					
-					BigDecimal nativeBalance = account.getConfirmedBalance(key);
-					
-					System.out.print("; NantiveBalance: " + nativeBalance);
-					
-					if(blockExplorerBalance.equals(nativeBalance))
-					{
-						System.out.println(" OK.");
-					}
-					else
-					{
-						System.out.println(" Fail!!!");
-					}
-					
-					assertEquals(blockExplorerBalance, nativeBalance);
+					System.out.println(" OK.");
 				}
+				else
+				{
+					System.out.println(" Fail!!!");
+				}
+				
+				assertEquals(blockExplorerBalance, nativeBalance);
 			}
 		}
-		*/
 		
 		DBSet.getInstance().close();
 	}
@@ -330,11 +327,11 @@ public class BlockExplorerTest {
 
 		Transaction transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
 		Account account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-		System.out.println(transaction.getAmount(account));
+		System.out.println(transaction.viewAmount(account));
 		
 		transaction = getTransaction(Base58.decode("4JXPXqdP7GT743AoX2m8vHBeWNrKvBcf71TcDLfLeMn6rmV5uyVRDcV5gLspNquZyatY4tHB9RXDWKahEM85oTJv"));
 		account = new Account("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ");
-		System.out.println(transaction.getAmount(account));
+		System.out.println(transaction.viewAmount(account));
 	}
 	
 	public Transaction getTransaction(byte[] signature) {

@@ -21,11 +21,12 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import database.BalanceMap;
+//import database.BalanceMap;
 import database.DBSet;
 
 public class CreateOrderTransaction extends Transaction 
 {
+	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;
 	private static final int PRICE_LENGTH = 12;
@@ -238,7 +239,7 @@ public class CreateOrderTransaction extends Transaction
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
+		process_fee(fork);
 		
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.order.getHave(), fork).compareTo(this.order.getAmount()) == -1)
@@ -246,13 +247,10 @@ public class CreateOrderTransaction extends Transaction
 			return NO_BALANCE;
 		}
 		
-		//ONLY AFTER POWFIX_RELEASE TO SAVE THE OLD NETWORK
-		if(this.timestamp >= Transaction.getPOWFIX_RELEASE()) {
-			//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-			if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
-			{
-				return NO_BALANCE;
-			}	
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, fork).compareTo(this.fee) == -1)
+		{
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF HAVE IS NOT DIVISBLE
@@ -289,13 +287,7 @@ public class CreateOrderTransaction extends Transaction
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-		
+				
 		return VALIDATE_OK;
 	}
 	
@@ -352,12 +344,12 @@ public class CreateOrderTransaction extends Transaction
 	}
 
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
+			return BigDecimal.ZERO.setScale(8);
 		}
 		
 		return BigDecimal.ZERO;
@@ -367,7 +359,7 @@ public class CreateOrderTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(), this.order.getAmount());
 		
 		return assetAmount;

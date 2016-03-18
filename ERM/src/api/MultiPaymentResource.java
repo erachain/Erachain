@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -31,6 +32,9 @@ import utils.Pair;
 @Produces(MediaType.APPLICATION_JSON)
 public class MultiPaymentResource 
 {
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(MultiPaymentResource.class);
 	@Context
 	HttpServletRequest request;
 	
@@ -49,7 +53,7 @@ public class MultiPaymentResource
 			if(jsonObject.containsKey("asset")) {
 				lgAsset = ((Long) jsonObject.get("asset")).intValue();
 			}
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			
 			Asset defaultAsset;
 			try {
@@ -86,7 +90,19 @@ public class MultiPaymentResource
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_SENDER);
 			}
-						
+			
+			int feePow=0;
+			if(feePowStr != null) {
+				try
+				{
+					feePow = Integer.parseInt(feePowStr);
+				}
+				catch(Exception e)
+				{
+				}	
+			} else {
+			}
+			
 			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(account, payments, feePow);
 			
 			switch (result.getB()) {
@@ -99,10 +115,10 @@ public class MultiPaymentResource
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_RECIPIENT);
 
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						ApiErrorFactory.ERROR_NO_BALANCE);
 
 			case Transaction.FEE_LESS_REQUIRED:
 
@@ -128,15 +144,10 @@ public class MultiPaymentResource
 						ApiErrorFactory.ERROR_UNKNOWN);
 			}
 		}
-		catch(NullPointerException e)
+		catch(NullPointerException | ClassCastException e)
 		{
 			//JSON EXCEPTION
-			//e.printStackTrace();
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-		catch(ClassCastException e)
-		{
-			//JSON EXCEPTION
+			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}

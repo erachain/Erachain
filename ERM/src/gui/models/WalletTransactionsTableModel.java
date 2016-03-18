@@ -110,7 +110,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 				
 			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getAmount(account));			
+				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(account));			
 
 			case COLUMN_FEE:
 				

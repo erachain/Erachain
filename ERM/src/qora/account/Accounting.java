@@ -135,7 +135,7 @@ public class Accounting extends Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.getAmount(this));
+					balance = balance.subtract(transaction.viewAmount(this));
 				}
 			}
 				

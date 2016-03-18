@@ -52,7 +52,8 @@ public class BlockChain
 
         	//PROCESS
         	genesisBlock.process();
-        	
+
+        	/*
         	//ADD QORA ASSET
         	byte[] genesisGenerator = genesisBlock.getGeneratorSignature();
         	db = DBSet.getInstance(); 
@@ -60,23 +61,7 @@ public class BlockChain
         	qoraAsset.setReference(genesisGenerator);
         	db.getIssueAssetMap().set(genesisGenerator, 0l);
         	db.getAssetMap().set(0l, qoraAsset);
-
-        	/*
-        	// ASSETS
-			Asset asset;
-        	byte[] signature;
-
-        	signature = genesisBlock.getAsset1_Ref();
-        	asset = genesisBlock.makeOil(signature);
-			db.getIssueAssetMap().set(signature, 1l);
-			db.getAssetMap().set(1l, asset);
-
-        	signature = genesisBlock.getAsset2_Ref();
-			asset = genesisBlock.makeGem(signature);
-			db.getIssueAssetMap().set(signature, 2l);
-			db.getAssetMap().set(2l, asset);
-			*/
-			
+        	*/
 
         }
 	}

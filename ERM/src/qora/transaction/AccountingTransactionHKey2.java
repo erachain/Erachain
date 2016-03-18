@@ -27,9 +27,10 @@ import qora.crypto.Crypto;
 //import utils.Converter;
 
 
-public class AccountingTransactionHKey2 extends Transaction {
+public class AccountingTransactionHKey2 extends TransactionAmount {
 	
-	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + CREATOR_LENGTH + DATA_SIZE_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH;
+	protected static final int HASH_KEY_LENGTH = 1;
+	protected static final int BASE_LENGTH = AccountingTransaction.BASE_LENGTH - KEY_LENGTH + HASH_KEY_LENGTH;
 
 	protected byte[] data;
 
@@ -39,29 +40,28 @@ public class AccountingTransactionHKey2 extends Transaction {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 
-		super(ACCOUNTING_TRANSACTION, creator, timestamp, reference);
+		super(ACCOUNTING_TRANSACTION, creator, recipient, amount, 0l, timestamp, reference);
 
-		this.recipient = recipient;
 		this.hkey = hkey;
-		this.amount = amount;
+
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 
 	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 
-		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+		this(creator, recipient, amount, hkey, data, isText, encrypted, timestamp, reference);
 		this.feePow = feePow;
 		this.signature = signature;
 		this.calcFee();
 
 	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, byte[] hkey, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 
-		this(creator, recipient, hkey, amount, data, isText, encrypted, timestamp, reference);
+		this(creator, recipient, amount, hkey, data, isText, encrypted, timestamp, reference);
 		this.feePow = feePow;
 		this.calcFee();
 
@@ -288,53 +288,22 @@ public class AccountingTransactionHKey2 extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new AccountingTransactionHKey2(creator, recipient, hkey, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new AccountingTransactionHKey2(creator, recipient, amount, hkey, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
-
-	/*
-	@Override
-	public boolean isSignatureValid() {
-		
-		byte[] data = this.toBytes( false );
-		if ( data == null ) return false;
-			
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	
-	}
-	*/
 
 	@Override
 	public int isValid(DBSet db) {
 		
+		int res = super.isValid(db);
+		if (res > 0) return res;
+
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}
 	
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-		
-		//REMOVE FEE
-		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
-		
-		//CHECK IF SENDER HAS ENOUGH QORA BALANCE
-		if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-
 		return VALIDATE_OK;
 	}
 
@@ -342,10 +311,10 @@ public class AccountingTransactionHKey2 extends Transaction {
 	public void process(DBSet db) {
 		//UPDATE SENDER
 		process_fee(db);
-		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+		//this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+		//this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.signature, db);
@@ -356,10 +325,10 @@ public class AccountingTransactionHKey2 extends Transaction {
 	public void orphan(DBSet db) {
 		//UPDATE SENDER
 		orphan_fee(db);
-		this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
+		//this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
+		//this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
 		
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.reference, db);
@@ -367,7 +336,7 @@ public class AccountingTransactionHKey2 extends Transaction {
 	}
 
 	@Override
-	public BigDecimal getAmount(Account account) {
+	public BigDecimal viewAmount(Account account) {
 		
 		return this.amount;
 	}
@@ -377,7 +346,7 @@ public class AccountingTransactionHKey2 extends Transaction {
 	// TODO hkey
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 
 	public BigDecimal calcBaseFee() {

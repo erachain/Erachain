@@ -134,7 +134,7 @@ public class NameSalesResource
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
 			String amount = (String) jsonObject.get("amount");
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			
 			//PARSE AMOUNT
 			BigDecimal bdAmount;
@@ -150,15 +150,13 @@ public class NameSalesResource
 				
 			
 			//PARSE FEE
-			BigDecimal bdFee;
+			int feePow=0;
 			try
 			{
-				bdFee = new BigDecimal(feePow);
-				bdFee = bdFee.setScale(8);
+				feePow = Integer.parseInt(feePowStr);
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
 			APIUtils.askAPICallAllowed("POST namesales/" + nameName + "\n"+x, request);
@@ -222,9 +220,9 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);				
 				
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 				
 			case Transaction.FEE_LESS_REQUIRED:
 				
@@ -254,11 +252,20 @@ public class NameSalesResource
 	@DELETE
 	@Path("/{name}/{fee}")
 	@Consumes(MediaType.WILDCARD)
-	public String cancelNameSale(@PathParam("name") String nameName, @PathParam("feePow") int feePow)
+	public String cancelNameSale(@PathParam("name") String nameName, @PathParam("feePow") String feePowStr)
 	{
 		try
 		{
 			//PARSE FEE
+			int feePow = 0;
+			try
+			{
+				feePow = Integer.parseInt(feePowStr);
+			}
+			catch(Exception e)
+			{
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+			}	
 			
 			NameSale nameSale = Controller.getInstance().getNameSale(nameName);
 
@@ -318,9 +325,9 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_SALE_NO_EXISTS);	
 					
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 				
 			case Transaction.FEE_LESS_REQUIRED:
 				
@@ -357,9 +364,18 @@ public class NameSalesResource
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
 			String buyer = (String) jsonObject.get("buyer");
-			int feePow = (int) jsonObject.get("feePow");
+			String feePowStr = (String) jsonObject.get("feePow");
 			
 			//PARSE FEE
+			int feePow;
+			try
+			{
+				feePow = Integer.parseInt(feePowStr);
+			}
+			catch(Exception e)
+			{
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+			}
 
 			APIUtils.askAPICallAllowed("POST namesales/buy/" + nameName + "\n" + x, request);
 
@@ -429,9 +445,9 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_SALE_NO_EXISTS);		
 				
-			case Transaction.NEGATIVE_FEE:
+			case Transaction.NOT_ENOUGH_FEE:
 					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
 					
 			case Transaction.FEE_LESS_REQUIRED:
 				

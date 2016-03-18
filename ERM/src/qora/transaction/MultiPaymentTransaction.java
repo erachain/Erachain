@@ -205,16 +205,13 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(fork).subtract(this.fee), fork);
+		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, fork).subtract(this.fee), fork);
 		
-		//ONLY AFTER POWFIX_RELEASE TO SAVE THE OLD NETWORK
-		if(this.timestamp >= Transaction.getPOWFIX_RELEASE()) {
-			//CHECK IF CREATOR HAS ENOUGH QORA BALANCE
-			if(this.creator.getConfirmedBalance(fork).compareTo(BigDecimal.ZERO) == -1)
-			{
-				return NO_BALANCE;
-			}	
-		}
+		//CHECK IF CREATOR HAS ENOUGH QORA BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
+		{
+			return NO_BALANCE;
+		}	
 		
 		//CHECK PAYMENTS
 		for(Payment payment: this.payments)
@@ -257,13 +254,7 @@ public class MultiPaymentTransaction extends Transaction {
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-		
+				
 		return VALIDATE_OK;
 	}
 
@@ -345,8 +336,8 @@ public class MultiPaymentTransaction extends Transaction {
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();

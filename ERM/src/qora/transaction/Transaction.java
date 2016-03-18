@@ -31,8 +31,8 @@ public abstract class Transaction {
 	public static final int VALIDATE_OK = 1;
 	public static final int INVALID_ADDRESS = 2;
 	public static final int NEGATIVE_AMOUNT = 3;
-	public static final int NEGATIVE_FEE = 4;
-	//public static final int NOT_ENOUGH_FEE = 4;
+	//public static final int NEGATIVE_FEE = 4;
+	public static final int NOT_ENOUGH_FEE = 4;
 	public static final int NO_BALANCE = 5;
 	public static final int INVALID_REFERENCE = 6;
 	
@@ -119,7 +119,7 @@ public abstract class Transaction {
 	public static final int JSON_TRANSACTION = 27;
 	
 	// FEE KEY = OIL
-	public static final int FEE_KEY = 1;
+	public static final long FEE_KEY = 1l;
 	public static final BigDecimal FEE_PER_BYTE = new BigDecimal(0.00000001);
 	
 	//RELEASES
@@ -181,13 +181,11 @@ public abstract class Transaction {
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
-	protected static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 	protected static final int KEY_LENGTH = 8;
 	//protected static final int HKEY_LENGTH = 20;
-	protected static final int AMOUNT_LENGTH = 8;
 	protected static final int CREATOR_LENGTH = 32;
 	// not need now protected static final int FEE_LENGTH = 8;
-	protected static final int SIGNATURE_LENGTH = 64;
+	public static final int SIGNATURE_LENGTH = 64;
 		
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
@@ -249,10 +247,20 @@ public abstract class Transaction {
 		return this.timestamp + (1000*60*60*24);
 	}
 	
+	public BigDecimal viewAmount(Account account)
+	{
+		return BigDecimal.ZERO;
+	}
+	
 	public BigDecimal getFee()
 	{
 		return this.fee;
 	}
+	public String getStr()
+	{
+		return "trans";
+	}
+	
 	
 	public byte[] getSignature()
 	{
@@ -317,6 +325,7 @@ public abstract class Transaction {
 		transaction.put("reference", Base58.encode(this.reference));
 		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
+		if (this.creator != null ) transaction.put("creator", this.creator.getAddress());
 		
 		return transaction;
 	}
@@ -348,9 +357,10 @@ public abstract class Transaction {
 				this.signature, data);
 	}
 	
+
 	public int isValid()
 	{
-		return this.isValid(DBSet.getInstance());
+		return isValid(DBSet.getInstance());
 	}
 	
 	public abstract int isValid(DBSet db);
@@ -387,9 +397,7 @@ public abstract class Transaction {
 		
 	public abstract List<Account> getInvolvedAccounts();
 		
-	public abstract boolean isInvolved(Account account);
-	
-	public abstract BigDecimal getAmount(Account account);
+	public abstract boolean isInvolved(Account account);	
 	
 	public int getSeq()
 	{
@@ -460,8 +468,6 @@ public abstract class Transaction {
 		return Controller.getInstance().getLastBlock().getNextBlockVersion(DBSet.getInstance());	
 	}
 
-	public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
-	
 	public static Map<String, Map<Long, BigDecimal>> subAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount, String address, Long assetKey, BigDecimal amount) 
 	{
 		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(8).subtract(amount));

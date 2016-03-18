@@ -202,10 +202,10 @@ public class SellNameTransaction extends Transaction
 			return INVALID_AMOUNT;
 		}
 				
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
@@ -213,13 +213,7 @@ public class SellNameTransaction extends Transaction
 		{
 			return INVALID_REFERENCE;
 		}
-		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
-		
+				
 		return VALIDATE_OK;
 	}
 	
@@ -273,8 +267,8 @@ public class SellNameTransaction extends Transaction
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		String address = account.getAddress();
 		
@@ -286,7 +280,7 @@ public class SellNameTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import qora.account.Account;
@@ -14,6 +15,7 @@ import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.MessageTransaction;
 import qora.transaction.Transaction;
+import qora.transaction.TransactionAmount;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
@@ -26,6 +28,10 @@ import database.TransactionFinalMap;
 //QORA AT API IMPLEMENTATION
 public class AT_API_Platform_Impl extends AT_API_Impl {
 
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(AT_API_Platform_Impl.class);
+	
 	private final static AT_API_Platform_Impl instance = new AT_API_Platform_Impl();
 
 	private final static int FIX_HEIGHT_0 = 142000;
@@ -96,11 +102,9 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		}
 		catch ( Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
-		finally
-		{
-		}
+		
 	}
 
 	@Override
@@ -550,16 +554,20 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 	protected static long getAmount(Transaction tx, Account recipient, int height)
 	{
-		byte[] amountB = ( height >= FIX_HEIGHT_0 ) ? 	tx.getAmount( recipient ).unscaledValue().toByteArray():
-			tx.getAmount( tx.getCreator() ).unscaledValue().toByteArray();
-		if ( amountB.length < 8 )
-		{
-			byte[] fill = new byte[ 8 - amountB.length ];
-			amountB = Bytes.concat(fill, amountB);
+		if (tx instanceof TransactionAmount) {
+			tx = (TransactionAmount) tx;
+			byte[] amountB = ( height >= FIX_HEIGHT_0 ) ? 	tx.viewAmount( recipient ).unscaledValue().toByteArray():
+				tx.viewAmount( tx.getCreator() ).unscaledValue().toByteArray();
+			if ( amountB.length < 8 )
+			{
+				byte[] fill = new byte[ 8 - amountB.length ];
+				amountB = Bytes.concat(fill, amountB);
+			}
+	
+			long txAmount = Longs.fromByteArray( amountB );
+			return txAmount;
 		}
-
-		long txAmount = Longs.fromByteArray( amountB );
-		return txAmount;
+		return 0;
 	}
 
 

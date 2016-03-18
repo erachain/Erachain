@@ -554,8 +554,8 @@ public class InitiateAcctFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT will be enabled at !"),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				break;
-			case Transaction.NEGATIVE_FEE:
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee must be at least 1!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			case Transaction.NOT_ENOUGH_FEE:
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				break;	
 			case Transaction.NEGATIVE_AMOUNT:

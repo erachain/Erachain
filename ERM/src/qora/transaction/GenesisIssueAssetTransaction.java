@@ -26,6 +26,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import database.AssetMap;
 //import database.BalanceMap;
 import database.DBSet;
 
@@ -33,7 +34,6 @@ public class GenesisIssueAssetTransaction extends Transaction
 {
 	
 	private static final int BASE_LENGTH = CREATOR_LENGTH + TIMESTAMP_LENGTH;
-
 	private Asset asset;
 	
 	public GenesisIssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp) 
@@ -105,8 +105,9 @@ public class GenesisIssueAssetTransaction extends Transaction
 		position += CREATOR_LENGTH;
 
 		//READ ASSET
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length));
-		//position += asset.getDataLength();
+		// read without reference
+		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		//position += asset.getDataLength(false);
 						
 		return new GenesisIssueAssetTransaction(creator, asset, timestamp);
 	}	
@@ -131,7 +132,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 		data = Bytes.concat(data, this.creator.getPublicKey());
 
 		//WRITE ASSET
-		data = Bytes.concat(data, this.asset.toBytes(withSign));
+		// without reference
+		data = Bytes.concat(data, this.asset.toBytes(false));
 				
 		return data;
 	}
@@ -139,7 +141,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 	@Override
 	public int getDataLength()
 	{
-		return TYPE_LENGTH + BASE_LENGTH + this.asset.getDataLength();
+		// not include asset REFERENCE
+		return TYPE_LENGTH + BASE_LENGTH + this.asset.getDataLength(false);
 	}
 	
 	//VALIDATE
@@ -189,21 +192,27 @@ public class GenesisIssueAssetTransaction extends Transaction
 	public void process(DBSet db)
 	{
 		
-
-		//this.sign();
-		
-		//INSERT INTO DATABASE
-		long key = db.getAssetMap().add(this.asset);
-		
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
 
+		//INSERT INTO DATABASE
+		AssetMap assetMap = DBSet.getInstance().getAssetMap();
+		int mapSize = assetMap.size();
+		//Logger.getGlobal().info("GENESIS MAP SIZE: " + assetMap.size());
+		long key = 0l;
+		if (mapSize == 0) {
+			// initial map set
+			assetMap.set(0l, this.asset);
+		} else {
+			key = assetMap.add(this.asset);
+			//this.asset.setKey(key);
+		}
+		db.getIssueAssetMap().set(this, key); // need to SET but not ADD !
+
 		//ADD ASSETS TO OWNER
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
-		
-		//SET ORPHAN DATA
-		db.getIssueAssetMap().set(this, key);
-    	//db.getAssetMap().set(key, this.asset);
+
+		Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
 
 	}
 
@@ -216,14 +225,17 @@ public class GenesisIssueAssetTransaction extends Transaction
 		this.creator.setLastReference(this.reference, db);
 				
 		//DELETE FROM DATABASE
-		long key = db.getIssueAssetMap().get(this);
-		db.getAssetMap().delete(key);	
+		long assetKey = db.getIssueAssetMap().get(this);
+		db.getAssetMap().delete(assetKey);	
 		
 		//REMOVE ASSETS FROM OWNER
-		this.creator.setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		this.creator.setConfirmedBalance(assetKey, BigDecimal.ZERO.setScale(8), db);
 		
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
+
+		Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
+		//assetKey--;
 
 	}
 
@@ -251,13 +263,13 @@ public class GenesisIssueAssetTransaction extends Transaction
 	}
 
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{		
 		return BigDecimal.ZERO;
 	}
 	
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

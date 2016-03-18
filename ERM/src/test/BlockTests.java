@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import ntp.NTP;
@@ -14,11 +15,13 @@ import database.DBSet;
 import qora.BlockGenerator;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
+import qora.assets.Asset;
 import qora.block.Block;
 import qora.block.BlockFactory;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.GenesisTransferAssetTransaction;
 import qora.transaction.PaymentTransaction;
 import qora.transaction.Transaction;
 
@@ -27,11 +30,21 @@ public class BlockTests
 	@Test
 	public void validateSignatureGenesisBlock()
 	{
+		
+		//CREATE EMPTY DATABASE
+		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+
 		Block genesisBlock = new GenesisBlock();
+		//genesisBlock.process(databaseSet);
 		
 		//CHECK IF SIGNATURE VALID  this.transactionsSignature [B@5ecddf8f [B@6c629d6e
 		// [B@5ecddf8f [B@6c629d6e
-		//Logger.getGlobal().info("getGeneratorSignature " + genesisBlock.getGeneratorSignature());
+		Logger.getGlobal().info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
+				+ " : " + genesisBlock.getGeneratorSignature());
+
+		Logger.getGlobal().info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
+				+ " : " + genesisBlock.getGeneratorSignature());
+
 		assertEquals(true, genesisBlock.isSignatureValid());
 		
 		//ADD TRANSACTION SIGNATURE
@@ -87,7 +100,10 @@ public class BlockTests
 			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);
 					
 			//CHECK INSTANCE
-			assertEquals(true, parsedBlock instanceof GenesisBlock);
+			assertEquals(rawBlock.length, parsedBlock.getDataLength());
+			
+			//CHECK INSTANCE
+			//assertEquals(true, parsedBlock instanceof GenesisBlock);
 					
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisBlock.getSignature(), parsedBlock.getSignature()));
@@ -112,7 +128,7 @@ public class BlockTests
 		}
 		catch (Exception e) 
 		{
-			fail("Exception while parsing transaction.");
+			fail("Exception while parsing transaction." + e);
 		}
 				
 		//PARSE TRANSACTION FROM WRONG BYTES
@@ -161,7 +177,7 @@ public class BlockTests
 		
 		//CHECK IF SIGNATURE VALID
 		assertEquals(true, newBlock.isSignatureValid());
-		
+
 		//INVALID TRANSACTION SIGNATURE
 		transactionsSignature = new byte[64];
 		newBlock.setTransactionsSignature(transactionsSignature);
@@ -198,7 +214,7 @@ public class BlockTests
 		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
 		
 		//ADD TRANSACTION
-		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet), payment.getSignature());
+		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(databaseSet), payment.getSignature());
 		newBlock.addTransaction(payment);
 				
 		//ADD TRANSACTION SIGNATURE
@@ -223,11 +239,22 @@ public class BlockTests
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
-								
+				
+		Transaction transaction;
+		
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		/*
+		transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		transaction.process(databaseSet);
-						
+		*/
+		
+		// (issuer, recipient, 0l, bdAmount, timestamp)
+		// need add VOLUME for generating new block - 0l asset!
+		transaction = new GenesisTransferAssetTransaction(genesisBlock.getGenerator(),
+				generator, 0l,
+				BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		transaction.process(databaseSet);
+		
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
@@ -237,6 +264,10 @@ public class BlockTests
 		newBlock.setTransactionsSignature(transactionsSignature);
 		
 		//CHECK IF VALID
+		/* !!! in qora.block.Block.isValid(DBSet) - comment:
+				//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
+				if(this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp)
+		*/
 		assertEquals(true, newBlock.isValid(databaseSet));
 		
 		//CHANGE REFERENCE
@@ -309,7 +340,7 @@ public class BlockTests
 		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
 		
-		payment1.process(fork);
+		//payment1.process(fork);
 		block.addTransaction(payment1);	
 				
 		//GENERATE PAYMENT 2

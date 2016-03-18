@@ -127,8 +127,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) {
+	//@Override
+	public BigDecimal viewAmount(Account account) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 
@@ -140,7 +140,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
 			// IF QORA ASSET
-			if (payment.getAsset() == BalanceMap.QORA_KEY) {
+			if (payment.getAsset() == FEE_KEY) {
 				// IF SENDER
 				if (address.equals(this.creator.getAddress())) {
 					amount = amount.subtract(payment.getAmount());
@@ -156,12 +156,12 @@ public abstract class ArbitraryTransaction extends Transaction {
 		return amount;
 	}
 	
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

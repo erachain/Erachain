@@ -2,11 +2,18 @@ package test;
 
 import static org.junit.Assert.*;
 
+import java.util.logging.Logger;
+
 import java.math.BigDecimal;
+import java.util.Collection;
 
 import org.junit.Test;
 
 import database.DBSet;
+import database.AssetMap;
+//import database.IssueAssetMap;
+import qora.assets.Asset;
+import qora.block.GenesisBlock;
 
 
 public class DatabaseTests {
@@ -52,5 +59,29 @@ public class DatabaseTests {
 		
 		//CHECK VALUE IN FORK
 		assertEquals(BigDecimal.ZERO, fork2.getBalanceMap().get("test"));
-	}	
+	}
+	
+	@Test
+	public void databaseAssets()
+	{
+		
+		DBSet.reCreateDatabase();
+		//GenesisBlock gb = new GenesisBlock();
+		//gb.process();
+		
+		AssetMap db = DBSet.getInstance().getAssetMap();
+		
+		Collection<Asset> assets = db.getValues();
+		for (Asset asset:assets) {
+			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
+			Logger.getGlobal().info("ASSET - " + asset.getKey() + " : " + asset.getName()
+			+ " : " + asset.getReference());	
+			//db.add(asset);
+		}
+		db.add(db.get(1l));
+		Logger.getGlobal().info("keys " + db.getKeys());
+
+		//Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValues();
+	}
+
 }

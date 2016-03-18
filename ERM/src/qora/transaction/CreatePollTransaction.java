@@ -251,10 +251,10 @@ public class CreatePollTransaction extends Transaction
 			options.add(option.getName());
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK
@@ -263,11 +263,6 @@ public class CreatePollTransaction extends Transaction
 			return INVALID_REFERENCE;
 		}
 		
-		//CHECK IF FEE IS POSITIVE
-		if(this.fee.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_FEE;
-		}
 		
 		return VALIDATE_OK;
 	}
@@ -331,8 +326,8 @@ public class CreatePollTransaction extends Transaction
 		return false;
 	}
 
-	@Override
-	public BigDecimal getAmount(Account account) 
+	//@Override
+	public BigDecimal viewAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
@@ -342,7 +337,7 @@ public class CreatePollTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 	
-	@Override
+	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
