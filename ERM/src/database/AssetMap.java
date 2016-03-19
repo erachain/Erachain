@@ -37,7 +37,7 @@ public class AssetMap extends DBMap<Long, Asset>
 		this.key = this.getKey();
 	}
 	
-	public long getKey()
+	protected long getKey()
 	{
 		return this.key;
 	}

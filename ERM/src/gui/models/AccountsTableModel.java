@@ -7,6 +7,7 @@ import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 
+import qora.transaction.Transaction;
 import qora.account.Account;
 import qora.assets.Asset;
 import utils.NumberAsString;
@@ -106,14 +107,16 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			
 			if(this.asset == null || this.asset.getKey() == 0l)
 			{
-				return NumberAsString.getInstance().numberAsString(account.getBalance(0).subtract(account.getConfirmedBalance()));	
+				return NumberAsString.getInstance().numberAsString(
+						account.getUnconfirmedBalance().subtract(account.getConfirmedBalance()));	
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).subtract(account.getConfirmedBalance(this.asset.getKey())));
+				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).
+						subtract(account.getConfirmedBalance(this.asset.getKey())));
 			}
 		case COLUMN_OIL_BALANCE:
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(1l));
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
 			
 			
 		/*	

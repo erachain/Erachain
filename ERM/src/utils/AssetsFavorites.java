@@ -14,6 +14,8 @@ import database.SortableList;
 import gui.Gui;
 import qora.account.Account;
 import qora.assets.Asset;
+import qora.transaction.Transaction;		
+
 
 public class AssetsFavorites implements Observer{
 
@@ -33,7 +35,9 @@ public class AssetsFavorites implements Observer{
 	
 	public List<Asset> getAssets()
 	{
-		List<Asset> assets = new ArrayList<Asset>(); 
+		List<Asset> assets = new ArrayList<Asset>();
+		assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY));		
+		assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
 			assets.add(Controller.getInstance().getAsset(key));
 		}

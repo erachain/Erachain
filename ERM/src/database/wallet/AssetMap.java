@@ -13,8 +13,10 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.BTreeMap;
 
+import qora.block.GenesisBlock;
 import qora.account.Account;
 import qora.assets.Asset;
+import qora.block.GenesisBlock;
 import utils.ObserverMessage;
 import utils.Pair;
 import database.DBMap;
@@ -136,7 +138,15 @@ public class AssetMap extends DBMap<Tuple2<String, String>, Asset>
 	public List<Pair<Account, Asset>> get(List<Account> accounts)
 	{
 		List<Pair<Account, Asset>> assets = new ArrayList<Pair<Account, Asset>>();
+
+		/* icreator
+		Asset genesisAsset = GenesisBlock.makeAsset(0);
+		assets.add(new Pair<Account, Asset>(accounts.get(1), genesisAsset));
+		genesisAsset = GenesisBlock.makeAsset(1);
+		assets.add(new Pair<Account, Asset>(accounts.get(1), genesisAsset));
+		*/
 		
+
 		try
 		{
 			//FOR EACH ACCOUNTS
@@ -196,7 +206,8 @@ public class AssetMap extends DBMap<Tuple2<String, String>, Asset>
 	
 	public boolean add(Asset asset)
 	{
-		return this.set(new Tuple2<String, String>(asset.getCreator().getAddress(), new String(asset.getReference())), asset);
+		return this.set(new Tuple2<String, String>(asset.getCreator().getAddress(),
+				new String(asset.getReference())), asset);
 	}
 	
 	public void addAll(Map<Account, List<Asset>> assets)

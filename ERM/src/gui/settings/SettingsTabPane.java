@@ -1,6 +1,5 @@
 package gui.settings;
-// 16/03
-
+// 16 03
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 

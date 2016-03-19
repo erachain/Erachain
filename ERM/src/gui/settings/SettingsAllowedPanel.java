@@ -1,5 +1,5 @@
 package gui.settings;
-// 16/03
+//16 03
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
