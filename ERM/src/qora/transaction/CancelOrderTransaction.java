@@ -31,19 +31,13 @@ public class CancelOrderTransaction extends Transaction
 	
 	private BigInteger order;
 	
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, long timestamp, byte[] reference) {
-		super(CANCEL_ORDER_TRANSACTION, creator, timestamp, reference);
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+		super(CANCEL_ORDER_TRANSACTION, creator, feePow, timestamp, reference);
 		this.order = order;
 	}
 	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, order, timestamp, reference);
+		this(creator, order, feePow, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
-		this(creator, order, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -195,11 +189,11 @@ public class CancelOrderTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -215,11 +209,11 @@ public class CancelOrderTransaction extends Transaction
 		db.getOrderMap().delete(this.order);	
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 												
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -293,7 +287,7 @@ public class CancelOrderTransaction extends Transaction
 		
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

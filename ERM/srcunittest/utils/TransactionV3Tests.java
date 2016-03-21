@@ -62,9 +62,9 @@ public class TransactionV3Tests {
 		creator.setConfirmedBalance(61l, BigDecimal.valueOf(100).setScale(8), databaseSet);
 				
 		MessageTransaction messageTransactionV3 = new MessageTransaction(
-				creator, recipient, 61l, //	ATFunding 
+				creator, FEE_POWER, recipient, //	ATFunding 
+				61l, 
 				BigDecimal.valueOf(10).setScale(8), 
-				FEE_POWER, 
 				data, 
 				new byte[] { 1 },
 				new byte[] { 0 },

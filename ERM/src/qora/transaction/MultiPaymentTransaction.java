@@ -33,22 +33,15 @@ public class MultiPaymentTransaction extends Transaction {
 
 	private List<Payment> payments;
 	
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, long timestamp, byte[] reference) 
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(MULTI_PAYMENT_TRANSACTION, creator, timestamp, reference);		
+		super(MULTI_PAYMENT_TRANSACTION, creator, feePow, timestamp, reference);		
 		this.payments = payments;
 	}
 	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, payments, timestamp, reference);
+		this(creator, payments, feePow, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, payments, timestamp, reference);		
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -260,11 +253,11 @@ public class MultiPaymentTransaction extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	@Override
+	//@Override
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 						
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -282,11 +275,11 @@ public class MultiPaymentTransaction extends Transaction {
 		}
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 						
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -385,7 +378,7 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 	

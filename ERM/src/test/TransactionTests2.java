@@ -465,7 +465,7 @@ public class TransactionTests2 {
 		Logger.getGlobal().info("array[4]: " + i2);
 		*/
 		Asset asset = new Asset(creator, "ERM1", "1It is the basic unit of Environment Real Management", 999999999L, (byte) 6, true);
-		IssueAssetTransaction iat = new IssueAssetTransaction(creator, asset, timestamp, creator.getLastReference());
+		IssueAssetTransaction iat = new IssueAssetTransaction(creator, asset, FEE_POWER,timestamp, creator.getLastReference());
 		Logger.getGlobal().info("iat REF: " + iat.getReference().length);
 		iat.sign(creator);
 		iat.process();
@@ -476,9 +476,9 @@ public class TransactionTests2 {
 		byte[] data = "test123!".getBytes();
 		
 		AccountingTransaction accountingTransaction = new AccountingTransaction(
-				creator, recipient, asset.getKey(),
-				BigDecimal.valueOf(23).setScale(8), 
-				FEE_POWER,
+				creator, FEE_POWER, recipient,
+				asset.getKey(), 
+				BigDecimal.valueOf(23).setScale(8),
 				data, 
 				new byte[] { 1 },
 				new byte[] { 0 },

@@ -67,14 +67,11 @@ public class Asset {
 		return this.scale;
 	}
 	public long getKey() {
-		// -- return this.key;
-		return DBSet.getInstance().getIssueAssetMap().get(this.reference);
+		return this.getKey(DBSet.getInstance());
 	}
-	/*
-	public void setKey(long key) {
-		this.key = key;
+	public long getKey(DBSet db) {
+		return db.getIssueAssetMap().get(this.reference);
 	}
-	*/
 	
 	public String getDescription() {
 		return this.description;

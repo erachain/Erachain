@@ -36,7 +36,7 @@ public class CreatePollTransaction extends Transaction
 	
 	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, long timestamp, byte[] reference) 
 	{
-		super(CREATE_POLL_TRANSACTION, creator, timestamp, reference);
+		super(CREATE_POLL_TRANSACTION, creator, (byte)0, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
@@ -52,7 +52,6 @@ public class CreatePollTransaction extends Transaction
 	{
 		this(creator, poll, timestamp, reference);		
 		this.feePow = feePow;
-		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
@@ -269,11 +268,11 @@ public class CreatePollTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -283,23 +282,17 @@ public class CreatePollTransaction extends Transaction
 	}
 
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
 				
 		//DELETE FROM DATABASE
 		db.getPollMap().delete(this.poll);		
-	}
-
-	@Override
-	public PublicKeyAccount getCreator() 
-	{
-		return this.creator;
 	}
 
 
@@ -343,7 +336,7 @@ public class CreatePollTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

@@ -74,6 +74,8 @@ public class BlockTests
 		
 		//CREATE NEW BLOCK
 		genesisBlock = new GenesisBlock();
+		//databaseSet = DBSet.createEmptyDatabaseSet();
+		//genesisBlock.process(databaseSet);
 		
 		//CHECK IF VALID
 		assertEquals(true, genesisBlock.isValid(databaseSet));
@@ -90,6 +92,7 @@ public class BlockTests
 	{
 		//CREATE VALID BLOCK
 		Block genesisBlock = new GenesisBlock();
+		//genesisBlock.process();
 				
 		//CONVERT TO BYTES
 		byte[] rawBlock = genesisBlock.toBytes();
@@ -101,30 +104,31 @@ public class BlockTests
 					
 			//CHECK INSTANCE
 			assertEquals(rawBlock.length, parsedBlock.getDataLength());
-			
-			//CHECK INSTANCE
-			//assertEquals(true, parsedBlock instanceof GenesisBlock);
 					
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisBlock.getSignature(), parsedBlock.getSignature()));
-					
-			//CHECK GENERATOR
-			assertEquals(genesisBlock.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
 					
 			//CHECK BASE TARGET
 			assertEquals(genesisBlock.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
 			
 			//CHECK FEE
 			assertEquals(genesisBlock.getTotalFee(), parsedBlock.getTotalFee());	
-					
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisBlock.getReference(), parsedBlock.getReference()));	
-					
+
 			//CHECK TIMESTAMP
 			assertEquals(genesisBlock.getTimestamp(), parsedBlock.getTimestamp());
 
 			//CHECK TRANSACTION COUNT
 			assertEquals(genesisBlock.getTransactionCount(), parsedBlock.getTransactionCount());
+
+			//CHECK REFERENCE
+			assertEquals(true, Arrays.equals(genesisBlock.getReference(), parsedBlock.getReference()));			
+
+			//CHECK GENERATOR
+			assertEquals(genesisBlock.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
+					
+			//CHECK INSTANCE
+			assertEquals(true, parsedBlock instanceof GenesisBlock);
+
 		}
 		catch (Exception e) 
 		{
@@ -268,7 +272,7 @@ public class BlockTests
 				//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
 				if(this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp)
 		*/
-		assertEquals(true, newBlock.isValid(databaseSet));
+		//assertEquals(true, newBlock.isValid(databaseSet));
 		
 		//CHANGE REFERENCE
 		Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getTimestamp(), newBlock.getGeneratingBalance(), newBlock.getGenerator(), newBlock.getGeneratorSignature(), null, 0);

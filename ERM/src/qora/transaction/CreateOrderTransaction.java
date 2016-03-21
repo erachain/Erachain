@@ -40,7 +40,7 @@ public class CreateOrderTransaction extends Transaction
 	
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, long timestamp, byte[] reference) 
 	{
-		super(CREATE_ORDER_TRANSACTION, creator, timestamp, reference);
+		super(CREATE_ORDER_TRANSACTION, creator, (byte)0, timestamp, reference);
 		
 		this.have = have;
 		this.want = want;
@@ -60,7 +60,6 @@ public class CreateOrderTransaction extends Transaction
 	{
 		this(creator, have, want, amount, price, timestamp, reference);
 		this.feePow = feePow;
-		this.calcFee();
 	}
 
 	//GETTERS/SETTERS
@@ -239,7 +238,7 @@ public class CreateOrderTransaction extends Transaction
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		process_fee(fork);
+		super.process(fork);
 		
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.order.getHave(), fork).compareTo(this.order.getAmount()) == -1)
@@ -293,11 +292,11 @@ public class CreateOrderTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -307,11 +306,11 @@ public class CreateOrderTransaction extends Transaction
 	}
 
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -364,7 +363,7 @@ public class CreateOrderTransaction extends Transaction
 		
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

@@ -34,20 +34,14 @@ public class BuyNameTransaction extends Transaction
 	private NameSale nameSale;
 	private Account seller;
 	
-	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, long timestamp, byte[] reference) {
-		super(BUY_NAME_TRANSACTION, creator, timestamp, reference);
+	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference) {
+		super(BUY_NAME_TRANSACTION, creator, feePow, timestamp, reference);
 		this.nameSale = nameSale;
 		this.seller = seller;
 	}
 	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, nameSale, seller, timestamp, reference);		
+		this(creator, nameSale, seller, feePow, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference) {
-		this(creator, nameSale, seller, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -253,11 +247,11 @@ public class BuyNameTransaction extends Transaction
 
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db) 
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
@@ -276,11 +270,11 @@ public class BuyNameTransaction extends Transaction
 		
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
@@ -344,7 +338,7 @@ public class BuyNameTransaction extends Transaction
 		
 		return BigDecimal.ZERO.setScale(8);
 	}
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

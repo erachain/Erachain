@@ -35,23 +35,16 @@ public class AccountingTransaction extends TransactionAmount {
 	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH ; 
 			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH +  + CREATOR_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(ACCOUNTING_TRANSACTION, creator, recipient, amount, key, timestamp, reference);
+	public AccountingTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		super(ACCOUNTING_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
-		this.feePow = feePow;
+	public AccountingTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
-	}
-	public AccountingTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
-		this.feePow = feePow;
-		this.calcFee();
-
 	}
 
 	public byte[] getData() 
@@ -159,7 +152,7 @@ public class AccountingTransaction extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new AccountingTransaction(creator, recipient, key, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new AccountingTransaction(creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 

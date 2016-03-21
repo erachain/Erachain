@@ -56,7 +56,7 @@ public class DeployATTransaction extends Transaction
 
 	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
 	{
-		super(DEPLOY_AT_TRANSACTION, creator, timestamp, reference);
+		super(DEPLOY_AT_TRANSACTION, creator, (byte)0, timestamp, reference);
 
 		this.name = name;
 		this.description = description;
@@ -76,7 +76,6 @@ public class DeployATTransaction extends Transaction
 	{
 		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.feePow = feePow;
-		this.calcFee();
 	}
 
 	//PARSE/CONVERT
@@ -394,11 +393,11 @@ public class DeployATTransaction extends Transaction
 
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db) 
 	{
 		//UPDATE ISSUER
-		process_fee(db);
+		super.process(db);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount), db);
 
 		//UPDATE REFERENCE OF ISSUER
@@ -459,10 +458,11 @@ public class DeployATTransaction extends Transaction
 		return new Account(atId);
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) {
+
 		//UPDATE ISSUER
-		orphan_fee(db);
+		super.orphan(db);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount), db);
 
 		//UPDATE REFERENCE OF ISSUER
@@ -537,7 +537,7 @@ public class DeployATTransaction extends Transaction
 		return assetAmount;
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

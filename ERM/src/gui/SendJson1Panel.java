@@ -571,6 +571,7 @@ public class SendJson1Panel extends JPanel
 			parsing = 2;
 			int feePow = Integer.parseInt(txtFeePow.getText());
 			
+			/*
 			//CHECK MIMIMUM FEE_POW
 			String is = Transaction.checkFeePow(feePow);
 			if(is != null)
@@ -583,6 +584,7 @@ public class SendJson1Panel extends JPanel
 				
 				return;
 			}
+			*/
 			
 			String message = txtMessage.getText();
 			

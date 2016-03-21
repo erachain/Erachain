@@ -42,7 +42,7 @@ public class Settings {
 	private static final String[] DEFAULT_PEERS = { };
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1458235285336L; // QORA RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1458554240336L; // QORA RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC

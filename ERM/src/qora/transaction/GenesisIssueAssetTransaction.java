@@ -38,9 +38,9 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	public GenesisIssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp) 
 	{
-		// new reference = byte[]{}
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, creator, timestamp, null);
+		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
 
+		this.creator = creator;
 		this.asset = asset;
 		this.generateSignature();
 
@@ -196,7 +196,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		this.creator.setLastReference(this.signature, db);
 
 		//INSERT INTO DATABASE
-		AssetMap assetMap = DBSet.getInstance().getAssetMap();
+		AssetMap assetMap = db.getAssetMap();
 		int mapSize = assetMap.size();
 		//Logger.getGlobal().info("GENESIS MAP SIZE: " + assetMap.size());
 		long key = 0l;
@@ -207,7 +207,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 			key = assetMap.add(this.asset);
 			//this.asset.setKey(key);
 		}
-		db.getIssueAssetMap().set(this, key); // need to SET but not ADD !
+		db.getIssueAssetMap().set(this.signature, key); // need to SET but not ADD !
 
 		//ADD ASSETS TO OWNER
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
@@ -278,7 +278,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee();
+	public int calcBaseFee() {
+		return 0;
 	}
 }

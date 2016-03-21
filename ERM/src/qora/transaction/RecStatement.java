@@ -5,7 +5,10 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+//import java.util.LinkedHashMap;
+//import java.util.List;
+//import java.util.Map;
+import java.util.logging.Logger;
 
 import org.json.simple.JSONObject;
 
@@ -13,46 +16,45 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-//import com.google.common.primitives.Longs;
-
-import database.BalanceMap;
+//import database.BalanceMap;
 import database.DBSet;
-//import database.DBSet;
 import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
+//import qora.crypto.Crypto;
+//import utils.Converter;
 import qora.crypto.Crypto;
-import utils.Converter;
 
 
 
-public class JsonTransaction extends TransactionAmount {
+public class RecStatement extends Transaction {
 
+	private static final int REC_ID = STATEMENT_RECORD;
 	protected byte[] data;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
+	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH ; 
+			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH +  + CREATOR_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
-	public JsonTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(JSON_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);
-
+	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		super(REC_ID, creator, feePow, timestamp, reference);
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public JsonTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, recipient, key, amount, feePow, data, isText, encrypted, timestamp, reference);
+	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(creator, feePow, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
-	
+
 	public byte[] getData() 
 	{
 		return this.data;
 	}
-	
+
 	public byte[] getEncrypted()
 	{
 		byte[] enc = new byte[1];
@@ -91,7 +93,7 @@ public class JsonTransaction extends TransactionAmount {
 		
 		return transaction;	
 	}
-	
+		
 	public static Transaction Parse(byte[] data) throws Exception
 	{
 		if (data.length < BASE_LENGTH)
@@ -115,20 +117,10 @@ public class JsonTransaction extends TransactionAmount {
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
 
-		//READ SENDER
-		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-		Account recipient = new Account(Base58.encode(recipientBytes));
-		position += RECIPIENT_LENGTH;
-
-		//READ KEY
-		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-		long key = Longs.fromByteArray(keyBytes);	
-		position += KEY_LENGTH;
-		
-		//READ AMOUNT
-		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
-		position += AMOUNT_LENGTH;
+		//READ FEE POWER
+		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte feePow = feePowBytes[0];
+		position += 1;
 
 		//READ DATA SIZE
 		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
@@ -144,16 +136,11 @@ public class JsonTransaction extends TransactionAmount {
 		
 		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 		position += IS_TEXT_LENGTH;
-				
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-
+		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new JsonTransaction(creator, recipient, key, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new RecStatement(creator, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -163,7 +150,7 @@ public class JsonTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(JSON_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(REC_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 
@@ -173,24 +160,12 @@ public class JsonTransaction extends TransactionAmount {
 		data = Bytes.concat(data, timestampBytes);
 
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		data = Bytes.concat(data, this.getReference());
 
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-
-		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-
-		//WRITE KEY
-		byte[] keyBytes = Longs.toByteArray(this.key);
-		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
-		data = Bytes.concat(data, keyBytes);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
 
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
@@ -205,11 +180,6 @@ public class JsonTransaction extends TransactionAmount {
 		//WRITE ISTEXT
 		data = Bytes.concat(data, this.isText);
 
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
 		//SIGNATURE
 		if (withSign) data = Bytes.concat(data, this.signature);
 
@@ -221,22 +191,41 @@ public class JsonTransaction extends TransactionAmount {
 		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
 	}
 
-
 	//@Override
 	public int isValid(DBSet db) {
-		//CHECK IF RELEASED
 		
+
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}
-	
-		int res = super.isValid(db);
-		if (res > 0) return res;
+		
+		// TODO new super clss - without validation of amount
+		int res = 0; //super.isValid(db);
+		if (res > 0 & res != NO_BALANCE) return res;
 
 		return VALIDATE_OK;
 	}
+	
+	@Override
+	public List<Account> getInvolvedAccounts() {
+		return Arrays.asList(this.creator);
+	}
 
+	@Override
+	public boolean isInvolved(Account account) {
+		String address = account.getAddress();
+		
+		if(address.equals(creator.getAddress()))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+
+	public int calcBaseFee() {
+		return calcCommonFee();
+	}
 }
-

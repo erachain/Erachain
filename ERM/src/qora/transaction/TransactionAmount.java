@@ -24,7 +24,8 @@ public abstract class TransactionAmount extends Transaction {
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key;
-	
+
+	/*
 	protected TransactionAmount(int type, Account recipient, BigDecimal amount, long key, long timestamp)
 	{
 		super(type, timestamp);
@@ -38,25 +39,21 @@ public abstract class TransactionAmount extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
-		
 	}
+	*/
 	// need for calculate fee
-	protected TransactionAmount(int type, PublicKeyAccount creator, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(int type, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
 	{
-		super(type, creator, timestamp, reference);
-		this.signature = signature;
+		super(type, creator, feePow, timestamp, reference, signature);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
 	}
 
 	// need for calculate fee by feePow into GUI
-	protected TransactionAmount(int type, PublicKeyAccount creator, Account recipient, BigDecimal amount, long key, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(int type, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
 	{
-		super(type, creator, timestamp, reference, signature);
-		if (feePow < -4 ) feePow = -4;
-		else if (feePow > 4 ) feePow = 4;
-		this.feePow = feePow;
+		super(type, creator, feePow, timestamp, reference);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
@@ -80,6 +77,12 @@ public abstract class TransactionAmount extends Transaction {
 		return "transAmount";
 	}
 
+	@Override
+	public BigDecimal viewAmount() {
+		return this.amount;
+	}
+	
+	@Override
 	public BigDecimal viewAmount(Account account) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
@@ -148,6 +151,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		//REMOVE FEE
 		DBSet fork = db.fork();
+		calcFee();
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, fork).subtract(this.fee), fork);
 		
 		//CHECK IF CREATOR HAS ENOUGH FEE BALANCE
@@ -166,13 +170,7 @@ public abstract class TransactionAmount extends Transaction {
 				return INVALID_AMOUNT;
 			}
 		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		
+				
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
@@ -191,7 +189,7 @@ public abstract class TransactionAmount extends Transaction {
 	public void process(DBSet db) {
 
 		//UPDATE SENDER
-		process_fee(db);
+		super.process(db);
 
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 						
@@ -213,7 +211,7 @@ public abstract class TransactionAmount extends Transaction {
 
 	public void orphan(DBSet db) {
 		//UPDATE SENDER
-		orphan_fee(db);
+		super.orphan(db);
 		
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
 						
@@ -247,7 +245,7 @@ public abstract class TransactionAmount extends Transaction {
 
 	//public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
 	
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 

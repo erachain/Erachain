@@ -34,25 +34,17 @@ public class IssueAssetTransaction extends Transaction
 
 	private Asset asset;
 	
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp, byte[] reference) 
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(ISSUE_ASSET_TRANSACTION, creator, timestamp, reference);		
+		super(ISSUE_ASSET_TRANSACTION, creator, feePow, timestamp, reference);		
 		this.asset = asset;
 	}
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, asset, timestamp, reference);		
+		this(creator, asset, feePow, timestamp, reference);		
 		this.signature = signature;
-		this.asset.setReference(signature);
-		this.feePow = feePow;
 		this.calcFee();
-	}
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, asset, timestamp, reference);
-		this.feePow = feePow;
-		this.calcFee();
-	}
+}
 
 	//GETTERS/SETTERS
 		
@@ -65,12 +57,6 @@ public class IssueAssetTransaction extends Transaction
 	//@Override
 	public void sign(PrivateKeyAccount creator)
 	{
-		/*
-		byte[] data = this.toBytes( false );
-		if ( data == null ) return;
-
-		this.signature = Crypto.getInstance().sign(creator, data);
-		*/
 		super.sign(creator);
 		this.asset.setReference(this.signature);
 	}
@@ -135,22 +121,6 @@ public class IssueAssetTransaction extends Transaction
 		return transaction;	
 	}
 	
-	/*
-	public void generateSignature() {
-		
-		//return generateSignature1(this.recipient, this.amount, this.timestamp);
-		byte[] data = this.toBytes( false );
-
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		this.signature = digest;		
-		this.asset.setReference(digest);
-
-	}
-	*/
-
 	@Override
 	public byte[] toBytes(boolean withSign) 
 	{
@@ -199,11 +169,6 @@ public class IssueAssetTransaction extends Transaction
 	@Override
 	public int isValid(DBSet db) 
 	{
-		//CHECK IF RELEASED
-		if(NTP.getTime() < Transaction.getASSETS_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -249,35 +214,38 @@ public class IssueAssetTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
+		this.asset.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
 		long key = db.getAssetMap().add(this.asset);
 		//this.asset.setKey(key);
 		
 		//ADD ASSETS TO OWNER
-		this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		//this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
-		db.getIssueAssetMap().set(this, key);
+		//Logger.getGlobal().info("this.signature: " + this.signature.length + " : " + this.signature);
+		db.getIssueAssetMap().set(this.signature, key);
 
-		Logger.getGlobal().info("issue ASSET KEY: " + key);
+		//Logger.getGlobal().info("issue ASSET KEY: " + asset.getKey(db));
 
 	}
 
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -287,7 +255,8 @@ public class IssueAssetTransaction extends Transaction
 		db.getAssetMap().delete(key);	
 		
 		//REMOVE ASSETS FROM OWNER
-		this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		//this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
+		this.creator.setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
 		
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
@@ -344,7 +313,7 @@ public class IssueAssetTransaction extends Transaction
 
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee().add(Transaction.FEE_PER_BYTE.multiply(new BigDecimal(1000)));
+	public int calcBaseFee() {
+		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 1000);
 	}
 }

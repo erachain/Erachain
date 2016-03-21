@@ -30,24 +30,17 @@ public class SellNameTransaction extends Transaction
 	private PublicKeyAccount creator;
 	private NameSale nameSale;
 	
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, long timestamp, byte[] reference) 
+	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(SELL_NAME_TRANSACTION, creator, timestamp, reference);
+		super(SELL_NAME_TRANSACTION, creator, feePow, timestamp, reference);
 
 		this.creator = creator;
 		this.nameSale = nameSale;
 	}
 	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, nameSale, timestamp, reference);
+		this(creator, nameSale, feePow, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, nameSale, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -219,11 +212,11 @@ public class SellNameTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -232,11 +225,11 @@ public class SellNameTransaction extends Transaction
 		db.getNameExchangeMap().add(this.nameSale);
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -286,7 +279,7 @@ public class SellNameTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

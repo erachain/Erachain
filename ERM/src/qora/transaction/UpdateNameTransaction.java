@@ -29,24 +29,17 @@ public class UpdateNameTransaction extends Transaction
 
 	private Name name;
 	
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, long timestamp, byte[] reference) 
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(UPDATE_NAME_TRANSACTION, creator, timestamp, reference);
+		super(UPDATE_NAME_TRANSACTION, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
 	}
 	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, name, timestamp, reference);		
+		this(creator, name, feePow, timestamp, reference);		
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, name, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -215,11 +208,11 @@ public class UpdateNameTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 								
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -232,11 +225,11 @@ public class UpdateNameTransaction extends Transaction
 		db.getNameMap().add(this.name);
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -289,7 +282,7 @@ public class UpdateNameTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

@@ -34,25 +34,18 @@ public class MessageTransaction extends TransactionAmount {
 	
 	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
-	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(MESSAGE_TRANSACTION, creator, recipient, amount, key, timestamp, reference);
+	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		super(MESSAGE_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);
 
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
+		this.feePow = feePow;
 	}
-	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
-
+	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
 		this.calcFee();
-	}
-	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		this(creator, recipient, key, amount, data, isText, encrypted, timestamp, reference);
-		this.feePow = feePow;
-		this.calcFee();
-
 	}
 
 	public byte[] getData() 
@@ -160,7 +153,7 @@ public class MessageTransaction extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new MessageTransaction(creator, recipient, key, amount, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new MessageTransaction(creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -228,7 +221,7 @@ public class MessageTransaction extends TransactionAmount {
 		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
 	}
 
-	@Override
+	//@Override
 	public int isValid(DBSet db) {
 		
 		//CHECK DATA SIZE

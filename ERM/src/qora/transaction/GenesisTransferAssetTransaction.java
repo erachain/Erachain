@@ -38,7 +38,8 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	
 	public GenesisTransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long timestamp) 
 	{
-		super(GENESIS_TRANSFER_ASSET_TRANSACTION, creator, timestamp, null);		
+		super(GENESIS_TRANSFER_ASSET_TRANSACTION, timestamp);
+		this.creator = creator;
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
@@ -310,7 +311,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		
 		return assetAmount;
 	}
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee();
+	public int calcBaseFee() {
+		return 0;
 	}
 }

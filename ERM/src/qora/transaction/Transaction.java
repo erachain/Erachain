@@ -1,8 +1,8 @@
 package qora.transaction;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+//import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -97,7 +97,7 @@ public abstract class Transaction {
 	
 	public static final int CREATE_POLL_TRANSACTION =11;
 	public static final int VOTE_ON_POLL_TRANSACTION = 12;
-	public static final int REERVED_13 = 13;
+	public static final int STATEMENT_RECORD = 13;
 	public static final int REERVED_14 = 14;
 	
 	public static final int ARBITRARY_TRANSACTION = 15;
@@ -120,8 +120,10 @@ public abstract class Transaction {
 	
 	// FEE KEY = OIL
 	public static final long FEE_KEY = 1l;
-	public static final BigDecimal FEE_PER_BYTE = new BigDecimal(0.00000001);
-	
+	public static final int FEE_PER_BYTE = 1;
+	public static final float FEE_POW_BASE = (float)1.5;
+	public static final int FEE_POW_MAX = 6;
+		
 	//RELEASES
 	private static final long VOTING_RELEASE = 0l;
 	private static final long ARBITRARY_TRANSACTIONS_RELEASE = 0l;
@@ -175,7 +177,7 @@ public abstract class Transaction {
 	
 	//PROPERTIES LENGTH
 	protected static final int TYPE_LENGTH = 4;
-	protected static final int PROP_LENGTH = 2; // properties
+	//protected static final int PROP_LENGTH = 2; // properties
 	protected static final int TIMESTAMP_LENGTH = 8;
 	protected static final int REFERENCE_LENGTH = 64;
 	protected static final int DATA_SIZE_LENGTH = 4;
@@ -186,6 +188,7 @@ public abstract class Transaction {
 	protected static final int CREATOR_LENGTH = 32;
 	// not need now protected static final int FEE_LENGTH = 8;
 	public static final int SIGNATURE_LENGTH = 64;
+	protected static final int BASE_LENGTH = TYPE_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 		
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
@@ -201,27 +204,21 @@ public abstract class Transaction {
 		this.type = type;
 		this.timestamp = timestamp;
 	}
-	protected Transaction(int type, PublicKeyAccount creator, long timestamp, byte[] reference)
+	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
 		this.type = type;
 		this.creator = creator;
 		//this.props = props;
 		this.timestamp = timestamp;
 		this.reference = reference;
+		if (feePow < 0 ) feePow = 0;
+		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
+		this.feePow = feePow;
 	}
-	// need for calculate fee
-	protected Transaction(int type, PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature)
-	{
-		this(type, creator, timestamp, reference);
-		this.signature = signature;
-	}
-	// need for calculate fee by feePow into GUI
 	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
-		this(type, creator, timestamp, reference, signature);
-		if (feePow < -4 ) feePow = -4;
-		else if (feePow > 4 ) feePow = 4;
-		this.feePow = feePow;
+		this(type, creator, feePow, timestamp, reference);
+		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
@@ -247,6 +244,10 @@ public abstract class Transaction {
 		return this.timestamp + (1000*60*60*24);
 	}
 	
+	public BigDecimal viewAmount() {
+		return BigDecimal.ZERO;
+	}
+
 	public BigDecimal viewAmount(Account account)
 	{
 		return BigDecimal.ZERO;
@@ -270,43 +271,39 @@ public abstract class Transaction {
 	public byte[] getReference()
 	{
 		return this.reference;
-	}
-		
-	public boolean isValidFee()
-	{
-		// must be equal - fee calced by FeePower
-		return this.fee.compareTo(calcBaseFee()) >= 0;
-	}
-		
-	public BigDecimal calcCommonFee()
+	}			
+
+	
+	public int calcCommonFee()
 	{		
-		BigDecimal fee =  new BigDecimal(this.getDataLength() + 100).multiply(FEE_PER_BYTE).setScale(8, RoundingMode.HALF_UP);
-		if (this.getDataLength() <= 1000) {
-			return fee;
-		} else {
+		int fee =  this.getDataLength() + 100 * FEE_PER_BYTE;
+		if (this.getDataLength() > 1000) {
 			// add overheat
-			return fee.add(new BigDecimal(this.getDataLength() - 1000).multiply(FEE_PER_BYTE)).setScale(8, RoundingMode.HALF_UP);
+			fee += (this.getDataLength() - 1000) * FEE_PER_BYTE;
 		}
+		
+		return (int) fee;
 	}
 	
 	// get personal fee
-	public abstract BigDecimal calcBaseFee();
+	public abstract int calcBaseFee();
 	
 	// calc FEE by recommended and feePOW
 	public void calcFee()
 	{	
-		this.fee = calcBaseFee().multiply(new BigDecimal(2^this.feePow)).setScale(8, RoundingMode.UP);
+		
+		BigDecimal fee = new BigDecimal(calcBaseFee())
+				.multiply(new BigDecimal("0.00000001"))
+				.setScale(8, BigDecimal.ROUND_UP);
+
+		if (this.feePow > 0) {
+			this.fee = fee.multiply(new BigDecimal(FEE_POW_BASE).pow((int)this.feePow))
+					.setScale(8, BigDecimal.ROUND_UP);
+		} else {
+			this.fee = fee;
+		}
 	}
 	
-	//CHECK MIMIMUM FEE_POW
-	public static String checkFeePow(int feePow) {
-		
-	if(feePow < -4 || feePow > 4) {
-		return "Fee Power must be in -4..4!";
-		}
-	return null;
-	}
-
 	public Block getParent() {
 		
 		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
@@ -336,6 +333,7 @@ public abstract class Transaction {
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);
+		this.calcFee(); // need for recal!
 	}
 
 	public abstract JSONObject toJson();
@@ -371,27 +369,30 @@ public abstract class Transaction {
 	{
 		this.process(DBSet.getInstance());
 	}
-	public void process_fee(DBSet db)
+	//public abstract void process(DBSet db);
+	public void process(DBSet db)
 	{
+		
+		this.calcFee();
+
 		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
-			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(this.fee), db);
+			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
+					.subtract(this.fee), db);
 
 	}
-		
-	public abstract void process(DBSet db);
 
 	public void orphan()
 	{
 		this.orphan(DBSet.getInstance());
 	}
-	public void orphan_fee(DBSet db)
+	//public abstract void orphan(DBSet db);
+	public void orphan(DBSet db)
 	{
 		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
 			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
 	}
-	
-	public abstract void orphan(DBSet db);
+
 	
 	//REST
 		

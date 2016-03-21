@@ -35,7 +35,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 	
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Address", "Amount", "Fee"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Amount", "Fee"});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	public WalletTransactionsTableModel()
@@ -87,7 +87,9 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 			}
 			
 			Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
-			Account account = new Account(data.getA().a);
+			Account creator = new Account(data.getA().a);
+			//Account recipient = new Account(data.getA().b);
+			
 			Transaction transaction = data.getB();
 			
 			switch(column)
@@ -106,15 +108,17 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 				
 			case COLUMN_ADDRESS:
 				
-				return account.getAddress();
+				return creator.getAddress();
 				
 			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(account));			
+				String address = creator.getAddress();
+
+				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(creator));			
 
 			case COLUMN_FEE:
 				
-				String address = account.getAddress();
+				address = creator.getAddress();
 				
 				if(address.equals(transaction.getCreator().getAddress()))
 					return NumberAsString.getInstance().numberAsString(transaction.getFee());			

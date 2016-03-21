@@ -35,10 +35,10 @@ public abstract class ArbitraryTransaction extends Transaction {
 	protected List<Payment> payments;
 	
 	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
-		super(ARBITRARY_TRANSACTION, creator, timestamp, reference);	
+		super(ARBITRARY_TRANSACTION, creator, (byte)0, timestamp, reference);	
 	}
 	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
-		super(ARBITRARY_TRANSACTION, creator, timestamp, reference, signature);
+		super(ARBITRARY_TRANSACTION, creator, (byte)0, timestamp, reference, signature);
 	}
 		
 	// GETTERS/SETTERS
@@ -173,9 +173,10 @@ public abstract class ArbitraryTransaction extends Transaction {
 	}
 
 	// PROCESS/ORPHAN
-	@Override
+	//@Override
 	public void process(DBSet db) {
 
+		
 		try {
 			// NAME STORAGE UPDATE
 			if (this.getService() == 10) {
@@ -195,7 +196,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 
 		// UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 		
 		// UPDATE REFERENCE OF CREATOR
 		this.getCreator().setLastReference(this.signature, db);
@@ -212,7 +213,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) {
 
 		// NAME STORAGE UPDATE ORPHAN
@@ -224,7 +225,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// }
 
 		// UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 		
 		// UPDATE REFERENCE OF CREATOR
 		this.getCreator().setLastReference(this.reference, db);
@@ -453,7 +454,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

@@ -309,15 +309,34 @@ public class SendMoneyPanel extends JPanel
 		}
 
 		int parsing = 0;
+		BigDecimal amount = BigDecimal.ZERO;
+		int feePow = 0;
 		try
 		{
 			//READ AMOUNT
 			parsing = 1;
-			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
+			amount = new BigDecimal(txtAmount.getText()).setScale(8);
 			
 			//READ FEE
 			parsing = 2;
-			int feePow = Integer.parseInt(txtFeePow.getText());
+			feePow = Integer.parseInt(txtFeePow.getText());
+		}
+		catch(Exception e)
+		{
+			//CHECK WHERE PARSING ERROR HAPPENED
+			switch(parsing)
+			{
+			case 1:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+				
+			case 2:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+			}
+		}
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			Asset asset = (Asset) this.cbxFavorites.getSelectedItem();
@@ -376,23 +395,6 @@ public class SendMoneyPanel extends JPanel
 				break;		
 				
 			}
-		}
-		catch(Exception e)
-		{
-			//CHECK WHERE PARSING ERROR HAPPENED
-			switch(parsing)
-			{
-			case 1:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case 2:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-			}
-		}
 		
 		//ENABLE
 		this.sendButton.setEnabled(true);

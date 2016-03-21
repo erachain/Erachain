@@ -32,20 +32,13 @@ public class CancelSellNameTransaction extends Transaction
 	//private PublicKeyAccount owner;
 	private String name;
 	
-	public CancelSellNameTransaction(PublicKeyAccount creator, String name, long timestamp, byte[] reference) {
-		super(CANCEL_SELL_NAME_TRANSACTION, creator, timestamp, reference);
-	
-		this.name = name;
-	}
 	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference) {
-		this(creator, name, timestamp, reference);
-		this.feePow =feePow; 
-		this.calcFee();
+		super(CANCEL_SELL_NAME_TRANSACTION, creator, feePow, timestamp, reference);	
+		this.name = name;
 	}
 	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference, byte[] signature) {
-		super(CANCEL_SELL_NAME_TRANSACTION, creator, timestamp, reference, signature);
-		this.name = name;
-		this.feePow =feePow; 
+		this(creator, name, feePow, timestamp, reference);
+		this.signature = signature;
 		this.calcFee();
 	}
 	
@@ -226,11 +219,11 @@ public class CancelSellNameTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db) 
 	{
 		//UPDATE creator
-		process_fee(db);
+		super.process(db);
 												
 		//UPDATE REFERENCE OF creator
 		this.creator.setLastReference(this.signature, db);
@@ -244,11 +237,11 @@ public class CancelSellNameTransaction extends Transaction
 		
 	}
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE creator
-		orphan_fee(db);
+		super.orphan(db);
 												
 		//UPDATE REFERENCE OF creator
 		this.creator.setLastReference(this.reference, db);
@@ -303,7 +296,7 @@ public class CancelSellNameTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 	
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

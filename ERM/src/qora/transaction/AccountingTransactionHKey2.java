@@ -33,36 +33,24 @@ public class AccountingTransactionHKey2 extends TransactionAmount {
 	protected static final int BASE_LENGTH = AccountingTransaction.BASE_LENGTH - KEY_LENGTH + HASH_KEY_LENGTH;
 
 	protected byte[] data;
-
-	protected Account recipient;
-	protected BigDecimal amount;
 	protected byte[] hkey;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, byte[] hkey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 
-		super(ACCOUNTING_TRANSACTION, creator, recipient, amount, 0l, timestamp, reference);
+		super(ACCOUNTING_TRANSACTION, creator, feePow, recipient, amount, 0l, timestamp, reference);
 
 		this.hkey = hkey;
-
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 
 	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public AccountingTransactionHKey2(PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, byte[] hkey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
 
-		this(creator, recipient, amount, hkey, data, isText, encrypted, timestamp, reference);
-		this.feePow = feePow;
+		this(creator, feePow, recipient, amount, hkey, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
-
-	}
-	public AccountingTransactionHKey2(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte[] hkey, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-
-		this(creator, recipient, amount, hkey, data, isText, encrypted, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 
 	}
@@ -288,7 +276,7 @@ public class AccountingTransactionHKey2 extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new AccountingTransactionHKey2(creator, recipient, amount, hkey, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new AccountingTransactionHKey2(creator, feePow, recipient, amount, hkey, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -308,34 +296,6 @@ public class AccountingTransactionHKey2 extends TransactionAmount {
 	}
 
 	@Override
-	public void process(DBSet db) {
-		//UPDATE SENDER
-		process_fee(db);
-		//this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		//this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).add(this.amount), db);
-		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.signature, db);
-		
-	}
-
-	@Override
-	public void orphan(DBSet db) {
-		//UPDATE SENDER
-		orphan_fee(db);
-		//this.creator.setConfirmedBalance(this.hkey, this.creator.getConfirmedBalance(this.hkey, db).add(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		//this.recipient.setConfirmedBalance(this.hkey, this.recipient.getConfirmedBalance(this.hkey, db).subtract(this.amount), db);
-		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.reference, db);
-		
-	}
-
-	@Override
 	public BigDecimal viewAmount(Account account) {
 		
 		return this.amount;
@@ -349,7 +309,7 @@ public class AccountingTransactionHKey2 extends TransactionAmount {
 		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 

@@ -30,23 +30,15 @@ public class TransferAssetTransaction extends TransactionAmount {
 			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
 	
 	
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference) 
+	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TRANSFER_ASSET_TRANSACTION, creator, recipient, amount, key, timestamp, reference);		
+		super(TRANSFER_ASSET_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);		
 	}
 	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, recipient, key, amount, timestamp, reference);		
+		this(creator, recipient, key, amount, feePow, timestamp, reference);		
 		this.signature = signature;
-		this.feePow = feePow;
 		this.calcFee();
-	}
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, recipient, key, amount, timestamp, reference);
-		this.feePow = feePow;
-		this.calcFee();
-		
 	}
 	
 	//GETTERS/SETTERS

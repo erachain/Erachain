@@ -26,21 +26,14 @@ public class PaymentTransaction extends TransactionAmount {
 
 	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT - KEY_LENGTH;
 		
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, long timestamp, byte[] reference) 
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(PAYMENT_TRANSACTION, creator, recipient, amount, 0l, timestamp, reference);
+		super(PAYMENT_TRANSACTION, creator, feePow, recipient, amount, 0l, timestamp, reference);
 	}
 	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, recipient, amount, timestamp, reference);		
+		this(creator, recipient, amount, feePow, timestamp, reference);		
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, recipient, amount, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	
@@ -166,7 +159,7 @@ public class PaymentTransaction extends TransactionAmount {
 		return assetAmount;
 	}
 	
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

@@ -31,24 +31,17 @@ public class RegisterNameTransaction extends Transaction
 	private PublicKeyAccount creator;
 	private Name name;
 	
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, long timestamp, byte[] reference) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(REGISTER_NAME_TRANSACTION, creator, timestamp, reference);
+		super(REGISTER_NAME_TRANSACTION, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
 	}
 	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, name, timestamp, reference);
+		this(creator, name, feePow, timestamp, reference);
 		this.signature = signature;		
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, name, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -212,11 +205,11 @@ public class RegisterNameTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE OWNER
-		process_fee(db);
+		super.process(db);
 								
 		//UPDATE REFERENCE OF OWNER
 		this.creator.setLastReference(this.signature, db);
@@ -226,11 +219,11 @@ public class RegisterNameTransaction extends Transaction
 	}
 
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE OWNER
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF OWNER
 		this.creator.setLastReference(this.reference, db);
@@ -284,7 +277,7 @@ public class RegisterNameTransaction extends Transaction
 		return assetAmount;
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 }

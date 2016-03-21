@@ -35,9 +35,9 @@ public class VoteOnPollTransaction extends Transaction
 	private String poll;
 	public int option;
 	
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, long timestamp, byte[] reference) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(VOTE_ON_POLL_TRANSACTION, creator, timestamp, reference);
+		super(VOTE_ON_POLL_TRANSACTION, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
@@ -45,15 +45,8 @@ public class VoteOnPollTransaction extends Transaction
 	}
 	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, poll, option, timestamp, reference);
+		this(creator, poll, option, feePow, timestamp, reference);
 		this.signature = signature;
-		this.feePow = feePow;
-		this.calcFee();
-	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
-	{
-		this(creator, poll, option, timestamp, reference);
-		this.feePow = feePow;
 		this.calcFee();
 	}
 
@@ -255,11 +248,11 @@ public class VoteOnPollTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	@Override
+	//@Override
 	public void process(DBSet db)
 	{
 		//UPDATE CREATOR
-		process_fee(db);
+		super.process(db);
 		
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -278,11 +271,11 @@ public class VoteOnPollTransaction extends Transaction
 	}
 
 
-	@Override
+	//@Override
 	public void orphan(DBSet db) 
 	{
 		//UPDATE CREATOR
-		orphan_fee(db);
+		super.orphan(db);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -342,7 +335,7 @@ public class VoteOnPollTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
 	}
 
-	public BigDecimal calcBaseFee() {
-		return calcCommonFee().subtract(Transaction.FEE_PER_BYTE.multiply(new BigDecimal(70)));
+	public int calcBaseFee() {
+		return 0; //calcCommonFee(); // - Transaction.FEE_PER_BYTE * 70;
 	}
 }

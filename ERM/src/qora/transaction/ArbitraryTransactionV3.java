@@ -228,7 +228,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		// REMOVE FEE
 		DBSet fork = db.fork();
-		process_fee(fork);
+		super.process(fork);
 
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
 		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.ZERO) == -1)
@@ -276,7 +276,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		return VALIDATE_OK;
 	}
 
-	public BigDecimal calcBaseFee() {
+	public int calcBaseFee() {
 		return calcCommonFee();
 	}
 
