@@ -80,7 +80,7 @@ public abstract class Transaction {
 	
 	public static final int NOT_YET_RELEASED = 1000;
 	
-	//TYPES
+	//TYPES *******
 	public static final int EXTENDED = 0;
 	public static final int GENESIS_TRANSACTION = 1;
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 2;
@@ -132,7 +132,10 @@ public abstract class Transaction {
 	//public static final long ASSETS_RELEASE = 1411308000000l;
 	private static final long ASSETS_RELEASE = 0l;
 	private static final long POWFIX_RELEASE = 0L; // Block Version 3 // 2016-02-25T19:00:00+00:00
-											   
+								
+	//public static String[] TYPES = new String[256];
+	//public String TYPES[0] = "w";
+
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
 			return Settings.getInstance().getGenesisStamp();
@@ -203,6 +206,7 @@ public abstract class Transaction {
 	{
 		this.type = type;
 		this.timestamp = timestamp;
+
 	}
 	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{

@@ -81,7 +81,7 @@ public class Start {
 		        try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception e2) {
-					LOGGER.error(e2);
+					LOGGER.error(e2.getMessage(),e2);
 				}
 				
 				//ERROR STARTING

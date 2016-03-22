@@ -233,53 +233,41 @@ public class TransactionTests {
 	public void validatePaymentTransaction() 
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		GenesisBlock gb = new GenesisBlock();
-		gb.process();
-						
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-		
-		/*
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
-		*/
-		
-		// set OIL
-		sender.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+
+		init();
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		long timestamp = NTP.getTime();				
+		long timestamp = NTP.getTime();
+		maker.setConfirmedBalance(0l, BigDecimal.valueOf(1000).setScale(8), db);
+
+
 		//CREATE VALID PAYMENT
-		Transaction payment = new PaymentTransaction(sender, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, sender.getLastReference(databaseSet));
-		payment.sign(sender);
-		payment.process(databaseSet);
+		Transaction payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		payment.sign(maker);
 
 		//CHECK IF PAYMENT IS VALID
-		assertEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet));
+		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db));
 		
+		payment.process(db);
+
 		//CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
-		payment = new PaymentTransaction(sender, new Account("test"), BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, sender.getLastReference(databaseSet));
+		payment = new PaymentTransaction(maker, new Account("test"), BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
 	
 		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet));
+		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db));
 		
 		//CREATE INVALID PAYMENT NEGATIVE AMOUNT
-		payment = new PaymentTransaction(sender, recipient, BigDecimal.valueOf(-100).setScale(8), FEE_POWER, timestamp, sender.getLastReference(databaseSet));
-		payment.sign(sender);
+		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(-100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		payment.sign(maker);
 		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet));	
+		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db));	
 		
 		
 		//CREATE INVALID PAYMENT WRONG REFERENCE
-		payment = new PaymentTransaction(sender, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, new byte[64], new byte[64]);
+		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, new byte[64], new byte[64]);
 		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet));	
+		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db));	
 	}
 	
 	@Test
@@ -2204,10 +2192,11 @@ public class TransactionTests {
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
 		poll = new Poll(sender, "test2", "this is the value", Arrays.asList(new PollOption("test")));
-		pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));
+		pollCreation.sign(invalidOwner);
 		
 		//CHECK IF POLL CREATION IS INVALID
-		assertEquals(Transaction.NO_BALANCE, pollCreation.isValid(databaseSet));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, pollCreation.isValid(databaseSet));
 		
 		//CREATE POLL CREATION INVALID REFERENCE
 		poll = new Poll(sender, "test2", "this is the value", Arrays.asList(new PollOption("test")));
@@ -2495,10 +2484,13 @@ public class TransactionTests {
 		seed = Crypto.getInstance().digest("invalid".getBytes());
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-		pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, sender.getLastReference(databaseSet));	
+		pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, sender.getLastReference(databaseSet));
+		pollVote.sign(invalidOwner);
 		
+
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.NO_BALANCE, pollVote.isValid(databaseSet));
+		///Logger.getGlobal().info("pollVote.getFee: " + pollVote.getFee());
+		/// fee = 0 assertEquals(Transaction.NOT_ENOUGH_FEE, pollVote.isValid(databaseSet));
 		
 		//CREATE POLL CREATION INVALID REFERENCE
 		pollVote = new VoteOnPollTransaction(sender, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));	

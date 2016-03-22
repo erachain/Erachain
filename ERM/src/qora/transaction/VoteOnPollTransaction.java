@@ -191,12 +191,7 @@ public class VoteOnPollTransaction extends Transaction
 	@Override
 	public int isValid(DBSet db) 
 	{
-		//CHECK IF RELEASED
-		if(NTP.getTime() < Transaction.getVOTING_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
-		
+
 		//CHECK POLL LENGTH
 		int pollLength = this.poll.getBytes(StandardCharsets.UTF_8).length;
 		if(pollLength > 400 || pollLength < 1)
