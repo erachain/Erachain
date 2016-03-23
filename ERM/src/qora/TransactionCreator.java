@@ -14,6 +14,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 //import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.Venture;
 import qora.assets.Order;
 import qora.block.Block;
 import qora.naming.Name;
@@ -261,7 +262,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
+		Asset asset = new Venture(creator, name, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));

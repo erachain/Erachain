@@ -19,6 +19,7 @@ import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.AssetFactory;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
@@ -106,7 +107,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		//READ ASSET
 		// read without reference
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += asset.getDataLength(false);
 						
 		return new GenesisIssueAssetTransaction(creator, asset, timestamp);

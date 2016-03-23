@@ -204,7 +204,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 						
 		//CHECK IF AMOUNT IS DIVISIBLE
 		// genesis assets not in DB yet and need take it from genesis maker
-		if(!GenesisBlock.makeAsset((int)this.key).isDivisible())
+		if(!GenesisBlock.makeVenture((int)this.key).isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 			if(this.getAmount().stripTrailingZeros().scale() > 0)

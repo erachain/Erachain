@@ -19,6 +19,7 @@ import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.AssetFactory;
 import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
@@ -89,7 +90,7 @@ public class IssueAssetTransaction extends Transaction
 		
 		//READ ASSET
 		// asset parse without reference - if is = signature
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		position += asset.getDataLength(false);
 		
 		//READ FEE POWER

@@ -15,7 +15,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Asset;
+import qora.assets.Venture;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
@@ -91,21 +91,21 @@ public class GenesisBlock extends Block{
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 			GenesisIssueAssetTransaction trans;
 			
-			Asset asset0;
+			Venture asset0;
 			//CREATE ERM ASSET
-			asset0 = makeAsset(0);
+			asset0 = makeVenture(0);
 			trans = new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp));
 			
 
 			//CREATE JOB ASSET
-			Asset asset1 = makeAsset(1); //new byte[64]);
+			Venture asset1 = makeVenture(1); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp);
 			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
 			this.addTransaction(trans);
 			
 			//CREATE VOTE ASSET
-			Asset asset2 = makeAsset(2); //new byte[64]);
+			Venture asset2 = makeVenture(2); //new byte[64]);
 			trans = new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp);
 			this.addTransaction(trans);
 			
@@ -135,16 +135,16 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public static Asset makeAsset(int key) 
+	public static Venture makeVenture(int key) 
 	{
 		switch(key)
 		{
 		case 1:
-			return new Asset(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
+			return new Venture(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
 		case 2:
-			return new Asset(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
+			return new Venture(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
 		}
-		return new Asset(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
+		return new Venture(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
 	}
 
 	public String getTestNetInfo() 
