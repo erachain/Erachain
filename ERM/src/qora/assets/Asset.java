@@ -36,7 +36,7 @@ public abstract class Asset {
 	protected String name;
 	protected String description;
 	protected long key = -1;
-	protected byte[] reference; // this is signature of issued record
+	protected byte[] reference = null; // this is signature of issued record
 	
 	public Asset(int type, Account creator, String name, String description)
 	{

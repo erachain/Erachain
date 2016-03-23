@@ -213,7 +213,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//ADD ASSETS TO OWNER
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 
-		Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
+		//Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
 
 	}
 
@@ -235,8 +235,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
 
-		Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
-		//assetKey--;
+		//Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
 
 	}
 

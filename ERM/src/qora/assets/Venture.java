@@ -98,6 +98,7 @@ public class Venture extends Asset {
 		{
 			//READ REFERENCE
 			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			position += REFERENCE_LENGTH;
 		}
 
 		//READ QUANTITY

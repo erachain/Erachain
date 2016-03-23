@@ -124,7 +124,7 @@ public class AssetDetailsPanel extends JPanel {
 		this.add(chkDivisible, detailGBC);	
 		
 		//IF ASSET CONFIRMED AND NOT QORA
-		if(this.asset.getKey() > 0)
+		if(false & this.asset.getKey() > 0)
 		{
 			//ADD QORA PAIR BUTTON
 			labelGBC.gridy++;
@@ -160,7 +160,7 @@ public class AssetDetailsPanel extends JPanel {
 		}
 		
 		//IF ASSET CONFIRMED AND NOT QORA
-		if(this.asset.getKey() > 0)
+		if(this.asset.getKey() > 2l)
 		{
 			//FAVORITES
 			labelGBC.gridy++;

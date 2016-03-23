@@ -234,7 +234,6 @@ public class IssueAssetTransaction extends Transaction
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
-		//Logger.getGlobal().info("this.signature: " + this.signature.length + " : " + this.signature);
 		db.getIssueAssetMap().set(this.signature, key);
 
 		//Logger.getGlobal().info("issue ASSET KEY: " + asset.getKey(db));
