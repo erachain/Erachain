@@ -104,7 +104,8 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 				
 			case COLUMN_TYPE:
 				
-				return Lang.transactionTypes[transaction.getType()];
+				//return Lang.transactionTypes[transaction.getType()];
+				return Lang.getInstance().translate(transaction.getName());
 				
 			case COLUMN_ADDRESS:
 				

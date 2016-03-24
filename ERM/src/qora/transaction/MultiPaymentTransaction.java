@@ -28,6 +28,8 @@ import database.DBSet;
 
 public class MultiPaymentTransaction extends Transaction {
 
+	private static final int TYPE_ID = Transaction.MULTI_PAYMENT_TRANSACTION;
+	private static final String NAME_ID = "Multi Send";
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + PAYMENTS_SIZE_LENGTH + SIGNATURE_LENGTH;
 
@@ -35,7 +37,7 @@ public class MultiPaymentTransaction extends Transaction {
 	
 	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(MULTI_PAYMENT_TRANSACTION, creator, feePow, timestamp, reference);		
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);		
 		this.payments = payments;
 	}
 	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference, byte[] signature) 
@@ -46,7 +48,9 @@ public class MultiPaymentTransaction extends Transaction {
 	}
 	
 	//GETTERS/SETTERS
-	
+
+	//public static String getName() { return "Multi Send"; }
+
 	public List<Payment> getPayments()
 	{
 		return this.payments;
@@ -135,7 +139,7 @@ public class MultiPaymentTransaction extends Transaction {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(MULTI_PAYMENT_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

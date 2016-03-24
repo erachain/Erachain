@@ -19,6 +19,7 @@ import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.AssetFactory;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
@@ -33,12 +34,14 @@ import database.DBSet;
 public class GenesisIssueAssetTransaction extends Transaction 
 {
 	
+	private static final int TYPE_ID = GENESIS_ISSUE_ASSET_TRANSACTION;
+	private static final String NAME_ID = "Genesis Issue Asset";
 	private static final int BASE_LENGTH = CREATOR_LENGTH + TIMESTAMP_LENGTH;
 	private Asset asset;
 	
 	public GenesisIssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp) 
 	{
-		super(GENESIS_ISSUE_ASSET_TRANSACTION, timestamp);
+		super(TYPE_ID, NAME_ID, timestamp);
 
 		this.creator = creator;
 		this.asset = asset;
@@ -47,6 +50,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
+	//public static String getName() { return "Genesis Issue Asset"; }
+	
 	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
@@ -106,7 +111,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		//READ ASSET
 		// read without reference
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += asset.getDataLength(false);
 						
 		return new GenesisIssueAssetTransaction(creator, asset, timestamp);
@@ -119,7 +124,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_ISSUE_ASSET_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		
@@ -212,7 +217,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//ADD ASSETS TO OWNER
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 
-		Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
+		//Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
 
 	}
 
@@ -234,8 +239,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
 
-		Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
-		//assetKey--;
+		//Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
 
 	}
 

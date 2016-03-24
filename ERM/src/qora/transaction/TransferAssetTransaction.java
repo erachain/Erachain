@@ -26,13 +26,15 @@ import database.DBSet;
 
 public class TransferAssetTransaction extends TransactionAmount {
 
+	private static final int TYPE_ID = TRANSFER_ASSET_TRANSACTION;
+	private static final String NAME_ID = "OLD: Send Asset";
 	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT; 
 			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
 	
 	
 	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TRANSFER_ASSET_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);		
+		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);		
 	}
 	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -42,7 +44,9 @@ public class TransferAssetTransaction extends TransactionAmount {
 	}
 	
 	//GETTERS/SETTERS
-		
+	//public static String getName() { return "OLD: Send Asset"; }
+
+
 	//PARSE/CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception{
@@ -111,7 +115,7 @@ public class TransferAssetTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TRANSFER_ASSET_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

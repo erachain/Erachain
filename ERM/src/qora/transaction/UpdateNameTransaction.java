@@ -25,13 +25,15 @@ import database.DBSet;
 
 public class UpdateNameTransaction extends Transaction 
 {
+	private static final int TYPE_ID = UPDATE_NAME_TRANSACTION;
+	private static final String NAME_ID = "OLD: Update Name";
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private Name name;
 	
 	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(UPDATE_NAME_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
@@ -44,8 +46,10 @@ public class UpdateNameTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
-		
-	public Name getName()
+
+	//public static String getName() { return "OLD: Update Name"; }
+
+	public Name getAName()
 	{
 		return this.name;
 	}
@@ -113,7 +117,7 @@ public class UpdateNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(UPDATE_NAME_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

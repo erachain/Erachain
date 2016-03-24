@@ -30,7 +30,8 @@ import qora.crypto.Crypto;
 
 public class RecStatement extends Transaction {
 
-	private static final int REC_ID = STATEMENT_RECORD;
+	private static final int TYPE_ID = STATEMENT_RECORD;
+	private static final String NAME_ID = "Statement";
 	protected byte[] data;
 	protected byte[] encrypted;
 	protected byte[] isText;
@@ -39,7 +40,7 @@ public class RecStatement extends Transaction {
 			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH +  + CREATOR_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
 
 	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(REC_ID, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
@@ -49,6 +50,10 @@ public class RecStatement extends Transaction {
 		this.signature = signature;
 		this.calcFee();
 	}
+
+	//GETTERS/SETTERS
+
+	//public static String getName() { return "Statement"; }
 
 	public byte[] getData() 
 	{
@@ -150,7 +155,7 @@ public class RecStatement extends Transaction {
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(REC_ID);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 

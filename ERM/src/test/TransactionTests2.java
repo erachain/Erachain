@@ -21,13 +21,13 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.Venture;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 
 import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.AccountingTransaction;
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
 import qora.transaction.IssueAssetTransaction;
@@ -35,12 +35,34 @@ import qora.transaction.TransferAssetTransaction;
 
 public class TransactionTests2 {
 
-	long OIL_KEY = Transaction.FEE_KEY;
+	long OIL_KEY = 1l;
 	byte FEE_POWER = (byte)1;
-	PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,3,1,3,1,3,1,3});
-	//CREATE EMPTY MEMORY DATABASE
-	DBSet db = DBSet.createEmptyDatabaseSet();
+	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
+	
+	//CREATE EMPTY MEMORY DATABASE
+	private DBSet db;
+	private GenesisBlock gb;
+	
+	//CREATE KNOWN ACCOUNT
+	byte[] seed = Crypto.getInstance().digest("test".getBytes());
+	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
+	
+
+	// INIT ASSETS
+	private void init() {
+		
+		db = DBSet.createEmptyDatabaseSet();
+		gb = new GenesisBlock();
+		gb.process(db);
+		
+		// OIL FUND
+		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+
+	}
+	
 
 	//GENESIS
 	
@@ -57,13 +79,15 @@ public class TransactionTests2 {
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-		
+
+		/*
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		Transaction transaction = new GenesisTransaction(creator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		transaction.process(databaseSet);
+		*/
 		
 		//CREATE ASSET
-		Asset asset = new Asset(creator, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(creator, "test", "strontje", 50000l, (byte) 2, false);
 		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
 		//assertEquals(rawAsset.length, asset.getDataLength());
 		
@@ -189,7 +213,7 @@ public class TransactionTests2 {
 		long genesisTimestamp = NTP.getTime();
 		
 		//ADD QORA ASSET
-		//Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
+		//Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
     	//databaseSet.getAssetMap().set(0l, qoraAsset);
 						
 		//CREATE KNOWN ACCOUNT
@@ -202,7 +226,7 @@ public class TransactionTests2 {
 		long timestamp = NTP.getTime();
 				
 		//CREATE JOB ASSET
-		Asset asset = new Asset(sender, "OIL+", "+It is an OILing drops used for fees", 99999999L, (byte) 8, true);
+		Asset asset = new Venture(sender, "OIL+", "+It is an OILing drops used for fees", 99999999L, (byte) 8, true);
 		GenesisIssueAssetTransaction trans = new GenesisIssueAssetTransaction(sender, asset, genesisTimestamp);
 		trans.process(databaseSet);
 		Logger.getGlobal().info("asset key " + asset.getKey());
@@ -343,30 +367,31 @@ public class TransactionTests2 {
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-			
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		
+		//CREATE JOB ASSET
+		Asset asset = new Venture(sender, "OIL+", "+It is an OILing drops used for fees", 1000L, (byte) 8, true);
+		GenesisIssueAssetTransaction trans = new GenesisIssueAssetTransaction(sender, asset, timestamp);
+		trans.process(databaseSet);
+
+		long key = asset.getKey(databaseSet);
+		Logger.getGlobal().info("asset key " + key);
+		
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(1000).setScale(8),sender.getConfirmedBalance(key, databaseSet));
 			
 		//CREATE SIGNATURE
 		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		sender.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), databaseSet);
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 1, BigDecimal.valueOf(100).setScale(8), timestamp);
-		//assetTransfer.sign(sender); not  NEED
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		// assetTransfer.sign(sender); // not  NEED
 		assetTransfer.process(databaseSet);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(sender.getConfirmedBalance(databaseSet)));
-
-		assertEquals(BigDecimal.ZERO.setScale(8), sender.getConfirmedBalance(1, databaseSet));
-		//assertEquals(-1, BigDecimal.ZERO.setScale(8).compareTo(sender.getConfirmedBalance(1, databaseSet)));
+		assertEquals(BigDecimal.valueOf(900).setScale(8),sender.getConfirmedBalance(key, databaseSet));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(databaseSet));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(1, databaseSet));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, databaseSet));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -374,7 +399,7 @@ public class TransactionTests2 {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(databaseSet)));
+		assertEquals(true, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(databaseSet)));
 	}
 	
 	@Test
@@ -421,155 +446,5 @@ public class TransactionTests2 {
 		assertEquals(false, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(databaseSet)));
 	}
 	
-	// ACCOUNTING HKEY
-	
-	@Test
-	public void validateAccountingTransaction() 
-	{
-		
-		
-		//ADD QORA ASSET
-		//Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
-		//qoraAsset.setReference(new byte[64]);
-		//databaseSet.getAssetMap().set(0l, qoraAsset);
-    	
-		GenesisBlock genesisBlock = new GenesisBlock();
-		//genesisBlock.;
-		genesisBlock.process(db);
-		
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-				
-		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-		creator.setLastReference(new byte[64], db);
-		Account recipient = new Account("QfreeNWCeaU3BiXUxktaJRJrBB1SDg2k7o");		
-
-
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		//Transaction genTrans = new GenesisTransaction(creator, BigDecimal.valueOf(1000).setScale(8), timestamp);
-		//genTrans.process(db);
-		
-		// OIL FUND
-		creator.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
-		
-		/*
-		Integer ii = 22;
-		byte[] iib = new byte[]{ii.byteValue()};
-		Logger.getGlobal().info("byte iib: " + iib[0]);
-		
-		byte iii =  iib[0];
-		Logger.getGlobal().info("byte iii: " + iii); // BAD -23
-		Logger.getGlobal().info("byte.unsignedi: " + Byte.toUnsignedInt(iib[0])); // GOOD!
-		int i2 = Ints.fromByteArray(new byte[]{0,0,0,iib[0]}); // GOOD!
-		Logger.getGlobal().info("array[4]: " + i2);
-		*/
-		Asset asset = new Asset(creator, "ERM1", "1It is the basic unit of Environment Real Management", 999999999L, (byte) 6, true);
-		IssueAssetTransaction iat = new IssueAssetTransaction(creator, asset, FEE_POWER,timestamp, creator.getLastReference());
-		Logger.getGlobal().info("iat REF: " + iat.getReference().length);
-		iat.sign(creator);
-		iat.process();
-		Logger.getGlobal().info("ASSET KEY: " + asset.getKey());
-				
-		//byte[] hkey = new byte[]{1,3,54,12,34,123,123,120,12};
-		//byte[] hkey = new byte[3]; //{1,3,54,12,34,123,123,120,12};
-		byte[] data = "test123!".getBytes();
-		
-		AccountingTransaction accountingTransaction = new AccountingTransaction(
-				creator, FEE_POWER, recipient,
-				asset.getKey(), 
-				BigDecimal.valueOf(23).setScale(8),
-				data, 
-				new byte[] { 1 },
-				new byte[] { 0 },
-				timestamp,
-				creator.getLastReference(db)
-				);
-		accountingTransaction.sign(creator);
-
-		assertEquals(accountingTransaction.isValid(db), Transaction.VALIDATE_OK);
-		
-		//CONVERT TO BYTES
-		byte[] rawTransaction = accountingTransaction.toBytes(true);
-		
-		//CHECK DATALENGTH
-		assertEquals(rawTransaction.length, accountingTransaction.getDataLength());
-		
-		try 
-		{	
-			//PARSE FROM BYTES
-			AccountingTransaction accountingTransaction_parsed = (AccountingTransaction) TransactionFactory.getInstance().parse(rawTransaction);
-			accountingTransaction_parsed.calcFee();
-			
-			//CHECK INSTANCE
-			assertEquals(true, accountingTransaction_parsed instanceof AccountingTransaction);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(accountingTransaction.getSignature(), accountingTransaction_parsed.getSignature()));
-			
-			//CHECK KEY
-			assertEquals(accountingTransaction.getKey(), accountingTransaction_parsed.getKey());	
-			
-			//CHECK AMOUNT SENDER
-			assertEquals(accountingTransaction.viewAmount(creator), accountingTransaction_parsed.viewAmount(creator));	
-			
-			//CHECK AMOUNT RECIPIENT
-			assertEquals(accountingTransaction.viewAmount(recipient), accountingTransaction_parsed.viewAmount(recipient));	
-			
-			//CHECK FEE
-			assertEquals(accountingTransaction.getFee(), accountingTransaction_parsed.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(accountingTransaction.getReference(), accountingTransaction_parsed.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(accountingTransaction.getTimestamp(), accountingTransaction_parsed.getTimestamp());				
-		}
-		catch (Exception e) 
-		{
-			fail("Exception while parsing transaction. - " + e);
-		}
-		
-		//PARSE TRANSACTION FROM WRONG BYTES
-		rawTransaction = new byte[accountingTransaction.getDataLength()];
-		
-		try 
-		{	
-			//PARSE FROM BYTES
-			TransactionFactory.getInstance().parse(rawTransaction);
-			
-			//FAIL
-			fail("this should throw an exception");
-		}
-		catch (Exception e) 
-		{
-			//EXCEPTION IS THROWN OK
-		}	
-		
-		accountingTransaction.process(db);
-		
-		//assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(db));
-		assertEquals(BigDecimal.valueOf(-22).setScale(8).subtract(accountingTransaction.getFee()), creator.getConfirmedBalance(asset.getKey(), db));
-		assertEquals(BigDecimal.valueOf(23).setScale(8), recipient.getConfirmedBalance(asset.getKey(), db));
-		
-		byte[] rawMessageTransactionV3 = accountingTransaction.toBytes(true);
-		
-		AccountingTransaction accTrans_2 = null;
-		try {
-			accTrans_2 = (AccountingTransaction) AccountingTransaction.Parse(Arrays.copyOfRange(rawMessageTransactionV3, 4, rawMessageTransactionV3.length));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		assertEquals(new String(accountingTransaction.getData()), new String(accTrans_2.getData()));
-		assertEquals(accountingTransaction.getCreator(), accTrans_2.getCreator());
-		assertEquals(accountingTransaction.getRecipient(), accTrans_2.getRecipient());
-		assertEquals(accountingTransaction.getKey(), accTrans_2.getKey());
-		assertEquals(accountingTransaction.getAmount(), accTrans_2.getAmount());
-		assertEquals(accountingTransaction.isEncrypted(), accTrans_2.isEncrypted());
-		assertEquals(accountingTransaction.isText(), accTrans_2.isText());
-		
-		assertEquals(accountingTransaction.isSignatureValid(), true);
-		assertEquals(accTrans_2.isSignatureValid(), true);		
-	}
 
 }

@@ -19,6 +19,7 @@ import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.AssetFactory;
 import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
@@ -30,13 +31,16 @@ import database.DBSet;
 
 public class IssueAssetTransaction extends Transaction 
 {
+	private static final int TYPE_ID = Transaction.ISSUE_ASSET_TRANSACTION;
+	private static final String NAME_ID = "Issue Asset";
+
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private Asset asset;
 	
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(ISSUE_ASSET_TRANSACTION, creator, feePow, timestamp, reference);		
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);		
 		this.asset = asset;
 	}
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
@@ -47,7 +51,8 @@ public class IssueAssetTransaction extends Transaction
 }
 
 	//GETTERS/SETTERS
-		
+	//public static String getName() { return "Issue Asset"; }
+
 	public Asset getAsset()
 	{
 		return this.asset;
@@ -89,7 +94,7 @@ public class IssueAssetTransaction extends Transaction
 		
 		//READ ASSET
 		// asset parse without reference - if is = signature
-		Asset asset = Asset.parse(Arrays.copyOfRange(data, position, data.length), false);
+		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		position += asset.getDataLength(false);
 		
 		//READ FEE POWER
@@ -127,7 +132,7 @@ public class IssueAssetTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ISSUE_ASSET_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		
@@ -233,7 +238,6 @@ public class IssueAssetTransaction extends Transaction
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 		
 		//SET ORPHAN DATA
-		//Logger.getGlobal().info("this.signature: " + this.signature.length + " : " + this.signature);
 		db.getIssueAssetMap().set(this.signature, key);
 
 		//Logger.getGlobal().info("issue ASSET KEY: " + asset.getKey(db));

@@ -29,19 +29,22 @@ import utils.StorageUtils;
 
 public abstract class ArbitraryTransaction extends Transaction {
 
+	private static final int TYPE_ID = Transaction.ARBITRARY_TRANSACTION;
+	private static final String NAME_ID = "OLD: Arbitrary";
 	protected int service;
 	protected byte[] data;
 
 	protected List<Payment> payments;
 	
 	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
-		super(ARBITRARY_TRANSACTION, creator, (byte)0, timestamp, reference);	
+		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);	
 	}
 	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
-		super(ARBITRARY_TRANSACTION, creator, (byte)0, timestamp, reference, signature);
+		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference, signature);
 	}
 		
 	// GETTERS/SETTERS
+	//public static String getName() { return "OLD: Arbitrary"; }
 
 	public int getService() {
 		return this.service;

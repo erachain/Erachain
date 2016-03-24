@@ -24,11 +24,13 @@ import database.DBSet;
 
 public class PaymentTransaction extends TransactionAmount {
 
+	private static final int TYPE_ID = Transaction.PAYMENT_TRANSACTION;
+	private static final String NAME_ID = "OLD: payment";
 	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT - KEY_LENGTH;
 		
 	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(PAYMENT_TRANSACTION, creator, feePow, recipient, amount, 0l, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, 0l, timestamp, reference);
 	}
 	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -38,7 +40,9 @@ public class PaymentTransaction extends TransactionAmount {
 	}
 	
 	//GETTERS/SETTERS	
-	
+	//public static String getName() { return "OLD: Payment"; }
+
+
 	//PARSE/CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception{
@@ -104,7 +108,7 @@ public class PaymentTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(PAYMENT_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

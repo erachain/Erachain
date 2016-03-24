@@ -19,6 +19,7 @@ import database.DBSet;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.assets.Asset;
+import qora.assets.Venture;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 import qora.naming.Name;
@@ -633,13 +634,13 @@ public class TransactionTests {
 			assertEquals(nameRegistration.viewAmount(sender), parsedRegistration.viewAmount(sender));	
 			
 			//CHECK NAME OWNER
-			assertEquals(nameRegistration.getName().getOwner().getAddress(), parsedRegistration.getName().getOwner().getAddress());	
+			assertEquals(nameRegistration.getAName().getOwner().getAddress(), parsedRegistration.getAName().getOwner().getAddress());	
 			
 			//CHECK NAME NAME
-			assertEquals(nameRegistration.getName().getName(), parsedRegistration.getName().getName());	
+			assertEquals(nameRegistration.getAName().getName(), parsedRegistration.getAName().getName());	
 			
 			//CHECK NAME VALUE
-			assertEquals(nameRegistration.getName().getValue(), parsedRegistration.getName().getValue());	
+			assertEquals(nameRegistration.getAName().getValue(), parsedRegistration.getAName().getValue());	
 			
 			//CHECK FEE
 			assertEquals(nameRegistration.getFee(), parsedRegistration.getFee());	
@@ -912,13 +913,13 @@ public class TransactionTests {
 			assertEquals(nameUpdate.getCreator().getAddress(), parsedUpdate.getCreator().getAddress());	
 			
 			//CHECK NAME OWNER
-			assertEquals(nameUpdate.getName().getOwner().getAddress(), parsedUpdate.getName().getOwner().getAddress());	
+			assertEquals(nameUpdate.getAName().getOwner().getAddress(), parsedUpdate.getAName().getOwner().getAddress());	
 			
 			//CHECK NAME NAME
-			assertEquals(nameUpdate.getName().getName(), parsedUpdate.getName().getName());	
+			assertEquals(nameUpdate.getAName().getName(), parsedUpdate.getAName().getName());	
 			
 			//CHECK NAME VALUE
-			assertEquals(nameUpdate.getName().getValue(), parsedUpdate.getName().getValue());	
+			assertEquals(nameUpdate.getAName().getValue(), parsedUpdate.getAName().getValue());	
 			
 			//CHECK FEE
 			assertEquals(nameUpdate.getFee(), parsedUpdate.getFee());	
@@ -1547,7 +1548,7 @@ public class TransactionTests {
 			assertEquals(cancelNameSaleTransaction.getCreator().getAddress(), parsedCancelNameSale.getCreator().getAddress());	
 			
 			//CHECK NAME
-			assertEquals(cancelNameSaleTransaction.getName(), parsedCancelNameSale.getName());	
+			assertEquals(cancelNameSaleTransaction.getAName(), parsedCancelNameSale.getAName());	
 			
 			//CHECK FEE
 			assertEquals(cancelNameSaleTransaction.getFee(), parsedCancelNameSale.getFee());	
@@ -2983,7 +2984,7 @@ public class TransactionTests {
 		init();
 		
 		//CREATE ASSET
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 		//byte[] data = asset.toBytes(false);
 		//Asset asset2 = Asset.parse(data);
 		
@@ -3015,7 +3016,7 @@ public class TransactionTests {
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -3097,7 +3098,7 @@ public class TransactionTests {
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 
 				
 		//CREATE ISSUE ASSET TRANSACTION
@@ -3136,7 +3137,7 @@ public class TransactionTests {
 				
 		
 		long timestamp = NTP.getTime();
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -3171,7 +3172,7 @@ public class TransactionTests {
 		init();
 		
 		long timestamp = NTP.getTime();
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -3204,7 +3205,7 @@ public class TransactionTests {
 		init();
 		
 		long timestamp = NTP.getTime();
-		Asset asset = new Asset(maker, "test", "strontje", 50000l, (byte) 2, false);
+		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -3445,7 +3446,7 @@ public class TransactionTests {
 		account.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 		
 		//CREATE ASSET
-		Asset asset = new Asset(account, "a", "a", 50000l, (byte) 2, true);
+		Asset asset = new Venture(account, "a", "a", 50000l, (byte) 2, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(account, asset, FEE_POWER, System.currentTimeMillis(), account.getLastReference(dbSet), new byte[64]);
@@ -3596,7 +3597,7 @@ public class TransactionTests {
 		account.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 		
 		//CREATE ASSET
-		Asset asset = new Asset(account, "a", "a", 50000l, (byte) 2, true);
+		Asset asset = new Venture(account, "a", "a", 50000l, (byte) 2, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(account, asset, FEE_POWER, System.currentTimeMillis(), account.getLastReference(dbSet), new byte[64]);
@@ -3640,7 +3641,7 @@ public class TransactionTests {
 		*/
 		
 		//CREATE ASSET
-		Asset asset = new Asset(maker, "a", "a", 50000l, (byte) 2, true);
+		Asset asset = new Venture(maker, "a", "a", 50000l, (byte) 2, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
@@ -3687,7 +3688,7 @@ public class TransactionTests {
 		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
+		Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
 		qoraAsset.setReference(assetReference);
     	dbSet.getAssetMap().set(0l, qoraAsset);
 				
@@ -3727,7 +3728,7 @@ public class TransactionTests {
 		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte)2, true);
+		Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte)2, true);
 		qoraAsset.setReference(assetReference);
     	dbSet.getAssetMap().set(0l, qoraAsset);
 				
@@ -3802,7 +3803,7 @@ public class TransactionTests {
 
 		byte[] reference = sender.getLastReference(dbSet);
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
+		Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
 		qoraAsset.setReference(reference);
     	dbSet.getAssetMap().set(0l, qoraAsset);
 
@@ -3901,7 +3902,7 @@ public class TransactionTests {
 		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
+		Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
 		qoraAsset.setReference(assetReference);
     	dbSet.getAssetMap().set(0l, qoraAsset);
 				
@@ -3950,7 +3951,7 @@ public class TransactionTests {
 		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
 		//ADD QORA ASSET
-		Asset qoraAsset = new Asset(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
+		Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 8, true);
 		qoraAsset.setReference(assetReference);
     	dbSet.getAssetMap().set(0l, qoraAsset);
 				

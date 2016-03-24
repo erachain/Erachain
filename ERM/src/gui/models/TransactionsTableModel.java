@@ -13,6 +13,7 @@ import database.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
+// IN gui.DebugTabPane used
 public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> implements Observer {
 	
 	public static final int COLUMN_TIMESTAMP = 0;
@@ -85,7 +86,8 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 				
 			case COLUMN_TYPE:
 				
-				return Lang.transactionTypes[transaction.getType()];
+				//return Lang.transactionTypes[transaction.getType()];
+				return Lang.getInstance().translate(transaction.getName());
 				
 			case COLUMN_AMOUNT:
 				

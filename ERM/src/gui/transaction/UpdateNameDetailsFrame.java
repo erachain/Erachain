@@ -131,7 +131,7 @@ public class UpdateNameDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(nameUpdate.getName().getOwner().getAddress());
+		JTextField owner = new JTextField(nameUpdate.getAName().getOwner().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
@@ -143,7 +143,7 @@ public class UpdateNameDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(nameUpdate.getName().getName());
+		JTextField name = new JTextField(nameUpdate.getAName().getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -156,7 +156,7 @@ public class UpdateNameDetailsFrame extends JFrame
 		//VALUE
 		detailGBC.gridy = 7;
 
-		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameUpdate.getName().getValue()));
+		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameUpdate.getAName().getValue()));
 		txtareaValue.setRows(10);
       	txtareaValue.setColumns(43);
       	txtareaValue.setEditable(false);
@@ -175,7 +175,7 @@ public class UpdateNameDetailsFrame extends JFrame
   		//COMPRESSED
   		detailGBC.gridy = 8;
   		final JCheckBox compressed = new JCheckBox();
-  		compressed.setSelected(nameUpdate.getName().getValue().startsWith("?gz!"));
+  		compressed.setSelected(nameUpdate.getAName().getValue().startsWith("?gz!"));
   		compressed.setEnabled(false);
      	
   		this.add(compressed, detailGBC);		

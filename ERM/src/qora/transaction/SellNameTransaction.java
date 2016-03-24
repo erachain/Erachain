@@ -25,6 +25,8 @@ import database.DBSet;
 
 public class SellNameTransaction extends Transaction 
 {
+	private static final int TYPE_ID = SELL_NAME_TRANSACTION;
+	private static final String NAME_ID = "OLD: Sale Name";
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
@@ -32,7 +34,7 @@ public class SellNameTransaction extends Transaction
 	
 	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(SELL_NAME_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 
 		this.creator = creator;
 		this.nameSale = nameSale;
@@ -45,6 +47,9 @@ public class SellNameTransaction extends Transaction
 	}
 	
 	//GETTERS/SETTERS	
+
+	//public static String getName() { return "OLD: Sell Name"; }
+
 	public NameSale getNameSale()
 	{
 		return this.nameSale;
@@ -112,7 +117,7 @@ public class SellNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(SELL_NAME_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

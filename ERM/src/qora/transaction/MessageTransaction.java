@@ -27,6 +27,8 @@ import utils.Converter;
 
 public class MessageTransaction extends TransactionAmount {
 
+	private static final int TYPE_ID = Transaction.MESSAGE_TRANSACTION;
+	private static final String NAME_ID = "Send";
 
 	protected byte[] data;
 	protected byte[] encrypted;
@@ -35,7 +37,7 @@ public class MessageTransaction extends TransactionAmount {
 	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
 	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(MESSAGE_TRANSACTION, creator, feePow, recipient, amount, key, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
 		this.data = data;
 		this.encrypted = encrypted;
@@ -47,6 +49,10 @@ public class MessageTransaction extends TransactionAmount {
 		this.signature = signature;
 		this.calcFee();
 	}
+	
+	//GETTERS/SETTERS
+
+	//public static String getName() { return "Send"; }
 
 	public byte[] getData() 
 	{
@@ -163,7 +169,7 @@ public class MessageTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(MESSAGE_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 

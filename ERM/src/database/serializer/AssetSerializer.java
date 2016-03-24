@@ -8,6 +8,7 @@ import java.io.Serializable;
 import org.mapdb.Serializer;
 
 import qora.assets.Asset;
+import qora.assets.AssetFactory;
 
 public class AssetSerializer implements Serializer<Asset>, Serializable
 {
@@ -28,7 +29,7 @@ public class AssetSerializer implements Serializer<Asset>, Serializable
         in.readFully(bytes);
         try 
         {
-        	return Asset.parse(bytes, true);
+        	return AssetFactory.getInstance().parse(bytes, true);
 		}
         catch (Exception e) 
         {

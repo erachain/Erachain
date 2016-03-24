@@ -131,7 +131,7 @@ public class RegisterNameDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(nameRegistration.getName().getOwner().getAddress());
+		JTextField owner = new JTextField(nameRegistration.getAName().getOwner().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
@@ -143,7 +143,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(nameRegistration.getName().getName());
+		JTextField name = new JTextField(nameRegistration.getAName().getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -156,7 +156,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		//VALUE
 		detailGBC.gridy = 7;
 
-		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameRegistration.getName().getValue()));
+		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameRegistration.getAName().getValue()));
 		txtareaValue.setRows(10);
       	txtareaValue.setColumns(43);
       	txtareaValue.setEditable(false);
@@ -175,7 +175,7 @@ public class RegisterNameDetailsFrame extends JFrame
   		//COMPRESSED
   		detailGBC.gridy = 8;
   		final JCheckBox compressed = new JCheckBox();
-  		compressed.setSelected(nameRegistration.getName().getValue().startsWith("?gz!"));
+  		compressed.setSelected(nameRegistration.getAName().getValue().startsWith("?gz!"));
   		compressed.setEnabled(false);
       	
   		this.add(compressed, detailGBC);		

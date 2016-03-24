@@ -26,6 +26,8 @@ import database.DBSet;
 
 public class CreateOrderTransaction extends Transaction 
 {
+	private static final int TYPE_ID = Transaction.CREATE_ORDER_TRANSACTION;
+	private static final String NAME_ID = "Create Order";
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;
@@ -40,7 +42,7 @@ public class CreateOrderTransaction extends Transaction
 	
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, long timestamp, byte[] reference) 
 	{
-		super(CREATE_ORDER_TRANSACTION, creator, (byte)0, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);
 		
 		this.have = have;
 		this.want = want;
@@ -63,6 +65,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
+	//public static String getName() { return "Create Order"; }
 
 	public void makeOrder()
 	{
@@ -159,7 +162,7 @@ public class CreateOrderTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(CREATE_ORDER_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

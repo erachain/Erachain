@@ -32,11 +32,9 @@ public class BlockFactory {
 		return new Block(version, reference, timestamp, baseTarget, generator, signature, atBytes, atFees);		
 	}
 	
-	/*
 	public Block create(int version, byte[] reference, long timestamp, long baseTarget, PublicKeyAccount generator, byte[] signature) 
 	{		
 		return new Block(version, reference, timestamp, baseTarget, generator, signature);		
 	}
-	*/
 	
 }

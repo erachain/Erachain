@@ -26,13 +26,15 @@ import database.DBSet;
 
 public class CancelOrderTransaction extends Transaction
 {
+	private static final int TYPE_ID = Transaction.CANCEL_ORDER_TRANSACTION;
+	private static final String NAME_ID = "Cancel Order";
 	private static final int ORDER_LENGTH = 64;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + ORDER_LENGTH + SIGNATURE_LENGTH;
 	
 	private BigInteger order;
 	
 	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
-		super(CANCEL_ORDER_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		this.order = order;
 	}
 	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
@@ -42,7 +44,8 @@ public class CancelOrderTransaction extends Transaction
 	}
 	
 	//GETTERS/SETTERS
-	
+	//public static String getName() { return "OLD: Cancel Order"; }
+
 	public BigInteger getOrder()
 	{
 		return this.order;
@@ -110,7 +113,7 @@ public class CancelOrderTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(CANCEL_ORDER_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

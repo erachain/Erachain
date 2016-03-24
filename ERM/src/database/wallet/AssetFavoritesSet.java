@@ -14,6 +14,7 @@ public class AssetFavoritesSet extends Observable {
 	private WalletDatabase walletDatabase;
 	private Set<Long> assetsSet;
 	
+	// favorites init SET
 	public AssetFavoritesSet(WalletDatabase walletDatabase, DB database) 
 	{
 		this.walletDatabase = walletDatabase;
@@ -25,6 +26,16 @@ public class AssetFavoritesSet extends Observable {
 		if(!this.assetsSet.contains(0l))
 		{
 			this.add(0l);
+		}
+		//CHECK IF CONTAINS QORA
+		if(!this.assetsSet.contains(1l))
+		{
+			this.add(1l);
+		}
+		//CHECK IF CONTAINS QORA
+		if(!this.assetsSet.contains(2l))
+		{
+			this.add(2l);
 		}
 	}
 	

@@ -81,42 +81,41 @@ public abstract class Transaction {
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******
+	// univerlas
 	public static final int EXTENDED = 0;
-	public static final int GENESIS_TRANSACTION = 1;
-	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 2;
-	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 3;
-	public static final int REERVED_4 = 4;
+	// genesis
+	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
+	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 2;
+	// sipmle statement
+	public static final int STATEMENT_RECORD = 6;
+	// issue asset
+	public static final int ISSUE_ASSET_TRANSACTION = 11;
+	// transfer asset + mess
+	public static final int MESSAGE_TRANSACTION = 16;
+	// confirms other transactions
+	public static final int CONFIRM_TRANSACTION = 21;
+	// exchange of assets
+	public static final int CREATE_ORDER_TRANSACTION = 26;
+	public static final int CANCEL_ORDER_TRANSACTION = 27;
+	// voting
+	public static final int CREATE_POLL_TRANSACTION =31;
+	public static final int VOTE_ON_POLL_TRANSACTION = 32;
 
-	public static final int PAYMENT_TRANSACTION = 5;
+	// old
+	public static final int GENESIS_TRANSACTION = 4 + 130;
+	public static final int PAYMENT_TRANSACTION = 5 + 130;
+	public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
+	public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
+	public static final int SELL_NAME_TRANSACTION = 8 + 130;
+	public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
+	public static final int BUY_NAME_TRANSACTION = 10 + 130;
+	public static final int TRANSFER_ASSET_TRANSACTION = 11 + 130;	
+	public static final int ARBITRARY_TRANSACTION = 12 + 130;
+	public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
+	public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
 	
-	public static final int REGISTER_NAME_TRANSACTION = 6;
-	public static final int UPDATE_NAME_TRANSACTION = 7;
-	public static final int SELL_NAME_TRANSACTION = 8;
-	public static final int CANCEL_SELL_NAME_TRANSACTION = 9;
-	public static final int BUY_NAME_TRANSACTION = 10;
-	
-	public static final int CREATE_POLL_TRANSACTION =11;
-	public static final int VOTE_ON_POLL_TRANSACTION = 12;
-	public static final int STATEMENT_RECORD = 13;
-	public static final int REERVED_14 = 14;
-	
-	public static final int ARBITRARY_TRANSACTION = 15;
-	public static final int REERVED_16 = 16;
-	
-	public static final int ISSUE_ASSET_TRANSACTION = 17;
-	public static final int TRANSFER_ASSET_TRANSACTION = 18;
-	public static final int CREATE_ORDER_TRANSACTION = 19;
-	public static final int CANCEL_ORDER_TRANSACTION = 20;
-
-	public static final int MULTI_PAYMENT_TRANSACTION = 21;
-	public static final int REERVED_22 = 22;
-
-	public static final int DEPLOY_AT_TRANSACTION = 23;
-	public static final int REERVED_24 = 24;
-	
-	public static final int MESSAGE_TRANSACTION = 25;
-	public static final int ACCOUNTING_TRANSACTION = 26;
-	public static final int JSON_TRANSACTION = 27;
+	//public static final int ACCOUNTING_TRANSACTION = 26;
+	//public static final int JSON_TRANSACTION = 27;
 	
 	// FEE KEY = OIL
 	public static final long FEE_KEY = 1l;
@@ -135,6 +134,59 @@ public abstract class Transaction {
 								
 	//public static String[] TYPES = new String[256];
 	//public String TYPES[0] = "w";
+
+	/*
+	public static String getTypeName(int type) {
+		switch(type)
+		{
+		case EXTENDED:
+			return "Extended";
+		case GENESIS_ISSUE_ASSET_TRANSACTION:
+			return "Genesis Issue Asset";
+		case GENESIS_TRANSFER_ASSET_TRANSACTION:
+			return "Genesis Send Asset";
+		case STATEMENT_RECORD:
+			return "Statement";
+		case ISSUE_ASSET_TRANSACTION:
+			return "Issue Asset";
+		case MESSAGE_TRANSACTION:
+			return "Send Asset";
+		case CONFIRM_TRANSACTION:
+			return "Confirm Record";
+		case CREATE_ORDER_TRANSACTION:
+			return "Create Order";
+		case CANCEL_ORDER_TRANSACTION:
+			return "Cansel Order";
+		case CREATE_POLL_TRANSACTION:
+			return "Create Poll";
+		case VOTE_ON_POLL_TRANSACTION:
+			return "Vote on Poll";
+		case GENESIS_TRANSACTION:
+			return "Genesis record";
+		case PAYMENT_TRANSACTION:
+			return "OLD:Payment";
+		case REGISTER_NAME_TRANSACTION:
+			return "OLD:Register Name";
+		case UPDATE_NAME_TRANSACTION:
+			return "OLD:Update Name";
+		case SELL_NAME_TRANSACTION:
+			return "OLD:Sell Name";
+		case CANCEL_SELL_NAME_TRANSACTION:
+			return "OLD:Cancel Sell Name";
+		case BUY_NAME_TRANSACTION:
+			return "OLD:Buy Name";
+		case TRANSFER_ASSET_TRANSACTION:
+			return "OLD:Send Asset";
+		case ARBITRARY_TRANSACTION:
+			return "OLD:Arbitrary";
+		case MULTI_PAYMENT_TRANSACTION:
+			return "OLD:Multy Send";
+		case DEPLOY_AT_TRANSACTION:
+			return "OLD:Deploy AT";
+		}
+		return "Unknown record type";
+	}
+	*/
 
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
@@ -193,24 +245,27 @@ public abstract class Transaction {
 	public static final int SIGNATURE_LENGTH = 64;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 		
+	protected String NAME = "unknown";
+	protected int type;
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	protected byte feePow = 0;
-	protected int type;
 	protected byte[] signature;
 	protected long timestamp;
 	protected PublicKeyAccount creator;
 	
 	// need for genesis
-	protected Transaction(int type, long timestamp)
+	protected Transaction(int type, String name, long timestamp)
 	{
 		this.type = type;
+		this.NAME = name;
 		this.timestamp = timestamp;
 
 	}
-	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
+	protected Transaction(int type, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
 		this.type = type;
+		this.NAME = name;
 		this.creator = creator;
 		//this.props = props;
 		this.timestamp = timestamp;
@@ -219,13 +274,14 @@ public abstract class Transaction {
 		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
 		this.feePow = feePow;
 	}
-	protected Transaction(int type, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(int type, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
-		this(type, creator, feePow, timestamp, reference);
+		this(type, name, creator, feePow, timestamp, reference);
 		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
+	public String getName() { return this.NAME; }
 	
 	public int getType()
 	{

@@ -14,13 +14,12 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 //import qora.account.PublicKeyAccount;
 import qora.assets.Asset;
+import qora.assets.Venture;
 import qora.assets.Order;
 import qora.block.Block;
 import qora.naming.Name;
 import qora.naming.NameSale;
 import qora.payment.Payment;
-import qora.transaction.AccountingTransaction;
-import qora.transaction.JsonTransaction;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -261,7 +260,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		Asset asset = new Asset(creator, name, description, quantity, scale, divisible);
+		Asset asset = new Venture(creator, name, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
@@ -373,6 +372,8 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx);
 	}
+	
+	/*
 	public Pair<Transaction, Integer> createJson(PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
@@ -390,7 +391,6 @@ public class TransactionCreator
 		return afterCreate(messageTx);
 	}
 
-	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
@@ -421,6 +421,7 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx);
 	}
+	*/
 	
 	public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData)
 	{
