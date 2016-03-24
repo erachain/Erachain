@@ -27,6 +27,8 @@ import database.DBSet;
 
 public class GenesisTransferAssetTransaction extends Transaction {
 
+	private static final int TYPE_ID = Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION;
+	private static final String NAME_ID = "Genesis Send Asset";
 	//private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
@@ -38,7 +40,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	
 	public GenesisTransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long timestamp) 
 	{
-		super(GENESIS_TRANSFER_ASSET_TRANSACTION, timestamp);
+		super(TYPE_ID, NAME_ID, timestamp);
 		this.creator = creator;
 		this.recipient = recipient;
 		this.amount = amount;
@@ -47,6 +49,8 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	}
 	
 	//GETTERS/SETTERS
+	//public static String getName() { return NAME; }
+
 	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
@@ -143,7 +147,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_TRANSFER_ASSET_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

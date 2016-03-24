@@ -125,7 +125,7 @@ public class CancelSellNameDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 5;
-		JTextField name = new JTextField(cancelNameSale.getName());
+		JTextField name = new JTextField(cancelNameSale.getAName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

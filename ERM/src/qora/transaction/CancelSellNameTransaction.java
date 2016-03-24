@@ -26,6 +26,8 @@ import database.DBSet;
 
 public class CancelSellNameTransaction extends Transaction
 {
+	private static final int TYPE_ID = Transaction.CANCEL_SELL_NAME_TRANSACTION;
+	private static final String NAME_ID = "OLD: Cancel Sell Name";
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + SIGNATURE_LENGTH;
 	
@@ -33,7 +35,7 @@ public class CancelSellNameTransaction extends Transaction
 	private String name;
 	
 	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference) {
-		super(CANCEL_SELL_NAME_TRANSACTION, creator, feePow, timestamp, reference);	
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);	
 		this.name = name;
 	}
 	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, byte[] reference, byte[] signature) {
@@ -43,8 +45,10 @@ public class CancelSellNameTransaction extends Transaction
 	}
 	
 	//GETTERS/SETTERS
+	// public static String getName() { return "OLD: Cancel Sell Name"; }
+
 	
-	public String getName()
+	public String getAName()
 	{
 		return this.name;
 	}
@@ -120,7 +124,7 @@ public class CancelSellNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(CANCEL_SELL_NAME_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

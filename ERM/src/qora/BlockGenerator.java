@@ -340,7 +340,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		//CREATE NEW BLOCK
 		Block newBlock;
-		if ( version > 0 )
+		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK( block.getHeight() ) , block.getHeight() + 1 );
 			byte[] atBytes = atBlock.getBytesForBlock();
@@ -348,8 +348,7 @@ public class BlockGenerator extends Thread implements Observer
 		}
 		else
 		{
-			//newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature);
-			newBlock = null;
+			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature);
 		}
 		return newBlock;
 	}

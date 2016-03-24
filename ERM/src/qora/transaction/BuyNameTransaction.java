@@ -28,6 +28,8 @@ import database.DBSet;
 
 public class BuyNameTransaction extends Transaction
 {
+	private static final int TYPE_ID = Transaction.BUY_NAME_TRANSACTION;
+	private static final String NAME_ID = "OLD: Buy Name";
 	private static final int SELLER_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SELLER_LENGTH + SIGNATURE_LENGTH;
 	
@@ -35,7 +37,7 @@ public class BuyNameTransaction extends Transaction
 	private Account seller;
 	
 	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, byte[] reference) {
-		super(BUY_NAME_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		this.nameSale = nameSale;
 		this.seller = seller;
 	}
@@ -46,7 +48,8 @@ public class BuyNameTransaction extends Transaction
 	}
 	
 	//GETTERS/SETTERS
-	
+	//public static String getName() { return "OLD: Buy Name";	}
+
 	public PublicKeyAccount getBuyer()
 	{
 		return this.creator;
@@ -130,7 +133,7 @@ public class BuyNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(BUY_NAME_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

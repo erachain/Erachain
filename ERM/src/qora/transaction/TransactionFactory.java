@@ -114,6 +114,7 @@ public class TransactionFactory {
 			// PARSE MESSAGE TRANSACTION
 			return MessageTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			
+			/*
 		case Transaction.ACCOUNTING_TRANSACTION:
 
 			
@@ -125,7 +126,7 @@ public class TransactionFactory {
 			
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
-			
+			*/
 		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
@@ -143,7 +144,7 @@ public class TransactionFactory {
 			
 		}
 
-		throw new Exception("Invalid transaction type");
+		throw new Exception("Invalid transaction type: " + type);
 	}
 	
 }

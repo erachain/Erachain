@@ -28,6 +28,8 @@ import database.DBSet;
 
 public class VoteOnPollTransaction extends Transaction 
 {
+	private static final int TYPE_ID = VOTE_ON_POLL_TRANSACTION;
+	private static final String NAME_ID = "Vote on Poll";
 	private static final int POLL_SIZE_LENGTH = 4;
 	private static final int OPTION_SIZE_LENGTH = 4;
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + POLL_SIZE_LENGTH + OPTION_SIZE_LENGTH + SIGNATURE_LENGTH;
@@ -37,7 +39,7 @@ public class VoteOnPollTransaction extends Transaction
 	
 	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(VOTE_ON_POLL_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
@@ -51,7 +53,9 @@ public class VoteOnPollTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
-	
+
+	//public static String getName() { return "Vote on Poll"; }
+
 	public String getPoll()
 	{
 		return this.poll;
@@ -140,7 +144,7 @@ public class VoteOnPollTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(VOTE_ON_POLL_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

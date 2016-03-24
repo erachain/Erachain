@@ -634,13 +634,13 @@ public class TransactionTests {
 			assertEquals(nameRegistration.viewAmount(sender), parsedRegistration.viewAmount(sender));	
 			
 			//CHECK NAME OWNER
-			assertEquals(nameRegistration.getName().getOwner().getAddress(), parsedRegistration.getName().getOwner().getAddress());	
+			assertEquals(nameRegistration.getAName().getOwner().getAddress(), parsedRegistration.getAName().getOwner().getAddress());	
 			
 			//CHECK NAME NAME
-			assertEquals(nameRegistration.getName().getName(), parsedRegistration.getName().getName());	
+			assertEquals(nameRegistration.getAName().getName(), parsedRegistration.getAName().getName());	
 			
 			//CHECK NAME VALUE
-			assertEquals(nameRegistration.getName().getValue(), parsedRegistration.getName().getValue());	
+			assertEquals(nameRegistration.getAName().getValue(), parsedRegistration.getAName().getValue());	
 			
 			//CHECK FEE
 			assertEquals(nameRegistration.getFee(), parsedRegistration.getFee());	
@@ -913,13 +913,13 @@ public class TransactionTests {
 			assertEquals(nameUpdate.getCreator().getAddress(), parsedUpdate.getCreator().getAddress());	
 			
 			//CHECK NAME OWNER
-			assertEquals(nameUpdate.getName().getOwner().getAddress(), parsedUpdate.getName().getOwner().getAddress());	
+			assertEquals(nameUpdate.getAName().getOwner().getAddress(), parsedUpdate.getAName().getOwner().getAddress());	
 			
 			//CHECK NAME NAME
-			assertEquals(nameUpdate.getName().getName(), parsedUpdate.getName().getName());	
+			assertEquals(nameUpdate.getAName().getName(), parsedUpdate.getAName().getName());	
 			
 			//CHECK NAME VALUE
-			assertEquals(nameUpdate.getName().getValue(), parsedUpdate.getName().getValue());	
+			assertEquals(nameUpdate.getAName().getValue(), parsedUpdate.getAName().getValue());	
 			
 			//CHECK FEE
 			assertEquals(nameUpdate.getFee(), parsedUpdate.getFee());	
@@ -1548,7 +1548,7 @@ public class TransactionTests {
 			assertEquals(cancelNameSaleTransaction.getCreator().getAddress(), parsedCancelNameSale.getCreator().getAddress());	
 			
 			//CHECK NAME
-			assertEquals(cancelNameSaleTransaction.getName(), parsedCancelNameSale.getName());	
+			assertEquals(cancelNameSaleTransaction.getAName(), parsedCancelNameSale.getAName());	
 			
 			//CHECK FEE
 			assertEquals(cancelNameSaleTransaction.getFee(), parsedCancelNameSale.getFee());	

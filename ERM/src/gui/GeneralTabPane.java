@@ -43,13 +43,7 @@ public class GeneralTabPane extends JTabbedPane{
 
 		//MESSAGE
 		this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel());
-		
-		//Accounting
-	   this.addTab(Lang.getInstance().translate("Accounting"), new SendAccountingPanel());
-		
-		//Json1
-	   this.addTab(Lang.getInstance().translate("Json"), new SendJson1Panel());
-	   
+			   
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new JTable(this.transactionsModel);

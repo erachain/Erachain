@@ -36,6 +36,8 @@ import database.DBSet;
 public class DeployATTransaction extends Transaction
 {
 
+	private static final int TYPE_ID = Transaction.DEPLOY_AT_TRANSACTION;
+	private static final String NAME_ID = "Deploy AT";
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 
 	private static final int NAME_SIZE_LENGTH = 4;
@@ -56,7 +58,7 @@ public class DeployATTransaction extends Transaction
 
 	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
 	{
-		super(DEPLOY_AT_TRANSACTION, creator, (byte)0, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);
 
 		this.name = name;
 		this.description = description;
@@ -79,6 +81,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//PARSE/CONVERT
+	//public static String getName() { return "OLD: Deploy AT"; }
 
 	public static Transaction Parse(byte[] data) throws Exception 
 	{
@@ -212,7 +215,7 @@ public class DeployATTransaction extends Transaction
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(DEPLOY_AT_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 

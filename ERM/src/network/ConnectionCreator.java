@@ -1,13 +1,14 @@
 package network;
-
+// 24/03
 import java.util.List;
-import java.util.logging.Logger;
 
 import lang.Lang;
-import network.Network;
 import network.message.Message;
 import network.message.MessageFactory;
 import network.message.PeersMessage;
+
+import org.apache.log4j.Logger;
+
 import settings.Settings;
 
 public class ConnectionCreator extends Thread {
@@ -15,6 +16,8 @@ public class ConnectionCreator extends Thread {
 	private ConnectionCallback callback;
 	private boolean isRun;
 	
+	private static final Logger LOGGER = Logger
+			.getLogger(ConnectionCreator.class);
 	public ConnectionCreator(ConnectionCallback callback)
 	{
 		this.callback = callback;
@@ -54,11 +57,13 @@ public class ConnectionCreator extends Thread {
 								//if(!peer.getAddress().isSiteLocalAddress() && !peer.getAddress().isLoopbackAddress() && !peer.getAddress().isAnyLocalAddress())
 								{
 									//CONNECT
-									Logger.getGlobal().info(
-											Lang.getInstance().translate("Connecting to known peer ") + peer.getAddress().getHostAddress() 
-											+ ':' + Network.getNetworkPort() + " - " + knownPeersCounter + " / " + knownPeers.size() 
-											+ " :: "+Lang.getInstance().translate("Connections: ") + callback.getActiveConnections().size());
-								
+									LOGGER.info(
+											Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
+												.replace("%peer%", peer.getAddress().getHostAddress())
+												.replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
+												.replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
+												.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
+												);
 									peer.connect(callback);
 								}
 							}
@@ -110,11 +115,15 @@ public class ConnectionCreator extends Thread {
 														{
 															int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
 															
-															Logger.getGlobal().info(
-																Lang.getInstance().translate("Connecting to peer ") + newPeer.getAddress().getHostAddress() + Lang.getInstance().translate(" proposed by ") + peer.getAddress().getHostAddress() 
-																+ " :: " + foreignPeersCounter + " / " + maxReceivePeersForPrint + " / " + peersMessage.getPeers().size() 
-																+ " :: " + Lang.getInstance().translate("Connections: ") + callback.getActiveConnections().size());
-														
+															LOGGER.info(
+																Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
+																	.replace("%newpeer%", newPeer.getAddress().getHostAddress())
+																	.replace("%peer%", peer.getAddress().getHostAddress())
+																	.replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
+																	.replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
+																	.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
+																	.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
+																	);
 															//CONNECT
 															newPeer.connect(callback);
 														}
@@ -134,9 +143,9 @@ public class ConnectionCreator extends Thread {
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 				
-				Logger.getGlobal().info(Lang.getInstance().translate("Error creating new connection"));			
+				LOGGER.info(Lang.getInstance().translate("Error creating new connection"));			
 			}					
 		}
 	}

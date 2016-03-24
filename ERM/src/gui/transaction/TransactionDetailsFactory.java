@@ -2,8 +2,6 @@ package gui.transaction;
 
 import javax.swing.JFrame;
 
-import qora.transaction.AccountingTransaction;
-import qora.transaction.JsonTransaction;
 import qora.transaction.ArbitraryTransaction;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -116,7 +114,7 @@ public class TransactionDetailsFactory
 		case Transaction.MESSAGE_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
-		
+		/*
 		case Transaction.ACCOUNTING_TRANSACTION:
 			AccountingTransaction accountingTransaction = (AccountingTransaction)transaction;
 			return new AccountingTransactionDetailsFrame(accountingTransaction);
@@ -124,7 +122,7 @@ public class TransactionDetailsFactory
 		case Transaction.JSON_TRANSACTION:
 			JsonTransaction json1Transaction = (JsonTransaction)transaction;
 			return new Json1TransactionDetailsFrame(json1Transaction);
-
+		*/
 		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
 			
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;

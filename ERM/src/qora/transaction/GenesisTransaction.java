@@ -23,8 +23,8 @@ import database.DBSet;
 
 public class GenesisTransaction extends Transaction {
 
-	//private static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	//private static final int AMOUNT_LENGTH = 8;
+	private static final int TYPE_ID = Transaction.GENESIS_TRANSACTION;
+	private static final String NAME_ID = "OLD: Genesis";
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 
@@ -35,14 +35,15 @@ public class GenesisTransaction extends Transaction {
 	
 	public GenesisTransaction(Account recipient, BigDecimal amount, long timestamp)
 	{
-		super(GENESIS_TRANSACTION, timestamp);
+		super(TYPE_ID, NAME_ID, timestamp);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.signature = this.generateSignature();
 	}
 
 	//GETTERS/SETTERS
-	
+	//public static String getName() { return "OLD: Genesis"; }
+
 	public byte[] generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
@@ -115,7 +116,7 @@ public class GenesisTransaction extends Transaction {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		
@@ -193,40 +194,6 @@ public class GenesisTransaction extends Transaction {
 	}
 	
 	//REST
-
-	/* NEED for setLastReference */
-	/*
-	//@Override
-	private static byte[] generateSignature1(Account recipient, BigDecimal amount, long timestamp)
-	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(GENESIS_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-				
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-				
-		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(recipient.getAddress()));
-				
-		//WRITE AMOUNT
-		byte[] amountBytes = amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
-		
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		return digest;
-	}
-	*/
 	
 	@Override
 	public PublicKeyAccount getCreator()

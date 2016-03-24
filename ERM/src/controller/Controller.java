@@ -1789,6 +1789,8 @@ public class Controller extends Observable {
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}
+	
+	/*
 	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
 			Account recipient, long key, BigDecimal amount,int feePow,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
@@ -1806,6 +1808,7 @@ public class Controller extends Observable {
 		}
 
 	}
+	*/
 	
 	public Block getBlockByHeight(int parseInt) {
 		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);

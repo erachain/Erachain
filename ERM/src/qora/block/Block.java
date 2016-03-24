@@ -312,7 +312,7 @@ public class Block {
  
 		//CREATE BLOCK
 		Block block;
-		if(version > 1)
+		if(version > -1)
 		{
 			//ADD ATs BYTES
 			byte[] atBytesCountBytes = Arrays.copyOfRange(data, position, position + AT_BYTES_LENGTH);
@@ -548,6 +548,10 @@ public class Block {
 	// canonical definition of block version release schedule
 	public int getNextBlockVersion(DBSet db)
 	{
+
+		return 3;
+		
+		/*
 		int height = getHeight(db);
 
 		if(height < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
@@ -562,6 +566,7 @@ public class Block {
 		{
 			return 3;
 		}
+		*/
 	}
 
 	public boolean isValid()

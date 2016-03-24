@@ -26,6 +26,8 @@ import database.DBSet;
 
 public class RegisterNameTransaction extends Transaction 
 {
+	private static final int TYPE_ID = REGISTER_NAME_TRANSACTION;
+	private static final String NAME_ID = "OLD: Register Name";
 	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 
 	private PublicKeyAccount creator;
@@ -33,7 +35,7 @@ public class RegisterNameTransaction extends Transaction
 	
 	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(REGISTER_NAME_TRANSACTION, creator, feePow, timestamp, reference);
+		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
@@ -47,7 +49,9 @@ public class RegisterNameTransaction extends Transaction
 
 	//GETTERS/SETTERS
 		
-	public Name getName()
+	// public static String getName() { return "OLD: Gegister Name"; }
+
+	public Name getAName()
 	{
 		return this.name;
 	}
@@ -115,7 +119,7 @@ public class RegisterNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(REGISTER_NAME_TRANSACTION);
+		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		data = Bytes.concat(data, typeBytes);
 		

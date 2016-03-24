@@ -20,8 +20,6 @@ import qora.block.Block;
 import qora.naming.Name;
 import qora.naming.NameSale;
 import qora.payment.Payment;
-import qora.transaction.AccountingTransaction;
-import qora.transaction.JsonTransaction;
 import qora.transaction.ArbitraryTransactionV3;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
@@ -374,6 +372,8 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx);
 	}
+	
+	/*
 	public Pair<Transaction, Integer> createJson(PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
@@ -391,7 +391,6 @@ public class TransactionCreator
 		return afterCreate(messageTx);
 	}
 
-	
 	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
@@ -422,6 +421,7 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx);
 	}
+	*/
 	
 	public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData)
 	{

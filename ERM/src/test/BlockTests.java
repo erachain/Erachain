@@ -24,9 +24,19 @@ import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisTransferAssetTransaction;
 import qora.transaction.PaymentTransaction;
 import qora.transaction.Transaction;
+import qora.transaction.TransferAssetTransaction;
 
 public class BlockTests
 {
+	long OIL_KEY = 1l;
+	byte FEE_POWER = (byte)1;
+	byte[] assetReference = new byte[64];
+	long timestamp = NTP.getTime();
+	
+	//CREATE EMPTY MEMORY DATABASE
+	private DBSet db;
+	private GenesisBlock gb;
+
 	@Test
 	public void validateSignatureGenesisBlock()
 	{
@@ -100,11 +110,11 @@ public class BlockTests
 		try 
 		{	
 			//PARSE FROM BYTES
-			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);
+			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
 					
-			//CHECK INSTANCE
+			//CHECK length
 			assertEquals(rawBlock.length, parsedBlock.getDataLength());
-					
+
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisBlock.getSignature(), parsedBlock.getSignature()));
 					
@@ -427,9 +437,12 @@ public class BlockTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 												
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
+		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS for generate
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		transaction.process(databaseSet);
+		// OIL FUND
+		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 								
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
@@ -439,7 +452,7 @@ public class BlockTests
 		DBSet fork = databaseSet.fork();
 		
 		//GENERATE PAYMENT 1
-		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
+		Account recipient = new Account("QaEx7otgPh61k5zg4f4zCRXXfEiVnXXMGM");
 		long timestamp = block.getTimestamp();
 		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
@@ -448,8 +461,8 @@ public class BlockTests
 		block.addTransaction(payment1);	
 		
 		//GENERATE PAYMENT 2
-		Account recipient2 = new Account("XLPYYfxKEiDcybCkFA7jXcxSdePMMoyZLt");
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Account recipient2 = new Account("Qc14p8iokvDwCchc8CmUyBiJuj8wc4X63a");
+		Transaction payment2 = new TransferAssetTransaction(generator, recipient2, OIL_KEY, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator);
 		block.addTransaction(payment2);	
 		
@@ -459,31 +472,31 @@ public class BlockTests
 		
 		//CHECK VALID
 		assertEquals(true, block.isSignatureValid());
-		assertEquals(true, block.isValid(databaseSet));
+		assertEquals(true, block.isValid(databaseSet)); // comment if(this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp)
 		
 		//PROCESS BLOCK
 		block.process(databaseSet);
 		
 		//CHECK BALANCE GENERATOR
-		assertEquals(true, generator.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(800)) == 0);
+		assertEquals(generator.getConfirmedBalance(databaseSet), BigDecimal.valueOf(900.00000620).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
 		assertEquals(true, Arrays.equals(generator.getLastReference(databaseSet), payment2.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT
-		assertEquals(true, recipient.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(1100)) == 0);
+		assertEquals(recipient.getConfirmedBalance(databaseSet), BigDecimal.valueOf(100).setScale(8));
 		
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT2
-		assertEquals(true, recipient2.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(100)) == 0);
+		assertEquals(recipient2.getConfirmedBalance(databaseSet), BigDecimal.valueOf(0).setScale(8));
 				
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(recipient2.getLastReference(databaseSet), payment2.getSignature()));
 		
 		//CHECK TOTAL FEE
-		assertEquals(true, block.getTotalFee().compareTo(BigDecimal.valueOf(2)) == 0);
+		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.0000062).setScale(8));
 		
 		//CHECK TOTAL TRANSACTIONS
 		assertEquals(2, block.getTransactionCount());
@@ -510,6 +523,10 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		transaction.process(databaseSet);
+		
+		// OIL FUND
+		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 								
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
@@ -519,8 +536,11 @@ public class BlockTests
 		DBSet fork = databaseSet.fork();
 		
 		//GENERATE PAYMENT 1
-		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
+		Account recipient = new Account("QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc");
 		long timestamp = block.getTimestamp();
+		recipient.setLastReference(genesisBlock.getGeneratorSignature(), fork);
+		recipient.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), fork);
+		
 		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
 		
@@ -528,7 +548,10 @@ public class BlockTests
 		block.addTransaction(payment1);	
 		
 		//GENERATE PAYMENT 2
-		Account recipient2 = new Account("XLPYYfxKEiDcybCkFA7jXcxSdePMMoyZLt");
+		Account recipient2 = new Account("QQ7YLV7hcmAjcoYyosycsdEuhbN42M6TW1");
+		recipient2.setLastReference(genesisBlock.getGeneratorSignature(), fork);
+		recipient2.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), fork);
+		
 		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator);
 		

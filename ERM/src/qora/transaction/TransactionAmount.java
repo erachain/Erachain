@@ -25,41 +25,28 @@ public abstract class TransactionAmount extends Transaction {
 	protected BigDecimal amount;
 	protected long key;
 
-	/*
-	protected TransactionAmount(int type, Account recipient, BigDecimal amount, long key, long timestamp)
-	{
-		super(type, timestamp);
-		this.recipient = recipient;
-		this.amount = amount;
-		this.key = key;
-	}
-	protected TransactionAmount(int type, PublicKeyAccount creator, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
-	{
-		super(type, creator, timestamp, reference);
-		this.recipient = recipient;
-		this.amount = amount;
-		this.key = key;
-	}
-	*/
 	// need for calculate fee
-	protected TransactionAmount(int type, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(int type, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
 	{
-		super(type, creator, feePow, timestamp, reference, signature);
+		super(type, name, creator, feePow, timestamp, reference, signature);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
 	}
 
 	// need for calculate fee by feePow into GUI
-	protected TransactionAmount(int type, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
+	protected TransactionAmount(int type, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
 	{
-		super(type, creator, feePow, timestamp, reference);
+		super(type, name, creator, feePow, timestamp, reference);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
 	}
 
-	// GET - VIEW
+	//GETTERS/SETTERS	
+
+	//public static String getName() { return "unknown subclass Amount"; }
+
 	public Account getRecipient()
 	{
 		return this.recipient;

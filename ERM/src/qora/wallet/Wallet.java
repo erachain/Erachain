@@ -961,10 +961,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(nameRegistration.getName().getOwner().getAddress()))
+		if(this.accountExists(nameRegistration.getAName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().add(nameRegistration.getName());
+			this.database.getNameMap().add(nameRegistration.getAName());
 		}
 	}
 	
@@ -977,10 +977,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(nameRegistration.getName().getOwner().getAddress()))
+		if(this.accountExists(nameRegistration.getAName().getOwner().getAddress()))
 		{
 			//DELETE NAME
-			this.database.getNameMap().delete(nameRegistration.getName());
+			this.database.getNameMap().delete(nameRegistration.getAName());
 		}
 	}
 	
@@ -1056,7 +1056,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER CHANGED
-			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getAName().getOwner().getAddress()))
 			{
 				//DELETE PREVIOUS NAME
 				Name name = DBSet.getInstance().getUpdateNameMap().get(nameUpdate);
@@ -1065,10 +1065,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE NEW OWNER
-		if(this.accountExists(nameUpdate.getName().getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getAName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().add(nameUpdate.getName());
+			this.database.getNameMap().add(nameUpdate.getAName());
 		}
 	}
 	
@@ -1078,20 +1078,20 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER WAS CHANGED
-			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getAName().getOwner().getAddress()))
 			{
 				//ADD PREVIOUS  NAME
-				Name name = DBSet.getInstance().getNameMap().get(nameUpdate.getName().getName());
+				Name name = DBSet.getInstance().getNameMap().get(nameUpdate.getAName().getName());
 				this.database.getNameMap().add(name);
 
 			}
 		}
 		
 		//CHECK IF WE WERE NEW OWNER
-		if(this.accountExists(nameUpdate.getName().getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getAName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().delete(nameUpdate.getName());
+			this.database.getNameMap().delete(nameUpdate.getAName());
 		}
 	}
 	
@@ -1122,7 +1122,7 @@ public class Wallet extends Observable implements Observer
 		{
 			//REMOVE FROM DATABASE
 			BigDecimal amount = DBSet.getInstance().getCancelSellNameMap().get(cancelNameSaleTransaction);
-			NameSale nameSale = new NameSale(cancelNameSaleTransaction.getName(), amount);
+			NameSale nameSale = new NameSale(cancelNameSaleTransaction.getAName(), amount);
 			this.database.getNameSaleMap().delete(nameSale);
 		}
 	}
@@ -1133,7 +1133,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(cancelNameSaleTransaction.getCreator().getAddress()))
 		{
 			//ADD TO DATABASE
-			NameSale nameSale = DBSet.getInstance().getNameExchangeMap().getNameSale(cancelNameSaleTransaction.getName());
+			NameSale nameSale = DBSet.getInstance().getNameExchangeMap().getNameSale(cancelNameSaleTransaction.getAName());
 			this.database.getNameSaleMap().add(nameSale);
 		}
 	}
