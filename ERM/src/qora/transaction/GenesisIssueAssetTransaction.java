@@ -34,9 +34,9 @@ import database.DBSet;
 public class GenesisIssueAssetTransaction extends Transaction 
 {
 	
-	private static final int TYPE_ID = GENESIS_ISSUE_ASSET_TRANSACTION;
+	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Genesis Issue Asset";
-	private static final int BASE_LENGTH = CREATOR_LENGTH + TIMESTAMP_LENGTH;
+	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + CREATOR_LENGTH + TIMESTAMP_LENGTH;
 	private Asset asset;
 	
 	public GenesisIssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp) 
@@ -97,8 +97,10 @@ public class GenesisIssueAssetTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
-		
+		// READ TYPE
+		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
+		int position = SIMPLE_TYPE_LENGTH;
+	
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -121,12 +123,12 @@ public class GenesisIssueAssetTransaction extends Transaction
 	@Override
 	public byte[] toBytes(boolean withSign) 
 	{
-		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		byte[] data = new byte[]{TYPE_ID};
+		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
+		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		//data = Bytes.concat(data, TYPE_ID);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -147,14 +149,15 @@ public class GenesisIssueAssetTransaction extends Transaction
 	public int getDataLength()
 	{
 		// not include asset REFERENCE
-		return TYPE_LENGTH + BASE_LENGTH + this.asset.getDataLength(false);
+		return BASE_LENGTH + this.asset.getDataLength(false);
 	}
 	
 	//VALIDATE
 	
 	public boolean isSignatureValid()
 	{
-		return true;
+		return Arrays.equals(this.signature, this.getSignature());
+		//return true;
 	}
 	
 	@Override
@@ -227,7 +230,8 @@ public class GenesisIssueAssetTransaction extends Transaction
 	{
 														
 		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		// for not genesis - this.creator.setLastReference(this.reference, db);
+		this.creator.removeReference(db);
 				
 		//DELETE FROM DATABASE
 		long assetKey = db.getIssueAssetMap().get(this);
@@ -240,6 +244,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		db.getIssueAssetMap().delete(this);
 
 		//Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
+
 
 	}
 

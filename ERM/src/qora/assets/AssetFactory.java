@@ -52,7 +52,7 @@ public class AssetFactory {
 						
 		}
 
-		throw new Exception("Invalid asset type");
+		throw new Exception("Invalid asset type: " + type);
 	}
 	
 }

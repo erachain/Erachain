@@ -31,6 +31,7 @@ import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
+import qora.transaction.RecStatement;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
@@ -373,6 +374,22 @@ public class TransactionCreator
 		return afterCreate(messageTx);
 	}
 	
+	public Pair<Transaction, Integer> recStatement(PrivateKeyAccount creator,
+			int feePow, byte[] isText, byte[] message) {
+		
+		this.checkUpdate();
+		
+		Transaction statementTx;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE MESSAGE TRANSACTION
+		statementTx = new RecStatement((byte)0,(byte)0,(byte)0,creator, (byte)feePow, message, isText, timestamp, creator.getLastReference(this.fork));
+		statementTx.sign(creator);
+			
+		return afterCreate(statementTx);
+	}
+
 	/*
 	public Pair<Transaction, Integer> createJson(PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,

@@ -1,9 +1,9 @@
 # ERM base 
-Public GIT for the ERM cryptocurrency project.
+Public GIT for the ERM blockchain project.
 
 * [Website](http://datachains.world)
 * [API](http://datachains.world)
-* [Block Explorer](http://datachains.world)
+* [BlockChain Explorer](http://datachains.world)
 * [Bitcointalk]
 * [Slack]
 
@@ -11,3 +11,6 @@ Public GIT for the ERM cryptocurrency project.
 Run the program without any options to start the daemon.
 
 Run the program with the -cli option to access the daemon using the API.
+
+Run the program with the -testnet option to access the daemon using the API.
+or run_test.bat on Windows

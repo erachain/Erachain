@@ -20,14 +20,15 @@ import qora.payment.Payment;
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	protected static final int SERVICE_LENGTH = 4;
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
-	protected static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH
+	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + TIMESTAMP_LENGTH
 			+ REFERENCE_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
 			+ DATA_SIZE_LENGTH + SIGNATURE_LENGTH
 			+ PAYMENTS_SIZE_LENGTH;
 
-	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, long timestamp, byte[] reference) {
-		super(creator, timestamp, reference);
+	public ArbitraryTransactionV3(byte[] typeBytes,
+			PublicKeyAccount creator, List<Payment> payments, int service,
+			byte[] data, long timestamp, byte[] reference) {
+		super(typeBytes, creator, timestamp, reference);
 
 		this.creator = creator;
 		if(payments == null)
@@ -39,22 +40,27 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		this.service = service;
 		this.data = data;
 	}
-	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, byte feePow,
-			long timestamp, byte[] reference) 
+	public ArbitraryTransactionV3(byte[] typeBytes,
+			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
+			byte feePow, long timestamp, byte[] reference) 
 	{
-		this(creator, payments, service, data, timestamp, reference);
+		this(typeBytes, creator, payments, service, data, timestamp, reference);
 		this.feePow = feePow; 
 		this.calcFee();
 	}
-	public ArbitraryTransactionV3(PublicKeyAccount creator,
-			List<Payment> payments, int service, byte[] data, byte feePow,
-			long timestamp, byte[] reference, byte[] signature) {
-		this(creator, payments, service, data, timestamp, reference);
+	public ArbitraryTransactionV3(byte[] typeBytes,
+			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
+			byte feePow, long timestamp, byte[] reference, byte[] signature) {
+		this(typeBytes, creator, payments, service, data, timestamp, reference);
 		this.feePow = feePow;
-		this.reference = reference;
 		this.signature = signature;
 		this.calcFee();
+	}
+	public ArbitraryTransactionV3(
+			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
+			byte feePow, long timestamp, byte[] reference)
+	{
+		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, timestamp, reference);
 	}
 
 	// PARSE CONVERT
@@ -65,7 +71,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			throw new Exception("Data does not match block length");
 		}
 
-		int position = 0;
+
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
 
 		// READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position
@@ -130,8 +138,8 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position
 				+ SIGNATURE_LENGTH);
 
-		return new ArbitraryTransactionV3(creator, payments, service,
-				arbitraryData, feePow, timestamp, reference, signatureBytes);
+		return new ArbitraryTransactionV3(typeBytes, creator, payments,
+				service, arbitraryData, feePow, timestamp, reference, signatureBytes);
 	}
 
 	@Override
@@ -139,9 +147,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		byte[] data = new byte[0];
 
 		// WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(ARBITRARY_TRANSACTION);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 
 		// WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -196,7 +202,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			paymentsLength += payment.getDataLength();
 		}
 		
-		return TYPE_LENGTH + BASE_LENGTH + this.data.length +  paymentsLength;
+		return BASE_LENGTH + this.data.length +  paymentsLength;
 	}
 	
 	// VALIDATE

@@ -28,23 +28,27 @@ import database.DBSet;
 
 public class MultiPaymentTransaction extends Transaction {
 
-	private static final int TYPE_ID = Transaction.MULTI_PAYMENT_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.MULTI_PAYMENT_TRANSACTION;
 	private static final String NAME_ID = "Multi Send";
 	private static final int PAYMENTS_SIZE_LENGTH = 4;
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + PAYMENTS_SIZE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH + PAYMENTS_SIZE_LENGTH;
 
 	private List<Payment> payments;
 	
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);		
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 		this.payments = payments;
 	}
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, payments, feePow, timestamp, reference);
+		this(typeBytes, creator, payments, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
+	}
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, payments, feePow, timestamp, reference);
 	}
 	
 	//GETTERS/SETTERS
@@ -66,8 +70,11 @@ public class MultiPaymentTransaction extends Transaction {
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -110,7 +117,7 @@ public class MultiPaymentTransaction extends Transaction {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new MultiPaymentTransaction(creator, payments, feePow, timestamp, reference, signatureBytes);	
+		return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -139,9 +146,7 @@ public class MultiPaymentTransaction extends Transaction {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -185,7 +190,7 @@ public class MultiPaymentTransaction extends Transaction {
 			paymentsLength += payment.getDataLength();
 		}
 		
-		return TYPE_LENGTH + BASE_LENGTH + paymentsLength;
+		return BASE_LENGTH + paymentsLength;
 	}
 	
 	//VALIDATE

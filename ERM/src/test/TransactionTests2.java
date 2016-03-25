@@ -28,10 +28,10 @@ import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.GenesisTransferAssetTransaction;
+import qora.transaction.IssueAssetTransaction;
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.TransferAssetTransaction;
+import qora.transaction.RecStatement;;
 
 public class TransactionTests2 {
 
@@ -48,7 +48,29 @@ public class TransactionTests2 {
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
+	Asset asset;
+	long key = -1l;
+	GenesisIssueAssetTransaction genesisIssueAssetTransaction;
 	
+	private void initIssue(boolean toProcess) {
+	
+		//CREATE EMPTY MEMORY DATABASE
+		db = DBSet.createEmptyDatabaseSet();
+		
+		//CREATE ASSET
+		asset = GenesisBlock.makeVenture(0);
+		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
+		//assertEquals(rawAsset.length, asset.getDataLength());
+				
+		//CREATE ISSUE ASSET TRANSACTION
+		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(maker, asset, timestamp);
+		if (toProcess)
+		{ 
+			genesisIssueAssetTransaction.process(db);
+			key = asset.getKey(db);
+		}
+		
+	}
 
 	// INIT ASSETS
 	private void init() {
@@ -70,35 +92,13 @@ public class TransactionTests2 {
 	@Test
 	public void validateGenesisIssueAssetTransaction() 
 	{
-
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-				
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-
-		/*
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(creator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
-		*/
+		initIssue(false);
 		
-		//CREATE ASSET
-		Asset asset = new Venture(creator, "test", "strontje", 50000l, (byte) 2, false);
-		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
-		//assertEquals(rawAsset.length, asset.getDataLength());
-		
-		//CREATE SIGNATURE
-		long timestamp = NTP.getTime();
-		
-		//CREATE ISSUE ASSET TRANSACTION
-		GenesisIssueAssetTransaction genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(creator, asset, timestamp);
-		//genesisIssueAssetTransaction1.sign(sender);
+		//genesisIssueAssetTransaction.sign(creator);
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
 		assertEquals(true, genesisIssueAssetTransaction.isSignatureValid());
+		assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(db));
 				
 		//CONVERT TO BYTES
 		//Logger.getGlobal().info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
@@ -165,187 +165,257 @@ public class TransactionTests2 {
 		}	
 	}
 
+	
+	@Test
+	public void parseGenesisIssueAssetTransaction() 
+	{
+		
+		initIssue(false);
+		
+		//CONVERT TO BYTES
+		byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(true);
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength());
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction);
+			
+			//CHECK INSTANCE
+			assertEquals(true, parsedGenesisIssueAssetTransaction instanceof GenesisIssueAssetTransaction);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), parsedGenesisIssueAssetTransaction.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(genesisIssueAssetTransaction.getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getCreator().getAddress());
+			
+			//CHECK OWNER
+			assertEquals(genesisIssueAssetTransaction.getAsset().getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getAsset().getCreator().getAddress());
+			
+			//CHECK NAME
+			assertEquals(genesisIssueAssetTransaction.getAsset().getName(), parsedGenesisIssueAssetTransaction.getAsset().getName());
+				
+			//CHECK DESCRIPTION
+			assertEquals(genesisIssueAssetTransaction.getAsset().getDescription(), parsedGenesisIssueAssetTransaction.getAsset().getDescription());
+				
+			//CHECK QUANTITY
+			assertEquals(genesisIssueAssetTransaction.getAsset().getQuantity(), parsedGenesisIssueAssetTransaction.getAsset().getQuantity());
+			
+			//DIVISIBLE
+			assertEquals(genesisIssueAssetTransaction.getAsset().isDivisible(), parsedGenesisIssueAssetTransaction.getAsset().isDivisible());
+			
+			//CHECK FEE
+			assertEquals(genesisIssueAssetTransaction.getFee(), parsedGenesisIssueAssetTransaction.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), parsedGenesisIssueAssetTransaction.getReference()));	
+			
+			//CHECK TIMESTAMP
+			assertEquals(genesisIssueAssetTransaction.getTimestamp(), parsedGenesisIssueAssetTransaction.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction." + e);
+		}
+		
+		//PARSE TRANSACTION FROM WRONG BYTES
+		rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength()];
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction);
+			
+			//FAIL
+			fail("this should throw an exception");
+		}
+		catch (Exception e) 
+		{
+			//EXCEPTION IS THROWN OK
+		}	
+	}
+
+	
+	@Test
+	public void processGenesisIssueAssetTransaction()
+	{
+		
+		initIssue(true);		
+		Logger.getGlobal().info("asset KEY: " + key);
+		
+		//CHECK BALANCE ISSUER
+		assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
+		
+		//CHECK ASSET EXISTS SENDER
+		long key = db.getIssueAssetMap().get(genesisIssueAssetTransaction);
+		assertEquals(true, db.getAssetMap().contains(key));
+		
+		//CHECK ASSET IS CORRECT
+		assertEquals(true, Arrays.equals(db.getAssetMap().get(key).toBytes(true), asset.toBytes(true)));
+		
+		//CHECK ASSET BALANCE SENDER
+		assertEquals(true, db.getBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
+				
+		//CHECK REFERENCE SENDER
+		assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
+	}
+	
+	
+	@Test
+	public void orphanIssueAssetTransaction()
+	{
+		
+		initIssue(true);
+
+		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
+		assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
+		
+		genesisIssueAssetTransaction.orphan(db);
+		
+		//CHECK BALANCE ISSUER
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(key,db));
+		
+		//CHECK ASSET EXISTS SENDER
+		assertEquals(false, db.getAssetMap().contains(key));
+		
+		//CHECK ASSET BALANCE SENDER
+		assertEquals(0, db.getBalanceMap().get(maker.getAddress(), key).longValue());
+				
+		//CHECK REFERENCE SENDER
+		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
+		assertEquals(true, Arrays.equals(new byte[0], maker.getLastReference(db)));
+
+	}
+
 	//GENESIS TRANSFER ASSET
 	
 	@Test
-	public void validateGenesisSignatureTransferAssetTransaction() 
+	public void validateSignatureGenesisTransferAssetTransaction() 
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-				
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-		
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		initIssue(false);
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
 		long timestamp = NTP.getTime();
 		
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 0
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key
 				, BigDecimal.valueOf(100).setScale(8), timestamp);
 		//assetTransfer.sign(sender);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-		assertEquals(true, assetTransfer.isSignatureValid());
-		
-		//INVALID SIGNATURE
-		assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 0,
-				BigDecimal.valueOf(100).setScale(8), timestamp+1);
-		//assetTransfer.sign(sender);
-		
-		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
-		assertEquals(true, assetTransfer.isSignatureValid());
+		assertEquals(true, assetTransfer.isSignatureValid());		
 	}
 	
 	@Test
 	public void validateGenesisTransferAssetTransaction() 
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		long genesisTimestamp = NTP.getTime();
+		initIssue(true);
 		
-		//ADD QORA ASSET
-		//Asset qoraAsset = new Venture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
-    	//databaseSet.getAssetMap().set(0l, qoraAsset);
-						
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-
 		//CREATE SIGNATURE
 		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
-		long timestamp = NTP.getTime();
-				
-		//CREATE JOB ASSET
-		Asset asset = new Venture(sender, "OIL+", "+It is an OILing drops used for fees", 99999999L, (byte) 8, true);
-		GenesisIssueAssetTransaction trans = new GenesisIssueAssetTransaction(sender, asset, genesisTimestamp);
-		trans.process(databaseSet);
-		Logger.getGlobal().info("asset key " + asset.getKey());
-		
 
 		//CREATE VALID ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, asset.getKey(), BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));
 
-		assetTransfer.process(databaseSet);
+		assetTransfer.process(db);
 
 		//CREATE VALID ASSET TRANSFER
-		sender.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), databaseSet);
-		assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, asset.getKey(), BigDecimal.valueOf(100).setScale(8), timestamp);
+		maker.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), db);
+		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));			
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));			
 		
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
-		assetTransfer = new GenesisTransferAssetTransaction(sender, new Account("test"), asset.getKey(), BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(8), timestamp);
 	
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-		assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, asset.getKey(), BigDecimal.valueOf(-100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(-100).setScale(8), timestamp);
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));	
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));	
 		
-		/*
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-		assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, asset.getKey(), BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));
-		*/	
-
-		/*
-		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
-		assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 0, BigDecimal.valueOf(100).setScale(8), timestamp);
-						
-		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(databaseSet));
-		*/	
+		// nor need for genesis - assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));
 	}
 	
 	@Test
 	public void parseGenesisTransferAssetTransaction() 
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-								
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-						
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
-				
+
+		initIssue(true);		
+		
 		//CREATE SIGNATURE
 		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
-		long timestamp = NTP.getTime();
-					
+
 		//CREATE VALID ASSET TRANSFER
-		GenesisTransferAssetTransaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 0, BigDecimal.valueOf(100).setScale(8), timestamp);
-		//assetTransfer.sign(sender); !! nod need!
+		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		//genesisTransferAsset.sign(maker);
+		//genesisTransferAsset.process(db);
 
 		//CONVERT TO BYTES
-		byte[] rawAssetTransfer = assetTransfer.toBytes(true);
+		byte[] rawGenesisTransferAsset = genesisTransferAsset.toBytes(true);
 		
 		//CHECK DATALENGTH
-		assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength());
+		assertEquals(rawGenesisTransferAsset.length, genesisTransferAsset.getDataLength());
 		
 		try 
 		{	
 			//PARSE FROM BYTES
-			GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawAssetTransfer);
-			
+			GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset);
+			Logger.getGlobal().info(" 1: " + parsedAssetTransfer.getKey() );
+
 			//CHECK INSTANCE
 			assertEquals(true, parsedAssetTransfer instanceof GenesisTransferAssetTransaction);
 			
 			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(assetTransfer.getSignature(), parsedAssetTransfer.getSignature()));
+			assertEquals(true, Arrays.equals(genesisTransferAsset.getSignature(), parsedAssetTransfer.getSignature()));
 			
 			//CHECK KEY
-			assertEquals(assetTransfer.getKey(), parsedAssetTransfer.getKey());	
+			assertEquals(genesisTransferAsset.getKey(), parsedAssetTransfer.getKey());	
 			
 			//CHECK AMOUNT SENDER
-			assertEquals(assetTransfer.viewAmount(sender), parsedAssetTransfer.viewAmount(sender));	
+			assertEquals(genesisTransferAsset.viewAmount(maker), parsedAssetTransfer.viewAmount(maker));	
 			
 			//CHECK AMOUNT RECIPIENT
-			assertEquals(assetTransfer.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
+			assertEquals(genesisTransferAsset.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
 			
 			//CHECK FEE
-			assertEquals(assetTransfer.getFee(), parsedAssetTransfer.getFee());	
+			assertEquals(genesisTransferAsset.getFee(), parsedAssetTransfer.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(assetTransfer.getReference(), parsedAssetTransfer.getReference()));	
+			assertEquals(true, Arrays.equals(genesisTransferAsset.getReference(), parsedAssetTransfer.getReference()));	
 			
 			//CHECK TIMESTAMP
-			assertEquals(assetTransfer.getTimestamp(), parsedAssetTransfer.getTimestamp());				
+			assertEquals(genesisTransferAsset.getTimestamp(), parsedAssetTransfer.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
-			fail("Exception while parsing transaction.");
+			fail("Exception while parsing transaction. " + e);
 		}
 		
 		//PARSE TRANSACTION FROM WRONG BYTES
-		rawAssetTransfer = new byte[assetTransfer.getDataLength()];
+		rawGenesisTransferAsset = new byte[genesisTransferAsset.getDataLength()];
 		
 		try 
 		{	
 			//PARSE FROM BYTES
-			TransactionFactory.getInstance().parse(rawAssetTransfer);
+			TransactionFactory.getInstance().parse(rawGenesisTransferAsset);
 			
 			//FAIL
 			fail("this should throw an exception");
@@ -359,39 +429,28 @@ public class TransactionTests2 {
 	@Test
 	public void processGenesisTransferAssetTransaction()
 	{
-		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-					
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-		
-		//CREATE JOB ASSET
-		Asset asset = new Venture(sender, "OIL+", "+It is an OILing drops used for fees", 1000L, (byte) 8, true);
-		GenesisIssueAssetTransaction trans = new GenesisIssueAssetTransaction(sender, asset, timestamp);
-		trans.process(databaseSet);
 
-		long key = asset.getKey(databaseSet);
-		Logger.getGlobal().info("asset key " + key);
+		initIssue(true);
+		
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8),sender.getConfirmedBalance(key, databaseSet));
+		assertEquals(total, maker.getConfirmedBalance(key, db));
 			
 		//CREATE SIGNATURE
 		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
 			
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
 		// assetTransfer.sign(sender); // not  NEED
-		assetTransfer.process(databaseSet);
+		assetTransfer.process(db);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(900).setScale(8),sender.getConfirmedBalance(key, databaseSet));
+		assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, databaseSet));
+		assertEquals(amoSend, recipient.getConfirmedBalance(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -399,43 +458,32 @@ public class TransactionTests2 {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(databaseSet)));
+		assertEquals(true, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(db)));
 	}
 	
 	@Test
 	public void orphanGenesisTransferAssetTransaction()
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-					
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-			
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		initIssue(true);
+		
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 			
 		//CREATE SIGNATURE
 		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		sender.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), databaseSet);
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(sender, recipient, 1, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
 		// assetTransfer.sign(sender); not NEED
-		assetTransfer.process(databaseSet);
-		assetTransfer.orphan(databaseSet);
+		assetTransfer.process(db);
+		assetTransfer.orphan(db);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), sender.getConfirmedBalance(databaseSet));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), sender.getConfirmedBalance(1, databaseSet));
+		assertEquals(total, maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(databaseSet));
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(1, databaseSet));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -443,8 +491,76 @@ public class TransactionTests2 {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(databaseSet)));
+		assertEquals(false, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(db)));
 	}
 	
 
+	// RECORD STATEMENT
+	@Test
+	public void validateRecStatement() 
+	{
+		
+		init();
+				
+		byte[] data = "test123!1234567890987654321".getBytes();
+		Logger.getGlobal().info("data.len: " + data.length);
+		
+		
+		RecStatement recStatement = new RecStatement(
+				RecStatement.makeProps(), maker, 
+				FEE_POWER, 
+				data,
+				new byte[] { 1 },
+				timestamp, maker.getLastReference(db)
+				);
+		recStatement.sign(maker);
+		
+		assertEquals(recStatement.isValid(db), Transaction.VALIDATE_OK);
+		
+		recStatement.process(db);
+		
+		//assertEquals(BigDecimal.valueOf(0.99999571).setScale(8), maker.getConfirmedBalance(OIL_KEY, db));
+		
+		byte[] rawRecStatement = recStatement.toBytes(true);
+
+		assertEquals(rawRecStatement.length, recStatement.getDataLength());
+		
+		RecStatement recStatement_2 = null;
+		try {
+			recStatement_2 = (RecStatement) RecStatement.Parse(rawRecStatement);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		assertEquals(new String(recStatement.getData()), new String(recStatement_2.getData()));
+		assertEquals(recStatement.getCreator(), recStatement_2.getCreator());
+		assertEquals(recStatement.isText(), recStatement_2.isText());
+		
+		assertEquals(recStatement.isSignatureValid(), true);
+		assertEquals(recStatement_2.isSignatureValid(), true);		
+	}
+	
+	@Test
+	public void types() 
+	{
+		int type = 153;
+		byte[] data = new byte[]{1,2,13,-1,5,6,7,9};
+		byte[] data2 = new byte[]{(byte)type,-33,0,0};
+		Logger.getGlobal().info("ddd: " + data2[0]);
+		
+		//READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, Integer.BYTES);
+		int type2 = Byte.toUnsignedInt(typeBytes[3]);
+		Logger.getGlobal().info("type2: " + type2);
+
+		//Logger.getGlobal().info("Integer.BYTES: " + Integer.BYTES);
+		//Logger.getGlobal().info("typeBytes.len: " + typeBytes.length);
+		Logger.getGlobal().info("Integer.bitCount(2): " + Integer.bitCount(12445678));
+		String mask1 = Integer.toBinaryString(255); // 11111111
+		int int1 = (int)29 & (int)255;
+		Logger.getGlobal().info(int1 + " mask1: " + mask1 );
+
+		
+		
+	}
+	
 }

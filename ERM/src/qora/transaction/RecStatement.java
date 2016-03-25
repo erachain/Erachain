@@ -1,7 +1,7 @@
 package qora.transaction;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.BigDecimal;
+//import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -24,59 +24,52 @@ import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 //import qora.crypto.Crypto;
 //import utils.Converter;
-import qora.crypto.Crypto;
+//import qora.crypto.Crypto;
 
 
 
 public class RecStatement extends Transaction {
 
-	private static final int TYPE_ID = STATEMENT_RECORD;
+	private static final byte TYPE_ID = (byte) STATEMENT_RECORD;
 	private static final String NAME_ID = "Statement";
 	protected byte[] data;
-	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH ; 
-			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH +  + CREATOR_LENGTH + SIGNATURE_LENGTH + RECIPIENT_LENGTH + AMOUNT_LENGTH + KEY_LENGTH;
+	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 
-	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
+	public RecStatement(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.data = data;
-		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, feePow, data, isText, encrypted, timestamp, reference);
+	public RecStatement(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+		this(typeBytes, creator, feePow, data, isText, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
+	}
+	public RecStatement(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference)
+	{
+		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, data, isText, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
 
+	public static byte[] makeProps() {
+		return new byte[]{TYPE_ID, 0, 0, 0};
+	}
+	
 	//public static String getName() { return "Statement"; }
 
 	public byte[] getData() 
 	{
 		return this.data;
 	}
-
-	public byte[] getEncrypted()
-	{
-		byte[] enc = new byte[1];
-		enc[0] = (isEncrypted())?(byte)1:(byte)0;
-		return enc;
-	}
 	
 	public boolean isText()
 	{
 		return (Arrays.equals(this.isText,new byte[1]))?false:true;
 	}
-	
-	public boolean isEncrypted()
-	{
-		return (Arrays.equals(this.encrypted,new byte[1]))?false:true;
-	}
-	
+		
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 
@@ -85,7 +78,7 @@ public class RecStatement extends Transaction {
 		JSONObject transaction = this.getJsonBase();
 
 		//ADD CREATOR/SERVICE/DATA
-		if ( this.isText() && !this.isEncrypted() )
+		if ( this.isText() )
 		{
 			transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
 		}
@@ -93,7 +86,6 @@ public class RecStatement extends Transaction {
 		{
 			transaction.put("data", Base58.encode(this.data));
 		}
-		transaction.put("encrypted", this.isEncrypted());
 		transaction.put("isText", this.isText());
 		
 		return transaction;	
@@ -106,7 +98,10 @@ public class RecStatement extends Transaction {
 			throw new Exception("Data does not match block length");
 		}
 
-		int position = 0;
+
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
 
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
@@ -125,7 +120,7 @@ public class RecStatement extends Transaction {
 		//READ FEE POWER
 		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
 		byte feePow = feePowBytes[0];
-		position += 1;
+		position += FEE_POWER_LENGTH;
 
 		//READ DATA SIZE
 		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
@@ -135,42 +130,21 @@ public class RecStatement extends Transaction {
 		//READ DATA
 		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
 		position += dataSize;
-		
-		byte[] encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
-		position += ENCRYPTED_LENGTH;
-		
+				
 		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 		position += IS_TEXT_LENGTH;
 		
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new RecStatement(creator, feePow, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new RecStatement(typeBytes, creator, feePow, arbitraryData, isTextByte, timestamp, reference, signatureBytes);
 
 	}
 
-	@Override
+	//@Override
 	public byte[] toBytes(boolean withSign) {
 
-		byte[] data = new byte[0];
-
-		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
-
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.getReference());
-
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
+		byte[] data = super.toBytes(withSign);
 
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
@@ -178,10 +152,7 @@ public class RecStatement extends Transaction {
 
 		//WRITE DATA
 		data = Bytes.concat(data, this.data);
-		
-		//WRITE ENCRYPTED
-		data = Bytes.concat(data, this.encrypted);
-		
+				
 		//WRITE ISTEXT
 		data = Bytes.concat(data, this.isText);
 
@@ -193,22 +164,29 @@ public class RecStatement extends Transaction {
 
 	@Override
 	public int getDataLength() {
-		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
+		return BASE_LENGTH + this.data.length;
 	}
 
 	//@Override
 	public int isValid(DBSet db) {
 		
+		//CHECK IF REFERENCE IS OK
+		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
+		{
+			return INVALID_REFERENCE;
+		}
 
 		//CHECK DATA SIZE
-		if(data.length > 4000 || data.length < 1)
+		if(data.length > 4000 || data.length < 10)
 		{
 			return INVALID_DATA_LENGTH;
 		}
-		
-		// TODO new super clss - without validation of amount
-		int res = 0; //super.isValid(db);
-		if (res > 0 & res != NO_BALANCE) return res;
+
+		// CHECK FEE
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+		{
+			return NOT_ENOUGH_FEE;
+		}
 
 		return VALIDATE_OK;
 	}

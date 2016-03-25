@@ -25,24 +25,28 @@ import database.DBSet;
 
 public class UpdateNameTransaction extends Transaction 
 {
-	private static final int TYPE_ID = UPDATE_NAME_TRANSACTION;
+	private static final byte TYPE_ID = (byte)UPDATE_NAME_TRANSACTION;
 	private static final String NAME_ID = "OLD: Update Name";
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH;
 
 	private Name name;
 	
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
 	}
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, name, feePow, timestamp, reference);		
+		this(typeBytes, creator, name, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
+	}
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);		
 	}
 
 	//GETTERS/SETTERS
@@ -64,8 +68,11 @@ public class UpdateNameTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -92,7 +99,7 @@ public class UpdateNameTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new UpdateNameTransaction(creator, name, feePow, timestamp, reference, signatureBytes);
+		return new UpdateNameTransaction(typeBytes, creator, name, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -117,9 +124,7 @@ public class UpdateNameTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -149,7 +154,7 @@ public class UpdateNameTransaction extends Transaction
 	@Override
 	public int getDataLength()
 	{
-		return TYPE_LENGTH + BASE_LENGTH + this.name.getDataLength();
+		return BASE_LENGTH + this.name.getDataLength();
 	}
 	
 	//VALIDATE

@@ -62,9 +62,9 @@ public class NameStorageTest {
 		Name name = new Name(sender, "drizzt", "this is the value");
 
 		// CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(sender,
-				name, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(null,
+				sender, name, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		//nameRegistration.sign(sender);
 		
 
@@ -92,8 +92,8 @@ public class NameStorageTest {
 
 		// ADDING KEY COMPLETE WITH YES
 		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		
 		arbitraryTransaction.process(databaseSet);
@@ -119,8 +119,8 @@ public class NameStorageTest {
 
 			// ADDING KEY COMPLETE WITH YES
 			arbitraryTransaction = new ArbitraryTransactionV3(
-					badSender, null, 10, data, (byte)0, timestamp,
-					badSender.getLastReference(databaseSet));
+					null, badSender, null, 10, data, (byte)0,
+					timestamp, badSender.getLastReference(databaseSet));
 			
 			
 			arbitraryTransaction.process(databaseSet);
@@ -154,8 +154,8 @@ public class NameStorageTest {
 
 		// ADDING KEY COMPLETE WITH YES
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -173,9 +173,9 @@ public class NameStorageTest {
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -193,9 +193,9 @@ public class NameStorageTest {
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		
 		arbitraryTransaction.process(databaseSet);
 		arbitraryTransaction.sign(sender);
@@ -224,8 +224,8 @@ public class NameStorageTest {
 
 		// ADDING Skerberus as List key
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -242,9 +242,9 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		// ADDING vrontis as List key
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		
 		arbitraryTransaction.process(databaseSet);
@@ -263,9 +263,9 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		// removing skerberus as List key
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 
 		arbitraryTransaction.process(databaseSet);
@@ -289,9 +289,9 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		// removing skerberus as List key
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 
 		arbitraryTransaction.process(databaseSet);
@@ -315,9 +315,9 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		// removing skerberus as List key
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -334,9 +334,9 @@ public class NameStorageTest {
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 
 		arbitraryTransaction.process(databaseSet);
@@ -355,9 +355,9 @@ public class NameStorageTest {
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
-		arbitraryTransaction = new ArbitraryTransactionV3(sender, null, 10, data,
-				(byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
+				data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 
 		arbitraryTransaction.process(databaseSet);
@@ -383,8 +383,8 @@ public class NameStorageTest {
 		byte[] data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 
 		arbitraryTransaction.process(databaseSet);
@@ -403,8 +403,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender);
 
 		arbitraryTransaction2.process(databaseSet);
@@ -447,8 +447,8 @@ public class NameStorageTest {
 		byte[] data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -468,8 +468,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender);
 		arbitraryTransaction2.process(databaseSet);
 
@@ -489,8 +489,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender);
 		arbitraryTransaction3.process(databaseSet);
 
@@ -553,8 +553,8 @@ public class NameStorageTest {
 		byte[] data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -574,8 +574,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender);
 		arbitraryTransaction2.process(databaseSet);
 
@@ -595,8 +595,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender);
 		arbitraryTransaction3.process(databaseSet);
 
@@ -676,8 +676,8 @@ public class NameStorageTest {
 		byte[] data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender);
 		arbitraryTransaction.process(databaseSet);
 
@@ -697,8 +697,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender);
 		arbitraryTransaction2.process(databaseSet);
 
@@ -718,8 +718,8 @@ public class NameStorageTest {
 		data = storageJsonObject.toString().getBytes();
 
 		ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
-				sender, null, 10, data, (byte)0, timestamp,
-				sender.getLastReference(databaseSet));
+				null, sender, null, 10, data, (byte)0,
+				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender);
 		arbitraryTransaction3.process(databaseSet);
 

@@ -14,6 +14,10 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
 import controller.Controller;
 import database.DBSet;
 //import lang.Lang;
@@ -135,59 +139,6 @@ public abstract class Transaction {
 	//public static String[] TYPES = new String[256];
 	//public String TYPES[0] = "w";
 
-	/*
-	public static String getTypeName(int type) {
-		switch(type)
-		{
-		case EXTENDED:
-			return "Extended";
-		case GENESIS_ISSUE_ASSET_TRANSACTION:
-			return "Genesis Issue Asset";
-		case GENESIS_TRANSFER_ASSET_TRANSACTION:
-			return "Genesis Send Asset";
-		case STATEMENT_RECORD:
-			return "Statement";
-		case ISSUE_ASSET_TRANSACTION:
-			return "Issue Asset";
-		case MESSAGE_TRANSACTION:
-			return "Send Asset";
-		case CONFIRM_TRANSACTION:
-			return "Confirm Record";
-		case CREATE_ORDER_TRANSACTION:
-			return "Create Order";
-		case CANCEL_ORDER_TRANSACTION:
-			return "Cansel Order";
-		case CREATE_POLL_TRANSACTION:
-			return "Create Poll";
-		case VOTE_ON_POLL_TRANSACTION:
-			return "Vote on Poll";
-		case GENESIS_TRANSACTION:
-			return "Genesis record";
-		case PAYMENT_TRANSACTION:
-			return "OLD:Payment";
-		case REGISTER_NAME_TRANSACTION:
-			return "OLD:Register Name";
-		case UPDATE_NAME_TRANSACTION:
-			return "OLD:Update Name";
-		case SELL_NAME_TRANSACTION:
-			return "OLD:Sell Name";
-		case CANCEL_SELL_NAME_TRANSACTION:
-			return "OLD:Cancel Sell Name";
-		case BUY_NAME_TRANSACTION:
-			return "OLD:Buy Name";
-		case TRANSFER_ASSET_TRANSACTION:
-			return "OLD:Send Asset";
-		case ARBITRARY_TRANSACTION:
-			return "OLD:Arbitrary";
-		case MULTI_PAYMENT_TRANSACTION:
-			return "OLD:Multy Send";
-		case DEPLOY_AT_TRANSACTION:
-			return "OLD:Deploy AT";
-		}
-		return "Unknown record type";
-	}
-	*/
-
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
 			return Settings.getInstance().getGenesisStamp();
@@ -231,6 +182,7 @@ public abstract class Transaction {
 	}
 	
 	//PROPERTIES LENGTH
+	protected static final int SIMPLE_TYPE_LENGTH = 1;
 	protected static final int TYPE_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	protected static final int TIMESTAMP_LENGTH = 8;
@@ -239,14 +191,16 @@ public abstract class Transaction {
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
 	protected static final int KEY_LENGTH = 8;
+	protected static final int FEE_POWER_LENGTH = 1;
 	//protected static final int HKEY_LENGTH = 20;
 	protected static final int CREATOR_LENGTH = 32;
 	// not need now protected static final int FEE_LENGTH = 8;
 	public static final int SIGNATURE_LENGTH = 64;
-	protected static final int BASE_LENGTH = TYPE_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
+	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 		
 	protected String NAME = "unknown";
-	protected int type;
+	//protected int type;
+	protected byte[] typeBytes;
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	protected byte feePow = 0;
@@ -255,16 +209,16 @@ public abstract class Transaction {
 	protected PublicKeyAccount creator;
 	
 	// need for genesis
-	protected Transaction(int type, String name, long timestamp)
+	protected Transaction(byte type, String name, long timestamp)
 	{
-		this.type = type;
+		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
 		this.NAME = name;
 		this.timestamp = timestamp;
 
 	}
-	protected Transaction(int type, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
+	protected Transaction(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
-		this.type = type;
+		this.typeBytes = typeBytes;
 		this.NAME = name;
 		this.creator = creator;
 		//this.props = props;
@@ -274,9 +228,9 @@ public abstract class Transaction {
 		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
 		this.feePow = feePow;
 	}
-	protected Transaction(int type, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
-		this(type, name, creator, feePow, timestamp, reference);
+		this(typeBytes, name, creator, feePow, timestamp, reference);
 		this.signature = signature;
 	}
 
@@ -285,7 +239,7 @@ public abstract class Transaction {
 	
 	public int getType()
 	{
-		return this.type;
+		return Byte.toUnsignedInt(this.typeBytes[0]);
 	}
 	
 	public PublicKeyAccount getCreator() 
@@ -316,12 +270,11 @@ public abstract class Transaction {
 	public BigDecimal getFee()
 	{
 		return this.fee;
-	}
-	public String getStr()
+	}	
+	public byte getFeePow()
 	{
-		return "trans";
-	}
-	
+		return this.feePow;
+	}	
 	
 	public byte[] getSignature()
 	{
@@ -376,7 +329,10 @@ public abstract class Transaction {
 	{
 		JSONObject transaction = new JSONObject();
 		
-		transaction.put("type", this.type);
+		transaction.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
+		transaction.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
+		transaction.put("type2", Byte.toUnsignedInt(this.typeBytes[2]));
+		transaction.put("type3", Byte.toUnsignedInt(this.typeBytes[3]));
 		transaction.put("fee", this.fee.toPlainString());
 		transaction.put("timestamp", this.timestamp);
 		transaction.put("reference", Base58.encode(this.reference));
@@ -398,7 +354,32 @@ public abstract class Transaction {
 
 	public abstract JSONObject toJson();
 	
-	public abstract byte[] toBytes(boolean withSign);
+	public byte[] toBytes(boolean withSign) {
+
+		byte[] data = new byte[0];
+
+		//WRITE TYPE
+		data = Bytes.concat(data, this.typeBytes);
+
+		//WRITE TIMESTAMP
+		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+		data = Bytes.concat(data, timestampBytes);
+
+		//WRITE REFERENCE
+		data = Bytes.concat(data, this.getReference());
+
+		//WRITE CREATOR
+		data = Bytes.concat(data, this.creator.getPublicKey());
+
+		//WRITE FEE POWER
+		byte[] feePowBytes = new byte[1];
+		feePowBytes[0] = this.feePow;
+		data = Bytes.concat(data, feePowBytes);
+		
+		return data;
+		
+	}
 	
 	public abstract int getDataLength();
 	

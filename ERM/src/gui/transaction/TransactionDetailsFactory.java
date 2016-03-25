@@ -15,6 +15,7 @@ import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
+import qora.transaction.RecStatement;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
@@ -41,6 +42,11 @@ public class TransactionDetailsFactory
 		switch(transaction.getType())
 		{
 		
+		case Transaction.STATEMENT_RECORD:
+			
+			RecStatement statement = (RecStatement) transaction;
+			return new RecStatementDetailsFrame(statement);
+
 		case Transaction.PAYMENT_TRANSACTION:
 		
 			PaymentTransaction payment = (PaymentTransaction) transaction;

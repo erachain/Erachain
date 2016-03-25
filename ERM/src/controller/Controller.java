@@ -1789,6 +1789,13 @@ public class Controller extends Observable {
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}
+
+	public Pair<Transaction, Integer> recStatement(PrivateKeyAccount sender,
+			int feePow,	byte[] isText, byte[] message) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.recStatement(sender, feePow, message, isText);
+		}
+	}
 	
 	/*
 	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,

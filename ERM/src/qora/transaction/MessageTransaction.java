@@ -27,27 +27,30 @@ import utils.Converter;
 
 public class MessageTransaction extends TransactionAmount {
 
-	private static final int TYPE_ID = Transaction.MESSAGE_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.MESSAGE_TRANSACTION;
 	private static final String NAME_ID = "Send";
 
 	protected byte[] data;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
-	protected static final int BASE_LENGTH = BASE_LENGTH_AMOUNT + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
+	protected static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
-	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
-		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
+	public MessageTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 		this.feePow = feePow;
 	}
-	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+	public MessageTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(typeBytes, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
+	}
+	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 	}
 	
 	//GETTERS/SETTERS
@@ -105,7 +108,10 @@ public class MessageTransaction extends TransactionAmount {
 			throw new Exception("Data does not match block length");
 		}
 
-		int position = 0;
+
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
 
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
@@ -159,7 +165,7 @@ public class MessageTransaction extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new MessageTransaction(creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		return new MessageTransaction(typeBytes, creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 
 	}
 
@@ -169,9 +175,7 @@ public class MessageTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -224,7 +228,7 @@ public class MessageTransaction extends TransactionAmount {
 
 	@Override
 	public int getDataLength() {
-		return TYPE_LENGTH + BASE_LENGTH + this.data.length;
+		return BASE_LENGTH + this.data.length;
 	}
 
 	//@Override

@@ -31,29 +31,28 @@ public class CreatePollTransaction extends Transaction
 {
 	private static final int TYPE_ID = Transaction.CREATE_POLL_TRANSACTION;
 	private static final String NAME_ID = "Create Poll";
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
 	private PublicKeyAccount creator;
 	private Poll poll;
 	
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, long timestamp, byte[] reference) 
+	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
 	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, poll, timestamp, reference);		
+		this(typeBytes, creator, poll, feePow, timestamp, reference);
+		
 		this.signature = signature;
-		this.feePow = feePow;
 		this.calcFee();
 	}
 	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference) 
 	{
-		this(creator, poll, timestamp, reference);		
-		this.feePow = feePow;
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
@@ -74,8 +73,11 @@ public class CreatePollTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -102,7 +104,7 @@ public class CreatePollTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CreatePollTransaction(creator, poll, feePow, timestamp, reference, signatureBytes);
+		return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -134,9 +136,7 @@ public class CreatePollTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -166,7 +166,7 @@ public class CreatePollTransaction extends Transaction
 	@Override
 	public int getDataLength()
 	{
-		return TYPE_LENGTH + BASE_LENGTH + this.poll.getDataLength();
+		return BASE_LENGTH + this.poll.getDataLength();
 	}
 	
 	//VALIDATE

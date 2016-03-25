@@ -36,7 +36,7 @@ import database.DBSet;
 public class DeployATTransaction extends Transaction
 {
 
-	private static final int TYPE_ID = Transaction.DEPLOY_AT_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.DEPLOY_AT_TRANSACTION;
 	private static final String NAME_ID = "Deploy AT";
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 
@@ -46,7 +46,7 @@ public class DeployATTransaction extends Transaction
 	private static final int TAGS_SIZE_LENGTH = 4;
 	private static final int CREATION_BYTES_SIZE_LENGTH = 4;
 	//private static final int AMOUNT_LENGTH = 8;
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH + TYPE_SIZE_LENGTH + TAGS_SIZE_LENGTH + CREATION_BYTES_SIZE_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH + TYPE_SIZE_LENGTH + TAGS_SIZE_LENGTH + CREATION_BYTES_SIZE_LENGTH + AMOUNT_LENGTH;
 
 
 	private String name;
@@ -56,9 +56,9 @@ public class DeployATTransaction extends Transaction
 	private BigDecimal amount;
 	private byte[] creationBytes;
 
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference);
 
 		this.name = name;
 		this.description = description;
@@ -67,17 +67,21 @@ public class DeployATTransaction extends Transaction
 		this.tags = tags;
 		this.amount = quantity;
 	}
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
+		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.signature = signature;
 		this.feePow = feePow;
 		this.calcFee();
 	}
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference) 
+	{
+		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
+		this.feePow = feePow;
+	}
 	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference) 
 	{
-		this(creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
-		this.feePow = feePow;
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 	}
 
 	//PARSE/CONVERT
@@ -91,7 +95,10 @@ public class DeployATTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 
-		int position = 0;
+
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
 
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
@@ -145,8 +152,8 @@ public class DeployATTransaction extends Transaction
 			throw new Exception("Invalid type length");
 		}
 
-		byte[] typeBytes = Arrays.copyOfRange(data, position, position + typeLength);
-		String type = new String(typeBytes, StandardCharsets.UTF_8);
+		byte[] typeStrBytes = Arrays.copyOfRange(data, position, position + typeLength);
+		String type = new String(typeStrBytes, StandardCharsets.UTF_8);
 		position += typeLength;
 
 		//READ TAGS
@@ -189,7 +196,7 @@ public class DeployATTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, feePow, timestamp, reference, signatureBytes);
+		return new DeployATTransaction(typeBytes, creator, name, description, type, tags, creationBytes, amount, feePow, timestamp, reference, signatureBytes);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -215,9 +222,7 @@ public class DeployATTransaction extends Transaction
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -294,7 +299,7 @@ public class DeployATTransaction extends Transaction
 	@Override
 	public int getDataLength() 
 	{	
-		return TYPE_LENGTH + BASE_LENGTH +  
+		return BASE_LENGTH +  
 				this.name.getBytes(StandardCharsets.UTF_8).length + 
 				this.description.getBytes(StandardCharsets.UTF_8).length + 
 				this.type.getBytes(StandardCharsets.UTF_8).length + 

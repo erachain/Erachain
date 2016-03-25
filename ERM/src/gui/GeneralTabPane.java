@@ -38,6 +38,9 @@ public class GeneralTabPane extends JTabbedPane{
 		//ACCOUNTS
 		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
         
+		//STATEMENT
+		this.addTab(Lang.getInstance().translate("Statement"), new RecStatementPanel());
+
 		//SEND
 		this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
 

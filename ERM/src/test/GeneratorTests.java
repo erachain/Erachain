@@ -97,7 +97,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator);
 		
 			//PROCESS IN DB
@@ -145,7 +145,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator);
 		
 			//PROCESS IN DB

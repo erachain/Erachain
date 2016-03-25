@@ -47,14 +47,14 @@ public class OrderTests
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();		
 		//CREATE ORDER TRANSACTION
-		Transaction orderTransaction = new CreateOrderTransaction(sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
+		Transaction orderTransaction = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
 		orderTransaction.sign(sender);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS VALID
 		assertEquals(true, orderTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		orderTransaction = new CreateOrderTransaction(sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet), new byte[64]);
+		orderTransaction = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS INVALID
 		assertEquals(false, orderTransaction.isSignatureValid());
@@ -81,40 +81,40 @@ public class OrderTests
 		Asset asset = new Venture(account, "a", "a", 50000l, (byte)2, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(account, asset,(byte)0, System.currentTimeMillis(), account.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, account,asset, (byte)0, System.currentTimeMillis(), account.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CHECK VALID
 		long timeStamp = System.currentTimeMillis();
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(account, 1l, 0l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		CreateOrderTransaction orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(dbSet));
 		
 		//CREATE INVALID ORDER CREATION HAVE EQUALS WANT
-		orderCreation = new CreateOrderTransaction(account, 1l, 1l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 1l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
 			
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(dbSet));
 		
 		//CREATE INVALID ORDER CREATION NOT ENOUGH BALANCE
-		orderCreation = new CreateOrderTransaction(account, 1l, 0l, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(dbSet));
 		
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(account, 1l, 0l, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.INVALID_AMOUNT, orderCreation.isValid(dbSet));
 		
 		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-		orderCreation = new CreateOrderTransaction(account, 1l, 4l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 4l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(dbSet));
 		
 		//CREATE ORDER CREATION INVALID REFERENCE
-		orderCreation = new CreateOrderTransaction(account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, new byte[]{1,2}, new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, new byte[]{1,2}, new byte[64]);		
 			
 		//CHECK IF  ORDER CREATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(dbSet));
@@ -139,7 +139,7 @@ public class OrderTests
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
+		CreateOrderTransaction orderCreation = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
 		orderCreation.sign(sender);
 		
 		//CONVERT TO BYTES
@@ -216,7 +216,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte)2, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -231,16 +231,16 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte)8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		createOrderTransaction.process(dbSet);
 		
 		//CREATE ORDER TWO (SELLING 1000 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 100 B FOR 1000 A
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -271,7 +271,7 @@ public class OrderTests
 			
 		//CREATE ORDER THREE (SELLING 24 A FOR B AT A PRICE OF 0.2)
 		//GENERATES TRADE 20 A FOR 4 B
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(24).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(24).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -323,7 +323,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -338,16 +338,16 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		createOrderTransaction.process(dbSet);
 		
 		//CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 99,9 B FOR 999 A		
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(99.9).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(99.9).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -378,7 +378,7 @@ public class OrderTests
 		
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2)
 		//GENERATED TRADE 99 A FOR 9.9 B
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -424,7 +424,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -439,16 +439,16 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		createOrderTransaction.process(dbSet);
 		
 		//CREATE ORDER TWO (SELLING 200 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 100 B FOR 1000 A
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(200).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(200).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -479,7 +479,7 @@ public class OrderTests
 		
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2) (I CAN BUY AT INCREMENTS OF 1)
 		//GENERATED TRADE 95 A for 19 B
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -531,7 +531,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -546,16 +546,16 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		createOrderTransaction.process(dbSet);
 		
 		//CREATE ORDER TWO (SELLING 999 B FOR A AT A PRICE OF 5) (I CAN BUY AT INCREMENTS OF 0,00000010)
 		//GENERATES TRADE 100 B FOR 1000 A			
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(999).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(999).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -585,7 +585,7 @@ public class OrderTests
 		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(100)));
 		
 		//CREATE ORDER THREE (SELLING 99.99999999 A FOR B AT A PRICE OF 0.2) (I CAN BUY AT INCREMENTS OF 0,00000001)
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, new BigDecimal(BigInteger.valueOf(9999999999L), 8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, new BigDecimal(BigInteger.valueOf(9999999999L), 8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -637,7 +637,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -652,15 +652,15 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5,6});
 		createOrderTransaction.process(dbSet);
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -684,7 +684,7 @@ public class OrderTests
 		Assert.assertEquals(0, orderB.getInitiatedTrades(dbSet).size());
 		
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{3, 4});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{3, 4});
 		createOrderTransaction.process(dbSet);
 		
 		//CHECK BALANCES
@@ -744,7 +744,7 @@ public class OrderTests
 		Asset assetA = new Venture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA,(byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ASSET B
@@ -759,22 +759,22 @@ public class OrderTests
 		Asset assetB = new Venture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB,(byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
+		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
 		issueAssetTransaction.process(dbSet);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
 		DBSet fork1 = dbSet.fork();
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.1).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(fork1), new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork1), new byte[]{5,6});
 		createOrderTransaction.process(fork1);
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
 		DBSet fork2 = fork1.fork();
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
 		createOrderTransaction.process(fork2);
 		
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
 		DBSet fork3 = fork2.fork();
-		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8), BigDecimal.valueOf(5).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(fork3), new byte[]{3, 4});
+		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork3), new byte[]{3, 4});
 		createOrderTransaction.process(fork3);
 		
 		//ORPHAN ORDER THREE
@@ -801,7 +801,7 @@ public class OrderTests
 		Assert.assertEquals(0, orderB.getInitiatedTrades(fork3).size());
 		
 		//ORPHAN ORDER TWO
-		createOrderTransaction = new CreateOrderTransaction(accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(0.2).setScale(8),(byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
 		createOrderTransaction.orphan(fork2);
 		
 		//CHECK BALANCES

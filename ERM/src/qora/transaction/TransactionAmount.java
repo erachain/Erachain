@@ -19,25 +19,25 @@ public abstract class TransactionAmount extends Transaction {
 
 	protected static final int AMOUNT_LENGTH = 8;
 	protected static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-	protected static final int BASE_LENGTH_AMOUNT = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
+	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key;
 
 	// need for calculate fee
-	protected TransactionAmount(int type, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
 	{
-		super(type, name, creator, feePow, timestamp, reference, signature);
+		super(typeBytes, name, creator, feePow, timestamp, reference, signature);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
 	}
 
 	// need for calculate fee by feePow into GUI
-	protected TransactionAmount(int type, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
 	{
-		super(type, name, creator, feePow, timestamp, reference);
+		super(typeBytes, name, creator, feePow, timestamp, reference);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
@@ -136,6 +136,13 @@ public abstract class TransactionAmount extends Transaction {
 			return INVALID_REFERENCE;
 		}
 
+		//CHECK IF AMOUNT IS POSITIVE
+		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
+		{
+			return NEGATIVE_AMOUNT;
+		}
+
+		/* very SLOW - db.fork() !!
 		//REMOVE FEE
 		DBSet fork = db.fork();
 		calcFee();
@@ -157,17 +164,31 @@ public abstract class TransactionAmount extends Transaction {
 				return INVALID_AMOUNT;
 			}
 		}
-				
-		//CHECK IF AMOUNT IS POSITIVE
-		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_AMOUNT;
-		}
-						
+
 		//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
 		{
 			return NO_BALANCE;
+		}
+		*/
+
+		if (this.key != FEE_KEY) {
+			// CHECK FEE
+			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+			{
+				return NOT_ENOUGH_FEE;
+			}
+			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+			if(this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
+			{
+				return NO_BALANCE;
+			}
+		} else {
+			if(this.creator.getConfirmedBalance(FEE_KEY, db)
+					.compareTo( this.amount.add(this.fee) ) == -1)
+			{
+				return NO_BALANCE;
+			}
 		}
 
 		return VALIDATE_OK;

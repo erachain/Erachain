@@ -27,12 +27,12 @@ import database.DBSet;
 
 public class GenesisTransferAssetTransaction extends Transaction {
 
-	private static final int TYPE_ID = Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Genesis Send Asset";
 	//private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
-	private static final int BASE_LENGTH = TIMESTAMP_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
+	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
 	private Account recipient;
 	private BigDecimal amount;
@@ -105,8 +105,10 @@ public class GenesisTransferAssetTransaction extends Transaction {
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
-		
+		// READ TYPE
+		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
+		int position = SIMPLE_TYPE_LENGTH;
+	
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -144,12 +146,13 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	@Override
 	public byte[] toBytes(boolean withSign)
 	{
-		byte[] data = new byte[0];
+		//byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		byte[] data = new byte[]{TYPE_ID};
+		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
+		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		//data = Bytes.concat(data, typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -184,11 +187,12 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	@Override
 	public int getDataLength() 
 	{
-		return TYPE_LENGTH + BASE_LENGTH;
+		return BASE_LENGTH;
 	}
 
 
 	//VALIDATE
+	@Override
 	public boolean isSignatureValid()
 	{
 		

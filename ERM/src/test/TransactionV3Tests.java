@@ -77,14 +77,14 @@ public class TransactionV3Tests {
 		creator.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
 				
 		MessageTransaction messageTransactionV3 = new MessageTransaction(
-				creator, FEE_POWER, recipient, //	ATFunding 
+				null, creator, FEE_POWER, //	ATFunding 
+				recipient, 
 				key, 
 				BigDecimal.valueOf(10).setScale(8), 
-				data, 
+				data,
 				new byte[] { 1 },
 				new byte[] { 0 },
-				timestamp,
-				creator.getLastReference(db)
+				timestamp, creator.getLastReference(db)
 				);
 		messageTransactionV3.sign(creator);
 		
@@ -160,10 +160,10 @@ public class TransactionV3Tests {
 		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(8)));
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
-				creator, payments, 111, data,
-				FEE_POWER, 
-				timestamp,
-				creator.getLastReference(databaseSet)
+				null, creator, payments, 111,
+				data, 
+				FEE_POWER,
+				timestamp, creator.getLastReference(databaseSet)
 				);
 		arbitraryTransactionV3.sign(creator);
 		
@@ -246,10 +246,10 @@ public class TransactionV3Tests {
 		List<Payment> payments = new ArrayList<Payment>();
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
-				creator, payments, 111, data,
-				FEE_POWER, 
-				timestamp,
-				creator.getLastReference(databaseSet)
+				null, creator, payments, 111,
+				data, 
+				FEE_POWER,
+				timestamp, creator.getLastReference(databaseSet)
 				);
 		arbitraryTransactionV3.sign(creator);
 		

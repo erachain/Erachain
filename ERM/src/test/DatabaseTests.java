@@ -122,7 +122,7 @@ public class DatabaseTests {
 		//maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
-		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
+		Transaction issueAssetTransaction = new IssueAssetTransaction(null, maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueAssetTransaction.sign(maker);
 		issueAssetTransaction.process();
 		//Logger.getGlobal().info(asset.toString() + " getQuantity " + asset.getQuantity());

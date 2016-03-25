@@ -24,19 +24,23 @@ import database.DBSet;
 
 public class PaymentTransaction extends TransactionAmount {
 
-	private static final int TYPE_ID = Transaction.PAYMENT_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.PAYMENT_TRANSACTION;
 	private static final String NAME_ID = "OLD: payment";
-	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT - KEY_LENGTH;
+	private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH - KEY_LENGTH;
 		
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
+	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, 0l, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, 0l, timestamp, reference);
 	}
-	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, recipient, amount, feePow, timestamp, reference);		
+		this(typeBytes, creator, recipient, amount, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
+	}
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, recipient, amount, feePow, timestamp, reference);		
 	}
 	
 	//GETTERS/SETTERS	
@@ -53,8 +57,11 @@ public class PaymentTransaction extends TransactionAmount {
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -87,7 +94,7 @@ public class PaymentTransaction extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new PaymentTransaction(creator, recipient, amount, feePow, timestamp, reference, signatureBytes);	
+		return new PaymentTransaction(typeBytes, creator, recipient, amount, feePow, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -108,9 +115,7 @@ public class PaymentTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -146,7 +151,7 @@ public class PaymentTransaction extends TransactionAmount {
 	@Override
 	public int getDataLength() 
 	{
-		return TYPE_LENGTH + BASE_LENGTH;
+		return BASE_LENGTH;
 	}
 	
 

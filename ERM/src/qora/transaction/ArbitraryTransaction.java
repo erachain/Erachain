@@ -29,18 +29,21 @@ import utils.StorageUtils;
 
 public abstract class ArbitraryTransaction extends Transaction {
 
-	private static final int TYPE_ID = Transaction.ARBITRARY_TRANSACTION;
+	protected static final byte TYPE_ID = (byte)ARBITRARY_TRANSACTION;
 	private static final String NAME_ID = "OLD: Arbitrary";
 	protected int service;
 	protected byte[] data;
 
 	protected List<Payment> payments;
 	
-	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
-		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);	
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, long timestamp, byte[] reference) {
+		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference);	
 	}
-	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
-		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference, signature);
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
+		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference, signature);
+	}
+	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, timestamp, reference);	
 	}
 		
 	// GETTERS/SETTERS

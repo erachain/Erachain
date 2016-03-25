@@ -26,13 +26,13 @@ import database.DBSet;
 
 public class CreateOrderTransaction extends Transaction 
 {
-	private static final int TYPE_ID = Transaction.CREATE_ORDER_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.CREATE_ORDER_TRANSACTION;
 	private static final String NAME_ID = "Create Order";
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;
 	private static final int PRICE_LENGTH = 12;
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH;
 
 	private Order order;
 	private long have;
@@ -40,29 +40,28 @@ public class CreateOrderTransaction extends Transaction
 	private BigDecimal amount;
 	private BigDecimal price;
 	
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, long timestamp, byte[] reference) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, (byte)0, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.have = have;
 		this.want = want;
 		this.amount = amount;
 		this.price = price;
 	}
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, have, want, amount, price, timestamp, reference);
+		this(typeBytes, creator, have, want, amount, price, feePow, timestamp, reference);
 		this.signature = signature;
 		this.order = new Order(new BigInteger(this.signature), creator, have, want, amount, price, timestamp);
-		this.feePow = feePow;
 		this.calcFee();
 		
 	}
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
 	{
-		this(creator, have, want, amount, price, timestamp, reference);
-		this.feePow = feePow;
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference);
 	}
+	
 
 	//GETTERS/SETTERS
 	//public static String getName() { return "Create Order"; }
@@ -88,8 +87,11 @@ public class CreateOrderTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -132,7 +134,7 @@ public class CreateOrderTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CreateOrderTransaction(creator, have, want, amount, price, feePow, timestamp, reference, signatureBytes);
+		return new CreateOrderTransaction(typeBytes, creator, have, want, amount, price, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -162,9 +164,9 @@ public class CreateOrderTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
+		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -213,7 +215,7 @@ public class CreateOrderTransaction extends Transaction
 	@Override
 	public int getDataLength()
 	{
-		return TYPE_LENGTH + BASE_LENGTH;
+		return BASE_LENGTH;
 	}
 	
 	//VALIDATE

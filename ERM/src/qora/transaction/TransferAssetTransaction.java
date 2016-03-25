@@ -26,21 +26,24 @@ import database.DBSet;
 
 public class TransferAssetTransaction extends TransactionAmount {
 
-	private static final int TYPE_ID = TRANSFER_ASSET_TRANSACTION;
+	private static final byte TYPE_ID = (byte)TRANSFER_ASSET_TRANSACTION;
 	private static final String NAME_ID = "OLD: Send Asset";
-	private static final int BASE_LENGTH = BASE_LENGTH_AMOUNT; 
-			//1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH; 
 	
 	
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
+	public TransferAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(TYPE_ID, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);		
+		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);		
 	}
-	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public TransferAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(creator, recipient, key, amount, feePow, timestamp, reference);		
+		this(typeBytes, creator, recipient, key, amount, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
+	}
+	public TransferAssetTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, recipient, key, amount, feePow, timestamp, reference);		
 	}
 	
 	//GETTERS/SETTERS
@@ -57,8 +60,11 @@ public class TransferAssetTransaction extends TransactionAmount {
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -96,7 +102,7 @@ public class TransferAssetTransaction extends TransactionAmount {
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new TransferAssetTransaction(creator, recipient, key, amount, feePow, timestamp, reference, signatureBytes);	
+		return new TransferAssetTransaction(typeBytes, creator, recipient, key, amount, feePow, timestamp, reference, signatureBytes);	
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -115,9 +121,7 @@ public class TransferAssetTransaction extends TransactionAmount {
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -158,7 +162,7 @@ public class TransferAssetTransaction extends TransactionAmount {
 	@Override
 	public int getDataLength() 
 	{
-		return TYPE_LENGTH + BASE_LENGTH;
+		return BASE_LENGTH;
 	}
 	
 	//VALIDATE

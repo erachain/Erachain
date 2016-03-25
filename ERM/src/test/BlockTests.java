@@ -213,7 +213,7 @@ public class BlockTests
 		//ADD TRANSACTION
 		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment.sign(generator);
 		newBlock.addTransaction(payment);
 		
@@ -228,7 +228,7 @@ public class BlockTests
 		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
 		
 		//ADD TRANSACTION
-		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(databaseSet), payment.getSignature());
+		payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(databaseSet), payment.getSignature());
 		newBlock.addTransaction(payment);
 				
 		//ADD TRANSACTION SIGNATURE
@@ -306,7 +306,7 @@ public class BlockTests
 		invalidBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(-100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(-100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment.sign(generator);
 		invalidBlock.addTransaction(payment);		
 		
@@ -351,7 +351,7 @@ public class BlockTests
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
 		long timestamp = block.getTimestamp();
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
 		
 		//payment1.process(fork);
@@ -359,7 +359,7 @@ public class BlockTests
 				
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("XLPYYfxKEiDcybCkFA7jXcxSdePMMoyZLt");
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new PaymentTransaction(null, generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator);
 		
 		block.addTransaction(payment2);	
@@ -454,7 +454,7 @@ public class BlockTests
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("QaEx7otgPh61k5zg4f4zCRXXfEiVnXXMGM");
 		long timestamp = block.getTimestamp();
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
 		
 		payment1.process(fork);
@@ -462,7 +462,7 @@ public class BlockTests
 		
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("Qc14p8iokvDwCchc8CmUyBiJuj8wc4X63a");
-		Transaction payment2 = new TransferAssetTransaction(generator, recipient2, OIL_KEY, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new TransferAssetTransaction(null, generator, recipient2, OIL_KEY, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator);
 		block.addTransaction(payment2);	
 		
@@ -541,7 +541,7 @@ public class BlockTests
 		recipient.setLastReference(genesisBlock.getGeneratorSignature(), fork);
 		recipient.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator);
 		
 		payment1.process(fork);
@@ -552,7 +552,7 @@ public class BlockTests
 		recipient2.setLastReference(genesisBlock.getGeneratorSignature(), fork);
 		recipient2.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new PaymentTransaction(null, generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator);
 		
 		block.addTransaction(payment2);	

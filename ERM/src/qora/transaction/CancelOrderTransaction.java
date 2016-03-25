@@ -26,21 +26,24 @@ import database.DBSet;
 
 public class CancelOrderTransaction extends Transaction
 {
-	private static final int TYPE_ID = Transaction.CANCEL_ORDER_TRANSACTION;
+	private static final byte TYPE_ID = (byte)CANCEL_ORDER_TRANSACTION;
 	private static final String NAME_ID = "Cancel Order";
 	private static final int ORDER_LENGTH = 64;
-	private static final int BASE_LENGTH = 1 + TIMESTAMP_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + ORDER_LENGTH + SIGNATURE_LENGTH;
+	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
 	
 	private BigInteger order;
 	
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
-		super(TYPE_ID, NAME_ID, creator, feePow, timestamp, reference);
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.order = order;
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
-		this(creator, order, feePow, timestamp, reference);
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+		this(typeBytes, creator, order, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
+	}
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference);
 	}
 	
 	//GETTERS/SETTERS
@@ -61,8 +64,11 @@ public class CancelOrderTransaction extends Transaction
 			throw new Exception("Data does not match block length");
 		}
 		
-		int position = 0;
 		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
@@ -90,7 +96,7 @@ public class CancelOrderTransaction extends Transaction
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		
-		return new CancelOrderTransaction(creator, order, feePow, timestamp, reference, signatureBytes);
+		return new CancelOrderTransaction(typeBytes, creator, order, feePow, timestamp, reference, signatureBytes);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -113,9 +119,9 @@ public class CancelOrderTransaction extends Transaction
 		byte[] data = new byte[0];
 		
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
+		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
+		data = Bytes.concat(data, this.typeBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -148,7 +154,7 @@ public class CancelOrderTransaction extends Transaction
 	@Override
 	public int getDataLength() 
 	{
-		return TYPE_LENGTH + BASE_LENGTH;
+		return BASE_LENGTH;
 	}
 	
 	//VALIDATE

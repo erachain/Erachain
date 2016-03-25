@@ -1,5 +1,5 @@
 package settings;
-// 17/03
+// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
 
 import java.io.File;
 import java.io.InputStream;
@@ -42,7 +42,7 @@ public class Settings {
 	private static final String[] DEFAULT_PEERS = { };
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1458554240336L; // QORA RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1458906115336L; // QORA RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
