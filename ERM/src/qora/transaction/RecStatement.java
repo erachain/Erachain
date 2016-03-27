@@ -34,6 +34,8 @@ public class RecStatement extends Transaction {
 	private static final String NAME_ID = "Statement";
 	protected byte[] data;
 	protected byte[] isText;
+	protected PublicKeyAccount[] signers;
+	protected byte[][] signatures; // multi sign
 	
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 
@@ -47,6 +49,20 @@ public class RecStatement extends Transaction {
 		this.signature = signature;
 		this.calcFee();
 	}
+	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, data, isText, timestamp, reference, signature);
+	}
+	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, data, isText, timestamp, reference);
+	}
+	public RecStatement(PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText,
+			PublicKeyAccount[] signers, byte[][] signatures, long timestamp, byte[] reference)
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, data, isText, timestamp, reference);
+		this.signers = signers;
+		this.signatures = signatures;
+		this.makeProps();
+	}
 	public RecStatement(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, byte[] data, byte[] isText, long timestamp, byte[] reference)
 	{
 		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, data, isText, timestamp, reference);
@@ -54,8 +70,19 @@ public class RecStatement extends Transaction {
 
 	//GETTERS/SETTERS
 
-	public static byte[] makeProps() {
-		return new byte[]{TYPE_ID, 0, 0, 0};
+	protected void makeProps() {
+		if (this.signers == null | this.signers.length == 0) {
+			this.typeBytes = new byte[]{TYPE_ID, 0, 0, 0};
+		} else {
+			byte prop1;
+			int len = this.signers.length; 
+			if (len < 4) {
+				prop1 = (byte)len;
+			} else {
+				prop1 = (byte)4;
+			}
+			this.typeBytes = new byte[]{TYPE_ID, prop1, 0, 0};
+		}
 	}
 	
 	//public static String getName() { return "Statement"; }

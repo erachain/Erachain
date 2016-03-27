@@ -27,8 +27,8 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	public ArbitraryTransactionV3(byte[] typeBytes,
 			PublicKeyAccount creator, List<Payment> payments, int service,
-			byte[] data, long timestamp, byte[] reference) {
-		super(typeBytes, creator, timestamp, reference);
+			byte[] data, byte feePow, long timestamp, byte[] reference) {
+		super(typeBytes, creator, feePow, timestamp, reference);
 
 		this.creator = creator;
 		if(payments == null)
@@ -42,25 +42,23 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 	public ArbitraryTransactionV3(byte[] typeBytes,
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-			byte feePow, long timestamp, byte[] reference) 
+			byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
-		this(typeBytes, creator, payments, service, data, timestamp, reference);
-		this.feePow = feePow; 
-		this.calcFee();
-	}
-	public ArbitraryTransactionV3(byte[] typeBytes,
-			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-			byte feePow, long timestamp, byte[] reference, byte[] signature) {
-		this(typeBytes, creator, payments, service, data, timestamp, reference);
-		this.feePow = feePow;
+		this(typeBytes, creator, payments, service, data, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	public ArbitraryTransactionV3(
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
+			byte feePow, long timestamp, byte[] reference, byte[] signature)
+	{
+		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference, signature);
+	}
+	public ArbitraryTransactionV3(
+			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
 			byte feePow, long timestamp, byte[] reference)
 	{
-		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, timestamp, reference);
+		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference);
 	}
 
 	// PARSE CONVERT

@@ -82,18 +82,22 @@ public abstract class Transaction {
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
+	public static final int INVALID_DURATION = 42;
+
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******
-	// univerlas
+	// universal
 	public static final int EXTENDED = 0;
 	// genesis
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
 	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 2;
-	// sipmle statement
+	// simple statement
 	public static final int STATEMENT_RECORD = 6;
-	// issue asset
+	public static final int PERSONALIZE_RECORD = 7;
+	// issue note - asset
 	public static final int ISSUE_ASSET_TRANSACTION = 11;
+	public static final int ISSUE_NOTE_TRANSACTION = 12;
 	// transfer asset + mess
 	public static final int MESSAGE_TRANSACTION = 16;
 	// confirms other transactions
@@ -203,6 +207,7 @@ public abstract class Transaction {
 	protected byte[] typeBytes;
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
+	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
 	protected byte[] signature;
 	protected long timestamp;
@@ -385,6 +390,16 @@ public abstract class Transaction {
 	
 	//VALIDATE
 	
+	public static boolean isSignatureValid(PublicKeyAccount creator, byte[] data, byte[] signature) {
+
+		if ( signature == null | signature.length != 64 | signature == new byte[64]) return false;
+		
+		if ( data == null ) return false;
+
+		return Crypto.getInstance().verify(creator.getPublicKey(), signature, data);
+
+	}
+	
 	public boolean isSignatureValid() {
 
 		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
@@ -392,8 +407,7 @@ public abstract class Transaction {
 		byte[] data = this.toBytes( false );
 		if ( data == null ) return false;
 
-		return Crypto.getInstance().verify(this.creator.getPublicKey(),
-				this.signature, data);
+		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
 

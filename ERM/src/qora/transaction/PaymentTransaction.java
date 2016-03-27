@@ -38,6 +38,10 @@ public class PaymentTransaction extends TransactionAmount {
 		this.signature = signature;
 		this.calcFee();
 	}
+	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, recipient, amount, feePow, timestamp, reference, signature);
+	}
 	public PaymentTransaction(PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, recipient, amount, feePow, timestamp, reference);		

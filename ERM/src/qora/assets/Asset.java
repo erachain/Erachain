@@ -24,33 +24,40 @@ public abstract class Asset {
 	public static final int NAME = 2;
 	public static final int VENTURE = 3;
 
-	protected static final int TYPE_LENGTH = 4;
+	protected static final int TYPE_LENGTH = 2;
 	protected static final int CREATOR_LENGTH = Account.ADDRESS_LENGTH;
-	protected static final int NAME_SIZE_LENGTH = 4;
+	protected static final int NAME_SIZE_LENGTH = 1;
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 	
-	protected int type;
+	protected byte[] typeBytes;
 	protected Account creator;
 	protected String name;
 	protected String description;
 	protected long key = -1;
 	protected byte[] reference = null; // this is signature of issued record
 	
-	public Asset(int type, Account creator, String name, String description)
+	public Asset(byte[] typeBytes, Account creator, String name, String description)
 	{
-		this.type = type;
+		this.typeBytes = typeBytes;
 		this.creator = creator;
 		this.name = name;
 		this.description = description;
 	}
+	/*
+	public Asset(int type, Account creator, String name, String description)
+	{
+		this(new byte[TYPE_LENGTH], creator, name, description);
+		this.typeBytes[0] = (byte)type;
+	}
+	*/
 
 	//GETTERS/SETTERS
 	
-	public int getType()
+	public byte[] getType()
 	{
-		return this.type;
+		return this.typeBytes;
 	}
 
 	public Account getCreator() {
@@ -100,9 +107,7 @@ public abstract class Asset {
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
-		byte[] typeBytes = Ints.toByteArray(type);
-		typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, typeBytes);
+		data = Bytes.concat(data, this.typeBytes);
 
 		//WRITE CREATOR
 		try
@@ -117,8 +122,8 @@ public abstract class Asset {
 		//WRITE NAME SIZE
 		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
 		int nameLength = nameBytes.length;
-		byte[] nameLengthBytes = Ints.toByteArray(nameLength);
-		data = Bytes.concat(data, nameLengthBytes);
+		//byte[] nameLengthBytes = Ints.toByteArray(nameLength);
+		data = Bytes.concat(data, new byte[]{(byte)nameLength});
 		
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
@@ -158,12 +163,12 @@ public abstract class Asset {
 	
 	public String toString()
 	{		
-		return "(" + this.getKey() + ":" + this.type + ") " + this.getName();
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + "." + this.typeBytes[1] + ") " + this.getName();
 	}
 	
 	public String getShort()
 	{
-		return "(" + this.getKey() + ":" + this.type + ") " + this.getName().substring(0, Math.min(this.getName().length(), 4));
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + "." + this.typeBytes[1] + ") " + this.getName().substring(0, Math.min(this.getName().length(), 4));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -172,15 +177,16 @@ public abstract class Asset {
 		JSONObject assetJSON = new JSONObject();
 
 		// ADD DATA
-		assetJSON.put("type", this.getType());
-		assetJSON.put("key", this.getKey());
-		assetJSON.put("name", this.getName());
-		assetJSON.put("description", this.getDescription());
-		assetJSON.put("creator", this.getCreator().getAddress());
+		assetJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
+		assetJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
+		assetJSON.put("key", this.key);
+		assetJSON.put("name", this.name);
+		assetJSON.put("description", this.description);
+		assetJSON.put("creator", this.creator.getAddress());
 		assetJSON.put("isConfirmed", this.isConfirmed());
-		assetJSON.put("reference", Base58.encode(this.getReference()));
+		assetJSON.put("reference", Base58.encode(this.reference));
 		
-		Transaction txReference = Controller.getInstance().getTransaction(this.getReference());
+		Transaction txReference = Controller.getInstance().getTransaction(this.reference);
 		if(txReference != null)
 		{
 			assetJSON.put("timestamp", txReference.getTimestamp());

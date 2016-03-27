@@ -384,7 +384,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		statementTx = new RecStatement((byte)0,(byte)0,(byte)0,creator, (byte)feePow, message, isText, timestamp, creator.getLastReference(this.fork));
+		statementTx = new RecStatement((byte)0,(byte)0,(byte)0, creator, (byte)feePow, message, isText, timestamp, creator.getLastReference(this.fork));
 		statementTx.sign(creator);
 			
 		return afterCreate(statementTx);

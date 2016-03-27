@@ -50,6 +50,8 @@ public class DBSet implements Observer, IDB {
 	private OrderMap orderMap;
 	private CompletedOrderMap completedOrderMap;
 	private TradeMap tradeMap;
+	private NoteMap noteMap;
+	private IssueNoteMap issueNoteMap;
 	private ATMap atMap;
 	private ATStateMap atStateMap;
 	private ATTransactionMap atTransactionMap;
@@ -131,6 +133,8 @@ public class DBSet implements Observer, IDB {
 			this.orderMap = new OrderMap(this, database);
 			this.completedOrderMap = new CompletedOrderMap(this, database);
 			this.tradeMap = new TradeMap(this, database);
+			this.noteMap = new NoteMap(this, database);
+			this.issueNoteMap = new IssueNoteMap(this, database);
 			this.atMap = new ATMap(this,database);
 			this.atStateMap = new ATStateMap(this,database);
 			this.atTransactionMap = new ATTransactionMap(this,database);
@@ -173,6 +177,8 @@ public class DBSet implements Observer, IDB {
 		this.orderMap = new OrderMap(parent.orderMap);
 		this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap);
 		this.tradeMap = new TradeMap(parent.tradeMap);
+		this.noteMap = new NoteMap(parent.noteMap);
+		this.issueNoteMap = new IssueNoteMap(parent.issueNoteMap);
 		this.atMap = new ATMap(parent.atMap);
 		this.atStateMap = new ATStateMap(parent.atStateMap);
 		this.atTransactionMap = new ATTransactionMap(parent.atTransactionMap);
@@ -208,6 +214,8 @@ public class DBSet implements Observer, IDB {
 		this.completedOrderMap.reset();
 		this.issueAssetMap.reset();
 		this.assetMap.reset();
+		this.issueNoteMap.reset();
+		this.noteMap.reset();
 		this.atMap.reset();
 		this.atStateMap.reset();
 		this.atTransactionMap.reset();
@@ -355,6 +363,15 @@ public class DBSet implements Observer, IDB {
 	public TradeMap getTradeMap()
 	{
 		return this.tradeMap;
+	}
+	public NoteMap getNoteMap()
+	{
+		return this.noteMap;
+	}
+	
+	public IssueNoteMap getIssueNoteMap()
+	{
+		return this.issueNoteMap;
 	}
 
 	public ATMap getATMap()

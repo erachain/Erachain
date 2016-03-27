@@ -49,6 +49,10 @@ public class IssueAssetTransaction extends Transaction
 		this.signature = signature;
 		this.calcFee();
 	}
+	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference, signature);
+	}
 	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference);
@@ -182,7 +186,7 @@ public class IssueAssetTransaction extends Transaction
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > 400 || nameLength < 1)
+		if(nameLength > 256 || nameLength < 1)
 		{
 			return INVALID_NAME_LENGTH;
 		}
@@ -210,7 +214,7 @@ public class IssueAssetTransaction extends Transaction
 		//CHECK IF CREATOR HAS ENOUGH MONEY
 		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
-			return NO_BALANCE;
+			return NOT_ENOUGH_FEE;
 		}
 		
 		//CHECK IF REFERENCE IS OK

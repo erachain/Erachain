@@ -39,7 +39,7 @@ import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
-import qora.transaction.TransferAssetTransaction;
+//import qora.transaction.TransferAssetTransaction;
 import qora.transaction.UpdateNameTransaction;
 import qora.transaction.VoteOnPollTransaction;
 import qora.voting.Poll;
@@ -224,8 +224,7 @@ public class TransactionTests {
 		assertEquals(true, payment.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		payment = new PaymentTransaction(new byte[]{(byte)Transaction.PAYMENT_TRANSACTION, 0, 0, 0},
-				sender, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp+1, sender.getLastReference(databaseSet), new byte[64]);
+		payment = new PaymentTransaction(sender, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp+1, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF PAYMENT SIGNATURE IS INVALID
 		assertEquals(false, payment.isSignatureValid());
@@ -267,8 +266,7 @@ public class TransactionTests {
 		
 		
 		//CREATE INVALID PAYMENT WRONG REFERENCE
-		payment = new PaymentTransaction(new byte[]{(byte)Transaction.PAYMENT_TRANSACTION, 0, 0, 0},
-				maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, new byte[64], new byte[64]);
+		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, new byte[64], new byte[64]);
 		//CHECK IF PAYMENT IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db));	
 	}
@@ -507,7 +505,7 @@ public class TransactionTests {
 		assertEquals(true, nameRegistration.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		nameRegistration = new RegisterNameTransaction(new byte[]{(byte)Transaction.REGISTER_NAME_TRANSACTION, 0, 0, 0},
+		nameRegistration = new RegisterNameTransaction(
 				sender, name, FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -780,7 +778,7 @@ public class TransactionTests {
 		assertEquals(true, nameUpdate.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		nameUpdate = new RegisterNameTransaction(new byte[]{(byte)Transaction.REGISTER_NAME_TRANSACTION, 0, 0, 0},
+		nameUpdate = new RegisterNameTransaction(
 				sender, name, FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -1091,7 +1089,7 @@ public class TransactionTests {
 		assertEquals(true, nameSaleTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		nameSaleTransaction = new SellNameTransaction(new byte[]{(byte)Transaction.SELL_NAME_TRANSACTION, 0, 0, 0},
+		nameSaleTransaction = new SellNameTransaction(
 				sender, nameSale, FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -1399,7 +1397,7 @@ public class TransactionTests {
 		assertEquals(true, nameSaleTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		nameSaleTransaction = new CancelSellNameTransaction(new byte[]{(byte)Transaction.CANCEL_SELL_NAME_TRANSACTION, 0, 0, 0},
+		nameSaleTransaction = new CancelSellNameTransaction(
 				sender, "test", FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -1727,7 +1725,7 @@ public class TransactionTests {
 		assertEquals(true, buyNameTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		buyNameTransaction = new BuyNameTransaction(new byte[]{(byte)Transaction.BUY_NAME_TRANSACTION, 0, 0, 0},
+		buyNameTransaction = new BuyNameTransaction(
 				sender, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -2107,7 +2105,7 @@ public class TransactionTests {
 		assertEquals(true, pollCreation.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		pollCreation = new CreatePollTransaction(new byte[]{(byte)Transaction.CREATE_POLL_TRANSACTION, 0, 0, 0},
+		pollCreation = new CreatePollTransaction(
 				sender, poll, FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -2408,7 +2406,7 @@ public class TransactionTests {
 		assertEquals(true, pollVote.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		pollVote = new VoteOnPollTransaction(new byte[]{(byte)Transaction.VOTE_ON_POLL_TRANSACTION, 0, 0, 0},
+		pollVote = new VoteOnPollTransaction(
 				sender, "test", 5, FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF POLL VOTE IS INVALID
@@ -2727,7 +2725,7 @@ public class TransactionTests {
 		assertEquals(true, arbitraryTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		arbitraryTransaction = new ArbitraryTransactionV3(new byte[]{(byte)Transaction.ARBITRARY_TRANSACTION, 0, 0, 0},
+		arbitraryTransaction = new ArbitraryTransactionV3(
 				sender, null, 4889, "test".getBytes(), FEE_POWER, timestamp, sender.getLastReference(databaseSet), new byte[64]);
 		//arbitraryTransaction.sign(sender);
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
@@ -3010,7 +3008,7 @@ public class TransactionTests {
 		assertEquals(true, issueAssetTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueAssetTransaction = new IssueAssetTransaction(new byte[]{(byte)Transaction.ISSUE_ASSET_TRANSACTION, 0, 0, 0},
+		issueAssetTransaction = new IssueAssetTransaction(
 				maker, asset, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE ASSET IS INVALID

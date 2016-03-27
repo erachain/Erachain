@@ -22,9 +22,17 @@ public class Statement extends Asset {
 	
 	private static final int TYPE_ID = Asset.STATEMENT;
 
+	public Statement(byte[] typeBytes, Account creator, String name, String description)
+	{
+		super(typeBytes, creator, name, description);
+	}
+	public Statement(int props, Account creator, String name, String description)
+	{
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, creator, name, description);
+	}
 	public Statement(Account creator, String name, String description)
 	{
-		super(TYPE_ID, creator, name, description);
+		this(new byte[]{(byte)TYPE_ID, (byte)0}, creator, name, description);
 	}
 
 	//GETTERS/SETTERS
@@ -34,19 +42,23 @@ public class Statement extends Asset {
 	public static Statement parse(byte[] data, boolean includeReference) throws Exception
 	{	
 
-		int position = 0;
-		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+	
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		Account creator = new Account(Base58.encode(creatorBytes));
 		position += CREATOR_LENGTH;
 		
 		//READ NAME
-		byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-		int nameLength = Ints.fromByteArray(nameLengthBytes);
-		position += NAME_SIZE_LENGTH;
+		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
+		//int nameLength = Ints.fromByteArray(nameLengthBytes);
+		//position += NAME_SIZE_LENGTH;
+		int nameLength = Byte.toUnsignedInt(data[position]);
+		position ++;
 		
-		if(nameLength < 1 || nameLength > 400)
+		if(nameLength < 1 || nameLength > 256)
 		{
 			throw new Exception("Invalid name length");
 		}
@@ -70,7 +82,7 @@ public class Statement extends Asset {
 		position += descriptionLength;
 				
 		//RETURN
-		Statement statement = new Statement(creator, name, description);
+		Statement statement = new Statement(typeBytes, creator, name, description);
 
 		if (includeReference)
 		{

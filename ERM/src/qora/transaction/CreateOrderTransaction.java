@@ -57,6 +57,10 @@ public class CreateOrderTransaction extends Transaction
 		this.calcFee();
 		
 	}
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference, signature);
+	}
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference);

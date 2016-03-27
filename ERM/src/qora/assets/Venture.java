@@ -31,13 +31,21 @@ public class Venture extends Asset {
 	protected byte scale;
 	protected boolean divisible;
 
-	public Venture(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
+	public Venture(byte[] typeBytes, Account creator, String name, String description, long quantity, byte scale, boolean divisible)
 	{
-		super(TYPE_ID, creator, name, description);
+		super(typeBytes, creator, name, description);
 		this.quantity = quantity;
 		this.divisible = divisible;
 		this.scale = scale;
-}
+	}
+	public Venture(int props, Account creator, String name, String description, long quantity, byte scale, boolean divisible)
+	{
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, creator, name, description, quantity, scale, divisible);
+	}
+	public Venture(Account creator, String name, String description, long quantity, byte scale, boolean divisible)
+	{
+		this(new byte[]{(byte)TYPE_ID, (byte)0}, creator, name, description, quantity, scale, divisible);
+	}
 
 	//GETTERS/SETTERS
 	public Long getQuantity() {
@@ -58,7 +66,9 @@ public class Venture extends Asset {
 	public static Venture parse(byte[] data, boolean includeReference) throws Exception
 	{	
 
-		int position = 0;
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
 		
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -66,13 +76,15 @@ public class Venture extends Asset {
 		position += CREATOR_LENGTH;
 		
 		//READ NAME
-		byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-		int nameLength = Ints.fromByteArray(nameLengthBytes);
-		position += NAME_SIZE_LENGTH;
+		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
+		//int nameLength = Ints.fromByteArray(nameLengthBytes);
+		//position += NAME_SIZE_LENGTH;
+		int nameLength = Byte.toUnsignedInt(data[position]);
+		position ++;
 		
-		if(nameLength < 1 || nameLength > 400)
+		if(nameLength < 1 || nameLength > 256)
 		{
-			throw new Exception("Invalid name length");
+			throw new Exception("Invalid name length: " + nameLength);
 		}
 		
 		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
@@ -117,7 +129,7 @@ public class Venture extends Asset {
 		position += DIVISIBLE_LENGTH;		
 		
 		//RETURN
-		Venture venture = new Venture(creator, name, description, quantity, scale, divisable);
+		Venture venture = new Venture(typeBytes, creator, name, description, quantity, scale, divisable);
 		if (includeReference)
 		{
 			venture.setReference(reference);

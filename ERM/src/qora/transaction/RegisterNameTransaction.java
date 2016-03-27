@@ -46,6 +46,10 @@ public class RegisterNameTransaction extends Transaction
 		this.signature = signature;		
 		this.calcFee();
 	}
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference, signature);
+	}
 	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);

@@ -84,11 +84,6 @@ public class TransactionFactory {
 			//PARSE ARBITRARY TRANSACTION
 			return ArbitraryTransaction.Parse(data);			
 			
-		case Transaction.ISSUE_ASSET_TRANSACTION:
-			
-			//PARSE ISSUE ASSET TRANSACTION
-			return IssueAssetTransaction.Parse(data);
-			
 		case Transaction.TRANSFER_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
@@ -130,6 +125,16 @@ public class TransactionFactory {
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
+		case Transaction.ISSUE_ASSET_TRANSACTION:
+			
+			//PARSE ISSUE ASSET TRANSACTION
+			return IssueAssetTransaction.Parse(data);
+			
+		case Transaction.ISSUE_NOTE_TRANSACTION:
+			
+			//PARSE ISSUE NOTE TRANSACTION
+			return IssueNoteTransaction.Parse(data);
+			
 		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION

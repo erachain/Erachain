@@ -36,15 +36,17 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 	protected List<Payment> payments;
 	
-	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, long timestamp, byte[] reference) {
-		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference);	
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);	
 	}
-	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, long timestamp, byte[] reference, byte[] signature) {
-		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference, signature);
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference, signature);
 	}
-	public ArbitraryTransaction(PublicKeyAccount creator, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, timestamp, reference);	
+	/*
+	public ArbitraryTransaction(PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, timestamp, reference);	
 	}
+	*/
 		
 	// GETTERS/SETTERS
 	//public static String getName() { return "OLD: Arbitrary"; }
