@@ -12,6 +12,8 @@ import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;
 import gui.models.WalletBlocksTableModel;
 import gui.models.WalletTransactionsTableModel;
+import gui.models.WalletItemNotesTableModel;
+
 import gui.naming.NamingServicePanel;
 import gui.transaction.TransactionDetailsFactory;
 import gui.voting.VotingPanel;
@@ -109,7 +111,9 @@ public class GeneralTabPane extends JTabbedPane{
         this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
 
         //NOTES
-        ////this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());        
+        this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());
+        		//new WalletItemNotesTableModel())
+        		//);
 
 		//ATs
 		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());

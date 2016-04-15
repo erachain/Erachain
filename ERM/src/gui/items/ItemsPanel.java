@@ -31,13 +31,14 @@ import qora.item.ItemCls;
 public class ItemsPanel extends JPanel
 {
 	
+	//protected WalletItem_TableModel itemsModel;
 	private String mess_issue_item = "Issue Item";
 	private String mess_all_items = "All Items";
 	//private int observer_add;
 	//private int observer_remove;
 	//private int observer_list;
 
-	public ItemsPanel(int observer_add, int observer_remove, int observer_list,
+	public ItemsPanel(WalletItem_TableModel itemsModel,
 			String mess_all_items, String mess_issue_item)
 	{
 		
@@ -73,7 +74,8 @@ public class ItemsPanel extends JPanel
 		
 		//TABLE
 		///final - no!
-		WalletItem_TableModel itemsModel = new WalletItem_TableModel(observer_add, observer_remove, observer_list);
+		//WalletItem_TableModel itemsModel = new WalletItem_TableModel(observer_add, observer_remove, observer_list);
+		//this.itemsModel = itemsModel;
 		///final  - no!
 		JTable table = new JTable(itemsModel);
 		

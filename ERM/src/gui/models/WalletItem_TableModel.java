@@ -13,7 +13,7 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>, ItemCls> implements Observer
+public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>, ItemCls> implements Observer
 {
 	static Logger LOGGER = Logger.getLogger(WalletItem_TableModel.class.getName());
 
@@ -26,9 +26,9 @@ public class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>,
 	
 	protected String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
 	
-	private int observer_add;
-	private int observer_remove;
-	private int observer_list;
+	protected int observer_add;
+	protected int observer_remove;
+	protected int observer_list;
 	
 	public WalletItem_TableModel(int observer_add, int observer_remove, int observer_list)
 	{
@@ -36,6 +36,7 @@ public class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>,
 		this.observer_add = observer_add;
 		this.observer_remove = observer_remove;
 		this.observer_list = observer_list;
+		this.fireTableDataChanged();
 	}
 	
 	@Override
@@ -112,13 +113,16 @@ public class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>,
 		}
 	}
 	
+	//@SuppressWarnings("unchecked")
+	public abstract void syncUpdate(Observable o, Object arg);
+	/*
 	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == observer_list)
+		if(message.getType() == this.observer_list)
 		{
 			if(this.items == null)
 			{
@@ -131,9 +135,10 @@ public class WalletItem_TableModel extends TableModelCls<Tuple2<String, String>,
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == observer_add || message.getType() == observer_remove)
+		if(message.getType() == this.observer_add || message.getType() == this.observer_remove)
 		{
 			this.fireTableDataChanged();
 		}	
 	}
+	*/
 }
