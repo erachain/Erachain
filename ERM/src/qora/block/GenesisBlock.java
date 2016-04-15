@@ -1,6 +1,6 @@
 package qora.block;
 
-import java.util.logging.Logger;
+// import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -12,15 +12,17 @@ import com.google.common.primitives.Longs;
 
 import database.DBSet;
 import qora.account.Account;
-import qora.account.PrivateKeyAccount;
+//import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Venture;
+import qora.item.assets.AssetVenture;
+import qora.item.notes.Note;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
 import qora.transaction.GenesisTransferAssetTransaction;
+import qora.transaction.GenesisIssueNoteTransaction;
 import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
@@ -28,9 +30,9 @@ import utils.Pair;
 public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
-	private static byte[] genesisReference =  new byte[]{1,2,3,4,1,1,1,3};
+	private static byte[] genesisReference =  new byte[]{19,66,8,21,0,0,0,0};
 	private static long genesisGeneratingBalance = 1111111111L; // starting max volume for generating
-	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{1,3,1,3,1,3,1,3});
+	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{0,1,2,3,4,13,31,13,31,13,31});
 
 	private String testnetInfo; 
 	
@@ -63,7 +65,7 @@ public class GenesisBlock extends Block{
 				
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
 		    }
-			this.testnetInfo += "\nStart the other nodes with command:";
+			this.testnetInfo += "\nStart the other nodes with command" + ":";
 			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar Qora.jar -testnet=" + genesisTimestamp;
 
 			
@@ -77,74 +79,69 @@ public class GenesisBlock extends Block{
 					"QStUHLofuyCBy3UR2Rr8WRNnPc56WZYzWu","QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc","QYgYu43QEMv2cf1QC8nq5PwVRQrNVk81MM",
 					"Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP","QiZSovPpdyAhLW66P2KkF5UynR9RtVsLPN","QYMA8MopsHnWx4B28zUFArAsCmZoPx3ooG",
 					"QXuzwBv17fmDQD3y5Emhu7qiFoRYCDE8jS","QVcP2HUjxrGrb6ARWmu6h6x1fCTxatFw2H","QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk");
-
-			/*
-			//ADD MAINNET GENESIS TRANSACTIONS
-			for(String address: recipients)
-			{
-				recipient = new Account(address);
-				this.addTransaction(new GenesisTransaction(recipient, bdAmount, timestamp));
-				timestamp +=1; // for unique signature
-			}
-			*/
 			
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
-			GenesisIssueAssetTransaction trans;
+
+			//CREATE MY NOTE
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(0), timestamp++));
+			//CREATE PERSONALIZE NOTE
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(1), timestamp++));
+			//CREATE ESTABLISH NOTE
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(2), timestamp++));
 			
-			Venture asset0;
+			AssetVenture asset0;
 			//CREATE ERM ASSET
 			asset0 = makeVenture(0);
-			trans = new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp);
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, genesisTimestamp));
-			
-
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, timestamp++));
 			//CREATE JOB ASSET
-			Venture asset1 = makeVenture(1); //new byte[64]);
-			trans = new GenesisIssueAssetTransaction(issuer, asset1, genesisTimestamp);
-			//Logger.getGlobal().info("genesisGenerator " + genesisGenerator.getAddress());
-			this.addTransaction(trans);
-			
+			AssetVenture asset1 = makeVenture(1);
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, timestamp++));
 			//CREATE VOTE ASSET
-			Venture asset2 = makeVenture(2); //new byte[64]);
-			trans = new GenesisIssueAssetTransaction(issuer, asset2, genesisTimestamp);
-			this.addTransaction(trans);
+			AssetVenture asset2 = makeVenture(2);
+			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, timestamp++));
 			
-			//Logger.getGlobal().info("amount " + new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(11)));
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
 				
 				bdAmount = new BigDecimal(asset0.getQuantity()).divide(new BigDecimal(9));
-				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp));
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp++));
 
 				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
-				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp));
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp++));
 				
 				bdAmount = new BigDecimal(asset2.getQuantity()).divide(new BigDecimal(9));
-				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 2l, bdAmount, timestamp));
-				timestamp +=1; // for unique signature
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 2l, bdAmount, timestamp++));
 			}
-
-		 	
 			
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
-			//Logger.getGlobal().info("setTransactionsSignature " + this.transactionsSignature);
 			this.setTransactionsSignature(generateHash(this.getTransactions()));
-			//Logger.getGlobal().info("setTransactionsSignature " + this.transactionsSignature);
 		}
 	}
 
 	// make assets
-	public static Venture makeVenture(int key) 
+	public static AssetVenture makeVenture(int key) 
 	{
 		switch(key)
 		{
 		case 1:
-			return new Venture(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
+			return new AssetVenture(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
 		case 2:
-			return new Venture(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
+			return new AssetVenture(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
 		}
-		return new Venture(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
+		return new AssetVenture(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
+	}
+	// make notes
+	public static Note makeNote(int key) 
+	{
+		switch(key)
+		{
+		case 1:
+			return new Note(genesisGenerator, "Introduce Myself", "I, %First Name% %Middle Name% %Last Name%, date of birth \"%date of Birth%\", place of birth \"%Place of Birth%\", race \"%Race%\", height \"%height%\", color \"%Color%\", eye color \"Eye Color\", hair color \"%Hair Color%\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		case 2:
+			return new Note(genesisGenerator, "Establish the Company", "Company name \"%Company Name%\" in country \"%Country%\"");
+		}
+		return new Note(genesisGenerator, "Introduce Me", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 
 	public String getTestNetInfo() 
@@ -185,14 +182,9 @@ public class GenesisBlock extends Block{
 		
 		if ( transactions != null )
 		{
-			// icreator
 			//WRITE TRANSACTION SIGNATURE
 			for(Transaction transaction: transactions)
 			{
-				//data = Bytes.concat(data, transaction.toBytes(true));
-				//Logger.getGlobal().info("tx type " + transaction.getType());
-				//Logger.getGlobal().info("tx ref " + transaction.getReference());
-				//Logger.getGlobal().info("tx sign " + transaction.getSignature());
 				data = Bytes.concat(data, transaction.getSignature());
 			}
 		}
@@ -205,7 +197,6 @@ public class GenesisBlock extends Block{
 	}
 	
 	//VALIDATE
-	
 	
 	@Override
 	public boolean isSignatureValid()
@@ -245,7 +236,7 @@ public class GenesisBlock extends Block{
 		//VALIDATE TRANSACTIONS
 		for(Transaction transaction: this.getTransactions())
 		{
-			if(transaction.isValid(db) != Transaction.VALIDATE_OK)
+			if(transaction.isValid(db, null) != Transaction.VALIDATE_OK)
 			{
 				return false;
 			}

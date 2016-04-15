@@ -104,7 +104,7 @@ public class CreatePollFrame extends JFrame
 		
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -114,7 +114,7 @@ public class CreatePollFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -124,7 +124,7 @@ public class CreatePollFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 2;
-      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
       	this.add(descriptionLabel, labelGBC);
       		
       	//TXTAREA NAME
@@ -136,7 +136,7 @@ public class CreatePollFrame extends JFrame
         
       	//LABEL OPTIONS
       	labelGBC.gridy = 3;
-      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options:"));
+      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
       	this.add(optionsLabel, labelGBC);
       	
       	//TABLE OPTIONS
@@ -168,7 +168,7 @@ public class CreatePollFrame extends JFrame
       	
         //LABEL FEE
       	labelGBC.gridy = 5;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE

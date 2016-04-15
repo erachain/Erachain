@@ -2,7 +2,7 @@ package test;
 
 import static org.junit.Assert.*;
 
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -11,11 +11,12 @@ import org.junit.Test;
 
 import database.DBSet;
 import ntp.NTP;
-import database.AssetMap;
+import database.ItemAssetMap;
 import qora.account.PrivateKeyAccount;
 //import database.IssueAssetMap;
-import qora.assets.Asset;
-import qora.assets.Venture;
+import qora.item.ItemCls;
+import qora.item.assets.AssetCls;
+import qora.item.assets.AssetVenture;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 import qora.transaction.IssueAssetTransaction;
@@ -28,6 +29,8 @@ public class DatabaseTests {
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
+
+	static Logger LOGGER = Logger.getLogger(DatabaseTests.class.getName());
 
 	@Test
 	public void databaseFork() 
@@ -77,23 +80,23 @@ public class DatabaseTests {
 	{
 		
 		DBSet.reCreateDatabase();
-		//GenesisBlock gb = new GenesisBlock();
-		//gb.process();
+		GenesisBlock gb = new GenesisBlock();
+		gb.process();
 		
-		AssetMap db = DBSet.getInstance().getAssetMap();
-		
-		Collection<Asset> assets = db.getValues();
-		for (Asset asset:assets) {
+		ItemAssetMap db = DBSet.getInstance().getAssetMap();
+		Collection<ItemCls> assets = db.getValues();
+		for (ItemCls asset:assets) {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
-			Logger.getGlobal().info("ASSET - " + asset.getKey() + " : " + asset.getName()
-			+ " : " + asset.getQuantity()	
-			+ " - " + asset.getReference().length	
-			+ ": " + asset.getReference());	
+			AssetCls aa = (AssetCls) asset;
+			LOGGER.info("ASSET - " + asset.getKey() + " : " + asset.getName()
+				+ " : " + aa.getQuantity()	
+				+ " - " + aa.getReference().length	
+				+ ": " + aa.getReference());	
 			//db.add(asset);
 		}
-		
+				
 		db.add(db.get(1l));
-		Logger.getGlobal().info("keys " + db.getKeys());
+		LOGGER.info("keys " + db.getKeys());
 
 		//Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValues();
 		
@@ -121,18 +124,19 @@ public class DatabaseTests {
 		//maker.setLastReference(gb.getGeneratorSignature(), db);
 		//maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
-		Asset asset = new Venture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(null, maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueAssetTransaction.sign(maker);
-		issueAssetTransaction.process();
-		//Logger.getGlobal().info(asset.toString() + " getQuantity " + asset.getQuantity());
+		issueAssetTransaction.sign(maker, false);
+		issueAssetTransaction.process(false);
+		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
 		long key = asset.getKey(db);
 		
-		AssetMap assetDB = db.getAssetMap();
-		Collection<Asset> assets = assetDB.getValues();
-		for (Asset asset_2:assets) {
-			Logger.getGlobal().info(asset_2.toString() + " getQuantity " + asset_2.getQuantity());
+		ItemAssetMap assetDB = db.getAssetMap();
+		Collection<ItemCls> assets = assetDB.getValues();
+		for (ItemCls asset_2:assets) {
+			AssetCls aa = (AssetCls) asset_2;
+			LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());
 		}
 		
 	}

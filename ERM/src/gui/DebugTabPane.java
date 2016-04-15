@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+//import org.apache.log4j.Logger;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -24,12 +25,15 @@ import settings.Settings;
 public class DebugTabPane extends JTabbedPane{
 
 	private static final long serialVersionUID = 2717571093561259483L;
+	static Logger LOGGER = Logger.getLogger(DebugTabPane.class.getName());
+
 
 	private PeersTableModel peersTableModel;
 	private TransactionsTableModel transactionsTableModel;
 	private BlocksTableModel blocksTableModel;
 	private LoggerTextArea loggerTextArea;
 	private JTable transactionsTable;
+	
 	
 	public DebugTabPane()
 	{
@@ -90,7 +94,7 @@ public class DebugTabPane extends JTabbedPane{
 		//ADD BLOCK TABLE
 		this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
 		
-        this.loggerTextArea = new LoggerTextArea(Logger.getGlobal());
+        this.loggerTextArea = new LoggerTextArea(LOGGER);
         JScrollPane scrollPane = new JScrollPane(this.loggerTextArea);
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());

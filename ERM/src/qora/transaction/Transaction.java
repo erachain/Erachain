@@ -1,13 +1,16 @@
 package qora.transaction;
 
-//import java.util.logging.Logger;
+// import org.apache.log4j.Logger;
 import java.math.BigDecimal;
 //import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 //import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
@@ -15,7 +18,7 @@ import java.util.Map;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
+//import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -91,13 +94,19 @@ public abstract class Transaction {
 	public static final int EXTENDED = 0;
 	// genesis
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
+	public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 3;
+	public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 4;
+	public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 5;
 	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 2;
 	// simple statement
-	public static final int STATEMENT_RECORD = 6;
+	public static final int RECORD_NOTE = 6;
 	public static final int PERSONALIZE_RECORD = 7;
+	public static final int RELEASE_PACK = 9;
 	// issue note - asset
 	public static final int ISSUE_ASSET_TRANSACTION = 11;
 	public static final int ISSUE_NOTE_TRANSACTION = 12;
+	public static final int ISSUE_PERSON_TRANSACTION = 13;
+	public static final int ISSUE_STATUS_TRANSACTION = 14;
 	// transfer asset + mess
 	public static final int MESSAGE_TRANSACTION = 16;
 	// confirms other transactions
@@ -124,13 +133,19 @@ public abstract class Transaction {
 	
 	//public static final int ACCOUNTING_TRANSACTION = 26;
 	//public static final int JSON_TRANSACTION = 27;
-	
+
+	// CORE KEY = ERM
+	public static final long ERM_KEY = 0l;
+
 	// FEE KEY = OIL
 	public static final long FEE_KEY = 1l;
 	public static final int FEE_PER_BYTE = 1;
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
-		
+
+	// UNIQIE KEY = VOTE
+	public static final long VOTE_KEY = 2l;
+
 	//RELEASES
 	private static final long VOTING_RELEASE = 0l;
 	private static final long ARBITRARY_TRANSACTIONS_RELEASE = 0l;
@@ -139,9 +154,8 @@ public abstract class Transaction {
 	//public static final long ASSETS_RELEASE = 1411308000000l;
 	private static final long ASSETS_RELEASE = 0l;
 	private static final long POWFIX_RELEASE = 0L; // Block Version 3 // 2016-02-25T19:00:00+00:00
-								
-	//public static String[] TYPES = new String[256];
-	//public String TYPES[0] = "w";
+							
+	static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
 
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
@@ -189,7 +203,7 @@ public abstract class Transaction {
 	protected static final int SIMPLE_TYPE_LENGTH = 1;
 	protected static final int TYPE_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
-	protected static final int TIMESTAMP_LENGTH = 8;
+	public static final int TIMESTAMP_LENGTH = 8;
 	protected static final int REFERENCE_LENGTH = 64;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
@@ -201,8 +215,11 @@ public abstract class Transaction {
 	// not need now protected static final int FEE_LENGTH = 8;
 	public static final int SIGNATURE_LENGTH = 64;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
+	// in pack toByte and Parse - reference not included
+	protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH + /*REFERENCE_LENGTH*/ + SIGNATURE_LENGTH;
+
 		
-	protected String NAME = "unknown";
+	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
 	protected byte[] reference;
@@ -214,17 +231,17 @@ public abstract class Transaction {
 	protected PublicKeyAccount creator;
 	
 	// need for genesis
-	protected Transaction(byte type, String name, long timestamp)
+	protected Transaction(byte type, String type_name, long timestamp)
 	{
 		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
-		this.NAME = name;
+		this.TYPE_NAME = type_name;
 		this.timestamp = timestamp;
 
 	}
-	protected Transaction(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
 		this.typeBytes = typeBytes;
-		this.NAME = name;
+		this.TYPE_NAME = type_name;
 		this.creator = creator;
 		//this.props = props;
 		this.timestamp = timestamp;
@@ -233,20 +250,23 @@ public abstract class Transaction {
 		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
 		this.feePow = feePow;
 	}
-	protected Transaction(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
 	{
-		this(typeBytes, name, creator, feePow, timestamp, reference);
+		this(typeBytes, type_name, creator, feePow, timestamp, reference);
 		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
-	public String getName() { return this.NAME; }
+	public String getRecordType() { return this.TYPE_NAME; }
 	
 	public int getType()
 	{
 		return Byte.toUnsignedInt(this.typeBytes[0]);
 	}
-	
+	public byte[] getTypeBytes()
+	{
+		return this.typeBytes;
+	}
 	public PublicKeyAccount getCreator() 
 	{
 		return this.creator;
@@ -266,10 +286,16 @@ public abstract class Transaction {
 	public BigDecimal viewAmount() {
 		return BigDecimal.ZERO;
 	}
+	public BigDecimal getAmount() {
+		return this.viewAmount();
+	}
 
 	public BigDecimal viewAmount(Account account)
 	{
 		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount(Account account) {
+		return this.viewAmount(account);
 	}
 	
 	public BigDecimal getFee()
@@ -294,10 +320,10 @@ public abstract class Transaction {
 	
 	public int calcCommonFee()
 	{		
-		int fee =  this.getDataLength() + 100 * FEE_PER_BYTE;
-		if (this.getDataLength() > 1000) {
+		int fee =  this.getDataLength(false) + 100 * FEE_PER_BYTE;
+		if (this.getDataLength(false) > 1000) {
 			// add overheat
-			fee += (this.getDataLength() - 1000) * FEE_PER_BYTE;
+			fee += (this.getDataLength(false) - 1000) * FEE_PER_BYTE;
 		}
 		
 		return (int) fee;
@@ -338,6 +364,7 @@ public abstract class Transaction {
 		transaction.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
 		transaction.put("type2", Byte.toUnsignedInt(this.typeBytes[2]));
 		transaction.put("type3", Byte.toUnsignedInt(this.typeBytes[3]));
+		transaction.put("record_type", this.getRecordType());
 		transaction.put("fee", this.fee.toPlainString());
 		transaction.put("timestamp", this.timestamp);
 		transaction.put("reference", Base58.encode(this.reference));
@@ -348,45 +375,60 @@ public abstract class Transaction {
 		return transaction;
 	}
 	
-	public void sign(PrivateKeyAccount creator)
+	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
-		byte[] data = this.toBytes( false );
+		
+		// use this.reference in any case
+		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);
-		this.calcFee(); // need for recal!
+		if (!asPack)
+			 // need for recalc! if not as a pack
+			this.calcFee();
 	}
 
 	public abstract JSONObject toJson();
 	
-	public byte[] toBytes(boolean withSign) {
+	// releaserReference == null - not as pack
+	// releaserReference = reference of releaser - as pack
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+
+		boolean asPack = releaserReference != null;
 
 		byte[] data = new byte[0];
 
 		//WRITE TYPE
 		data = Bytes.concat(data, this.typeBytes);
 
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.getReference());
+		if (!asPack) {
+			//WRITE TIMESTAMP
+			byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+			timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+			data = Bytes.concat(data, timestampBytes);
+		}
+		
+		//WRITE REFERENCE - in any case as Pack or not
+		data = Bytes.concat(data, this.reference);
 
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
 
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
+		if (!asPack) {
+			//WRITE FEE POWER
+			byte[] feePowBytes = new byte[1];
+			feePowBytes[0] = this.feePow;
+			data = Bytes.concat(data, feePowBytes);
+		}
+
+		//SIGNATURE
+		if (withSign) data = Bytes.concat(data, this.signature);
 		
 		return data;
 		
 	}
 	
-	public abstract int getDataLength();
+	public abstract int getDataLength(boolean asPack);
 	
 	//VALIDATE
 	
@@ -404,57 +446,95 @@ public abstract class Transaction {
 
 		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
 		
-		byte[] data = this.toBytes( false );
+		// validation with reference - not as a pack in toBytes - in any case!
+		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
 
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
 
-	public int isValid()
+	public int isValid(byte[] releaserReference)
 	{
-		return isValid(DBSet.getInstance());
+		return isValid(DBSet.getInstance(), releaserReference);
 	}
 	
-	public abstract int isValid(DBSet db);
+	public int isValid(DBSet db, byte[] releaserReference)
+	{
 	
+		//CHECK IF REFERENCE IS OK
+		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
+		{
+			return INVALID_REFERENCE;
+		}
+
+		//CHECK CREATOR
+		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
+		{
+			return INVALID_ADDRESS;
+		}
+		
+		//CHECK IF CREATOR HAS ENOUGH MONEY
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+		{
+			return NOT_ENOUGH_FEE;
+		}
+						
+		return VALIDATE_OK;
+
+	}
+
 	//PROCESS/ORPHAN
 	
-	public void process()
+	public void process(boolean asPack)
 	{
-		this.process(DBSet.getInstance());
+		this.process(DBSet.getInstance(), asPack);
 	}
 	//public abstract void process(DBSet db);
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
-		
-		this.calcFee();
+	
+		if (!asPack) {
+			this.calcFee();
+	
+			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
+						.subtract(this.fee), db);
 
-		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
-			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
-					.subtract(this.fee), db);
+				//UPDATE REFERENCE OF SENDER
+				this.creator.setLastReference(this.signature, db);
+			}
+		}
 
 	}
 
-	public void orphan()
+	public void orphan(boolean asPack)
 	{
-		this.orphan(DBSet.getInstance());
+		this.orphan(DBSet.getInstance(), asPack);
 	}
+	
 	//public abstract void orphan(DBSet db);
-	public void orphan(DBSet db)
+	public void orphan(DBSet db, boolean asPack)
 	{
-		if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0)
-			this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
+		if (!asPack) {
+			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
+				//UPDATE REFERENCE OF SENDER
+				this.creator.setLastReference(this.reference, db);
+			}
+		}
 	}
 
 	
 	//REST
 		
-	public abstract List<Account> getInvolvedAccounts();
-		
-	public abstract boolean isInvolved(Account account);	
+	public abstract HashSet<Account> getInvolvedAccounts();
 	
+	public abstract HashSet<Account> getRecipientAccounts();
+		
+	public abstract boolean isInvolved(Account account);
+ 
 	public int getSeq()
 	{
 		if(this.isConfirmed())
@@ -507,7 +587,7 @@ public abstract class Transaction {
 
 		}catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return 0;
 		}
 	}

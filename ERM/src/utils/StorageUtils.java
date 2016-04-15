@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -26,6 +26,8 @@ import qora.web.OrphanNameStorageHelperMap;
 import qora.web.OrphanNameStorageMap;
 
 public class StorageUtils {
+
+	static Logger LOGGER = Logger.getLogger(StorageUtils.class.getName());
 
 	// REPLACES CURRENT VALUE
 	public static final String ADD_COMPLETE_KEY = "addcomplete";
@@ -263,8 +265,8 @@ public class StorageUtils {
 						nameStorageMap.add(name, key,
 								DiffHelper.patch(oldValueOpt, (String) patchJsonKey.get(key)));
 					} catch (Throwable e) {
-						Logger.getGlobal().info("Invalid patch!");
-						Logger.getGlobal().log(Level.FINE, "Invalid patch!", e);
+						LOGGER.info("Invalid patch!");
+						//LOGGER.info(Level.FINE, "Invalid patch!" e);
 					}
 				}
 			}

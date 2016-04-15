@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 //import java.util.ArrayList;
 import java.util.Arrays;
 //import java.util.List;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import ntp.NTP;
 
@@ -16,19 +16,24 @@ import org.junit.Test;
 //import com.google.common.primitives.Longs;
 
 import database.DBSet;
-import database.NoteMap;
+import database.ItemNoteMap;
 import qora.account.PrivateKeyAccount;
-import qora.notes.NoteCls;
-import qora.notes.Note;
+import qora.item.notes.NoteCls;
+import qora.item.notes.Note;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 //import qora.transaction.GenesisTransaction;
-import qora.transaction.IssueNoteTransaction;
+import qora.transaction.IssueNoteRecord;
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
 
 public class TrNoteTest {
 
+	static Logger LOGGER = Logger.getLogger(TrNoteTest.class.getName());
+
+	byte[] releaserReference = null;
+
+	boolean asPack = false;
 	long OIL_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
@@ -70,14 +75,14 @@ public class TrNoteTest {
 		Note note = new Note(maker, "test", "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		Transaction issueNoteTransaction = new IssueNoteTransaction(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteTransaction.sign(maker);
+		Transaction issueNoteTransaction = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
 		assertEquals(true, issueNoteTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueNoteTransaction = new IssueNoteTransaction(maker, note, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
+		issueNoteTransaction = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE NOTE IS INVALID
 		assertEquals(false, issueNoteTransaction.isSignatureValid());
@@ -96,48 +101,48 @@ public class TrNoteTest {
 		assertEquals(raw.length, note.getDataLength(false));
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteTransaction issueNoteTransaction = new IssueNoteTransaction(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteTransaction.sign(maker);
-		issueNoteTransaction.process(db);
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteRecord.sign(maker, false);
+		issueNoteRecord.process(db, false);
 		
 		//CONVERT TO BYTES
-		byte[] rawIssueNoteTransaction = issueNoteTransaction.toBytes(true);
+		byte[] rawIssueNoteTransaction = issueNoteRecord.toBytes(true, null);
 		
 		//CHECK DATA LENGTH
-		assertEquals(rawIssueNoteTransaction.length, issueNoteTransaction.getDataLength());
+		assertEquals(rawIssueNoteTransaction.length, issueNoteRecord.getDataLength(false));
 		
 		try 
 		{	
 			//PARSE FROM BYTES
-			IssueNoteTransaction parsedIssueNoteTransaction = (IssueNoteTransaction) TransactionFactory.getInstance().parse(rawIssueNoteTransaction);
-			Logger.getGlobal().info("parsedIssueNoteTransaction: " + parsedIssueNoteTransaction);
+			IssueNoteRecord parsedIssueNoteTransaction = (IssueNoteRecord) TransactionFactory.getInstance().parse(rawIssueNoteTransaction, releaserReference);
+			LOGGER.info("parsedIssueNoteTransaction: " + parsedIssueNoteTransaction);
 
 			//CHECK INSTANCE
-			assertEquals(true, parsedIssueNoteTransaction instanceof IssueNoteTransaction);
+			assertEquals(true, parsedIssueNoteTransaction instanceof IssueNoteRecord);
 			
 			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(issueNoteTransaction.getSignature(), parsedIssueNoteTransaction.getSignature()));
+			assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), parsedIssueNoteTransaction.getSignature()));
 			
 			//CHECK ISSUER
-			assertEquals(issueNoteTransaction.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
+			assertEquals(issueNoteRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueNoteTransaction.getNote().getCreator().getAddress(), parsedIssueNoteTransaction.getNote().getCreator().getAddress());
+			assertEquals(issueNoteRecord.getItem().getCreator().getAddress(), parsedIssueNoteTransaction.getItem().getCreator().getAddress());
 			
 			//CHECK NAME
-			assertEquals(issueNoteTransaction.getNote().getName(), parsedIssueNoteTransaction.getNote().getName());
+			assertEquals(issueNoteRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(issueNoteTransaction.getNote().getDescription(), parsedIssueNoteTransaction.getNote().getDescription());
+			assertEquals(issueNoteRecord.getItem().getDescription(), parsedIssueNoteTransaction.getItem().getDescription());
 							
 			//CHECK FEE
-			assertEquals(issueNoteTransaction.getFee(), parsedIssueNoteTransaction.getFee());	
+			assertEquals(issueNoteRecord.getFee(), parsedIssueNoteTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueNoteTransaction.getReference(), parsedIssueNoteTransaction.getReference()));	
+			assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference()));	
 			
 			//CHECK TIMESTAMP
-			assertEquals(issueNoteTransaction.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
+			assertEquals(issueNoteRecord.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -156,34 +161,34 @@ public class TrNoteTest {
 		Note note = new Note(maker, "test", "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteTransaction issueNoteTransaction = new IssueNoteTransaction(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteTransaction.sign(maker);
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteRecord.sign(maker, false);
 		
-		assertEquals(Transaction.VALIDATE_OK, issueNoteTransaction.isValid(db));
+		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
 		
-		issueNoteTransaction.process(db);
+		issueNoteRecord.process(db, false);
 		
-		Logger.getGlobal().info("note KEY: " + note.getKey(db));
+		LOGGER.info("note KEY: " + note.getKey(db));
 				
 		//CHECK NOTE EXISTS SENDER
-		long key = db.getIssueNoteMap().get(issueNoteTransaction);
+		long key = db.getIssueNoteMap().get(issueNoteRecord);
 		assertEquals(true, db.getNoteMap().contains(key));
 		
 		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
-		IssueNoteTransaction issueNoteTransaction_2 = new IssueNoteTransaction(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
-		issueNoteTransaction_2.sign(maker);
-		issueNoteTransaction_2.process(db);
-		Logger.getGlobal().info("note_2 KEY: " + note_2.getKey(db));
-		issueNoteTransaction_2.orphan(db);
-		NoteMap noteMap = db.getNoteMap();
+		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
+		issueNoteTransaction_2.sign(maker, false);
+		issueNoteTransaction_2.process(db, false);
+		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
+		issueNoteTransaction_2.orphan(db, false);
+		ItemNoteMap noteMap = db.getNoteMap();
 		int mapSize = noteMap.size();
-		assertEquals(0, mapSize - 1);
+		assertEquals(0, mapSize - 4);
 		
 		//CHECK NOTE IS CORRECT
 		assertEquals(true, Arrays.equals(db.getNoteMap().get(key).toBytes(true), note.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueNoteTransaction.getSignature(), maker.getLastReference(db)));
+		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
 	}
 	
 	
@@ -196,19 +201,19 @@ public class TrNoteTest {
 		Note note = new Note(maker, "test", "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteTransaction issueNoteTransaction = new IssueNoteTransaction(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteTransaction.sign(maker);
-		issueNoteTransaction.process(db);
-		long key = db.getIssueNoteMap().get(issueNoteTransaction);
-		assertEquals(true, Arrays.equals(issueNoteTransaction.getSignature(), maker.getLastReference(db)));
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteRecord.sign(maker, false);
+		issueNoteRecord.process(db, false);
+		long key = db.getIssueNoteMap().get(issueNoteRecord);
+		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
 		
-		issueNoteTransaction.orphan(db);
+		issueNoteRecord.orphan(db, false);
 				
 		//CHECK NOTE EXISTS SENDER
 		assertEquals(false, db.getNoteMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueNoteTransaction.getReference(), maker.getLastReference(db)));
+		assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), maker.getLastReference(db)));
 	}
 	
 	

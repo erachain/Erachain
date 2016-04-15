@@ -3,11 +3,13 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -21,6 +23,7 @@ import database.DBSet;
 import qora.account.Account;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
+import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.payment.Payment;
 import qora.web.blog.BlogEntry;
@@ -35,6 +38,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 	protected byte[] data;
 
 	protected List<Payment> payments;
+	
+	static Logger LOGGER = Logger.getLogger(ArbitraryTransaction.class.getName());
 	
 	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);	
@@ -107,10 +112,20 @@ public abstract class ArbitraryTransaction extends Transaction {
 	}
 
 	@Override
-	public List<Account> getInvolvedAccounts() {
-		List<Account> accounts = new ArrayList<Account>();
-
+	public HashSet<Account> getInvolvedAccounts() {
+		HashSet<Account> accounts = new HashSet<>();
+		
 		accounts.add(this.creator);
+		accounts.addAll(this.getRecipientAccounts());
+		
+		return accounts;
+	}
+
+	
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
 
 		for (Payment payment : this.payments) {
 			accounts.add(payment.getRecipient());
@@ -118,7 +133,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		return accounts;
 	}
-
+	
 	@Override
 	public boolean isInvolved(Account account) 
 	{
@@ -182,7 +197,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 	// PROCESS/ORPHAN
 	//@Override
-	public void process(DBSet db) {
+	public void process(DBSet db, boolean asPack) {
 
 		
 		try {
@@ -200,15 +215,12 @@ public abstract class ArbitraryTransaction extends Transaction {
 				addToCommentMapOnDemand(db);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 
 		// UPDATE CREATOR
-		super.process(db);
+		super.process(db, asPack);
 		
-		// UPDATE REFERENCE OF CREATOR
-		this.getCreator().setLastReference(this.signature, db);
-
 		// PROCESS PAYMENTS
 		for (Payment payment : this.getPayments()) {
 			payment.process(this.getCreator(), db);
@@ -222,7 +234,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	}
 
 	//@Override
-	public void orphan(DBSet db) {
+	public void orphan(DBSet db, boolean asPack) {
 
 		// NAME STORAGE UPDATE ORPHAN
 		// if (service == 10) {
@@ -233,11 +245,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// }
 
 		// UPDATE CREATOR
-		super.orphan(db);
+		super.orphan(db, asPack);
 		
-		// UPDATE REFERENCE OF CREATOR
-		this.getCreator().setLastReference(this.reference, db);
-
 		// ORPHAN PAYMENTS
 		for (Payment payment : this.getPayments()) {
 			payment.orphan(this.getCreator(), db);

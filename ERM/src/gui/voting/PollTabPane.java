@@ -10,7 +10,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.voting.Poll;
 import utils.BigDecimalStringComparator;
 
@@ -23,7 +23,7 @@ public class PollTabPane extends JTabbedPane{
 	private VotesTableModel allVotesTableModel;
 	
 	@SuppressWarnings("unchecked")
-	public PollTabPane(Poll poll, Asset asset)
+	public PollTabPane(Poll poll, AssetCls asset)
 	{
 		super();
 			
@@ -50,7 +50,7 @@ public class PollTabPane extends JTabbedPane{
 		this.addTab(Lang.getInstance().translate("My Votes"), new JScrollPane(myVotesTable));
 	}
 
-	public void setAsset(Asset asset)
+	public void setAsset(AssetCls asset)
 	{
 		pollDetailsPanel.setAsset(asset);
 		allVotesTableModel.setAsset(asset);

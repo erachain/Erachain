@@ -1,7 +1,7 @@
 package utils;
 
 import java.util.List;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -17,6 +17,8 @@ import database.DBSet;
 import database.SortableList;
 
 public class UpdateUtil {
+
+	static Logger LOGGER = Logger.getLogger(UpdateUtil.class.getName());
 
 	public static void repopulateNameStorage(int height) {
 		DBSet.getInstance().getNameStorageMap().reset();
@@ -107,7 +109,7 @@ public class UpdateUtil {
 			}
 			if ( b.getHeight()%2000 == 0 )
 			{
-				Logger.getGlobal().info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
+				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
 				DBSet.getInstance().commit();
 			}
 			b = b.getChild();
@@ -135,7 +137,7 @@ public class UpdateUtil {
 			}
 			if ( b.getHeight()%2000 == 0 )
 			{
-				Logger.getGlobal().info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
+				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
 				DBSet.getInstance().commit();
 			}
 			b = b.getChild();

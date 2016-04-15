@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.log4j.Logger;
+
 import ntp.NTP;
 import qora.account.PrivateKeyAccount;
 import qora.block.Block;
@@ -40,6 +42,7 @@ public class BlockGenerator extends Thread implements Observer
 	public static final int MIN_BLOCK_TIME = 1 * 60;
 	public static final int MAX_BLOCK_TIME = 5 * 60;
 	
+	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
 	public enum ForgingStatus {
 	    
@@ -76,7 +79,7 @@ public class BlockGenerator extends Thread implements Observer
 	private List<PrivateKeyAccount> cachedAccounts;
 	
 	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
-	private boolean walletOnceUnlocked = false;;
+	private boolean walletOnceUnlocked = false;
 	
 	
 	public BlockGenerator()
@@ -223,7 +226,7 @@ public class BlockGenerator extends Thread implements Observer
 					
 					/*Date date = new Date(block.getTimestamp());
 					DateFormat format = DateFormat.getDateTimeInstance();
-					System.out.println(format.format(date));*/
+					LOGGER.info(format.format(date));*/
 					
 					//CHECK IF BLACK TIMESTAMP IS VALID
 					if(block.getTimestamp() <= NTP.getTime() && !validBlockFound)
@@ -252,7 +255,7 @@ public class BlockGenerator extends Thread implements Observer
 					} 
 					catch (InterruptedException e) 
 					{
-						e.printStackTrace();
+						LOGGER.error(e.getMessage(),e);
 					}
 				}
 			}
@@ -265,7 +268,7 @@ public class BlockGenerator extends Thread implements Observer
 				} 
 				catch (InterruptedException e) 
 				{
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(),e);
 				}
 			}
 		}
@@ -413,10 +416,10 @@ public class BlockGenerator extends Thread implements Observer
 				{
 					try{
 						//CHECK IF VALID
-						if(transaction.isValid(newBlockDb) == Transaction.VALIDATE_OK)
+						if(transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
 						{
 							//CHECK IF ENOUGH ROOM
-							if(totalBytes + transaction.getDataLength() <= Block.MAX_TRANSACTION_BYTES)
+							if(totalBytes + transaction.getDataLength(false) <= Block.MAX_TRANSACTION_BYTES)
 							{
 								//ADD INTO BLOCK
 								block.addTransaction(transaction);
@@ -425,7 +428,7 @@ public class BlockGenerator extends Thread implements Observer
 								orderedTransactions.remove(transaction);
 											
 								//PROCESS IN NEWBLOCKDB
-								transaction.process(newBlockDb);
+								transaction.process(newBlockDb, false);
 											
 								//TRANSACTION PROCESSES
 								transactionProcessed = true;
@@ -433,7 +436,7 @@ public class BlockGenerator extends Thread implements Observer
 							}
 						}
 					}catch(Exception e){
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage(),e);
                         //REMOVE FROM LIST
                         orderedTransactions.remove(transaction);
                         transactionProcessed = true;

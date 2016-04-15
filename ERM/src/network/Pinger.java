@@ -1,4 +1,6 @@
 package network;
+// 30/03
+import org.apache.log4j.Logger;
 
 import database.DBSet;
 import network.message.Message;
@@ -7,6 +9,8 @@ import settings.Settings;
 
 public class Pinger extends Thread
 {
+	
+	private static final Logger LOGGER = Logger.getLogger(Pinger.class);
 	private Peer peer;
 	private boolean run;
 	private long ping;
@@ -83,7 +87,7 @@ public class Pinger extends Thread
 		}
 		catch(Exception e)
 		{
-			
+			LOGGER.debug(e.getMessage(),e);
 		}
 	}
 }

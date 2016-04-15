@@ -1,5 +1,5 @@
 package gui.transaction;
-
+// 30/03
 import gui.PasswordPane;
 import lang.Lang;
 
@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import qora.account.Account;
@@ -40,6 +41,8 @@ public class MessageTransactionDetailsFrame extends JFrame
 {
 	private JTextField messageText;
 	
+	private static final Logger LOGGER = Logger
+			.getLogger(MessageTransactionDetailsFrame.class);
 	public MessageTransactionDetailsFrame(final MessageTransaction messageTransaction)
 	{
 		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
@@ -84,7 +87,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL TYPE
 		labelGBC.gridy = componentLevel;
 		
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 		
 		//TYPE
@@ -95,7 +98,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL SIGNATURE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -108,7 +111,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL REFERENCE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -121,7 +124,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL TIMESTAMP
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -134,7 +137,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL SENDER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator:"));
+		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(senderLabel, labelGBC);
 		
 		//SENDER
@@ -147,7 +150,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL RECIPIENT
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient:"));
+		JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
 		this.add(recipientLabel, labelGBC);
 		
 		//RECIPIENT
@@ -160,13 +163,13 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL SERVICE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message:"));
+		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
 		this.add(serviceLabel, labelGBC);
 		
 		//ISTEXT
 		detailGBC.gridy = componentLevel;
 		detailGBC.gridwidth = 2;
-		messageText = new JTextField( ( messageTransaction.isText() ) ? new String(messageTransaction.getData(), Charset.forName("UTF-8")) : Base58.encode(messageTransaction.getData()));
+		messageText = new JTextField( ( messageTransaction.isText() ) ? new String(messageTransaction.getData(), Charset.forName("UTF-8")) : Converter.toHex(messageTransaction.getData()));
 		messageText.setEditable(false);
 		MenuPopupUtil.installContextMenu(messageText);
 		this.add(messageText, detailGBC);			
@@ -232,12 +235,8 @@ public class MessageTransactionDetailsFrame extends JFrame
 	        		
 	        		try {
 	        			messageText.setText(new String(AEScrypto.dataDecrypt(messageTransaction.getData(), privateKey, publicKey), "UTF-8"));
-					} catch (UnsupportedEncodingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InvalidCipherTextException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+						LOGGER.error(e1.getMessage(),e1);
 					}
         		}
         		else
@@ -245,8 +244,7 @@ public class MessageTransactionDetailsFrame extends JFrame
         			try {
         				messageText.setText(new String(messageTransaction.getData(), "UTF-8"));
 					} catch (UnsupportedEncodingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						LOGGER.error(e1.getMessage(),e1);
 					}
         		}
         		//encrypted.isSelected();
@@ -257,7 +255,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL AMOUNT
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount:"));
+		JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		this.add(amountLabel, labelGBC);
 				
 		//AMOUNT
@@ -282,7 +280,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL FEE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -295,7 +293,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 		//LABEL CONFIRMATIONS
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

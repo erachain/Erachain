@@ -7,26 +7,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
 import javax.ws.rs.WebApplicationException;
 
+import org.apache.log4j.Logger;
+
 import api.ApiClient;
 import api.ApiErrorFactory;
 import controller.Controller;
 import gui.PasswordPane;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 import qora.web.ServletUtils;
 import settings.Settings;
+import test.TrNoteTest;
 
 public class APIUtils {
+
+	static Logger LOGGER = Logger.getLogger(APIUtils.class.getName());
 
 	public static String processPayment(String assetKeyString, String amount, String feePowStr,
 			String sender, String recipient, String x,
 			HttpServletRequest request) {
 		
 		// PARSE AMOUNT		
-		Asset asset;
+		AssetCls asset;
 		
 		if(assetKeyString == null)
 		{
@@ -198,7 +203,7 @@ public class APIUtils {
 			if (e instanceof WebApplicationException) {
 				throw (WebApplicationException) e;
 			}
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_UNKNOWN);
 		}

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.json.simple.JSONObject;
 import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Order;
+import qora.item.assets.Order;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
@@ -117,7 +118,7 @@ public class CancelOrderTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -155,7 +156,7 @@ public class CancelOrderTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		return BASE_LENGTH;
 	}
@@ -163,7 +164,7 @@ public class CancelOrderTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK IF ORDER EXISTS
 		Order order = db.getOrderMap().get(this.order);
@@ -202,13 +203,10 @@ public class CancelOrderTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db);
-
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
+		super.process(db, asPack);
 				
 		//SET ORPHAN DATA
 		Order order = db.getOrderMap().get(this.order);
@@ -222,14 +220,11 @@ public class CancelOrderTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-												
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
-				
+		super.orphan(db, asPack);
+																
 		//ADD TO DATABASE
 		Order order = db.getCompletedOrderMap().get(this.order);
 		db.getOrderMap().add(order);	
@@ -242,13 +237,19 @@ public class CancelOrderTransaction extends Transaction
 	}
 
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
 		return accounts;
 	}
-
+	
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		return new HashSet<>();
+	}
+	
 	@Override
 	public boolean isInvolved(Account account) 
 	{

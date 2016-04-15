@@ -2,6 +2,7 @@ package gui.naming;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.models.WalletTransactionsTableModel;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -18,6 +19,8 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.Logger;
 
 import controller.Controller;
 import qora.account.Account;
@@ -36,6 +39,8 @@ public class BuyNameFrame extends JFrame
 	private JButton buyButton;
 	
 	private NameSale nameSale;
+
+	static Logger LOGGER = Logger.getLogger(BuyNameFrame.class.getName());
 	
 	public BuyNameFrame(NameSale nameSale)
 	{
@@ -95,7 +100,7 @@ public class BuyNameFrame extends JFrame
 		
 		//LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -107,7 +112,7 @@ public class BuyNameFrame extends JFrame
         
         //LABEL BUYER
       	labelGBC.gridy = 2;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Buyer:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Buyer") + ":");
       	this.add(ownerLabel, labelGBC);
       		
       	//CBX BUYER
@@ -117,7 +122,7 @@ public class BuyNameFrame extends JFrame
         
       	//LABEL PRICE
       	labelGBC.gridy = 3;
-      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price:"));
+      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
       	this.add(priceLabel, labelGBC);
       	
       	//TXT PRICE
@@ -129,7 +134,7 @@ public class BuyNameFrame extends JFrame
       	
         //LABEL FEE
       	labelGBC.gridy = 4;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -262,7 +267,7 @@ public class BuyNameFrame extends JFrame
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}

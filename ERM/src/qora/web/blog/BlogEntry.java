@@ -10,11 +10,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
 import qora.naming.Name;
+import qora.wallet.Wallet;
 import qora.web.Profile;
 import utils.BlogUtils;
 import utils.DateTimeFormat;
@@ -58,6 +60,8 @@ public class BlogEntry {
 	 */
 	private String shareAuthorOpt = null;
 	private List<String> hashTags;
+
+	static Logger LOGGER = Logger.getLogger(BlogEntry.class.getName());
 
 	public BlogEntry(String titleOpt, String description, String nameOpt,
 			long timeOpt, String creator, String signature, String blogname) {
@@ -139,7 +143,7 @@ public class BlogEntry {
 					StandardCharsets.UTF_8);
 			return template.replace("{{url}}", url);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return "";
 		}
 	}

@@ -103,7 +103,7 @@ public class SettingsBasicPanel extends JPanel
         gbc_chckbxRpcEnabled.gridy = 2;
         add(chckbxRpcEnabled, gbc_chckbxRpcEnabled);
         
-        JLabel lblRpcPort = new JLabel(Lang.getInstance().translate("RPC port:"));
+        JLabel lblRpcPort = new JLabel(Lang.getInstance().translate("RPC port") + ":");
         GridBagConstraints gbc_lblRpcPort = new GridBagConstraints();
         gbc_lblRpcPort.anchor = GridBagConstraints.EAST;
         gbc_lblRpcPort.insets = new Insets(0, 0, 5, 5);
@@ -145,7 +145,7 @@ public class SettingsBasicPanel extends JPanel
         gbc_chckbxWebEnabled.gridy = 4;
         add(chckbxWebEnabled, gbc_chckbxWebEnabled);
         
-        JLabel lblWebPort = new JLabel(Lang.getInstance().translate("WEB port:"));
+        JLabel lblWebPort = new JLabel(Lang.getInstance().translate("WEB port") + ":");
         GridBagConstraints gbc_lblWebPort = new GridBagConstraints();
         gbc_lblWebPort.anchor = GridBagConstraints.EAST;
         gbc_lblWebPort.insets = new Insets(0, 0, 5, 5);
@@ -198,7 +198,7 @@ public class SettingsBasicPanel extends JPanel
         gbc_lblAnExplanatoryText_3.gridy = 7;
         add(lblKeyCachingExplanatoryText, gbc_lblAnExplanatoryText_3);
         
-        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("Data dir:"));
+        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("Data dir") + ":");
         GridBagConstraints gbc_lblDataDir = new GridBagConstraints();
         gbc_lblDataDir.anchor = GridBagConstraints.WEST;
         gbc_lblDataDir.insets = new Insets(0, 0, 5, 5);
@@ -237,7 +237,7 @@ public class SettingsBasicPanel extends JPanel
         });
         add(btnBrowseDataFolder, gbc_btnBrowseDataFolder);
         
-        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("Wallet dir:"));
+        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("Wallet dir") + ":");
         GridBagConstraints gbc_lblWelletDir = new GridBagConstraints();
         gbc_lblWelletDir.anchor = GridBagConstraints.WEST;
         gbc_lblWelletDir.insets = new Insets(0, 0, 5, 5);
@@ -288,7 +288,7 @@ public class SettingsBasicPanel extends JPanel
         gbc_lblNewLabel_1.gridy = 10;
         add(lblAnExplanatoryText_4, gbc_lblNewLabel_1);
         
-        JLabel lblMinConnections = new JLabel(Lang.getInstance().translate("Min connections:"));
+        JLabel lblMinConnections = new JLabel(Lang.getInstance().translate("Min connections") + ":");
         GridBagConstraints gbc_lblMinConnections = new GridBagConstraints();
         gbc_lblMinConnections.anchor = GridBagConstraints.EAST;
         gbc_lblMinConnections.insets = new Insets(0, 0, 5, 5);
@@ -308,7 +308,7 @@ public class SettingsBasicPanel extends JPanel
         gbc_textMinConnections.gridy = 11;
         add(textMinConnections, gbc_textMinConnections);
         
-        JLabel lblMaxConnections = new JLabel(Lang.getInstance().translate("Max connections:"));
+        JLabel lblMaxConnections = new JLabel(Lang.getInstance().translate("Max connections") + ":");
         GridBagConstraints gbc_lblMaxConnections = new GridBagConstraints();
         gbc_lblMaxConnections.anchor = GridBagConstraints.EAST;
         gbc_lblMaxConnections.insets = new Insets(0, 0, 5, 5);
@@ -339,7 +339,7 @@ public class SettingsBasicPanel extends JPanel
         add(lbllimitConnections, gbc_lbllimitConnections);
      
         
-        JLabel lblSounds = new JLabel(Lang.getInstance().translate("Sounds:"));
+        JLabel lblSounds = new JLabel(Lang.getInstance().translate("Sounds") + ":");
         lblSounds.setVerticalAlignment(SwingConstants.TOP);
         GridBagConstraints gbc_lblSounds = new GridBagConstraints();
         gbc_lblSounds.fill = GridBagConstraints.BOTH;

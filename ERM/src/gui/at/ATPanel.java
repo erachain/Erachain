@@ -188,7 +188,7 @@ public class ATPanel extends JPanel
 		});
 
 
-		this.add(new JLabel(Lang.getInstance().translate("search:")), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 		this.add(new JScrollPane(atsTable), tableGBC);
 

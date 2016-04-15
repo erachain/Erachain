@@ -123,7 +123,7 @@ public class SettingsAllowedPanel extends JPanel
         webAllowedScrollPane.setPreferredSize(new Dimension( 490, 180 ));
         this.add(webAllowedScrollPane, gbc_webAllowedScrollPane);
          
-	     JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address:"));
+	     JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
 	     GridBagConstraints gbc_lblAddNewAddress = new GridBagConstraints();
 	     gbc_lblAddNewAddress.anchor = GridBagConstraints.NORTHEAST;
 	     gbc_lblAddNewAddress.insets = new Insets(4, 0, 5, 5);
@@ -222,7 +222,7 @@ public class SettingsAllowedPanel extends JPanel
 		rpcScrollPane.setPreferredSize(new Dimension( 520, 180 ));
         this.add(rpcScrollPane, gbc_rpcAllowedTable);
 		
-		JLabel labelRpcAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address:"));
+		JLabel labelRpcAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
 		GridBagConstraints gbc_labelRpcAddNewAddress = new GridBagConstraints();
 		gbc_labelRpcAddNewAddress.anchor = GridBagConstraints.EAST;
 		gbc_labelRpcAddNewAddress.insets = new Insets(4, 0, 0, 5);

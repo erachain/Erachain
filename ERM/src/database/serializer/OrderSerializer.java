@@ -5,13 +5,15 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.assets.Order;
+import qora.item.assets.Order;
 
 public class OrderSerializer implements Serializer<Order>, Serializable
 {
 	private static final long serialVersionUID = -6538913048331349777L;
+	static Logger LOGGER = Logger.getLogger(OrderSerializer.class.getName());
 
 	@Override
 	public void serialize(DataOutput out, Order value) throws IOException 
@@ -32,7 +34,7 @@ public class OrderSerializer implements Serializer<Order>, Serializable
 		} 
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	LOGGER.error(e.getMessage(),e);
 		}
 		return null;
     }

@@ -1,5 +1,5 @@
 package api;
-
+// 30/03
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -97,6 +97,11 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET peers/preset",
+				"Returns an array of all preset peers. From settings.json, peers.json, Internet, -peers=<address[,...]>",
+				""
+			},
+			{
 				"DELETE peers/known",
 				"Forget all known peers with all statistics.",
 				""
@@ -129,6 +134,11 @@ public class ApiClient {
 			{
 				"GET transactions/network", 
 				"Returns an array of all the unconfirmed transactions known to the client.",
+				""
+			},
+			{
+				"GET transactions/unconfirmedof/<address>", 
+				"Returns an array of all the unconfirmed transactions of address known to the client.",
 				""
 			},
 			{
@@ -348,8 +358,13 @@ public class ApiClient {
 			},
 			{
 				"GET names/address/<address>", 
-				"Returns an array of all the names owned by a specific address in your wallet.",
-				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
+				"Returns an array of all the names owned by a specific address.",
+				"Errors: 102 - Invalid address."
+			},
+			{
+				"GET names/address/<address>/values", 
+				"Returns an array of all the names with values owned by a specific address.",
+				"Errors: 102 - Invalid address."
 			},
 			{
 				"GET names/<name>", 

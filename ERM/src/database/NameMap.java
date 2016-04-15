@@ -5,10 +5,9 @@ import java.util.Map;
 
 import org.mapdb.DB;
 
-import qora.naming.Name;
-
-import database.DBSet;
+//import database.DBSet;
 import database.serializer.NameSerializer;
+import qora.naming.Name;
 
 public class NameMap extends DBMap<String, Name> 
 {

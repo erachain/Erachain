@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -123,7 +124,7 @@ public class SellNameTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -156,7 +157,7 @@ public class SellNameTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		return BASE_LENGTH + this.nameSale.getDataLength();
 	}
@@ -164,7 +165,7 @@ public class SellNameTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -227,10 +228,10 @@ public class SellNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db);
+		super.process(db, asPack);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
@@ -240,10 +241,10 @@ public class SellNameTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
+		super.orphan(db, asPack);
 										
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.reference, db);
@@ -254,11 +255,16 @@ public class SellNameTransaction extends Transaction
 	}
 
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<Account>();
 		accounts.add(this.creator);
 		return accounts;
+	}
+
+	@Override
+	public HashSet<Account> getRecipientAccounts() {
+		return new HashSet<Account>();
 	}
 
 	@Override
@@ -290,7 +296,7 @@ public class SellNameTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {

@@ -18,7 +18,7 @@ import org.json.simple.JSONValue;
 
 import controller.Controller;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.payment.Payment;
@@ -56,7 +56,7 @@ public class ArbitraryTransactionsResource
 				lgAsset = ((Long) jsonObject.get("asset")).intValue();
 			}
 			
-			Asset defaultAsset;
+			AssetCls defaultAsset;
 
 			try {
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));

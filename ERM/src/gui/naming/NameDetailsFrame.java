@@ -59,7 +59,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL REGISTRANT
 		labelGBC.gridy = 1;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(registrantLabel, labelGBC);
 		
 		//REGISTRANT
@@ -71,7 +71,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 2;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -83,7 +83,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL VALUE
 		labelGBC.gridy = 3;
-		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
 		this.add(valueLabel, labelGBC);
 		           
 		//VALUE

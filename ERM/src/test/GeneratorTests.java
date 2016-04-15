@@ -38,7 +38,7 @@ public class GeneratorTests {
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		transaction.process(databaseSet, false);
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -83,7 +83,7 @@ public class GeneratorTests {
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		transaction.process(databaseSet, false);
 				
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
@@ -98,10 +98,10 @@ public class GeneratorTests {
 				
 			//CREATE VALID PAYMENT
 			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
-			payment.sign(generator);
+			payment.sign(generator, false);
 		
 			//PROCESS IN DB
-			payment.process(snapshot);
+			payment.process(snapshot, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
 			blockGenerator.addUnconfirmedTransaction(databaseSet, payment, false);
@@ -131,7 +131,7 @@ public class GeneratorTests {
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		transaction.process(databaseSet, false);
 				
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
@@ -146,10 +146,10 @@ public class GeneratorTests {
 				
 			//CREATE VALID PAYMENT
 			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
-			payment.sign(generator);
+			payment.sign(generator, false);
 		
 			//PROCESS IN DB
-			payment.process(snapshot);
+			payment.process(snapshot, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
 			blockGenerator.addUnconfirmedTransaction(databaseSet, payment, false);

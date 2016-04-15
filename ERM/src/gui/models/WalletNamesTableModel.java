@@ -15,7 +15,7 @@ import database.wallet.NameMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletNamesTableModel extends QoraTableModel<Tuple2<String, String>, Name> implements Observer
+public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>, Name> implements Observer
 {
 	public static final int COLUMN_NAME = 0;
 	public static final int COLUMN_ADDRESS = 1;

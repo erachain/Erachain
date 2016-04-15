@@ -13,7 +13,7 @@ import database.wallet.PollMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletPollsTableModel extends QoraTableModel<Tuple2<String, String>, Poll> implements Observer
+public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>, Poll> implements Observer
 {
 	public static final int COLUMN_NAME = 0;
 	public static final int COLUMN_ADDRESS = 1;

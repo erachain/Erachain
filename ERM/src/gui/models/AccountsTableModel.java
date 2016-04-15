@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 
 import qora.transaction.Transaction;
 import qora.account.Account;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
@@ -27,7 +27,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", "OILs"});
 	private List<Account> accounts;
-	private Asset asset = null;
+	private AssetCls asset = null;
 	
 	public AccountsTableModel()
 	{
@@ -41,7 +41,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		return accounts.get(row);
 	}
 	
-	public void setAsset(Asset asset) 
+	public void setAsset(AssetCls asset) 
 	{
 		this.asset = asset;
 		this.fireTableDataChanged();

@@ -1,5 +1,6 @@
 package qora.crypto;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -8,9 +9,13 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
+import qora.BlockGenerator;
+
 public class AEScrypto {
 	
 	private static byte[] ivconst = new byte[]{6,4,3,8,1,2,1,2,7,2,3,8,5,7,1,1};
+
+	static Logger LOGGER = Logger.getLogger(AEScrypto.class.getName());
 
 	public static byte[] dataEncrypt(byte[] data, byte[] myPrivateKey, byte[] theirPublicKey)
 	{
@@ -23,7 +28,7 @@ public class AEScrypto {
 			encryptdata = aesEncrypt(data, password, ivconst);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		byte[] encryptdataandver = new byte[encryptdata.length + 1];
@@ -48,7 +53,7 @@ public class AEScrypto {
 			decryptdata = aesDecrypt(encryptdata2, password, ivconst);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			//LOGGER.error(e.getMessage(),e);
 		}
 		
 		

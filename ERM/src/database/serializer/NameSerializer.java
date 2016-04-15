@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
 import qora.naming.Name;
@@ -12,6 +13,7 @@ import qora.naming.Name;
 public class NameSerializer implements Serializer<Name>, Serializable
 {
 	private static final long serialVersionUID = -6538913048331349777L;
+	static Logger LOGGER = Logger.getLogger(NameSerializer.class.getName());
 
 	@Override
 	public void serialize(DataOutput out, Name value) throws IOException 
@@ -32,7 +34,7 @@ public class NameSerializer implements Serializer<Name>, Serializable
 		} 
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	LOGGER.error(e.getMessage(),e);
 		}
 		return null;
     }

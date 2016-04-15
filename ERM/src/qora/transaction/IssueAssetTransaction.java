@@ -5,10 +5,11 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import ntp.NTP;
 
@@ -18,8 +19,8 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Asset;
-import qora.assets.AssetFactory;
+import qora.item.assets.AssetCls;
+import qora.item.assets.AssetFactory;
 import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
@@ -34,26 +35,37 @@ public class IssueAssetTransaction extends Transaction
 	private static final byte TYPE_ID = (byte)ISSUE_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Issue Asset";
 
-	private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
+	//private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-	private Asset asset;
+	private AssetCls asset;
 	
-	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 		this.asset = asset;
 	}
-	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(typeBytes, creator, asset, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	// as pack
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte[] reference, byte[] signature) 
+	{
+		this(typeBytes, creator, asset, (byte)0, 0l, reference);
+		this.signature = signature;
+	}
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference, signature);
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, Asset asset, byte feePow, long timestamp, byte[] reference) 
+	// as pack
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte[] reference, byte[] signature) 
+	{
+		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, (byte)0, 0l, reference, signature);
+	}
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference);
 	}
@@ -61,63 +73,20 @@ public class IssueAssetTransaction extends Transaction
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Asset"; }
 
-	public Asset getAsset()
+	public AssetCls getAsset()
 	{
 		return this.asset;
 	}
 	
 	
 	//@Override
-	public void sign(PrivateKeyAccount creator)
+	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
-		super.sign(creator);
+		super.sign(creator, asPack);
 		this.asset.setReference(this.signature);
 	}
 
 	//PARSE CONVERT
-	
-	public static Transaction Parse(byte[] data) throws Exception
-	{	
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length");
-		}
-		
-
-		// READ TYPE
-		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-		int position = TYPE_LENGTH;
-	
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-		
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
-		
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
-		
-		//READ ASSET
-		// asset parse without reference - if is = signature
-		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
-		position += asset.getDataLength(false);
-		
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-		
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-		
-		return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes);
-	}	
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -136,57 +105,104 @@ public class IssueAssetTransaction extends Transaction
 				
 		return transaction;	
 	}
+
+	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	{	
+		boolean asPack = releaserReference != null;
+		
+		//CHECK IF WE MATCH BLOCK LENGTH
+		if (data.length < BASE_LENGTH_AS_PACK
+				| !asPack & data.length < BASE_LENGTH)
+		{
+			throw new Exception("Data does not match block length " + data.length);
+		}
+		
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
+		long timestamp = 0;
+		if (!asPack) {
+			//READ TIMESTAMP
+			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+			timestamp = Longs.fromByteArray(timestampBytes);	
+			position += TIMESTAMP_LENGTH;
+		}
+
+		byte[] reference;
+		if (!asPack) {
+			//READ REFERENCE
+			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			position += REFERENCE_LENGTH;
+		} else {
+			reference = releaserReference;
+		}
+		
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
+		
+		byte feePow = 0;
+		if (!asPack) {
+			//READ FEE POWER
+			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+			feePow = feePowBytes[0];
+			position += 1;
+		}
+		
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+		position += SIGNATURE_LENGTH;
+
+		/////		
+		
+		//READ ASSET
+		// asset parse without reference - if is = signature
+		AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+		position += asset.getDataLength(false);
+
+		if (!asPack) {
+			return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes);
+		} else {
+			return new IssueAssetTransaction(typeBytes, creator, asset, reference, signatureBytes);
+		}
+	}	
 	
-	@Override
-	public byte[] toBytes(boolean withSign) 
+	
+	//@Override
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
+
+		byte[] data = super.toBytes(withSign, releaserReference);
 		
 		//WRITE ASSET
 		// without reference
 		data = Bytes.concat(data, this.asset.toBytes(false));
-		
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
-		
+				
 		return data;
 	}
 	
 	@Override
-	public int getDataLength()
+	public int getDataLength(boolean asPack)
 	{
 		// not include asset reference
-		return BASE_LENGTH + this.asset.getDataLength(false);
+		if (asPack) {
+			return BASE_LENGTH_AS_PACK + this.asset.getDataLength(false);
+		} else {
+			return BASE_LENGTH + this.asset.getDataLength(false);
+		}
 	}
 	
 	//VALIDATE
 		
-	@Override
-	public int isValid(DBSet db) 
+	//@Override
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > 256 || nameLength < 1)
+		if(nameLength > AssetCls.MAX_NAME_LENGTH || nameLength < 1)
 		{
 			return INVALID_NAME_LENGTH;
 		}
@@ -205,37 +221,18 @@ public class IssueAssetTransaction extends Transaction
 			return INVALID_QUANTITY;
 		}
 		
-		//CHECK CREATOR
-		if(!Crypto.getInstance().isValidAddress(this.asset.getCreator().getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+		return super.isValid(db, releaserReference);
+
 	}
 	
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db);
+		super.process(db, asPack);
 								
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
 		this.asset.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
@@ -249,19 +246,15 @@ public class IssueAssetTransaction extends Transaction
 		//SET ORPHAN DATA
 		db.getIssueAssetMap().set(this.signature, key);
 
-		//Logger.getGlobal().info("issue ASSET KEY: " + asset.getKey(db));
+		//LOGGER.info("issue ASSET KEY: " + asset.getKey(db));
 
 	}
 
-
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-										
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		super.orphan(db, asPack);
 				
 		//DELETE FROM DATABASE
 		long key = db.getIssueAssetMap().get(this);
@@ -277,23 +270,25 @@ public class IssueAssetTransaction extends Transaction
 
 
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts() 
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		return this.getRecipientAccounts();
+	}
+	
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
-		//accounts.add(this.asset.getCreator());
 		return accounts;
 	}
-
 
 	@Override
 	public boolean isInvolved(Account account) 
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.creator.getAddress())
-				//|| address.equals(this.asset.getCreator().getAddress())
-				)
+		if(address.equals(this.creator.getAddress()))
 		{
 			return true;
 		}
@@ -320,7 +315,7 @@ public class IssueAssetTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 		
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), this.asset.getKey(), new BigDecimal(this.asset.getQuantity()).setScale(8));
 

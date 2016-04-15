@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
 import at.AT;
@@ -12,6 +13,7 @@ import at.AT;
 public class ATSerializer implements Serializer<AT>, Serializable
 {
 	private static final long serialVersionUID = -6538913048331349777L;
+	static Logger LOGGER = Logger.getLogger(ATSerializer.class.getName());
 
 	@Override
 	public void serialize(DataOutput out, AT value) throws IOException 
@@ -32,7 +34,7 @@ public class ATSerializer implements Serializer<AT>, Serializable
 		} 
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	LOGGER.error(e.getMessage(),e);
 		}
 		return null;
     }

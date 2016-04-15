@@ -22,7 +22,7 @@ import database.DBSet;
 import gui.Gui;
 import gui.models.PollOptionsTableModel;
 import lang.Lang;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.Transaction;
 import qora.voting.Poll;
@@ -35,10 +35,10 @@ public class PollDetailsPanel extends JPanel
 	private Poll poll;
 	private JTable table;
 	private PollOptionsTableModel pollOptionsTableModel;
-	private Asset asset;
+	private AssetCls asset;
 	
 	@SuppressWarnings("unchecked")
-	public PollDetailsPanel(Poll poll, Asset asset)
+	public PollDetailsPanel(Poll poll, AssetCls asset)
 	{
 		this.poll = poll;
 		this.asset = asset;
@@ -68,7 +68,7 @@ public class PollDetailsPanel extends JPanel
 		
 		//LABEL CREATOR
 		labelGBC.gridy = 1;
-		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator:"));
+		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(creatorLabel, labelGBC);
 		
 		//CREATOR
@@ -79,7 +79,7 @@ public class PollDetailsPanel extends JPanel
 		
 		//LABEL NAME
 		labelGBC.gridy = 2;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -90,7 +90,7 @@ public class PollDetailsPanel extends JPanel
 		
 		//LABEL DATE
 		labelGBC.gridy = 3;
-		JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date:"));
+		JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date") + ":");
 		this.add(dateLabel, labelGBC);
 		
 		String dateTime = "";
@@ -113,7 +113,7 @@ public class PollDetailsPanel extends JPanel
 
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 4;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
@@ -126,7 +126,7 @@ public class PollDetailsPanel extends JPanel
 		
 		//LABEL OPTIONS
 		labelGBC.gridy = 5;
-		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options:"));
+		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
 		this.add(optionsLabel, labelGBC);
 		
 		//OPTIONS
@@ -169,7 +169,7 @@ public class PollDetailsPanel extends JPanel
 		new VoteFrame(this.poll, row, asset);
 	}
 	
-	public void setAsset(Asset asset)
+	public void setAsset(AssetCls asset)
 	{
 		this.asset = asset;
 		pollOptionsTableModel.setAsset(asset);

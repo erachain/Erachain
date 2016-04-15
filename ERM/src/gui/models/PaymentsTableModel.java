@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 import controller.Controller;
 import lang.Lang;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.payment.Payment;
 import utils.NumberAsString;
 
@@ -61,7 +61,7 @@ public class PaymentsTableModel extends AbstractTableModel
 		
 		case COLUMN_ASSET:
 			
-			Asset asset = Controller.getInstance().getAsset(payment.getAsset());
+			AssetCls asset = Controller.getInstance().getAsset(payment.getAsset());
 			return asset.toString();
 			
 		case COLUMN_AMOUNT:

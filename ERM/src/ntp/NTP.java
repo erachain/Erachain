@@ -1,12 +1,13 @@
 package ntp;
 
 import java.net.InetAddress;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
 import lang.Lang;
+import network.message.MessageFactory;
 
 public final class NTP
 {
@@ -16,6 +17,8 @@ public final class NTP
 	private static long lastUpdate = 0;
 	private static long offset = 0;
    
+	static Logger LOGGER = Logger.getLogger(NTP.class.getName());
+
 	public static long getTime()
 	{
 		//CHECK IF OFFSET NEEDS TO BE UPDATED
@@ -25,7 +28,7 @@ public final class NTP
 			lastUpdate = System.currentTimeMillis();
 			
 			//LOG OFFSET
-			Logger.getGlobal().info(Lang.getInstance().translate("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
+			LOGGER.info(Lang.getInstance().translate("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
 		}
 	   
 		//CALCULATE CORRECTED TIME

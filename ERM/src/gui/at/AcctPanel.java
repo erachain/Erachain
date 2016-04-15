@@ -107,7 +107,7 @@ public class AcctPanel extends JPanel
 
 
 		//CREATE SEARCH LABEL
-		this.add(new JLabel(Lang.getInstance().translate("search:")), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		
 		//CREATE SEARCH FIELD
 		final JTextField txtSearch = new JTextField();

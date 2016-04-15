@@ -2,16 +2,21 @@ package qora.transaction;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+
 //import database.BalanceMap;
 import database.DBSet;
 import qora.account.Account;
 import qora.account.PublicKeyAccount;
+import qora.crypto.Base58;
 //import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
@@ -20,6 +25,7 @@ public abstract class TransactionAmount extends Transaction {
 	protected static final int AMOUNT_LENGTH = 8;
 	protected static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
+	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
 	protected Account recipient;
 	protected BigDecimal amount;
@@ -93,6 +99,30 @@ public abstract class TransactionAmount extends Transaction {
 		return amount;
 	}
 	
+	//PARSE/CONVERT
+	//@Override
+	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	{
+		
+		byte[] data = super.toBytes(withSign, releaserReference);
+				
+		//WRITE RECIPIENT
+		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+		
+		//WRITE KEY
+		byte[] keyBytes = Longs.toByteArray(this.key);
+		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+		data = Bytes.concat(data, keyBytes);
+		
+		//WRITE AMOUNT
+		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+		amountBytes = Bytes.concat(fill, amountBytes);
+		data = Bytes.concat(data, amountBytes);
+				
+		return data;
+	}
+
 	@SuppressWarnings("unchecked")
 	protected JSONObject getJsonBase()
 	{
@@ -106,12 +136,24 @@ public abstract class TransactionAmount extends Transaction {
 	}
 	
 	@Override
-	public List<Account> getInvolvedAccounts() {
-		return Arrays.asList(this.creator, this.recipient);
+	public HashSet<Account> getInvolvedAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<Account>();
+		accounts.add(this.creator);
+		accounts.addAll(this.getRecipientAccounts());
+		return accounts;
 	}
 
 	@Override
-	public boolean isInvolved(Account account) {
+	public HashSet<Account> getRecipientAccounts() {
+		HashSet<Account> accounts = new HashSet<Account>();
+		accounts.add(this.recipient);
+		return accounts;
+	}
+	
+	@Override
+	public boolean isInvolved(Account account) 
+	{
 		String address = account.getAddress();
 		
 		if(address.equals(creator.getAddress()) || address.equals(recipient.getAddress()))
@@ -122,7 +164,8 @@ public abstract class TransactionAmount extends Transaction {
 		return false;
 	}
 
-	public int isValid(DBSet db) {
+	@Override // - fee + balance - calculate here
+	public int isValid(DBSet db, byte[] releaserReference) {
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
@@ -131,7 +174,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
+		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
@@ -194,48 +237,49 @@ public abstract class TransactionAmount extends Transaction {
 		return VALIDATE_OK;
 	}		
 
-	public void process(DBSet db) {
+	public void process(DBSet db, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db);
+		super.process(db, asPack);
 
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.signature, db);
+		if (!asPack) {
 
-		//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
-		if(this.key == FEE_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
+			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
+			if(this.key == FEE_KEY)
 			{
-				this.recipient.setLastReference(this.signature, db);
+				if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
+				{
+					this.recipient.setLastReference(this.signature, db);
+				}
 			}
 		}
+
 	}
 
-	public void orphan(DBSet db) {
+	public void orphan(DBSet db, boolean asPack) {
 		//UPDATE SENDER
-		super.orphan(db);
+		super.orphan(db, asPack);
 		
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 		
-		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.reference, db);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		if(this.key == FEE_KEY)
-		{
-			if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
+		if (!asPack) {
+			
+			//UPDATE REFERENCE OF RECIPIENT
+			if(this.key == FEE_KEY)
 			{
-				this.recipient.removeReference(db);
-			}	
+				if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
+				{
+					this.recipient.removeReference(db);
+				}	
+			}
 		}
 	}
 

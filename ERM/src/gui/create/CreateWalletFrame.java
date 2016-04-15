@@ -80,7 +80,7 @@ public class CreateWalletFrame extends JFrame {
 		
 		//LABEL
 		labelGBC.gridy = 0;
-		JLabel label1 = new JLabel(Lang.getInstance().translate("Your wallet generation seed:"));	
+		JLabel label1 = new JLabel(Lang.getInstance().translate("Your wallet generation seed") + ":");	
 		this.add(label1, labelGBC);
 		
 		//ADD TEXTBOX

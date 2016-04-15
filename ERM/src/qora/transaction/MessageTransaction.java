@@ -34,6 +34,7 @@ public class MessageTransaction extends TransactionAmount {
 	protected byte[] encrypted;
 	protected byte[] isText;
 	
+	protected static final int BASE_LENGTH_AS_PACK = TransactionAmount.BASE_LENGTH_AS_PACK + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 	protected static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH + IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
 	public MessageTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
@@ -49,8 +50,17 @@ public class MessageTransaction extends TransactionAmount {
 		this.signature = signature;
 		this.calcFee();
 	}
+	// as pack
+	public MessageTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, byte[] reference, byte[] signature) {
+		this(typeBytes, creator, (byte)0, recipient, key, amount, data, isText, encrypted, 0l, reference);
+		this.signature = signature;
+	}
 	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+	}
+	// as pack
+	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, recipient, key, amount, data, isText, encrypted, 0l, reference);
 	}
 	
 	//GETTERS/SETTERS
@@ -100,38 +110,63 @@ public class MessageTransaction extends TransactionAmount {
 		
 		return transaction;	
 	}
+
+	//PARSE/CONVERT
 	
-	public static Transaction Parse(byte[] data) throws Exception
-	{
-		if (data.length < BASE_LENGTH)
+	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception{
+
+		boolean asPack = releaserReference != null;
+
+		//CHECK IF WE MATCH BLOCK LENGTH
+		if (data.length < BASE_LENGTH_AS_PACK
+				| !asPack & data.length < BASE_LENGTH)
 		{
-			throw new Exception("Data does not match block length");
+			throw new Exception("Data does not match block length " + data.length);
 		}
-
-
+		
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
+		long timestamp = 0;
+		if (!asPack) {
+			//READ TIMESTAMP
+			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+			timestamp = Longs.fromByteArray(timestampBytes);	
+			position += TIMESTAMP_LENGTH;
+		}
 
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
-
+		byte[] reference;
+		if (!asPack) {
+			//READ REFERENCE
+			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			position += REFERENCE_LENGTH;
+		} else {
+			reference = releaserReference;
+		}
+		
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
+		
+		byte feePow = 0;
+		if (!asPack) {
+			//READ FEE POWER
+			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+			feePow = feePowBytes[0];
+			position += 1;
+		}
+		
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+		position += SIGNATURE_LENGTH;
 
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;
-
+		
 		//READ KEY
 		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
 		long key = Longs.fromByteArray(keyBytes);	
@@ -141,7 +176,7 @@ public class MessageTransaction extends TransactionAmount {
 		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
-
+				
 		//READ DATA SIZE
 		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
 		int dataSize = Ints.fromByteArray(dataSizeBytes);	
@@ -157,50 +192,18 @@ public class MessageTransaction extends TransactionAmount {
 		byte[] isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 		position += IS_TEXT_LENGTH;
 		
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-
-		return new MessageTransaction(typeBytes, creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		if (!asPack) {
+			return new MessageTransaction(typeBytes, creator, feePow, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+		} else {
+			return new MessageTransaction(typeBytes, creator, recipient, key, amount, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
+		}
 
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) {
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
 
-		byte[] data = new byte[0];
-
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
-
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-
-		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-
-		//WRITE KEY
-		byte[] keyBytes = Longs.toByteArray(this.key);
-		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
-		data = Bytes.concat(data, keyBytes);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		byte[] data = super.toBytes(withSign, releaserReference);
 
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
@@ -215,35 +218,28 @@ public class MessageTransaction extends TransactionAmount {
 		//WRITE ISTEXT
 		data = Bytes.concat(data, this.isText);
 
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
-
 		return data;	
 	}
 
 	@Override
-	public int getDataLength() {
-		return BASE_LENGTH + this.data.length;
+	public int getDataLength(boolean asPack) {
+		if (asPack) {
+			return BASE_LENGTH_AS_PACK + this.data.length;
+		} else {
+			return BASE_LENGTH + this.data.length;
+		}
 	}
 
 	//@Override
-	public int isValid(DBSet db) {
+	public int isValid(DBSet db, byte[] releaserReference) {
 		
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}
-	
-		int res = super.isValid(db);
-		if (res > 0) return res;
-		
-		return VALIDATE_OK;
+			
+		return super.isValid(db, releaserReference);
 	}
 
 }

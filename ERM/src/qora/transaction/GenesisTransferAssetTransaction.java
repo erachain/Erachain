@@ -3,6 +3,7 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
-		byte[] data = this.toBytes( false );
+		byte[] data = this.toBytes( false, null );
 
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
@@ -144,7 +145,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	}	
 	
 	@Override
-	public byte[] toBytes(boolean withSign)
+	public byte[] toBytes(boolean withSign, byte[] releaserReference)
 	{
 		//byte[] data = new byte[0];
 		
@@ -185,7 +186,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		return BASE_LENGTH;
 	}
@@ -201,7 +202,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	}
 
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -234,7 +235,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
@@ -249,7 +250,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	}
 
 	@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
@@ -266,9 +267,19 @@ public class GenesisTransferAssetTransaction extends Transaction {
 	//REST
 	
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		return Arrays.asList(this.creator, this.recipient);
+		HashSet<Account> accounts = new HashSet<Account>();
+		accounts.add(this.creator);
+		accounts.addAll(this.getRecipientAccounts());
+		return accounts;
+	}
+
+	@Override
+	public HashSet<Account> getRecipientAccounts() {
+		HashSet<Account> accounts = new HashSet<Account>();
+		accounts.add(this.recipient);
+		return accounts;
 	}
 	
 	@Override
@@ -291,7 +302,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		String address = account.getAddress();
 		
 		//IF QORA ASSET
-		if(this.key == BalanceMap.QORA_KEY)
+		if(this.key == BalanceMap.FEE_KEY)
 		{
 			//IF CREATOR
 			if(address.equals(this.creator.getAddress()))

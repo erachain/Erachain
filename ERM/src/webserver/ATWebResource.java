@@ -1,5 +1,5 @@
 package webserver;
-
+// 30/03
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class ATWebResource {
 		Collection<String> ats = DBSet.getInstance().getATMap().getTypeATsList(type);
 		for (String at : ats)
 		{
-			String[] tags = DBSet.getInstance().getATMap().get(at).getTags().split(",");;
+			String[] tags = DBSet.getInstance().getATMap().get(at).getTags().split(",");
 			
 			for (String tag : tags)
 			{

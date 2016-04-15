@@ -1,5 +1,5 @@
 package controller;
-// upd 09/03
+// 04/01 +- 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.TrayIcon.MessageType;
@@ -27,7 +27,8 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+// import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
@@ -43,6 +44,7 @@ import api.ApiClient;
 import api.ApiService;
 import at.AT;
 import database.DBSet;
+import database.Item_Map;
 import database.LocalDataMap;
 import database.SortableList;
 import gui.Gui;
@@ -65,9 +67,11 @@ import qora.Synchronizer;
 import qora.TransactionCreator;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.assets.Order;
-import qora.assets.Trade;
+import qora.item.ItemCls;
+import qora.item.assets.AssetCls;
+import qora.item.notes.NoteCls;
+import qora.item.assets.Order;
+import qora.item.assets.Trade;
 import qora.block.Block;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
@@ -89,6 +93,7 @@ import webserver.WebService;
 
 public class Controller extends Observable {
 
+	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 	private String version = "0.26.0 beta";
 	private String buildTime = "2016-03-10 00:00:00 UTC";
 	private long buildTimestamp;
@@ -162,7 +167,7 @@ public class Controller extends Observable {
 		        	try {
 						date = (Date)formatter.parse(this.buildTime);
 					} catch (ParseException e) {
-						e.printStackTrace();
+						LOGGER.error(e.getMessage(),e);
 					}
 		        }
 		    }
@@ -186,7 +191,7 @@ public class Controller extends Observable {
 	
 	public void statusInfo()
 	{
-		Logger.getGlobal().info(
+		LOGGER.info(
 			"STATUS OK\n" 
 			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock().getSignature()) + "\n"
 			+ "| Last Block Height: " + this.blockChain.getLastBlock().getHeight() + "\n"
@@ -287,7 +292,7 @@ public class Controller extends Observable {
 		// CHECK WEB PORT AVAILABLE
 		if (Settings.getInstance().isWebEnabled()) {
 			if (!Network.isPortAvailable(Settings.getInstance().getWebPort())) {	
-				System.out.println(Lang.getInstance().translate("Web port %port% already in use!").
+				LOGGER.error(Lang.getInstance().translate("Web port %port% already in use!").
 						replace("%port%", String.valueOf(Settings.getInstance().getWebPort())));
 			}
 		}
@@ -311,8 +316,8 @@ public class Controller extends Observable {
 		try {
 			DBSet.getInstance();
 		} catch (Throwable e) {
-			e.printStackTrace();
-			System.out.println(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
+			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
 			reCreateDB();
 		}
 
@@ -322,7 +327,7 @@ public class Controller extends Observable {
 			try {
 				DBSet.getInstance().close();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 			}
 			reCreateDB();
 		}
@@ -339,11 +344,12 @@ public class Controller extends Observable {
 				DBSet.getInstance().getLocalDataMap().set("nsupdate", "1");
 			}
 			//CREATE TRANSACTIONS FINAL MAP
-			if (DBSet.getInstance().getLocalDataMap().get("txfinalmap") == null )
+			if (DBSet.getInstance().getLocalDataMap().get("txfinalmap") == null
+					|| !DBSet.getInstance().getLocalDataMap().get("txfinalmap").equals("2"))
 			{
 				//FIRST NAME STORAGE UPDATE
 				UpdateUtil.repopulateTransactionFinalMap(  );
-				DBSet.getInstance().getLocalDataMap().set("txfinalmap", "1");
+				DBSet.getInstance().getLocalDataMap().set("txfinalmap", "2");
 			}
 			
 			if (DBSet.getInstance().getLocalDataMap().get("blogpostmap") == null ||  !DBSet.getInstance().getLocalDataMap().get("blogpostmap").equals("2"))
@@ -354,7 +360,7 @@ public class Controller extends Observable {
 			}
 		} else {
 			DBSet.getInstance().getLocalDataMap().set("nsupdate", "1");
-			DBSet.getInstance().getLocalDataMap().set("txfinalmap", "1");
+			DBSet.getInstance().getLocalDataMap().set("txfinalmap", "2");
 			DBSet.getInstance().getLocalDataMap().set("blogpostmap", "2");
 		}
 		
@@ -380,7 +386,7 @@ public class Controller extends Observable {
 		this.wallet = new Wallet();
 
 	    if(this.wallet.isWalletDatabaseExisting()){
-	    	this.wallet.initiateAssetsFavorites();
+	    	this.wallet.initiateItemsFavorites();
 	    }
 	    
 		if(Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting() && this.wallet.getAccounts().size() > 0) {
@@ -438,6 +444,16 @@ public class Controller extends Observable {
 			this.wallet.replaseAssetFavorite();
 		}
 	}
+	public void replaseNotesFavorites() {
+		if(this.wallet != null) {
+			this.wallet.replaseNoteFavorite();
+		}
+	}
+	public void replaseFavoriteItems(int type) {
+		if(this.wallet != null) {
+			this.wallet.replaseFavoriteItems(type);
+		}
+	}
 	
 	public void reCreateDB() throws IOException, Exception {
 		reCreateDB(true);
@@ -454,11 +470,11 @@ public class Controller extends Observable {
 			if (useDataBak && dataBak.exists()
 					&& Settings.getInstance().isCheckpointingEnabled()) {
 				FileUtils.copyDirectory(dataBak, dataDir);
-				System.out.println(Lang.getInstance().translate("restoring backup database"));
+				LOGGER.error(Lang.getInstance().translate("restoring backup database"));
 				try {
 					DBSet.reCreateDatabase();
 				} catch (IOError e) {
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(),e);
 					//backupdb is buggy too starting from scratch
 					if(dataDir.exists())
 					{
@@ -561,6 +577,9 @@ public class Controller extends Observable {
 		// ADD OBSERVER TO ASSETS
 		DBSet.getInstance().getAssetMap().addObserver(o);
 
+		// ADD OBSERVER TO NOTES
+		DBSet.getInstance().getNoteMap().addObserver(o);
+
 		// ADD OBSERVER TO ORDERS
 		DBSet.getInstance().getOrderMap().addObserver(o);
 
@@ -601,24 +620,24 @@ public class Controller extends Observable {
 			this.isStopping = true;
 
 			// STOP MESSAGE PROCESSOR
-			Logger.getGlobal().info(Lang.getInstance().translate("Stopping message processor"));
+			LOGGER.info(Lang.getInstance().translate("Stopping message processor"));
 			this.network.stop();
 
 			// STOP BLOCK PROCESSOR
-			Logger.getGlobal().info(Lang.getInstance().translate("Stopping block processor"));
+			LOGGER.info(Lang.getInstance().translate("Stopping block processor"));
 			this.synchronizer.stop();
 
 			// CLOSE DATABABASE
-			Logger.getGlobal().info(Lang.getInstance().translate("Closing database"));
+			LOGGER.info(Lang.getInstance().translate("Closing database"));
 			DBSet.getInstance().close();
 
 			// CLOSE WALLET
-			Logger.getGlobal().info(Lang.getInstance().translate("Closing wallet"));
+			LOGGER.info(Lang.getInstance().translate("Closing wallet"));
 			this.wallet.close();
 
 			createDataCheckpoint();
 
-			Logger.getGlobal().info(Lang.getInstance().translate("Closed."));
+			LOGGER.info(Lang.getInstance().translate("Closed."));
 			// FORCE CLOSE
 			System.exit(0);
 		}
@@ -640,13 +659,13 @@ public class Controller extends Observable {
 								dataBak.toPath(),
 								new SimpleFileVisitorForRecursiveFolderDeletion());
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.error(e.getMessage(),e);
 					}
 				}
 				try {
 					FileUtils.copyDirectory(dataDir, dataBak);
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(),e);
 				}
 
 			}
@@ -874,7 +893,7 @@ public class Controller extends Observable {
 				// CHECK IF VALID
 				if (isNewBlockValid
 						&& this.synchronizer.process(block)) {
-					Logger.getGlobal().info(Lang.getInstance().translate("received new valid block"));
+					LOGGER.info(Lang.getInstance().translate("received new valid block"));
 
 					// PROCESS
 					// this.synchronizer.process(block);
@@ -1020,7 +1039,7 @@ public class Controller extends Observable {
 				this.synchronizer.synchronize(peer);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 
 			if (peer != null) {
 				// DISHONEST PEER
@@ -1104,7 +1123,7 @@ public class Controller extends Observable {
 
 	public boolean doesWalletExists() {
 		// CHECK IF WALLET EXISTS
-		return this.wallet.exists();
+		return this.wallet != null && this.wallet.exists();
 	}
 
 	public boolean doesWalletDatabaseExists() {
@@ -1119,7 +1138,7 @@ public class Controller extends Observable {
 	public boolean recoverWallet(byte[] seed, String password, int amount) {
 		if(this.wallet.create(seed, password, amount, false))
 		{
-			Logger.getGlobal().info(Lang.getInstance().translate("Wallet needs to synchronize!"));
+			LOGGER.info(Lang.getInstance().translate("Wallet needs to synchronize!"));
 			this.actionAfterConnect();
 			this.setNeedSync(true);
 
@@ -1339,25 +1358,70 @@ public class Controller extends Observable {
 		return this.wallet.getPolls(account);
 	}
 
-	public void addAssetFavorite(Asset asset) {
+	/*
+	public void addAssetFavorite(AssetCls asset) {
 		this.wallet.addAssetFavorite(asset);
 	}
-
-	public void removeAssetFavorite(Asset asset) {
-		this.wallet.removeAssetFavorite(asset);
+	*/
+	public void addItemFavorite(ItemCls item) {
+		this.wallet.addItemFavorite(item);
 	}
 
-	public boolean isAssetFavorite(Asset asset) {
+	/*
+	public void removeAssetFavorite(AssetCls asset) {
+		this.wallet.removeAssetFavorite(asset);
+	}
+	public void removeNoteFavorite(NoteCls note) {
+		this.wallet.removeNoteFavorite(note);
+	}
+	*/
+	
+	public Item_Map getItemMap(int type) {
+		switch(type)
+			{
+			case ItemCls.ASSET_TYPE:
+				return DBSet.getInstance().getAssetMap();
+
+			case ItemCls.NOTE_TYPE:
+				return DBSet.getInstance().getNoteMap();
+		}
+		return null;
+	}
+
+	public void removeItemFavorite(ItemCls item) {
+		this.wallet.removeItemFavorite(item);
+	}
+
+	/*
+	public boolean isAssetFavorite(AssetCls asset) {
 		return this.wallet.isAssetFavorite(asset);
+	}
+	
+	public boolean isNoteFavorite(NoteCls note) {
+		return this.wallet.isNoteFavorite(note);
+	}
+	*/
+	public boolean isItemFavorite(ItemCls item) {
+		return this.wallet.isItemFavorite(item);
 	}
 
 	public Collection<Poll> getAllPolls() {
 		return DBSet.getInstance().getPollMap().getValues();
 	}
 
-	public Collection<Asset> getAllAssets() {
+	public Collection<ItemCls> getAllItems(int type) {
+		return getItemMap(type).getValues();
+	}
+
+	/*
+	public Collection<ItemCls> getAllAssets() {
 		return DBSet.getInstance().getAssetMap().getValues();
 	}
+
+	public Collection<ItemCls> getAllNotes() {
+		return DBSet.getInstance().getNoteMap().getValues();
+	}
+	*/
 
 	public void onDatabaseCommit() {
 		this.wallet.commit();
@@ -1448,25 +1512,26 @@ public class Controller extends Observable {
 
 	// ASSETS
 
-	public Asset getQoraAsset() {
+	/*
+	public ItemCls getQoraAsset() {
 		return DBSet.getInstance().getAssetMap().get(0l);
 	}
-
-	public Asset getAsset(long key) {
-		return DBSet.getInstance().getAssetMap().get(key);
+	*/
+	public AssetCls getAsset(long key) {
+		return (AssetCls) DBSet.getInstance().getAssetMap().get(key);
 	}
 
-	public SortableList<BigInteger, Order> getOrders(Asset have, Asset want) {
+	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
 		return this.getOrders(have, want, false);
 	}
 
-	public SortableList<BigInteger, Order> getOrders(Asset have, Asset want, boolean filter) {
+	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
 		return DBSet.getInstance().getOrderMap()
 				.getOrdersSortableList(have.getKey(), want.getKey(), filter);
 	}
 	
 	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(
-			Asset have, Asset want) {
+			AssetCls have, AssetCls want) {
 		return DBSet.getInstance().getTradeMap()
 				.getTradesSortableList(have.getKey(), want.getKey());
 	}
@@ -1474,6 +1539,26 @@ public class Controller extends Observable {
 	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(
 			Order order) {
 		return DBSet.getInstance().getTradeMap().getTrades(order);
+	}
+
+	// NOTES
+	public NoteCls getNote(long key) {
+		return (NoteCls)DBSet.getInstance().getNoteMap().get(key);
+	}
+
+	// ALL ITEMS
+	public ItemCls getItem(int type, long key) {
+		
+		switch(type)
+			{
+			case ItemCls.ASSET_TYPE: {
+				return DBSet.getInstance().getAssetMap().get(key);
+			}
+			case ItemCls.NOTE_TYPE: {
+				return DBSet.getInstance().getNoteMap().get(key);
+			}
+		}
+		return null;
 	}
 
 	// ATs
@@ -1521,122 +1606,9 @@ public class Controller extends Observable {
 		}
 	}
 
-	/*
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameRegistration(
-			String name, String value) {
-		return this.transactionCreator
-				.calcRecommendedFeeForNameRegistration(new Name(new Account(
-						"QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"), name, value)); // FOR
-																				// GENESIS
-																				// ADDRESS
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameUpdate(
-			String name, String value) {
-		return this.transactionCreator
-				.calcRecommendedFeeForNameUpdate(new Name(new Account(
-						"QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"), name, value)); // FOR
-																				// GENESIS
-																				// ADDRESS
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForPoll(String name,
-			String description, List<String> options) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-
-		// CREATE POLL OPTIONS
-		List<PollOption> pollOptions = new ArrayList<PollOption>();
-		for (String option : options) {
-			pollOptions.add(new PollOption(option));
-		}
-
-		// CREATE POLL
-		Poll poll = new Poll(new Account("QLpLzqs4DW1FNJByeJ63qaqw3eAYCxfkjR"),
-				name, description, pollOptions);
-
-		return this.transactionCreator.calcRecommendedFeeForPollCreation(poll);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForArbitraryTransaction(
-			byte[] data, List<Payment> payments) {
-		
-		if(payments == null) {
-			payments = new ArrayList<Payment>();
-		}
-		
-		return this.transactionCreator
-				.calcRecommendedFeeForArbitraryTransaction(data, payments);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForMessage(byte[] message) {
-		return this.transactionCreator.calcRecommendedFeeForMessage(message);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForPayment() {
-		return this.transactionCreator.calcRecommendedFeeForPayment();
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForAssetTransfer() {
-		return this.transactionCreator.calcRecommendedFeeForAssetTransfer();
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForOrderTransaction() {
-		return this.transactionCreator.calcRecommendedFeeForOrderTransaction();
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelOrderTransaction() {
-		return this.transactionCreator
-				.calcRecommendedFeeForCancelOrderTransaction();
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNameSale(String name) {
-		return this.transactionCreator
-				.calcRecommendedFeeForNameSale(new NameSale(name,
-						Transaction.MINIMUM_FEE));
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForNamePurchase(
-			String name) {
-		return this.transactionCreator
-				.calcRecommendedFeeForNamePurchase(new NameSale(name,
-						Transaction.MINIMUM_FEE));
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForCancelNameSale(
-			String name) {
-		return this.transactionCreator
-				.calcRecommendedFeeForCancelNameSale(new NameSale(name,
-						Transaction.MINIMUM_FEE));
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForPollVote(
-			String pollName) {
-		return this.transactionCreator.calcRecommendedFeeForPollVote(pollName);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForIssueAssetTransaction(
-			String name, String description) {
-		return this.transactionCreator
-				.calcRecommendedFeeForIssueAssetTransaction(name, description);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForMultiPayment(
-			List<Payment> payments) {
-		return this.transactionCreator
-				.calcRecommendedFeeForMultiPayment(payments);
-	}
-
-	public Pair<BigDecimal, Integer> calcRecommendedFeeForDeployATTransaction(
-			String name, String description, String type, String tags,
-			byte[] creationBytes) {
-		return this.transactionCreator
-				.calcRecommendedFeeForDeployATTransaction(name, description,
-						type, tags, creationBytes);
-	}
-	*/
 
 	public Pair<Transaction, Integer> updateName(PrivateKeyAccount owner,
-			Account newOwner, String name, String value,int feePow) {
+			Account newOwner, String name, String value, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createNameUpdate(owner, new Name(
@@ -1734,8 +1706,17 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Pair<Transaction, Integer> issueNote(PrivateKeyAccount creator,
+			String name, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueNoteTransaction(creator,
+					name, description, feePow);
+		}
+	}
+
 	public Pair<Transaction, Integer> createOrder(PrivateKeyAccount creator,
-			Asset have, Asset want, BigDecimal amount, BigDecimal price,
+			AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
@@ -1754,7 +1735,7 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> transferAsset(PrivateKeyAccount sender,
-			Account recipient, Asset asset, BigDecimal amount,int feePow) {
+			Account recipient, AssetCls asset, BigDecimal amount,int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createAssetTransfer(sender,
@@ -1790,10 +1771,10 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> recStatement(PrivateKeyAccount sender,
-			int feePow,	byte[] isText, byte[] message) {
+	public Pair<Transaction, Integer> recordNote(boolean asPack, PrivateKeyAccount sender,
+			int feePow,	long key, byte[] message, byte[] isText) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.recStatement(sender, feePow, message, isText);
+			return this.transactionCreator.recordNote(asPack, sender, feePow, key, isText, message);
 		}
 	}
 	

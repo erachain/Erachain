@@ -16,7 +16,7 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class AcctTableModel extends QoraTableModel<String, AT> implements Observer
+public class AcctTableModel extends TableModelCls<String, AT> implements Observer
 {
 	public static final int COLUMN_AT_NAME = 0;
 	public static final int COLUMN_AT_DESCRIPTION = 1;

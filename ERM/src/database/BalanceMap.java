@@ -20,7 +20,7 @@ import database.DBSet;
 
 public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal> 
 {
-	public static final long QORA_KEY = 0l;
+	public static final long FEE_KEY = 0l;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -91,7 +91,7 @@ public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 	
 	public void set(String address, BigDecimal value)
 	{
-		this.set(address, QORA_KEY, value);
+		this.set(address, FEE_KEY, value);
 	}
 	
 	public void set(String address, long key, BigDecimal value)
@@ -101,7 +101,7 @@ public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 	
 	public BigDecimal get(String address)
 	{
-		return this.get(address, QORA_KEY);
+		return this.get(address, FEE_KEY);
 	}
 	
 	public BigDecimal get(String address, long key)

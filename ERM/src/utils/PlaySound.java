@@ -1,5 +1,5 @@
 package utils;
-
+// 03/03
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,10 +11,13 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.apache.log4j.Logger;
+
 public class PlaySound {
 	private static PlaySound instance;
 	private ArrayList<byte[]> transactionsAlreadyPlayed;
 	
+	private static final Logger LOGGER = Logger.getLogger(PlaySound.class);
 	public static PlaySound getInstance()
 	{
 		if(instance == null)
@@ -64,8 +67,10 @@ public class PlaySound {
 			    	    clip.stop(); 
 			    	    clip.close(); 
 			    	} catch(IOException | UnsupportedAudioFileException | LineUnavailableException exc) {
-			    	    exc.printStackTrace();
-			    	} catch (InterruptedException exc) {}
+			    		LOGGER.error(exc.getMessage(),exc);
+			    	} catch (InterruptedException exc) {
+			    		LOGGER.debug(exc);
+			    	}
 			    	
 			    }
 			  }).start();

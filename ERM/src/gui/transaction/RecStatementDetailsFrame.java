@@ -29,7 +29,7 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.AEScrypto;
 import qora.crypto.Base58;
-import qora.transaction.RecStatement;
+import qora.transaction.RecordNote;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -40,7 +40,7 @@ public class RecStatementDetailsFrame extends JFrame
 {
 	private JTextField messageText;
 	
-	public RecStatementDetailsFrame(final RecStatement recStatement)
+	public RecStatementDetailsFrame(final RecordNote recStatement)
 	{
 		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Statement Details"));
 		
@@ -84,7 +84,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL TYPE
 		labelGBC.gridy = componentLevel;
 		
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 		
 		//TYPE
@@ -95,7 +95,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL SIGNATURE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -108,7 +108,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL REFERENCE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -121,7 +121,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL TIMESTAMP
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -134,7 +134,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL SENDER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator:"));
+		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(senderLabel, labelGBC);
 		
 		//SENDER
@@ -147,7 +147,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL SERVICE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message:"));
+		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
 		this.add(serviceLabel, labelGBC);
 		
 		//ISTEXT
@@ -162,7 +162,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL FEE POWER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
+		JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
 		this.add(feePowLabel, labelGBC);
 						
 		//FEE POWER
@@ -175,7 +175,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL FEE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -188,7 +188,7 @@ public class RecStatementDetailsFrame extends JFrame
 		//LABEL CONFIRMATIONS
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

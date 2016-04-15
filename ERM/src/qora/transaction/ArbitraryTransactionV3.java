@@ -15,6 +15,7 @@ import database.DBSet;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
 import qora.crypto.Crypto;
+import qora.item.assets.AssetCls;
 import qora.payment.Payment;
 
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
@@ -141,7 +142,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) {
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
 		byte[] data = new byte[0];
 
 		// WRITE TYPE
@@ -192,7 +193,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		int paymentsLength = 0;
 		for(Payment payment: this.getPayments())
@@ -218,7 +219,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	*/
 
 	@Override
-	public int isValid(DBSet db) {
+	public int isValid(DBSet db, byte[] releaserReference) {
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -232,7 +233,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		// REMOVE FEE
 		DBSet fork = db.fork();
-		super.process(fork);
+		super.process(fork, false);
 
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
 		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.ZERO) == -1)
@@ -260,7 +261,8 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			}
 
 			// CHECK IF AMOUNT IS DIVISIBLE
-			if (!db.getAssetMap().get(payment.getAsset()).isDivisible()) {
+			AssetCls aa = (AssetCls) db.getAssetMap().get(payment.getAsset());
+			if (!aa.isDivisible()) {
 				// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 				if (payment.getAmount().stripTrailingZeros().scale() > 0) {
 					// AMOUNT HAS DECIMALS

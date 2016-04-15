@@ -12,20 +12,22 @@ import qora.transaction.Transaction;
 import com.google.common.primitives.UnsignedBytes;
 
 import database.DBSet;
+import database.IssueItemMap;
 
-public class IssueNoteMap extends DBMap<byte[], Long> 
+public class IssueNoteMap extends IssueItemMap 
 {
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	//private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	public IssueNoteMap(DBSet databaseSet, DB database)
 	{
-		super(databaseSet, database);
+		super(databaseSet, database, "note");
 	}
 
 	public IssueNoteMap(IssueNoteMap parent) 
 	{
 		super(parent);
 	}
+	/*
 	
 	protected void createIndexes(DB database){}
 
@@ -71,4 +73,5 @@ public class IssueNoteMap extends DBMap<byte[], Long>
 	{
 		this.delete(transaction.getSignature());
 	}
+	*/
 }

@@ -12,6 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -35,6 +36,8 @@ public abstract class DBMap<T, U> extends Observable {
 	protected Map<T, U> map;
 	protected List<T> deleted;
 	private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+	
+	static Logger LOGGER = Logger.getLogger(DBMap.class.getName());
 
 	public DBMap(IDB databaseSet, DB database)
 	{
@@ -114,7 +117,7 @@ public abstract class DBMap<T, U> extends Observable {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			return this.getDefaultValue();
 		}			
@@ -177,7 +180,7 @@ public abstract class DBMap<T, U> extends Observable {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		return false;
@@ -227,7 +230,7 @@ public abstract class DBMap<T, U> extends Observable {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}		
 	}
 	

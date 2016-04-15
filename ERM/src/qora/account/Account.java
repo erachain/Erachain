@@ -1,5 +1,5 @@
 package qora.account;
-
+//04/01 +- 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -267,6 +267,12 @@ public class Account {
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
 				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.FEE_KEY)) + "}"
 				+ " - " + this.getAddress();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.getAddress().hashCode();
 	}
 	
 	//EQUALS

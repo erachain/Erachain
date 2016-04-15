@@ -15,7 +15,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class WalletNameSalesTableModel extends QoraTableModel<Tuple2<String, String>, BigDecimal> implements Observer{
+public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, String>, BigDecimal> implements Observer{
 
 	public static final int COLUMN_NAME = 0;
 	public static final int COLUMN_OWNER = 1;

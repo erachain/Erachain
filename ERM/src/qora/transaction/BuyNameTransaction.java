@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +139,7 @@ public class BuyNameTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes( boolean withSign) 
+	public byte[] toBytes( boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -176,14 +177,14 @@ public class BuyNameTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		return BASE_LENGTH + this.nameSale.getDataLength();
 	}
 	
 	//VALIDATE
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -251,9 +252,9 @@ public class BuyNameTransaction extends Transaction
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.nameSale.getAmount());
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.nameSale.getAmount());
 		
-		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), BalanceMap.QORA_KEY, this.nameSale.getAmount());
+		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), BalanceMap.FEE_KEY, this.nameSale.getAmount());
 		
 		return assetAmount;
 	}
@@ -261,19 +262,16 @@ public class BuyNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db);
+		super.process(db, asPack);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
 		this.seller.setConfirmedBalance(this.seller.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
-		
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
-				
+						
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		name = new Name(this.creator, name.getName(), name.getValue());
 		db.getNameMap().add(name);
@@ -284,18 +282,15 @@ public class BuyNameTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
+		super.orphan(db, asPack);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		this.seller.setConfirmedBalance(this.seller.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
-												
-		//UPDATE REFERENCE OF OWNER
-		this.creator.setLastReference(this.reference, db);
-				
+
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		Name name = this.nameSale.getName(db);
 		name = new Name(this.seller, name.getName(), name.getValue());
@@ -306,13 +301,21 @@ public class BuyNameTransaction extends Transaction
 	}
 
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<>();
 		
 		accounts.add(this.creator);
-		accounts.add(this.getSeller());
+		accounts.addAll(this.getRecipientAccounts());
 		
+		return accounts;
+	}
+	
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
+		accounts.add(this.getSeller());
 		return accounts;
 	}
 

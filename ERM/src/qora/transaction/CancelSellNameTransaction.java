@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class CancelSellNameTransaction extends Transaction
 	// public static String getName() { return "OLD: Cancel Sell Name"; }
 
 	
-	public String getAName()
+	public String getName()
 	{
 		return this.name;
 	}
@@ -127,7 +128,7 @@ public class CancelSellNameTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -168,7 +169,7 @@ public class CancelSellNameTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
 		int nameLength = nameBytes.length;
@@ -179,7 +180,7 @@ public class CancelSellNameTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
@@ -232,14 +233,11 @@ public class CancelSellNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE creator
-		super.process(db);
-												
-		//UPDATE REFERENCE OF creator
-		this.creator.setLastReference(this.signature, db);
-				
+		super.process(db, asPack);
+
 		//SET ORPHAN DATA
 		NameSale nameSale = db.getNameExchangeMap().getNameSale(this.name);
 		db.getCancelSellNameMap().set(this, nameSale.getAmount());
@@ -250,14 +248,11 @@ public class CancelSellNameTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE creator
-		super.orphan(db);
-												
-		//UPDATE REFERENCE OF creator
-		this.creator.setLastReference(this.reference, db);
-				
+		super.orphan(db, asPack);
+
 		//ADD TO DATABASE
 		BigDecimal amount = db.getCancelSellNameMap().get(this);
 		NameSale nameSale = new NameSale(this.name, amount);
@@ -269,13 +264,19 @@ public class CancelSellNameTransaction extends Transaction
 
 
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<Account>();
 		accounts.add(this.creator);
 		return accounts;
 	}
 
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		return new HashSet<>();
+	}
+	
 	@Override
 	public boolean isInvolved(Account account) 
 	{

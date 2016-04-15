@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -135,7 +136,7 @@ public class CreatePollTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -168,7 +169,7 @@ public class CreatePollTransaction extends Transaction
 	}
 	
 	@Override
-	public int getDataLength()
+	public int getDataLength(boolean asPack)
 	{
 		return BASE_LENGTH + this.poll.getDataLength();
 	}
@@ -177,14 +178,14 @@ public class CreatePollTransaction extends Transaction
 	
 	public boolean isSignatureValid()
 	{
-		byte[] data = this.toBytes( false );
+		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
 				
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK IF RELEASED
 		if(NTP.getTime() < Transaction.getVOTING_RELEASE())
@@ -276,13 +277,10 @@ public class CreatePollTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db);
-								
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
+		super.process(db, asPack);
 		
 		//INSERT INTO DATABASE
 		db.getPollMap().add(this.poll);
@@ -290,13 +288,10 @@ public class CreatePollTransaction extends Transaction
 
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-										
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		super.orphan(db, asPack);
 				
 		//DELETE FROM DATABASE
 		db.getPollMap().delete(this.poll);		
@@ -304,14 +299,19 @@ public class CreatePollTransaction extends Transaction
 
 
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts() 
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
 		accounts.add(this.poll.getCreator());
 		return accounts;
 	}
 
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		return new HashSet<>();
+	}
 
 	@Override
 	public boolean isInvolved(Account account) 
@@ -340,7 +340,7 @@ public class CreatePollTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {

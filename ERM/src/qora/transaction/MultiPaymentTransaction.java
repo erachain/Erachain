@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,18 +14,19 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import database.BalanceMap;
 import database.DBSet;
+
+import qora.account.Account;
+//import qora.account.PrivateKeyAccount;
+import qora.account.PublicKeyAccount;
+import qora.crypto.Crypto;
+import qora.payment.Payment;
+import qora.item.assets.AssetCls;
 
 public class MultiPaymentTransaction extends Transaction {
 
@@ -46,9 +48,19 @@ public class MultiPaymentTransaction extends Transaction {
 		this.signature = signature;
 		this.calcFee();
 	}
+	// as pack
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte[] reference, byte[] signature) 
+	{
+		this(typeBytes, creator, payments, (byte)0, 0l, reference);
+		this.signature = signature;
+	}
 	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, payments, feePow, timestamp, reference);
+	}
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte[] reference)
+	{
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, payments, (byte)0, 0l, reference);		
 	}
 	
 	//GETTERS/SETTERS
@@ -61,64 +73,6 @@ public class MultiPaymentTransaction extends Transaction {
 	}
 	
 	//PARSE/CONVERT
-	
-	public static Transaction Parse(byte[] data) throws Exception{
-		
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length");
-		}
-		
-		
-		// READ TYPE
-		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-		int position = TYPE_LENGTH;
-
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-		
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
-		
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
-		
-		//READ PAYMENTS SIZE
-		byte[] paymentsLengthBytes = Arrays.copyOfRange(data, position, position + PAYMENTS_SIZE_LENGTH);
-		int paymentsLength = Ints.fromByteArray(paymentsLengthBytes);
-		position += PAYMENTS_SIZE_LENGTH;
-		
-		if(paymentsLength < 1 || paymentsLength > 400)
-		{
-			throw new Exception("Invalid payments length");
-		}
-		
-		//READ PAYMENTS
-		List<Payment> payments = new ArrayList<Payment>();
-		for(int i=0; i<paymentsLength; i++)
-		{
-			Payment payment = Payment.parse(Arrays.copyOfRange(data, position, position + Payment.BASE_LENGTH));
-			payments.add(payment);
-			
-			position += Payment.BASE_LENGTH;
-		}
-		
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-		
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-		
-		return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);	
-	}	
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -139,26 +93,93 @@ public class MultiPaymentTransaction extends Transaction {
 				
 		return transaction;	
 	}
-	
-	@Override
-	public byte[] toBytes(boolean withSign) 
+		
+	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
 	{
-		byte[] data = new byte[0];
+		boolean asPack = releaserReference != null;
 		
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
+		//CHECK IF WE MATCH BLOCK LENGTH
+		if (data.length < BASE_LENGTH_AS_PACK
+				| !asPack & data.length < BASE_LENGTH)
+		{
+			throw new Exception("Data does not match block length " + data.length);
+		}
 		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
 		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		// READ TYPE
+		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+		int position = TYPE_LENGTH;
+
+		long timestamp = 0;
+		if (!asPack) {
+			//READ TIMESTAMP
+			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+			timestamp = Longs.fromByteArray(timestampBytes);	
+			position += TIMESTAMP_LENGTH;
+		}
+
+		byte[] reference;
+		if (!asPack) {
+			//READ REFERENCE
+			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			position += REFERENCE_LENGTH;
+		} else {
+			reference = releaserReference;
+		}
 		
-		//WRITE CREATOR
-		data = Bytes.concat(data , this.creator.getPublicKey());
+		//READ CREATOR
+		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+		position += CREATOR_LENGTH;
+		
+		byte feePow = 0;
+		if (!asPack) {
+			//READ FEE POWER
+			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+			feePow = feePowBytes[0];
+			position += 1;
+		}
+		
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+		position += SIGNATURE_LENGTH;
+
+		/////				
+		//READ PAYMENTS SIZE
+		byte[] paymentsLengthBytes = Arrays.copyOfRange(data, position, position + PAYMENTS_SIZE_LENGTH);
+		int paymentsLength = Ints.fromByteArray(paymentsLengthBytes);
+		position += PAYMENTS_SIZE_LENGTH;
+		
+		if(paymentsLength < 1 || paymentsLength > 400)
+		{
+			throw new Exception("Invalid payments length");
+		}
+		
+		//READ PAYMENTS
+		List<Payment> payments = new ArrayList<Payment>();
+		for(int i=0; i<paymentsLength; i++)
+		{
+			Payment payment = Payment.parse(Arrays.copyOfRange(data, position, position + Payment.BASE_LENGTH));
+			payments.add(payment);
+			
+			position += Payment.BASE_LENGTH;
+		}
+
+		if (!asPack) {
+			return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);	
+		} else {
+			return new MultiPaymentTransaction(typeBytes, creator, payments, reference, signatureBytes);	
+		}
+
+	}	
 	
+
+	//@Override
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	{
+
+		byte[] data = super.toBytes(withSign, releaserReference);
+
 		//WRITE PAYMENTS SIZE
 		int paymentsLength = this.payments.size();
 		byte[] paymentsLengthBytes = Ints.toByteArray(paymentsLength);
@@ -170,19 +191,11 @@ public class MultiPaymentTransaction extends Transaction {
 			data = Bytes.concat(data, payment.toBytes());
 		}
 		
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
-		
 		return data;
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		int paymentsLength = 0;
 		for(Payment payment: this.getPayments())
@@ -190,13 +203,17 @@ public class MultiPaymentTransaction extends Transaction {
 			paymentsLength += payment.getDataLength();
 		}
 		
-		return BASE_LENGTH + paymentsLength;
+		if (asPack) {
+			return BASE_LENGTH_AS_PACK + paymentsLength;
+		} else {
+			return BASE_LENGTH + paymentsLength;
+		}
 	}
 	
 	//VALIDATE
 	
-	@Override
-	public int isValid(DBSet db) 
+	//@Override
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		
 		//CHECK PAYMENTS SIZE
@@ -237,7 +254,8 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 			
 			//CHECK IF AMOUNT IS DIVISIBLE
-			if(!db.getAssetMap().get(payment.getAsset()).isDivisible())
+			AssetCls aa = (AssetCls)db.getAssetMap().get(payment.getAsset()); 
+			if(!aa.isDivisible())
 			{
 				//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 				if(payment.getAmount().stripTrailingZeros().scale() > 0)
@@ -251,26 +269,17 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, fork);
 		}
 		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+		return super.isValid(db, releaserReference);
 	}
 
 	//PROCESS/ORPHAN
 	
 	//@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db);
-						
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
-		
+		super.process(db, asPack);
+								
 		//PROCESS PAYMENTS
 		for(Payment payment: this.payments)
 		{
@@ -285,13 +294,10 @@ public class MultiPaymentTransaction extends Transaction {
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-						
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		super.orphan(db, asPack);
 		
 		//ORPHAN PAYMENTS
 		for(Payment payment: this.payments)
@@ -309,10 +315,18 @@ public class MultiPaymentTransaction extends Transaction {
 	//REST
 	
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<Account>();
 		accounts.add(this.creator);
+		accounts.addAll(this.getRecipientAccounts());
+		return accounts;
+	}
+	
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
 		
 		for(Payment payment: this.payments)
 		{
@@ -354,7 +368,7 @@ public class MultiPaymentTransaction extends Transaction {
 		for(Payment payment: this.payments)
 		{
 			//IF QORA ASSET
-			if(payment.getAsset() == BalanceMap.QORA_KEY)
+			if(payment.getAsset() == BalanceMap.FEE_KEY)
 			{
 				//IF CREATOR
 				if(address.equals(this.creator.getAddress()))
@@ -377,7 +391,7 @@ public class MultiPaymentTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

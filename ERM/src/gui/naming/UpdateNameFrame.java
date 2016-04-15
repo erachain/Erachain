@@ -129,7 +129,7 @@ public class UpdateNameFrame extends JFrame
 		
 		//LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       	
       		
@@ -141,7 +141,7 @@ public class UpdateNameFrame extends JFrame
         
         //LABEL OWNER
       	labelGBC.gridy = 2;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
       	this.add(ownerLabel, labelGBC);
       	
       		
@@ -152,7 +152,7 @@ public class UpdateNameFrame extends JFrame
       	
       	 //LABEL KEY
       	labelGBC.gridy = 3;
-      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key:"));
+      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
       	this.add(keyLabel, labelGBC);
       	
       	//TXT KEY
@@ -163,7 +163,7 @@ public class UpdateNameFrame extends JFrame
       	
         //LABEL VALUE
       	labelGBC.gridy = 5;
-      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
       	this.add(valueLabel, labelGBC);
       		
       	//TXTAREA VALUE
@@ -303,7 +303,7 @@ public class UpdateNameFrame extends JFrame
       	//LABEL FEE
 		labelGBC.gridx = 0;
 		labelGBC.gridy = 9;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE

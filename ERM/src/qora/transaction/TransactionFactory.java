@@ -1,7 +1,7 @@
 package qora.transaction;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
@@ -25,24 +25,24 @@ public class TransactionFactory {
 		
 	}
 	
-	public Transaction parse(byte[] data) throws Exception
+	public Transaction parse(byte[] data, byte[] releaserReference) throws Exception
 	{
 		//READ TYPE
 		int type = Byte.toUnsignedInt(data[0]);
-		//Logger.getGlobal().info(" 1: " + parsedAssetTransfer.getKey() );
+		//LOGGER.info(" 1: " + parsedAssetTransfer.getKey() );
 
 		
 		switch(type)
 		{
-		case Transaction.STATEMENT_RECORD:
+		case Transaction.RECORD_NOTE:
 			
 			//PARSE PAYMENT TRANSACTION
-			return RecStatement.Parse(data);
+			return RecordNote.Parse(data, releaserReference);
 
 		case Transaction.PAYMENT_TRANSACTION:
 			
 			//PARSE PAYMENT TRANSACTION
-			return PaymentTransaction.Parse(data);
+			return PaymentTransaction.Parse(data, releaserReference);
 		
 		case Transaction.REGISTER_NAME_TRANSACTION:
 			
@@ -77,7 +77,7 @@ public class TransactionFactory {
 		case Transaction.VOTE_ON_POLL_TRANSACTION:
 			
 			//PARSE CREATE POLL VOTE
-			return VoteOnPollTransaction.Parse(data);		
+			return VoteOnPollTransaction.Parse(data, releaserReference);		
 			
 		case Transaction.ARBITRARY_TRANSACTION:
 			
@@ -87,7 +87,7 @@ public class TransactionFactory {
 		case Transaction.TRANSFER_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
-			return TransferAssetTransaction.Parse(data);	
+			return TransferAssetTransaction.Parse(data, releaserReference);	
 		
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			
@@ -102,7 +102,7 @@ public class TransactionFactory {
 		case Transaction.MULTI_PAYMENT_TRANSACTION:
 			
 			//PARSE MULTI PAYMENT
-			return MultiPaymentTransaction.Parse(data);		
+			return MultiPaymentTransaction.Parse(data, releaserReference);		
 		
 		case Transaction.DEPLOY_AT_TRANSACTION:
 			return DeployATTransaction.Parse(data);
@@ -110,7 +110,7 @@ public class TransactionFactory {
 		case Transaction.MESSAGE_TRANSACTION:
 
 			// PARSE MESSAGE TRANSACTION
-			return MessageTransaction.Parse(data);
+			return MessageTransaction.Parse(data, releaserReference);
 			
 			/*
 		case Transaction.ACCOUNTING_TRANSACTION:
@@ -128,18 +128,23 @@ public class TransactionFactory {
 		case Transaction.ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION
-			return IssueAssetTransaction.Parse(data);
+			return IssueAssetTransaction.Parse(data, releaserReference);
 			
 		case Transaction.ISSUE_NOTE_TRANSACTION:
 			
 			//PARSE ISSUE NOTE TRANSACTION
-			return IssueNoteTransaction.Parse(data);
+			return IssueNoteRecord.Parse(data, releaserReference);
 			
 		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
 			return GenesisTransferAssetTransaction.Parse(data);	
 		
+		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+			
+			//PARSE ISSUE ASSET TRANSACTION
+			return GenesisIssueNoteTransaction.Parse(data);
+
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION

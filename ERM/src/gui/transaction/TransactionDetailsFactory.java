@@ -10,12 +10,13 @@ import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.GenesisTransaction;
 import qora.transaction.GenesisIssueAssetTransaction;
+import qora.transaction.GenesisIssueNoteTransaction;
 import qora.transaction.GenesisTransferAssetTransaction;
 import qora.transaction.IssueAssetTransaction;
 import qora.transaction.MessageTransaction;
 import qora.transaction.MultiPaymentTransaction;
 import qora.transaction.PaymentTransaction;
-import qora.transaction.RecStatement;
+import qora.transaction.RecordNote;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
 import qora.transaction.Transaction;
@@ -42,9 +43,9 @@ public class TransactionDetailsFactory
 		switch(transaction.getType())
 		{
 		
-		case Transaction.STATEMENT_RECORD:
+		case Transaction.RECORD_NOTE:
 			
-			RecStatement statement = (RecStatement) transaction;
+			RecordNote statement = (RecordNote) transaction;
 			return new RecStatementDetailsFrame(statement);
 
 		case Transaction.PAYMENT_TRANSACTION:
@@ -134,6 +135,11 @@ public class TransactionDetailsFactory
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
 			return new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);		
 			
+		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+			
+			GenesisIssueNoteTransaction genesisIssueNoteTransaction = (GenesisIssueNoteTransaction) transaction;
+			return new GenesisIssueNoteDetailsFrame(genesisIssueNoteTransaction);	
+
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			GenesisIssueAssetTransaction genesisIssueAssetTransaction = (GenesisIssueAssetTransaction) transaction;

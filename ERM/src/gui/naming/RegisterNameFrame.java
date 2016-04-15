@@ -124,7 +124,7 @@ public class RegisterNameFrame extends JFrame
 		
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -134,7 +134,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -161,7 +161,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL RECEIVER DETAILS 
        	labelGBC.gridy = 2;
-       	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Name details:"));
+       	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Name details") + ":");
        	this.add(recDetailsLabel, labelGBC);
        		
        	//NAME DETAILS 
@@ -178,7 +178,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL KEY
       	labelGBC.gridy = 3;
-      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key:"));
+      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
       	this.add(keyLabel, labelGBC);
       	
     	txtGBC.gridy = 3;
@@ -189,7 +189,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 5;
-      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
       	this.add(valueLabel, labelGBC);
       		
       	//TXTAREA NAME
@@ -315,7 +315,7 @@ public class RegisterNameFrame extends JFrame
 		//LABEL FEE
       	labelGBC.gridy = 9;
       	labelGBC.gridx = 0;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       	
       	//TXT FEE

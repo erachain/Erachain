@@ -24,6 +24,8 @@ import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import qora.crypto.Base58;
+import qora.item.ItemCls;
+import qora.item.assets.AssetCls;
 import qora.transaction.CreatePollTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
@@ -73,7 +75,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL TYPE
 		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -83,7 +85,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -95,7 +97,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -107,7 +109,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL TIMESTAMP
 		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -119,7 +121,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL CREATOR
 		labelGBC.gridy = 4;
-		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator:"));
+		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(creatorLabel, labelGBC);
 		
 		//CREATOR
@@ -131,7 +133,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 5;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -143,7 +145,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 6;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
@@ -157,12 +159,13 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL OPTIONS
 		labelGBC.gridy = 7;
-		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options:"));
+		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
 		this.add(optionsLabel, labelGBC);
 		
 		//OPTIONS
 		detailGBC.gridy = 7;
-		PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(), Controller.getInstance().getAsset(0l));
+		PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
+				Controller.getInstance().getAsset(0l));
 		JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
 		
 		TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
@@ -172,7 +175,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL FEE
 		labelGBC.gridy = 8;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -184,7 +187,7 @@ public class CreatePollDetailsFrame extends JFrame
 		
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 9;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

@@ -11,6 +11,7 @@ import java.util.List;
 
 import ntp.NTP;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -21,7 +22,11 @@ import qora.account.PublicKeyAccount;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 import qora.transaction.DeployATTransaction;
+import qora.transaction.GenesisIssueAssetTransaction;
+import qora.transaction.GenesisIssueNoteTransaction;
 import qora.transaction.GenesisTransaction;
+import qora.transaction.GenesisTransferAssetTransaction;
+
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
 import utils.Converter;
@@ -73,6 +78,8 @@ public class Block {
 
 	protected byte[] atBytes;
 	protected Long atFees;
+
+	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
 	public Block(int version, byte[] reference, long timestamp, long generatingBalance, PublicKeyAccount generator, byte[] generatorSignature, byte[] atBytes, long atFees)
@@ -176,7 +183,7 @@ public class Block {
 
 					//PARSE TRANSACTION
 					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position + TRANSACTION_SIZE_LENGTH, position + TRANSACTION_SIZE_LENGTH + transactionLength);
-					Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes);
+					Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
 
 					//ADD TO TRANSACTIONS
 					this.transactions.add(transaction);
@@ -450,13 +457,13 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//WRITE TRANSACTION LENGTH
-			int transactionLength = transaction.getDataLength();
+			int transactionLength = transaction.getDataLength(false);
 			byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
 			//transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, 4, 0);
 			data = Bytes.concat(data, transactionLengthBytes);
 
 			//WRITE TRANSACTION
-			data = Bytes.concat(data, transaction.toBytes(true));
+			data = Bytes.concat(data, transaction.toBytes(true, null));
 		}
 
 		return data;
@@ -478,7 +485,7 @@ public class Block {
 
 		for(Transaction transaction: this.getTransactions())
 		{
-			length += 4 + transaction.getDataLength();
+			length += 4 + transaction.getDataLength(false);
 		}
 
 		return length;
@@ -652,7 +659,7 @@ public class Block {
 			}
 			catch(NoSuchAlgorithmException | AT_Exception e)
 			{
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 				return false;
 			}
 		}
@@ -662,7 +669,10 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//CHECK IF NOT GENESISTRANSACTION
-			if(transaction instanceof GenesisTransaction)
+			if(transaction instanceof GenesisTransaction
+					| transaction instanceof GenesisIssueAssetTransaction
+					| transaction instanceof GenesisIssueNoteTransaction
+					| transaction instanceof GenesisTransferAssetTransaction )
 			{
 				return false;
 			}
@@ -682,7 +692,7 @@ public class Block {
 					return false;
 				}
 			}
-			else if(transaction.isValid(fork) != Transaction.VALIDATE_OK)
+			else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 			{
 				return false;
 			}
@@ -694,7 +704,7 @@ public class Block {
 			}
 
 			//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-			transaction.process(fork);		
+			transaction.process(fork, false);		
 		}
 
 		//BLOCK IS VALID
@@ -714,7 +724,7 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//PROCESS
-			transaction.process(db);
+			transaction.process(db, false);
 
 			//SET PARENT
 			db.getTransactionParentMap().set(transaction, this);
@@ -847,7 +857,7 @@ public class Block {
 		for(int i=transactions.size() -1; i>=0; i--)
 		{
 			Transaction transaction = transactions.get(i);
-			transaction.orphan(db);
+			transaction.orphan(db, false);
 		}
 	}
 

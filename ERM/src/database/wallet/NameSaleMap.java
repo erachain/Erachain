@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -29,7 +30,9 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
 	public static final int AMOUNT_INDEX = 3;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
+
+	static Logger LOGGER = Logger.getLogger(NameSaleMap.class.getName());
+
 	public NameSaleMap(WalletDatabase walletDatabase, DB database)
 	{
 		super(walletDatabase, database);
@@ -144,7 +147,7 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
 		catch(Exception e)
 		{
 			//ERROR
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		return nameSales;
@@ -172,7 +175,7 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
 		catch(Exception e)
 		{
 			//ERROR
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		return nameSales;

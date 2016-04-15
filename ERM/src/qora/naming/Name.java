@@ -1,5 +1,5 @@
 package qora.naming;
-
+// 30/03
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -165,6 +165,12 @@ public class Name {
 	public String toString()
 	{
 		return this.name;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.name.hashCode();
 	}
 	
 	@Override

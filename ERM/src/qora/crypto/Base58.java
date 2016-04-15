@@ -1,3 +1,4 @@
+// 30/03
 /**
  * Copyright 2011 Google Inc.
  * Copyright 2013-2014 Ronald W Hoffman
@@ -26,8 +27,11 @@ import java.util.Arrays;
 public class Base58 {
 
     /** Alphabet used for encoding and decoding */
+	
+	private static final String ALPHABET_STR = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+			
     private static final char[] ALPHABET =
-            "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+    		ALPHABET_STR.toCharArray();
 
     /** Lookup index for US-ASCII characters (code points 0-127) */
     private static final int[] INDEXES = new int[128];
@@ -230,5 +234,15 @@ public class Base58 {
 
 	public static BigInteger decodeBI(String input) {
 		return new BigInteger(decode(input));
+	}
+	
+	public static String clean(String str)
+	{
+		return str.replaceAll("[^"+ALPHABET_STR+"]", "");
+	}
+	
+	public static boolean isExtraSymbols(String str)
+	{
+		return !clean(str).equals(str);
 	}
 }

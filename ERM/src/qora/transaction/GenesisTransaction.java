@@ -3,6 +3,7 @@ package qora.transaction;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class GenesisTransaction extends Transaction {
 	public byte[] generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
-		byte[] data = this.toBytes( false );
+		byte[] data = this.toBytes( false, null );
 
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
@@ -113,7 +114,7 @@ public class GenesisTransaction extends Transaction {
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		
 		//WRITE TYPE
@@ -142,7 +143,7 @@ public class GenesisTransaction extends Transaction {
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{
 		return BASE_LENGTH;
 	}
@@ -156,7 +157,7 @@ public class GenesisTransaction extends Transaction {
 	}
 
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{	
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) == -1)
@@ -176,7 +177,7 @@ public class GenesisTransaction extends Transaction {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DBSet db) {
+	public void process(DBSet db, boolean asPack) {
 		
 		//UPDATE BALANCE
 		this.recipient.setConfirmedBalance(this.amount, db);
@@ -187,7 +188,7 @@ public class GenesisTransaction extends Transaction {
 	}
 	
 	@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UNDO BALANCE
 		this.recipient.setConfirmedBalance(BigDecimal.ZERO, db);
@@ -205,11 +206,19 @@ public class GenesisTransaction extends Transaction {
 	}
 	
 	@Override
-	public List<Account> getInvolvedAccounts()
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		return Arrays.asList(this.recipient);
+		return this.getRecipientAccounts();
 	}
 
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
+		accounts.add(this.recipient);
+		return accounts;
+	}
+	
 	@Override
 	public boolean isInvolved(Account account) 
 	{	
@@ -232,7 +241,7 @@ public class GenesisTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<String, Map<Long, BigDecimal>>();
 		
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), BalanceMap.QORA_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), BalanceMap.FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

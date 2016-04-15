@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import utils.Pair;
@@ -19,6 +21,8 @@ public class Crypto {
 	
 	private static Crypto instance;
 	
+	static Logger LOGGER = Logger.getLogger(Crypto.class.getName());
+
 	public static Crypto getInstance()
 	{
 		if(instance == null)
@@ -63,7 +67,7 @@ public class Crypto {
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 	}
@@ -220,7 +224,7 @@ public class Crypto {
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return new byte[64];
 		}
 	}
@@ -234,7 +238,7 @@ public class Crypto {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return false;
 		}
 	}

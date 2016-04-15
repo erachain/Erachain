@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import qora.assets.Order;
+import qora.item.assets.Order;
 import qora.transaction.CancelOrderTransaction;
 
 import com.google.common.primitives.UnsignedBytes;

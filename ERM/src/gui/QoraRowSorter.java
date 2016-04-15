@@ -1,6 +1,6 @@
 package gui;
 
-import gui.models.QoraTableModel;
+import gui.models.TableModelCls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,10 @@ import javax.swing.table.TableModel;
 public class QoraRowSorter extends RowSorter<TableModel> {
 
 		private List<SortKey> keys;	
-		private QoraTableModel<?, ?> model;
+		private TableModelCls<?, ?> model;
     	private Map<Integer, Integer> indexes;
  
-        public QoraRowSorter(QoraTableModel<?, ?> model, Map<Integer, Integer> indexes)
+        public QoraRowSorter(TableModelCls<?, ?> model, Map<Integer, Integer> indexes)
         {
         	this.keys = new ArrayList<SortKey>();
         	this.model = model;

@@ -3,13 +3,14 @@ package qora;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import database.DBSet;
+import ntp.NTP;
 //import ntp.NTP;
 import qora.account.Account;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.block.Block;
 import qora.block.GenesisBlock;
 import qora.transaction.ArbitraryTransaction;
@@ -21,7 +22,9 @@ import utils.Pair;
 
 public class BlockChain
 {
-	public static final int MAX_SIGNATURES = 500;
+	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
+	
+	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	
 	public BlockChain()
 	{	
@@ -30,7 +33,7 @@ public class BlockChain
 		DBSet db = DBSet.getInstance();
 
 		if(Settings.getInstance().isTestnet()) {
-			Logger.getGlobal().info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
+			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
 		if(	!db.getBlockMap().contains(genesisBlock.getSignature())
@@ -40,13 +43,13 @@ public class BlockChain
 		{
 			if(db.getBlockMap().getLastBlockSignature() != null)
 			{
-				Logger.getGlobal().info("reCreate Database...");	
+				LOGGER.info("reCreate Database...");	
 		
 	        	try {
 	        		db.close();
 					Controller.getInstance().reCreateDB(false);
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(),e);
 				}
 			}
 

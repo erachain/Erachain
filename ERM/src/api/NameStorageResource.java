@@ -23,7 +23,7 @@ import org.json.simple.JSONValue;
 
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.payment.Payment;
@@ -216,7 +216,7 @@ public class NameStorageResource {
 							ApiErrorFactory.ERROR_INVALID_AMOUNT);
 					}
 					
-					Asset paymentAsset = Controller.getInstance().getAsset(new Long(0L));
+					AssetCls paymentAsset = Controller.getInstance().getAsset(new Long(0L));
 					
 					if(amountAssetJsonObject.containsKey(ASSET_JSON_KEY)) {
 						try {

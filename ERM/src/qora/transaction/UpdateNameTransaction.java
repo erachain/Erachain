@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class UpdateNameTransaction extends Transaction
 
 	//public static String getName() { return "OLD: Update Name"; }
 
-	public Name getAName()
+	public Name getName()
 	{
 		return this.name;
 	}
@@ -119,7 +120,7 @@ public class UpdateNameTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -152,7 +153,7 @@ public class UpdateNameTransaction extends Transaction
 	}
 	
 	@Override
-	public int getDataLength()
+	public int getDataLength(boolean asPack)
 	{
 		return BASE_LENGTH + this.name.getDataLength();
 	}
@@ -160,7 +161,7 @@ public class UpdateNameTransaction extends Transaction
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -207,7 +208,7 @@ public class UpdateNameTransaction extends Transaction
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
+		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
 		{
 			return INVALID_REFERENCE;
 		}		
@@ -218,14 +219,11 @@ public class UpdateNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db);
-								
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
-		
+		super.process(db, asPack);
+							
 		//SET ORPHAN DATA
 		Name oldName = db.getNameMap().get(this.name.getName());
 		db.getUpdateNameMap().set(this, oldName);
@@ -235,14 +233,11 @@ public class UpdateNameTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-										
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
-			
+		super.orphan(db, asPack);
+
 		//RESTORE ORPHAN DATA
 		Name oldName = db.getUpdateNameMap().get(this);
 		db.getNameMap().add(oldName);
@@ -253,12 +248,17 @@ public class UpdateNameTransaction extends Transaction
 
 
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<Account>();
 		accounts.add(this.creator);
 		accounts.add(this.name.getOwner());
 		return accounts;
+	}
+
+	@Override
+	public HashSet<Account> getRecipientAccounts() {
+		return new HashSet<Account>();
 	}
 
 	@Override
@@ -288,7 +288,7 @@ public class UpdateNameTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {

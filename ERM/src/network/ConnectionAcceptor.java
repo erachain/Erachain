@@ -2,9 +2,10 @@ package network;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import controller.Controller;
+import gui.status.WalletStatus;
 import lang.Lang;
 import ntp.NTP;
 import qora.transaction.Transaction;
@@ -17,6 +18,8 @@ public class ConnectionAcceptor extends Thread{
 	private ServerSocket socket;
 	
 	private boolean isRun;
+	
+	static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());
 	
 	public ConnectionAcceptor(ConnectionCallback callback)
 	{
@@ -85,8 +88,8 @@ public class ConnectionAcceptor extends Thread{
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				Logger.getGlobal().warning(Lang.getInstance().translate("Error accepting new connection"));			
+				LOGGER.error(e.getMessage(),e);
+				LOGGER.warn(Lang.getInstance().translate("Error accepting new connection"));			
 			}
 		}
 	}

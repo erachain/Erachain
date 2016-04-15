@@ -107,8 +107,8 @@ public class NameUtils {
 				
 				if (transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION) {
 					UpdateNameTransaction updateNameTx = (UpdateNameTransaction) transaction;
-					if (updateNameTx.getAName().getName().equals(name.getName())) {
-						rawNameValue = updateNameTx.getAName().getValue();
+					if (updateNameTx.getName().getName().equals(name.getName())) {
+						rawNameValue = updateNameTx.getName().getValue();
 						break;
 					}
 					

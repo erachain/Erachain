@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,8 @@ import org.json.simple.JSONObject;
 import qora.account.Account;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Asset;
-import qora.assets.Order;
+import qora.item.assets.AssetCls;
+import qora.item.assets.Order;
 //import qora.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
@@ -163,7 +164,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign)
+	public byte[] toBytes(boolean withSign, byte[] releaserReference)
 	{
 		byte[] data = new byte[0];
 		
@@ -217,7 +218,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 	
 	@Override
-	public int getDataLength()
+	public int getDataLength(boolean asPack)
 	{
 		return BASE_LENGTH;
 	}
@@ -225,7 +226,7 @@ public class CreateOrderTransaction extends Transaction
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		//CHECK IF ASSETS NOT THE SAME
 		if(this.order.getHave() == this.order.getWant())
@@ -247,7 +248,7 @@ public class CreateOrderTransaction extends Transaction
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		super.process(fork);
+		super.process(fork, false);
 		
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.order.getHave(), fork).compareTo(this.order.getAmount()) == -1)
@@ -273,7 +274,7 @@ public class CreateOrderTransaction extends Transaction
 		}
 		
 		//CHECK IF WANT EXISTS
-		Asset wantAsset = this.order.getWantAsset(db);
+		AssetCls wantAsset = this.order.getWantAsset(db);
 		if(wantAsset == null)
 		{
 			//WANT DOES NOT EXIST
@@ -302,13 +303,10 @@ public class CreateOrderTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db);
-								
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
+		super.process(db, asPack);
 		
 		//PROCESS ORDER
 		this.order.copy().process(db, this);
@@ -316,13 +314,10 @@ public class CreateOrderTransaction extends Transaction
 
 
 	//@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db);
-										
-		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		super.orphan(db, asPack);
 				
 		//ORPHAN ORDER
 		this.order.copy().orphan(db);
@@ -330,13 +325,18 @@ public class CreateOrderTransaction extends Transaction
 
 
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts() 
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
 		return accounts;
 	}
 
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		return new HashSet<>();
+	}
 
 	@Override
 	public boolean isInvolved(Account account) 

@@ -1,5 +1,5 @@
 package gui.create;
-
+// 03/03
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,6 +29,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
 import lang.Lang;
 import qora.crypto.Base58;
@@ -41,6 +43,8 @@ public class ConfirmSeedFrame extends JFrame {
 	private JTextField passwordTxt;
 	private JTextField confirmPasswordTxt;
 	
+	private static final Logger LOGGER = Logger
+			.getLogger(ConfirmSeedFrame.class);
 	public ConfirmSeedFrame(CreateWalletFrame parent)
 	{
 		super(Lang.getInstance().translate("Qora") + " - "+ Lang.getInstance().translate("Create Wallet"));
@@ -81,7 +85,7 @@ public class ConfirmSeedFrame extends JFrame {
 		
 		//LABEL
 		labelGBC.gridy = 0;
-		JLabel label1 = new JLabel(Lang.getInstance().translate("Please confirm your wallet seed:"));	
+		JLabel label1 = new JLabel(Lang.getInstance().translate("Please confirm your wallet seed") + ":");	
 		this.add(label1, labelGBC);
 		
 		
@@ -102,7 +106,7 @@ public class ConfirmSeedFrame extends JFrame {
 					String clipboardContent = (String) clipboard.getData(DataFlavor.stringFlavor);
 					seedTxt.setText(clipboardContent);
 				} catch (UnsupportedFlavorException | IOException e1) {
-					e1.printStackTrace();
+					LOGGER.error(e1.getMessage(),e1);
 				} 
 			}
 		});
@@ -119,7 +123,7 @@ public class ConfirmSeedFrame extends JFrame {
       	//LABEL
       	labelGBC.gridy = 3;
       	labelGBC.insets.top = 10;
-		JLabel label3 = new JLabel(Lang.getInstance().translate("Please enter your wallet password:"));	
+		JLabel label3 = new JLabel(Lang.getInstance().translate("Please enter your wallet password") + ":");	
 		this.add(label3, labelGBC);
 		
 		//ADD TEXTBOX
@@ -131,7 +135,7 @@ public class ConfirmSeedFrame extends JFrame {
 		//LABEL
       	labelGBC.gridy = 5;
       	labelGBC.insets.top = 10;
-		JLabel label4 = new JLabel(Lang.getInstance().translate("Please confirm your password:"));	
+		JLabel label4 = new JLabel(Lang.getInstance().translate("Please confirm your password") + ":");	
 		this.add(label4, labelGBC);
 		
 		//ADD TEXTBOX
@@ -150,7 +154,7 @@ public class ConfirmSeedFrame extends JFrame {
 		        onConfirmClick();
 		    }
 		});	
-        confirmButton.setPreferredSize(new Dimension(80, 25));
+        confirmButton.setPreferredSize(new Dimension(110, 25));
     	this.add(confirmButton, buttonGBC);
     	
     	//BUTTON BACK
@@ -163,7 +167,7 @@ public class ConfirmSeedFrame extends JFrame {
 		        onBackClick();
 		    }
 		});
-        backButton.setPreferredSize(new Dimension(80, 25));
+        backButton.setPreferredSize(new Dimension(110, 25));
     	this.add(backButton, buttonGBC);
         
     	//CLOSE NICELY

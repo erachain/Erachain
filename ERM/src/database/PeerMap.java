@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
@@ -31,6 +31,8 @@ public class PeerMap extends DBMap<byte[], byte[]>
 	private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	
+	static Logger LOGGER = Logger.getLogger(PeerMap.class.getName());
 	
 	public PeerMap(DBSet databaseSet, DB database)
 	{
@@ -112,7 +114,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			return new ArrayList<Peer>();
 		}
@@ -273,13 +275,13 @@ public class PeerMap extends DBMap<byte[], byte[]>
 							listPeerInfo.add(peerInfo);
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.error(e.getMessage(),e);
 					}
 				}
 				Collections.sort(listPeerInfo, new ReverseComparator<PeerInfo>(new PeerInfoComparator())); 
 					
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 			}
 			
 			for (PeerInfo peer : listPeerInfo) {
@@ -302,13 +304,13 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			}
 			
 			if(allFromSettings) {
-				Logger.getGlobal().info("Peers loaded from database : " + peers.size());
+				LOGGER.info("Peers loaded from database : " + peers.size());
 			}
 
 			List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
 			
 			if(allFromSettings) {
-				Logger.getGlobal().info("Peers loaded from settings : " + knownPeers.size());
+				LOGGER.info("Peers loaded from settings : " + knownPeers.size());
 			}
 				
 			for (Peer knownPeer : knownPeers) {
@@ -331,7 +333,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 						peers.add(knownPeer);
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(),e);
 				}
 				
 			}
@@ -341,7 +343,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			return new ArrayList<Peer>();
 		}	
@@ -361,7 +363,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 				
 			return new ArrayList<String>();
 		}
@@ -397,7 +399,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			return new ArrayList<PeerInfo>();
 		}
@@ -459,7 +461,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace(System.out);
+			LOGGER.error(eSystem.out);
 		}	*/		
 	}
 	

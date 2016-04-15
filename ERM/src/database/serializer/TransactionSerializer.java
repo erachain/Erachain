@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 
 import org.mapdb.Serializer;
@@ -15,12 +15,13 @@ import qora.transaction.TransactionFactory;
 public class TransactionSerializer implements Serializer<Transaction>, Serializable
 {
 	private static final long serialVersionUID = -6538913048331349777L;
+	static Logger LOGGER = Logger.getLogger(TransactionSerializer.class.getName());
 
 	@Override
 	public void serialize(DataOutput out, Transaction value) throws IOException 
 	{
-		out.writeInt(value.getDataLength());
-        out.write(value.toBytes(true));
+		out.writeInt(value.getDataLength(false));
+        out.write(value.toBytes(true, null));
     }
 
     @Override
@@ -31,11 +32,11 @@ public class TransactionSerializer implements Serializer<Transaction>, Serializa
         in.readFully(bytes);
         try 
         {
-        	return TransactionFactory.getInstance().parse(bytes);
+        	return TransactionFactory.getInstance().parse(bytes, null);
 		} 
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	LOGGER.error(e.getMessage(),e);
 		}
 		return null;
     }

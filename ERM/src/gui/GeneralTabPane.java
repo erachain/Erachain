@@ -5,7 +5,8 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.assets.AssetsPanel;
+import gui.items.assets.AssetsPanel;
+import gui.items.notes.NotesPanel;
 import gui.at.ATPanel;
 import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;
@@ -39,7 +40,7 @@ public class GeneralTabPane extends JTabbedPane{
 		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
         
 		//STATEMENT
-		this.addTab(Lang.getInstance().translate("Statement"), new RecStatementPanel());
+		this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
 
 		//SEND
 		this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
@@ -95,7 +96,7 @@ public class GeneralTabPane extends JTabbedPane{
 		indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlockMap.FEE_INDEX);
 		sorter = new QoraRowSorter(blocksModel, indexes);
 		blocksTable.setRowSorter(sorter);
-		
+
         this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
         
         //NAMING
@@ -106,6 +107,9 @@ public class GeneralTabPane extends JTabbedPane{
         
         //ASSETS
         this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
+
+        //NOTES
+        ////this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());        
 
 		//ATs
 		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());

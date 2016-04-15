@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -217,7 +218,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		byte[] data = new byte[0];
 
@@ -297,7 +298,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength() 
+	public int getDataLength(boolean asPack) 
 	{	
 		return BASE_LENGTH +  
 				this.name.getBytes(StandardCharsets.UTF_8).length + 
@@ -310,7 +311,7 @@ public class DeployATTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db)
+	public int isValid(DBSet db, byte[] releaserReference)
 	{
 		return isValid(db, 0);
 	}
@@ -402,14 +403,11 @@ public class DeployATTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db) 
+	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE ISSUER
-		super.process(db);
+		super.process(db, asPack);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount), db);
-
-		//UPDATE REFERENCE OF ISSUER
-		this.creator.setLastReference(this.signature, db);
 
 		//CREATE AT ID = ADDRESS
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
@@ -467,14 +465,11 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db) {
+	public void orphan(DBSet db, boolean asPack) {
 
 		//UPDATE ISSUER
-		super.orphan(db);
+		super.orphan(db, asPack);
 		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount), db);
-
-		//UPDATE REFERENCE OF ISSUER
-		this.creator.setLastReference(this.reference, db);
 		
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 		
@@ -502,13 +497,22 @@ public class DeployATTransaction extends Transaction
 	}
 	
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts() 
 	{
-		List<Account> accounts = new ArrayList<Account>();
+		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
+		accounts.addAll(this.getRecipientAccounts());
 		return accounts;
 	}
 
+	@Override
+	public HashSet<Account> getRecipientAccounts()
+	{
+		HashSet<Account> accounts = new HashSet<>();
+		accounts.add(this.getATaccount());
+		return accounts;
+	}
+	
 	@Override
 	public boolean isInvolved(Account account) 
 	{
@@ -519,6 +523,11 @@ public class DeployATTransaction extends Transaction
 			return true;
 		}
 
+		if(address.equals(this.getATaccount().getAddress()))
+		{
+			return true;
+		}
+		
 		return false;
 	}
 
@@ -537,10 +546,10 @@ public class DeployATTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.QORA_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.getATaccount().getAddress(), BalanceMap.QORA_KEY, this.amount);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.getATaccount().getAddress(), BalanceMap.FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

@@ -1,7 +1,7 @@
 package utils;
 // 16/03
 import at.AT_Transaction;
-import qora.assets.Trade;
+import qora.item.assets.Trade;
 import qora.block.Block;
 import qora.transaction.Transaction;
 

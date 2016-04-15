@@ -1,5 +1,5 @@
 package gui.create;
-
+// 30/03
 import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -42,6 +43,9 @@ import utils.SaveStrToFile;
 @SuppressWarnings("serial")
 public class SettingLangFrame extends JDialog {
 	
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(SettingLangFrame.class);
 	private  JList<LangFile> listLang;
 	
 	public SettingLangFrame()
@@ -88,7 +92,7 @@ public class SettingLangFrame extends JDialog {
 		buttonGBC.gridy = 2;	
 		buttonGBC.gridx = 1;		
 		
-        JLabel labelSelect = new JLabel("Language:");
+        JLabel labelSelect = new JLabel(Lang.getInstance().translate("Language") + ":");
 		this.add(labelSelect, labelGBC);	
 
       	// read internet 
@@ -100,7 +104,7 @@ public class SettingLangFrame extends JDialog {
 			InputStream in = u.openStream();
 			stringFromInternet = IOUtils.toString(in, Charsets.UTF_8);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			LOGGER.error(e1.getMessage(),e1);
 			stringFromInternet = "";
 		}
 		
@@ -175,7 +179,7 @@ public class SettingLangFrame extends JDialog {
 			Settings.FreeInstance();
 			Lang.getInstance().loadLang();
 		}catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			JOptionPane.showMessageDialog(
 				new JFrame(), "Error writing to the file: "
 						+ "\nProbably there is no access.",

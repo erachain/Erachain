@@ -5,10 +5,11 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 //import ntp.NTP;
 
@@ -18,8 +19,8 @@ import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 //import qora.account.PrivateKeyAccount;
 import qora.account.PublicKeyAccount;
-import qora.assets.Asset;
-import qora.assets.AssetFactory;
+import qora.item.assets.AssetCls;
+import qora.item.assets.AssetFactory;
 import qora.crypto.Base58;
 import qora.crypto.Crypto;
 
@@ -27,19 +28,20 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import database.AssetMap;
+import database.ItemAssetMap;
 //import database.BalanceMap;
 import database.DBSet;
 
+// qora.block.Block.isValid(DBSet) - check as false it
 public class GenesisIssueAssetTransaction extends Transaction 
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Genesis Issue Asset";
 	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + CREATOR_LENGTH + TIMESTAMP_LENGTH;
-	private Asset asset;
+	private AssetCls asset;
 	
-	public GenesisIssueAssetTransaction(PublicKeyAccount creator, Asset asset, long timestamp) 
+	public GenesisIssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, long timestamp) 
 	{
 		super(TYPE_ID, NAME_ID, timestamp);
 
@@ -55,7 +57,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);
-		byte[] data = this.toBytes( false );
+		byte[] data = this.toBytes( false, null );
 
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);
@@ -66,7 +68,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 	}
 		
-	public Asset getAsset()
+	public AssetCls getAsset()
 	{
 		return this.asset;
 	}
@@ -113,7 +115,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		//READ ASSET
 		// read without reference
-		Asset asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+		AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += asset.getDataLength(false);
 						
 		return new GenesisIssueAssetTransaction(creator, asset, timestamp);
@@ -121,7 +123,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	
 	
 	@Override
-	public byte[] toBytes(boolean withSign) 
+	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
 		
 		//WRITE TYPE
@@ -146,7 +148,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	}
 	
 	@Override
-	public int getDataLength()
+	public int getDataLength(boolean asPack)
 	{
 		// not include asset REFERENCE
 		return BASE_LENGTH + this.asset.getDataLength(false);
@@ -161,7 +163,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 	}
 	
 	@Override
-	public int isValid(DBSet db) 
+	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		
 		//CHECK IF ADDRESS IS VALID
@@ -172,7 +174,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 
 		//CHECK NAME LENGTH
 		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > 400 || nameLength < 1)
+		if(nameLength > AssetCls.MAX_NAME_LENGTH || nameLength < 1)
 		{
 			return INVALID_NAME_LENGTH;
 		}
@@ -197,16 +199,16 @@ public class GenesisIssueAssetTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	@Override
-	public void process(DBSet db)
+	public void process(DBSet db, boolean asPack)
 	{
 		
 		//UPDATE REFERENCE OF CREATOR
 		this.creator.setLastReference(this.signature, db);
 
 		//INSERT INTO DATABASE
-		AssetMap assetMap = db.getAssetMap();
+		ItemAssetMap assetMap = db.getAssetMap();
 		int mapSize = assetMap.size();
-		//Logger.getGlobal().info("GENESIS MAP SIZE: " + assetMap.size());
+		//LOGGER.info("GENESIS MAP SIZE: " + assetMap.size());
 		long key = 0l;
 		if (mapSize == 0) {
 			// initial map set
@@ -220,13 +222,13 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//ADD ASSETS TO OWNER
 		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
 
-		//Logger.getGlobal().info("GENESIS ASSET KEY: " + key);
+		//LOGGER.info("GENESIS ASSET KEY: " + key);
 
 	}
 
 
 	@Override
-	public void orphan(DBSet db) 
+	public void orphan(DBSet db, boolean asPack) 
 	{
 														
 		//UPDATE REFERENCE OF CREATOR
@@ -243,39 +245,35 @@ public class GenesisIssueAssetTransaction extends Transaction
 		//DELETE ORPHAN DATA
 		db.getIssueAssetMap().delete(this);
 
-		//Logger.getGlobal().info("GENESIS ORpHAN ASSET KEY: " + assetKey);
-
+		//LOGGER.info("GENESIS ORpHAN ASSET KEY: " + assetKey);
 
 	}
 
+	@Override
+	public HashSet<Account> getInvolvedAccounts()
+	{
+		return this.getRecipientAccounts();
+	}
 
 	@Override
-	public List<Account> getInvolvedAccounts() 
+	public HashSet<Account> getRecipientAccounts()
 	{
-		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(this.asset.getCreator());
+		HashSet<Account> accounts = new HashSet<>();
+		accounts.add(this.creator);
 		return accounts;
 	}
-
-
+	
 	@Override
 	public boolean isInvolved(Account account) 
-	{
-		String address = account.getAddress();
-		
-		if(address.equals(this.asset.getCreator().getAddress()))
-		{
-			return true;
-		}
-		
-		return false;
+	{	
+		return this.creator.getAddress().equals(account.getAddress());		
 	}
 
 
 	//@Override
 	public BigDecimal viewAmount(Account account) 
 	{		
-		return BigDecimal.ZERO;
+		return new BigDecimal(this.asset.getQuantity());
 	}
 	
 	//@Override

@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
 import qora.crypto.Base58;
@@ -46,6 +48,8 @@ import database.DBSet;
 
 @SuppressWarnings("serial")
 public class ResponseAcctFrame extends JFrame {
+	static Logger LOGGER = Logger.getLogger(ResponseAcctFrame.class.getName());
+
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtFeePow;
 	private JTextField txtHashSecret;
@@ -115,7 +119,7 @@ public class ResponseAcctFrame extends JFrame {
 
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 
 		//COMBOBOX FROM
@@ -125,7 +129,7 @@ public class ResponseAcctFrame extends JFrame {
 
 		//SWAP LABEP
 		labelGBC.gridy = 1;
-		JLabel swapLabel = new JLabel(Lang.getInstance().translate("Trade:"));
+		JLabel swapLabel = new JLabel(Lang.getInstance().translate("Trade") + ":");
 		this.add(swapLabel, labelGBC);
 
 		//TXT AMOUNT
@@ -154,7 +158,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 2;
 		labelGBC.gridx = 0;
-		JLabel csPagesLabel = new JLabel(Lang.getInstance().translate("Recipient:"));
+		JLabel csPagesLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
 		this.add(csPagesLabel, labelGBC);
 
 		//TXT NAME
@@ -173,7 +177,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL BURST ADDRESS
 		labelGBC.gridy = 3;
 		labelGBC.gridx = 0;
-		JLabel burstAddressLabel = new JLabel(Lang.getInstance().translate("My BURST address:"));
+		JLabel burstAddressLabel = new JLabel(Lang.getInstance().translate("My BURST address") + ":");
 		this.add(burstAddressLabel, labelGBC);
 
 		//TXT LABEL ADDRESS
@@ -188,7 +192,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL DATA
 		labelGBC.gridy = 4;
 		labelGBC.gridx = 0;
-		JLabel dataBytesLabel = new JLabel(Lang.getInstance().translate("Lock:"));
+		JLabel dataBytesLabel = new JLabel(Lang.getInstance().translate("Lock") + ":");
 		this.add(dataBytesLabel, labelGBC);
 
 		//TXTAREA DESCRIPTION
@@ -210,7 +214,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL FEE
 		labelGBC.gridy = 6;
 		labelGBC.gridx = 0;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
 		this.add(feeLabel, labelGBC);
 
 		//TXT FEE
@@ -229,7 +233,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 7;
 		labelGBC.gridx = 0;
-		final JLabel dPagesLabel = new JLabel(Lang.getInstance().translate("Expire after:"));
+		final JLabel dPagesLabel = new JLabel(Lang.getInstance().translate("Expire after") + ":");
 		this.add(dPagesLabel, labelGBC);
 
 		//TXT NAME
@@ -248,7 +252,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 8;
 		labelGBC.gridx = 0;
-		JLabel minActivationAmountLabel = new JLabel(Lang.getInstance().translate("Min activation amount:"));
+		JLabel minActivationAmountLabel = new JLabel(Lang.getInstance().translate("Min activation amount") + ":");
 		this.add(minActivationAmountLabel, labelGBC);
 
 		//TXT NAME
@@ -538,7 +542,7 @@ public class ResponseAcctFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown exception!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 			}
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 
 		//ENABLE

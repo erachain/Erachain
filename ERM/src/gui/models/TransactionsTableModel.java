@@ -3,6 +3,8 @@ package gui.models;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.log4j.Logger;
+
 import qora.transaction.Transaction;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
@@ -14,7 +16,7 @@ import lang.Lang;
 
 @SuppressWarnings("serial")
 // IN gui.DebugTabPane used
-public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> implements Observer {
+public class TransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
 	
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
@@ -25,7 +27,8 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "OIL"});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
-	
+
+	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
 
 	public TransactionsTableModel()
 	{
@@ -87,7 +90,7 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 			case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.getName());
+				return Lang.getInstance().translate(transaction.getRecordType());
 				
 			case COLUMN_AMOUNT:
 				
@@ -101,7 +104,7 @@ public class TransactionsTableModel extends QoraTableModel<byte[], Transaction> 
 			return null;
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 	}

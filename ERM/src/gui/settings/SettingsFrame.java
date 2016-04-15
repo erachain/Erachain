@@ -19,11 +19,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import controller.Controller;
 import gui.Menu;
+import gui.naming.SellNameFrame;
 import lang.Lang;
 import lang.LangFile;
 import network.Network;
@@ -32,6 +34,8 @@ import utils.SaveStrToFile;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JFrame{
+	static Logger LOGGER = Logger.getLogger(SettingsFrame.class.getName());
+
 	public JSONObject settingsJSONbuf;
 	private SettingsTabPane settingsTabPane;
 	
@@ -296,7 +300,7 @@ public class SettingsFrame extends JFrame{
 				SaveStrToFile.saveJsonFine(Settings.getInstance().getPeersPath(), jsonObject);			
 				
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage(),e);
 				JOptionPane.showMessageDialog(
 						new JFrame(), "Error writing to the file: " + Settings.getInstance().getPeersPath()
 								+ "\nProbably there is no access.",
@@ -339,7 +343,7 @@ public class SettingsFrame extends JFrame{
 		try {
 			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);			
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			JOptionPane.showMessageDialog(
 					new JFrame(), "Error writing to the file: " + Settings.getInstance().getSettingsPath()
 							+ "\nProbably there is no access.",

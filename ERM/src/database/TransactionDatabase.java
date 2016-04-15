@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import ntp.NTP;
 
+import org.apache.log4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
@@ -24,6 +25,9 @@ public class TransactionDatabase extends Observable implements Observer {
 	private TransactionDatabase parent;
 	private DBSet databaseSet;	
 	private Map<byte[], byte[]> transactionMap;	
+	
+	static Logger LOGGER = Logger.getLogger(TransactionDatabase.class.getName());
+
 	
 	public TransactionDatabase(DBSet databaseSet, DB database)
 	{
@@ -63,7 +67,7 @@ public class TransactionDatabase extends Observable implements Observer {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return new ArrayList<Transaction>();
 		}		
 	}
@@ -87,7 +91,7 @@ public class TransactionDatabase extends Observable implements Observer {
 		{
 			if(this.transactionMap.containsKey(signature))
 			{
-				return TransactionFactory.getInstance().parse(this.transactionMap.get(signature));
+				return TransactionFactory.getInstance().parse(this.transactionMap.get(signature), null);
 			}
 			else
 			{
@@ -110,7 +114,7 @@ public class TransactionDatabase extends Observable implements Observer {
 	{
 		try
 		{			
-			this.transactionMap.put(transaction.getSignature(), transaction.toBytes(true));
+			this.transactionMap.put(transaction.getSignature(), transaction.toBytes(true, null));
 			
 			//COMMIT
 			if(this.databaseSet != null)
@@ -120,7 +124,7 @@ public class TransactionDatabase extends Observable implements Observer {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}	
 	}
 	

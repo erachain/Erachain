@@ -1,7 +1,7 @@
 package gui;
 
+import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
-import gui.models.AssetsComboBoxModel;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -18,7 +18,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import qora.account.Account;
-import qora.assets.Asset;
+import qora.item.assets.AssetCls;
 import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 //import settings.Settings;
@@ -38,7 +38,7 @@ public class SendMoneyPanel extends JPanel
 	private JTextField txtRecDetails;
 	private JButton sendButton;
 	private AccountsComboBoxModel accountsModel;
-	private JComboBox<Asset> cbxFavorites;
+	private JComboBox<AssetCls> cbxFavorites;
 	
 	public SendMoneyPanel()
 	{
@@ -83,7 +83,7 @@ public class SendMoneyPanel extends JPanel
 		favoritesGBC.gridy = 0;	
 		
 		//ASSET FAVORITES
-		cbxFavorites = new JComboBox<Asset>(new AssetsComboBoxModel());
+		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
 		
 		//BUTTON GBC
@@ -96,7 +96,7 @@ public class SendMoneyPanel extends JPanel
 		
 		//LABEL FROM
 		labelGBC.gridy = 2;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -110,7 +110,7 @@ public class SendMoneyPanel extends JPanel
 		cbxFavorites.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 		    	
-		    	Asset asset = ((Asset) cbxFavorites.getSelectedItem());
+		    	AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 		    	if(asset != null)
 		    	{
 		    		((AccountRenderer)cbxFrom.getRenderer()).setAsset(asset.getKey());
@@ -147,7 +147,7 @@ public class SendMoneyPanel extends JPanel
         
         //LABEL RECEIVER DETAILS 
       	labelGBC.gridy = 4;
-      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details:"));
+      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
       	this.add(recDetailsLabel, labelGBC);
       		
       	//RECEIVER DETAILS 
@@ -158,7 +158,7 @@ public class SendMoneyPanel extends JPanel
         
         //LABEL AMOUNT
       	labelGBC.gridy = 5;
-      	JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount:"));
+      	JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
       	this.add(amountLabel, labelGBC);
       		
       	//TXT AMOUNT
@@ -168,7 +168,7 @@ public class SendMoneyPanel extends JPanel
         
         //LABEL FEE POWER
       	labelGBC.gridy = 6;
-      	JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
+      	JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
       	this.add(feePowLabel, labelGBC);
       		
       	//TXT FEE POWER
@@ -206,7 +206,7 @@ public class SendMoneyPanel extends JPanel
 	private void refreshReceiverDetails()
 	{
 		String toValue = txtTo.getText();
-		Asset asset = ((Asset) cbxFavorites.getSelectedItem());
+		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 		
 		if(toValue.isEmpty())
 		{
@@ -339,7 +339,7 @@ public class SendMoneyPanel extends JPanel
 		}
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
-			Asset asset = (Asset) this.cbxFavorites.getSelectedItem();
+			AssetCls asset = (AssetCls) this.cbxFavorites.getSelectedItem();
 			Pair<Transaction, Integer> result;
 			if(asset.getKey() == 0l)
 			{

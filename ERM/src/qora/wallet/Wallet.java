@@ -10,7 +10,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -22,21 +22,26 @@ import controller.Controller;
 import database.DBSet;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.WalletDatabase;
+import network.message.Message;
 import qora.account.Account;
 import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.assets.Order;
+import qora.item.ItemCls;
+import qora.item.assets.AssetCls;
+import qora.item.notes.NoteCls;
+import qora.item.assets.Order;
 import qora.block.Block;
 import qora.block.GenesisBlock;
 import qora.crypto.Crypto;
 import qora.naming.Name;
 import qora.naming.NameSale;
+import qora.transaction.ArbitraryTransaction;
 import qora.transaction.BuyNameTransaction;
 import qora.transaction.CancelOrderTransaction;
 import qora.transaction.CancelSellNameTransaction;
 import qora.transaction.CreateOrderTransaction;
 import qora.transaction.CreatePollTransaction;
 import qora.transaction.IssueAssetTransaction;
+import qora.transaction.IssueNoteRecord;
 import qora.transaction.PaymentTransaction;
 import qora.transaction.RegisterNameTransaction;
 import qora.transaction.SellNameTransaction;
@@ -44,7 +49,7 @@ import qora.transaction.Transaction;
 import qora.transaction.UpdateNameTransaction;
 import qora.transaction.VoteOnPollTransaction;
 import qora.voting.Poll;
-import utils.AssetsFavorites;
+import qora.wallet.NotesFavorites;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -62,7 +67,10 @@ public class Wallet extends Observable implements Observer
 	private int syncHeight;
 	
 	AssetsFavorites assetsFavorites; 
+	NotesFavorites notesFavorites; 
 	
+	static Logger LOGGER = Logger.getLogger(Wallet.class.getName());
+
 	//CONSTRUCTORS
 	
 	public Wallet()
@@ -86,11 +94,28 @@ public class Wallet extends Observable implements Observer
 	{
 		return this.syncHeight;
 	}
-	
+
+	/*
 	public void initiateAssetsFavorites()
 	{
 		if(this.assetsFavorites == null){
 			this.assetsFavorites = new AssetsFavorites();
+		}
+	}
+	public void initiateNotesFavorites()
+	{
+		if(this.notesFavorites == null){
+			this.notesFavorites = new NotesFavorites();
+		}
+	}
+	*/
+	public void initiateItemsFavorites()
+	{
+		if(this.assetsFavorites == null){
+			this.assetsFavorites = new AssetsFavorites();
+		}
+		if(this.notesFavorites == null){
+			this.notesFavorites = new NotesFavorites();
 		}
 	}
 	
@@ -264,7 +289,8 @@ public class Wallet extends Observable implements Observer
 		return this.database.getPollMap().get(account);
 	}
 	
-	public void addAssetFavorite(Asset asset)
+	/*
+	public void addAssetFavorite(AssetCls asset)
 	{
 		if(!this.exists())
 		{
@@ -273,7 +299,26 @@ public class Wallet extends Observable implements Observer
 		
 		this.database.getAssetFavoritesSet().add(asset.getKey());
 	}
-	
+	public void addNoteFavorite(NoteCls note)
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		this.database.getNoteFavoritesSet().add(note.getKey());
+	}
+	*/
+	public void addItemFavorite(ItemCls item)
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		this.database.addItemToFavorite(item);
+	}
+
 	public void replaseAssetFavorite()
 	{
 		if(!this.exists())
@@ -285,8 +330,39 @@ public class Wallet extends Observable implements Observer
 			this.database.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());	
 		}
 	}
+	public void replaseNoteFavorite()
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		if(this.notesFavorites != null) {
+			this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());	
+		}
+	}
+	// тут нужно понять где это используется
+	public void replaseFavoriteItems(int type)
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		switch (type) {
+			case ItemCls.ASSET_TYPE:
+				if(this.assetsFavorites != null) {
+					this.database.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());
+				}
+			case ItemCls.NOTE_TYPE:
+				if(this.notesFavorites != null) {
+					this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());
+				}
+		}
+	}
 	
-	public void removeAssetFavorite(Asset asset)
+	/*
+	public void removeAssetFavorite(AssetCls asset)
 	{
 		if(!this.exists())
 		{
@@ -295,8 +371,28 @@ public class Wallet extends Observable implements Observer
 		
 		this.database.getAssetFavoritesSet().delete(asset.getKey());
 	}
+	public void removeNoteFavorite(NoteCls note)
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		this.database.getNoteFavoritesSet().delete(note.getKey());
+	}
+	*/
+	public void removeItemFavorite(ItemCls item)
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		this.database.removeItemFromFavorite(item);
+	}
 	
-	public boolean isAssetFavorite(Asset asset)
+	/*
+	public boolean isAssetFavorite(AssetCls asset)
 	{
 		if(!this.exists())
 		{
@@ -305,7 +401,26 @@ public class Wallet extends Observable implements Observer
 		
 		return this.database.getAssetFavoritesSet().contains(asset.getKey());
 	}
-	
+	public boolean isNoteFavorite(NoteCls note)
+	{
+		if(!this.exists())
+		{
+			return false;
+		}
+		
+		return this.database.getNoteFavoritesSet().contains(note.getKey());
+	}
+	*/
+	public boolean isItemFavorite(ItemCls item)
+	{
+		if(!this.exists())
+		{
+			return false;
+		}
+		
+		return this.database.isItemFavorite(item);
+	}
+
 	//CREATE
 	
 	public boolean create(byte[] seed, String password, int depth, boolean synchronize)
@@ -356,7 +471,8 @@ public class Wallet extends Observable implements Observer
 	    Controller.getInstance().addObserver(this);
 	    DBSet.getInstance().getCompletedOrderMap().addObserver(this);
 	    
-	    this.initiateAssetsFavorites();
+	    this.initiateItemsFavorites();
+	    //this.initiateNotesFavorites();
 	    
 	    return true;
 	}
@@ -385,7 +501,7 @@ public class Wallet extends Observable implements Observer
 	    	//ADD TO DATABASE
 		    this.secureDatabase.getAccountSeedMap().add(account);
 		    this.database.getAccountMap().add(account);
-		    Logger.getGlobal().info("Added account #" + nonce);
+		    LOGGER.info("Added account #" + nonce);
 		    
 		    this.secureDatabase.commit();
 		    this.database.commit();
@@ -448,8 +564,9 @@ public class Wallet extends Observable implements Observer
 		this.database.getNameSaleMap().reset();
 		this.database.getPollMap().reset();
 		this.database.getAssetMap().reset();
+		this.database.getNoteMap().reset();
 		this.database.getOrderMap().reset();
-		Logger.getGlobal().info("Resetted maps");
+		LOGGER.info("Resetted maps");
 		
 		//REPROCESS BLOCKS
 		Block block = new GenesisBlock();
@@ -470,7 +587,7 @@ public class Wallet extends Observable implements Observer
 					
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 					
-					Logger.getGlobal().info("Synchronize wallet: " + this.syncHeight);
+					LOGGER.info("Synchronize wallet: " + this.syncHeight);
 					this.database.commit();
 				}
 				
@@ -494,7 +611,7 @@ public class Wallet extends Observable implements Observer
 				this.database.getAccountMap().update(account, account.getConfirmedBalance());
 			}
 		}
-		Logger.getGlobal().info("Resetted balances");
+		LOGGER.info("Resetted balances");
 
 		Controller.getInstance().walletSyncStatusUpdate(-1);
 		
@@ -603,7 +720,34 @@ public class Wallet extends Observable implements Observer
 	  	
 	  	//ADD ASSETS
 	  	this.database.getOrderMap().addAll(orders);
+
+	  	//SCAN NOTES --------
+	  	 * notes!
+		Map<Account, List<NoteCls>> notes;
+	  	synchronized(accounts)
+	  	{
+	  		assets = Controller.getInstance().scanAssets(accounts);
+	  	}
 	  	
+	  	//DELETE NOTES
+	  	this.database.getAssetMap().deleteAll(accounts);
+	  	
+	  	//ADD ASSETS
+	  	this.database.getAssetMap().addAll(assets);
+
+	  	//SCAN ORDERS
+	  	Map<Account, List<Order>> orders;
+	  	synchronized(accounts)
+	  	{
+	  		orders = Controller.getInstance().scanOrders(accounts);
+	  	}
+	  	
+	  	//DELETE ASSETS
+	  	this.database.getOrderMap().deleteAll(accounts);
+	  	
+	  	//ADD ASSETS ---- notes
+	  	this.database.getOrderMap().addAll(orders);
+
 	  	//SET LAST BLOCK
 	  	this.database.setLastBlockSignature(Controller.getInstance().getLastBlock().getSignature());*/
 	}
@@ -777,12 +921,18 @@ public class Wallet extends Observable implements Observer
 		//REGISTER ON ASSETS
 		this.database.getAssetMap().addObserver(o);
 
+		//REGISTER ON NOTES
+		this.database.getNoteMap().addObserver(o);
+
 		//REGISTER ON ORDERS
 		this.database.getOrderMap().addObserver(o);
 		
 		//REGISTER ON ASSET FAVORITES
 		this.database.getAssetFavoritesSet().addObserver(o);
 		
+		//REGISTER ON NOTE FAVORITES
+		this.database.getNoteFavoritesSet().addObserver(o);
+
 		//SEND STATUS
 		int status = STATUS_LOCKED;
 		if(this.isUnlocked())
@@ -913,7 +1063,7 @@ public class Wallet extends Observable implements Observer
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if(lastBlockSignature == null || !Arrays.equals(lastBlockSignature, block.getReference()))
 		{
-			Logger.getGlobal().info("Wallet not synchronized with current blockchain: synchronizing wallet.");
+			LOGGER.info("Wallet not synchronized with current blockchain: synchronizing wallet.");
 			this.synchronize();
 		}
 		
@@ -961,10 +1111,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(nameRegistration.getAName().getOwner().getAddress()))
+		if(this.accountExists(nameRegistration.getName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().add(nameRegistration.getAName());
+			this.database.getNameMap().add(nameRegistration.getName());
 		}
 	}
 	
@@ -977,10 +1127,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(nameRegistration.getAName().getOwner().getAddress()))
+		if(this.accountExists(nameRegistration.getName().getOwner().getAddress()))
 		{
 			//DELETE NAME
-			this.database.getNameMap().delete(nameRegistration.getAName());
+			this.database.getNameMap().delete(nameRegistration.getName());
 		}
 	}
 	
@@ -1056,7 +1206,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER CHANGED
-			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getAName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
 			{
 				//DELETE PREVIOUS NAME
 				Name name = DBSet.getInstance().getUpdateNameMap().get(nameUpdate);
@@ -1065,10 +1215,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE NEW OWNER
-		if(this.accountExists(nameUpdate.getAName().getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().add(nameUpdate.getAName());
+			this.database.getNameMap().add(nameUpdate.getName());
 		}
 	}
 	
@@ -1078,20 +1228,20 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(nameUpdate.getCreator().getAddress()))
 		{
 			//CHECK IF OWNER WAS CHANGED
-			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getAName().getOwner().getAddress()))
+			if(!nameUpdate.getCreator().getAddress().equals(nameUpdate.getName().getOwner().getAddress()))
 			{
 				//ADD PREVIOUS  NAME
-				Name name = DBSet.getInstance().getNameMap().get(nameUpdate.getAName().getName());
+				Name name = DBSet.getInstance().getNameMap().get(nameUpdate.getName().getName());
 				this.database.getNameMap().add(name);
 
 			}
 		}
 		
 		//CHECK IF WE WERE NEW OWNER
-		if(this.accountExists(nameUpdate.getAName().getOwner().getAddress()))
+		if(this.accountExists(nameUpdate.getName().getOwner().getAddress()))
 		{
 			//ADD NAME
-			this.database.getNameMap().delete(nameUpdate.getAName());
+			this.database.getNameMap().delete(nameUpdate.getName());
 		}
 	}
 	
@@ -1122,7 +1272,7 @@ public class Wallet extends Observable implements Observer
 		{
 			//REMOVE FROM DATABASE
 			BigDecimal amount = DBSet.getInstance().getCancelSellNameMap().get(cancelNameSaleTransaction);
-			NameSale nameSale = new NameSale(cancelNameSaleTransaction.getAName(), amount);
+			NameSale nameSale = new NameSale(cancelNameSaleTransaction.getName(), amount);
 			this.database.getNameSaleMap().delete(nameSale);
 		}
 	}
@@ -1133,7 +1283,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(cancelNameSaleTransaction.getCreator().getAddress()))
 		{
 			//ADD TO DATABASE
-			NameSale nameSale = DBSet.getInstance().getNameExchangeMap().getNameSale(cancelNameSaleTransaction.getAName());
+			NameSale nameSale = DBSet.getInstance().getNameExchangeMap().getNameSale(cancelNameSaleTransaction.getName());
 			this.database.getNameSaleMap().add(nameSale);
 		}
 	}
@@ -1197,7 +1347,7 @@ public class Wallet extends Observable implements Observer
 		//CHECK IF WE ARE OWNER
 		if(this.accountExists(assetIssue.getAsset().getCreator().getAddress()))
 		{
-			//ADD POLL
+			//ADD ASSET
 			this.database.getAssetMap().add(assetIssue.getAsset());
 		}
 	}
@@ -1215,6 +1365,37 @@ public class Wallet extends Observable implements Observer
 		{
 			//DELETE ASSET
 			this.database.getAssetMap().delete(assetIssue.getAsset());
+		}
+	}
+	private void processNoteIssue(IssueNoteRecord noteIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(noteIssue.getItem().getCreator().getAddress()))
+		{
+			//ADD NOTE
+			this.database.getNoteMap().add((NoteCls)noteIssue.getItem());
+		}
+	}
+	
+	private void orphanNoteIssue(IssueNoteRecord noteIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(noteIssue.getItem().getCreator().getAddress()))
+		{
+			//DELETE NOTE
+			this.database.getNoteMap().delete((NoteCls)noteIssue.getItem());
 		}
 	}
 	
@@ -1360,6 +1541,11 @@ public class Wallet extends Observable implements Observer
 				{
 					this.processAssetIssue((IssueAssetTransaction) transaction);
 				}
+				//CHECK IF NOTE ISSUE
+				else if(transaction instanceof IssueNoteRecord)
+				{
+					this.processNoteIssue((IssueNoteRecord) transaction);
+				}
 				
 				//CHECK IF ORDER CREATION
 				/*if(transaction instanceof CreateOrderTransaction)
@@ -1403,6 +1589,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueAssetTransaction)
 			{
 				this.processAssetIssue((IssueAssetTransaction) transaction);
+			}
+			//CHECK IF NOTE ISSUE
+			else if(transaction instanceof IssueNoteRecord)
+			{
+				this.processNoteIssue((IssueNoteRecord) transaction);
 			}
 			
 			//CHECK IF ORDER CREATION
@@ -1471,6 +1662,11 @@ public class Wallet extends Observable implements Observer
 				{
 					this.orphanAssetIssue((IssueAssetTransaction) transaction);
 				}
+				//CHECK IF NOTE ISSUE
+				else if(transaction instanceof IssueNoteRecord)
+				{
+					this.orphanNoteIssue((IssueNoteRecord) transaction);
+				}
 				
 				//CHECK IF ORDER CREATION
 				else if(transaction instanceof CreateOrderTransaction)
@@ -1513,6 +1709,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueAssetTransaction)
 			{
 				this.orphanAssetIssue((IssueAssetTransaction) transaction);
+			}
+			//CHECK IF NOTE ISSUE
+			else if(transaction instanceof IssueNoteRecord)
+			{
+				this.orphanNoteIssue((IssueNoteRecord) transaction);
 			}
 			
 			//CHECK IF ORDER CREATION
