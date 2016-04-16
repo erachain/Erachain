@@ -29,7 +29,7 @@ public class FavoriteItem extends Observable {
 		for (long i = 1; i < initialAdd; i++)
 		{
 			//CHECK IF CONTAINS ITEM
-			if(!this.itemsSet.contains(0l))
+			if(!this.itemsSet.contains(i))
 			{
 				this.add(i);
 			} else {

@@ -37,7 +37,7 @@ public class PersonFactory {
 		case PersonCls.HUMAN:
 			
 			//PARSE SIMPLE NOTE
-			return Person.parse(data, includeReference);
+			return PersonHuman.parse(data, includeReference);
 						
 		case PersonCls.DOG:
 				

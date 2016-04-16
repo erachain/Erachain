@@ -28,6 +28,9 @@ public class AssetsFavorites implements Observer{
 		
 		Controller.getInstance().addWalletListener(this);
 		Controller.getInstance().addObserver(this);
+		///this.reload();
+		//this.getAssets();
+		
 	}
 	
 	public List<Long> getKeys()
@@ -38,14 +41,34 @@ public class AssetsFavorites implements Observer{
 	public List<AssetCls> getAssets()
 	{
 		List<AssetCls> assets = new ArrayList<AssetCls>();
-		assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY));		
-		assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY + 1l));		
+		//assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY));		
+		//assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
 			assets.add(Controller.getInstance().getAsset(key));
 		}
 		return assets;
 	}
 	
+	public void reload()
+	{
+		List<Long> favoritesUpadate = new ArrayList<Long>();
+		
+		for (Account account : Controller.getInstance().getAccounts()) {
+			SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getBalanceMap().getBalancesSortableList(account);
+			
+			for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
+				if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {
+					if(!favoritesUpadate.contains(balance.getA().b)){
+						favoritesUpadate.add(balance.getA().b);
+					}
+				}
+			}
+		}
+		this.favorites = favoritesUpadate;
+
+		Controller.getInstance().replaseAssetsFavorites();
+
+	}
 	
 	@Override
 	public void update(Observable o, Object arg) {
@@ -68,23 +91,7 @@ public class AssetsFavorites implements Observer{
 							message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
 					)))
 		{
-			List<Long> favoritesUpadate = new ArrayList<Long>();
-			favoritesUpadate.add(0L);
-			
-			for (Account account : Controller.getInstance().getAccounts()) {
-				SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getBalanceMap().getBalancesSortableList(account);
-				
-				for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
-					if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {
-						if(!favoritesUpadate.contains(balance.getA().b)){
-							favoritesUpadate.add(balance.getA().b);
-						}
-					}
-				}
-			}
-			this.favorites = favoritesUpadate;
-
-			Controller.getInstance().replaseAssetsFavorites();
+			this.reload();
 		}
 	}
 }

@@ -107,13 +107,13 @@ public class GeneralTabPane extends JTabbedPane{
         //VOTING
         this.addTab(Lang.getInstance().translate("Voting"), new VotingPanel());       
         
-        //ASSETS
-        this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
-
         //NOTES
         this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());
         		//new WalletItemNotesTableModel())
         		//);
+
+        //ASSETS
+        this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
 
 		//ATs
 		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());

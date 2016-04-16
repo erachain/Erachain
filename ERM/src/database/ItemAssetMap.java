@@ -8,6 +8,7 @@ import org.mapdb.DB;
 
 import database.DBSet;
 import database.Item_Map;
+import database.serializer.ItemSerializer;
 import database.serializer.AssetSerializer;
 
 import qora.item.ItemCls;
@@ -46,8 +47,8 @@ public class ItemAssetMap extends Item_Map
 		
 		//OPEN MAP
 		return database.createTreeMap(NAME)
-				//.valueSerializer(new ItemSerializer(TYPE))
-				.valueSerializer(new AssetSerializer())
+				.valueSerializer(new ItemSerializer(TYPE))
+				//.valueSerializer(new AssetSerializer())
 				.makeOrGet();
 	}
 

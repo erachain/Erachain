@@ -39,6 +39,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import qora.account.Account;
+import gui.items.notes.ComboBoxModelItemsNotes;
 import qora.item.ItemCls;
 import qora.item.assets.AssetCls;
 import qora.item.notes.NoteCls;
@@ -66,7 +67,7 @@ public class RecordNotePanel extends JPanel
 	private JButton sendButton;
 	private JButton packButton;
 	private AccountsComboBoxModel accountsModel;
-	private JComboBox<ItemCls> cbxFavorites;
+	private JComboBox<NoteCls> cbxFavorites;
 	private JTextArea txtRecDetails;
 	private JLabel messageLabel;
 	
@@ -93,8 +94,9 @@ public class RecordNotePanel extends JPanel
 		favoritesGBC.gridx = 0;	
 		favoritesGBC.gridy = gridy++;	
 		
-		cbxFavorites = new JComboBox<ItemCls>(new ComboBoxModelItems(
-					ObserverMessage.LIST_NOTE_FAVORITES_TYPE, ItemCls.NOTE_TYPE));
+		//cbxFavorites = new JComboBox<ItemCls>(new ComboBoxModelItems(
+		//			ObserverMessage.LIST_NOTE_FAVORITES_TYPE, ItemCls.NOTE_TYPE));
+		cbxFavorites = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
 		this.add(cbxFavorites, favoritesGBC);
 
 		//LABEL RECEIVER

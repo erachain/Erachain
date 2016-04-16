@@ -163,7 +163,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
 			// IF QORA ASSET
-			if (payment.getAsset() == FEE_KEY) {
+			if (payment.getAsset() == OIL_KEY) {
 				// IF SENDER
 				if (address.equals(this.creator.getAddress())) {
 					amount = amount.subtract(payment.getAmount());
@@ -184,7 +184,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), OIL_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

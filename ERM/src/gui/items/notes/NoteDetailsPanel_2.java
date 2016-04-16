@@ -15,11 +15,14 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import qora.item.ItemCls;
 import qora.item.notes.NoteCls;
 import controller.Controller;
 import lang.Lang;
+import gui.items.ItemDetailsPanel;
 
-public class NoteDetailsPanel extends JPanel {
+public class NoteDetailsPanel_2 extends ItemDetailsPanel
+{
 
 	private static final long serialVersionUID = 4763074704570450206L;
 	
@@ -27,9 +30,10 @@ public class NoteDetailsPanel extends JPanel {
 
 	private JButton favoritesButton;
 	
-	public NoteDetailsPanel(NoteCls note)
+	public NoteDetailsPanel_2(NoteCls item)
 	{
-		this.note = note;
+		
+		super(item);
 	
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
@@ -99,14 +103,14 @@ public class NoteDetailsPanel extends JPanel {
 		JTextField owner = new JTextField(note.getCreator().getAddress());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
-								
-		//IF NOTE CONFIRMED
+						
+		//IF ASSET CONFIRMED
 		if(this.note.getKey() >= 0)
 		{
 			//ADD QORA PAIR BUTTON
 			labelGBC.gridy++;
 			labelGBC.gridwidth = 2;
-			JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
+			JButton openPairButton = new JButton(Lang.getInstance().translate("Sign Note"));
 			openPairButton.setPreferredSize(new Dimension(200, 25));
 			openPairButton.addActionListener(new ActionListener()
 			{
@@ -118,7 +122,7 @@ public class NoteDetailsPanel extends JPanel {
 			this.add(openPairButton, labelGBC);
 		}
 		
-		//IF NOTE CONFIRMED AND NOT QORA
+		//IF ASSET CONFIRMED AND NOT QORA
 		if(this.note.getKey() > 2l)
 		{
 			//FAVORITES
@@ -127,7 +131,7 @@ public class NoteDetailsPanel extends JPanel {
 			this.favoritesButton = new JButton();
 			
 			//CHECK IF FAVORITES
-			if(Controller.getInstance().isItemFavorite(note))
+			if(Controller.getInstance().isItemFavorite((ItemCls)note))
 			{
 				this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
 			}
@@ -161,15 +165,15 @@ public class NoteDetailsPanel extends JPanel {
 	public void onFavoriteClick()
 	{
 		//CHECK IF FAVORITES
-		if(Controller.getInstance().isItemFavorite(note))
+		if(Controller.getInstance().isItemFavorite((ItemCls)note))
 		{
 			this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
-			Controller.getInstance().removeItemFavorite(this.note);
+			Controller.getInstance().removeItemFavorite((ItemCls)this.note);
 		}
 		else
 		{
 			this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
-			Controller.getInstance().addItemFavorite(this.note);
+			Controller.getInstance().addItemFavorite((ItemCls)this.note);
 		}
 			
 	}

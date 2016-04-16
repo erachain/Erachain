@@ -514,7 +514,7 @@ public class Wallet extends Observable implements Observer
 	    return account.getAddress();
 	}
 	
-	private byte[] generateAccountSeed(byte[] seed, int nonce) 
+	public static byte[] generateAccountSeed(byte[] seed, int nonce) 
 	{		
 		byte[] nonceBytes = Ints.toByteArray(nonce);
 		byte[] accountSeed = Bytes.concat(nonceBytes, seed, nonceBytes);

@@ -37,7 +37,10 @@ public class PersonalizeRecord extends Transaction {
 	private static final int DURATION_LENGTH = 1; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	private static final BigDecimal MIN_VOTE_BALANCE = BigDecimal.valueOf(10).setScale(8);
-	
+
+	public static final BigDecimal OIL_AMOUNT = BigDecimal.valueOf(0.00003).setScale(8);
+	public static final BigDecimal VOTE_AMOUNT = BigDecimal.ONE.setScale(8);
+
 	protected long key;
 	protected Integer duration; // duration in days 
 	protected PublicKeyAccount userAccount1;
@@ -62,6 +65,13 @@ public class PersonalizeRecord extends Transaction {
 		this.userAccount2 = userAccount2;
 		this.userAccount3 = userAccount3;
 		this.duration = duration; 
+	}
+	public PersonalizeRecord(PublicKeyAccount creator, byte feePow, long key,
+			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
+			int duration, long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
+				userAccount1, userAccount2, userAccount3,
+				duration, timestamp, reference);
 	}
 	public PersonalizeRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
@@ -111,6 +121,11 @@ public class PersonalizeRecord extends Transaction {
 
 	//public static String getName() { return "Send"; }
 
+	public long getKey()
+	{
+		return this.key;
+	}
+
 	public PublicKeyAccount getUserAccount1() 
 	{
 		return this.userAccount1;
@@ -158,31 +173,16 @@ public class PersonalizeRecord extends Transaction {
 		return transaction;	
 	}
 
-	public void signUserAccount1(PrivateKeyAccount userAccount)
+	public void signUserAccounts(PrivateKeyAccount userAccount1, PrivateKeyAccount userAccount2, PrivateKeyAccount userAccount3)
 	{
+		byte[] data;
 		// use this.reference in any case
-		byte[] data = this.toBytes( false, null );
+		data = this.toBytes( false, null );
 		if ( data == null ) return;
 
-		this.userSignature1 = Crypto.getInstance().sign(userAccount, data);
-		//this.calcFee(); // need for recal!
-	}
-	public void signUserAccount2(PrivateKeyAccount userAccount)
-	{
-		// use this.reference in any case
-		byte[] data = this.toBytes( false, null );
-		if ( data == null ) return;
-
-		this.userSignature2 = Crypto.getInstance().sign(userAccount, data);
-		//this.calcFee(); // need for recal!
-	}
-	public void signUserAccount3(PrivateKeyAccount userAccount)
-	{
-		// use this.reference in any case
-		byte[] data = this.toBytes( false, null );
-		if ( data == null ) return;
-
-		this.userSignature3 = Crypto.getInstance().sign(userAccount, data);
+		this.userSignature1 = Crypto.getInstance().sign(userAccount1, data);
+		this.userSignature2 = Crypto.getInstance().sign(userAccount2, data);
+		this.userSignature3 = Crypto.getInstance().sign(userAccount3, data);
 		//this.calcFee(); // need for recal!
 	}
 
@@ -340,19 +340,25 @@ public class PersonalizeRecord extends Transaction {
 	public boolean isSignatureValid() {
 
 		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]
-			| this.userSignature1 == null | this.userSignature1.length != 64 | this.userSignature1 == new byte[64]) return false;
+			| this.userSignature1 == null | this.userSignature1.length != 64 | this.userSignature1 == new byte[64]
+			| this.userSignature2 == null | this.userSignature2.length != 64 | this.userSignature2 == new byte[64]
+			| this.userSignature3 == null | this.userSignature3.length != 64 | this.userSignature3 == new byte[64]
+					)
+			return false;
 		
 		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
 
 		Crypto crypto = Crypto.getInstance();
 		return crypto.verify(creator.getPublicKey(), signature, data)
-				& crypto.verify(this.userAccount1.getPublicKey(), this.userSignature1, data);
+				& crypto.verify(this.userAccount1.getPublicKey(), this.userSignature1, data)
+				& crypto.verify(this.userAccount2.getPublicKey(), this.userSignature2, data)
+				& crypto.verify(this.userAccount3.getPublicKey(), this.userSignature3, data);
 	}
 
 	public int isValid(DBSet db, byte[] releaserReference) {
 		
-		//CHECK DATA SIZE
+		//CHECK DURATION
 		if(duration < 100 | duration > 777)
 		{
 			return INVALID_DURATION;
@@ -380,6 +386,54 @@ public class PersonalizeRecord extends Transaction {
 
 		
 		return super.isValid(db, releaserReference);
+	}
+
+	//PROCESS/ORPHAN
+	
+	public void process(DBSet db, boolean asPack) {
+
+		//UPDATE SENDER
+		super.process(db, asPack);
+
+		// send VOTE_KEY
+		this.creator.setConfirmedBalance(Transaction.OIL_KEY, this.creator.getConfirmedBalance(Transaction.OIL_KEY, db).subtract(OIL_AMOUNT), db);						
+		this.creator.setConfirmedBalance(Transaction.VOTE_KEY, this.creator.getConfirmedBalance(Transaction.VOTE_KEY, db).subtract(VOTE_AMOUNT), db);						
+		//UPDATE USER
+		this.userAccount1.setConfirmedBalance(Transaction.OIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.OIL_KEY, db).add(OIL_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.VOTE_KEY, this.userAccount1.getConfirmedBalance(Transaction.VOTE_KEY, db).add(VOTE_AMOUNT), db);
+		
+		if (!asPack) {
+
+			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
+			if(Arrays.equals(this.userAccount1.getLastReference(db), new byte[0]))
+			{
+				this.userAccount1.setLastReference(this.signature, db);
+			}
+		}
+
+	}
+
+	public void orphan(DBSet db, boolean asPack) {
+
+		//UPDATE SENDER
+		super.orphan(db, asPack);
+		
+		// BACK VOTE_KEY
+		this.creator.setConfirmedBalance(Transaction.OIL_KEY, this.creator.getConfirmedBalance(Transaction.OIL_KEY, db).add(OIL_AMOUNT), db);						
+		this.creator.setConfirmedBalance(Transaction.VOTE_KEY, this.creator.getConfirmedBalance(Transaction.VOTE_KEY, db).add(VOTE_AMOUNT), db);						
+						
+		//UPDATE RECIPIENT
+		this.userAccount1.setConfirmedBalance(Transaction.OIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.OIL_KEY, db).subtract(OIL_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.VOTE_KEY, this.userAccount1.getConfirmedBalance(Transaction.VOTE_KEY, db).subtract(VOTE_AMOUNT), db);
+		
+		if (!asPack) {
+			
+			//UPDATE REFERENCE OF RECIPIENT
+			if(Arrays.equals(this.userAccount1.getLastReference(db), this.signature))
+			{
+				this.userAccount1.removeReference(db);
+			}	
+		}
 	}
 
 	@Override

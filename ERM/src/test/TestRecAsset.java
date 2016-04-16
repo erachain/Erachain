@@ -31,9 +31,9 @@ import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
 import qora.transaction.TransferAssetTransaction;
 
-public class TransactionTests3Assets {
+public class TestRecAsset {
 
-	static Logger LOGGER = Logger.getLogger(TransactionTests3Assets.class.getName());
+	static Logger LOGGER = Logger.getLogger(TestRecAsset.class.getName());
 
 	byte[] releaserReference = null;
 

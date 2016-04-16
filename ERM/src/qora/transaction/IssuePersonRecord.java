@@ -66,7 +66,8 @@ public class IssuePersonRecord extends IssueItemRecord
 	}
 
 	//GETTERS/SETTERS
-	//public static String getName() { return "Issue Person"; }
+	
+	//public String getName() { return "Issue Person"; }
 	
 
 	//PARSE CONVERT

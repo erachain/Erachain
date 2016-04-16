@@ -12,25 +12,25 @@ import qora.account.Account;
 import qora.crypto.Base58;
 import utils.ByteArrayUtils;
 
-public class Person extends PersonCls {
+public class PersonHuman extends PersonCls {
 	
 	private static final int TYPE_ID = PersonCls.HUMAN;
 
-	public Person(Account creator, String fullName, long birthday,
+	public PersonHuman(Account creator, String fullName, long birthday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
 		super(new byte[]{(byte)TYPE_ID}, creator, fullName, birthday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
-	public Person(byte[] typeBytes, Account creator, String fullName, long birthday,
+	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
 		super(typeBytes, creator, fullName, birthday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
 
 	//GETTERS/SETTERS
@@ -38,7 +38,7 @@ public class Person extends PersonCls {
 
 	//PARSE
 	// includeReference - TRUE only for store in local DB
-	public static Person parse(byte[] data, boolean includeReference) throws Exception
+	public static PersonHuman parse(byte[] data, boolean includeReference) throws Exception
 	{	
 
 		// READ TYPE
@@ -159,15 +159,15 @@ public class Person extends PersonCls {
 		position ++;
 
 		//RETURN
-		Person person = new Person(typeBytes, creator, fullName, birthday,
+		PersonHuman personHuman = new PersonHuman(typeBytes, creator, fullName, birthday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, description);
 		if (includeReference)
 		{
-			person.setReference(reference);
+			personHuman.setReference(reference);
 		}
 
-		return person;
+		return personHuman;
 	}
 	
 }

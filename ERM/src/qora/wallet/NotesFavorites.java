@@ -37,8 +37,8 @@ public class NotesFavorites implements Observer{
 	public List<NoteCls> getNotes()
 	{
 		List<NoteCls> notes = new ArrayList<NoteCls>();
-		notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY));		
-		notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY + 1l));		
+		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY));		
+		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
 			notes.add(Controller.getInstance().getNote(key));
 		}
@@ -47,6 +47,7 @@ public class NotesFavorites implements Observer{
 	
 	
 	@Override
+	// if some changed in wallet - reload favorites
 	public void update(Observable o, Object arg) {
 
 		if(!Gui.isGuiStarted()){
@@ -59,16 +60,13 @@ public class NotesFavorites implements Observer{
 			||((Controller.getInstance().getStatus() == Controller.STATUS_OK) && 
 					(
 							message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
-							||
-							message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-							||
-							message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-							||
-							message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
+							|| message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
+							//|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
+							//|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
 					)))
 		{
 			List<Long> favoritesUpadate = new ArrayList<Long>();
-			favoritesUpadate.add(0L);
+			//favoritesUpadate.add(0L);
 			
 			/* balancec = nil
 			for (Account account : Controller.getInstance().getAccounts()) {
@@ -84,9 +82,9 @@ public class NotesFavorites implements Observer{
 			}
 			*/
 			
-			this.favorites = favoritesUpadate;
+			////////this.favorites = favoritesUpadate;
 
-			Controller.getInstance().replaseNotesFavorites();
+			///////Controller.getInstance().replaseNotesFavorites();
 		}
 	}
 }
