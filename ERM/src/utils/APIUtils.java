@@ -12,13 +12,13 @@ import org.apache.log4j.Logger;
 import api.ApiClient;
 import api.ApiErrorFactory;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import core.web.ServletUtils;
 import gui.PasswordPane;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
-import qora.web.ServletUtils;
 import settings.Settings;
 import test.TestRecNote;
 
@@ -97,7 +97,7 @@ public class APIUtils {
 		Pair<Transaction, Integer> result;
 		if(asset.getKey() == 0l)
 		{
-			// SEND QORA PAYMENT
+			// SEND ERM PAYMENT
 			result = Controller.getInstance()
 				.sendPayment(account, new Account(recipient), bdAmount, feePow);
 		}
