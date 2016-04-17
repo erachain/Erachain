@@ -11,13 +11,13 @@ import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
 
 
-public class QoraRowSorter extends RowSorter<TableModel> {
+public class CoreRowSorter extends RowSorter<TableModel> {
 
 		private List<SortKey> keys;	
 		private TableModelCls<?, ?> model;
     	private Map<Integer, Integer> indexes;
  
-        public QoraRowSorter(TableModelCls<?, ?> model, Map<Integer, Integer> indexes)
+        public CoreRowSorter(TableModelCls<?, ?> model, Map<Integer, Integer> indexes)
         {
         	this.keys = new ArrayList<SortKey>();
         	this.model = model;

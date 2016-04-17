@@ -1,4 +1,4 @@
-package qora.item.persons;
+package core.item.persons;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +8,8 @@ import java.util.Arrays;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.ByteArrayUtils;
 
 public class PersonHuman extends PersonCls {

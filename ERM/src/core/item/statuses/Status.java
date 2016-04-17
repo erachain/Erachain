@@ -1,4 +1,4 @@
-package qora.item.statuses;
+package core.item.statuses;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -7,8 +7,8 @@ import java.util.Arrays;
 
 import com.google.common.primitives.Ints;
 
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 
 public class Status extends StatusCls {
 	

@@ -4,8 +4,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.item.assets.AssetCls;
-import qora.voting.Poll;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.DBSet;

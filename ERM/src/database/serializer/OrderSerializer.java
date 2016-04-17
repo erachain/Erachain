@@ -8,7 +8,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.assets.Order;
+import core.item.assets.Order;
 
 public class OrderSerializer implements Serializer<Order>, Serializable
 {

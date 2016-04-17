@@ -8,11 +8,11 @@ import javax.swing.table.AbstractTableModel;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
 import database.SortableList;
 import lang.Lang;
 

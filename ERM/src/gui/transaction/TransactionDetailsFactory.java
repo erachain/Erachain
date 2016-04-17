@@ -2,27 +2,27 @@ package gui.transaction;
 
 import javax.swing.JFrame;
 
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.BuyNameTransaction;
-import qora.transaction.CancelOrderTransaction;
-import qora.transaction.CancelSellNameTransaction;
-import qora.transaction.CreateOrderTransaction;
-import qora.transaction.CreatePollTransaction;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisIssueNoteTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.MessageTransaction;
-import qora.transaction.MultiPaymentTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.RecordNote;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.SellNameTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransferAssetTransaction;
-import qora.transaction.UpdateNameTransaction;
-import qora.transaction.VoteOnPollTransaction;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.MessageTransaction;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.R_SignNote;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransferAssetTransaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnPollTransaction;
 
 public class TransactionDetailsFactory 
 {
@@ -45,7 +45,7 @@ public class TransactionDetailsFactory
 		
 		case Transaction.SIGN_NOTE_TRANSACTION:
 			
-			RecordNote statement = (RecordNote) transaction;
+			R_SignNote statement = (R_SignNote) transaction;
 			return new RecStatementDetailsFrame(statement);
 
 		case Transaction.PAYMENT_TRANSACTION:

@@ -1,4 +1,4 @@
-package qora.wallet;
+package core.wallet;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,12 +9,12 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
 import gui.Gui;
-import qora.account.Account;
-import qora.item.assets.AssetCls;
-import qora.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.Pair;		
 
@@ -41,8 +41,6 @@ public class AssetsFavorites implements Observer{
 	public List<AssetCls> getAssets()
 	{
 		List<AssetCls> assets = new ArrayList<AssetCls>();
-		//assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY));		
-		//assets.add(Controller.getInstance().getAsset(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
 			assets.add(Controller.getInstance().getAsset(key));
 		}

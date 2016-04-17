@@ -1,4 +1,4 @@
-package qora.crypto;
+package core.crypto;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.CipherParameters;
@@ -9,7 +9,7 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import qora.BlockGenerator;
+import core.BlockGenerator;
 
 public class AEScrypto {
 	

@@ -10,8 +10,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import qora.item.assets.AssetCls;
-import qora.voting.Poll;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
 import utils.BigDecimalStringComparator;
 
 public class PollTabPane extends JTabbedPane{

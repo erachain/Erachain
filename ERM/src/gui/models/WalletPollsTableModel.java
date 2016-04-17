@@ -5,9 +5,9 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.voting.Poll;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.voting.Poll;
 import database.SortableList;
 import database.wallet.PollMap;
 import lang.Lang;

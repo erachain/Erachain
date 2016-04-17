@@ -4,10 +4,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
 import database.SortableList;
 import gui.models.TableModelCls;
-import qora.item.assets.AssetCls;
-
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import lang.Lang;

@@ -36,10 +36,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Base58;
-import qora.transaction.Transaction;
 import utils.Converter;
 import utils.Pair;
 import at.AT_Constants;
@@ -50,6 +46,10 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @SuppressWarnings("serial")
@@ -72,7 +72,7 @@ public class InitiateAcctFrame extends JFrame {
 
 	public InitiateAcctFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Initiate ACCT"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Initiate ACCT"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -147,8 +147,8 @@ public class InitiateAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 1;
 		labelGBC.gridx = 2;
-		JLabel qoraLabel = new JLabel(Lang.getInstance().translate("QORA for"));
-		this.add(qoraLabel, labelGBC);
+		JLabel coreLabel = new JLabel(Lang.getInstance().translate("DATACHAINS.world for"));
+		this.add(coreLabel, labelGBC);
 		
 		//TXT AMOUNT
 		txtGBC.gridy = 1;
@@ -522,7 +522,7 @@ public class InitiateAcctFrame extends JFrame {
 			byte[] creationBytes = null;
 			creationBytes = creation.array();
 			
-			String name = "QORABURST @ " + quantity.divide(burstQuantity, 2, RoundingMode.HALF_UP);
+			String name = "DATACHAINS.worldBURST @ " + quantity.divide(burstQuantity, 2, RoundingMode.HALF_UP);
 			String desc = Lang.getInstance().translate("Initiators BURST address: ") + this.txtBurstAddress.getText();
 			String type = "acct";
 			String tags = "acct,atomic cross chain tx,initiate,initiator";

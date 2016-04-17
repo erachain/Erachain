@@ -7,16 +7,16 @@ import java.util.List;
 import org.junit.Test;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
 import gui.transaction.ArbitraryTransactionDetailsFrame;
 import gui.transaction.MessageTransactionDetailsFrame;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.transaction.ArbitraryTransactionV3;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
 
 public class txWindowTest {
 

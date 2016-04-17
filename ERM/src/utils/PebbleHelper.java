@@ -15,9 +15,9 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.extension.escaper.EscaperExtension;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
-import qora.web.NavbarElements;
-import qora.web.Profile;
-import qora.web.ProfileHelper;
+import core.web.NavbarElements;
+import core.web.Profile;
+import core.web.ProfileHelper;
 
 public class PebbleHelper {
 	

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
 
@@ -28,7 +28,7 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
-import qora.item.assets.Order;
+import core.item.assets.Order;
 
 @SuppressWarnings("serial")
 public class MyOrdersFrame extends JFrame{
@@ -37,7 +37,7 @@ public class MyOrdersFrame extends JFrame{
 
 	public MyOrdersFrame() {
 		
-		super(Lang.getInstance().translate("Qora")+ " - " + Lang.getInstance().translate("My Orders"));
+		super(Lang.getInstance().translate("DATACHAINS.world")+ " - " + Lang.getInstance().translate("My Orders"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -97,7 +97,7 @@ public class MyOrdersFrame extends JFrame{
 		
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		QoraRowSorter sorter = new QoraRowSorter(this.ordersTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.ordersTableModel, indexes);
 		ordersTable.setRowSorter(sorter);
 		
 

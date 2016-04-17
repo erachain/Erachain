@@ -1,4 +1,4 @@
-package qora.item.assets;
+package core.item.assets;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -13,11 +13,9 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
-//import database.DBSet;
-import qora.account.Account;
-import qora.crypto.Base58;
-//import qora.crypto.Crypto;
-import qora.transaction.Transaction;
+import core.account.Account;
+import core.crypto.Base58;
+import core.transaction.Transaction;
 
 public class AssetVenture extends AssetCls {
 	

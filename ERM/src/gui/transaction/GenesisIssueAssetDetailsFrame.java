@@ -16,9 +16,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.GenesisIssueAssetTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.GenesisIssueAssetTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -27,7 +27,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 {
 	public GenesisIssueAssetDetailsFrame(GenesisIssueAssetTransaction assetIssue)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

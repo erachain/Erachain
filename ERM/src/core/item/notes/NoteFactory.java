@@ -1,11 +1,6 @@
-package qora.item.notes;
+package core.item.notes;
 
-// import org.apache.log4j.Logger;
-
-//import com.google.common.primitives.Ints;
-//import com.google.common.primitives.Longs;
-
-import qora.item.notes.NoteCls;
+import core.item.notes.NoteCls;
 
 public class NoteFactory {
 

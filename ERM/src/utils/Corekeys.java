@@ -1,6 +1,6 @@
 package utils;
 
-public enum Qorakeys {
+public enum Corekeys {
 
 	DEFAULT("defaultkey", KeyVariation.DEFAULTKEY), WEBSITE("website",KeyVariation.DEFAULTKEY), BLOGWHITELIST("blogwhitelist", KeyVariation.LISTKEY), BLOGBLACKLIST(
 			"blogblacklist",KeyVariation.LISTKEY), BLOGDESCRIPTION("blogdescription",KeyVariation.DEFAULTKEY), BLOGTITLE("blogtitle",KeyVariation.DEFAULTKEY), BLOGENABLE(
@@ -9,7 +9,7 @@ public enum Qorakeys {
 	private final String keyname;
 	private KeyVariation variation;
 
-	private Qorakeys(String keyname, KeyVariation variation) {
+	private Corekeys(String keyname, KeyVariation variation) {
 		this.keyname = keyname;
 		this.variation = variation;
 	}
@@ -28,9 +28,9 @@ public enum Qorakeys {
 	
 	public static boolean isPartOf(String enumString)
 	{
-		Qorakeys[] values = Qorakeys.values();
-		for (Qorakeys qorakey : values) {
-			if(enumString.equals(qorakey.toString()))
+		Corekeys[] values = Corekeys.values();
+		for (Corekeys corekey : values) {
+			if(enumString.equals(corekey.toString()))
 			{
 				return true;
 			}

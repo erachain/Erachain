@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,9 +12,9 @@ import org.json.simple.JSONValue;
 import com.google.common.base.Charsets;
 
 import controller.Controller;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
 import utils.GZIP;
 import utils.StorageUtils;
 

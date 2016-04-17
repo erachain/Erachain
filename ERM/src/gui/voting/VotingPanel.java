@@ -1,6 +1,6 @@
 package gui.voting;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.WalletPollsTableModel;
 import lang.Lang;
 
@@ -24,8 +24,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
+import core.voting.Poll;
 import database.wallet.PollMap;
-import qora.voting.Poll;
 
 @SuppressWarnings("serial")
 public class VotingPanel extends JPanel
@@ -63,7 +63,7 @@ public class VotingPanel extends JPanel
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(WalletPollsTableModel.COLUMN_NAME, PollMap.NAME_INDEX);
 		indexes.put(WalletPollsTableModel.COLUMN_ADDRESS, PollMap.CREATOR_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(pollsModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(pollsModel, indexes);
 		table.setRowSorter(sorter);
 				
 		//CHECKBOX FOR CONFIRMED

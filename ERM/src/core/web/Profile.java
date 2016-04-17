@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,15 +13,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.json.simple.JSONObject;
 
-import qora.naming.Name;
-import qora.payment.Payment;
 import utils.KeyVariation;
 import utils.Pair;
 import utils.ProfileUtils;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.StorageUtils;
 import api.NameStorageResource;
 import controller.Controller;
+import core.naming.Name;
+import core.payment.Payment;
 import database.DBSet;
 
 @SuppressWarnings("unchecked")
@@ -109,15 +109,15 @@ public class Profile {
 	}
 
 	public String getBlogDescriptionOpt() {
-		return (String) jsonRepresenation.get(Qorakeys.BLOGDESCRIPTION
+		return (String) jsonRepresenation.get(Corekeys.BLOGDESCRIPTION
 				.toString());
 	}
 
 	public void saveBlogDescription(String blogDescription) {
-		storeKeyValueIfNotBlank(Qorakeys.BLOGDESCRIPTION, blogDescription);
+		storeKeyValueIfNotBlank(Corekeys.BLOGDESCRIPTION, blogDescription);
 	}
 
-	public void storeKeyValueIfNotBlank(Qorakeys key, String value) {
+	public void storeKeyValueIfNotBlank(Corekeys key, String value) {
 		if (!StringUtils.isBlank(value)) {
 			jsonRepresenation.put(key.toString(), value);
 		} else {
@@ -126,29 +126,29 @@ public class Profile {
 	}
 
 	public void saveBlogTitle(String blogTitle) {
-		storeKeyValueIfNotBlank(Qorakeys.BLOGTITLE, blogTitle);
+		storeKeyValueIfNotBlank(Corekeys.BLOGTITLE, blogTitle);
 	}
 
 	public void saveAvatarTitle(String profileavatar) {
-		storeKeyValueIfNotBlank(Qorakeys.PROFILEAVATAR, profileavatar);
+		storeKeyValueIfNotBlank(Corekeys.PROFILEAVATAR, profileavatar);
 	}
 
 	public void saveProfileMainGraphicOpt(String maingraphicurl) {
-		storeKeyValueIfNotBlank(Qorakeys.PROFILEMAINGRAPHIC, maingraphicurl);
+		storeKeyValueIfNotBlank(Corekeys.PROFILEMAINGRAPHIC, maingraphicurl);
 	}
 
 	public String getBlogTitleOpt() {
-		return (String) jsonRepresenation.get(Qorakeys.BLOGTITLE.toString());
+		return (String) jsonRepresenation.get(Corekeys.BLOGTITLE.toString());
 	}
 
 	public String getAvatarOpt() {
 		return (String) jsonRepresenation
-				.get(Qorakeys.PROFILEAVATAR.toString());
+				.get(Corekeys.PROFILEAVATAR.toString());
 	}
 
 	public String getProfileGraphicOpt() {
 		String graphiccontent = (String) jsonRepresenation
-				.get(Qorakeys.PROFILEMAINGRAPHIC.toString());
+				.get(Corekeys.PROFILEMAINGRAPHIC.toString());
 
 		return graphiccontent;
 	}
@@ -163,7 +163,7 @@ public class Profile {
 
 	private List<String> getFollowedBlogsInternal() {
 		String profileFollowString = (String) jsonRepresenation
-				.get(Qorakeys.PROFILEFOLLOW.toString());
+				.get(Corekeys.PROFILEFOLLOW.toString());
 		if (profileFollowString != null) {
 			String[] profileFollowArray = StringUtils.split(
 					profileFollowString, ";");
@@ -175,7 +175,7 @@ public class Profile {
 
 	private List<String> getLikedPostsInternal() {
 		String profileLikeString = (String) jsonRepresenation
-				.get(Qorakeys.PROFILELIKEPOSTS.toString());
+				.get(Corekeys.PROFILELIKEPOSTS.toString());
 		if (profileLikeString != null) {
 			String[] profileLikeArray = StringUtils.split(profileLikeString,
 					";");
@@ -211,7 +211,7 @@ public class Profile {
 				}
 				String joinResult = StringUtils
 						.join(followedBlogsInternal, ";");
-				jsonRepresenation.put(Qorakeys.PROFILEFOLLOW.toString(),
+				jsonRepresenation.put(Corekeys.PROFILEFOLLOW.toString(),
 						joinResult);
 			}
 		}
@@ -237,40 +237,40 @@ public class Profile {
 			}
 		}
 		String joinResult = StringUtils.join(likedPostsInternal, ";");
-		jsonRepresenation.put(Qorakeys.PROFILELIKEPOSTS.toString(), joinResult);
+		jsonRepresenation.put(Corekeys.PROFILELIKEPOSTS.toString(), joinResult);
 	}
 
 	public boolean isProfileEnabled() {
-		return jsonRepresenation.containsKey(Qorakeys.PROFILEENABLE.toString());
+		return jsonRepresenation.containsKey(Corekeys.PROFILEENABLE.toString());
 	}
 
 	public void setProfileEnabled(boolean enabled) {
 		if (enabled) {
-			jsonRepresenation.put(Qorakeys.PROFILEENABLE.toString(), "");
+			jsonRepresenation.put(Corekeys.PROFILEENABLE.toString(), "");
 		} else {
-			jsonRepresenation.remove(Qorakeys.PROFILEENABLE.toString());
+			jsonRepresenation.remove(Corekeys.PROFILEENABLE.toString());
 		}
 	}
 
 	public void setBlogEnabled(boolean enabled) {
 		if (enabled) {
-			jsonRepresenation.put(Qorakeys.BLOGENABLE.toString(), "");
+			jsonRepresenation.put(Corekeys.BLOGENABLE.toString(), "");
 		} else {
-			jsonRepresenation.remove(Qorakeys.BLOGENABLE.toString());
+			jsonRepresenation.remove(Corekeys.BLOGENABLE.toString());
 		}
 	}
 	
 	public void setBlockComments(boolean blockComments)
 	{
 		if (blockComments) {
-			jsonRepresenation.put(Qorakeys.BLOGBLOCKCOMMENTS.toString(), "");
+			jsonRepresenation.put(Corekeys.BLOGBLOCKCOMMENTS.toString(), "");
 		} else {
-			jsonRepresenation.remove(Qorakeys.BLOGBLOCKCOMMENTS.toString());
+			jsonRepresenation.remove(Corekeys.BLOGBLOCKCOMMENTS.toString());
 		}
 	}
 
 	public boolean isBlogEnabled() {
-		return jsonRepresenation.containsKey(Qorakeys.BLOGENABLE.toString());
+		return jsonRepresenation.containsKey(Corekeys.BLOGENABLE.toString());
 	}
 	
 	public boolean isCommentingAllowed(){
@@ -278,7 +278,7 @@ public class Profile {
 	}
 	
 	public boolean isCommentingDisabled(){
-		return jsonRepresenation.containsKey(Qorakeys.BLOGBLOCKCOMMENTS.toString());
+		return jsonRepresenation.containsKey(Corekeys.BLOGBLOCKCOMMENTS.toString());
 	}
 
 	public BlogBlackWhiteList getBlogBlackWhiteList() {
@@ -312,23 +312,23 @@ public class Profile {
 
 		if (blogBlackWhiteList.getBlackwhiteList().isEmpty()) {
 			StringUtils.isBlank((CharSequence) oldBWListJson
-					.get(Qorakeys.BLOGWHITELIST.toString()));
+					.get(Corekeys.BLOGWHITELIST.toString()));
 		}
 
-		List<Qorakeys> profileKeys = Arrays.asList(Qorakeys.BLOGBLACKLIST,
-				Qorakeys.BLOGWHITELIST, Qorakeys.BLOGDESCRIPTION,
-				Qorakeys.BLOGENABLE, Qorakeys.PROFILEAVATAR,
-				Qorakeys.BLOGTITLE, Qorakeys.PROFILEENABLE,
-				Qorakeys.PROFILEFOLLOW, Qorakeys.PROFILELIKEPOSTS,
-				Qorakeys.PROFILEMAINGRAPHIC, Qorakeys.BLOGBLOCKCOMMENTS);
+		List<Corekeys> profileKeys = Arrays.asList(Corekeys.BLOGBLACKLIST,
+				Corekeys.BLOGWHITELIST, Corekeys.BLOGDESCRIPTION,
+				Corekeys.BLOGENABLE, Corekeys.PROFILEAVATAR,
+				Corekeys.BLOGTITLE, Corekeys.PROFILEENABLE,
+				Corekeys.PROFILEFOLLOW, Corekeys.PROFILELIKEPOSTS,
+				Corekeys.PROFILEMAINGRAPHIC, Corekeys.BLOGBLOCKCOMMENTS);
 
-		for (Qorakeys qorakey : profileKeys) {
+		for (Corekeys corekey : profileKeys) {
 
-			String key = qorakey.toString();
+			String key = corekey.toString();
 			String newValueOpt = (String) jsonRepresenation.get(key);
 			String oldValueOpt = (String) oldProfileJson.get(key);
 
-			if (qorakey.getVariation() == KeyVariation.EXISTSKEY) {
+			if (corekey.getVariation() == KeyVariation.EXISTSKEY) {
 
 				if (oldValueOpt == null && newValueOpt == null) {
 					continue;
@@ -344,7 +344,7 @@ public class Profile {
 				continue;
 			}
 
-			if (qorakey.getVariation() == KeyVariation.DEFAULTKEY) {
+			if (corekey.getVariation() == KeyVariation.DEFAULTKEY) {
 
 				if (StringUtils.isBlank(oldValueOpt)
 						&& StringUtils.isBlank(newValueOpt)) {
@@ -368,7 +368,7 @@ public class Profile {
 				continue;
 			}
 
-			if (qorakey.getVariation() == KeyVariation.LISTKEY) {
+			if (corekey.getVariation() == KeyVariation.LISTKEY) {
 				if (StringUtils.isBlank(oldValueOpt)
 						&& StringUtils.isBlank(newValueOpt)) {
 					continue;
@@ -421,33 +421,33 @@ public class Profile {
 		
 		//BECAUSE THE BLACK AND WHITELIST EXCLUDE THEMSELVES WE HAVE TO PROCESS THESE EXTRA RULES TO MAKE SURE THE CONCEPT FITS.
 		if (blogBlackWhiteList.isWhitelist()) {
-			jsonRepresenation.remove(Qorakeys.BLOGBLACKLIST.toString());
+			jsonRepresenation.remove(Corekeys.BLOGBLACKLIST.toString());
 			
 			//switching kind of list from empty to empty!
 			if(blogBlackWhiteList.getBlackwhiteList().isEmpty() && oldBlackWhiteList.isBlacklist() && oldBlackWhiteList.getBlackwhiteList().isEmpty())
 			{
 				removeCompleteKeys.add(
-						Qorakeys.BLOGBLACKLIST.toString());
+						Corekeys.BLOGBLACKLIST.toString());
 				addCompleteKeys.add(new Pair<String, String>(
-						Qorakeys.BLOGWHITELIST.toString(), ""));
+						Corekeys.BLOGWHITELIST.toString(), ""));
 			}
 		} else {
-			jsonRepresenation.remove(Qorakeys.BLOGWHITELIST.toString());
+			jsonRepresenation.remove(Corekeys.BLOGWHITELIST.toString());
 			//switching kind of list from empty to empty!
 			if (blogBlackWhiteList.getBlackwhiteList().isEmpty()
 					&& oldBlackWhiteList.isWhitelist() && oldBlackWhiteList.getBlackwhiteList().isEmpty()) {
 				addCompleteKeys.add(new Pair<String, String>(
-						Qorakeys.BLOGBLACKLIST.toString(), ""));
+						Corekeys.BLOGBLACKLIST.toString(), ""));
 				removeCompleteKeys.add(
-						Qorakeys.BLOGWHITELIST.toString());
+						Corekeys.BLOGWHITELIST.toString());
 			}else if(blogBlackWhiteList.getBlackwhiteList().isEmpty() && oldBlackWhiteList.isBlacklist() && !oldBlackWhiteList.getBlackwhiteList().isEmpty())
 			{
 				addCompleteKeys.add(new Pair<String, String>(
-						Qorakeys.BLOGBLACKLIST.toString(), ""));
+						Corekeys.BLOGBLACKLIST.toString(), ""));
 				removeCompleteKeys.add(
-						Qorakeys.BLOGWHITELIST.toString());
+						Corekeys.BLOGWHITELIST.toString());
 				
-				removeCompleteKeys.remove(Qorakeys.BLOGBLACKLIST.toString());
+				removeCompleteKeys.remove(Corekeys.BLOGBLACKLIST.toString());
 			}
 		}
 

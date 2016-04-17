@@ -1,11 +1,11 @@
-package qora.web;
+package core.web;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import qora.naming.Name;
 import controller.Controller;
+import core.naming.Name;
 
 public class ProfileHelper {
 

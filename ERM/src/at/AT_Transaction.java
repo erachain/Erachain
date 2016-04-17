@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
-import qora.crypto.Base58;
+import core.crypto.Base58;
 import utils.Converter;
 
 

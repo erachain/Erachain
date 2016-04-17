@@ -43,6 +43,29 @@ import com.google.common.primitives.Longs;
 import api.ApiClient;
 import api.ApiService;
 import at.AT;
+import core.BlockChain;
+import core.BlockGenerator;
+import core.Synchronizer;
+import core.TransactionCreator;
+import core.BlockGenerator.ForgingStatus;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.assets.Order;
+import core.item.assets.Trade;
+import core.item.notes.NoteCls;
+import core.item.persons.PersonCls;
+import core.naming.Name;
+import core.naming.NameSale;
+import core.payment.Payment;
+import core.transaction.Transaction;
+import core.voting.Poll;
+import core.voting.PollOption;
+import core.wallet.Wallet;
 import database.DBSet;
 import database.Item_Map;
 import database.LocalDataMap;
@@ -60,28 +83,6 @@ import network.message.MessageFactory;
 import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
-import qora.BlockChain;
-import qora.BlockGenerator;
-import qora.BlockGenerator.ForgingStatus;
-import qora.Synchronizer;
-import qora.TransactionCreator;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.item.notes.NoteCls;
-import qora.item.assets.Order;
-import qora.item.assets.Trade;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.naming.NameSale;
-import qora.payment.Payment;
-import qora.transaction.Transaction;
-import qora.voting.Poll;
-import qora.voting.PollOption;
-import qora.wallet.Wallet;
 import settings.Settings;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
@@ -449,6 +450,11 @@ public class Controller extends Observable {
 			this.wallet.replaseNoteFavorite();
 		}
 	}
+	public void replasePersonsFavorites() {
+		if(this.wallet != null) {
+			this.wallet.replasePersonFavorite();
+		}
+	}
 	public void replaseFavoriteItems(int type) {
 		if(this.wallet != null) {
 			this.wallet.replaseFavoriteItems(type);
@@ -579,6 +585,9 @@ public class Controller extends Observable {
 
 		// ADD OBSERVER TO NOTES
 		DBSet.getInstance().getNoteMap().addObserver(o);
+
+		// ADD OBSERVER TO PERSONS
+		DBSet.getInstance().getPersonMap().addObserver(o);
 
 		// ADD OBSERVER TO ORDERS
 		DBSet.getInstance().getOrderMap().addObserver(o);
@@ -1374,6 +1383,9 @@ public class Controller extends Observable {
 	public void removeNoteFavorite(NoteCls note) {
 		this.wallet.removeNoteFavorite(note);
 	}
+	public void removePersonFavorite(PersonCls person) {
+		this.wallet.removePersonFavorite(person);
+	}
 	*/
 	
 	public Item_Map getItemMap(int type) {
@@ -1381,9 +1393,10 @@ public class Controller extends Observable {
 			{
 			case ItemCls.ASSET_TYPE:
 				return DBSet.getInstance().getAssetMap();
-
 			case ItemCls.NOTE_TYPE:
 				return DBSet.getInstance().getNoteMap();
+			case ItemCls.PERSON_TYPE:
+				return DBSet.getInstance().getPersonMap();
 		}
 		return null;
 	}
@@ -1399,6 +1412,9 @@ public class Controller extends Observable {
 	
 	public boolean isNoteFavorite(NoteCls note) {
 		return this.wallet.isNoteFavorite(note);
+	}
+	public boolean isPersonFavorite(PersonCls person) {
+		return this.wallet.isPersonFavorite(person);
 	}
 	*/
 	public boolean isItemFavorite(ItemCls item) {
@@ -1420,6 +1436,9 @@ public class Controller extends Observable {
 
 	public Collection<ItemCls> getAllNotes() {
 		return DBSet.getInstance().getNoteMap().getValues();
+	}
+	public Collection<ItemCls> getAllPersons() {
+		return DBSet.getInstance().getPersonMap().getValues();
 	}
 	*/
 
@@ -1513,7 +1532,7 @@ public class Controller extends Observable {
 	// ASSETS
 
 	/*
-	public ItemCls getQoraAsset() {
+	public ItemCls getERMAsset() {
 		return DBSet.getInstance().getAssetMap().get(0l);
 	}
 	*/
@@ -1546,6 +1565,11 @@ public class Controller extends Observable {
 		return (NoteCls)DBSet.getInstance().getNoteMap().get(key);
 	}
 
+	// PERSONS
+	public PersonCls getPerson(long key) {
+		return (PersonCls)DBSet.getInstance().getPersonMap().get(key);
+	}
+
 	// ALL ITEMS
 	public ItemCls getItem(int type, long key) {
 		
@@ -1556,6 +1580,9 @@ public class Controller extends Observable {
 			}
 			case ItemCls.NOTE_TYPE: {
 				return DBSet.getInstance().getNoteMap().get(key);
+			}
+			case ItemCls.PERSON_TYPE: {
+				return DBSet.getInstance().getPersonMap().get(key);	
 			}
 		}
 		return null;
@@ -1712,6 +1739,18 @@ public class Controller extends Observable {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueNoteTransaction(creator,
 					name, description, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, String fullName, int feePow,
+			long birthday,
+			byte gender, String race, float birthLatitude, float birthLongitude,
+			String skinColor, String eyeColor, String hairСolor, int height, String description) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday,
+					gender, race, birthLatitude, birthLongitude,
+					skinColor, eyeColor, hairСolor, height, description);
 		}
 	}
 

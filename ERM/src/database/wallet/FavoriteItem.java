@@ -11,10 +11,10 @@ import utils.ObserverMessage;
 
 public class FavoriteItem extends Observable {
 
-	private WalletDatabase walletDatabase;
-	private Set<Long> itemsSet;
+	protected WalletDatabase walletDatabase;
+	protected Set<Long> itemsSet;
 	
-	private int observer_favorites;
+	protected int observer_favorites;
 
 	// favorites init SET
 	public FavoriteItem(WalletDatabase walletDatabase, DB database, int observer_favorites,
@@ -26,7 +26,7 @@ public class FavoriteItem extends Observable {
 		//OPEN MAP
 		this.itemsSet = database.getTreeSet(treeSet + "Favorites");
 
-		for (long i = 1; i < initialAdd; i++)
+		for (long i = 0; i < initialAdd; i++)
 		{
 			//CHECK IF CONTAINS ITEM
 			if(!this.itemsSet.contains(i))
@@ -81,7 +81,7 @@ public class FavoriteItem extends Observable {
 		this.notifyFavorites();
 	}
 	
-	private void notifyFavorites()
+	protected void notifyFavorites()
 	{
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(this.observer_favorites, this.itemsSet));

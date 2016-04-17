@@ -5,4 +5,4 @@
  * @author adm
  *
  */
-package qora.item;
+package core.item;

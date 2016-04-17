@@ -1,4 +1,7 @@
-package qora.item.statuses;
+package core.item.statuses;
+
+import core.account.Account;
+import core.item.ItemCls;
 
 //import java.math.BigDecimal;
 // import org.apache.log4j.Logger;
@@ -7,8 +10,6 @@ import database.DBSet;
 import database.IssueItemMap;
 import database.Item_Map;
 import database.ItemStatusMap;
-import qora.account.Account;
-import qora.item.ItemCls;
 
 public abstract class StatusCls extends ItemCls {
 

@@ -21,8 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
-import qora.crypto.Base58;
-import qora.transaction.MultiPaymentTransaction;
+import core.crypto.Base58;
+import core.transaction.MultiPaymentTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -33,7 +33,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 	@SuppressWarnings("unchecked")
 	public MultiPaymentDetailsFrame(MultiPaymentTransaction multiPayment)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

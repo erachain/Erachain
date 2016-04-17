@@ -1,4 +1,4 @@
-package qora.crypto;
+package core.crypto;
 
 //Punisher.NaCl;
 

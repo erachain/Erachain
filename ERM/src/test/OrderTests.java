@@ -12,18 +12,18 @@ import ntp.NTP;
 import org.junit.Assert;
 import org.junit.Test;
 
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetVenture;
-import qora.item.assets.Order;
-import qora.item.assets.Trade;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.CreateOrderTransaction;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
+import core.account.PrivateKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
+import core.item.assets.Order;
+import core.item.assets.Trade;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 import database.DBSet;
 
 public class OrderTests 
@@ -67,9 +67,9 @@ public class OrderTests
 	{
 		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
-		//ADD QORA ASSET
-    	AssetCls qoraAsset = new AssetVenture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte)2, true);
-    	dbSet.getAssetMap().set(0l, qoraAsset);
+		//ADD ERM ASSET
+    	AssetCls ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte)2, true);
+    	dbSet.getAssetMap().set(0l, ermAsset);
 		
 		//CREATE ASSET A
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

@@ -9,18 +9,17 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import core.account.PrivateKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 import ntp.NTP;
 import database.ItemAssetMap;
-import qora.account.PrivateKeyAccount;
-//import database.IssueAssetMap;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetVenture;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.Transaction;
 
 
 public class DatabaseTests {

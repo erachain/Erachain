@@ -16,22 +16,21 @@ import org.junit.Test;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetVenture;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
-import qora.transaction.RecordNote;;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.R_SignNote;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
+import database.DBSet;;
 
 public class TransactionTests2 {
 

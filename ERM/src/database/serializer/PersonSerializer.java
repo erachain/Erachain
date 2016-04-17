@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.persons.PersonCls;
-import qora.item.persons.PersonFactory;
+import core.item.persons.PersonCls;
+import core.item.persons.PersonFactory;
 
 public class PersonSerializer implements Serializer<PersonCls>, Serializable
 {

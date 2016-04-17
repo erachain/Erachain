@@ -92,7 +92,7 @@ public class Start {
 				LOGGER.info(Lang.getInstance().translate("Starting %qora% / version: %version% / build date: %builddate% / ...")
 						.replace("%version%", Controller.getInstance().getVersion())
 						.replace("%builddate%", Controller.getInstance().getBuildDateString())
-						.replace("%qora%", Lang.getInstance().translate("Qora"))
+						.replace("%qora%", Lang.getInstance().translate("DATACHAINS.world"))
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC

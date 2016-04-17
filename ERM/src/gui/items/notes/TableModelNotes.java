@@ -4,7 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.item.notes.NoteCls;
+import core.item.notes.NoteCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.SortableList;

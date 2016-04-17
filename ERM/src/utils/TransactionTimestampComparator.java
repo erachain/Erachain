@@ -2,7 +2,7 @@ package utils;
 
 import java.util.Comparator;
 
-import qora.transaction.Transaction;
+import core.transaction.Transaction;
 
 public class TransactionTimestampComparator implements Comparator<Transaction> {
 	

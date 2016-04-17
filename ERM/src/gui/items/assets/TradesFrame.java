@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
-import qora.item.assets.Order;
+import core.item.assets.Order;
 
 @SuppressWarnings("serial")
 public class TradesFrame extends JFrame{
@@ -25,7 +25,7 @@ public class TradesFrame extends JFrame{
 
 	public TradesFrame(Order order) {
 		
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Trades"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Trades"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -82,7 +82,7 @@ public class TradesFrame extends JFrame{
 		//CHECKBOX FOR CONFIRMED
 		//ASSETS SORTER
 		//Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		//QoraRowSorter sorter = new QoraRowSorter(this.tradesTableModel, indexes);
+		//CoreRowSorter sorter = new CoreRowSorter(this.tradesTableModel, indexes);
 		//tradesTableModel.setRowSorter(sorter);
 		
 

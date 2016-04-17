@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,15 +18,15 @@ import com.google.common.base.Charsets;
 //import com.google.common.primitives.Longs;
 
 import api.BlogPostResource;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.payment.Payment;
+import core.web.blog.BlogEntry;
 import database.BalanceMap;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.payment.Payment;
-import qora.web.blog.BlogEntry;
 import utils.BlogUtils;
 import utils.StorageUtils;
 
@@ -162,7 +162,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
-			// IF QORA ASSET
+			// IF ERM ASSET
 			if (payment.getAsset() == OIL_KEY) {
 				// IF SENDER
 				if (address.equals(this.creator.getAddress())) {

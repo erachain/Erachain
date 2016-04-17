@@ -5,7 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.naming.NameSale;
+import core.naming.NameSale;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;

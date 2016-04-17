@@ -1,4 +1,4 @@
-package qora.item.assets;
+package core.item.assets;
 // 16/03
 import java.math.BigDecimal;
 import java.math.BigInteger;

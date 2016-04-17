@@ -2,7 +2,7 @@ package utils;
 
 import java.util.Comparator;
 
-import qora.account.Account;
+import core.account.Account;
 
 /**
  * Sorts Accounts by balance.

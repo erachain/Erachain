@@ -33,8 +33,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableRowSorter;
 
 import at.AT;
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.BigDecimalStringComparator;
 import utils.MenuPopupUtil;
 import utils.StringComparator;

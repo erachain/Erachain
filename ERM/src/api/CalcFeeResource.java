@@ -16,10 +16,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.crypto.Base58;
-import qora.payment.Payment;
 import utils.Pair;
 import controller.Controller;
+import core.crypto.Base58;
+import core.payment.Payment;
 import api.BlogPostResource;
 
 @Path("calcfee")

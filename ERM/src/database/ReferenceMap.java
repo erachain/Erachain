@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.mapdb.DB;
 
-import qora.account.Account;
+import core.account.Account;
 import database.DBSet;
 
 public class ReferenceMap extends DBMap<String, byte[]> 

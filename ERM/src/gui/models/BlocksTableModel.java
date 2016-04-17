@@ -4,11 +4,11 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-import qora.block.Block;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.block.Block;
 import database.BlockMap;
 import database.SortableList;
 import lang.Lang;

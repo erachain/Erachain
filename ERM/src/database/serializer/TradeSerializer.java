@@ -8,7 +8,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.assets.Trade;
+import core.item.assets.Trade;
 
 public class TradeSerializer implements Serializer<Trade>, Serializable
 {

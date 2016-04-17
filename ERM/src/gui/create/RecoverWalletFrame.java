@@ -31,8 +31,8 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.crypto.Base58;
 import lang.Lang;
-import qora.crypto.Base58;
 
 @SuppressWarnings("serial")
 public class RecoverWalletFrame extends JFrame
@@ -47,7 +47,7 @@ public class RecoverWalletFrame extends JFrame
 			.getLogger(RecoverWalletFrame.class);
 	public RecoverWalletFrame(NoWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Recover Wallet"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Recover Wallet"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

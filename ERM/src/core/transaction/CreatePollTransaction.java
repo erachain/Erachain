@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -14,17 +14,15 @@ import ntp.NTP;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Crypto;
-import qora.voting.Poll;
-import qora.voting.PollOption;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Crypto;
+import core.voting.Poll;
+import core.voting.PollOption;
 import database.BalanceMap;
 import database.DBSet;
 

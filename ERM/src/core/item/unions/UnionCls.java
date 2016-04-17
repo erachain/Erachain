@@ -1,4 +1,4 @@
-package qora.item.unions;
+package core.item.unions;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -12,14 +12,14 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.account.Account;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.ItemCls;
 import database.DBSet;
 import database.IssueItemMap;
 import database.Item_Map;
 import database.ItemUnionMap;
-import qora.account.Account;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.item.ItemCls;
 
 public abstract class UnionCls extends ItemCls{
 

@@ -7,11 +7,10 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import qora.naming.Name;
-import qora.transaction.Transaction;
-
 import com.google.common.primitives.UnsignedBytes;
 
+import core.naming.Name;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.serializer.NameSerializer;
 

@@ -38,10 +38,10 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Error;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.Converter;
 import utils.Pair;
@@ -70,7 +70,7 @@ public class DeployATFrame extends JFrame {
 
 	public DeployATFrame()
 	{
-		super(Lang.getInstance().translate("Qora")+" - "+Lang.getInstance().translate("Deploy AT Program"));
+		super(Lang.getInstance().translate("DATACHAINS.world")+" - "+Lang.getInstance().translate("Deploy AT Program"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

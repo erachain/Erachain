@@ -43,7 +43,7 @@ public class SettingsFrame extends JFrame{
 	{
 		
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Settings"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Settings"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

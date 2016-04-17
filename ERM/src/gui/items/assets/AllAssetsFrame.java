@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import lang.Lang;
 
 import javax.swing.JComponent;
@@ -31,7 +31,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 
-import qora.item.assets.AssetCls;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AllAssetsFrame extends JFrame{
@@ -40,7 +40,7 @@ public class AllAssetsFrame extends JFrame{
 
 	public AllAssetsFrame() {
 		
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("All Assets"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("All Assets"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -100,7 +100,7 @@ public class AllAssetsFrame extends JFrame{
 		
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		QoraRowSorter sorter = new QoraRowSorter(this.tableModelItemAssets, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.tableModelItemAssets, indexes);
 		assetsTable.setRowSorter(sorter);
 		
 		//CREATE SEARCH FIELD

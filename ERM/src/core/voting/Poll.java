@@ -1,4 +1,4 @@
-package qora.voting;
+package core.voting;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -12,9 +12,9 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
+import core.account.Account;
+import core.crypto.Base58;
 import database.DBSet;
-import qora.account.Account;
-import qora.crypto.Base58;
 import utils.Pair;
 
 public class Poll 

@@ -8,15 +8,15 @@ import ntp.NTP;
 
 import org.junit.Test;
 
-import qora.BlockGenerator;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.Transaction;
+import core.BlockGenerator;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.transaction.GenesisTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 
 public class GeneratorTests {

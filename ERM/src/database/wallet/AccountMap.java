@@ -8,7 +8,7 @@ import java.util.Observable;
 
 import org.mapdb.DB;
 
-import qora.account.Account;
+import core.account.Account;
 import utils.ObserverMessage;
 
 public class AccountMap extends Observable {

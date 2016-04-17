@@ -1,4 +1,4 @@
-package qora;
+package core;
 
 
 import java.math.BigDecimal;
@@ -15,11 +15,6 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 
 import ntp.NTP;
-import qora.account.PrivateKeyAccount;
-import qora.block.Block;
-import qora.block.BlockFactory;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
 import settings.Settings;
 import utils.ObserverMessage;
 import utils.TransactionFeeComparator;
@@ -31,6 +26,11 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.BlockFactory;
+import core.crypto.Crypto;
+import core.transaction.Transaction;
 import database.DBSet;
 import lang.Lang;
 

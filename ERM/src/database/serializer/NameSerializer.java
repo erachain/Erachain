@@ -8,7 +8,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.naming.Name;
+import core.naming.Name;
 
 public class NameSerializer implements Serializer<Name>, Serializable
 {

@@ -6,9 +6,9 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import qora.item.ItemCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.ItemCls;
 import database.SortableList;
 import lang.Lang;
 

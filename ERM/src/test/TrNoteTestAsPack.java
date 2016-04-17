@@ -13,19 +13,19 @@ import ntp.NTP;
 
 import org.junit.Test;
 
+import core.account.PrivateKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.notes.Note;
+import core.item.notes.NoteCls;
+import core.transaction.IssueNoteRecord;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
+
 //import com.google.common.primitives.Longs;
 
 import database.DBSet;
 import database.ItemNoteMap;
-import qora.account.PrivateKeyAccount;
-import qora.item.notes.NoteCls;
-import qora.item.notes.Note;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-//import qora.transaction.GenesisTransaction;
-import qora.transaction.IssueNoteRecord;
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
 
 public class TrNoteTestAsPack {
 

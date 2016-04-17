@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.notes.NoteCls;
-import qora.item.notes.NoteFactory;
+import core.item.notes.NoteCls;
+import core.item.notes.NoteFactory;
 
 public class NoteSerializer implements Serializer<NoteCls>, Serializable
 {

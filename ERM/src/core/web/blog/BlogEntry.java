@@ -1,4 +1,4 @@
-package qora.web.blog;
+package core.web.blog;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,9 +15,9 @@ import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
-import qora.naming.Name;
-import qora.wallet.Wallet;
-import qora.web.Profile;
+import core.naming.Name;
+import core.wallet.Wallet;
+import core.web.Profile;
 import utils.BlogUtils;
 import utils.DateTimeFormat;
 import utils.LinkUtils;
@@ -38,7 +38,7 @@ public class BlogEntry {
 	private String nameOpt;
 	private long time;
 	private final String creator;
-	private String 	avatar = "img/qora-user.png";
+	private String 	avatar = "img/user.png";
 	private final Profile profileOpt;
 
 	private List<String> imagelinks = new ArrayList<String>();

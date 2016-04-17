@@ -32,16 +32,16 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.transaction.Transaction;
-import qora.voting.Poll;
-import qora.voting.PollOption;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import core.voting.Poll;
+import core.voting.PollOption;
 
 @SuppressWarnings("serial")
 public class VoteFrame extends JFrame
@@ -55,7 +55,7 @@ public class VoteFrame extends JFrame
 	
 	public VoteFrame(Poll poll, int option, AssetCls asset)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Vote"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Vote"));
 		
 		this.poll = poll;
 		
@@ -202,7 +202,7 @@ public class VoteFrame extends JFrame
       	
       	 //LABEL FEE
       	labelGBC.gridy = 6;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee(Qora)") + ":");
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee(OIL)") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE

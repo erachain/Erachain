@@ -7,8 +7,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.item.assets.AssetCls;
-import qora.item.assets.Order;
+import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;

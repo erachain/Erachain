@@ -12,16 +12,16 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.ArbitraryTransactionV3;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.GenesisTransaction;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.Transaction;
 import utils.Pair;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.StorageUtils;
 import database.DBSet;
 
@@ -81,12 +81,12 @@ public class NameStorageTest {
 
 		// We have nothing in name storage for drizzt here.
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILEENABLE.toString()));
+				Corekeys.PROFILEENABLE.toString()));
 		assertNull(databaseSet.getNameStorageMap().get("drizzt"));
 
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILEENABLE.toString(), "yes")), null, null,
+						Corekeys.PROFILEENABLE.toString(), "yes")), null, null,
 				null, null, null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
@@ -103,7 +103,7 @@ public class NameStorageTest {
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		
 		
 		byte[] seed = Crypto.getInstance().digest("test2".getBytes());
@@ -113,7 +113,7 @@ public class NameStorageTest {
 		 
 		  storageJsonObject = StorageUtils.getStorageJsonObject(
 					null, Arrays.asList(
-							Qorakeys.PROFILEENABLE.toString()),null,
+							Corekeys.PROFILEENABLE.toString()),null,
 					null, null, null);
 			storageJsonObject.put("name", "drizzt");
 			 data = storageJsonObject.toString().getBytes();
@@ -130,7 +130,7 @@ public class NameStorageTest {
 			assertEquals(
 					"yes",
 					databaseSet.getNameStorageMap().getOpt("drizzt",
-							Qorakeys.PROFILEENABLE.toString()));
+							Corekeys.PROFILEENABLE.toString()));
 		
 		
 		
@@ -143,12 +143,12 @@ public class NameStorageTest {
 
 		// We have nothing in name storage for drizzt here.
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILEENABLE.toString()));
+				Corekeys.PROFILEENABLE.toString()));
 		assertNull(databaseSet.getNameStorageMap().get("drizzt"));
 
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILEENABLE.toString(), "yes")), null, null,
+						Corekeys.PROFILEENABLE.toString(), "yes")), null, null,
 				null, null, null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
@@ -164,12 +164,12 @@ public class NameStorageTest {
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 
 		// CHANGING KEY
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(Collections
-				.singletonList(new Pair<String, String>(Qorakeys.PROFILEENABLE
+				.singletonList(new Pair<String, String>(Corekeys.PROFILEENABLE
 						.toString(), "anothervalue")), null, null, null, null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -184,12 +184,12 @@ public class NameStorageTest {
 		assertEquals(
 				"anothervalue",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 
 		// REMOVING KEY COMPLETE
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null,
-				Arrays.asList(Qorakeys.PROFILEENABLE.toString()), null, null,
+				Arrays.asList(Corekeys.PROFILEENABLE.toString()), null, null,
 				null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -202,7 +202,7 @@ public class NameStorageTest {
 		arbitraryTransaction.sign(sender, false);
 
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILEENABLE.toString()));
+				Corekeys.PROFILEENABLE.toString()));
 
 	}
 
@@ -213,12 +213,12 @@ public class NameStorageTest {
 
 		// We have nothing in name storage for drizzt here.
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILELIKEPOSTS.toString()));
+				Corekeys.PROFILELIKEPOSTS.toString()));
 		assertNull(databaseSet.getNameStorageMap().get("drizzt"));
 
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(null,
 				null, Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILELIKEPOSTS.toString(), "skerberus")),
+						Corekeys.PROFILELIKEPOSTS.toString(), "skerberus")),
 				null, null, null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
@@ -233,11 +233,11 @@ public class NameStorageTest {
 		assertEquals(
 				"skerberus",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILELIKEPOSTS.toString()));
+						Corekeys.PROFILELIKEPOSTS.toString()));
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILELIKEPOSTS.toString(), "vrontis")),
+						Corekeys.PROFILELIKEPOSTS.toString(), "vrontis")),
 				null, null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -252,13 +252,13 @@ public class NameStorageTest {
 
 		// KEY IS THERE!
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
-				.getOpt("drizzt", Qorakeys.PROFILELIKEPOSTS.toString()));
+				.getOpt("drizzt", Corekeys.PROFILELIKEPOSTS.toString()));
 
 		// removing step by step!
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null, null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILELIKEPOSTS.toString(), "skerberus")),
+						Corekeys.PROFILELIKEPOSTS.toString(), "skerberus")),
 				null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -275,7 +275,7 @@ public class NameStorageTest {
 		assertEquals(
 				"vrontis",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILELIKEPOSTS.toString()));
+						Corekeys.PROFILELIKEPOSTS.toString()));
 
 		// nothing happens cause not part of the list
 		storageJsonObject = StorageUtils
@@ -284,7 +284,7 @@ public class NameStorageTest {
 						null,
 						null,
 						Collections.singletonList(new Pair<String, String>(
-								Qorakeys.PROFILELIKEPOSTS.toString(), "haloman")),
+								Corekeys.PROFILELIKEPOSTS.toString(), "haloman")),
 						null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -301,7 +301,7 @@ public class NameStorageTest {
 		assertEquals(
 				"vrontis",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILELIKEPOSTS.toString()));
+						Corekeys.PROFILELIKEPOSTS.toString()));
 
 		// removing last person
 		storageJsonObject = StorageUtils
@@ -310,7 +310,7 @@ public class NameStorageTest {
 						null,
 						null,
 						Collections.singletonList(new Pair<String, String>(
-								Qorakeys.PROFILELIKEPOSTS.toString(), "vrontis")),
+								Corekeys.PROFILELIKEPOSTS.toString(), "vrontis")),
 						null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -324,13 +324,13 @@ public class NameStorageTest {
 
 		// KEY IS THERE!
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILELIKEPOSTS.toString()));
+				Corekeys.PROFILELIKEPOSTS.toString()));
 
 		// adding more than one element!
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILELIKEPOSTS.toString(), "a;b;c")), null,
+						Corekeys.PROFILELIKEPOSTS.toString(), "a;b;c")), null,
 				null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -345,13 +345,13 @@ public class NameStorageTest {
 		assertEquals(
 				"a;b;c",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILELIKEPOSTS.toString()));
+						Corekeys.PROFILELIKEPOSTS.toString()));
 
 		// removing more than one
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null, null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILELIKEPOSTS.toString(), "a;c;nothing")),
+						Corekeys.PROFILELIKEPOSTS.toString(), "a;c;nothing")),
 				null, null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
@@ -367,7 +367,7 @@ public class NameStorageTest {
 		assertEquals(
 				"b",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILELIKEPOSTS.toString()));
+						Corekeys.PROFILELIKEPOSTS.toString()));
 
 	}
 
@@ -379,7 +379,7 @@ public class NameStorageTest {
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(null,
 				null, null, null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "first")), null);
+								Corekeys.WEBSITE.toString(), "first")), null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
 
@@ -395,11 +395,11 @@ public class NameStorageTest {
 		assertEquals(
 				"first",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null, null,
 				null, Collections.singletonList(new Pair<String, String>(
-						Qorakeys.WEBSITE.toString(), " second")), null);
+						Corekeys.WEBSITE.toString(), " second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -415,7 +415,7 @@ public class NameStorageTest {
 		assertEquals(
 				"first second",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 
 		// ORPHANING FIRST TX!
 		arbitraryTransaction.orphan(databaseSet, false);
@@ -423,13 +423,13 @@ public class NameStorageTest {
 		assertEquals(
 				" second",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 
 		// ORPHANING second TX!
 		arbitraryTransaction2.orphan(databaseSet, false);
 
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.WEBSITE.toString()));
+				Corekeys.WEBSITE.toString()));
 	}
 
 	@Test
@@ -439,11 +439,11 @@ public class NameStorageTest {
 		String random_linking_example = "randomlinkingExample";
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILEENABLE.toString(), "yes")), null,
+						Corekeys.PROFILEENABLE.toString(), "yes")), null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "skerberus")), null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.WEBSITE.toString(), "first")), null);
+						Corekeys.WEBSITE.toString(), "first")), null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
 
@@ -464,7 +464,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "second")), null);
+								Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -485,7 +485,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "third")), null);
+								Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -504,11 +504,11 @@ public class NameStorageTest {
 		// asdf : asdf
 
 		assertEquals("firstsecondthird", databaseSet.getNameStorageMap()
-				.getOpt("drizzt", Qorakeys.WEBSITE.toString()));
+				.getOpt("drizzt", Corekeys.WEBSITE.toString()));
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
 				.getOpt("drizzt", random_linking_example));
 		assertEquals("asdf",
@@ -525,11 +525,11 @@ public class NameStorageTest {
 		assertEquals(
 				"firstthird",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals(
 				"skerberus",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -545,11 +545,11 @@ public class NameStorageTest {
 		String random_linking_example = "randomlinkingExample";
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILEENABLE.toString(), "yes")), null,
+						Corekeys.PROFILEENABLE.toString(), "yes")), null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "skerberus")), null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.WEBSITE.toString(), "first")), null);
+						Corekeys.WEBSITE.toString(), "first")), null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
 
@@ -570,7 +570,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "second")), null);
+								Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -591,7 +591,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "third")), null);
+								Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -610,11 +610,11 @@ public class NameStorageTest {
 		// asdf : asdf
 
 		assertEquals("firstsecondthird", databaseSet.getNameStorageMap()
-				.getOpt("drizzt", Qorakeys.WEBSITE.toString()));
+				.getOpt("drizzt", Corekeys.WEBSITE.toString()));
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
 				.getOpt("drizzt", random_linking_example));
 		assertEquals("asdf",
@@ -630,11 +630,11 @@ public class NameStorageTest {
 		assertEquals(
 				"secondthird",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 		assertNull(
 
 		databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILEENABLE.toString()));
+				Corekeys.PROFILEENABLE.toString()));
 		assertEquals(
 				"vrontis",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -650,11 +650,11 @@ public class NameStorageTest {
 		assertEquals(
 				"third",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 		assertNull(
 
 		databaseSet.getNameStorageMap().getOpt("drizzt",
-				Qorakeys.PROFILEENABLE.toString()));
+				Corekeys.PROFILEENABLE.toString()));
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
 				random_linking_example));
 		assertEquals("asdf",
@@ -668,11 +668,11 @@ public class NameStorageTest {
 		String random_linking_example = "randomlinkingExample";
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.PROFILEENABLE.toString(), "yes")), null,
+						Corekeys.PROFILEENABLE.toString(), "yes")), null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "skerberus")), null,
 				Collections.singletonList(new Pair<String, String>(
-						Qorakeys.WEBSITE.toString(), "first")), null);
+						Corekeys.WEBSITE.toString(), "first")), null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
 
@@ -693,7 +693,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "second")), null);
+								Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -714,7 +714,7 @@ public class NameStorageTest {
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
 						.singletonList(new Pair<String, String>(
-								Qorakeys.WEBSITE.toString(), "third")), null);
+								Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -733,11 +733,11 @@ public class NameStorageTest {
 		// asdf : asdf
 
 		assertEquals("firstsecondthird", databaseSet.getNameStorageMap()
-				.getOpt("drizzt", Qorakeys.WEBSITE.toString()));
+				.getOpt("drizzt", Corekeys.WEBSITE.toString()));
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
 				.getOpt("drizzt", random_linking_example));
 		assertEquals("asdf",
@@ -752,11 +752,11 @@ public class NameStorageTest {
 		assertEquals(
 				"firstsecond",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.WEBSITE.toString()));
+						Corekeys.WEBSITE.toString()));
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
-						Qorakeys.PROFILEENABLE.toString()));
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
 				.getOpt("drizzt", random_linking_example));
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt", "asdf"));

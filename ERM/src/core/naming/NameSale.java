@@ -1,4 +1,4 @@
-package qora.naming;
+package core.naming;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

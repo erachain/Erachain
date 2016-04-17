@@ -27,8 +27,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import core.crypto.Base58;
 import lang.Lang;
-import qora.crypto.Base58;
 
 @SuppressWarnings("serial")
 public class CreateWalletFrame extends JFrame {
@@ -39,7 +39,7 @@ public class CreateWalletFrame extends JFrame {
 	
 	public CreateWalletFrame(NoWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Create Wallet"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Create Wallet"));
 		
 		//RANDOM
 		this.random = new SecureRandom();

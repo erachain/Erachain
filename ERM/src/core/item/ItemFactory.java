@@ -1,16 +1,11 @@
-package qora.item;
+package core.item;
 
-// import org.apache.log4j.Logger;
-
-//import com.google.common.primitives.Ints;
-//import com.google.common.primitives.Longs;
-
-import qora.item.ItemCls;
-import qora.item.assets.AssetFactory;
-import qora.item.notes.NoteFactory;
-import qora.item.persons.PersonFactory;
-import qora.item.statuses.StatusFactory;
-import qora.item.unions.UnionFactory;
+import core.item.ItemCls;
+import core.item.assets.AssetFactory;
+import core.item.notes.NoteFactory;
+import core.item.persons.PersonFactory;
+import core.item.statuses.StatusFactory;
+import core.item.unions.UnionFactory;
 
 public class ItemFactory {
 

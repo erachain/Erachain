@@ -13,12 +13,12 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple6;
 
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.blockexplorer.BlockExplorer;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.blockexplorer.BlockExplorer;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import database.DBSet;
 import lang.Lang;
 

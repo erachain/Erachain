@@ -6,7 +6,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 
-import qora.item.ItemCls;
+import core.item.ItemCls;
 import utils.ObserverMessage;
 import database.serializer.NoteSerializer;
 

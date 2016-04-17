@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -15,24 +15,22 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetFactory;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetFactory;
 import database.ItemAssetMap;
 //import database.BalanceMap;
 import database.DBSet;
 
-// qora.block.Block.isValid(DBSet) - check as false it
+// core.block.Block.isValid(DBSet) - check as false it
 public class GenesisIssueAssetTransaction extends Transaction 
 {
 	

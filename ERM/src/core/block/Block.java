@@ -1,4 +1,4 @@
-package qora.block;
+package core.block;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,19 +16,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
-import qora.BlockGenerator;
-import qora.account.Account;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.transaction.DeployATTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisIssueNoteTransaction;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
 import utils.Converter;
 import at.AT_API_Platform_Impl;
 import at.AT_Block;
@@ -37,6 +24,18 @@ import at.AT_Controller;
 import at.AT_Exception;
 import at.AT_Transaction;
 import controller.Controller;
+import core.BlockGenerator;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.transaction.DeployATTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;

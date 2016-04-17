@@ -5,8 +5,8 @@ import java.util.Observer;
 
 import at.AT;
 import controller.Controller;
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.SortableList;

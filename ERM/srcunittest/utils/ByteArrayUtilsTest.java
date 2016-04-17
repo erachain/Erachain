@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import qora.crypto.Base58;
+import core.crypto.Base58;
 
 public class ByteArrayUtilsTest {
 

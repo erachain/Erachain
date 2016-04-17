@@ -13,10 +13,12 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+
+import core.account.Account;
+import core.voting.Poll;
+
 import org.mapdb.BTreeMap;
 
-import qora.account.Account;
-import qora.voting.Poll;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;

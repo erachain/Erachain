@@ -20,11 +20,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
+import core.crypto.Base58;
+import core.transaction.ArbitraryTransaction;
 import gui.Gui;
 import gui.models.PaymentsTableModel;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.ArbitraryTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -34,7 +34,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 {
 	public ArbitraryTransactionDetailsFrame(ArbitraryTransaction arbitraryTransaction)
 	{
-		super(Lang.getInstance().translate("Qora")+" - "+Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world")+" - "+Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

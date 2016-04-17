@@ -15,9 +15,9 @@ import lang.Lang;
 import settings.Settings;
 import utils.APIUtils;
 
-@Path("qora")
+@Path("core")
 @Produces(MediaType.APPLICATION_JSON)
-public class QoraResource 
+public class CoreResource 
 {
 	@Context
 	HttpServletRequest request;
@@ -26,7 +26,7 @@ public class QoraResource
 	@Path("/stop")
 	public String stop()
 	{
-		APIUtils.askAPICallAllowed("GET qora/stop", request);
+		APIUtils.askAPICallAllowed("GET core/stop", request);
 
 		if(Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);

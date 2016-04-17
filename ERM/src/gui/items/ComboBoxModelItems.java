@@ -10,9 +10,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.item.ItemCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.ItemCls;
 
 @SuppressWarnings("serial")
 public class ComboBoxModelItems extends DefaultComboBoxModel<ItemCls> implements Observer {

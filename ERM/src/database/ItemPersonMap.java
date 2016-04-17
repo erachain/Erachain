@@ -8,11 +8,10 @@ import java.util.Map;
 //import org.mapdb.Atomic;
 import org.mapdb.DB;
 
+import core.item.ItemCls;
 import utils.ObserverMessage;
 import database.DBSet;
-import qora.item.ItemCls;
 import database.serializer.PersonSerializer;
-//import qora.item.persons.PersonCls;
 
 public class ItemPersonMap extends Item_Map
 {

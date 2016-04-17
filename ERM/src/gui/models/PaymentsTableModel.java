@@ -5,9 +5,9 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
 import lang.Lang;
-import qora.item.assets.AssetCls;
-import qora.payment.Payment;
 import utils.NumberAsString;
 
 @SuppressWarnings("serial")

@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 // 30/03 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -11,15 +11,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-import qora.crypto.Crypto;
-import qora.naming.Name;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import utils.ProfileUtils;
-import utils.Qorakeys;
+import utils.Corekeys;
 import controller.Controller;
+import core.account.Account;
+import core.crypto.Crypto;
+import core.naming.Name;
 import database.DBSet;
 
 /**
@@ -53,8 +53,8 @@ public class BlogBlackWhiteList {
 
 		JSONObject jsonForName = ProfileUtils.getBlogBlackWhiteList(blogname);
 
-		if (jsonForName.containsKey(Qorakeys.BLOGWHITELIST.toString())) {
-			String whitelist = (String) jsonForName.get(Qorakeys.BLOGWHITELIST
+		if (jsonForName.containsKey(Corekeys.BLOGWHITELIST.toString())) {
+			String whitelist = (String) jsonForName.get(Corekeys.BLOGWHITELIST
 					.toString());
 
 			String[] whiteListEntries = StringUtils.split(whitelist, ";");
@@ -64,8 +64,8 @@ public class BlogBlackWhiteList {
 
 		}
 
-		if (jsonForName.containsKey(Qorakeys.BLOGBLACKLIST.toString())) {
-			String blackList = (String) jsonForName.get(Qorakeys.BLOGBLACKLIST
+		if (jsonForName.containsKey(Corekeys.BLOGBLACKLIST.toString())) {
+			String blackList = (String) jsonForName.get(Corekeys.BLOGBLACKLIST
 					.toString());
 
 			String[] blackListEntries = StringUtils.split(blackList, ";");
@@ -277,8 +277,8 @@ public class BlogBlackWhiteList {
 
 	public Pair<String, String> getJsonKeyPairRepresentation() {
 		String results = StringUtils.join(blackwhiteList, ";");
-		return new Pair<>(isWhitelist() ? Qorakeys.BLOGWHITELIST.toString()
-				: Qorakeys.BLOGBLACKLIST.toString(), results);
+		return new Pair<>(isWhitelist() ? Corekeys.BLOGWHITELIST.toString()
+				: Corekeys.BLOGBLACKLIST.toString(), results);
 	}
 
 	public void setWhitelist(boolean whitelist) {

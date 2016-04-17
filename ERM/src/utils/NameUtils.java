@@ -8,13 +8,13 @@ import java.util.Set;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.naming.Name;
-import qora.transaction.Transaction;
-import qora.transaction.UpdateNameTransaction;
-import qora.web.NameStorageMap;
 import api.ApiErrorFactory;
 import controller.Controller;
+import core.account.Account;
+import core.naming.Name;
+import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
+import core.web.NameStorageMap;
 import database.DBSet;
 import database.NameMap;
 
@@ -125,7 +125,7 @@ public class NameUtils {
 		// THIS SIGNIFICANTLY INCREASES SPEED!
 		if (!decompressedNameValue.startsWith("{")) {
 			jsonValue = new JSONObject();
-			jsonValue.put(Qorakeys.DEFAULT.toString(), decompressedNameValue);
+			jsonValue.put(Corekeys.DEFAULT.toString(), decompressedNameValue);
 			return jsonValue;
 		}
 
@@ -134,7 +134,7 @@ public class NameUtils {
 
 			if (jsonValue == null) {
 				jsonValue = new JSONObject();
-				jsonValue.put(Qorakeys.DEFAULT.toString(),
+				jsonValue.put(Corekeys.DEFAULT.toString(),
 						decompressedNameValue);
 			}
 
@@ -144,7 +144,7 @@ public class NameUtils {
 			// no valid json
 
 			jsonValue = new JSONObject();
-			jsonValue.put(Qorakeys.DEFAULT.toString(), decompressedNameValue);
+			jsonValue.put(Corekeys.DEFAULT.toString(), decompressedNameValue);
 			return jsonValue;
 		}
 
@@ -183,7 +183,7 @@ public class NameUtils {
 		Set<String> keys = nameStorageMap.getKeys();
 
 		for (String key : keys) {
-			String value = nameStorageMap.getOpt(key, Qorakeys.WEBSITE.getKeyname());
+			String value = nameStorageMap.getOpt(key, Corekeys.WEBSITE.getKeyname());
 					if (value != null) {
 						if (searchValueOpt == null) {
 							results.add(new Pair<String, String>(key,

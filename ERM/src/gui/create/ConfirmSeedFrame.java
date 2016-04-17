@@ -32,8 +32,8 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.crypto.Base58;
 import lang.Lang;
-import qora.crypto.Base58;
 
 @SuppressWarnings("serial")
 public class ConfirmSeedFrame extends JFrame {
@@ -47,7 +47,7 @@ public class ConfirmSeedFrame extends JFrame {
 			.getLogger(ConfirmSeedFrame.class);
 	public ConfirmSeedFrame(CreateWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("Qora") + " - "+ Lang.getInstance().translate("Create Wallet"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - "+ Lang.getInstance().translate("Create Wallet"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

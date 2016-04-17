@@ -15,8 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.item.notes.NoteCls;
 import controller.Controller;
+import core.item.notes.NoteCls;
 import lang.Lang;
 
 public class NoteDetailsPanel extends JPanel {
@@ -103,7 +103,7 @@ public class NoteDetailsPanel extends JPanel {
 		//IF NOTE CONFIRMED
 		if(this.note.getKey() >= 0)
 		{
-			//ADD QORA PAIR BUTTON
+			//ADD ERM PAIR BUTTON
 			labelGBC.gridy++;
 			labelGBC.gridwidth = 2;
 			JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
@@ -118,7 +118,7 @@ public class NoteDetailsPanel extends JPanel {
 			this.add(openPairButton, labelGBC);
 		}
 		
-		//IF NOTE CONFIRMED AND NOT QORA
+		//IF NOTE CONFIRMED AND NOT ERM
 		if(this.note.getKey() > 2l)
 		{
 			//FAVORITES

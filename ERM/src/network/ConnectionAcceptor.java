@@ -5,10 +5,10 @@ import java.net.Socket;
  import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.transaction.Transaction;
 import gui.status.WalletStatus;
 import lang.Lang;
 import ntp.NTP;
-import qora.transaction.Transaction;
 import settings.Settings;
 
 public class ConnectionAcceptor extends Thread{

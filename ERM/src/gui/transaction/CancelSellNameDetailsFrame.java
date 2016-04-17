@@ -14,9 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.CancelSellNameTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.CancelSellNameTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -25,7 +25,7 @@ public class CancelSellNameDetailsFrame extends JFrame
 {
 	public CancelSellNameDetailsFrame(CancelSellNameTransaction cancelNameSale)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

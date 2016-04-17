@@ -17,8 +17,8 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import core.block.Block;
 import database.serializer.BlockSerializer;
-import qora.block.Block;
 import utils.Converter;
 import utils.ObserverMessage;
 import utils.ReverseComparator;

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.mapdb.DB;
 
-import qora.voting.Poll;
+import core.voting.Poll;
 import utils.ObserverMessage;
 
 import database.DBSet;

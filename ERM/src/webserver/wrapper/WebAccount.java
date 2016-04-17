@@ -2,7 +2,7 @@ package webserver.wrapper;
 
 import java.math.BigDecimal;
 
-import qora.account.Account;
+import core.account.Account;
 
 /**
  * Web respresentation of an Account for read only usage with pebble

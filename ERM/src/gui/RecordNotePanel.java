@@ -38,19 +38,19 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import qora.account.Account;
 import gui.items.notes.ComboBoxModelItemsNotes;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.item.notes.NoteCls;
-import qora.crypto.Base58;
-import qora.transaction.Transaction;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.crypto.Base58;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.notes.NoteCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 

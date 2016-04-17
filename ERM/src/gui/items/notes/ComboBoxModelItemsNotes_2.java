@@ -10,10 +10,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.item.ItemCls;
-import qora.item.notes.NoteCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.ItemCls;
+import core.item.notes.NoteCls;
 import gui.items.ComboBoxModelItems;
 
 @SuppressWarnings("serial")

@@ -29,13 +29,13 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class IssueAssetFrame extends JFrame
@@ -51,7 +51,7 @@ public class IssueAssetFrame extends JFrame
 
 	public IssueAssetFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Issue Asset"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Asset"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

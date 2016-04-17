@@ -18,14 +18,14 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
+import core.item.assets.AssetCls;
+import core.transaction.CreatePollTransaction;
+import core.transaction.Transaction;
+import core.voting.Poll;
 import database.DBSet;
 import gui.Gui;
 import gui.models.PollOptionsTableModel;
 import lang.Lang;
-import qora.item.assets.AssetCls;
-import qora.transaction.CreatePollTransaction;
-import qora.transaction.Transaction;
-import qora.voting.Poll;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 

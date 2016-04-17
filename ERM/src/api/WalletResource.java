@@ -13,9 +13,9 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.crypto.Base58;
 import utils.APIUtils;
 import controller.Controller;
+import core.crypto.Base58;
 
 @Path("wallet")
 @Produces(MediaType.APPLICATION_JSON)

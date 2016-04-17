@@ -8,7 +8,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.voting.Poll;
+import core.voting.Poll;
 
 public class PollSerializer implements Serializer<Poll>, Serializable
 {

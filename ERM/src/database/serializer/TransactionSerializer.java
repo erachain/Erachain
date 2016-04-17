@@ -9,8 +9,8 @@ import java.io.Serializable;
 
 import org.mapdb.Serializer;
 
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 
 public class TransactionSerializer implements Serializer<Transaction>, Serializable
 {

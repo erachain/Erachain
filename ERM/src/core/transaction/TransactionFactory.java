@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.util.Arrays;
  import org.apache.log4j.Logger;
@@ -37,7 +37,7 @@ public class TransactionFactory {
 		case Transaction.SIGN_NOTE_TRANSACTION:
 			
 			//PARSE PAYMENT TRANSACTION
-			return RecordNote.Parse(data, releaserReference);
+			return R_SignNote.Parse(data, releaserReference);
 
 		case Transaction.PAYMENT_TRANSACTION:
 			

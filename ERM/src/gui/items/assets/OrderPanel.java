@@ -30,14 +30,14 @@ import javax.swing.event.DocumentListener;
 
 import org.apache.log4j.Logger;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class OrderPanel extends JPanel

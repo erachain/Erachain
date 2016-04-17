@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-import qora.item.assets.AssetCls;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AssetFrame extends JFrame
@@ -19,7 +19,7 @@ public class AssetFrame extends JFrame
 	
 	public AssetFrame(AssetCls asset)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.asset = asset;
 		

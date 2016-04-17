@@ -1,4 +1,4 @@
-package qora.item.persons;
+package core.item.persons;
 
 import java.util.Arrays;
  import org.apache.log4j.Logger;
@@ -6,7 +6,7 @@ import java.util.Arrays;
 import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
 
-import qora.item.persons.PersonCls;
+import core.item.persons.PersonCls;
 
 public class PersonFactory {
 

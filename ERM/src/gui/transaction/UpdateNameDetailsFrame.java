@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.UpdateNameTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.UpdateNameTransaction;
 import utils.DateTimeFormat;
 import utils.GZIP;
 import utils.MenuPopupUtil;
@@ -30,7 +30,7 @@ public class UpdateNameDetailsFrame extends JFrame
 {
 	public UpdateNameDetailsFrame(UpdateNameTransaction nameUpdate)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

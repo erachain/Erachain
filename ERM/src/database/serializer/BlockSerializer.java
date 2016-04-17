@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.block.Block;
-import qora.block.BlockFactory;
+import core.block.Block;
+import core.block.BlockFactory;
 
 public class BlockSerializer implements Serializer<Block>, Serializable
 {

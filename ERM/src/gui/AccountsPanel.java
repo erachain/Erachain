@@ -33,12 +33,12 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
 
-import qora.account.Account;
-import qora.item.assets.AssetCls;
 import utils.BigDecimalStringComparator;
 import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener

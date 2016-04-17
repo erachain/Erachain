@@ -5,9 +5,9 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.item.notes.NoteCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.notes.NoteCls;
 import database.SortableList;
 import lang.Lang;
 

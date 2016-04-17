@@ -23,10 +23,10 @@ import javax.swing.border.EmptyBorder;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
 import database.SortableList;
-import qora.account.Account;
-import qora.item.assets.AssetCls;
-import qora.payment.Payment;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -42,7 +42,7 @@ public class PayDividendFrame extends JFrame
 
 	public PayDividendFrame(AssetCls asset)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Pay Dividend"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Pay Dividend"));
 		
 		this.asset = asset;
 		

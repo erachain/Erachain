@@ -7,11 +7,11 @@ import java.util.Observer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import qora.web.NameStorageMap;
-import qora.web.OrphanNameStorageHelperMap;
-import qora.web.OrphanNameStorageMap;
-import qora.web.SharedPostsMap;
 import controller.Controller;
+import core.web.NameStorageMap;
+import core.web.OrphanNameStorageHelperMap;
+import core.web.OrphanNameStorageMap;
+import core.web.SharedPostsMap;
 import settings.Settings;
 import utils.ObserverMessage;
 

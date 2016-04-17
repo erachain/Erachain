@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import gui.items.assets.AssetsPanel;
 import gui.items.notes.NotesPanel;
+import gui.items.persons.PersonsPanel;
 import gui.at.ATPanel;
 import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;
@@ -23,9 +24,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
+import core.transaction.Transaction;
 import database.wallet.BlockMap;
 import database.wallet.TransactionMap;
-import qora.transaction.Transaction;
 
 public class GeneralTabPane extends JTabbedPane{
 
@@ -60,7 +61,7 @@ public class GeneralTabPane extends JTabbedPane{
 		indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
 		indexes.put(WalletTransactionsTableModel.COLUMN_ADDRESS, TransactionMap.ADDRESS_INDEX);
 		indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(transactionsModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
 		transactionsTable.setRowSorter(sorter);
 		
 		//TRANSACTION DETAILS
@@ -96,17 +97,14 @@ public class GeneralTabPane extends JTabbedPane{
 		indexes.put(WalletBlocksTableModel.COLUMN_BASETARGET, BlockMap.BALANCE_INDEX);
 		indexes.put(WalletBlocksTableModel.COLUMN_TRANSACTIONS, BlockMap.TRANSACTIONS_INDEX);
 		indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlockMap.FEE_INDEX);
-		sorter = new QoraRowSorter(blocksModel, indexes);
+		sorter = new CoreRowSorter(blocksModel, indexes);
 		blocksTable.setRowSorter(sorter);
 
         this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
         
-        //NAMING
-        this.addTab(Lang.getInstance().translate("Naming service"), new NamingServicePanel());      
-        
-        //VOTING
-        this.addTab(Lang.getInstance().translate("Voting"), new VotingPanel());       
-        
+        //NOTES
+        this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
+
         //NOTES
         this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());
         		//new WalletItemNotesTableModel())
@@ -115,6 +113,12 @@ public class GeneralTabPane extends JTabbedPane{
         //ASSETS
         this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
 
+        //NAMING
+        this.addTab(Lang.getInstance().translate("Naming service"), new NamingServicePanel());      
+        
+        //VOTING
+        this.addTab(Lang.getInstance().translate("Voting"), new VotingPanel());       
+        
 		//ATs
 		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());
 

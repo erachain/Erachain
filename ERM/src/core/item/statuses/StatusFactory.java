@@ -1,11 +1,6 @@
-package qora.item.statuses;
+package core.item.statuses;
 
-//import org.apache.log4j.Logger;
-
-//import com.google.common.primitives.Ints;
-//import com.google.common.primitives.Longs;
-
-import qora.item.statuses.StatusCls;
+import core.item.statuses.StatusCls;
 
 public class StatusFactory {
 

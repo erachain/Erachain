@@ -16,11 +16,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
 import gui.items.ComboBoxModelItemsAll;
 import lang.Lang;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.voting.Poll;
 
 @SuppressWarnings("serial")
 public class PollFrame extends JFrame{
@@ -31,7 +31,7 @@ public class PollFrame extends JFrame{
 	public PollFrame(Poll poll, AssetCls asset) 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Poll Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Poll Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

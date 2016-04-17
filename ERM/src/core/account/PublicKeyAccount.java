@@ -1,6 +1,6 @@
-package qora.account;
+package core.account;
 
-import qora.crypto.Crypto;
+import core.crypto.Crypto;
 
 public class PublicKeyAccount extends Account {
 

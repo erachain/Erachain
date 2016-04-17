@@ -39,17 +39,17 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class RegisterNameFrame extends JFrame
@@ -70,7 +70,7 @@ public class RegisterNameFrame extends JFrame
 	
 	public RegisterNameFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Register Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Register Name"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -184,7 +184,7 @@ public class RegisterNameFrame extends JFrame
     	txtGBC.gridy = 3;
       	this.txtKey = new JTextField();
       	this.add(this.txtKey, txtGBC);
-      	txtKey.setText(Qorakeys.DEFAULT.toString());
+      	txtKey.setText(Corekeys.DEFAULT.toString());
       	
         
         //LABEL NAME
@@ -373,7 +373,7 @@ public class RegisterNameFrame extends JFrame
 			});
 		
     	ArrayList<Pair<String, String>> list = new ArrayList<>();
-    	list.add(new Pair<String, String>(Qorakeys.DEFAULT.toString(), ""));
+    	list.add(new Pair<String, String>(Corekeys.DEFAULT.toString(), ""));
     	namesModel.setData(list);
     	namesTable.requestFocus();
 		namesTable.changeSelection(0,0,false, false);

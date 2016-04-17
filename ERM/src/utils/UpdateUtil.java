@@ -7,11 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
 import api.BlogPostResource;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
 import database.BlockMap;
 import database.DBSet;
 import database.SortableList;

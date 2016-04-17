@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,30 +17,30 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.notes.NoteCls;
+import core.item.notes.NoteFactory;
+import core.item.persons.PersonCls;
+import core.item.persons.PersonFactory;
 import database.BalanceMap;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.item.notes.NoteCls;
-import qora.item.notes.NoteFactory;
-import qora.item.persons.PersonCls;
-import qora.item.persons.PersonFactory;
 import utils.Converter;
 
-public class PersonalizeRecord extends Transaction {
+public class R_SertifyPerson extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PERSON_TRANSACTION;
-	private static final String NAME_ID = "Personalize";
+	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ACCOUNT_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DURATION_LENGTH = 4; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	private static final BigDecimal MIN_VOTE_BALANCE = BigDecimal.valueOf(10).setScale(8);
 
-	public static final BigDecimal OIL_AMOUNT = BigDecimal.valueOf(0.00003).setScale(8);
+	// how many OIL gift
+	public static final BigDecimal OIL_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
 	public static final BigDecimal VOTE_AMOUNT = BigDecimal.ONE.setScale(8);
 
 	protected long key;
@@ -57,7 +57,7 @@ public class PersonalizeRecord extends Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
-	public PersonalizeRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
@@ -69,14 +69,14 @@ public class PersonalizeRecord extends Transaction {
 		this.userAccount3 = userAccount3;
 		this.duration = duration; 
 	}
-	public PersonalizeRecord(PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
 				duration, timestamp, reference);
 	}
-	public PersonalizeRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, long timestamp, byte[] reference, byte[] signature,
 			 byte[] userSignature1,  byte[] userSignature2,  byte[] userSignature3) {
@@ -90,7 +90,7 @@ public class PersonalizeRecord extends Transaction {
 		this.calcFee();
 	}
 	// as pack
-	public PersonalizeRecord(byte[] typeBytes, PublicKeyAccount creator, long key,
+	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, byte[] signature,
 			 byte[] userSignature1,  byte[] userSignature2,  byte[] userSignature3) {
@@ -102,7 +102,7 @@ public class PersonalizeRecord extends Transaction {
 		this.userSignature2 = userSignature2;
 		this.userSignature3 = userSignature3;
 	}
-	public PersonalizeRecord(PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, long timestamp, byte[] reference, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
@@ -111,7 +111,7 @@ public class PersonalizeRecord extends Transaction {
 				duration, timestamp, reference);
 	}
 	// as pack
-	public PersonalizeRecord(PublicKeyAccount creator, long key,
+	public R_SertifyPerson(PublicKeyAccount creator, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int duration, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
@@ -283,12 +283,12 @@ public class PersonalizeRecord extends Transaction {
 		position += SIGNATURE_LENGTH;
 
 		if (!asPack) {
-			return new PersonalizeRecord(typeBytes, creator, feePow, key,
+			return new R_SertifyPerson(typeBytes, creator, feePow, key,
 					userAccount1, userAccount2, userAccount3,
 					duration, timestamp, reference, signature,
 					 userSignature1,  userSignature2,  userSignature3);
 		} else {
-			return new PersonalizeRecord(typeBytes, creator, key,
+			return new R_SertifyPerson(typeBytes, creator, key,
 					userAccount1, userAccount2, userAccount3,
 					duration, signature,
 					 userSignature1,  userSignature2,  userSignature3);
@@ -403,8 +403,8 @@ public class PersonalizeRecord extends Transaction {
 		super.process(db, asPack);
 
 		// send VOTE_KEY
-		this.creator.setConfirmedBalance(Transaction.OIL_KEY, this.creator.getConfirmedBalance(Transaction.OIL_KEY, db).subtract(OIL_AMOUNT), db);						
-		this.creator.setConfirmedBalance(Transaction.VOTE_KEY, this.creator.getConfirmedBalance(Transaction.VOTE_KEY, db).subtract(VOTE_AMOUNT), db);						
+		this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, db).subtract(OIL_AMOUNT), db);						
+		this.creator.setConfirmedBalance(VOTE_KEY, this.creator.getConfirmedBalance(VOTE_KEY, db).subtract(VOTE_AMOUNT), db);						
 		//UPDATE USER
 		this.userAccount1.setConfirmedBalance(Transaction.OIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.OIL_KEY, db).add(OIL_AMOUNT), db);
 		this.userAccount1.setConfirmedBalance(Transaction.VOTE_KEY, this.userAccount1.getConfirmedBalance(Transaction.VOTE_KEY, db).add(VOTE_AMOUNT), db);

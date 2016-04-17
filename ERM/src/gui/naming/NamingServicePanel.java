@@ -1,6 +1,6 @@
 package gui.naming;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.WalletNamesTableModel;
 import lang.Lang;
 
@@ -25,8 +25,8 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
+import core.naming.Name;
 import database.wallet.NameMap;
-import qora.naming.Name;
 
 @SuppressWarnings("serial")
 public class NamingServicePanel extends JPanel
@@ -64,7 +64,7 @@ public class NamingServicePanel extends JPanel
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(WalletNamesTableModel.COLUMN_NAME, NameMap.NAME_INDEX);
 		indexes.put(WalletNamesTableModel.COLUMN_ADDRESS, NameMap.OWNER_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(namesModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(namesModel, indexes);
 		namesTable.setRowSorter(sorter);
 		
 		//CHECKBOX FOR CONFIRMED

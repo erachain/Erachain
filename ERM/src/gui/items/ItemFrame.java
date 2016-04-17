@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-import qora.item.ItemCls;
+import core.item.ItemCls;
 
 @SuppressWarnings("serial")
 public class ItemFrame extends JFrame
@@ -19,7 +19,7 @@ public class ItemFrame extends JFrame
 	
 	public ItemFrame(ItemCls item)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.item = item;
 		

@@ -1,6 +1,6 @@
 package gui.at;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.ATTxsTableModel;
 import lang.Lang;
 
@@ -22,7 +22,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import qora.account.Account;
+
+import core.account.Account;
 import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
 
@@ -45,7 +46,7 @@ public class ATTransactionsPanel extends JPanel
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(ATTxsTableModel.COLUMN_HEIGHT, ATTxsTableModel.COLUMN_HEIGHT);
-		QoraRowSorter sorter = new QoraRowSorter(this.atTxsTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.atTxsTableModel, indexes);
 		sorter.toggleSortOrder(ATTxsTableModel.COLUMN_HEIGHT);
 		sorter.toggleSortOrder(ATTxsTableModel.COLUMN_HEIGHT);
 		atsTable.setRowSorter(sorter);

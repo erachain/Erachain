@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 //import java.math.BigDecimal;
@@ -18,23 +18,18 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 //import database.BalanceMap;
 import database.DBSet;
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-//import qora.crypto.Crypto;
-//import utils.Converter;
-//import qora.crypto.Crypto;
-//import qora.payment.Payment;
 
 
 
-public class RecordNote extends Transaction {
+public class R_SignNote extends Transaction {
 
 	private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
-	private static final String NAME_ID = "Record Note";
+	private static final String NAME_ID = "Sign Note";
 
 	protected static final byte HAS_NOTE_MASK = (byte)(1 << 7);
 	/*
@@ -52,29 +47,29 @@ public class RecordNote extends Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 
-	public RecordNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.data = data;
 		this.isText = isText;
 	}
-	public RecordNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
 		this(typeBytes, creator, feePow, Note, data, isText, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// asPack
-	public RecordNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data, byte[] isText, byte[] reference, byte[] signature) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data, byte[] isText, byte[] reference, byte[] signature) {
 		this(typeBytes, creator, (byte)0, Note, data, isText, 0l, reference);
 		this.signature = signature;
 		// not need this.calcFee();
 	}
-	public RecordNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, Note, data, isText, timestamp, reference, signature);
 	}
-	public RecordNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, Note, data, isText, timestamp, reference);
 	}
-	public RecordNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data,
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data,
 			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, byte[] reference, byte[] signature)
 	{
 		this(typeBytes, creator, feePow, Note, data, isText, timestamp, reference, signature);
@@ -83,7 +78,7 @@ public class RecordNote extends Transaction {
 		this.setTypeBytes();
 	}
 	// as Pack
-	public RecordNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data,
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data,
 			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, byte[] reference, byte[] signature)
 	{
 		this(typeBytes, creator, Note, data, isText, reference, signature);
@@ -91,7 +86,7 @@ public class RecordNote extends Transaction {
 		this.signatures = signatures;
 		this.setTypeBytes();
 	}
-	public RecordNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference)
+	public R_SignNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference)
 	{
 		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, Note, data, isText, timestamp, reference);
 	}
@@ -260,15 +255,15 @@ public class RecordNote extends Transaction {
 		
 		if (signersLen == 0) {
 			if (!asPack) {
-				return new RecordNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, timestamp, reference, signatureBytes);
+				return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, timestamp, reference, signatureBytes);
 			} else {
-				return new RecordNote(typeBytes, creator, key, arbitraryData, isTextByte, reference, signatureBytes);
+				return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, reference, signatureBytes);
 			}
 		} else {
 			if (!asPack) {
-				return new RecordNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, signers, signatures, timestamp, reference, signatureBytes);
+				return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, signers, signatures, timestamp, reference, signatureBytes);
 			} else {
-				return new RecordNote(typeBytes, creator, key, arbitraryData, isTextByte, signers, signatures, reference, signatureBytes);
+				return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, signers, signatures, reference, signatureBytes);
 			}
 			
 		}

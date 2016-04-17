@@ -8,9 +8,9 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
+import core.item.assets.AssetCls;
+import core.item.assets.AssetFactory;
 import database.TransactionDatabase;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetFactory;
 
 public class AssetSerializer implements Serializer<AssetCls>, Serializable
 {

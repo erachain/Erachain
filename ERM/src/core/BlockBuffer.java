@@ -1,4 +1,4 @@
-package qora;
+package core;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import qora.block.Block;
+import core.block.Block;
 import settings.Settings;
 import network.Peer;
 import network.message.BlockMessage;

@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -10,13 +10,11 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.PublicKeyAccount;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
 import database.DBSet;
-//import ntp.NTP;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Crypto;
-import qora.item.assets.AssetCls;
-import qora.payment.Payment;
 
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	protected static final int SERVICE_LENGTH = 4;

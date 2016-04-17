@@ -11,8 +11,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import core.naming.Name;
 import lang.Lang;
-import qora.naming.Name;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 
@@ -21,7 +21,7 @@ public class NameDetailsFrame extends JFrame
 {
 	public NameDetailsFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Name Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Name Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

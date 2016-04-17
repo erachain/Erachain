@@ -11,7 +11,7 @@ import javax.swing.ListCellRenderer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
-import qora.item.assets.AssetCls;
+import core.item.assets.AssetCls;
 import utils.NumberAsString;
 import utils.Pair;
 

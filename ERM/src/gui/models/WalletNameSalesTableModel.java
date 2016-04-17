@@ -6,11 +6,11 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.account.Account;
+import core.naming.NameSale;
 import database.SortableList;
 import database.wallet.NameSaleMap;
 import lang.Lang;
-import qora.account.Account;
-import qora.naming.NameSale;
 import utils.ObserverMessage;
 import utils.Pair;
 

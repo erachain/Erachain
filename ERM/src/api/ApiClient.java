@@ -32,32 +32,32 @@ public class ApiClient {
 	String[] [] helpStrings =
 		{
 			{
-				"GET qora/stop", 
+				"GET core/stop", 
 				"Will stop the application. This command might not be able to return a http OK message.",
 				""
 			},
 			{
-				"GET qora/status", 
+				"GET core/status", 
 				"Returns the status of the application.",
 				"0 - No connections. 1 - Synchronizing 2 - OK"
 			},
 			{
-				"GET qora/status/forging",
+				"GET core/status/forging",
 				"Returns the status of the forging process.",
 				"0 - Forging disabled. 1 - Forging enabled 2 - Forging"
 			},
 			{
-				"GET qora/isuptodate", 
+				"GET core/isuptodate", 
 				"Shows if the application is synchronized with the network.",
 				""
 			},
 			{
-				"GET qora/settings", 
+				"GET core/settings", 
 				"Shows settings.",
 				""
 			},
 			{
-				"GET qora/version",
+				"GET core/version",
 				"Returns the version and buildtime of the running client.",
 				""
 			},
@@ -343,12 +343,12 @@ public class ApiClient {
 			},
 			{
 				"POST payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
-				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 			{
 				"POST namepayment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipientName>\"}", 
-				"Send a new neme-payment using the given data. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new neme-payment using the given data. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked. 701 - The name is not registered. 702 -  Names for sale. 703 = Name with trailing or leading spaces."
 			},
 			{
@@ -583,12 +583,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog",
-				"Equivalent to blog/posts/QORA",
+				"Equivalent to blog/posts/ERM",
 				""
 			},
 			{
 				"GET blog/posts/<blogname>",
-				"List posts to a blog by transaction signature. If <blogname> is omitted, QORA is provided.",
+				"List posts to a blog by transaction signature. If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -598,7 +598,7 @@ public class ApiClient {
 			},
 			{
 				"GET blog/entries/<blogname>",
-				"Returns the content of the entries for the blog.  If <blogname> is omitted, QORA is provided.",
+				"Returns the content of the entries for the blog.  If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -608,12 +608,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog/lastentry/<blogname>",
-				"Returns the content of the last entry of the blog.  If <blogname> is omitted, QORA is provided.",
+				"Returns the content of the last entry of the blog.  If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled. 906 - This blog is empty."
 			},
 			{
 				"POST multipayment {\"sender\":\"<sender>\", \"asset\":<defaultkey>, \"payments\": [{\"recipient\":\"<recipient 1>\", \"amount\": \"<amount 1>\", \"asset\":<key>},{\"recipient\":\"<recipient 2>\", \"amount\": \"<amount 2>\"}]}",
-				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 		};

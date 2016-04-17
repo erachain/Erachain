@@ -51,7 +51,7 @@ public class SettingLangFrame extends JDialog {
 	public SettingLangFrame()
 	{
 		super();
-		this.setTitle("Qora" + " - " + "Language select");
+		this.setTitle("DATACHAINS.world" + " - " + "Language select");
 		this.setModal(true);
 
 		//ICON

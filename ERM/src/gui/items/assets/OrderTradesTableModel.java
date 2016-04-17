@@ -7,12 +7,12 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.item.assets.Order;
-import qora.item.assets.Trade;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.assets.Order;
+import core.item.assets.Trade;
 import database.DBSet;
 import database.SortableList;
 import gui.models.TableModelCls;

@@ -7,10 +7,9 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import qora.transaction.Transaction;
-
 import com.google.common.primitives.UnsignedBytes;
 
+import core.transaction.Transaction;
 import database.DBSet;
 
 public class VoteOnPollMap extends DBMap<byte[], Integer> 

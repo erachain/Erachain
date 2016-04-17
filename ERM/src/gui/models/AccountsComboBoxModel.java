@@ -8,10 +8,10 @@ import java.util.Observer;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.account.Account;
 import utils.AccountBalanceComparator;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.account.Account;
 
 @SuppressWarnings("serial")
 public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> implements Observer {

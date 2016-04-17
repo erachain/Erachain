@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 
 import javax.swing.table.AbstractTableModel;
 
+import core.item.assets.AssetCls;
+import core.voting.Poll;
+import core.voting.PollOption;
 import lang.Lang;
-import qora.item.assets.AssetCls;
-import qora.voting.Poll;
-import qora.voting.PollOption;
 import utils.NumberAsString;
 
 @SuppressWarnings("serial")

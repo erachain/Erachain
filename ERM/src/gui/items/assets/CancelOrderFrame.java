@@ -23,12 +23,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.Order;
-import qora.transaction.Transaction;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.PrivateKeyAccount;
+import core.item.assets.Order;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class CancelOrderFrame extends JFrame
@@ -39,7 +39,7 @@ public class CancelOrderFrame extends JFrame
 	
 	public CancelOrderFrame(Order order)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Cancel Order"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Cancel Order"));
 		
 		this.order = order;
 		

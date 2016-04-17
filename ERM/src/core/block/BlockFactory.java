@@ -1,6 +1,6 @@
-package qora.block;
+package core.block;
 
-import qora.account.PublicKeyAccount;
+import core.account.PublicKeyAccount;
 
 public class BlockFactory {
 

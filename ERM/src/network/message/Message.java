@@ -2,12 +2,11 @@ package network.message;
 
 import java.util.Arrays;
 
-import qora.crypto.Crypto;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import controller.Controller;
+import core.crypto.Crypto;
 import network.Peer;
 
 public class Message {

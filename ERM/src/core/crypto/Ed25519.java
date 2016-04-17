@@ -1,4 +1,4 @@
-package qora.crypto;
+package core.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

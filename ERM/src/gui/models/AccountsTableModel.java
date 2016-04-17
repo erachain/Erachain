@@ -7,12 +7,12 @@ import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 
-import qora.transaction.Transaction;
-import qora.account.Account;
-import qora.item.assets.AssetCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import lang.Lang;
 
 @SuppressWarnings("serial")

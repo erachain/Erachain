@@ -15,8 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.item.ItemCls;
 import controller.Controller;
+import core.item.ItemCls;
 import lang.Lang;
 
 public class ItemDetailsPanel extends JPanel {
@@ -103,7 +103,7 @@ public class ItemDetailsPanel extends JPanel {
 		//IF ASSET CONFIRMED
 		if(this.item.getKey() >= 0)
 		{
-			//ADD QORA PAIR BUTTON
+			//ADD ERM PAIR BUTTON
 			labelGBC.gridy++;
 			labelGBC.gridwidth = 2;
 			JButton openPairButton = new JButton(Lang.getInstance().translate("Sign Item"));
@@ -118,7 +118,7 @@ public class ItemDetailsPanel extends JPanel {
 			this.add(openPairButton, labelGBC);
 		}
 		
-		//IF ASSET CONFIRMED AND NOT QORA
+		//IF ASSET CONFIRMED AND NOT ERM
 		if(this.item.getKey() > 2l)
 		{
 			//FAVORITES

@@ -17,16 +17,16 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import qora.account.Account;
-import qora.item.assets.AssetCls;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import utils.MenuPopupUtil;
 import controller.Controller;
+import core.account.Account;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class SendMoneyPanel extends JPanel 
@@ -278,7 +278,7 @@ public class SendMoneyPanel extends JPanel
 		//READ SENDER
 		Account sender = (Account) cbxFrom.getSelectedItem();
 		
-		//READ RECIPIENT (NAME OR QORA ADRESS)
+		//READ RECIPIENT (NAME OR WALLET ADRESS)
 		String recipientAddress = txtTo.getText();
 		
 		

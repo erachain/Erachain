@@ -24,9 +24,9 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import qora.account.PrivateKeyAccount;
-import qora.naming.Name;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.naming.Name;
+import core.transaction.Transaction;
 //import settings.Settings;
 import utils.Pair;
 
@@ -43,7 +43,7 @@ public class SellNameFrame extends JFrame
 	
 	public SellNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Sell Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -12,18 +12,18 @@ import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.GenesisTransaction;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetVenture;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.transaction.ArbitraryTransactionV3;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
 
 
 
@@ -129,12 +129,12 @@ public class TransactionV3Tests {
 		//CREATE EMPTY MEMORY DATABASE
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
-		//ADD QORA ASSET
-		AssetCls qoraAsset = new AssetVenture(new GenesisBlock().getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
-		qoraAsset.setReference(assetReference);
-		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true);
+		//ADD ERM ASSET
+		AssetCls ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte) 2, true);
+		ermAsset.setReference(assetReference);
+		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(assetReference);
-		databaseSet.getAssetMap().set(0l, qoraAsset);
+		databaseSet.getAssetMap().set(0l, ermAsset);
 		databaseSet.getAssetMap().set(61l, aTFundingAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
@@ -224,12 +224,12 @@ public class TransactionV3Tests {
 		GenesisBlock genesisBlock = new GenesisBlock();
 		genesisBlock.process(databaseSet);
 
-		//ADD QORA ASSET
-		AssetCls qoraAsset = new AssetVenture(genesisBlock.getGenerator(), "Qora", "This is the simulated Qora asset.", 10000000000L, (byte) 2, true);
-		qoraAsset.setReference(assetReference);
-		AssetCls aTFundingAsset = new AssetVenture(genesisBlock.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into Qora.", 250000000L, (byte) 2, true);
+		//ADD ERM ASSET
+		AssetCls ermAsset = new AssetVenture(genesisBlock.getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte) 2, true);
+		ermAsset.setReference(assetReference);
+		AssetCls aTFundingAsset = new AssetVenture(genesisBlock.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(genesisBlock.getGeneratorSignature());
-		databaseSet.getAssetMap().set(0l, qoraAsset);
+		databaseSet.getAssetMap().set(0l, ermAsset);
 		databaseSet.getAssetMap().set(61l, aTFundingAsset);
 
 		//CREATE KNOWN ACCOUNT

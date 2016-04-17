@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import core.account.Account;
+import core.item.assets.AssetCls;
+import core.voting.PollOption;
 import lang.Lang;
-import qora.account.Account;
-import qora.item.assets.AssetCls;
-import qora.voting.PollOption;
 import utils.NumberAsString;
 import utils.Pair;
 

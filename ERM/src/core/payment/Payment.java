@@ -1,4 +1,4 @@
- package qora.payment;
+ package core.payment;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,10 +9,10 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
 
 public class Payment {
 

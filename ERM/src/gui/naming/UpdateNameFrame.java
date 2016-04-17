@@ -45,16 +45,16 @@ import javax.swing.event.ListSelectionListener;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.naming.Name;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.Pair;
-import utils.Qorakeys;
+import utils.Corekeys;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.naming.Name;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @SuppressWarnings("serial")
@@ -75,7 +75,7 @@ public class UpdateNameFrame extends JFrame
 
 	public UpdateNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Update Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Update Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -442,7 +442,7 @@ public class UpdateNameFrame extends JFrame
 			
 		}else
 		{
-			keyvaluepairs.add(new Pair<String, String>(Qorakeys.DEFAULT.toString(), value));
+			keyvaluepairs.add(new Pair<String, String>(Corekeys.DEFAULT.toString(), value));
 		}
 		
 		namesModel.setData(keyvaluepairs);

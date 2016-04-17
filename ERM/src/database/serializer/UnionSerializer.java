@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.unions.UnionCls;
-import qora.item.unions.UnionFactory;
+import core.item.unions.UnionCls;
+import core.item.unions.UnionFactory;
 
 public class UnionSerializer implements Serializer<UnionCls>, Serializable
 {

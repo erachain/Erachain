@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 
 import java.math.BigDecimal;
@@ -16,16 +16,15 @@ import java.util.Map;
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
 import utils.Converter;
 import at.AT;
 import at.AT_Constants;
 import at.AT_Controller;
 import at.AT_Exception;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;

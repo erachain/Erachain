@@ -12,7 +12,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import qora.naming.NameSale;
+import core.naming.NameSale;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
 import database.DBSet;

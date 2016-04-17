@@ -1,7 +1,6 @@
 package gui.items.notes;
 
 
-//import qora.item.notes.NoteCls;
 import utils.ObserverMessage;
 
 import java.awt.Dimension;
@@ -25,7 +24,8 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
-import gui.QoraRowSorter;
+import core.item.notes.NoteCls;
+import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
 import gui.items.notes.AllNotesFrame;
 import gui.items.notes.NoteFrame;
@@ -34,7 +34,6 @@ import gui.items.notes.IssueNoteFrame;
 //import gui.items.notes.PayDividendFrame;
 import gui.models.WalletItemNotesTableModel;
 import lang.Lang;
-import qora.item.notes.NoteCls;
 
 /*
 @SuppressWarnings("serial")
@@ -80,7 +79,7 @@ public class NotesPanel extends JPanel
 		
 		//POLLS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		QoraRowSorter sorter = new QoraRowSorter(notesModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(notesModel, indexes);
 		table.setRowSorter(sorter);
 
 		/*

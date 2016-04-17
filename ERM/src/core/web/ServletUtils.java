@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -1,14 +1,14 @@
-package qora.item.assets;
+package core.item.assets;
 
+
+import core.account.Account;
+import core.item.ItemCls;
 
 // import org.apache.log4j.Logger;
 
 import database.DBSet;
 import database.Item_Map;
 import database.IssueItemMap;
-import qora.account.Account;
-
-import qora.item.ItemCls;
 
 
 public abstract class AssetCls extends ItemCls {

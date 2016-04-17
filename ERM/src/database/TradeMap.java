@@ -18,8 +18,8 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import qora.item.assets.Order;
-import qora.item.assets.Trade;
+import core.item.assets.Order;
+import core.item.assets.Trade;
 import utils.ObserverMessage;
 import database.DBSet;
 import database.serializer.TradeSerializer;

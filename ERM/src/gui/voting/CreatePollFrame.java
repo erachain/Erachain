@@ -30,13 +30,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class CreatePollFrame extends JFrame
@@ -50,7 +50,7 @@ public class CreatePollFrame extends JFrame
 
 	public CreatePollFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Create Poll"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Create Poll"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

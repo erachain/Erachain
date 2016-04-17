@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.voting.PollOption;
+import core.voting.PollOption;
 
 @SuppressWarnings("serial")
 public class OptionsComboBoxModel extends DefaultComboBoxModel<PollOption> {

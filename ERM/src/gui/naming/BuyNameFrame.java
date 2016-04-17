@@ -23,10 +23,10 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.naming.NameSale;
-import qora.transaction.Transaction;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.naming.NameSale;
+import core.transaction.Transaction;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -44,7 +44,7 @@ public class BuyNameFrame extends JFrame
 	
 	public BuyNameFrame(NameSale nameSale)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Buy Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Buy Name"));
 		
 		this.nameSale = nameSale;
 		

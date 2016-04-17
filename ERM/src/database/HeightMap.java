@@ -10,9 +10,9 @@ import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
-import qora.block.Block;
-
 import com.google.common.primitives.UnsignedBytes;
+
+import core.block.Block;
 
 public class HeightMap extends DBMap<byte[], Integer> 
 {

@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,18 +13,16 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.item.ItemCls;
-import qora.item.notes.NoteCls;
-import qora.item.notes.NoteFactory;
-import qora.crypto.Crypto;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.crypto.Crypto;
+import core.item.ItemCls;
+import core.item.notes.NoteCls;
+import core.item.notes.NoteFactory;
 //import database.ItemMap;
 import database.DBSet;
 

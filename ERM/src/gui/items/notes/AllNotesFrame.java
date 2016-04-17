@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import lang.Lang;
 
 import javax.swing.JComponent;
@@ -31,7 +31,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 
-import qora.item.notes.NoteCls;
+import core.item.notes.NoteCls;
 import gui.items.AllItemsFrame;
 
 @SuppressWarnings("serial")
@@ -104,7 +104,7 @@ public class AllNotesFrame extends AllItemsFrame {
 		
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		QoraRowSorter sorter = new QoraRowSorter(this.tableModelNotes, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.tableModelNotes, indexes);
 		notesTable.setRowSorter(sorter);
 		
 		//CREATE SEARCH FIELD

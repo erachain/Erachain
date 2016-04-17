@@ -15,9 +15,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import core.crypto.Base58;
+import core.transaction.TransferAssetTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.TransferAssetTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -26,7 +26,7 @@ public class TransferAssetDetailsFrame extends JFrame
 {
 	public TransferAssetDetailsFrame(TransferAssetTransaction assetTransfer)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

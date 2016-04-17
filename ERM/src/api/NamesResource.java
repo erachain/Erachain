@@ -20,19 +20,19 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.transaction.BuyNameTransaction;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.transaction.BuyNameTransaction;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.UpdateNameTransaction;
 import utils.APIUtils;
 import utils.GZIP;
 import utils.Pair;
-import utils.Qorakeys;
+import utils.Corekeys;
 
 @Path("names")
 @Produces(MediaType.APPLICATION_JSON)
@@ -330,7 +330,7 @@ public class NamesResource {
 					{
 						//THERE MUST BE at least one KEY always, so we convert it to the defaultkey
 						String oldVal = (String) resultJson.get(key);
-						resultJson.put(Qorakeys.DEFAULT.toString(), oldVal);
+						resultJson.put(Corekeys.DEFAULT.toString(), oldVal);
 					}
 					
 					resultJson.remove(key);
@@ -340,7 +340,7 @@ public class NamesResource {
 			} else {
 
 				//SPECIAL CASE USER TRIES TO DELETE LAST KEY
-				if(key.equals(Qorakeys.DEFAULT.toString()))
+				if(key.equals(Corekeys.DEFAULT.toString()))
 				{
 					throw ApiErrorFactory.getInstance().createError(
 							ApiErrorFactory.ERROR_LAST_KEY_IS_DEFAULT_KEY_ERROR);
@@ -460,7 +460,7 @@ public class NamesResource {
 			} else {
 				// CONVERTING TO CORRECT FORMAT
 				resultJson = new JSONObject();
-				resultJson.put(Qorakeys.DEFAULT.toString(), oldValue);
+				resultJson.put(Corekeys.DEFAULT.toString(), oldValue);
 				resultJson.put(key, value);
 			}
 

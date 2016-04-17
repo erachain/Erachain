@@ -12,7 +12,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
 
-import qora.crypto.Base64;
+import core.crypto.Base64;
 
 
 public class GZIP {

@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.statuses.StatusCls;
-import qora.item.statuses.StatusFactory;
+import core.item.statuses.StatusCls;
+import core.item.statuses.StatusFactory;
 
 public class StatusSerializer implements Serializer<StatusCls>, Serializable
 {

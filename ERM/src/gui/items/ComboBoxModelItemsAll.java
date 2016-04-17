@@ -7,8 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.DefaultComboBoxModel;
 
 import controller.Controller;
-import qora.item.ItemCls;
-//import qora.item.items.ItemCls;
+import core.item.ItemCls;
 
 @SuppressWarnings("serial")
 public class ComboBoxModelItemsAll extends DefaultComboBoxModel<ItemCls> {

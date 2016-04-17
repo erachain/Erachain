@@ -1,4 +1,4 @@
-package qora.block;
+package core.block;
 
 // import org.apache.log4j.Logger;
 
@@ -10,20 +10,18 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.assets.AssetVenture;
+import core.item.notes.Note;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.item.assets.AssetVenture;
-import qora.item.notes.Note;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.GenesisIssueNoteTransaction;
-import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
 
@@ -66,7 +64,7 @@ public class GenesisBlock extends Block{
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
 		    }
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
-			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar Qora.jar -testnet=" + genesisTimestamp;
+			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERM.jar -testnet=" + genesisTimestamp;
 
 			
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE

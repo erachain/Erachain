@@ -1,8 +1,6 @@
-package qora.item.unions;
+package core.item.unions;
 
-// import org.apache.log4j.Logger;
-
-import qora.item.unions.UnionCls;
+import core.item.unions.UnionCls;
 
 public class UnionFactory {
 

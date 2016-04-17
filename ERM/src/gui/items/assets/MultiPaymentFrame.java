@@ -22,9 +22,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import qora.item.assets.AssetCls;
-import qora.payment.Payment;
-import qora.transaction.Transaction;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
+import core.transaction.Transaction;
 import utils.BigDecimalStringComparator;
 import utils.Pair;
 
@@ -41,7 +41,7 @@ public class MultiPaymentFrame extends JFrame
 	@SuppressWarnings("unchecked")
 	public MultiPaymentFrame(AssetCls asset, List<Payment> payments)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Pay Dividend"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Pay Dividend"));
 		
 		this.asset = asset;
 		this.payments = payments;

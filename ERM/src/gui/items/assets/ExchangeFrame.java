@@ -21,7 +21,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
-import qora.item.assets.AssetCls;
+
+import core.item.assets.AssetCls;
 
 
 public class ExchangeFrame extends JFrame
@@ -39,12 +40,12 @@ public class ExchangeFrame extends JFrame
 	
 	public ExchangeFrame(AssetCls have, AssetCls want) 
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Check Exchange"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange"));
 		
 		this.have = have;
 		this.want = want;
 		
-		this.setTitle(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
+		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

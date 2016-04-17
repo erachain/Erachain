@@ -15,8 +15,8 @@ import org.mapdb.DB;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 import utils.ObserverMessage;
 import utils.TransactionsList;
 

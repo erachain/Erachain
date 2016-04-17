@@ -5,11 +5,11 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-import qora.transaction.Transaction;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.transaction.Transaction;
 import database.SortableList;
 import database.TransactionMap;
 import lang.Lang;

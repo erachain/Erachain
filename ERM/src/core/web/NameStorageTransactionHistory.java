@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import qora.crypto.Base58;
-import qora.transaction.ArbitraryTransaction;
+import core.crypto.Base58;
+import core.transaction.ArbitraryTransaction;
 import utils.DateTimeFormat;
 
 public class NameStorageTransactionHistory {

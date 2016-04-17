@@ -25,24 +25,24 @@ import javax.swing.border.EmptyBorder;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.transaction.RecordNote;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.transaction.R_SignNote;
 
 @SuppressWarnings("serial")
 public class RecStatementDetailsFrame extends JFrame
 {
 	private JTextField messageText;
 	
-	public RecStatementDetailsFrame(final RecordNote recStatement)
+	public RecStatementDetailsFrame(final R_SignNote recStatement)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Statement Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Statement Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

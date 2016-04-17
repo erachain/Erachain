@@ -1,17 +1,17 @@
-package qora.naming;
+package core.naming;
 // 30/03
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-import qora.crypto.Base58;
 import utils.NumberAsString;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
+import core.account.Account;
+import core.crypto.Base58;
 import database.DBSet;
 
 public class Name {

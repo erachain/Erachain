@@ -1,4 +1,4 @@
-package qora.wallet;
+package core.wallet;
 // 09/03
 
 import java.math.BigDecimal;
@@ -10,7 +10,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
- import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -19,37 +19,40 @@ import com.google.common.primitives.Ints;
 
 import at.AT_Transaction;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.assets.Order;
+import core.item.notes.NoteCls;
+import core.item.persons.PersonCls;
+import core.naming.Name;
+import core.naming.NameSale;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueNoteRecord;
+import core.transaction.IssuePersonRecord;
+import core.transaction.PaymentTransaction;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnPollTransaction;
+import core.voting.Poll;
+import core.wallet.NotesFavorites;
+import core.wallet.PersonsFavorites;
 import database.DBSet;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.WalletDatabase;
 import network.message.Message;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.item.notes.NoteCls;
-import qora.item.assets.Order;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.naming.NameSale;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.BuyNameTransaction;
-import qora.transaction.CancelOrderTransaction;
-import qora.transaction.CancelSellNameTransaction;
-import qora.transaction.CreateOrderTransaction;
-import qora.transaction.CreatePollTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.IssueNoteRecord;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.SellNameTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.UpdateNameTransaction;
-import qora.transaction.VoteOnPollTransaction;
-import qora.voting.Poll;
-import qora.wallet.NotesFavorites;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -68,6 +71,7 @@ public class Wallet extends Observable implements Observer
 	
 	AssetsFavorites assetsFavorites; 
 	NotesFavorites notesFavorites; 
+	PersonsFavorites personsFavorites; 
 	
 	static Logger LOGGER = Logger.getLogger(Wallet.class.getName());
 
@@ -116,6 +120,9 @@ public class Wallet extends Observable implements Observer
 		}
 		if(this.notesFavorites == null){
 			this.notesFavorites = new NotesFavorites();
+		}
+		if(this.personsFavorites == null){
+			this.personsFavorites = new PersonsFavorites();
 		}
 	}
 	
@@ -341,6 +348,17 @@ public class Wallet extends Observable implements Observer
 			this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());	
 		}
 	}
+	public void replasePersonFavorite()
+	{
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		if(this.personsFavorites != null) {
+			this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());	
+		}
+	}
 	// тут нужно понять где это используется
 	public void replaseFavoriteItems(int type)
 	{
@@ -357,6 +375,10 @@ public class Wallet extends Observable implements Observer
 			case ItemCls.NOTE_TYPE:
 				if(this.notesFavorites != null) {
 					this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());
+				}
+			case ItemCls.PERSON_TYPE:
+				if(this.personsFavorites != null) {
+					this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());
 				}
 		}
 	}
@@ -565,6 +587,7 @@ public class Wallet extends Observable implements Observer
 		this.database.getPollMap().reset();
 		this.database.getAssetMap().reset();
 		this.database.getNoteMap().reset();
+		this.database.getPersonMap().reset();
 		this.database.getOrderMap().reset();
 		LOGGER.info("Resetted maps");
 		
@@ -924,6 +947,9 @@ public class Wallet extends Observable implements Observer
 		//REGISTER ON NOTES
 		this.database.getNoteMap().addObserver(o);
 
+		//REGISTER ON PERSONS
+		this.database.getPersonMap().addObserver(o);
+
 		//REGISTER ON ORDERS
 		this.database.getOrderMap().addObserver(o);
 		
@@ -932,6 +958,9 @@ public class Wallet extends Observable implements Observer
 		
 		//REGISTER ON NOTE FAVORITES
 		this.database.getNoteFavoritesSet().addObserver(o);
+
+		//REGISTER ON PERSON FAVORITES
+		this.database.getPersonFavoritesSet().addObserver(o);
 
 		//SEND STATUS
 		int status = STATUS_LOCKED;
@@ -1367,6 +1396,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getAssetMap().delete(assetIssue.getAsset());
 		}
 	}
+
 	private void processNoteIssue(IssueNoteRecord noteIssue)
 	{
 		//CHECK IF WALLET IS OPEN
@@ -1398,6 +1428,38 @@ public class Wallet extends Observable implements Observer
 			this.database.getNoteMap().delete((NoteCls)noteIssue.getItem());
 		}
 	}
+
+	private void processPersonIssue(IssuePersonRecord personIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(personIssue.getItem().getCreator().getAddress()))
+		{
+			//ADD PERSON
+			this.database.getPersonMap().add((PersonCls)personIssue.getItem());
+		}
+	}
+	private void orphanPersonIssue(IssuePersonRecord personIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(personIssue.getItem().getCreator().getAddress()))
+		{
+			//DELETE PERSON
+			this.database.getPersonMap().delete((PersonCls)personIssue.getItem());
+		}
+	}
+
 	
 	private void processOrderCreation(CreateOrderTransaction orderCreation)
 	{
@@ -1547,6 +1609,12 @@ public class Wallet extends Observable implements Observer
 					this.processNoteIssue((IssueNoteRecord) transaction);
 				}
 				
+				//CHECK IF PERSON ISSUE
+				else if(transaction instanceof IssuePersonRecord)
+				{
+					this.processPersonIssue((IssuePersonRecord) transaction);
+				}
+				
 				//CHECK IF ORDER CREATION
 				/*if(transaction instanceof CreateOrderTransaction)
 				{
@@ -1594,6 +1662,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueNoteRecord)
 			{
 				this.processNoteIssue((IssueNoteRecord) transaction);
+			}
+			//CHECK IF PERSON ISSUE
+			else if(transaction instanceof IssuePersonRecord)
+			{
+				this.processPersonIssue((IssuePersonRecord) transaction);
 			}
 			
 			//CHECK IF ORDER CREATION
@@ -1667,6 +1740,11 @@ public class Wallet extends Observable implements Observer
 				{
 					this.orphanNoteIssue((IssueNoteRecord) transaction);
 				}
+				//CHECK IF PERSON ISSUE
+				else if(transaction instanceof IssuePersonRecord)
+				{
+					this.orphanPersonIssue((IssuePersonRecord) transaction);
+				}
 				
 				//CHECK IF ORDER CREATION
 				else if(transaction instanceof CreateOrderTransaction)
@@ -1714,6 +1792,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueNoteRecord)
 			{
 				this.orphanNoteIssue((IssueNoteRecord) transaction);
+			}
+			//CHECK IF PERSON ISSUE
+			else if(transaction instanceof IssuePersonRecord)
+			{
+				this.orphanPersonIssue((IssuePersonRecord) transaction);
 			}
 			
 			//CHECK IF ORDER CREATION

@@ -12,9 +12,9 @@ import javax.swing.JLabel;
 
 import org.apache.log4j.Logger;
 
-import qora.wallet.Wallet;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.wallet.Wallet;
 import gui.settings.SettingsFrame;
 import lang.Lang;
 

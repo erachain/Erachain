@@ -21,13 +21,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.payment.Payment;
-import qora.transaction.Transaction;
 import utils.APIUtils;
 import utils.GZIP;
 import utils.Pair;
@@ -37,6 +30,13 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.naming.Name;
+import core.payment.Payment;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @Path("namestorage")
@@ -333,7 +333,7 @@ public class NameStorageResource {
 								ApiErrorFactory.ERROR_TX_AMOUNT);
 					}
 					
-					//recalculating qora amount
+					//recalculating OIL amount
 					BigDecimal newCompleteFee = BigDecimal.ZERO;
 					BigDecimal oldAmount = BigDecimal.ZERO;
 					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[],BigDecimal>>();
@@ -369,7 +369,7 @@ public class NameStorageResource {
 					basicInfo = "Because of the size of the data this call will create "
 							+ allTxPairs.size()
 							+ " transactions.\nAll Arbitrary Transactions will cost: "
-							+ newCompleteFee.toPlainString() + " Qora.\nDetails:\n\n";
+							+ newCompleteFee.toPlainString() + " OIL.\nDetails:\n\n";
 
 //					basicInfo += StringUtils.join(askApicalls, "\n");
 					basicInfo += apicalls;
@@ -473,7 +473,7 @@ public class NameStorageResource {
 		}
 		String basicInfo = "WARNING : This call contains multipayments:\n";
 		for (Payment payment : resultPayments) {
-			basicInfo +=  "Recipient " + payment.getRecipient().getAddress() + " Amount: " + payment.getAmount().toPlainString() + " AssetID " + payment.getAsset() + (payment.getAsset() == 0L ? "(Qora)\n" : "\n");
+			basicInfo +=  "Recipient " + payment.getRecipient().getAddress() + " Amount: " + payment.getAmount().toPlainString() + " AssetID " + payment.getAsset() + (payment.getAsset() == 0L ? "(ERM)\n" : "\n");
 		}
 		basicInfo +="\n";
 		return basicInfo;

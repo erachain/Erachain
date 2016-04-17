@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,17 +12,15 @@ import ntp.NTP;
 
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.block.GenesisBlock;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.block.GenesisBlock;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import database.BalanceMap;
 import database.DBSet;
 
@@ -301,7 +299,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 		
-		//IF QORA ASSET
+		//IF OIL ASSET
 		if(this.key == BalanceMap.FEE_KEY)
 		{
 			//IF CREATOR

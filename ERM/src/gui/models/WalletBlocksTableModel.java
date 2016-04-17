@@ -5,10 +5,10 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import qora.block.Block;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.block.Block;
 import database.SortableList;
 import database.wallet.BlockMap;
 import lang.Lang;

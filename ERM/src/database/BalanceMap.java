@@ -14,7 +14,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import qora.account.Account;
+import core.account.Account;
 import utils.ObserverMessage;
 import database.DBSet;
 

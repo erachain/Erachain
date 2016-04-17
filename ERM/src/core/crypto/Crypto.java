@@ -1,4 +1,4 @@
-package qora.crypto;
+package core.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,11 +8,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
 import utils.Pair;
 
 import com.google.common.primitives.Bytes;
+
+import core.account.Account;
+import core.account.PrivateKeyAccount;
 
 public class Crypto {
 

@@ -1,12 +1,6 @@
-package qora.item.assets;
+package core.item.assets;
 
-//import java.util.Arrays;
-// import org.apache.log4j.Logger;
-
-//import com.google.common.primitives.Ints;
-//import com.google.common.primitives.Longs;
-
-import qora.item.assets.AssetCls;
+import core.item.assets.AssetCls;
 
 public class AssetFactory {
 

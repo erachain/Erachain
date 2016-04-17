@@ -6,11 +6,9 @@ import java.util.Map;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
+import core.item.ItemCls;
 //import utils.ObserverMessage;
 import database.DBSet;
-//import org.mapdb.Serializer;
-//import database.serializer.ItemSerializer;
-import qora.item.ItemCls;
 
 public abstract class Item_Map extends DBMap<Long, ItemCls> 
 {

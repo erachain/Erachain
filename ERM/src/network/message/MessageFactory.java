@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.List;
  import org.apache.log4j.Logger;
 
-import qora.block.Block;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
-
 import com.google.common.primitives.Ints;
 
+import core.block.Block;
+import core.crypto.Crypto;
+import core.transaction.Transaction;
 import lang.Lang;
 import network.Peer;
 

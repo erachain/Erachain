@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import qora.account.Account;
+import core.account.Account;
 
 public class AccountRenderer implements ListCellRenderer<Account> 
 {

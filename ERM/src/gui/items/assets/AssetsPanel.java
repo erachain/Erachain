@@ -1,6 +1,6 @@
 package gui.items.assets;
 ////////// 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
 
@@ -25,7 +25,7 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
-import qora.item.assets.AssetCls;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AssetsPanel extends JPanel
@@ -61,7 +61,7 @@ public class AssetsPanel extends JPanel
 		
 		//POLLS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		QoraRowSorter sorter = new QoraRowSorter(assetsModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
 		table.setRowSorter(sorter);
 				
 		//CHECKBOX FOR DIVISIBLE

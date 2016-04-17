@@ -6,7 +6,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
 
-import qora.account.PrivateKeyAccount;
+import core.account.PrivateKeyAccount;
 import settings.Settings;
 
 public class SecureWalletDatabase 

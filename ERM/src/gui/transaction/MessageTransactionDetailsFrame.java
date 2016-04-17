@@ -26,15 +26,15 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.transaction.MessageTransaction;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.transaction.MessageTransaction;
 
 @SuppressWarnings("serial")
 public class MessageTransactionDetailsFrame extends JFrame
@@ -45,7 +45,7 @@ public class MessageTransactionDetailsFrame extends JFrame
 			.getLogger(MessageTransactionDetailsFrame.class);
 	public MessageTransactionDetailsFrame(final MessageTransaction messageTransaction)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

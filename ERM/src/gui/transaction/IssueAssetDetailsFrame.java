@@ -16,9 +16,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.IssueAssetTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.IssueAssetTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -27,7 +27,7 @@ public class IssueAssetDetailsFrame extends JFrame
 {
 	public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

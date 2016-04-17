@@ -58,28 +58,28 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import api.BlogPostResource;
 import api.NameStorageResource;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.blockexplorer.BlockExplorer;
+import core.crypto.Base58;
+import core.crypto.Base64;
+import core.naming.Name;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
+import core.web.BlogBlackWhiteList;
+import core.web.BlogProfile;
+import core.web.HTMLSearchResult;
+import core.web.NameStorageMap;
+import core.web.NameStorageTransactionHistory;
+import core.web.NavbarElements;
+import core.web.Profile;
+import core.web.ProfileHelper;
+import core.web.ServletUtils;
+import core.web.WebNameStorageHistoryHelper;
+import core.web.blog.BlogEntry;
 import database.DBSet;
 import database.NameMap;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.blockexplorer.BlockExplorer;
-import qora.crypto.Base58;
-import qora.crypto.Base64;
-import qora.naming.Name;
-import qora.payment.Payment;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
-import qora.web.BlogBlackWhiteList;
-import qora.web.BlogProfile;
-import qora.web.HTMLSearchResult;
-import qora.web.NameStorageMap;
-import qora.web.NameStorageTransactionHistory;
-import qora.web.NavbarElements;
-import qora.web.Profile;
-import qora.web.ProfileHelper;
-import qora.web.ServletUtils;
-import qora.web.WebNameStorageHistoryHelper;
-import qora.web.blog.BlogEntry;
 import settings.Settings;
 import utils.AccountBalanceComparator;
 import utils.BlogUtils;
@@ -88,7 +88,7 @@ import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import utils.PebbleHelper;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.StorageUtils;
 import utils.StrJSonFine;
 import utils.UpdateUtil;
@@ -297,7 +297,7 @@ public class WebResource {
 							.getInstance()
 							.getNameStorageMap()
 							.getOpt(nameobj.getName(),
-									Qorakeys.WEBSITE.toString());
+									Corekeys.WEBSITE.toString());
 				}
 
 				pebbleHelper.getContextMap().put("name", nameobj.getName());
@@ -585,8 +585,8 @@ public class WebResource {
 
 		JSONObject json = new JSONObject();
 
-		if (key != null && !key.equalsIgnoreCase(Qorakeys.WEBSITE.toString())) {
-			if (Qorakeys.isPartOf(key)) {
+		if (key != null && !key.equalsIgnoreCase(Corekeys.WEBSITE.toString())) {
+			if (Corekeys.isPartOf(key)) {
 				json.put("type", "badKey");
 
 				return Response
@@ -610,7 +610,7 @@ public class WebResource {
 		if (StringUtils.isNotBlank(key)) {
 			websitepair = new Pair<String, String>(key, website);
 		} else {
-			websitepair = new Pair<String, String>(Qorakeys.WEBSITE.toString(),
+			websitepair = new Pair<String, String>(Corekeys.WEBSITE.toString(),
 					website);
 		}
 
@@ -620,7 +620,7 @@ public class WebResource {
 			storageJsonObject = StorageUtils
 					.getStorageJsonObject(
 							null,
-							Collections.singletonList(StringUtils.isBlank(key) ? Qorakeys.WEBSITE
+							Collections.singletonList(StringUtils.isBlank(key) ? Corekeys.WEBSITE
 									.toString() : key), null, null, null, null);
 		} else {
 
@@ -698,19 +698,19 @@ public class WebResource {
 			}
 
 			boolean blogenable = Boolean.valueOf(form
-					.getFirst(Qorakeys.BLOGENABLE.toString()));
+					.getFirst(Corekeys.BLOGENABLE.toString()));
 			boolean blockComments = Boolean.valueOf(form
-					.getFirst(Qorakeys.BLOGBLOCKCOMMENTS.toString()));
+					.getFirst(Corekeys.BLOGBLOCKCOMMENTS.toString()));
 			boolean profileenable = Boolean.valueOf(form
-					.getFirst(Qorakeys.PROFILEENABLE.toString()));
-			String titleOpt = form.getFirst(Qorakeys.BLOGTITLE.toString());
+					.getFirst(Corekeys.PROFILEENABLE.toString()));
+			String titleOpt = form.getFirst(Corekeys.BLOGTITLE.toString());
 			titleOpt = decodeIfNotNull(titleOpt);
-			String blogDescrOpt = form.getFirst(Qorakeys.BLOGDESCRIPTION
+			String blogDescrOpt = form.getFirst(Corekeys.BLOGDESCRIPTION
 					.toString());
 			blogDescrOpt = decodeIfNotNull(blogDescrOpt);
-			String profileAvatarOpt = form.getFirst(Qorakeys.PROFILEAVATAR
+			String profileAvatarOpt = form.getFirst(Corekeys.PROFILEAVATAR
 					.toString());
-			String profileBannerOpt = form.getFirst(Qorakeys.PROFILEMAINGRAPHIC
+			String profileBannerOpt = form.getFirst(Corekeys.PROFILEMAINGRAPHIC
 					.toString());
 
 			String bwlistkind = form.getFirst("bwlistkind");
@@ -892,7 +892,7 @@ public class WebResource {
 					Controller.getInstance().getForgingStatus().getName());
 			pebbleHelper.getContextMap().put(
 					"version",
-					"Qora " + Controller.getInstance().getVersion());
+					"DATACHAINS.world " + Controller.getInstance().getVersion());
 			
 			int status = Controller.getInstance().getStatus();
 			String statustext = "";
@@ -1003,7 +1003,7 @@ public class WebResource {
 		}
 	}
 
-	String[] imgsArray = { "qora.png", "logo_header.png", "qora-user.png",
+	String[] imgsArray = { "DATACHAINS.world.png", "logo_header.png", "DATACHAINS.world-user.png",
 			"logo_bottom.png", "banner_01.png", "loading.gif",
 			"00_generating.png", "01_genesis.jpg", "02_payment_in.png",
 			"02_payment_out.png", "03_name_registration.png",
@@ -3191,7 +3191,7 @@ public class WebResource {
 			}
 
 			String website = DBSet.getInstance().getNameStorageMap()
-					.getOpt(nameName, Qorakeys.WEBSITE.toString());
+					.getOpt(nameName, Corekeys.WEBSITE.toString());
 
 			if (website == null) {
 				try {

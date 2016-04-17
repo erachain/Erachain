@@ -10,9 +10,9 @@ import org.json.simple.JSONObject;
 
 import at.AT_Constants;
 import at.AT_Error;
+import core.transaction.Transaction;
 import lang.Lang;
-import qora.transaction.Transaction;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.NameUtils.NameResult;
 
 public class ApiErrorFactory 
@@ -161,7 +161,7 @@ public class ApiErrorFactory
 		this.errorMessages.put(ERROR_INVALID_UPDATE_VALUE, Lang.getInstance().translate("invalid update value"));
 		this.errorMessages.put(ERROR_KEY_ALREADY_EXISTS, Lang.getInstance().translate("key already exists, edit is false"));
 		this.errorMessages.put(ERROR_KEY_NOT_EXISTS, Lang.getInstance().translate("the key does not exist"));
-		this.errorMessages.put(ERROR_LAST_KEY_IS_DEFAULT_KEY_ERROR, Lang.getInstance().translate(("you can't delete the key \"%key%\" if it is the only key")).replace("%key%", Qorakeys.DEFAULT.toString()));
+		this.errorMessages.put(ERROR_LAST_KEY_IS_DEFAULT_KEY_ERROR, Lang.getInstance().translate(("you can't delete the key \"%key%\" if it is the only key")).replace("%key%", Corekeys.DEFAULT.toString()));
 		this.errorMessages.put(ERROR_FEE_LESS_REQUIRED, Lang.getInstance().translate("fee less required"));
 		this.errorMessages.put(ERROR_WALLET_NOT_IN_SYNC, Lang.getInstance().translate("wallet needs to be synchronized"));
 		this.errorMessages.put(ERROR_INVALID_NETWORK_ADDRESS, Lang.getInstance().translate("invalid network address"));

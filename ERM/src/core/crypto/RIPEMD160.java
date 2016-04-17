@@ -1,4 +1,4 @@
-package qora.crypto;
+package core.crypto;
 
 public class RIPEMD160 {
  

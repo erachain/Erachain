@@ -22,9 +22,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
-import qora.account.PrivateKeyAccount;
-import qora.naming.NameSale;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.naming.NameSale;
+import core.transaction.Transaction;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -38,7 +38,7 @@ public class CancelSellNameFrame extends JFrame
 	
 	public CancelSellNameFrame(NameSale nameSale)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

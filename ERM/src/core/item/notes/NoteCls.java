@@ -1,14 +1,13 @@
-package qora.item.notes;
+package core.item.notes;
 
 
+import core.account.Account;
+import core.item.ItemCls;
 //import database.DBMap;
 import database.DBSet;
 import database.Item_Map;
 import database.wallet.FavoriteItemNote;
 import database.IssueItemMap;
-import qora.account.Account;
-
-import qora.item.ItemCls;
 
 public abstract class NoteCls extends ItemCls {
 	

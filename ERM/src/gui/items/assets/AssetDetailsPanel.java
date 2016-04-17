@@ -15,8 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.item.assets.AssetCls;
 import controller.Controller;
+import core.item.assets.AssetCls;
 import lang.Lang;
 
 public class AssetDetailsPanel extends JPanel {
@@ -126,7 +126,7 @@ public class AssetDetailsPanel extends JPanel {
 		//IF ASSET CONFIRMED
 		if(this.asset.getKey() >= 0)
 		{
-			//ADD QORA PAIR BUTTON
+			//ADD ERM PAIR BUTTON
 			labelGBC.gridy++;
 			labelGBC.gridwidth = 2;
 			JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
@@ -141,7 +141,7 @@ public class AssetDetailsPanel extends JPanel {
 			this.add(openPairButton, labelGBC);
 		}
 		
-		//IF ASSET CONFIRMED AND NOT QORA
+		//IF ASSET CONFIRMED AND NOT ERM
 		if(this.asset.getKey() > 2l)
 		{
 			//FAVORITES

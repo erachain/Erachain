@@ -18,17 +18,17 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.transaction.Transaction;
+import core.web.Profile;
+import core.web.blog.BlogEntry;
 import database.DBSet;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.transaction.Transaction;
-import qora.web.Profile;
-import qora.web.blog.BlogEntry;
 import utils.APIUtils;
 import utils.BlogUtils;
 import utils.Pair;
-import utils.Qorakeys;
+import utils.Corekeys;
 
 @Path("blogpost")
 @Produces(MediaType.APPLICATION_JSON)
@@ -389,7 +389,7 @@ public class BlogPostResource {
 		}
 
 		String blogenable = DBSet.getInstance().getNameStorageMap()
-				.getOpt(blogname, Qorakeys.BLOGENABLE.toString());
+				.getOpt(blogname, Corekeys.BLOGENABLE.toString());
 
 		if (blogenable == null) {
 

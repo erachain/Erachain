@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 // import org.apache.log4j.Logger;
 import java.math.BigDecimal;
@@ -22,14 +22,13 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import database.DBSet;
-//import lang.Lang;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
 import settings.Settings;
 
 public abstract class Transaction {

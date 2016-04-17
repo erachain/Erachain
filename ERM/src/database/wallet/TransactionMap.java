@@ -14,10 +14,12 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+
+import core.account.Account;
+import core.transaction.Transaction;
+
 import org.mapdb.BTreeMap;
 
-import qora.account.Account;
-import qora.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;

@@ -8,10 +8,10 @@ import javax.swing.DefaultComboBoxModel;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
 import database.SortableList;
 
 @SuppressWarnings("serial")

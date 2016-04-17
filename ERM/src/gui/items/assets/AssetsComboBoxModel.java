@@ -10,9 +10,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.item.assets.AssetCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implements Observer {

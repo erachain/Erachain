@@ -11,21 +11,21 @@ import ntp.NTP;
 
 import org.junit.Test;
 
+import core.BlockGenerator;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.BlockFactory;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransferAssetTransaction;
+import core.web.blog.BlogEntry;
 import database.DBSet;
-import qora.BlockGenerator;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.block.Block;
-import qora.block.BlockFactory;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransferAssetTransaction;
-import qora.web.blog.BlogEntry;
 
 public class BlockTests
 {
@@ -281,7 +281,7 @@ public class BlockTests
 		newBlock.setTransactionsSignature(transactionsSignature);
 		
 		//CHECK IF VALID
-		/* !!! in qora.block.Block.isValid(DBSet) - comment:
+		/* !!! in core.block.Block.isValid(DBSet) - comment:
 				//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
 				if(this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp)
 		*/

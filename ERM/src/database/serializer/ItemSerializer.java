@@ -8,8 +8,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.item.ItemCls;
-import qora.item.ItemFactory;
+import core.item.ItemCls;
+import core.item.ItemFactory;
 
 public class ItemSerializer implements Serializer<ItemCls>, Serializable
 {

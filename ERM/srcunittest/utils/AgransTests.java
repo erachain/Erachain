@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.junit.Test;
 
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.crypto.Base64;
+import core.crypto.Crypto;
 import network.Peer;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.crypto.Base64;
-import qora.crypto.Crypto;
 
 public class AgransTests {
 	

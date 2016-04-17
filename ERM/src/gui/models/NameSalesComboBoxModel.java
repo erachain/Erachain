@@ -8,11 +8,11 @@ import javax.swing.DefaultComboBoxModel;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.naming.Name;
-import qora.naming.NameSale;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.naming.Name;
+import core.naming.NameSale;
 import database.SortableList;
 import database.wallet.NameSaleMap;
 

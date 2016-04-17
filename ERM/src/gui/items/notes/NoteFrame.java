@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-import qora.item.notes.NoteCls;
+import core.item.notes.NoteCls;
 
 @SuppressWarnings("serial")
 public class NoteFrame extends JFrame
@@ -19,7 +19,7 @@ public class NoteFrame extends JFrame
 	
 	public NoteFrame(NoteCls note)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.note = note;
 		

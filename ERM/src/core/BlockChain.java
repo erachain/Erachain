@@ -1,4 +1,4 @@
-package qora;
+package core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,17 +6,15 @@ import java.util.List;
  import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.account.Account;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.item.assets.AssetCls;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 import ntp.NTP;
-//import ntp.NTP;
-import qora.account.Account;
-import qora.item.assets.AssetCls;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-//import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.Transaction;
 import settings.Settings;
 import utils.Pair;
 
@@ -55,16 +53,6 @@ public class BlockChain
 
         	//PROCESS
         	genesisBlock.process();
-
-        	/*
-        	//ADD QORA ASSET
-        	byte[] genesisGenerator = genesisBlock.getGeneratorSignature();
-        	db = DBSet.getInstance(); 
-        	Asset qoraAsset = genesisBlock.makeERM();
-        	qoraAsset.setReference(genesisGenerator);
-        	db.getIssueAssetMap().set(genesisGenerator, 0l);
-        	db.getAssetMap().set(0l, qoraAsset);
-        	*/
 
         }
 	}

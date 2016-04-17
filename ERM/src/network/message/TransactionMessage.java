@@ -1,9 +1,9 @@
 package network.message;
 
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
-
 import com.google.common.primitives.Bytes;
+
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 
 public class TransactionMessage extends Message{
 

@@ -6,17 +6,17 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
+import core.BlockGenerator;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.transaction.GenesisTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 import ntp.NTP;
-import qora.BlockGenerator;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.Transaction;
 
 public class GeneratorTests {
 

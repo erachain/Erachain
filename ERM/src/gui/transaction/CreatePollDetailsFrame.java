@@ -23,10 +23,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import qora.crypto.Base58;
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
-import qora.transaction.CreatePollTransaction;
+import core.crypto.Base58;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.transaction.CreatePollTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -37,7 +37,7 @@ public class CreatePollDetailsFrame extends JFrame
 	@SuppressWarnings("unchecked")
 	public CreatePollDetailsFrame(CreatePollTransaction pollCreation)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

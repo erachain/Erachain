@@ -1,4 +1,4 @@
-package qora;
+package core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,12 +13,12 @@ import network.message.Message;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
 import network.message.TransactionMessage;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.transaction.Transaction;
 import at.AT;
 import at.AT_API_Platform_Impl;
 import at.AT_Constants;
+import core.block.Block;
+import core.crypto.Base58;
+import core.transaction.Transaction;
 
 import com.google.common.primitives.Bytes;
 

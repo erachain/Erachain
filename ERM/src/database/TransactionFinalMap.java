@@ -24,14 +24,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
+import core.account.Account;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
-import qora.account.Account;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisIssueNoteTransaction;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.Transaction;
 import utils.BlExpUnit;
 
 public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transaction>

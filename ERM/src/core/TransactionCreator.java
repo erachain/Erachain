@@ -1,4 +1,4 @@
-package qora;
+package core;
 
 import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -8,42 +8,43 @@ import java.util.Collections;
 import java.util.List;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
+import core.item.assets.Order;
+import core.item.notes.Note;
+import core.item.notes.NoteCls;
+import core.item.persons.PersonHuman;
+import core.item.persons.PersonCls;
+import core.naming.Name;
+import core.naming.NameSale;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.DeployATTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueNoteRecord;
+import core.transaction.IssuePersonRecord;
+import core.transaction.MessageTransaction;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.R_SignNote;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
+import core.transaction.TransferAssetTransaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnPollTransaction;
+import core.voting.Poll;
 import database.DBSet;
 import ntp.NTP;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-//import qora.account.PublicKeyAccount;
-import qora.item.assets.AssetCls;
-import qora.item.assets.AssetVenture;
-import qora.item.assets.Order;
-import qora.item.notes.NoteCls;
-import qora.item.notes.Note;
-import qora.block.Block;
-import qora.naming.Name;
-import qora.naming.NameSale;
-import qora.payment.Payment;
-import qora.transaction.ArbitraryTransactionV3;
-import qora.transaction.BuyNameTransaction;
-import qora.transaction.CancelOrderTransaction;
-import qora.transaction.CancelSellNameTransaction;
-import qora.transaction.CreateOrderTransaction;
-import qora.transaction.CreatePollTransaction;
-import qora.transaction.DeployATTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.IssueNoteRecord;
-import qora.transaction.MessageTransaction;
-import qora.transaction.MultiPaymentTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.RecordNote;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.SellNameTransaction;
-import qora.transaction.Transaction;
-//import qora.transaction.Transaction.*;
-import qora.transaction.TransactionFactory;
-import qora.transaction.TransferAssetTransaction;
-import qora.transaction.UpdateNameTransaction;
-import qora.transaction.VoteOnPollTransaction;
-import qora.voting.Poll;
 //import settings.Settings;
 import utils.Pair;
 import utils.TransactionTimestampComparator;
@@ -298,6 +299,28 @@ public class TransactionCreator
 		return this.afterCreate(issueNoteRecord, false);
 	}
 
+	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+					byte gender, String race, float birthLatitude, float birthLongitude,
+					String skinColor, String eyeColor, String hairСolor, int height, String description) 
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+
+		PersonCls person = new PersonHuman(creator, fullName, birthday,
+				gender, race, birthLatitude, birthLongitude,
+				skinColor, eyeColor, hairСolor, height, description);
+							
+		//CREATE ISSUE NOTE TRANSACTION
+		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, creator.getLastReference(this.fork));
+		issuePersonRecord.sign(creator, false);
+										
+		//VALIDATE AND PROCESS
+		return this.afterCreate(issuePersonRecord, false);
+	}
+
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price, int feePow)
 	{
 		//CHECK FOR UPDATES
@@ -405,7 +428,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		recordNoteTx = new RecordNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, timestamp, creator.getLastReference(this.fork));
+		recordNoteTx = new R_SignNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
 			
 		return afterCreate(recordNoteTx, asPack);

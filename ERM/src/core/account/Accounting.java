@@ -1,4 +1,4 @@
-package qora.account;
+package core.account;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -11,10 +11,10 @@ import org.mapdb.Fun.Tuple2;
 
 import at.AT_Transaction;
 import controller.Controller;
-import qora.BlockGenerator;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.transaction.Transaction;
+import core.BlockGenerator;
+import core.block.Block;
+import core.crypto.Base58;
+import core.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
 

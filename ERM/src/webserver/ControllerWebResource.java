@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import controller.Controller;
-import qora.account.Account;
-import qora.naming.Name;
+import core.account.Account;
+import core.naming.Name;
 import webserver.wrapper.WebAccount;
 import webserver.wrapper.WebName;
 

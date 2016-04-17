@@ -10,9 +10,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.DefaultComboBoxModel;
 
-import qora.item.notes.NoteCls;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.notes.NoteCls;
 
 @SuppressWarnings("serial")
 public class ComboBoxModelItemsNotes extends DefaultComboBoxModel<NoteCls> implements Observer {

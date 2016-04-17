@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import at.AT;
+import core.account.Account;
+import core.crypto.Base58;
 import lang.Lang;
-import qora.account.Account;
-import qora.crypto.Base58;
 import utils.Converter;
 
 public class ATDetailsFrame extends JFrame {
@@ -29,7 +29,7 @@ public class ATDetailsFrame extends JFrame {
 
 	public ATDetailsFrame(AT at)
 	{	
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("AT Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("AT Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

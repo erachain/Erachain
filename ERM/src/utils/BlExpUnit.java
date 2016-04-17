@@ -1,9 +1,9 @@
 package utils;
 // 16/03
 import at.AT_Transaction;
-import qora.item.assets.Trade;
-import qora.block.Block;
-import qora.transaction.Transaction;
+import core.block.Block;
+import core.item.assets.Trade;
+import core.transaction.Transaction;
 
 public class BlExpUnit implements Comparable<BlExpUnit>
 {

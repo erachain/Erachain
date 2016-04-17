@@ -23,9 +23,9 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import qora.item.ItemCls;
-import qora.item.assets.AssetCls;
 import controller.Controller;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AssetPairSelect extends JFrame{
@@ -34,7 +34,7 @@ public class AssetPairSelect extends JFrame{
 
 	public AssetPairSelect(long key) {
 		
-		super(Lang.getInstance().translate("Qora") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

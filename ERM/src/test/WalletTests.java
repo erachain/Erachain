@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import qora.crypto.Crypto;
-import qora.wallet.Wallet;*/
+import core.crypto.Crypto;
+import core.wallet.Wallet;*/
 
 public class WalletTests {
 /*

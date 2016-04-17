@@ -14,20 +14,20 @@ import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.crypto.Base58;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
-import qora.web.BlogBlackWhiteList;
-import qora.web.BlogProfile;
-import qora.web.NameStorageMap;
-import qora.web.Profile;
-import qora.web.blog.BlogEntry;
 import api.BlogPostResource;
 
 import com.google.common.collect.Lists;
 import com.twitter.Extractor;
 
 import controller.Controller;
+import core.crypto.Base58;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
+import core.web.BlogBlackWhiteList;
+import core.web.BlogProfile;
+import core.web.NameStorageMap;
+import core.web.Profile;
+import core.web.blog.BlogEntry;
 import database.DBSet;
 import database.PostCommentMap;
 
@@ -235,7 +235,7 @@ public class BlogUtils {
 		List<BlogEntry> results = new ArrayList<>();
 
 		List<byte[]> blogPostList = DBSet.getInstance().getBlogPostMap()
-				.get(blogOpt == null ? "QORA" : blogOpt);
+				.get(blogOpt == null ? "DATACHAINS.world" : blogOpt);
 
 		List<byte[]> list = blogPostList != null ? Lists
 				.newArrayList(blogPostList) : new ArrayList<byte[]>();

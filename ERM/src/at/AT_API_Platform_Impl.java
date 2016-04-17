@@ -9,23 +9,22 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransactionAmount;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import database.ATTransactionMap;
 import database.DBSet;
 import database.TransactionFinalMap;
 
 
-//QORA AT API IMPLEMENTATION
+//CORE AT API IMPLEMENTATION
 public class AT_API_Platform_Impl extends AT_API_Impl {
 
 	

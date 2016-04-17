@@ -1,4 +1,4 @@
-package qora.web;
+package core.web;
 
 public enum NavbarElements {
 	BlogNavbar("web/blogleftnavbar.html"), Searchnavbar("web/searchnavbar.html"), NoNavbar("");

@@ -12,13 +12,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import controller.Controller;
+import core.crypto.Base58;
+import core.naming.Name;
+import core.transaction.Transaction;
+import core.web.Profile;
+import core.web.blog.BlogEntry;
 import database.DBSet;
 import database.NameMap;
-import qora.crypto.Base58;
-import qora.naming.Name;
-import qora.transaction.Transaction;
-import qora.web.Profile;
-import qora.web.blog.BlogEntry;
 import utils.BlogUtils;
 import webserver.WebResource;
 
@@ -28,7 +28,7 @@ public class BlogResource {
 	
 	@GET
 	public String getBlogList() {
-		return getBlogList("QORA");
+		return getBlogList("DATACHAINS.world");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -36,7 +36,7 @@ public class BlogResource {
 	@Path("/posts/{blogname}")
 	public String getBlogList(@PathParam("blogname") String blogname) {
 
-		if(blogname.equals("QORA"))
+		if(blogname.equals("DATACHAINS.world"))
 		{
 			blogname = null;
 		}
@@ -59,7 +59,7 @@ public class BlogResource {
 		}
 		
 		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
-				.get(blogname == null ? "QORA" : blogname);
+				.get(blogname == null ? "DATACHAINS.world" : blogname);
 
 		JSONArray outputJSON = new JSONArray();
 		
@@ -112,7 +112,7 @@ public class BlogResource {
 	
 		JSONObject outputJSON = new JSONObject();
 		
-		if(blogname.equals("QORA"))
+		if(blogname.equals("DATACHAINS.world"))
 		{
 			blogname = null;
 		}
@@ -153,7 +153,7 @@ public class BlogResource {
 	@GET
 	@Path("/entries")
 	public String getBlogEntry() {
-		return getBlogEntry("QORA", -1);
+		return getBlogEntry("DATACHAINS.world", -1);
 	}
 	
 	@GET
@@ -165,13 +165,13 @@ public class BlogResource {
 	@GET
 	@Path("/lastentry")
 	public String getLastEntry() {
-		return getLastEntry("QORA");
+		return getLastEntry("DATACHAINS.world");
 	}
 	
 	@GET
 	@Path("/lastentry/{blogname}")
 	public String getLastEntry(@PathParam("blogname") String blogname) {
-		if(blogname.equals("QORA"))
+		if(blogname.equals("DATACHAINS.world"))
 		{
 			blogname = null;
 		}
@@ -194,7 +194,7 @@ public class BlogResource {
 		}
 		
 		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
-				.get(blogname == null ? "QORA" : blogname);
+				.get(blogname == null ? "DATACHAINS.world" : blogname);
 		
 		if(txlist.size() == 0)
 		{

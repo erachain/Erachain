@@ -1,4 +1,4 @@
-package qora.item.persons;
+package core.item.persons;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -12,12 +12,12 @@ import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.item.ItemCls;
 import database.DBSet;
 import database.IssueItemMap;
 import database.Item_Map;
 import database.ItemPersonMap;
-import qora.account.Account;
-import qora.item.ItemCls;
 
 public abstract class PersonCls extends ItemCls {
 

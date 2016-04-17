@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.json.simple.JSONObject;
 
-import qora.crypto.Base58;
+import core.crypto.Base58;
 
 @Path("seed")
 @Produces(MediaType.APPLICATION_JSON)

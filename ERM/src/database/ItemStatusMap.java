@@ -6,13 +6,12 @@ import java.util.Map;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
+import core.item.ItemCls;
+import core.item.statuses.StatusCls;
 import utils.ObserverMessage;
 import database.DBSet;
 //import database.serializer.PersonSerializer;
 import database.serializer.StatusSerializer;
-
-import qora.item.ItemCls;
-import qora.item.statuses.StatusCls;
 
 public class ItemStatusMap extends Item_Map 
 {

@@ -2,7 +2,7 @@ package utils;
 
 import org.json.simple.JSONObject;
 
-import qora.web.NameStorageMap;
+import core.web.NameStorageMap;
 import database.DBSet;
 
 public class ProfileUtils {
@@ -15,8 +15,8 @@ public class ProfileUtils {
 		
 		if(nameStorageMap.get(blogname) != null)
 		{
-			addToJson(blogname, json, nameStorageMap, Qorakeys.BLOGWHITELIST);
-			addToJson(blogname, json, nameStorageMap, Qorakeys.BLOGBLACKLIST);
+			addToJson(blogname, json, nameStorageMap, Corekeys.BLOGWHITELIST);
+			addToJson(blogname, json, nameStorageMap, Corekeys.BLOGBLACKLIST);
 		}
 		
 		
@@ -31,15 +31,15 @@ public class ProfileUtils {
 		
 		if(nameStorageMap.get(profilename) != null)
 		{
-			addToJson(profilename, json, nameStorageMap, Qorakeys.BLOGTITLE);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.BLOGDESCRIPTION);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.BLOGENABLE);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.PROFILEENABLE);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.PROFILEAVATAR);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.PROFILEMAINGRAPHIC);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.PROFILEFOLLOW);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.PROFILELIKEPOSTS);
-			addToJson(profilename, json, nameStorageMap, Qorakeys.BLOGBLOCKCOMMENTS);
+			addToJson(profilename, json, nameStorageMap, Corekeys.BLOGTITLE);
+			addToJson(profilename, json, nameStorageMap, Corekeys.BLOGDESCRIPTION);
+			addToJson(profilename, json, nameStorageMap, Corekeys.BLOGENABLE);
+			addToJson(profilename, json, nameStorageMap, Corekeys.PROFILEENABLE);
+			addToJson(profilename, json, nameStorageMap, Corekeys.PROFILEAVATAR);
+			addToJson(profilename, json, nameStorageMap, Corekeys.PROFILEMAINGRAPHIC);
+			addToJson(profilename, json, nameStorageMap, Corekeys.PROFILEFOLLOW);
+			addToJson(profilename, json, nameStorageMap, Corekeys.PROFILELIKEPOSTS);
+			addToJson(profilename, json, nameStorageMap, Corekeys.BLOGBLOCKCOMMENTS);
 		}
 		
 		
@@ -49,7 +49,7 @@ public class ProfileUtils {
 
 	@SuppressWarnings("unchecked")
 	public static void addToJson(String profilename, JSONObject json,
-			NameStorageMap nameStorageMap, Qorakeys key) {
+			NameStorageMap nameStorageMap, Corekeys key) {
 		String value = nameStorageMap.getOpt(profilename, key.toString());
 		if(value != null)
 		{

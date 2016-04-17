@@ -1,4 +1,4 @@
-package qora.item.assets;
+package core.item.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,10 +9,10 @@ import java.util.List;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.crypto.Base58;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.crypto.Base58;
-import qora.transaction.Transaction;
 
 public class Order implements Comparable<Order> {
 	

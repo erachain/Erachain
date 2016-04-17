@@ -1,4 +1,4 @@
-package qora.item.notes;
+package core.item.notes;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 import com.google.common.primitives.Ints;
 
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 
 public class Note extends NoteCls {
 	

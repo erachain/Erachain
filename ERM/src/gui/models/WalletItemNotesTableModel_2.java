@@ -5,7 +5,7 @@ import java.util.Observable;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.item.ItemCls;
+import core.item.ItemCls;
 import utils.ObserverMessage;
 //import controller.Controller;
 import database.SortableList;

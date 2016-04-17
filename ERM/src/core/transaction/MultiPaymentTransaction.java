@@ -1,4 +1,4 @@
-package qora.transaction;
+package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -18,15 +18,13 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
 import database.BalanceMap;
 import database.DBSet;
-
-import qora.account.Account;
-//import qora.account.PrivateKeyAccount;
-import qora.account.PublicKeyAccount;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.item.assets.AssetCls;
 
 public class MultiPaymentTransaction extends Transaction {
 
@@ -226,7 +224,7 @@ public class MultiPaymentTransaction extends Transaction {
 		DBSet fork = db.fork();
 		this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, fork).subtract(this.fee), fork);
 		
-		//CHECK IF CREATOR HAS ENOUGH QORA BALANCE
+		//CHECK IF CREATOR HAS ENOUGH OIL BALANCE
 		if(this.creator.getConfirmedBalance(OIL_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
@@ -367,7 +365,7 @@ public class MultiPaymentTransaction extends Transaction {
 		//CHECK PAYMENTS
 		for(Payment payment: this.payments)
 		{
-			//IF QORA ASSET
+			//IF OIL ASSET
 			if(payment.getAsset() == BalanceMap.FEE_KEY)
 			{
 				//IF CREATOR
