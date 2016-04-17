@@ -88,6 +88,8 @@ public class TransactionTests3AssetsAsPack {
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+
 		issueAssetTransaction.sign(maker, asPack);
 		
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID

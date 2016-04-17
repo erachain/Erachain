@@ -34,7 +34,7 @@ public class TransactionFactory {
 		
 		switch(type)
 		{
-		case Transaction.RECORD_NOTE:
+		case Transaction.SIGN_NOTE_TRANSACTION:
 			
 			//PARSE PAYMENT TRANSACTION
 			return RecordNote.Parse(data, releaserReference);
@@ -84,7 +84,7 @@ public class TransactionFactory {
 			//PARSE ARBITRARY TRANSACTION
 			return ArbitraryTransaction.Parse(data);			
 			
-		case Transaction.TRANSFER_ASSET_TRANSACTION:
+		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
 			return TransferAssetTransaction.Parse(data, releaserReference);	
@@ -107,7 +107,7 @@ public class TransactionFactory {
 		case Transaction.DEPLOY_AT_TRANSACTION:
 			return DeployATTransaction.Parse(data);
 
-		case Transaction.MESSAGE_TRANSACTION:
+		case Transaction.SEND_ASSET_TRANSACTION:
 
 			// PARSE MESSAGE TRANSACTION
 			return MessageTransaction.Parse(data, releaserReference);
@@ -134,8 +134,13 @@ public class TransactionFactory {
 			
 			//PARSE ISSUE NOTE TRANSACTION
 			return IssueNoteRecord.Parse(data, releaserReference);
+
+		case Transaction.ISSUE_PERSON_TRANSACTION:
 			
-		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
+			//PARSE ISSUE PERSON TRANSACTION
+			return IssuePersonRecord.Parse(data, releaserReference);
+			
+		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
 			return GenesisTransferAssetTransaction.Parse(data);	

@@ -215,7 +215,7 @@ public class ATWebResource {
 	
 	public List<Transaction> getMessageTransactions(String address)
 	{
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.MESSAGE_TRANSACTION, 50);
+		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.SEND_ASSET_TRANSACTION, 50);
 		return txs;
 		
 	}

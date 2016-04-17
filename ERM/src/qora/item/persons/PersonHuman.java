@@ -20,7 +20,7 @@ public class PersonHuman extends PersonCls {
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
-		super(new byte[]{(byte)TYPE_ID}, creator, fullName, birthday,
+		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
@@ -126,7 +126,7 @@ public class PersonHuman extends PersonCls {
 		
 		byte[] skinColorBytes = Arrays.copyOfRange(data, position, position + skinColorLength);
 		String skinColor = new String(skinColorBytes, StandardCharsets.UTF_8);
-		position += raceLength;
+		position += skinColorLength;
 
 		//READ EYE COLOR LENGTH
 		int eyeColorLength = Byte.toUnsignedInt(data[position]);

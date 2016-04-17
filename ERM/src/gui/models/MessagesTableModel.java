@@ -88,14 +88,14 @@ public class MessagesTableModel extends JTable implements Observer{
 		List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.MESSAGE_TRANSACTION)
+			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
 				transactions.add(transaction);
 			}
 		}
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.MESSAGE_TRANSACTION, 0));	
+			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 		for (Transaction messagetx : transactions) {
@@ -365,7 +365,7 @@ public class MessagesTableModel extends JTable implements Observer{
 		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{		
 			boolean is;
-			if(((Transaction) message.getValue()).getType() == Transaction.MESSAGE_TRANSACTION)
+			if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )

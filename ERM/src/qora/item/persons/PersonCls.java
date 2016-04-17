@@ -26,6 +26,7 @@ public abstract class PersonCls extends ItemCls {
 	public static final int CAT = 3;
 
 	protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
+	public static final int GENDER_LENGTH = 1;
 	protected static final int RACE_SIZE_LENGTH = 1;
 	public static final int MAX_RACE_LENGTH = 256 * RACE_SIZE_LENGTH;
 	protected static final int LATITUDE_LENGTH = 4;
@@ -37,7 +38,7 @@ public abstract class PersonCls extends ItemCls {
 	public static final int MAX_HAIR_COLOR_LENGTH = 256 * HAIR_COLOR_SIZE_LENGTH;
 	public static final int HEIGHT_LENGTH = 1;
 	protected static final int BASE_LENGTH = ItemCls.BASE_LENGTH
-			+ BIRTHDAY_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
+			+ BIRTHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
 			+ SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH
 			+ HEIGHT_LENGTH;
 	

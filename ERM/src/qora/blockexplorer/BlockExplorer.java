@@ -1586,7 +1586,7 @@ public class BlockExplorer
 				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getAsset().getName());
 			}
 
-			if(transaction.getType() == Transaction.TRANSFER_ASSET_TRANSACTION) 
+			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 
 			{
 				if (assetNames != null) 
 				{
@@ -1594,7 +1594,7 @@ public class BlockExplorer
 				}
 			}
 
-			if(transaction.getType() == Transaction.MESSAGE_TRANSACTION) 
+			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 
 			{
 				if (assetNames != null) 
 				{

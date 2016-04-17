@@ -1,5 +1,6 @@
 package qora.transaction;
 
+import java.math.BigDecimal;
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -32,7 +33,7 @@ import qora.crypto.Base58;
 
 public class RecordNote extends Transaction {
 
-	private static final byte TYPE_ID = (byte) RECORD_NOTE;
+	private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
 	private static final String NAME_ID = "Record Note";
 
 	protected static final byte HAS_NOTE_MASK = (byte)(1 << 7);
@@ -310,7 +311,16 @@ public class RecordNote extends Transaction {
 			return INVALID_DATA_LENGTH;
 		}
 	
-		return super.isValid(db, releaserReference);
+
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		// ITEM EXIST? - for assets transfer not need - amount expect instead
+		if (!db.getNoteMap().contains(this.key))
+			return Transaction.ITEM_DOES_NOT_EXIST;
+
+		return Transaction.VALIDATE_OK;
+
 	}
 	
 	@Override

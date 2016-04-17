@@ -125,7 +125,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			if ( !transaction.getClass().equals( AT_Transaction.class ))
 			{
 				Transaction tx = (Transaction) transaction;
-				return ( tx.getType() == Transaction.MESSAGE_TRANSACTION ) ? 1 : 0;
+				return ( tx.getType() == Transaction.SEND_ASSET_TRANSACTION ) ? 1 : 0;
 			}
 			else
 			{

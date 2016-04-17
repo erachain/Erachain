@@ -198,7 +198,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
 					}
 				}
-				else if(((Transaction) message.getValue()).getType() == Transaction.MESSAGE_TRANSACTION)
+				else if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
 				{
 					Account account = Controller.getInstance().getAccountByAddress(((MessageTransaction) message.getValue()).getRecipient().getAddress());	
 					if(account != null)

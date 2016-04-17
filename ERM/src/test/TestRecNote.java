@@ -27,9 +27,9 @@ import qora.transaction.IssueNoteRecord;
 import qora.transaction.Transaction;
 import qora.transaction.TransactionFactory;
 
-public class TrNoteTest {
+public class TestRecNote {
 
-	static Logger LOGGER = Logger.getLogger(TrNoteTest.class.getName());
+	static Logger LOGGER = Logger.getLogger(TestRecNote.class.getName());
 
 	byte[] releaserReference = null;
 
@@ -216,5 +216,5 @@ public class TrNoteTest {
 		assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), maker.getLastReference(db)));
 	}
 	
-	
+	// TODO - in statement - valid on key = 999
 }

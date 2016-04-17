@@ -1,5 +1,7 @@
 package qora.transaction;
 
+import static org.junit.Assert.assertEquals;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -31,10 +33,10 @@ import utils.Converter;
 
 public class PersonalizeRecord extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.PERSONALIZE_RECORD;
+	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Personalize";
 	private static final int USER_ACCOUNT_LENGTH = Transaction.CREATOR_LENGTH;
-	private static final int DURATION_LENGTH = 1; // one year + 256 days max
+	private static final int DURATION_LENGTH = 4; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	private static final BigDecimal MIN_VOTE_BALANCE = BigDecimal.valueOf(10).setScale(8);
 
@@ -49,7 +51,8 @@ public class PersonalizeRecord extends Transaction {
 	protected byte[] userSignature1;
 	protected byte[] userSignature2;
 	protected byte[] userSignature3;
-	private static final int SELF_LENGTH = 3 * (USER_ACCOUNT_LENGTH + SIGNATURE_LENGTH) + DURATION_LENGTH;
+	private static final int SELF_LENGTH = 3 * (USER_ACCOUNT_LENGTH + SIGNATURE_LENGTH) + DURATION_LENGTH
+			+ KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
@@ -298,11 +301,7 @@ public class PersonalizeRecord extends Transaction {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
-		//WRITE PERSON
-		// without reference
-		//data = Bytes.concat(data, this.key.toBytes(false));
-
-		//WRITE KEY
+		//WRITE PERSON KEY
 		byte[] keyBytes = Longs.toByteArray(this.key);
 		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
@@ -356,6 +355,7 @@ public class PersonalizeRecord extends Transaction {
 				& crypto.verify(this.userAccount3.getPublicKey(), this.userSignature3, data);
 	}
 
+	//
 	public int isValid(DBSet db, byte[] releaserReference) {
 		
 		//CHECK DURATION
@@ -364,18 +364,19 @@ public class PersonalizeRecord extends Transaction {
 			return INVALID_DURATION;
 		}
 	
-		/* VALID in all cases!
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.applicant.getAddress()))
+		if(this.userAccount1 == null | !Crypto.getInstance().isValidAddress(this.userAccount1.getAddress())
+			| this.userAccount2 == null | !Crypto.getInstance().isValidAddress(this.userAccount2.getAddress())
+			| this.userAccount3 == null | !Crypto.getInstance().isValidAddress(this.userAccount3.getAddress())
+				)
 		{
 			return INVALID_ADDRESS;
 		}
-		*/
 		
 		BigDecimal balERM = this.creator.getConfirmedBalance(ERM_KEY, db);
 		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
 		{
-			return Transaction.INVALID_AMOUNT;
+			return Transaction.NOT_ENOUGH_ERM;
 		}
 		
 		BigDecimal balVOTE = this.creator.getConfirmedBalance(0l, db);
@@ -384,8 +385,14 @@ public class PersonalizeRecord extends Transaction {
 			return Transaction.INVALID_AMOUNT;
 		}
 
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
 		
-		return super.isValid(db, releaserReference);
+		// ITEM EXIST?
+		if (!db.getPersonMap().contains(this.key))
+			return Transaction.ITEM_DOES_NOT_EXIST;
+
+		return Transaction.VALIDATE_OK;
 	}
 
 	//PROCESS/ORPHAN

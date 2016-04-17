@@ -27,7 +27,7 @@ import utils.Converter;
 
 public class MessageTransaction extends TransactionAmount {
 
-	private static final byte TYPE_ID = (byte)Transaction.MESSAGE_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.SEND_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Send";
 
 	protected byte[] data;

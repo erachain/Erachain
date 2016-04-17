@@ -87,6 +87,9 @@ public abstract class Transaction {
 	
 	public static final int INVALID_DURATION = 42;
 
+	public static final int NOT_ENOUGH_ERM = 50;
+	public static final int ITEM_DOES_NOT_EXIST = 51;
+
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******
@@ -94,21 +97,27 @@ public abstract class Transaction {
 	public static final int EXTENDED = 0;
 	// genesis
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
-	public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 3;
-	public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 4;
-	public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 5;
-	public static final int GENESIS_TRANSFER_ASSET_TRANSACTION = 2;
-	// simple statement
-	public static final int RECORD_NOTE = 6;
-	public static final int PERSONALIZE_RECORD = 7;
-	public static final int RELEASE_PACK = 9;
-	// issue note - asset
+	public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 2;
+	public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
+	public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
+	public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5;
+	public static final int GENESIS_SEND_ASSET_TRANSACTION = 6;
+	public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7;
+	public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8;
+	public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;
+	public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;
+	// ISSUE ITEMS
 	public static final int ISSUE_ASSET_TRANSACTION = 11;
 	public static final int ISSUE_NOTE_TRANSACTION = 12;
 	public static final int ISSUE_PERSON_TRANSACTION = 13;
 	public static final int ISSUE_STATUS_TRANSACTION = 14;
-	// transfer asset + mess
-	public static final int MESSAGE_TRANSACTION = 16;
+	public static final int ISSUE_UNION_TRANSACTION = 15;
+	// USE ITEMS
+	public static final int SEND_ASSET_TRANSACTION = 16;
+	public static final int SIGN_NOTE_TRANSACTION = 17;
+	public static final int CERTIFY_PERSON_TRANSACTION = 18;
+	public static final int ASSIGN_STATUS_TRANSACTION = 19;
+	public static final int ADOPT_UNION_TRANSACTION = 20;
 	// confirms other transactions
 	public static final int CONFIRM_TRANSACTION = 21;
 	// exchange of assets
@@ -117,6 +126,8 @@ public abstract class Transaction {
 	// voting
 	public static final int CREATE_POLL_TRANSACTION =31;
 	public static final int VOTE_ON_POLL_TRANSACTION = 32;
+	
+	public static final int RELEASE_PACK = 40;
 
 	// old
 	public static final int GENESIS_TRANSACTION = 4 + 130;
@@ -126,7 +137,7 @@ public abstract class Transaction {
 	public static final int SELL_NAME_TRANSACTION = 8 + 130;
 	public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
 	public static final int BUY_NAME_TRANSACTION = 10 + 130;
-	public static final int TRANSFER_ASSET_TRANSACTION = 11 + 130;	
+	public static final int TRANSFER_ASSET_TRANSACTION_OLD = 11 + 130;	
 	public static final int ARBITRARY_TRANSACTION = 12 + 130;
 	public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
 	public static final int DEPLOY_AT_TRANSACTION = 14 + 130;

@@ -43,7 +43,7 @@ public class TransactionDetailsFactory
 		switch(transaction.getType())
 		{
 		
-		case Transaction.RECORD_NOTE:
+		case Transaction.SIGN_NOTE_TRANSACTION:
 			
 			RecordNote statement = (RecordNote) transaction;
 			return new RecStatementDetailsFrame(statement);
@@ -98,7 +98,7 @@ public class TransactionDetailsFactory
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) transaction;
 			return new IssueAssetDetailsFrame(issueAssetTransaction);	
 			
-		case Transaction.TRANSFER_ASSET_TRANSACTION:
+		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
 			
 			TransferAssetTransaction transferAssetTransaction = (TransferAssetTransaction) transaction;
 			return new TransferAssetDetailsFrame(transferAssetTransaction);		
@@ -118,7 +118,7 @@ public class TransactionDetailsFactory
 			MultiPaymentTransaction MultiPaymentTransaction = (MultiPaymentTransaction) transaction;
 			return new MultiPaymentDetailsFrame(MultiPaymentTransaction);
 
-		case Transaction.MESSAGE_TRANSACTION:
+		case Transaction.SEND_ASSET_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
 		/*
@@ -130,7 +130,7 @@ public class TransactionDetailsFactory
 			JsonTransaction json1Transaction = (JsonTransaction)transaction;
 			return new Json1TransactionDetailsFrame(json1Transaction);
 		*/
-		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
+		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
 			return new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);		

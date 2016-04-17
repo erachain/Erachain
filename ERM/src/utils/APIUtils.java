@@ -20,7 +20,7 @@ import qora.crypto.Crypto;
 import qora.transaction.Transaction;
 import qora.web.ServletUtils;
 import settings.Settings;
-import test.TrNoteTest;
+import test.TestRecNote;
 
 public class APIUtils {
 
