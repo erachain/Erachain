@@ -35,7 +35,7 @@ import core.item.notes.NoteCls;
 import gui.items.AllItemsFrame;
 
 @SuppressWarnings("serial")
-public class AllNotesFrame extends AllItemsFrame {
+public class AllNotesFrame extends JFrame {
 	
 	private TableModelNotes tableModelNotes;
 	

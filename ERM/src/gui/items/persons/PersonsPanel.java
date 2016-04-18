@@ -182,7 +182,7 @@ public class PersonsPanel extends JPanel
 		
 		//ADD MY ORDERS BUTTON
 		buttonGBC.gridx = 2;
-		JButton myOrdersButton = new JButton(Lang.getInstance().translate("My Orders"));
+		JButton myOrdersButton = new JButton(Lang.getInstance().translate("My Persons"));
 		myOrdersButton.setPreferredSize(new Dimension(120, 25));
 		myOrdersButton.addActionListener(new ActionListener()
 		{

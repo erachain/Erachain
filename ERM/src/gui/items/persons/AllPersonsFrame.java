@@ -35,14 +35,14 @@ import core.item.persons.PersonCls;
 import gui.items.AllItemsFrame;
 
 @SuppressWarnings("serial")
-public class AllPersonsFrame extends AllItemsFrame {
+public class AllPersonsFrame extends JFrame { //AllItemsFrame {
 	
 	private TableModelPersons tableModelPersons;
 	
 
 	public AllPersonsFrame() {
 		
-		super("All Persons");
+		super(Lang.getInstance().translate("All Persons"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
