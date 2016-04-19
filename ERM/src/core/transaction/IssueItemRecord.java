@@ -61,7 +61,8 @@ public abstract class IssueItemRecord extends Transaction
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
 		super.sign(creator, asPack);
-		this.item.setReference(this.signature);
+		// in IMPRINT reference already setted before sign
+		if (this.item.getReference() == null) this.item.setReference(this.signature);
 	}
 
 	//PARSE CONVERT
@@ -118,7 +119,7 @@ public abstract class IssueItemRecord extends Transaction
 		
 		//CHECK DESCRIPTION LENGTH
 		int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000 || descriptionLength < 1)
+		if(descriptionLength > 4000 || descriptionLength < 0)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}
@@ -134,8 +135,9 @@ public abstract class IssueItemRecord extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
-								
-		this.item.setReference(this.signature);
+		
+		// SET REFERENCE if not setted before (in Imprint it setted)
+		if (this.item.getReference() == null) this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
 		long key = this.item.insertToMap(db);

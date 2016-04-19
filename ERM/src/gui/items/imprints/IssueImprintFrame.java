@@ -12,6 +12,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.StandardCharsets;
 //import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +36,21 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class IssueImprintFrame extends JFrame
 {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtScale;
 	private JTextField txtFeePow;
-	private JTextField txtName;
+	private JTextField txtNumber;
+	private JTextField txtDate;
+	private JTextField txtDebitor;
+	private JTextField txtCreditor;
+	private JTextField txtAmount;
 	private JTextArea txtareaDescription;
-	private JTextField txtQuantity;
-	private JCheckBox chkDivisible;
 	private JButton issueButton;
 
 	public IssueImprintFrame()
@@ -103,78 +107,88 @@ public class IssueImprintFrame extends JFrame
 		buttonGBC.gridwidth = 2;
 		buttonGBC.gridx = 0;		
 		
+		int gridy = 0;
 		//LABEL FROM
-		labelGBC.gridy = 0;
+		labelGBC.gridy = gridy;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
-		txtGBC.gridy = 0;
+		txtGBC.gridy = gridy++;
 		this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
         this.add(this.cbxFrom, txtGBC);
         
-        //LABEL NAME
-      	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-      	this.add(nameLabel, labelGBC);
+        //LABEL NUMBER
+      	labelGBC.gridy = gridy;
+      	JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + "(0..9/-.):");
+      	this.add(numberLabel, labelGBC);
       		
-      	//TXT NAME
-      	txtGBC.gridy = 1;
-      	this.txtName = new JTextField();
-        this.add(this.txtName, txtGBC);
+      	//TXT NUMBER
+      	txtGBC.gridy = gridy++;
+      	this.txtNumber = new JTextField();
+        this.add(this.txtNumber, txtGBC);
+
+        //LABEL DATE
+      	labelGBC.gridy = gridy;
+      	JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + "(YY-MM-DD HH:MM");
+      	this.add(dateLabel, labelGBC);
+      		
+      	//TXT DEBITOR
+      	txtGBC.gridy = gridy++;
+      	this.txtDate = new JTextField();
+        this.add(this.txtDate, txtGBC);
         
+        //LABEL DEBITOR
+      	labelGBC.gridy = gridy;
+      	JLabel debitorLabel = new JLabel(Lang.getInstance().translate("Debitor INN") + ":");
+      	this.add(debitorLabel, labelGBC);
+      		
+      	//TXT DEBITOR
+      	txtGBC.gridy = gridy++;
+      	this.txtDebitor = new JTextField();
+        this.add(this.txtDebitor, txtGBC);
+
+        //LABEL CREDITOR
+      	labelGBC.gridy = gridy;
+      	JLabel creditorLabel = new JLabel(Lang.getInstance().translate("Creditor INN") + ":");
+      	this.add(creditorLabel, labelGBC);
+      		
+      	//TXT DEBITOR
+      	txtGBC.gridy = gridy++;
+      	this.txtCreditor = new JTextField();
+        this.add(this.txtCreditor, txtGBC);
+
+        //LABEL CREDITOR
+      	labelGBC.gridy = gridy;
+      	JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + "(123.03):");
+      	this.add(amountLabel, labelGBC);
+      		
+      	//TXT DEBITOR
+      	txtGBC.gridy = gridy++;
+      	this.txtAmount = new JTextField();
+        this.add(this.txtAmount, txtGBC);
+
+        this.txtareaDescription.setText("");
+        /*
         //LABEL DESCRIPTION
-      	labelGBC.gridy = 2;
+      	labelGBC.gridy = gridy;
       	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
       	this.add(descriptionLabel, labelGBC);
       		
       	//TXTAREA DESCRIPTION
-      	txtGBC.gridy = 2;
+      	txtGBC.gridy = gridy++;
       	this.txtareaDescription = new JTextArea();
+      	*/
        	
       	this.txtareaDescription.setRows(6);
       	this.txtareaDescription.setColumns(20);
-      	this.txtareaDescription.setBorder(this.txtName.getBorder());
+      	this.txtareaDescription.setBorder(this.txtNumber.getBorder());
 
       	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
       	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
       	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(scrollDescription, txtGBC);
-      	
-      	
-      	//LABEL QUANTITY
-      	labelGBC.gridy = 3;
-      	JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
-      	this.add(quantityLabel, labelGBC);
-      		
-      	//TXT QUANTITY
-      	txtGBC.gridy = 3;
-      	this.txtQuantity = new JTextField();
-      	this.txtQuantity.setText("9999999");
-        this.add(this.txtQuantity, txtGBC);
-        
-        //LABEL SCALE
-      	labelGBC.gridy = 4;
-      	JLabel scaleLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-      	this.add(scaleLabel, labelGBC);
-      		
-      	//TXT SCALE
-      	txtGBC.gridy = 4;
-      	this.txtScale = new JTextField();
-      	this.txtScale.setText("2");
-        this.add(this.txtScale, txtGBC);
-
-        //LABEL DIVISIBLE
-      	labelGBC.gridy = 5;
-      	JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
-      	this.add(divisibleLabel, labelGBC);
-      		
-      	//CHECKBOX DIVISIBLE
-      	txtGBC.gridy = 5;
-      	this.chkDivisible = new JCheckBox();
-      	this.chkDivisible.setSelected(true);
-      	this.add(this.chkDivisible, txtGBC);
-      	
+      	      	
         //LABEL FEE POW
       	labelGBC.gridy = 6;
       	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
@@ -249,10 +263,21 @@ public class IssueImprintFrame extends JFrame
 			
 			//READ FEE POW
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
+			// READ AMOUNT
+			//float amount = Float.parseFloat(this.txtAmount.getText());
+			
+			// NAME TOTAL
+			String name_total = this.txtNumber.getText().trim() + this.txtDate.getText().trim()
+				+ this.txtDebitor.getText().trim() + this.txtCreditor.getText().trim() + this.txtAmount.getText().trim();
+			byte[] digest = Crypto.getInstance().digest(name_total.getBytes(StandardCharsets.UTF_8));
+
+			// CUT LEN
+			name_total = Base58.encode(digest).substring(0, 30);
+			String description = ""; //this.txtareaDescription.getText();
 						
 			//CREATE IMPRINT
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow);
+			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

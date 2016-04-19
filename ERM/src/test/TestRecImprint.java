@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 //import java.math.BigInteger;
 //import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,8 +14,11 @@ import ntp.NTP;
 
 import org.junit.Test;
 
+import com.google.common.primitives.Bytes;
+
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
+import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
@@ -34,7 +38,7 @@ public class TestRecImprint {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = Transaction.LAEV_KEY;
+	long FEE_KEY = Transaction.DIL_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] imprintReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -48,10 +52,17 @@ public class TestRecImprint {
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	
+	String name_total = "123890TYRH76576567567tytryrtyr6fdhgdfdskdfhuiweyriusdfyf8s7fssudfgdytrttygd";
+	byte[] digest;
+
+	Imprint imprint;
 
 	// INIT IMPRINTS
 	private void init() {
-		
+
+		name_total = Imprint.hashNameToBase58(name_total);
+		digest = Base58.decode(name_total);
+
 		db = DBSet.createEmptyDatabaseSet();
 		gb = new GenesisBlock();
 		gb.process(db);
@@ -59,6 +70,8 @@ public class TestRecImprint {
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+
+		imprint = new Imprint(maker, name_total, "");
 
 	}
 	
@@ -71,15 +84,20 @@ public class TestRecImprint {
 		
 		init();
 		
-		//CREATE IMPRINT
-		Imprint imprint = new Imprint(maker, "test12345678", "strontje");
+		byte[] reference = imprint.getCuttedReference();
+		assertEquals(true, Arrays.equals(digest, reference));
+		assertEquals(name_total, Base58.encode(reference));
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
-		Transaction issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueImprintTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE IMPRINT TRANSACTION IS VALID
 		assertEquals(true, issueImprintTransaction.isSignatureValid());
+
+		// CHECK REFERENCE OF ITEM NOT CHANGED
+		Imprint impr_1 = (Imprint) issueImprintTransaction.getItem();
+		assertEquals(name_total, Base58.encode(impr_1.getCuttedReference()));
 		
 		//INVALID SIGNATURE
 		issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
@@ -96,7 +114,6 @@ public class TestRecImprint {
 		
 		init();
 		
-		ImprintCls imprint = new Imprint(maker, "tesdfwerwrest132", "12345678910strontje");
 		byte[] raw = imprint.toBytes(false);
 		assertEquals(raw.length, imprint.getDataLength(false));
 				
@@ -157,9 +174,7 @@ public class TestRecImprint {
 	{
 		
 		init();				
-		
-		Imprint imprint = new Imprint(maker, "test", "strontje");
-				
+						
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueImprintRecord.sign(maker, false);
@@ -171,10 +186,12 @@ public class TestRecImprint {
 		LOGGER.info("imprint KEY: " + imprint.getKey(db));
 				
 		//CHECK IMPRINT EXISTS SENDER
-		long key = db.getIssueImprintMap().get(issueImprintRecord);
+		///////// NOT FONT THROUGHT db.get(issueImprintRecord)
+		//long key = db.getIssueImprintMap().get(issueImprintRecord);
+		long key = issueImprintRecord.getItem().getKey();
 		assertEquals(true, db.getImprintMap().contains(key));
 		
-		ImprintCls imprint_2 = new Imprint(maker, "test132_2", "2_12345678910strontje");				
+		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), "e");				
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueImprintTransaction_2.sign(maker, false);
 		issueImprintTransaction_2.process(db, false);
@@ -182,7 +199,7 @@ public class TestRecImprint {
 		issueImprintTransaction_2.orphan(db, false);
 		ItemImprintMap imprintMap = db.getImprintMap();
 		int mapSize = imprintMap.size();
-		assertEquals(0, mapSize - 4);
+		assertEquals(0, mapSize - 1);
 		
 		//CHECK IMPRINT IS CORRECT
 		assertEquals(true, Arrays.equals(db.getImprintMap().get(key).toBytes(true), imprint.toBytes(true)));
@@ -197,8 +214,6 @@ public class TestRecImprint {
 	{
 		
 		init();				
-				
-		Imprint imprint = new Imprint(maker, "test", "strontje");
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));

@@ -212,7 +212,7 @@ public abstract class Transaction {
 	protected static final int TYPE_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
-	protected static final int REFERENCE_LENGTH = 64;
+	public static final int REFERENCE_LENGTH = 64;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
@@ -457,7 +457,7 @@ public abstract class Transaction {
 	
 	public boolean isSignatureValid() {
 
-		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
+		if ( this.signature == null || this.signature.length != 64 || this.signature == new byte[64]) return false;
 		
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );

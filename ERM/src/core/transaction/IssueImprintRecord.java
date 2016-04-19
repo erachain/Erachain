@@ -35,8 +35,6 @@ public class IssueImprintRecord extends IssueItemRecord
 	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference) 
 	{
 		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, reference);	
-		// this reference = bytes from name
-		this.reference = this.getItem().getName().getBytes();
 	}
 	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -139,13 +137,20 @@ public class IssueImprintRecord extends IssueItemRecord
 	{
 		
 		//CHECK NAME LENGTH
-		int nameLength = this.getItem().getName().getBytes().length;
-		if(nameLength > 70 || nameLength < 10)
+		ItemCls item = this.getItem();
+		int nameLength = item.getName().getBytes().length;
+		if(nameLength > 40 || nameLength < 10)
 		{
 			return INVALID_NAME_LENGTH;
 		}
 						
-		return super.isValid(db, releaserReference);
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result;
+		
+		// CHECK reference in DB
+		if (item.getDBIssueMap(db).contains(item.getReference())) return Transaction.INVALID_AMOUNT;
+
+		return Transaction.VALIDATE_OK; 		
 	
 	}
 
