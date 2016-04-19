@@ -68,12 +68,15 @@ public class ConnectionAcceptor extends Thread{
 							 * || connectionSocket.getInetAddress().isAnyLocalAddress() 
 							 * || connectionSocket.getInetAddress().isLoopbackAddress() 
 							 *  */
+							
+							/*
 							(
 									(NTP.getTime() < Transaction.getPOWFIX_RELEASE() ) 
 									&& 
 									callback.isConnectedTo(connectionSocket.getInetAddress())
 							)
 							||
+							*/
 							PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress()))
 					{
 						//DO NOT CONNECT TO OURSELF/EXISTING CONNECTION

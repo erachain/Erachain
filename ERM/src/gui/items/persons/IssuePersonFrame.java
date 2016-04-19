@@ -353,11 +353,12 @@ public class IssuePersonFrame extends JFrame
 				this.dispose();
 				break;	
 				
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Persons will be enabled at %time%!").replace("%time%", DateTimeFormat.timestamptoString(Transaction.getASSETS_RELEASE())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
-				
+				*/
 			case Transaction.INVALID_QUANTITY:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

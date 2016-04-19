@@ -185,11 +185,13 @@ public class CreatePollTransaction extends Transaction
 	@Override
 	public int isValid(DBSet db, byte[] releaserReference) 
 	{
+		/*
 		//CHECK IF RELEASED
 		if(NTP.getTime() < Transaction.getVOTING_RELEASE())
 		{
 			return NOT_YET_RELEASED;
 		}
+		*/
 		
 		//CHECK POLL NAME LENGTH
 		int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -257,7 +259,7 @@ public class CreatePollTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}

@@ -213,7 +213,7 @@ public class CancelSellNameTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -304,7 +304,7 @@ public class CancelSellNameTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), OIL_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), DIL_KEY, this.fee);
 	}
 	
 	public int calcBaseFee() {

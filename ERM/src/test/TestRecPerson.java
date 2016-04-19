@@ -40,9 +40,9 @@ public class TestRecPerson {
 	byte[] releaserReference = null;
 
 	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
-	long ERM_KEY = Transaction.ERM_KEY;
-	long OIL_KEY = Transaction.OIL_KEY;
-	long VOTE_KEY = Transaction.VOTE_KEY;
+	long ERM_KEY = Transaction.ERMO_KEY;
+	long OIL_KEY = Transaction.DIL_KEY;
+	long VOTE_KEY = Transaction.LAEV_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] personReference = new byte[64];
 	long timestamp = NTP.getTime();

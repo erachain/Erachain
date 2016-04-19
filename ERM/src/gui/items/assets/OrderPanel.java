@@ -414,12 +414,13 @@ public class OrderPanel extends JPanel
 				this.txtPrice.setText("");
 				
 				break;	
-				
+
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets will be enabled at %time%!").replace("%time%", DateTimeFormat.timestamptoString(Transaction.getASSETS_RELEASE())),  "Error", JOptionPane.ERROR_MESSAGE);
 				break;
-				
+				*/
 			case Transaction.HAVE_EQUALS_WANT:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Have can not equal Want!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

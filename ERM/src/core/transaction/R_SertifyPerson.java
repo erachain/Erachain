@@ -373,7 +373,7 @@ public class R_SertifyPerson extends Transaction {
 			return INVALID_ADDRESS;
 		}
 		
-		BigDecimal balERM = this.creator.getConfirmedBalance(ERM_KEY, db);
+		BigDecimal balERM = this.creator.getConfirmedBalance(ERMO_KEY, db);
 		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
 		{
 			return Transaction.NOT_ENOUGH_ERM;
@@ -403,11 +403,11 @@ public class R_SertifyPerson extends Transaction {
 		super.process(db, asPack);
 
 		// send VOTE_KEY
-		this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, db).subtract(OIL_AMOUNT), db);						
-		this.creator.setConfirmedBalance(VOTE_KEY, this.creator.getConfirmedBalance(VOTE_KEY, db).subtract(VOTE_AMOUNT), db);						
+		this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db).subtract(OIL_AMOUNT), db);						
+		this.creator.setConfirmedBalance(LAEV_KEY, this.creator.getConfirmedBalance(LAEV_KEY, db).subtract(VOTE_AMOUNT), db);						
 		//UPDATE USER
-		this.userAccount1.setConfirmedBalance(Transaction.OIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.OIL_KEY, db).add(OIL_AMOUNT), db);
-		this.userAccount1.setConfirmedBalance(Transaction.VOTE_KEY, this.userAccount1.getConfirmedBalance(Transaction.VOTE_KEY, db).add(VOTE_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.DIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.DIL_KEY, db).add(OIL_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.LAEV_KEY, this.userAccount1.getConfirmedBalance(Transaction.LAEV_KEY, db).add(VOTE_AMOUNT), db);
 		
 		if (!asPack) {
 
@@ -426,12 +426,12 @@ public class R_SertifyPerson extends Transaction {
 		super.orphan(db, asPack);
 		
 		// BACK VOTE_KEY
-		this.creator.setConfirmedBalance(Transaction.OIL_KEY, this.creator.getConfirmedBalance(Transaction.OIL_KEY, db).add(OIL_AMOUNT), db);						
-		this.creator.setConfirmedBalance(Transaction.VOTE_KEY, this.creator.getConfirmedBalance(Transaction.VOTE_KEY, db).add(VOTE_AMOUNT), db);						
+		this.creator.setConfirmedBalance(Transaction.DIL_KEY, this.creator.getConfirmedBalance(Transaction.DIL_KEY, db).add(OIL_AMOUNT), db);						
+		this.creator.setConfirmedBalance(Transaction.LAEV_KEY, this.creator.getConfirmedBalance(Transaction.LAEV_KEY, db).add(VOTE_AMOUNT), db);						
 						
 		//UPDATE RECIPIENT
-		this.userAccount1.setConfirmedBalance(Transaction.OIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.OIL_KEY, db).subtract(OIL_AMOUNT), db);
-		this.userAccount1.setConfirmedBalance(Transaction.VOTE_KEY, this.userAccount1.getConfirmedBalance(Transaction.VOTE_KEY, db).subtract(VOTE_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.DIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.DIL_KEY, db).subtract(OIL_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.LAEV_KEY, this.userAccount1.getConfirmedBalance(Transaction.LAEV_KEY, db).subtract(VOTE_AMOUNT), db);
 		
 		if (!asPack) {
 			

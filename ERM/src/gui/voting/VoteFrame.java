@@ -288,11 +288,12 @@ public class VoteFrame extends JFrame
 				this.dispose();
 				break;	
 				
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Voting will be enabled at ") + DateTimeFormat.timestamptoString(Transaction.getVOTING_RELEASE()) + "!",  "Error", JOptionPane.ERROR_MESSAGE);
 				break;
-			
+				*/
 			case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("You have already voted for that option!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

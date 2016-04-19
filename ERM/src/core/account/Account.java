@@ -258,14 +258,14 @@ public class Account {
 				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
 				+ " - " + this.getAddress();
 				*/
-		return this.getConfirmedBalance(Transaction.OIL_KEY)
+		return this.getConfirmedBalance(Transaction.DIL_KEY)
 				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.OIL_KEY)) + "}"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.DIL_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	

@@ -234,7 +234,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		super.process(fork, false);
 
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, db).compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}

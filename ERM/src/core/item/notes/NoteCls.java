@@ -6,7 +6,7 @@ import core.item.ItemCls;
 //import database.DBMap;
 import database.DBSet;
 import database.Item_Map;
-import database.wallet.FavoriteItemNote;
+//import database.wallet.FavoriteItemNote;
 import database.IssueItemMap;
 
 public abstract class NoteCls extends ItemCls {

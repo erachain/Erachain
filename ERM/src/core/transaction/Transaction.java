@@ -106,27 +106,28 @@ public abstract class Transaction {
 	public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;
 	public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;
 	// ISSUE ITEMS
-	public static final int ISSUE_ASSET_TRANSACTION = 11;
-	public static final int ISSUE_NOTE_TRANSACTION = 12;
-	public static final int ISSUE_PERSON_TRANSACTION = 13;
-	public static final int ISSUE_STATUS_TRANSACTION = 14;
-	public static final int ISSUE_UNION_TRANSACTION = 15;
+	public static final int ISSUE_ASSET_TRANSACTION = 21;
+	public static final int ISSUE_IMPRINT_TRANSACTION = 22;
+	public static final int ISSUE_NOTE_TRANSACTION = 23;
+	public static final int ISSUE_PERSON_TRANSACTION = 24;
+	public static final int ISSUE_STATUS_TRANSACTION = 25;
+	public static final int ISSUE_UNION_TRANSACTION = 26;
 	// USE ITEMS
-	public static final int SEND_ASSET_TRANSACTION = 16;
-	public static final int SIGN_NOTE_TRANSACTION = 17;
-	public static final int CERTIFY_PERSON_TRANSACTION = 18;
-	public static final int ASSIGN_STATUS_TRANSACTION = 19;
-	public static final int ADOPT_UNION_TRANSACTION = 20;
+	public static final int SEND_ASSET_TRANSACTION = 31;
+	public static final int SIGN_NOTE_TRANSACTION = 32;
+	public static final int CERTIFY_PERSON_TRANSACTION = 33;
+	public static final int ASSIGN_STATUS_TRANSACTION = 34;
+	public static final int ADOPT_UNION_TRANSACTION = 35;
 	// confirms other transactions
-	public static final int CONFIRM_TRANSACTION = 21;
+	public static final int CONFIRM_TRANSACTION = 40;
 	// exchange of assets
-	public static final int CREATE_ORDER_TRANSACTION = 26;
-	public static final int CANCEL_ORDER_TRANSACTION = 27;
+	public static final int CREATE_ORDER_TRANSACTION = 50;
+	public static final int CANCEL_ORDER_TRANSACTION = 51;
 	// voting
-	public static final int CREATE_POLL_TRANSACTION =31;
-	public static final int VOTE_ON_POLL_TRANSACTION = 32;
+	public static final int CREATE_POLL_TRANSACTION =61;
+	public static final int VOTE_ON_POLL_TRANSACTION = 62;
 	
-	public static final int RELEASE_PACK = 40;
+	public static final int RELEASE_PACK = 70;
 
 	// old
 	public static final int GENESIS_TRANSACTION = 4 + 130;
@@ -144,30 +145,25 @@ public abstract class Transaction {
 	//public static final int ACCOUNTING_TRANSACTION = 26;
 	//public static final int JSON_TRANSACTION = 27;
 
-	// CORE KEY = ERM
-	public static final long ERM_KEY = 0l;
-
-	// FEE KEY = OIL
-	public static final long OIL_KEY = 1l;
+	// CORE KEY
+	public static final long ERMO_KEY = 0l;
+	// PERSON KEY
+	public static final long LAEV_KEY = 1l;
+	// FEE KEY
+	public static final long DIL_KEY = 2l;
+	// FEE PARAMETERS
 	public static final int FEE_PER_BYTE = 1;
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
 
-	// UNIQIE KEY = VOTE
-	public static final long VOTE_KEY = 2l;
-
 	//RELEASES
-	private static final long VOTING_RELEASE = 0l;
-	private static final long ARBITRARY_TRANSACTIONS_RELEASE = 0l;
-	private static final int AT_BLOCK_HEIGHT_RELEASE = 0;
-	private static final int MESSAGE_BLOCK_HEIGHT_RELEASE = 0;
-	//public static final long ASSETS_RELEASE = 1411308000000l;
-	private static final long ASSETS_RELEASE = 0l;
-	private static final long POWFIX_RELEASE = 0L; // Block Version 3 // 2016-02-25T19:00:00+00:00
+	//private static final long ASSETS_RELEASE = 0l;
+	//private static final long POWFIX_RELEASE = 0L; // Block Version 3 // 2016-02-25T19:00:00+00:00
 							
 	static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
 
+	/*/
 	public static long getVOTING_RELEASE() {
 		if(Settings.getInstance().isTestnet()) {
 			return Settings.getInstance().getGenesisStamp();
@@ -209,6 +205,7 @@ public abstract class Transaction {
 		}
 		return POWFIX_RELEASE;
 	}
+	*/
 	
 	//PROPERTIES LENGTH
 	protected static final int SIMPLE_TYPE_LENGTH = 1;
@@ -491,7 +488,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getConfirmedBalance(OIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -514,7 +511,7 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, db)
+				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db)
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
@@ -534,7 +531,7 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, db).add(this.fee), db);
+				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
 				this.creator.setLastReference(this.reference, db);

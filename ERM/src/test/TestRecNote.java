@@ -34,7 +34,7 @@ public class TestRecNote {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long OIL_KEY = 1l;
+	long FEE_KEY = Transaction.DIL_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -58,7 +58,7 @@ public class TestRecNote {
 		
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
 	
@@ -162,10 +162,10 @@ public class TestRecNote {
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteRecord.sign(maker, false);
 		
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
 		
+		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, false);
 		
 		LOGGER.info("note KEY: " + note.getKey(db));

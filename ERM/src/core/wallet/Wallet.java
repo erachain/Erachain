@@ -27,6 +27,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.naming.Name;
@@ -38,6 +39,7 @@ import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.PaymentTransaction;
@@ -494,7 +496,6 @@ public class Wallet extends Observable implements Observer
 	    DBSet.getInstance().getCompletedOrderMap().addObserver(this);
 	    
 	    this.initiateItemsFavorites();
-	    //this.initiateNotesFavorites();
 	    
 	    return true;
 	}
@@ -586,6 +587,7 @@ public class Wallet extends Observable implements Observer
 		this.database.getNameSaleMap().reset();
 		this.database.getPollMap().reset();
 		this.database.getAssetMap().reset();
+		this.database.getImprintMap().reset();
 		this.database.getNoteMap().reset();
 		this.database.getPersonMap().reset();
 		this.database.getOrderMap().reset();
@@ -943,6 +945,9 @@ public class Wallet extends Observable implements Observer
 		
 		//REGISTER ON ASSETS
 		this.database.getAssetMap().addObserver(o);
+
+		//REGISTER ON IMPRINTS
+		this.database.getImprintMap().addObserver(o);
 
 		//REGISTER ON NOTES
 		this.database.getNoteMap().addObserver(o);
@@ -1397,6 +1402,38 @@ public class Wallet extends Observable implements Observer
 		}
 	}
 
+	private void processImprintIssue(IssueImprintRecord imprintIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(imprintIssue.getItem().getCreator().getAddress()))
+		{
+			//ADD IMPRINT
+			this.database.getImprintMap().add((ImprintCls)imprintIssue.getItem());
+		}
+	}
+	
+	private void orphanImprintIssue(IssueImprintRecord imprintIssue)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		if(this.accountExists(imprintIssue.getItem().getCreator().getAddress()))
+		{
+			//DELETE IMPRINT
+			this.database.getImprintMap().delete((ImprintCls)imprintIssue.getItem());
+		}
+	}
+
 	private void processNoteIssue(IssueNoteRecord noteIssue)
 	{
 		//CHECK IF WALLET IS OPEN
@@ -1603,6 +1640,11 @@ public class Wallet extends Observable implements Observer
 				{
 					this.processAssetIssue((IssueAssetTransaction) transaction);
 				}
+				//CHECK IF IMPRINT ISSUE
+				else if(transaction instanceof IssueImprintRecord)
+				{
+					this.processImprintIssue((IssueImprintRecord) transaction);
+				}
 				//CHECK IF NOTE ISSUE
 				else if(transaction instanceof IssueNoteRecord)
 				{
@@ -1657,6 +1699,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueAssetTransaction)
 			{
 				this.processAssetIssue((IssueAssetTransaction) transaction);
+			}
+			//CHECK IF IMPRINT ISSUE
+			else if(transaction instanceof IssueImprintRecord)
+			{
+				this.processImprintIssue((IssueImprintRecord) transaction);
 			}
 			//CHECK IF NOTE ISSUE
 			else if(transaction instanceof IssueNoteRecord)
@@ -1735,6 +1782,11 @@ public class Wallet extends Observable implements Observer
 				{
 					this.orphanAssetIssue((IssueAssetTransaction) transaction);
 				}
+				//CHECK IF IMPRINT ISSUE
+				else if(transaction instanceof IssueImprintRecord)
+				{
+					this.orphanImprintIssue((IssueImprintRecord) transaction);
+				}
 				//CHECK IF NOTE ISSUE
 				else if(transaction instanceof IssueNoteRecord)
 				{
@@ -1787,6 +1839,11 @@ public class Wallet extends Observable implements Observer
 			else if(transaction instanceof IssueAssetTransaction)
 			{
 				this.orphanAssetIssue((IssueAssetTransaction) transaction);
+			}
+			//CHECK IF IMPRINT ISSUE
+			else if(transaction instanceof IssueImprintRecord)
+			{
+				this.orphanImprintIssue((IssueImprintRecord) transaction);
 			}
 			//CHECK IF NOTE ISSUE
 			else if(transaction instanceof IssueNoteRecord)

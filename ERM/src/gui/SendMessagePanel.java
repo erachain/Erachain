@@ -644,12 +644,14 @@ public class SendMessagePanel extends JPanel
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
 
-			
+
+			/*
 			if(key != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
 			{	
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets transactions will be enabled at %ss%!").replace("%ss%", DateTimeFormat.timestamptoString(Transaction.getPOWFIX_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			*/
 			
 			//CREATE TX MESSAGE
 			result = Controller.getInstance().sendMessage(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);

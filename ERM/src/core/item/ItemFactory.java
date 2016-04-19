@@ -2,6 +2,7 @@ package core.item;
 
 import core.item.ItemCls;
 import core.item.assets.AssetFactory;
+import core.item.imprints.Imprint;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonFactory;
 import core.item.statuses.StatusFactory;
@@ -33,6 +34,8 @@ public class ItemFactory {
 		{
 		case ItemCls.ASSET_TYPE:
 			return AssetFactory.getInstance().parse(data, includeReference);
+		case ItemCls.IMPRINT_TYPE:
+			return Imprint.parse(data, includeReference);
 		case ItemCls.NOTE_TYPE:
 			return NoteFactory.getInstance().parse(data, includeReference);
 		case ItemCls.PERSON_TYPE:

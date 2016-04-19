@@ -17,6 +17,7 @@ import core.transaction.MessageTransaction;
 import core.transaction.Transaction;
 import gui.transaction.ArbitraryTransactionDetailsFrame;
 import gui.transaction.MessageTransactionDetailsFrame;
+import ntp.NTP;
 
 public class txWindowTest {
 
@@ -51,7 +52,8 @@ public class txWindowTest {
 				creator, payments, 111,
 				data,
 				FEE_POWER, 
-				Transaction.getPOWFIX_RELEASE(), //new byte[]{0},
+				//Transaction.getPOWFIX_RELEASE(),
+				NTP.getTime(),
 				new byte[]{0}
 				);
 		

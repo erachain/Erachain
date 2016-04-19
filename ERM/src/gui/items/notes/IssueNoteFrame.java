@@ -250,7 +250,7 @@ public class IssueNoteFrame extends JFrame
 			//READ FEE POW
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
 						
-			//CREATE ASSET
+			//CREATE NOTE
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			Pair<Transaction, Integer> result = Controller.getInstance().issueNote(creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow);
 			
@@ -262,12 +262,13 @@ public class IssueNoteFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
 				break;	
-				
+
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Notes will be enabled at %time%!").replace("%time%", DateTimeFormat.timestamptoString(Transaction.getASSETS_RELEASE())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
-				
+				*/
 			case Transaction.INVALID_QUANTITY:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

@@ -172,7 +172,8 @@ public class TransactionV3Tests {
 				);
 		arbitraryTransactionV3.sign(creator, false);
 		
-		if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
+		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
+		if (false)
 		{
 			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.NOT_YET_RELEASED);
 		}
@@ -258,7 +259,8 @@ public class TransactionV3Tests {
 				);
 		arbitraryTransactionV3.sign(creator, false);
 		
-		if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
+		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
+		if (false)
 		{
 			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.NOT_YET_RELEASED);
 		}

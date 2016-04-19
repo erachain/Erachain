@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gui.items.assets.AssetsPanel;
+import gui.items.imprints.ImprintsPanel;
 import gui.items.notes.NotesPanel;
 import gui.items.persons.PersonsPanel;
 import gui.at.ATPanel;
@@ -13,7 +14,7 @@ import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;
 import gui.models.WalletBlocksTableModel;
 import gui.models.WalletTransactionsTableModel;
-import gui.models.WalletItemNotesTableModel;
+//import gui.models.WalletItemNotesTableModel;
 
 import gui.naming.NamingServicePanel;
 import gui.transaction.TransactionDetailsFactory;
@@ -102,6 +103,9 @@ public class GeneralTabPane extends JTabbedPane{
 
         this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
         
+        //NOTES
+        this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
+
         //NOTES
         this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
 

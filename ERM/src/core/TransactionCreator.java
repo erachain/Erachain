@@ -14,6 +14,8 @@ import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.assets.Order;
+import core.item.imprints.Imprint;
+import core.item.imprints.ImprintCls;
 import core.item.notes.Note;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonHuman;
@@ -29,6 +31,7 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.MessageTransaction;
@@ -280,7 +283,25 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueAssetTransaction, false);
 	}
-		
+
+	public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+								
+		ImprintCls imprint = new Imprint(creator, name, description);
+							
+		//CREATE ISSUE IMPRINT TRANSACTION
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time, creator.getLastReference(this.fork));
+		issueImprintRecord.sign(creator, false);
+										
+		//VALIDATE AND PROCESS
+		return this.afterCreate(issueImprintRecord, false);
+	}
+
 	public Pair<Transaction, Integer> createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
 	{
 		//CHECK FOR UPDATES

@@ -37,7 +37,7 @@ public class TestRecAsset {
 
 	byte[] releaserReference = null;
 
-	long OIL_KEY = 1l;
+	long FEE_KEY = Transaction.DIL_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -63,7 +63,7 @@ public class TestRecAsset {
 		
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		asset = new AssetVenture(maker, "a", "a", 50000l, (byte) 2, true);
 		//key = asset.getKey(db);
@@ -297,9 +297,9 @@ public class TestRecAsset {
 						
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueAssetTransaction.sign(maker, false);
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
-		
+
+		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
@@ -310,11 +310,11 @@ public class TestRecAsset {
 				
 		//CREATE VALID ASSET TRANSFER
 		Transaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
-		assetTransfer.sign(maker, false);
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 		
+		assetTransfer.sign(maker, false);
 		assetTransfer.process(db, false);
 		
 		//CREATE VALID ASSET TRANSFER
@@ -338,8 +338,8 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		assetTransfer = new TransferAssetTransaction(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
-		assetTransfer.sign(maker, false);
-		assetTransfer.process(db, false);
+		//assetTransfer.sign(maker, false);
+		//assetTransfer.process(db, false);
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));	
@@ -366,7 +366,7 @@ public class TestRecAsset {
 		assetTransfer.sign(maker, false);
 
 		//CONVERT TO BYTES
-		byte[] rawAssetTransfer = assetTransfer.toBytes(true, null);
+		byte[] rawAssetTransfer = assetTransfer.toBytes(true, releaserReference);
 		
 		//CHECK DATALENGTH
 		assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(false));
@@ -409,7 +409,7 @@ public class TestRecAsset {
 		}
 		catch (Exception e) 
 		{
-			fail("Exception while parsing transaction.");
+			fail("Exception while parsing transaction." + e);
 		}
 		
 		//PARSE TRANSACTION FROM WRONG BYTES
@@ -531,7 +531,7 @@ public class TestRecAsset {
 		key = asset.getKey(db);
 
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
 		createOrderTransaction.sign(maker, false);
 		createOrderTransaction.process(db, false);
 		
@@ -564,7 +564,7 @@ public class TestRecAsset {
 		//CREATE INVALID CANCEL ORDER NO BALANCE
 		DBSet fork = db.fork();
 		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});		
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.ZERO, fork);		
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.ZERO, fork);		
 		
 		//CHECK IF CANCEL ORDER IS INVALID
 		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
@@ -660,7 +660,7 @@ public class TestRecAsset {
 		key = asset.getKey(db);
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
 		createOrderTransaction.sign(maker, false);
 		createOrderTransaction.process(db, false);
 		
@@ -698,7 +698,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
 		createOrderTransaction.sign(maker, false);
 		createOrderTransaction.process(db, false);
 

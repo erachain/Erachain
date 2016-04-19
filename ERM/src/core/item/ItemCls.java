@@ -18,16 +18,17 @@ import core.transaction.Transaction;
 import database.DBSet;
 //import database.DBMap;
 import database.Item_Map;
-import database.wallet.FavoriteItem;
+//import database.wallet.FavoriteItem;
 import database.IssueItemMap;
 
 public abstract class ItemCls {
 
 	public static final int ASSET_TYPE = 1;
-	public static final int NOTE_TYPE = 2;
-	public static final int PERSON_TYPE = 3;
-	public static final int STATUS_TYPE = 4;
-	public static final int UNION_TYPE = 5;
+	public static final int IMPRINT_TYPE = 2;
+	public static final int NOTE_TYPE = 3;
+	public static final int PERSON_TYPE = 4;
+	public static final int STATUS_TYPE = 5;
+	public static final int UNION_TYPE = 6;
 
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int CREATOR_LENGTH = Account.ADDRESS_LENGTH;
@@ -173,12 +174,12 @@ public abstract class ItemCls {
 	
 	public String toString()
 	{		
-		return "(" + this.key + ":" + this.typeBytes.toString() + ") " + this.name;
+		return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name;
 	}
 	
 	public String getShort()
 	{
-		return "(" + this.key + ":" + this.typeBytes.toString() + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
 	}
 	
 	@SuppressWarnings("unchecked")

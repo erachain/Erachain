@@ -57,6 +57,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
+import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.naming.Name;
@@ -583,6 +584,9 @@ public class Controller extends Observable {
 		// ADD OBSERVER TO ASSETS
 		DBSet.getInstance().getAssetMap().addObserver(o);
 
+		// ADD OBSERVER TO IMPRINTS
+		DBSet.getInstance().getImprintMap().addObserver(o);
+
 		// ADD OBSERVER TO NOTES
 		DBSet.getInstance().getNoteMap().addObserver(o);
 
@@ -718,7 +722,8 @@ public class Controller extends Observable {
 		// GET HEIGHT
 		int height = this.blockChain.getHeight();
 
-		if(NTP.getTime() >= Transaction.getPOWFIX_RELEASE())
+		//if(NTP.getTime() >= Transaction.getPOWFIX_RELEASE())
+		if (true)
 		{
 			// SEND FOUNDMYSELF MESSAGE
 			peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
@@ -1393,6 +1398,8 @@ public class Controller extends Observable {
 			{
 			case ItemCls.ASSET_TYPE:
 				return DBSet.getInstance().getAssetMap();
+			case ItemCls.IMPRINT_TYPE:
+				return DBSet.getInstance().getImprintMap();
 			case ItemCls.NOTE_TYPE:
 				return DBSet.getInstance().getNoteMap();
 			case ItemCls.PERSON_TYPE:
@@ -1560,6 +1567,11 @@ public class Controller extends Observable {
 		return DBSet.getInstance().getTradeMap().getTrades(order);
 	}
 
+	// IMPRINTS
+	public ImprintCls getImprint(long key) {
+		return (ImprintCls)DBSet.getInstance().getImprintMap().get(key);
+	}
+
 	// NOTES
 	public NoteCls getNote(long key) {
 		return (NoteCls)DBSet.getInstance().getNoteMap().get(key);
@@ -1577,6 +1589,9 @@ public class Controller extends Observable {
 			{
 			case ItemCls.ASSET_TYPE: {
 				return DBSet.getInstance().getAssetMap().get(key);
+			}
+			case ItemCls.IMPRINT_TYPE: {
+				return DBSet.getInstance().getImprintMap().get(key);
 			}
 			case ItemCls.NOTE_TYPE: {
 				return DBSet.getInstance().getNoteMap().get(key);
@@ -1730,6 +1745,15 @@ public class Controller extends Observable {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueAssetTransaction(creator,
 					name, description, quantity, scale, divisible, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator,
+			String name, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueImprintTransaction(creator,
+					name, description, feePow);
 		}
 	}
 

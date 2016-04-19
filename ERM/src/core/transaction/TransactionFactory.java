@@ -130,6 +130,11 @@ public class TransactionFactory {
 			//PARSE ISSUE ASSET TRANSACTION
 			return IssueAssetTransaction.Parse(data, releaserReference);
 			
+		case Transaction.ISSUE_IMPRINT_TRANSACTION:
+			
+			//PARSE ISSUE IMPRINT TRANSACTION
+			return IssueImprintRecord.Parse(data, releaserReference);
+
 		case Transaction.ISSUE_NOTE_TRANSACTION:
 			
 			//PARSE ISSUE NOTE TRANSACTION

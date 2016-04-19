@@ -317,11 +317,13 @@ public class DeployATTransaction extends Transaction
 
 	public int isValid(DBSet db, Integer forkHeight) 
 	{
+		/*
 		//CHECK IF RELEASED
 		if(db.getBlockMap().getLastBlock().getHeight(db) + 1 < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
 		{
 			return NOT_YET_RELEASED;
 		}
+		*/
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
@@ -362,7 +364,7 @@ public class DeployATTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}

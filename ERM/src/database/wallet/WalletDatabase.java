@@ -7,6 +7,7 @@ import org.mapdb.Atomic.Var;
 import core.account.Account;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 
@@ -32,6 +33,7 @@ public class WalletDatabase implements IDB
 	private NameSaleMap nameSaleMap;
 	private PollMap pollMap;
 	private WItemAssetMap assetMap;
+	private WItemImprintMap imprintMap;
 	private WItemNoteMap noteMap;
 	private WItemPersonMap personMap;
 	private OrderMap orderMap;
@@ -67,6 +69,7 @@ public class WalletDatabase implements IDB
 	    this.nameSaleMap = new NameSaleMap(this, this.database);
 	    this.pollMap = new PollMap(this, this.database);
 	    this.assetMap = new WItemAssetMap(this, this.database);
+	    this.imprintMap = new WItemImprintMap(this, this.database);
 	    this.noteMap = new WItemNoteMap(this, this.database);
 	    this.personMap = new WItemPersonMap(this, this.database);
 	    this.orderMap = new OrderMap(this, this.database);
@@ -152,6 +155,10 @@ public class WalletDatabase implements IDB
 	{
 		return this.assetMap;
 	}
+	public WItemImprintMap getImprintMap()
+	{
+		return this.imprintMap;
+	}
 	public WItemNoteMap getNoteMap()
 	{
 		return this.noteMap;
@@ -162,10 +169,12 @@ public class WalletDatabase implements IDB
 	}
 	public WItem_Map getItemMap(ItemCls item)
 	{
-		if (item instanceof NoteCls) { 
-			return (WItem_Map)this.noteMap;
-		} else if (item instanceof AssetCls) { 
+		if (item instanceof AssetCls) { 
 			return (WItem_Map)this.assetMap;
+		} else if (item instanceof ImprintCls) { 
+			return (WItem_Map)this.imprintMap;
+		} else if (item instanceof NoteCls) { 
+			return (WItem_Map)this.noteMap;
 		} else if (item instanceof PersonCls) { 
 			return (WItem_Map)this.personMap;
 		} else {
@@ -178,6 +187,8 @@ public class WalletDatabase implements IDB
 		{
 			case ItemCls.ASSET_TYPE:
 				return this.assetMap;
+			case ItemCls.IMPRINT_TYPE:
+				return this.imprintMap;
 			case ItemCls.NOTE_TYPE:
 				return this.noteMap;
 			case ItemCls.PERSON_TYPE:
@@ -276,6 +287,7 @@ public class WalletDatabase implements IDB
 		this.nameSaleMap.delete(account);
 		this.pollMap.delete(account);
 		this.assetMap.delete(account);
+		this.imprintMap.delete(account);
 		this.noteMap.delete(account);
 		this.personMap.delete(account);
 		this.orderMap.delete(account);

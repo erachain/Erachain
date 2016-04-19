@@ -254,7 +254,7 @@ public class CreateOrderTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, fork).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, fork).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -364,7 +364,7 @@ public class CreateOrderTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), OIL_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), DIL_KEY, this.fee);
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(), this.order.getAmount());
 		
 		return assetAmount;

@@ -440,10 +440,12 @@ public class DeployATFrame extends JFrame {
 			case Transaction.VALIDATE_OK:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT has been deployed!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
-				break;	
+				break;
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT will be enabled after %block% block!").replace("%block%", String.valueOf(Transaction.getAT_BLOCK_HEIGHT_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
+				*/
 			case Transaction.NOT_ENOUGH_FEE:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);

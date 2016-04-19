@@ -222,10 +222,10 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(OIL_KEY, this.creator.getConfirmedBalance(OIL_KEY, fork).subtract(this.fee), fork);
+		this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, fork).subtract(this.fee), fork);
 		
 		//CHECK IF CREATOR HAS ENOUGH OIL BALANCE
-		if(this.creator.getConfirmedBalance(OIL_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getConfirmedBalance(DIL_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
 		}	
