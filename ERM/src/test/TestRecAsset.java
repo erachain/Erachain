@@ -47,7 +47,7 @@ public class TestRecAsset {
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
-	byte[] seed = Crypto.getInstance().digest("test".getBytes());
+	byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	
