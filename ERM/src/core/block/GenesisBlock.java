@@ -29,7 +29,7 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference =  new byte[]{19,66,8,21,0,0,0,0};
-	private static long genesisGeneratingBalance = 6000000L; // starting max volume for generating
+	private static long genesisGeneratingBalance = 12000000L; // starting max volume for generating	
 	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{0,1,2,3,4,13,31,13,31,13,31});
 
 	private String testnetInfo; 
@@ -37,7 +37,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance, genesisGenerator, generateHash(null), null, 0);
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance / 5, genesisGenerator, generateHash(null), null, 0);
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		
@@ -128,7 +128,7 @@ public class GenesisBlock extends Block{
 		case 2:
 			return new AssetVenture(genesisGenerator, "DIL", "It is an DILing drops used for fees", 99999999L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance * 2, (byte)0, true);
+		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 
