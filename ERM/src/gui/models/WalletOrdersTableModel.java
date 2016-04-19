@@ -6,15 +6,15 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 
-import qora.assets.Order;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.assets.Order;
 import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletOrdersTableModel extends QoraTableModel<Tuple2<String, BigInteger>, Order> implements Observer
+public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInteger>, Order> implements Observer
 {
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_HAVE = 1;

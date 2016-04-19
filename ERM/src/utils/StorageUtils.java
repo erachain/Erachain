@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -16,16 +16,18 @@ import org.json.simple.JSONValue;
 import com.google.common.base.Charsets;
 
 import controller.Controller;
+import core.account.PublicKeyAccount;
+import core.naming.Name;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
+import core.web.NameStorageMap;
+import core.web.OrphanNameStorageHelperMap;
+import core.web.OrphanNameStorageMap;
 import database.DBSet;
-import qora.account.PublicKeyAccount;
-import qora.naming.Name;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
-import qora.web.NameStorageMap;
-import qora.web.OrphanNameStorageHelperMap;
-import qora.web.OrphanNameStorageMap;
 
 public class StorageUtils {
+
+	static Logger LOGGER = Logger.getLogger(StorageUtils.class.getName());
 
 	// REPLACES CURRENT VALUE
 	public static final String ADD_COMPLETE_KEY = "addcomplete";
@@ -263,8 +265,8 @@ public class StorageUtils {
 						nameStorageMap.add(name, key,
 								DiffHelper.patch(oldValueOpt, (String) patchJsonKey.get(key)));
 					} catch (Throwable e) {
-						Logger.getGlobal().info("Invalid patch!");
-						Logger.getGlobal().log(Level.FINE, "Invalid patch!", e);
+						LOGGER.info("Invalid patch!");
+						//LOGGER.info(Level.FINE, "Invalid patch!" e);
 					}
 				}
 			}

@@ -8,14 +8,17 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+
+import core.account.Account;
+import core.naming.Name;
+
 import org.mapdb.BTreeMap;
 
-import qora.account.Account;
-import qora.naming.Name;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;
@@ -29,6 +32,8 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name>
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
+	static Logger LOGGER = Logger.getLogger(NameMap.class.getName());
+
 	public NameMap(WalletDatabase walletDatabase, DB database)
 	{
 		super(walletDatabase, database);
@@ -130,7 +135,7 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name>
 		catch(Exception e)
 		{
 			//ERROR
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		return names;
@@ -158,7 +163,7 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name>
 		catch(Exception e)
 		{
 			//ERROR
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		return names;

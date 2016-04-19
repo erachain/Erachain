@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import database.DBSet;
@@ -34,6 +34,8 @@ public class Peer extends Thread{
 	
 	private Map<Integer, BlockingQueue<Message>> messages;
 	
+	static Logger LOGGER = Logger.getLogger(Peer.class.getName());
+
 	public Peer(InetAddress address)
 	{
 		this.address = address;
@@ -73,7 +75,7 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			Logger.getGlobal().info("Failed to connect to : " + address);
+			LOGGER.info("Failed to connect to : " + address);
 		}
 	}
 	
@@ -139,7 +141,7 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			Logger.getGlobal().info(Lang.getInstance().translate("Failed to connect to : ") + address);
+			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address);
 		}
 	}
 	
@@ -160,7 +162,7 @@ public class Peer extends Thread{
 					//PROCESS NEW MESSAGE
 					Message message = MessageFactory.getInstance().parse(this, in);
 					
-					//Logger.getGlobal().info("received message " + message.getType() + " from " + this.address.toString());
+					//LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
 					
 					//CHECK IF WE ARE WAITING FOR A MESSAGE WITH THAT ID
 					if(message.hasId() && this.messages.containsKey(message.getId()))
@@ -184,7 +186,7 @@ public class Peer extends Thread{
 		} 
 		catch (Exception e) 
 		{
-			//e.printStackTrace();
+			//LOGGER.error(e.getMessage(),e);
 			
 			//DISCONNECT
 			callback.onDisconnect(this);

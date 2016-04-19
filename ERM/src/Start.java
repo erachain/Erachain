@@ -1,43 +1,79 @@
+import gui.Gui;
+// 30/03
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import lang.Lang;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import api.ApiClient;
-import controller.Controller;
-import gui.Gui;
-import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
+import api.ApiClient;
+import controller.Controller;
 
 public class Start {
 	
 	static Logger LOGGER = Logger.getLogger(Start.class.getName());
 
-	public static void main(String args[])
+	public static void main(String args[]) throws IOException
 	{	
 		
-		PropertyConfigurator.configure(new File( "log4j.properties").getAbsolutePath());
+		File log4j = new File("log4j.properties");
+		if(log4j.exists())
+		{
+			PropertyConfigurator.configure(log4j.getAbsolutePath());
+		}else
+		{
+			try( InputStream resourceAsStream = ClassLoader.class.getResourceAsStream("/log4j/log4j.default");)
+			{
+				PropertyConfigurator.configure(resourceAsStream);
+				LOGGER.error("log4j.properties not found, search path is " + log4j.getAbsolutePath() + " using default!");
+			}
+		}
 		
 		boolean cli = false;
+		
+		
 		
 		for(String arg: args)
 		{
 			if(arg.equals("-cli"))
 			{
 				cli = true;
-			} if(arg.equals("-testnet")) {
-				Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
-			} else if(arg.startsWith("-testnet=") && arg.length() > 9) {
-				try
+			} 
+			else 
+			{
+				if(arg.startsWith("-peers=") && arg.length() > 7) 
 				{
-					Settings.getInstance().setGenesisStamp(Long.parseLong(arg.substring(9)));
-				} catch(Exception e) {
-					Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
+					Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
+				}
+				
+				if(arg.equals("-testnet")) 
+				{
+					Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
+				} 
+				else if(arg.startsWith("-testnet=") && arg.length() > 9) 
+				{
+					try
+					{
+						long testnetstamp = Long.parseLong(arg.substring(9));
+						
+						if (testnetstamp == 0)
+						{
+							testnetstamp = System.currentTimeMillis();
+						}
+							
+						Settings.getInstance().setGenesisStamp(testnetstamp);
+					} catch(Exception e) {
+						Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
+					}
 				}
 			}
 		}
@@ -56,7 +92,7 @@ public class Start {
 				LOGGER.info(Lang.getInstance().translate("Starting %qora% / version: %version% / build date: %builddate% / ...")
 						.replace("%version%", Controller.getInstance().getVersion())
 						.replace("%builddate%", Controller.getInstance().getBuildDateString())
-						.replace("%qora%", Lang.getInstance().translate("Qora"))
+						.replace("%qora%", Lang.getInstance().translate("DATACHAINS.world"))
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
@@ -69,8 +105,8 @@ public class Start {
 						{					
 							SysTray.getInstance().createTrayIcon();
 						}
-				} catch(Exception e) {
-					LOGGER.error(Lang.getInstance().translate("GUI ERROR") ,e);
+				} catch(Exception e1) {
+					LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
 				}
 				
 			} catch(Exception e) {
@@ -114,7 +150,7 @@ public class Start {
 				}
 				
 				String result = client.executeCommand(command);
-				System.out.println("[RESULT] " + result);
+				LOGGER.info("[RESULT] " + result);
 			}
 		}		
 	}

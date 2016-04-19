@@ -11,8 +11,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import core.naming.Name;
 import lang.Lang;
-import qora.naming.Name;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 
@@ -21,7 +21,7 @@ public class NameDetailsFrame extends JFrame
 {
 	public NameDetailsFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Name Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Name Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -59,7 +59,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL REGISTRANT
 		labelGBC.gridy = 1;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(registrantLabel, labelGBC);
 		
 		//REGISTRANT
@@ -71,7 +71,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 2;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -83,7 +83,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//LABEL VALUE
 		labelGBC.gridy = 3;
-		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
 		this.add(valueLabel, labelGBC);
 		           
 		//VALUE

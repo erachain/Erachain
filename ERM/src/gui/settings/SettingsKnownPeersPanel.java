@@ -65,7 +65,7 @@ public class SettingsKnownPeersPanel extends JPanel
         TableColumn confirmedColumn = knownPeersTable.getColumnModel().getColumn(1);
         confirmedColumn.setCellRenderer(knownPeersTable.getDefaultRenderer(Boolean.class));
         
-        JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address:"));
+        JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
         GridBagConstraints gbc_lblAddNewAddress = new GridBagConstraints();
         gbc_lblAddNewAddress.anchor = GridBagConstraints.NORTHEAST;
         gbc_lblAddNewAddress.insets = new Insets(4, 0, 0, 5);

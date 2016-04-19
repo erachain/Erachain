@@ -1,5 +1,6 @@
 package settings;
-// 17/03
+// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
+// 30/03 ++
 
 import java.io.File;
 import java.io.InputStream;
@@ -10,10 +11,12 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Logger;
+// import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
+
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,6 +34,8 @@ import ntp.NTP;
 
 public class Settings {
 
+	private static final Logger LOGGER = Logger.getLogger(Settings.class);
+
 	//NETWORK
 	private static final int DEFAULT_MIN_CONNECTIONS = 10;
 	private static final int DEFAULT_MAX_CONNECTIONS = 50;
@@ -39,10 +44,13 @@ public class Settings {
 	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
 	private static final int DEFAULT_PING_INTERVAL = 30000;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
-	private static final String[] DEFAULT_PEERS = { };
+	//private static final String[] DEFAULT_PEERS = { };
+	
+	// BLOCK
+	public static final int BLOCK_MAX_SIGNATURES = 5000;
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1458554240336L; // QORA RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1460992991336L; // CORE RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -99,6 +107,9 @@ public class Settings {
 	List<Peer> cacheInternetPeers;
 	long timeLoadInternetPeers;
 	
+	private String[] defaultPeers = { };
+
+	
 	public static Settings getInstance()
 	{
 		if(instance == null)
@@ -141,6 +152,13 @@ public class Settings {
 				
 				String jsonString = "";
 				for(String line : lines){
+					
+					//correcting single backslash bug
+					if(line.contains("userpath"))
+					{
+						line = line.replace("\\", "/");
+					}
+					
 					jsonString += line;
 				}
 				
@@ -167,10 +185,9 @@ public class Settings {
 		}
 		catch(Exception e)
 		{
-			//STOP
-			System.out.println("Error while reading/creating settings.json " + file.getAbsolutePath());
-			e.printStackTrace();
-			System.exit(0);
+			LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
+			LOGGER.error(e.getMessage(),e);
+			settingsJSON =	new JSONObject();
 		}
 		
 		//TRY READ PEERS.JSON
@@ -199,16 +216,20 @@ public class Settings {
 		}
 		catch(Exception e)
 		{
-			//STOP
-			System.out.println("Error while reading peers.json " + file.getAbsolutePath());
-			e.printStackTrace();
-			System.exit(0);
+			LOGGER.info("Error while reading peers.json " + file.getAbsolutePath() + " using default!");
+			LOGGER.error(e.getMessage(),e);
+			this.peersJSON = new JSONObject();
 		}
 	}
 	
 	public JSONObject Dump()
 	{
 		return (JSONObject) settingsJSON.clone();
+	}
+	
+	public void setDefaultPeers(String[] peers)
+	{
+		this.defaultPeers = peers;
 	}
 	
 	public String getSettingsPath()
@@ -261,7 +282,7 @@ public class Settings {
 				NTP.getTime() - Controller.getInstance().getToOfflineTime() > 5*60*1000
 				);
 			
-			List<Peer> knownPeers = new ArrayList<Peer>();
+			List<Peer> knownPeers = new ArrayList<>();
 			JSONArray peersArray = new JSONArray();
 	
 			try {
@@ -276,7 +297,8 @@ public class Settings {
 					}
 				}
 			} catch (Exception e) {
-				Logger.getGlobal().info("Error with loading knownpeers from settings.json.");
+				LOGGER.error(e.getMessage(),e);
+				LOGGER.info("Error with loading knownpeers from settings.json.");
 			}
 			
 			try {
@@ -292,20 +314,24 @@ public class Settings {
 				}
 				
 			} catch (Exception e) {
-				Logger.getGlobal().info("Error with loading knownpeers from peers.json.");
+				LOGGER.error(e.getMessage(),e);
+				LOGGER.info("Error with loading knownpeers from peers.json.");
 			}
 			
-			knownPeers = getKnownPeersFromJSONArray(peersArray);
+			knownPeers.addAll(this.getPeersFromDefault());
+			
+			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 			
 			if(knownPeers.size() == 0 || loadPeersFromInternet)
 			{
-				knownPeers = getKnownPeersFromInternet();
+				knownPeers.addAll(getKnownPeersFromInternet());
 			}
-				
+			
 			return knownPeers;
 		
 		} catch (Exception e) {
-			Logger.getGlobal().info("Error in getKnownPeers().");
+			LOGGER.error(e.getMessage(),e);
+			LOGGER.info("Error in getKnownPeers().");
 			return new ArrayList<Peer>();
 		}
 	}
@@ -332,31 +358,52 @@ public class Settings {
 				}
 			}
 		
-			Logger.getGlobal().info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
+			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
 
 			return this.cacheInternetPeers;
 			
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
-			Logger.getGlobal().info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
+			LOGGER.debug(e.getMessage(),e);
+			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 						
 			return this.cacheInternetPeers;
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	public List<Peer> getPeersFromDefault()
+	{
+		List<Peer> peers = new ArrayList<Peer>();
+		for(int i=0; i<this.defaultPeers.length; i++)
+		{
+			try
+			{
+				InetAddress address = InetAddress.getByName(this.defaultPeers[i]);
+				
+				if(!this.isLocalAddress(address))
+				{
+					//CREATE PEER
+					Peer peer = new Peer(address);
+								
+					//ADD TO LIST
+					peers.add(peer);
+				}
+			}catch(Exception e)
+			{
+				LOGGER.debug(e.getMessage(),e);
+				LOGGER.info(this.defaultPeers[i] + " - invalid peer address!");
+			}
+		}
+		return peers;
+	}
+	
 	public List<Peer> getKnownPeersFromJSONArray(JSONArray peersArray)
 	{
 		try
 		{
-			//GET PEERS FROM JSON
-			
-			if(peersArray.isEmpty())
-				peersArray.addAll(Arrays.asList(DEFAULT_PEERS));
-				
 			//CREATE LIST WITH PEERS
-			List<Peer> peers = new ArrayList<Peer>();
+			List<Peer> peers = new ArrayList<>();
 			
 			for(int i=0; i<peersArray.size(); i++)
 			{
@@ -374,7 +421,8 @@ public class Settings {
 					}
 				}catch(Exception e)
 				{
-					Logger.getGlobal().info((String) peersArray.get(i) + " - invalid peer address!");
+					LOGGER.debug(e.getMessage(),e);
+					LOGGER.info((String) peersArray.get(i) + " - invalid peer address!");
 				}
 			}
 			
@@ -602,7 +650,7 @@ public class Settings {
 				return ((Boolean) this.settingsJSON.get("forging")).booleanValue();
 			}
 		} catch (Exception e) {
-			System.err.println("Bad Settings.json content for parameter forging " + ExceptionUtils.getStackTrace(e));
+			LOGGER.error("Bad Settings.json content for parameter forging " + ExceptionUtils.getStackTrace(e));
 		}
 		
 		return DEFAULT_FORGING_ENABLED;
@@ -769,7 +817,7 @@ public class Settings {
                 }
             }
         } catch (SocketException e) {
-            System.out.println("unable to get current IP " + e.getMessage());
+            LOGGER.info("unable to get current IP " + e.getMessage());
         }
 		return null;
     }

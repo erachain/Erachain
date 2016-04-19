@@ -11,7 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.NameSalesTableModel;
 import lang.Lang;
 
@@ -26,8 +26,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import core.naming.NameSale;
 import database.NameExchangeMap;
-import qora.naming.NameSale;
 
 @SuppressWarnings("serial")
 public class AllNameSalesPanel extends JPanel {
@@ -80,7 +80,7 @@ public class AllNameSalesPanel extends JPanel {
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(NameSalesTableModel.COLUMN_NAME, NameExchangeMap.DEFAULT_INDEX);
 		indexes.put(NameSalesTableModel.COLUMN_PRICE, NameExchangeMap.AMOUNT_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(this.nameSalesTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.nameSalesTableModel, indexes);
 		nameSalesTable.setRowSorter(sorter);
 		
 		//CREATE SEARCH FIELD
@@ -142,7 +142,7 @@ public class AllNameSalesPanel extends JPanel {
 			}
 		});
 
-		this.add(new JLabel(Lang.getInstance().translate("search:")), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 		this.add(new JScrollPane(nameSalesTable), tableGBC);
 	}

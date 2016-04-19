@@ -20,7 +20,7 @@ import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
 
-import qora.assets.Order;
+import core.item.assets.Order;
 import utils.ObserverMessage;
 import database.DBSet;
 import database.serializer.OrderSerializer;

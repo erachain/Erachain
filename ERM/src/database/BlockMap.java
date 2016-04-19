@@ -1,5 +1,5 @@
 package database;
-// 16/03
+// 30/03
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +14,11 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
-import org.mapdb.Serializer;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import core.block.Block;
 import database.serializer.BlockSerializer;
-import qora.block.Block;
 import utils.Converter;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
@@ -47,26 +46,11 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BLOCK_TYPE);
 		
 		//LAST BLOCK
-		if(database.exists("lastBlock"))
-		{
-			this.lastBlockVar = database.getAtomicVar("lastBlock");
-		}
-		else
-		{
-			this.lastBlockVar = database.createAtomicVar("lastBlock", new byte[0], Serializer.BYTE_ARRAY);
-		}
+		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
 		
 		//PROCESSING
-		if(database.exists("processingBlock"))
-		{
-			this.processingVar = database.getAtomicVar("processingBlock");
-		}
-		else
-		{
-			this.processingVar = database.createAtomicVar("processingBlock", false, Serializer.BOOLEAN);
-		}
-		
+		this.processingVar = database.getAtomicVar("processingBlock");
 		this.processing = this.processingVar.get();
 	}
 

@@ -3,10 +3,10 @@ package network.message;
 
 import java.util.Arrays;
 
-import qora.block.Block;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+
+import core.block.Block;
 
 public class BlockMessage extends Message{
 

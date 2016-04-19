@@ -7,11 +7,11 @@ import java.util.Observer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import qora.web.NameStorageMap;
-import qora.web.OrphanNameStorageHelperMap;
-import qora.web.OrphanNameStorageMap;
-import qora.web.SharedPostsMap;
 import controller.Controller;
+import core.web.NameStorageMap;
+import core.web.OrphanNameStorageHelperMap;
+import core.web.OrphanNameStorageMap;
+import core.web.SharedPostsMap;
 import settings.Settings;
 import utils.ObserverMessage;
 
@@ -45,11 +45,21 @@ public class DBSet implements Observer, IDB {
 	private CancelSellNameMap cancelSellNameMap;
 	private PollMap pollMap;
 	private VoteOnPollMap voteOnPollMap;
-	private AssetMap assetMap;
+	private ItemAssetMap assetMap;
 	private IssueAssetMap issueAssetMap;
 	private OrderMap orderMap;
 	private CompletedOrderMap completedOrderMap;
 	private TradeMap tradeMap;
+	private ItemStatusMap statusMap;
+	private IssueStatusMap issueStatusMap;
+	private ItemImprintMap imprintMap;
+	private IssueImprintMap issueImprintMap;
+	private ItemNoteMap noteMap;
+	private IssueNoteMap issueNoteMap;
+	private ItemPersonMap personMap;
+	private IssuePersonMap issuePersonMap;
+	private ItemUnionMap unionMap;
+	private IssueUnionMap issueUnionMap;
 	private ATMap atMap;
 	private ATStateMap atStateMap;
 	private ATTransactionMap atTransactionMap;
@@ -126,11 +136,21 @@ public class DBSet implements Observer, IDB {
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
 			this.pollMap = new PollMap(this, database);
 			this.voteOnPollMap = new VoteOnPollMap(this, database);
-			this.assetMap = new AssetMap(this, database);
+			this.assetMap = new ItemAssetMap(this, database);
 			this.issueAssetMap = new IssueAssetMap(this, database);
 			this.orderMap = new OrderMap(this, database);
 			this.completedOrderMap = new CompletedOrderMap(this, database);
 			this.tradeMap = new TradeMap(this, database);
+			this.imprintMap = new ItemImprintMap(this, database);
+			this.issueImprintMap = new IssueImprintMap(this, database);
+			this.noteMap = new ItemNoteMap(this, database);
+			this.issueNoteMap = new IssueNoteMap(this, database);
+			this.personMap = new ItemPersonMap(this, database);
+			this.issuePersonMap = new IssuePersonMap(this, database);
+			this.statusMap = new ItemStatusMap(this, database);
+			this.issueStatusMap = new IssueStatusMap(this, database);
+			this.unionMap = new ItemUnionMap(this, database);
+			this.issueUnionMap = new IssueUnionMap(this, database);
 			this.atMap = new ATMap(this,database);
 			this.atStateMap = new ATStateMap(this,database);
 			this.atTransactionMap = new ATTransactionMap(this,database);
@@ -168,11 +188,21 @@ public class DBSet implements Observer, IDB {
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
 		this.pollMap = new PollMap(parent.pollMap);
 		this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
-		this.assetMap = new AssetMap(parent.assetMap);
+		this.assetMap = new ItemAssetMap(parent.assetMap);
 		this.issueAssetMap = new IssueAssetMap(parent.issueAssetMap);
 		this.orderMap = new OrderMap(parent.orderMap);
 		this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap);
 		this.tradeMap = new TradeMap(parent.tradeMap);
+		this.imprintMap = new ItemImprintMap(parent.imprintMap);
+		this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
+		this.noteMap = new ItemNoteMap(parent.noteMap);
+		this.issueNoteMap = new IssueNoteMap(parent.issueNoteMap);
+		this.personMap = new ItemPersonMap(parent.personMap);
+		this.issuePersonMap = new IssuePersonMap(parent.issuePersonMap);
+		this.statusMap = new ItemStatusMap(parent.statusMap);
+		this.issueStatusMap = new IssueStatusMap(parent.issueStatusMap);
+		this.unionMap = new ItemUnionMap(parent.unionMap);
+		this.issueUnionMap = new IssueUnionMap(parent.issueUnionMap);
 		this.atMap = new ATMap(parent.atMap);
 		this.atStateMap = new ATStateMap(parent.atStateMap);
 		this.atTransactionMap = new ATTransactionMap(parent.atTransactionMap);
@@ -208,6 +238,16 @@ public class DBSet implements Observer, IDB {
 		this.completedOrderMap.reset();
 		this.issueAssetMap.reset();
 		this.assetMap.reset();
+		this.issueImprintMap.reset();
+		this.imprintMap.reset();
+		this.issueNoteMap.reset();
+		this.noteMap.reset();
+		this.issuePersonMap.reset();
+		this.personMap.reset();
+		this.issueStatusMap.reset();
+		this.statusMap.reset();
+		this.issueUnionMap.reset();
+		this.unionMap.reset();
 		this.atMap.reset();
 		this.atStateMap.reset();
 		this.atTransactionMap.reset();
@@ -332,7 +372,7 @@ public class DBSet implements Observer, IDB {
 		return this.voteOnPollMap;
 	}
 	
-	public AssetMap getAssetMap()
+	public ItemAssetMap getAssetMap()
 	{
 		return this.assetMap;
 	}
@@ -355,6 +395,46 @@ public class DBSet implements Observer, IDB {
 	public TradeMap getTradeMap()
 	{
 		return this.tradeMap;
+	}
+	public ItemImprintMap getImprintMap()
+	{
+		return this.imprintMap;
+	}	
+	public IssueImprintMap getIssueImprintMap()
+	{
+		return this.issueImprintMap;
+	}
+	public ItemNoteMap getNoteMap()
+	{
+		return this.noteMap;
+	}	
+	public IssueNoteMap getIssueNoteMap()
+	{
+		return this.issueNoteMap;
+	}
+	public ItemPersonMap getPersonMap()
+	{
+		return this.personMap;
+	}
+	public IssuePersonMap getIssuePersonMap()
+	{
+		return this.issuePersonMap;
+	}
+	public ItemStatusMap getStatusMap()
+	{
+		return this.statusMap;
+	}	
+	public IssueStatusMap getIssueStatusMap()
+	{
+		return this.issueStatusMap;
+	}
+	public ItemUnionMap getUnionMap()
+	{
+		return this.unionMap;
+	}	
+	public IssueUnionMap getIssueUnionMap()
+	{
+		return this.issueUnionMap;
 	}
 
 	public ATMap getATMap()

@@ -20,10 +20,10 @@ public class MainFrame extends JFrame{
 	public MainFrame()
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora"));
+		super(Lang.getInstance().translate("DATACHAINS.world"));
 		
 		if(Settings.getInstance().isTestnet()) {
-			setTitle(Lang.getInstance().translate("Qora TestNet ") + Settings.getInstance().getGenesisStamp());
+			setTitle(Lang.getInstance().translate("DATACHAINS.world TestNet ") + Settings.getInstance().getGenesisStamp());
 		}
 		
 		//ICON

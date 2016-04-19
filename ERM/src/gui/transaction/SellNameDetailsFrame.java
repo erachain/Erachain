@@ -14,9 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.SellNameTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.SellNameTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -25,7 +25,7 @@ public class SellNameDetailsFrame extends JFrame
 {
 	public SellNameDetailsFrame(SellNameTransaction nameSale)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -63,7 +63,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL TYPE
 		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -73,7 +73,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -85,7 +85,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -97,7 +97,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL TIMESTAMP
 		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -109,7 +109,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL REGISTRANT
 		labelGBC.gridy = 4;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Seller:"));
+		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Seller") + ":");
 		this.add(registrantLabel, labelGBC);
 		
 		//REGISTRANT
@@ -121,7 +121,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 5;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -133,7 +133,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL PRICE
 		labelGBC.gridy = 6;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price:"));
+		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
 		this.add(priceLabel, labelGBC);
 				
 		//PRICE
@@ -145,7 +145,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL FEE
 		labelGBC.gridy = 7;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -157,7 +157,7 @@ public class SellNameDetailsFrame extends JFrame
 		
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 8;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

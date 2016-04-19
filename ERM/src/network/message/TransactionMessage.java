@@ -1,9 +1,9 @@
 package network.message;
 
-import qora.transaction.Transaction;
-import qora.transaction.TransactionFactory;
-
 import com.google.common.primitives.Bytes;
+
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 
 public class TransactionMessage extends Message{
 
@@ -24,7 +24,7 @@ public class TransactionMessage extends Message{
 	public static TransactionMessage parse(byte[] data) throws Exception
 	{
 		//PARSE TRANSACTION
-		Transaction transaction = TransactionFactory.getInstance().parse(data);
+		Transaction transaction = TransactionFactory.getInstance().parse(data, null);
 		
 		return new TransactionMessage(transaction);
 	}
@@ -34,7 +34,7 @@ public class TransactionMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.transaction.toBytes(true);
+		byte[] blockBytes = this.transaction.toBytes(true, null);
 		data = Bytes.concat(data, blockBytes);
 		
 		//ADD CHECKSUM
@@ -45,7 +45,7 @@ public class TransactionMessage extends Message{
 	
 	protected int getDataLength()
 	{
-		return this.transaction.getDataLength();
+		return this.transaction.getDataLength(false);
 	}
 	
 }

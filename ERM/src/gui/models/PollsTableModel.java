@@ -4,8 +4,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.assets.Asset;
-import qora.voting.Poll;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.DBSet;
@@ -13,12 +13,12 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class PollsTableModel extends QoraTableModel<String, Poll> implements Observer
+public class PollsTableModel extends TableModelCls<String, Poll> implements Observer
 {
 	public static final int COLUMN_NAME = 0;
 	private static final int COLUMN_CREATOR = 1;
 	public static final int COLUMN_VOTES = 2;
-	private Asset asset;
+	private AssetCls asset;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes"});
 	private SortableList<String, Poll> polls;
@@ -29,7 +29,7 @@ public class PollsTableModel extends QoraTableModel<String, Poll> implements Obs
 		Controller.getInstance().addObserver(this);
 	}
 	
-	public void setAsset(Asset asset) 
+	public void setAsset(AssetCls asset) 
 	{
 		this.asset = asset;
 		this.fireTableDataChanged();

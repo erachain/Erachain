@@ -2,25 +2,27 @@ package gui.transaction;
 
 import javax.swing.JFrame;
 
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.BuyNameTransaction;
-import qora.transaction.CancelOrderTransaction;
-import qora.transaction.CancelSellNameTransaction;
-import qora.transaction.CreateOrderTransaction;
-import qora.transaction.CreatePollTransaction;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.GenesisIssueAssetTransaction;
-import qora.transaction.GenesisTransferAssetTransaction;
-import qora.transaction.IssueAssetTransaction;
-import qora.transaction.MessageTransaction;
-import qora.transaction.MultiPaymentTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.RegisterNameTransaction;
-import qora.transaction.SellNameTransaction;
-import qora.transaction.Transaction;
-import qora.transaction.TransferAssetTransaction;
-import qora.transaction.UpdateNameTransaction;
-import qora.transaction.VoteOnPollTransaction;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisTransaction;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.MessageTransaction;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.R_SignNote;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransferAssetTransaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnPollTransaction;
 
 public class TransactionDetailsFactory 
 {
@@ -41,6 +43,11 @@ public class TransactionDetailsFactory
 		switch(transaction.getType())
 		{
 		
+		case Transaction.SIGN_NOTE_TRANSACTION:
+			
+			R_SignNote statement = (R_SignNote) transaction;
+			return new RecStatementDetailsFrame(statement);
+
 		case Transaction.PAYMENT_TRANSACTION:
 		
 			PaymentTransaction payment = (PaymentTransaction) transaction;
@@ -91,7 +98,7 @@ public class TransactionDetailsFactory
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) transaction;
 			return new IssueAssetDetailsFrame(issueAssetTransaction);	
 			
-		case Transaction.TRANSFER_ASSET_TRANSACTION:
+		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
 			
 			TransferAssetTransaction transferAssetTransaction = (TransferAssetTransaction) transaction;
 			return new TransferAssetDetailsFrame(transferAssetTransaction);		
@@ -111,7 +118,7 @@ public class TransactionDetailsFactory
 			MultiPaymentTransaction MultiPaymentTransaction = (MultiPaymentTransaction) transaction;
 			return new MultiPaymentDetailsFrame(MultiPaymentTransaction);
 
-		case Transaction.MESSAGE_TRANSACTION:
+		case Transaction.SEND_ASSET_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
 		/*
@@ -123,11 +130,16 @@ public class TransactionDetailsFactory
 			JsonTransaction json1Transaction = (JsonTransaction)transaction;
 			return new Json1TransactionDetailsFrame(json1Transaction);
 		*/
-		case Transaction.GENESIS_TRANSFER_ASSET_TRANSACTION:
+		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
 			return new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);		
 			
+		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+			
+			GenesisIssueNoteTransaction genesisIssueNoteTransaction = (GenesisIssueNoteTransaction) transaction;
+			return new GenesisIssueNoteDetailsFrame(genesisIssueNoteTransaction);	
+
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			GenesisIssueAssetTransaction genesisIssueAssetTransaction = (GenesisIssueAssetTransaction) transaction;

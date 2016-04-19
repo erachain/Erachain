@@ -7,19 +7,22 @@ import java.util.List;
 import org.junit.Test;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
 import gui.transaction.ArbitraryTransactionDetailsFrame;
 import gui.transaction.MessageTransactionDetailsFrame;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.transaction.ArbitraryTransactionV3;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
+import ntp.NTP;
 
 public class txWindowTest {
 
+	byte FEE_POWER = 0;
+	
 	@Test
 	public void windowTest() {
 		
@@ -46,10 +49,11 @@ public class txWindowTest {
 		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
 		
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
-				creator, payments, 111, data,
-				//BigDecimal.valueOf(1).setScale(8), 
-				Transaction.getPOWFIX_RELEASE(),
-				//new byte[]{0},
+				creator, payments, 111,
+				data,
+				FEE_POWER, 
+				//Transaction.getPOWFIX_RELEASE(),
+				NTP.getTime(),
 				new byte[]{0}
 				);
 		

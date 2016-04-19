@@ -9,20 +9,23 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
 import lang.Lang;
 
 @SuppressWarnings("serial")
 public class ClosingDialog extends JFrame{
 
+	private static final Logger LOGGER = Logger.getLogger(ClosingDialog.class);
 	private JDialog waitDialog;
 	
 	public ClosingDialog()
 	{
 		try {
 			Gui.getInstance().hideMainFrame();
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		//CREATE WAIT DIALOG

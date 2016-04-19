@@ -11,7 +11,7 @@ import javax.swing.ListCellRenderer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
-import qora.assets.Asset;
+import core.item.assets.AssetCls;
 import utils.NumberAsString;
 import utils.Pair;
 
@@ -30,7 +30,7 @@ public class BalanceRenderer implements ListCellRenderer<Pair<Tuple2<String, Lon
 		
 		if(value != null)
 		{
-			Asset asset = Controller.getInstance().getAsset(value.getA().b);		
+			AssetCls asset = Controller.getInstance().getAsset(value.getA().b);		
 			renderer.setText("(" + asset.getKey() + ") " + asset.getName() + " - " + NumberAsString.getInstance().numberAsString(value.getB()));
 		}
 		

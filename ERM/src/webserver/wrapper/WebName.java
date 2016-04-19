@@ -1,6 +1,6 @@
 package webserver.wrapper;
 
-import qora.naming.Name;
+import core.naming.Name;
 import utils.NumberAsString;
 
 /**

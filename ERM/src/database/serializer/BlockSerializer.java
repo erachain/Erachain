@@ -5,14 +5,16 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Serializer;
 
-import qora.block.Block;
-import qora.block.BlockFactory;
+import core.block.Block;
+import core.block.BlockFactory;
 
 public class BlockSerializer implements Serializer<Block>, Serializable
 {
 	private static final long serialVersionUID = -6538913048331349777L;
+	static Logger LOGGER = Logger.getLogger(BlockSerializer.class.getName());
 
 	@Override
 	public void serialize(DataOutput out, Block value) throws IOException 
@@ -33,7 +35,7 @@ public class BlockSerializer implements Serializer<Block>, Serializable
 		} 
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	LOGGER.error(e.getMessage(),e);
 		}
 		return null;
     }

@@ -12,15 +12,15 @@ import javax.ws.rs.core.MediaType;
 
 import org.json.simple.JSONArray;
 
-import qora.BlockGenerator;
-import qora.account.Account;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
 import utils.APIUtils;
 import utils.Pair;
 import controller.Controller;
+import core.BlockGenerator;
+import core.account.Account;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import database.DBSet;
 
 @Path("blocks")

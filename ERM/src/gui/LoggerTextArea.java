@@ -3,6 +3,7 @@ package gui;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
 import java.util.logging.SimpleFormatter;
 
 import javax.swing.JTextArea;
@@ -10,6 +11,7 @@ import javax.swing.text.BadLocationException;
 
 @SuppressWarnings("serial")
 public class LoggerTextArea extends JTextArea {
+	
 	
 	private Handler handler;
 	private Logger logger;
@@ -56,7 +58,7 @@ public class LoggerTextArea extends JTextArea {
 class TextComponentHandler extends Handler 
 {
 	private final JTextArea text;
-	   
+	private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(LoggerTextArea.class);
 	TextComponentHandler(JTextArea text)
 	{
 		this.text = text;
@@ -83,7 +85,7 @@ class TextComponentHandler extends Handler
 					} 
 					catch (BadLocationException e) 
 					{
-						e.printStackTrace();
+						LOGGER.error(e.getMessage(),e);
 					}
 					
 				}

@@ -17,12 +17,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
-import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
+import core.transaction.Transaction;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -56,7 +56,7 @@ public class ArbitraryTransactionsResource
 				lgAsset = ((Long) jsonObject.get("asset")).intValue();
 			}
 			
-			Asset defaultAsset;
+			AssetCls defaultAsset;
 
 			try {
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));

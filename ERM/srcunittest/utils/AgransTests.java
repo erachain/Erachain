@@ -10,17 +10,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.junit.Test;
 
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.crypto.Base64;
+import core.crypto.Crypto;
 import network.Peer;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.crypto.Base64;
-import qora.crypto.Crypto;
 
 public class AgransTests {
+	
+	static Logger LOGGER = Logger.getLogger(AgransTests.class.getName());
 
 	@Test
 	public void testLinkedHashMap() throws UnknownHostException 
@@ -33,22 +36,22 @@ public class AgransTests {
 		
 		peerHeight.put(peer2, 1);
 		
-		System.out.println(peerHeight.toString());
+		LOGGER.error(peerHeight.toString());
 
 		peerHeight.remove(peer2);
 		peerHeight.remove(peer1);
 		
-		System.out.println("peer1 "+peerHeight.get(peer1));
+		LOGGER.error("peer1 "+peerHeight.get(peer1));
 		
-		System.out.println(peerHeight.toString());
+		LOGGER.error(peerHeight.toString());
 	}
 	
 	@Test
 	public void testBigDecimal() {
 		
-		System.out.println( BigDecimal.ONE.compareTo(BigDecimal.ZERO));
-		System.out.println( BigDecimal.ZERO.compareTo(BigDecimal.ONE));
-		System.out.println( BigDecimal.ONE.compareTo(BigDecimal.ONE));
+		LOGGER.error( BigDecimal.ONE.compareTo(BigDecimal.ZERO));
+		LOGGER.error( BigDecimal.ZERO.compareTo(BigDecimal.ONE));
+		LOGGER.error( BigDecimal.ONE.compareTo(BigDecimal.ONE));
 		
 	}
 
@@ -81,9 +84,9 @@ public class AgransTests {
         String str3 = bg3 + " after removing trailing zeros " +bg6.toPlainString();
 
         // print bg3, bg4 values
-        System.out.println( str1 );
-        System.out.println( str2 );
-        System.out.println( str3 );
+        LOGGER.error( str1 );
+        LOGGER.error( str2 );
+        LOGGER.error( str3 );
     }
 	 
 	@Test
@@ -92,7 +95,7 @@ public class AgransTests {
 		//wallet seed: AsF8sY23poJZro7to4ifXQyMzJQsVGFdDgkQd1uihnrg
 		//address seed: ETWEM8bdV2DQxjaS8p9qn9Q5556htaLXoZPc6Hz4Qo3j
 		
-		String text = "Test message. Rus:Тестовое сообщение.";
+		String text = "Test message. Rus:пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.";
 		
 		String signerSeed = "ETWEM8bdV2DQxjaS8p9qn9Q5556htaLXoZPc6Hz4Qo3j";
 		byte[] signerSeedByte = Base58.decode(signerSeed);
@@ -159,7 +162,7 @@ public class AgransTests {
 		
 		assertEquals(Crypto.getInstance().getAddress(recipientPublicKey), "QQQdEJ9xYHkBru1tCg2V7m2jPiHHcrJT4r");
 		
-		String StartMessage = "Test message. Rus:Тестовое сообщение.";
+		String StartMessage = "Test message. Rus:пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.";
 		
 		byte[] messageBytes;
 		
@@ -170,7 +173,7 @@ public class AgransTests {
 		try {
 			messageBytes = AEScrypto.dataDecrypt(messageBytes, recipientPrivateKey, senderPublicKey);
 		} catch (InvalidCipherTextException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 		
 		String EndMessage = new String( messageBytes, Charset.forName("UTF-8") );

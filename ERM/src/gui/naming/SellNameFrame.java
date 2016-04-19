@@ -21,16 +21,20 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
-import qora.account.PrivateKeyAccount;
-import qora.naming.Name;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.naming.Name;
+import core.transaction.Transaction;
 //import settings.Settings;
 import utils.Pair;
 
 @SuppressWarnings("serial")
 public class SellNameFrame extends JFrame
 {
+	static Logger LOGGER = Logger.getLogger(SellNameFrame.class.getName());
+
 	private JComboBox<Name> cbxName;
 	private JTextField txtOwner;
 	private JTextField txtPrice;
@@ -39,7 +43,7 @@ public class SellNameFrame extends JFrame
 	
 	public SellNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Sell Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -93,7 +97,7 @@ public class SellNameFrame extends JFrame
 		
 		//LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -116,7 +120,7 @@ public class SellNameFrame extends JFrame
         
         //LABEL OWNER
       	labelGBC.gridy = 2;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
       	this.add(ownerLabel, labelGBC);
       		
       	//TXT OWNER
@@ -127,7 +131,7 @@ public class SellNameFrame extends JFrame
         
       	//LABEL PRICE
       	labelGBC.gridy = 3;
-      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price:"));
+      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
       	this.add(priceLabel, labelGBC);
       	
       	//TXT PRICE
@@ -138,7 +142,7 @@ public class SellNameFrame extends JFrame
       	
         //LABEL FEE
       	labelGBC.gridy = 4;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -289,7 +293,7 @@ public class SellNameFrame extends JFrame
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			
 			//CHECK WHERE PARSING ERROR HAPPENED
 			switch(parsing)

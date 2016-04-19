@@ -20,15 +20,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
-import qora.voting.Poll;
-import qora.voting.PollOption;
 import utils.APIUtils;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.transaction.Transaction;
+import core.voting.Poll;
+import core.voting.PollOption;
 
 @Path("polls")
 @Produces(MediaType.APPLICATION_JSON)

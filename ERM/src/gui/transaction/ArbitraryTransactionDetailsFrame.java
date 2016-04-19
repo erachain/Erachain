@@ -20,11 +20,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
+import core.crypto.Base58;
+import core.transaction.ArbitraryTransaction;
 import gui.Gui;
 import gui.models.PaymentsTableModel;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.ArbitraryTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -34,7 +34,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 {
 	public ArbitraryTransactionDetailsFrame(ArbitraryTransaction arbitraryTransaction)
 	{
-		super(Lang.getInstance().translate("Qora")+" - "+Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world")+" - "+Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -74,7 +74,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL TYPE
 		labelGBC.gridy = componentLevel;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -86,7 +86,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL SIGNATURE
 		labelGBC.gridy = componentLevel;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -100,7 +100,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL REFERENCE
 		labelGBC.gridy = componentLevel;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -114,7 +114,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL TIMESTAMP
 		labelGBC.gridy = componentLevel;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -128,7 +128,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 		
 		//LABEL SENDER
 		labelGBC.gridy = componentLevel;
-		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator:"));
+		JLabel senderLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(senderLabel, labelGBC);
 		
 		//SENDER
@@ -142,7 +142,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 		
 		//LABEL SERVICE
 		labelGBC.gridy = componentLevel;
-		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Service ID:"));
+		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Service ID") + ":");
 		this.add(serviceLabel, labelGBC);
 		
 		//SERVICE
@@ -156,7 +156,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL DATA AS BASE58
 		labelGBC.gridy = componentLevel;
-		JLabel dataLabel = new JLabel(Lang.getInstance().translate("Data as Base58:"));
+		JLabel dataLabel = new JLabel(Lang.getInstance().translate("Data as Base58") + ":");
 		this.add(dataLabel, labelGBC);
 				
 		//DATA AS BASE58
@@ -178,7 +178,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL DATA AS TEXT
 		labelGBC.gridy = componentLevel;
-		JLabel dataTextLabel = new JLabel(Lang.getInstance().translate("Data as Text:"));
+		JLabel dataTextLabel = new JLabel(Lang.getInstance().translate("Data as Text") + ":");
 		this.add(dataTextLabel, labelGBC);
 		
 		//DATA AS TEXT
@@ -202,7 +202,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 			
 			//LABEL PAYMENTS
 			labelGBC.gridy = componentLevel;
-			JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments:"));
+			JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments") + ":");
 			this.add(paymentsLabel, labelGBC);
 			
 			//PAYMENTS
@@ -221,7 +221,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 		
 		//LABEL FEE
 		labelGBC.gridy = componentLevel;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -235,7 +235,7 @@ public class ArbitraryTransactionDetailsFrame extends JFrame
 
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = componentLevel;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

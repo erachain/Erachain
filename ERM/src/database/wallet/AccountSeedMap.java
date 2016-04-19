@@ -9,7 +9,7 @@ import org.mapdb.DB;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import qora.account.PrivateKeyAccount;
+import core.account.PrivateKeyAccount;
 
 public class AccountSeedMap {
 

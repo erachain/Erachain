@@ -1,6 +1,7 @@
 package gui.at;
 
 import gui.PasswordPane;
+import gui.items.assets.OrderPanel;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 
@@ -28,6 +29,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -35,16 +38,18 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Error;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.Converter;
 import utils.Pair;
 
 @SuppressWarnings("serial")
 public class DeployATFrame extends JFrame {
+	static Logger LOGGER = Logger.getLogger(DeployATFrame.class.getName());
+
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtFeePow;
 	private JTextField txtName;
@@ -65,7 +70,7 @@ public class DeployATFrame extends JFrame {
 
 	public DeployATFrame()
 	{
-		super(Lang.getInstance().translate("Qora")+" - "+Lang.getInstance().translate("Deploy AT Program"));
+		super(Lang.getInstance().translate("DATACHAINS.world")+" - "+Lang.getInstance().translate("Deploy AT Program"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -119,7 +124,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 
 		//COMBOBOX FROM
@@ -129,7 +134,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL NAME
 		labelGBC.gridy = 1;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 
 		//TXT NAME
@@ -139,7 +144,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 2;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 
 		//TXTAREA DESCRIPTION
@@ -151,7 +156,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL TYPE
 		labelGBC.gridy = 3;
-		JLabel typeBytesLabel = new JLabel(Lang.getInstance().translate("Type/Domain:"));
+		JLabel typeBytesLabel = new JLabel(Lang.getInstance().translate("Type/Domain") + ":");
 		this.add(typeBytesLabel, labelGBC);
 
 		//TXTAREA TYPE
@@ -162,7 +167,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL TAGS
 		labelGBC.gridy = 4;
-		JLabel tagsBytesLabel = new JLabel(Lang.getInstance().translate("Tags:"));
+		JLabel tagsBytesLabel = new JLabel(Lang.getInstance().translate("Tags") + ":");
 		this.add(tagsBytesLabel, labelGBC);
 
 		//TXTAREA TAGS
@@ -174,7 +179,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL CODE
 		labelGBC.gridy = 5;
-		JLabel codeBytesLabel = new JLabel(Lang.getInstance().translate("Code:"));
+		JLabel codeBytesLabel = new JLabel(Lang.getInstance().translate("Code") + ":");
 		this.add(codeBytesLabel, labelGBC);
 
 		//TXTAREA CODE
@@ -185,7 +190,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL DATA
 		labelGBC.gridy = 6;
-		JLabel dataBytesLabel = new JLabel(Lang.getInstance().translate("Data:"));
+		JLabel dataBytesLabel = new JLabel(Lang.getInstance().translate("Data") + ":");
 		this.add(dataBytesLabel, labelGBC);
 
 		//TXTAREA DESCRIPTION
@@ -196,7 +201,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL NAME
 		labelGBC.gridy = 7;
-		JLabel dPagesLabel = new JLabel(Lang.getInstance().translate("Data Pages:"));
+		JLabel dPagesLabel = new JLabel(Lang.getInstance().translate("Data Pages") + ":");
 		this.add(dPagesLabel, labelGBC);
 
 		//TXT NAME
@@ -206,7 +211,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL NAME
 		labelGBC.gridy = 8;
-		JLabel csPagesLabel = new JLabel(Lang.getInstance().translate("CS Pages:"));
+		JLabel csPagesLabel = new JLabel(Lang.getInstance().translate("CS Pages") + ":");
 		this.add(csPagesLabel, labelGBC);
 
 		//TXT NAME
@@ -216,7 +221,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL NAME
 		labelGBC.gridy = 9;
-		JLabel usPagesLabel = new JLabel(Lang.getInstance().translate("US Pages:"));
+		JLabel usPagesLabel = new JLabel(Lang.getInstance().translate("US Pages") + ":");
 		this.add(usPagesLabel, labelGBC);
 
 		//TXT NAME
@@ -226,7 +231,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL NAME
 		labelGBC.gridy = 10;
-		JLabel minActivationAmountLabel = new JLabel(Lang.getInstance().translate("Minimum Activation Amount:"));
+		JLabel minActivationAmountLabel = new JLabel(Lang.getInstance().translate("Minimum Activation Amount") + ":");
 		this.add(minActivationAmountLabel, labelGBC);
 
 		//TXT NAME
@@ -236,7 +241,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL QUANTITY
 		labelGBC.gridy = 11;
-		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity:"));
+		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
 		this.add(quantityLabel, labelGBC);
 
 		//TXT QUANTITY
@@ -247,7 +252,7 @@ public class DeployATFrame extends JFrame {
 
 		//LABEL FEE
 		labelGBC.gridy = 12;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
 		this.add(feeLabel, labelGBC);
 
 		//TXT FEE
@@ -435,10 +440,12 @@ public class DeployATFrame extends JFrame {
 			case Transaction.VALIDATE_OK:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT has been deployed!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
-				break;	
+				break;
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT will be enabled after %block% block!").replace("%block%", String.valueOf(Transaction.getAT_BLOCK_HEIGHT_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
+				*/
 			case Transaction.NOT_ENOUGH_FEE:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
@@ -489,7 +496,7 @@ public class DeployATFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown exception!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 			}
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 
 		//ENABLE

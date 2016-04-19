@@ -10,14 +10,19 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import qora.wallet.Wallet;
+import org.apache.log4j.Logger;
+
 import utils.ObserverMessage;
 import controller.Controller;
+import core.wallet.Wallet;
+import gui.settings.SettingsFrame;
 import lang.Lang;
 
 @SuppressWarnings("serial")
 public class WalletStatus extends JLabel implements Observer
 {
+	static Logger LOGGER = Logger.getLogger(WalletStatus.class.getName());
+
 	private ImageIcon unlockedIcon;
 	private ImageIcon lockedIcon;
 	
@@ -39,7 +44,7 @@ public class WalletStatus extends JLabel implements Observer
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
 

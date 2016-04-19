@@ -7,12 +7,12 @@ import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 
-import qora.transaction.Transaction;
-import qora.account.Account;
-import qora.assets.Asset;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -27,7 +27,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", "OILs"});
 	private List<Account> accounts;
-	private Asset asset = null;
+	private AssetCls asset = null;
 	
 	public AccountsTableModel()
 	{
@@ -41,7 +41,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		return accounts.get(row);
 	}
 	
-	public void setAsset(Asset asset) 
+	public void setAsset(AssetCls asset) 
 	{
 		this.asset = asset;
 		this.fireTableDataChanged();
@@ -116,7 +116,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 						subtract(account.getConfirmedBalance(this.asset.getKey())));
 			}
 		case COLUMN_OIL_BALANCE:
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.DIL_KEY));
 			
 			
 		/*	

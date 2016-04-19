@@ -13,11 +13,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.ToolTipManager;
 
-import qora.BlockGenerator;
-import qora.account.Account;
 import utils.GUIUtils;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.BlockGenerator;
+import core.account.Account;
 import lang.Lang;
 
 @SuppressWarnings("serial")

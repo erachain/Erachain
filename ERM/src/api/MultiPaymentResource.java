@@ -19,12 +19,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.crypto.Crypto;
-import qora.payment.Payment;
-import qora.transaction.Transaction;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.payment.Payment;
+import core.transaction.Transaction;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -55,7 +55,7 @@ public class MultiPaymentResource
 			}
 			String feePowStr = (String) jsonObject.get("feePow");
 			
-			Asset defaultAsset;
+			AssetCls defaultAsset;
 			try {
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));
 			} catch (Exception e) {
@@ -157,7 +157,7 @@ public class MultiPaymentResource
 		return jsonPaymentParser(jsonArray, Controller.getInstance().getAsset(0L));
 	}
 	
-	public static List<Payment> jsonPaymentParser(JSONArray jsonArray, Asset defaultAsset)
+	public static List<Payment> jsonPaymentParser(JSONArray jsonArray, AssetCls defaultAsset)
 	{
 		List<Payment> payments = new ArrayList<Payment>();
 		
@@ -176,7 +176,7 @@ public class MultiPaymentResource
 			}
 			Account paymentRecipient = new Account(jsonPayment.get("recipient").toString());
 			
-			Asset paymentAsset = defaultAsset;
+			AssetCls paymentAsset = defaultAsset;
 			if(jsonPayment.containsKey("asset")) {
 				try {
 					paymentAsset = Controller.getInstance().getAsset(new Long(jsonPayment.get("asset").toString()));

@@ -14,8 +14,8 @@ import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import qora.crypto.Base58;
 import at.AT_Constants;
+import core.crypto.Base58;
 
 //Integer -> blockHeight (f.e 0 -> 1000 -> 2000 if we keep state every 1000s blocks), byte[] -> atId , byte[] stateBytes
 public class ATStateMap extends DBMap< Tuple2<Integer, String> ,  byte[] > {

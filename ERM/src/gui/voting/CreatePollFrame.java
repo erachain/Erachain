@@ -30,13 +30,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class CreatePollFrame extends JFrame
@@ -50,7 +50,7 @@ public class CreatePollFrame extends JFrame
 
 	public CreatePollFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Create Poll"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Create Poll"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -104,7 +104,7 @@ public class CreatePollFrame extends JFrame
 		
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -114,7 +114,7 @@ public class CreatePollFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -124,7 +124,7 @@ public class CreatePollFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 2;
-      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
       	this.add(descriptionLabel, labelGBC);
       		
       	//TXTAREA NAME
@@ -136,7 +136,7 @@ public class CreatePollFrame extends JFrame
         
       	//LABEL OPTIONS
       	labelGBC.gridy = 3;
-      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options:"));
+      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
       	this.add(optionsLabel, labelGBC);
       	
       	//TABLE OPTIONS
@@ -168,7 +168,7 @@ public class CreatePollFrame extends JFrame
       	
         //LABEL FEE
       	labelGBC.gridy = 5;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -252,12 +252,13 @@ public class CreatePollFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll creation has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
 				break;	
-				
+
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Voting will be enabled at ") + DateTimeFormat.timestamptoString(Transaction.getVOTING_RELEASE()) + "!",  "Error", JOptionPane.ERROR_MESSAGE);
 				break;
-			
+				*/
 			case Transaction.NAME_NOT_LOWER_CASE:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be lower case!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

@@ -1,5 +1,5 @@
 package webserver;
-
+// 30/03
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -11,14 +11,14 @@ import java.util.TreeMap;
 
 import org.bouncycastle.util.encoders.Hex;
 
-import qora.account.Account;
-import qora.crypto.Base58;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
 import utils.Converter;
 import at.AT;
 import at.AT_API_Helper;
 import at.AT_Transaction;
+import core.account.Account;
+import core.crypto.Base58;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
 
 import com.google.common.collect.Lists;
 
@@ -53,7 +53,7 @@ public class ATWebResource {
 		Collection<String> ats = DBSet.getInstance().getATMap().getTypeATsList(type);
 		for (String at : ats)
 		{
-			String[] tags = DBSet.getInstance().getATMap().get(at).getTags().split(",");;
+			String[] tags = DBSet.getInstance().getATMap().get(at).getTags().split(",");
 			
 			for (String tag : tags)
 			{
@@ -215,7 +215,7 @@ public class ATWebResource {
 	
 	public List<Transaction> getMessageTransactions(String address)
 	{
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.MESSAGE_TRANSACTION, 50);
+		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.SEND_ASSET_TRANSACTION, 50);
 		return txs;
 		
 	}

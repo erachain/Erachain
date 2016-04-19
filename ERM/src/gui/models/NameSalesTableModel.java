@@ -5,7 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
-import qora.naming.NameSale;
+import core.naming.NameSale;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -14,7 +14,7 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class NameSalesTableModel extends QoraTableModel<String, BigDecimal> implements Observer
+public class NameSalesTableModel extends TableModelCls<String, BigDecimal> implements Observer
 {
 	public static final int COLUMN_NAME = 0;
 	private static final int COLUMN_OWNER = 1;

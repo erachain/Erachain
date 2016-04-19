@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.log4j.Logger;
+
 import settings.Settings;
 import utils.ObserverMessage;
 import controller.Controller;
@@ -28,6 +30,8 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 	
 	private String[] columnNames = {"IP", Lang.getInstance().translate("Connected now")};
 	
+	static Logger LOGGER = Logger.getLogger(KnownPeersTableModel.class.getName());
+
 	public List<String> getPeers()
 	{
 		List<String> peersstr= new ArrayList<String>(); 
@@ -49,7 +53,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 			this.fireTableDataChanged();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
 	

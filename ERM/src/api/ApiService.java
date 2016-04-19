@@ -20,7 +20,7 @@ public class ApiService {
 	{
 		//CREATE CONFIG
 		Set<Class<?>> s = new HashSet<Class<?>>();
-        s.add(QoraResource.class);     
+        s.add(CoreResource.class);     
         s.add(SeedResource.class);  
         s.add(PeersResource.class);    
         s.add(TransactionsResource.class);

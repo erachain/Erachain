@@ -39,17 +39,17 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
-import utils.Qorakeys;
+import utils.Corekeys;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class RegisterNameFrame extends JFrame
@@ -70,7 +70,7 @@ public class RegisterNameFrame extends JFrame
 	
 	public RegisterNameFrame()
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Register Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Register Name"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -124,7 +124,7 @@ public class RegisterNameFrame extends JFrame
 		
 		//LABEL FROM
 		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -134,7 +134,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -161,7 +161,7 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL RECEIVER DETAILS 
        	labelGBC.gridy = 2;
-       	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Name details:"));
+       	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Name details") + ":");
        	this.add(recDetailsLabel, labelGBC);
        		
        	//NAME DETAILS 
@@ -178,18 +178,18 @@ public class RegisterNameFrame extends JFrame
         
         //LABEL KEY
       	labelGBC.gridy = 3;
-      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key:"));
+      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
       	this.add(keyLabel, labelGBC);
       	
     	txtGBC.gridy = 3;
       	this.txtKey = new JTextField();
       	this.add(this.txtKey, txtGBC);
-      	txtKey.setText(Qorakeys.DEFAULT.toString());
+      	txtKey.setText(Corekeys.DEFAULT.toString());
       	
         
         //LABEL NAME
       	labelGBC.gridy = 5;
-      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
       	this.add(valueLabel, labelGBC);
       		
       	//TXTAREA NAME
@@ -315,7 +315,7 @@ public class RegisterNameFrame extends JFrame
 		//LABEL FEE
       	labelGBC.gridy = 9;
       	labelGBC.gridx = 0;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       	
       	//TXT FEE
@@ -373,7 +373,7 @@ public class RegisterNameFrame extends JFrame
 			});
 		
     	ArrayList<Pair<String, String>> list = new ArrayList<>();
-    	list.add(new Pair<String, String>(Qorakeys.DEFAULT.toString(), ""));
+    	list.add(new Pair<String, String>(Corekeys.DEFAULT.toString(), ""));
     	namesModel.setData(list);
     	namesTable.requestFocus();
 		namesTable.changeSelection(0,0,false, false);

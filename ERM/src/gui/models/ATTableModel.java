@@ -5,15 +5,15 @@ import java.util.Observer;
 
 import at.AT;
 import controller.Controller;
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class ATTableModel extends QoraTableModel<Long, AT> implements Observer
+public class ATTableModel extends TableModelCls<Long, AT> implements Observer
 {
 	public static final int COLUMN_TYPE = 0;
 	public static final int COLUMN_ADDRESS = 1;

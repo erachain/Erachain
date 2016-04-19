@@ -7,11 +7,10 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import qora.block.Block;
-import qora.transaction.Transaction;
-
 import com.google.common.primitives.UnsignedBytes;
 
+import core.block.Block;
+import core.transaction.Transaction;
 import database.DBSet;
 
 public class TransactionParentMap extends DBMap<byte[], byte[]> 

@@ -16,21 +16,22 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import gui.models.AssetsAllComboBoxModel;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
+import gui.items.ComboBoxModelItemsAll;
 import lang.Lang;
-import qora.assets.Asset;
-import qora.voting.Poll;
 
 @SuppressWarnings("serial")
 public class PollFrame extends JFrame{
 
 	private PollTabPane PollTabPane;
-	private JComboBox<Asset> cbxAssets;
+	private JComboBox<ItemCls> cbxAssets;
 	
-	public PollFrame(Poll poll, Asset asset) 
+	public PollFrame(Poll poll, AssetCls asset) 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Poll Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Poll Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -74,16 +75,16 @@ public class PollFrame extends JFrame{
 		pollTabPaneGBC.gridx = 0;
 		pollTabPaneGBC.gridy = 2;
 		
-		this.add(new JLabel(Lang.getInstance().translate("Check:")), assetLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
 		
-		cbxAssets = new JComboBox<Asset>(new AssetsAllComboBoxModel());
+		cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
 		cbxAssets.setSelectedItem(asset);
 		this.add(cbxAssets, assetsGBC);
 		
 		cbxAssets.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 
-		    	Asset asset = ((Asset) cbxAssets.getSelectedItem());
+		    	AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
 
 		    	if(asset != null)
 		    	{

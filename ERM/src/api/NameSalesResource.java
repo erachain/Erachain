@@ -18,15 +18,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.naming.NameSale;
-import qora.transaction.Transaction;
 import utils.APIUtils;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.naming.NameSale;
+import core.transaction.Transaction;
 
 @Path("namesales")
 @Produces(MediaType.APPLICATION_JSON)

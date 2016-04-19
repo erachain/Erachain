@@ -1,5 +1,5 @@
 package api;
-
+// 30/03
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,32 +32,32 @@ public class ApiClient {
 	String[] [] helpStrings =
 		{
 			{
-				"GET qora/stop", 
+				"GET core/stop", 
 				"Will stop the application. This command might not be able to return a http OK message.",
 				""
 			},
 			{
-				"GET qora/status", 
+				"GET core/status", 
 				"Returns the status of the application.",
 				"0 - No connections. 1 - Synchronizing 2 - OK"
 			},
 			{
-				"GET qora/status/forging",
+				"GET core/status/forging",
 				"Returns the status of the forging process.",
 				"0 - Forging disabled. 1 - Forging enabled 2 - Forging"
 			},
 			{
-				"GET qora/isuptodate", 
+				"GET core/isuptodate", 
 				"Shows if the application is synchronized with the network.",
 				""
 			},
 			{
-				"GET qora/settings", 
+				"GET core/settings", 
 				"Shows settings.",
 				""
 			},
 			{
-				"GET qora/version",
+				"GET core/version",
 				"Returns the version and buildtime of the running client.",
 				""
 			},
@@ -97,6 +97,11 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET peers/preset",
+				"Returns an array of all preset peers. From settings.json, peers.json, Internet, -peers=<address[,...]>",
+				""
+			},
+			{
 				"DELETE peers/known",
 				"Forget all known peers with all statistics.",
 				""
@@ -129,6 +134,11 @@ public class ApiClient {
 			{
 				"GET transactions/network", 
 				"Returns an array of all the unconfirmed transactions known to the client.",
+				""
+			},
+			{
+				"GET transactions/unconfirmedof/<address>", 
+				"Returns an array of all the unconfirmed transactions of address known to the client.",
 				""
 			},
 			{
@@ -333,12 +343,12 @@ public class ApiClient {
 			},
 			{
 				"POST payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
-				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 			{
 				"POST namepayment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipientName>\"}", 
-				"Send a new neme-payment using the given data. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new neme-payment using the given data. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked. 701 - The name is not registered. 702 -  Names for sale. 703 = Name with trailing or leading spaces."
 			},
 			{
@@ -348,8 +358,13 @@ public class ApiClient {
 			},
 			{
 				"GET names/address/<address>", 
-				"Returns an array of all the names owned by a specific address in your wallet.",
-				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
+				"Returns an array of all the names owned by a specific address.",
+				"Errors: 102 - Invalid address."
+			},
+			{
+				"GET names/address/<address>/values", 
+				"Returns an array of all the names with values owned by a specific address.",
+				"Errors: 102 - Invalid address."
 			},
 			{
 				"GET names/<name>", 
@@ -568,12 +583,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog",
-				"Equivalent to blog/posts/QORA",
+				"Equivalent to blog/posts/ERM",
 				""
 			},
 			{
 				"GET blog/posts/<blogname>",
-				"List posts to a blog by transaction signature. If <blogname> is omitted, QORA is provided.",
+				"List posts to a blog by transaction signature. If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -583,7 +598,7 @@ public class ApiClient {
 			},
 			{
 				"GET blog/entries/<blogname>",
-				"Returns the content of the entries for the blog.  If <blogname> is omitted, QORA is provided.",
+				"Returns the content of the entries for the blog.  If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -593,12 +608,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog/lastentry/<blogname>",
-				"Returns the content of the last entry of the blog.  If <blogname> is omitted, QORA is provided.",
+				"Returns the content of the last entry of the blog.  If <blogname> is omitted, ERM is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled. 906 - This blog is empty."
 			},
 			{
 				"POST multipayment {\"sender\":\"<sender>\", \"asset\":<defaultkey>, \"payments\": [{\"recipient\":\"<recipient 1>\", \"amount\": \"<amount 1>\", \"asset\":<key>},{\"recipient\":\"<recipient 2>\", \"amount\": \"<amount 2>\"}]}",
-				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: QORA).",
+				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 		};

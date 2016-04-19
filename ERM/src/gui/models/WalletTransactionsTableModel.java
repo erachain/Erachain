@@ -4,12 +4,9 @@ import java.awt.TrayIcon.MessageType;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
-import qora.transaction.MessageTransaction;
-import qora.transaction.PaymentTransaction;
-import qora.transaction.Transaction;
 import settings.Settings;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
@@ -18,13 +15,17 @@ import utils.Pair;
 import utils.PlaySound;
 import utils.SysTray;
 import controller.Controller;
+import core.account.Account;
+import core.transaction.MessageTransaction;
+import core.transaction.PaymentTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
 import database.wallet.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, String>, Transaction> implements Observer {
+public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 	
 	public static final int COLUMN_CONFIRMATIONS = 0;
 	public static final int COLUMN_TIMESTAMP = 1;
@@ -37,6 +38,8 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Amount", "Fee"});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
+
+	static Logger LOGGER = Logger.getLogger(WalletTransactionsTableModel.class.getName());
 
 	public WalletTransactionsTableModel()
 	{
@@ -105,7 +108,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 			case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.getName());
+				return Lang.getInstance().translate(transaction.getRecordType());
 				
 			case COLUMN_ADDRESS:
 				
@@ -129,7 +132,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 			return null;
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 		
@@ -195,7 +198,7 @@ public class WalletTransactionsTableModel extends QoraTableModel<Tuple2<String, 
 						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
 					}
 				}
-				else if(((Transaction) message.getValue()).getType() == Transaction.MESSAGE_TRANSACTION)
+				else if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
 				{
 					Account account = Controller.getInstance().getAccountByAddress(((MessageTransaction) message.getValue()).getRecipient().getAddress());	
 					if(account != null)

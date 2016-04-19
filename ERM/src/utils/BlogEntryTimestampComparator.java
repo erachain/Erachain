@@ -2,7 +2,7 @@ package utils;
 
 import java.util.Comparator;
 
-import qora.web.blog.BlogEntry;
+import core.web.blog.BlogEntry;
 
 public class BlogEntryTimestampComparator implements Comparator<BlogEntry> {
 

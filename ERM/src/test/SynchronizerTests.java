@@ -9,19 +9,22 @@ import java.util.List;
 
 import ntp.NTP;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import qora.BlockGenerator;
-import qora.Synchronizer;
-import qora.account.PrivateKeyAccount;
-import qora.block.Block;
-import qora.block.GenesisBlock;
-import qora.crypto.Crypto;
-import qora.transaction.GenesisTransaction;
-import qora.transaction.Transaction;
+import core.BlockGenerator;
+import core.Synchronizer;
+import core.account.PrivateKeyAccount;
+import core.block.Block;
+import core.block.GenesisBlock;
+import core.crypto.Crypto;
+import core.transaction.GenesisTransaction;
+import core.transaction.Transaction;
 import database.DBSet;
 
 public class SynchronizerTests {
+
+	static Logger LOGGER = Logger.getLogger(SynchronizerTests.class.getName());
 
 	@Test
 	public void synchronizeNoCommonBlock()
@@ -40,7 +43,7 @@ public class SynchronizerTests {
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		transaction.process(databaseSet, false);
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -72,7 +75,7 @@ public class SynchronizerTests {
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
+		transaction.process(databaseSet, false);
 		
 		//FORK
 		DBSet fork = databaseSet.fork();	
@@ -153,8 +156,8 @@ public class SynchronizerTests {
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
-		transaction.process(databaseSet2);
+		transaction.process(databaseSet, false);
+		transaction.process(databaseSet2, false);
 		
 		//CREATE KNOWN ACCOUNT 2
 		byte[] seed2 = Crypto.getInstance().digest("test2".getBytes());
@@ -163,8 +166,8 @@ public class SynchronizerTests {
 		
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR2 HAS FUNDS
 		transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet);
-		transaction.process(databaseSet2);
+		transaction.process(databaseSet, false);
+		transaction.process(databaseSet2, false);
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -231,7 +234,7 @@ public class SynchronizerTests {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(),e);
 			fail("Exception during synchronize");
 		}	
 	}	

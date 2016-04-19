@@ -102,7 +102,7 @@ public class AT_Machine_Processor{
 		{
 			fun.fun =  (machineData.getAp_code()).getShort( machineData.getMachineState().pc+1);
 			fun.addr1 =  (machineData.getAp_code()).getInt((machineData.getMachineState().pc+1+2));
-			//System.out.println("fun: "+fun.fun+" fun.addr1 :"+fun.addr1);
+			//System.out.println("fun: "+fun.fun+" fun.addr1 ") + ":+fun.addr1);
 			if (!validAddr(fun.addr1, false))
 				return -1;
 			else

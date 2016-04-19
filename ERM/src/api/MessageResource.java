@@ -17,14 +17,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Crypto;
+import core.naming.Name;
+import core.transaction.Transaction;
 import database.DBSet;
 import ntp.NTP;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Crypto;
-import qora.naming.Name;
-import qora.transaction.Transaction;
 import utils.APIUtils;
 import utils.Converter;
 import utils.Pair;
@@ -66,7 +66,8 @@ public class MessageResource {
 				assetKey = Long.valueOf(assetKeyString);
 			}
 			
-			if(assetKey != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
+			//if(assetKey != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
+			if (false)
 			{	
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_ASSET_ID);
@@ -160,7 +161,7 @@ public class MessageResource {
 				try {
 					messageBytes = Converter.parseHexString(message);
 				} catch (Exception e) {
-					LOGGER.error(e);
+					LOGGER.error(e.getMessage(),e);
 					throw ApiErrorFactory.getInstance().createError(
 							ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
 				}

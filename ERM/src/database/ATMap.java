@@ -12,10 +12,10 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
 import utils.ObserverMessage;
 import at.AT;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 
 import com.google.common.collect.Lists;
 

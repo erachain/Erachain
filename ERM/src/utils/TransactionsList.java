@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.transaction.Transaction;
 
 public class TransactionsList extends AbstractList<Transaction> 
 {

@@ -13,7 +13,7 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class ATTxsTableModel extends QoraTableModel<Tuple2<Integer, Integer>, AT_Transaction> implements Observer
+public class ATTxsTableModel extends TableModelCls<Tuple2<Integer, Integer>, AT_Transaction> implements Observer
 {
 	public static final int COLUMN_SENDER = 1;
 	public static final int COLUMN_RECIPIENT = 2;

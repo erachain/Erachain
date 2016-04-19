@@ -21,8 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
-import qora.crypto.Base58;
-import qora.transaction.MultiPaymentTransaction;
+import core.crypto.Base58;
+import core.transaction.MultiPaymentTransaction;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -33,7 +33,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 	@SuppressWarnings("unchecked")
 	public MultiPaymentDetailsFrame(MultiPaymentTransaction multiPayment)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -71,7 +71,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL TYPE
 		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -81,7 +81,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -93,7 +93,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -105,7 +105,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL TIMESTAMP
 		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -117,7 +117,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL CREATOR
 		labelGBC.gridy = 4;
-		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Sender:"));
+		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Sender") + ":");
 		this.add(creatorLabel, labelGBC);
 		
 		//CREATOR
@@ -129,7 +129,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 	
 		//LABEL PAYMENTS
 		labelGBC.gridy = 5;
-		JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments:"));
+		JLabel paymentsLabel = new JLabel(Lang.getInstance().translate("Payments") + ":");
 		this.add(paymentsLabel, labelGBC);
 		
 		//PAYMENTS
@@ -144,7 +144,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL FEE
 		labelGBC.gridy = 6;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -156,7 +156,7 @@ public class MultiPaymentDetailsFrame extends JFrame
 		
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 7;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

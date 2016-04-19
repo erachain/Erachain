@@ -5,12 +5,14 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+//import org.apache.log4j.Logger;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
+import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
 import gui.models.BlocksTableModel;
@@ -18,18 +20,20 @@ import gui.models.PeersTableModel;
 import gui.models.TransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
-import qora.transaction.Transaction;
 import settings.Settings;
 
 public class DebugTabPane extends JTabbedPane{
 
 	private static final long serialVersionUID = 2717571093561259483L;
+	static Logger LOGGER = Logger.getLogger(DebugTabPane.class.getName());
+
 
 	private PeersTableModel peersTableModel;
 	private TransactionsTableModel transactionsTableModel;
 	private BlocksTableModel blocksTableModel;
 	private LoggerTextArea loggerTextArea;
 	private JTable transactionsTable;
+	
 	
 	public DebugTabPane()
 	{
@@ -51,7 +55,7 @@ public class DebugTabPane extends JTabbedPane{
 		//TRANSACTIONS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(transactionsTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
 		transactionsTable.setRowSorter(sorter);
 		
 		//TRANSACTION DETAILS
@@ -84,13 +88,13 @@ public class DebugTabPane extends JTabbedPane{
 		//BLOCKS SORTER
 		indexes = new TreeMap<Integer, Integer>();
 		indexes.put(BlocksTableModel.COLUMN_HEIGHT, BlockMap.HEIGHT_INDEX);
-		sorter = new QoraRowSorter(blocksTableModel, indexes);
+		sorter = new CoreRowSorter(blocksTableModel, indexes);
 		blocksTable.setRowSorter(sorter);
 		
 		//ADD BLOCK TABLE
 		this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
 		
-        this.loggerTextArea = new LoggerTextArea(Logger.getGlobal());
+        this.loggerTextArea = new LoggerTextArea(LOGGER);
         JScrollPane scrollPane = new JScrollPane(this.loggerTextArea);
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());

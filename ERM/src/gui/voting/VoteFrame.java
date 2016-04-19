@@ -2,8 +2,8 @@ package gui.voting;
 
 import gui.AccountRenderer;
 import gui.PasswordPane;
+import gui.items.ComboBoxModelItemsAll;
 import gui.models.AccountsComboBoxModel;
-import gui.models.AssetsAllComboBoxModel;
 import gui.models.OptionsComboBoxModel;
 import lang.Lang;
 
@@ -32,15 +32,16 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.transaction.Transaction;
-import qora.voting.Poll;
-import qora.voting.PollOption;
 import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import core.voting.Poll;
+import core.voting.PollOption;
 
 @SuppressWarnings("serial")
 public class VoteFrame extends JFrame
@@ -50,11 +51,11 @@ public class VoteFrame extends JFrame
 	private JComboBox<PollOption> cbxOptions;
 	private JButton voteButton;
 	private JTextField txtFeePow;
-	private JComboBox<Asset> cbxAssets;
+	private JComboBox<ItemCls> cbxAssets;
 	
-	public VoteFrame(Poll poll, int option, Asset asset)
+	public VoteFrame(Poll poll, int option, AssetCls asset)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Vote"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Vote"));
 		
 		this.poll = poll;
 		
@@ -95,7 +96,7 @@ public class VoteFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 1;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Poll:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Poll") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -106,7 +107,7 @@ public class VoteFrame extends JFrame
 		
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 2;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
@@ -137,16 +138,16 @@ public class VoteFrame extends JFrame
 		assetsGBC.gridx = 1;
 		assetsGBC.gridy = 3;
 		
-		this.add(new JLabel(Lang.getInstance().translate("Check:")), assetLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
 		
-		cbxAssets = new JComboBox<Asset>(new AssetsAllComboBoxModel());
+		cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
 		cbxAssets.setSelectedItem(asset);
 		this.add(cbxAssets, assetsGBC);
 		
 		cbxAssets.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 
-		    	Asset asset = ((Asset) cbxAssets.getSelectedItem());
+		    	AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
 
 		    	if(asset != null)
 		    	{
@@ -160,7 +161,7 @@ public class VoteFrame extends JFrame
 		
         //LABEL ACCOUNT
       	labelGBC.gridy = 4;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Account:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
       	this.add(ownerLabel, labelGBC);
       		
       	//CBX ACCOUNT
@@ -172,7 +173,7 @@ public class VoteFrame extends JFrame
 		
       	//LABEL OPTIONS
       	labelGBC.gridy = 5;
-      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Option:"));
+      	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Option") + ":");
       	this.add(optionsLabel, labelGBC);
       		
       	//CBX ACCOUNT
@@ -189,7 +190,7 @@ public class VoteFrame extends JFrame
       	                                               boolean cellHasFocus) {
       	    	PollOption employee = (PollOption)value;
       	        
-      	    	Asset asset = ((Asset) cbxAssets.getSelectedItem());
+      	    	AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
       	    	
       	    	value = employee.toString(asset.getKey());
       	        return super.getListCellRendererComponent(list, value,
@@ -201,7 +202,7 @@ public class VoteFrame extends JFrame
       	
       	 //LABEL FEE
       	labelGBC.gridy = 6;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee(Qora):"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee(OIL)") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -287,11 +288,12 @@ public class VoteFrame extends JFrame
 				this.dispose();
 				break;	
 				
+				/*
 			case Transaction.NOT_YET_RELEASED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Voting will be enabled at ") + DateTimeFormat.timestamptoString(Transaction.getVOTING_RELEASE()) + "!",  "Error", JOptionPane.ERROR_MESSAGE);
 				break;
-			
+				*/
 			case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("You have already voted for that option!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

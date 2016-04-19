@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.RegisterNameTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.RegisterNameTransaction;
 import utils.DateTimeFormat;
 import utils.GZIP;
 import utils.MenuPopupUtil;
@@ -30,7 +30,7 @@ public class RegisterNameDetailsFrame extends JFrame
 {
 	public RegisterNameDetailsFrame(RegisterNameTransaction nameRegistration)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -68,7 +68,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL TYPE
 		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -78,7 +78,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -90,7 +90,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -102,7 +102,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL TIMESTAMP
 		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -114,7 +114,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL REGISTRANT
 		labelGBC.gridy = 4;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Registrant:"));
+		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Registrant") + ":");
 		this.add(registrantLabel, labelGBC);
 		
 		//REGISTRANT
@@ -126,37 +126,37 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL OWNER
 		labelGBC.gridy = 5;
-		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(ownerLabel, labelGBC);
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(nameRegistration.getAName().getOwner().getAddress());
+		JTextField owner = new JTextField(nameRegistration.getName().getOwner().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
 		
 		//LABEL NAME
 		labelGBC.gridy = 6;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(nameRegistration.getAName().getName());
+		JTextField name = new JTextField(nameRegistration.getName().getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
 		
 		//LABEL VALUE
 		labelGBC.gridy = 7;
-		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+		JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
 		this.add(valueLabel, labelGBC);
 				
 		//VALUE
 		detailGBC.gridy = 7;
 
-		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameRegistration.getAName().getValue()));
+		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameRegistration.getName().getValue()));
 		txtareaValue.setRows(10);
       	txtareaValue.setColumns(43);
       	txtareaValue.setEditable(false);
@@ -169,20 +169,20 @@ public class RegisterNameDetailsFrame extends JFrame
       	      	
       	//LABEL COMPRESSED
       	labelGBC.gridy = 8;
-      	JLabel compressedLabel = new JLabel(Lang.getInstance().translate("Compressed:"));
+      	JLabel compressedLabel = new JLabel(Lang.getInstance().translate("Compressed") + ":");
       	this.add(compressedLabel, labelGBC);
       		
   		//COMPRESSED
   		detailGBC.gridy = 8;
   		final JCheckBox compressed = new JCheckBox();
-  		compressed.setSelected(nameRegistration.getAName().getValue().startsWith("?gz!"));
+  		compressed.setSelected(nameRegistration.getName().getValue().startsWith("?gz!"));
   		compressed.setEnabled(false);
       	
   		this.add(compressed, detailGBC);		
 		
 		//LABEL FEE
 		labelGBC.gridy = 9;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		this.add(feeLabel, labelGBC);
 						
 		//FEE
@@ -194,7 +194,7 @@ public class RegisterNameDetailsFrame extends JFrame
 		
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 10;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

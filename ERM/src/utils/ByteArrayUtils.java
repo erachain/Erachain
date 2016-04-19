@@ -2,6 +2,7 @@ package utils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.nio.ByteBuffer;
 
 public class ByteArrayUtils {
 
@@ -35,5 +36,18 @@ public class ByteArrayUtils {
 
 		return i;
 	}
+	
+	public static byte[] long2ByteArray (long value)
+	{
+	    return ByteBuffer.allocate(8).putLong(value).array();
+	}
 
+	public static byte[] float2ByteArray (float value)
+	{  
+	     return ByteBuffer.allocate(4).putFloat(value).array();
+	}
+	public static float ByteArray2float (byte[] array)
+	{  
+	     return ByteBuffer.wrap(array).getFloat();
+	}
 }

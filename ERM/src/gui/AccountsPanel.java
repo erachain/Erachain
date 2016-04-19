@@ -1,7 +1,7 @@
 package gui;
 
+import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsTableModel;
-import gui.models.AssetsComboBoxModel;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -33,17 +33,17 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
 
-import qora.account.Account;
-import qora.assets.Asset;
 import utils.BigDecimalStringComparator;
 import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener
 {
-	private static JComboBox<Asset> cbxFavorites;
+	private static JComboBox<AssetCls> cbxFavorites;
 	private AccountsTableModel tableModel;
 
 	@SuppressWarnings("unchecked")
@@ -81,7 +81,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 		favoritesGBC.gridy = 0;	
 		
 		//ASSET FAVORITES
-		cbxFavorites = new JComboBox<Asset>(new AssetsComboBoxModel());
+		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
 		
 		//TABLE
@@ -210,9 +210,9 @@ public class AccountsPanel extends JPanel implements ItemListener
 		this.add(newButton, buttonGBC);
 	}
 	
-	public static Asset getAsset()
+	public static AssetCls getAsset()
 	{
-		return (Asset) cbxFavorites.getSelectedItem();
+		return (AssetCls) cbxFavorites.getSelectedItem();
 	}
 
 	public void onNewClick()
@@ -239,7 +239,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 	{
 		if(e.getStateChange() == ItemEvent.SELECTED) 
 		{		
-			Asset asset = (Asset) cbxFavorites.getSelectedItem();
+			AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
         	tableModel.setAsset(asset);  
 		} 
 	}

@@ -8,10 +8,9 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import qora.transaction.CancelSellNameTransaction;
-
 import com.google.common.primitives.UnsignedBytes;
 
+import core.transaction.CancelSellNameTransaction;
 import database.DBSet;
 
 public class CancelSellNameMap extends DBMap<byte[], BigDecimal> 

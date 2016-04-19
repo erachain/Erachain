@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
+import core.account.Account;
 import utils.APIUtils;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;

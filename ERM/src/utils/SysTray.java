@@ -1,5 +1,5 @@
 package utils;
-
+// 30/03
 import java.awt.AWTException;
 import java.awt.HeadlessException;
 import java.awt.Image;
@@ -26,26 +26,30 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
+import core.transaction.Transaction;
 import database.wallet.TransactionMap;
 import gui.ClosingDialog;
 import gui.ConsolePanel;
 import gui.Gui;
 import gui.PasswordPane;
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.SendMessagePanel;
 import gui.SendMoneyPanel;
-import gui.assets.AssetsPanel;
+import gui.items.assets.AssetsPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.naming.NamingServicePanel;
 import gui.settings.SettingsFrame;
 import gui.transaction.TransactionDetailsFactory;
 import gui.voting.VotingPanel;
-import qora.transaction.Transaction;
 import settings.Settings;
 
 public class SysTray implements Observer{
 
+	
+	private static final Logger LOGGER = Logger.getLogger(SysTray.class);
 	private static SysTray systray = null;
 	private TrayIcon icon = null;
 	private PopupMenu createPopupMenu;
@@ -67,13 +71,13 @@ public class SysTray implements Observer{
 			MalformedURLException, AWTException, FileNotFoundException {
 		if (icon == null) {
 			if (!SystemTray.isSupported()) {
-				System.out.println("SystemTray is not supported");
+				LOGGER.info("SystemTray is not supported");
 			} else {
 				
-				//String toolTipText = "Qora "	+ Controller.getInstance().getVersion();
+				//String toolTipText = "DATACHAINS.world "	+ Controller.getInstance().getVersion();
 				createPopupMenu = createPopupMenu();
 				TrayIcon icon = new TrayIcon(createImage(
-						"images/icons/icon32.png", "tray icon"), "Qora "
+						"images/icons/icon32.png", "tray icon"), "DATACHAINS.world "
 						+ Controller.getInstance().getVersion(),
 						createPopupMenu);
 				
@@ -87,7 +91,7 @@ public class SysTray implements Observer{
 						try {
 							Gui.getInstance().bringtoFront();
 						} catch (Exception e1) {
-							e1.printStackTrace();
+							LOGGER.error(e1.getMessage(),e1);
 						}
 					}
 				});
@@ -124,13 +128,13 @@ public class SysTray implements Observer{
 		PopupMenu menu = new PopupMenu();
 		
 		
-		MenuItem decentralizedWeb = new MenuItem("Qora Web/Social Network");
+		MenuItem decentralizedWeb = new MenuItem("DATACHAINS.world Web/Social Network");
 		decentralizedWeb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
         			URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort()));
 				} catch (MalformedURLException e1) {
-					e1.printStackTrace();
+					LOGGER.error(e1.getMessage(),e1);
 				}
 			}
 		});
@@ -141,7 +145,7 @@ public class SysTray implements Observer{
 				try {
 					URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort() + "/index/status.html"));
 				} catch (MalformedURLException e1) {
-					e1.printStackTrace();
+					LOGGER.error(e1.getMessage(),e1);
 				}
 			}
 		});
@@ -209,7 +213,7 @@ public class SysTray implements Observer{
 					indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
 					indexes.put(WalletTransactionsTableModel.COLUMN_ADDRESS, TransactionMap.ADDRESS_INDEX);
 					indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-					QoraRowSorter sorter = new QoraRowSorter(transactionsModel, indexes);
+					CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
 					transactionsTable.setRowSorter(sorter);
 					
 					//TRANSACTION DETAILS
@@ -340,7 +344,7 @@ public class SysTray implements Observer{
 		int currentHeight;
 		String networkStatus = "";
 		String syncProcent = "";
-		String toolTipText = "Qora " + Controller.getInstance().getVersion() + "\n";
+		String toolTipText = "DATACHAINS.world " + Controller.getInstance().getVersion() + "\n";
 		
 		
 		if(Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {

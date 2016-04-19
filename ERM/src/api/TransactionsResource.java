@@ -1,5 +1,5 @@
 package api;
-
+// 30/03
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +20,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.account.Account;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.transaction.Transaction;
 import database.DBSet;
-import qora.account.Account;
-import qora.block.Block;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -194,6 +194,23 @@ public class TransactionsResource {
 		
 		for(Transaction transaction: transactions)
 		{
+			array.add(transaction.toJson());
+		}
+		
+		return array.toJSONString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("/unconfirmedof/{address}")
+	public String getNetworkTransactions(@PathParam("address") String address)
+	{
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		JSONArray array = new JSONArray();
+		
+		for(Transaction transaction: transactions)
+		{
+			if(transaction.getCreator().getAddress().equals(address))
 			array.add(transaction.toJson());
 		}
 		

@@ -16,9 +16,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import core.crypto.Base58;
+import core.transaction.GenesisIssueAssetTransaction;
 import lang.Lang;
-import qora.crypto.Base58;
-import qora.transaction.GenesisIssueAssetTransaction;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
@@ -27,7 +27,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 {
 	public GenesisIssueAssetDetailsFrame(GenesisIssueAssetTransaction assetIssue)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Transaction Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -65,7 +65,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL TYPE
 		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type:"));
+		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
 		this.add(typeLabel, labelGBC);
 						
 		//TYPE
@@ -75,7 +75,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature:"));
+		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
 		this.add(signatureLabel, labelGBC);
 				
 		//SIGNATURE
@@ -87,7 +87,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference:"));
+		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
 		this.add(referenceLabel, labelGBC);
 						
 		//REFERENCE
@@ -99,7 +99,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL TIMESTAMP
 		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp:"));
+		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
 		this.add(timestampLabel, labelGBC);
 						
 		//TIMESTAMP
@@ -111,7 +111,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 				
 		//LABEL OWNER
 		labelGBC.gridy = 5;
-		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(ownerLabel, labelGBC);
 				
 		//OWNER
@@ -123,7 +123,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL NAME
 		labelGBC.gridy = 6;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -135,7 +135,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 7;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description:"));
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
@@ -149,7 +149,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL QUANTITY
 		labelGBC.gridy = 8;
-		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity:"));
+		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
 		this.add(quantityLabel, labelGBC);
 				
 		//QUANTITY
@@ -161,7 +161,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//LABEL DIVISIBLE
 		labelGBC.gridy = 9;
-		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible:"));
+		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
 		this.add(divisibleLabel, labelGBC);
 				
 		//QUANTITY
@@ -173,7 +173,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 				
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 11;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations:"));
+		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS

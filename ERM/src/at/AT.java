@@ -8,8 +8,8 @@ import java.util.Iterator;
 
 import org.json.simple.JSONObject;
 
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import database.DBSet;
 
 public class AT extends AT_Machine_State {

@@ -30,8 +30,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableRowSorter;
 
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.BigDecimalStringComparator;
 import utils.MenuPopupUtil;
 import utils.StringComparator;
@@ -107,7 +107,7 @@ public class AcctPanel extends JPanel
 
 
 		//CREATE SEARCH LABEL
-		this.add(new JLabel(Lang.getInstance().translate("search:")), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		
 		//CREATE SEARCH FIELD
 		final JTextField txtSearch = new JTextField();

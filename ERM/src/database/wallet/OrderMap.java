@@ -11,8 +11,8 @@ import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
-import qora.assets.Order;
+import core.account.Account;
+import core.item.assets.Order;
 import utils.ObserverMessage;
 import database.DBMap;
 import database.IDB;

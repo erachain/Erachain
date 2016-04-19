@@ -6,16 +6,16 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.account.Account;
+import core.naming.NameSale;
 import database.SortableList;
 import database.wallet.NameSaleMap;
 import lang.Lang;
-import qora.account.Account;
-import qora.naming.NameSale;
 import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class WalletNameSalesTableModel extends QoraTableModel<Tuple2<String, String>, BigDecimal> implements Observer{
+public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, String>, BigDecimal> implements Observer{
 
 	public static final int COLUMN_NAME = 0;
 	public static final int COLUMN_OWNER = 1;

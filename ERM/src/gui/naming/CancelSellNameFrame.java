@@ -22,9 +22,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
-import qora.account.PrivateKeyAccount;
-import qora.naming.NameSale;
-import qora.transaction.Transaction;
+import core.account.PrivateKeyAccount;
+import core.naming.NameSale;
+import core.transaction.Transaction;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -38,7 +38,7 @@ public class CancelSellNameFrame extends JFrame
 	
 	public CancelSellNameFrame(NameSale nameSale)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -92,7 +92,7 @@ public class CancelSellNameFrame extends JFrame
 		
 		//LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -115,7 +115,7 @@ public class CancelSellNameFrame extends JFrame
         
         //LABEL OWNER
       	labelGBC.gridy = 2;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
       	this.add(ownerLabel, labelGBC);
       		
       	//TXT OWNER
@@ -126,7 +126,7 @@ public class CancelSellNameFrame extends JFrame
         
       	//LABEL PRICE
       	labelGBC.gridy = 3;
-      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price:"));
+      	JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
       	this.add(priceLabel, labelGBC);
       	
       	//TXT PRICE
@@ -137,7 +137,7 @@ public class CancelSellNameFrame extends JFrame
       	
       	//LABEL FEE
       	labelGBC.gridy = 4;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE

@@ -17,13 +17,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import qora.account.Account;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.account.Account;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import database.DBSet;
 
 public abstract class AT_Controller {
@@ -66,13 +65,13 @@ public abstract class AT_Controller {
 			{
 				if ( state.getMachineState().stopped )
 				{
-					System.out.println( "stopped" );
+					LOGGER.trace( "stopped" );
 					state.getMachineState().running = false;
 					return 2;
 				}
 				else if ( state.getMachineState().finished )
 				{
-					System.out.println( "finished" );
+					LOGGER.trace( "finished" );
 					state.getMachineState().running = false;
 					return 1;
 				}
@@ -80,11 +79,11 @@ public abstract class AT_Controller {
 			else
 			{
 				if ( rc == -1 )
-					System.out.println( "error: overflow" );
+					LOGGER.trace( "error: overflow" );
 				else if ( rc==-2 )
-					System.out.println( "error: invalid code" );
+					LOGGER.trace( "error: invalid code" );
 				else
-					System.out.println( "unexpected error" );
+					LOGGER.trace( "unexpected error" );
 
 				if ( state.getMachineState().jumps.contains( state.getMachineState().err ) )
 				{
@@ -320,7 +319,7 @@ public abstract class AT_Controller {
 				}
 				catch ( Exception e )
 				{
-					LOGGER.error(e);
+					LOGGER.error(e.getMessage(),e);
 
 				}
 			}
@@ -346,7 +345,7 @@ public abstract class AT_Controller {
 		catch ( NoSuchAlgorithmException e )
 		{
 			//should not reach ever here
-			LOGGER.error(e);
+			LOGGER.error(e.getMessage(),e);
 		}
 
 
@@ -357,7 +356,7 @@ public abstract class AT_Controller {
 
 	public static AT_Block validateATs( byte[] blockATs , int blockHeight , DBSet dbSet ) throws NoSuchAlgorithmException, AT_Exception {
 
-		System.out.println("Validate ATs");
+		LOGGER.trace("Validate ATs");
 		if ( blockATs == null )
 		{
 			return new AT_Block( 0 , 0 , null , true );
@@ -432,7 +431,7 @@ public abstract class AT_Controller {
 			}
 			catch ( Exception e )
 			{
-				LOGGER.error(e);
+				LOGGER.error(e.getMessage(),e);
 				throw new AT_Exception( "ATs error. Block rejected" );
 			}
 		}
@@ -444,7 +443,7 @@ public abstract class AT_Controller {
 		{
 			String atId = Base58.encode( at.getId() );
 			Account account = new Account(atId);
-			System.out.println("AT : " + account.getAddress() + " total balance: " + account.getConfirmedBalance(dbSet));
+			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getConfirmedBalance(dbSet));
 			//atLastState.put( atId ,  tempAtStates.get( atId ) );
 			dbSet.getATMap().update( at , blockHeight );
 			dbSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
@@ -554,7 +553,7 @@ public abstract class AT_Controller {
 					totalFees += tx.getAmount();
 				}
 				sender.setConfirmedBalance( sender.getConfirmedBalance( dbSet ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
-				System.out.println("Sender :" + sender.getAddress() + " total balance :" + sender.getConfirmedBalance(dbSet));
+				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getConfirmedBalance(dbSet));
 			}
 
 		}

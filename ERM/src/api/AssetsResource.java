@@ -9,8 +9,8 @@ import javax.ws.rs.core.MediaType;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.blockexplorer.BlockExplorer;
 import database.DBSet;
-import qora.blockexplorer.BlockExplorer;
 
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)

@@ -7,8 +7,8 @@ import java.util.Observer;
 import at.AT;
 import at.AT_API_Helper;
 import controller.Controller;
-import qora.account.Account;
-import qora.crypto.Base58;
+import core.account.Account;
+import core.crypto.Base58;
 import utils.Converter;
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -16,7 +16,7 @@ import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class AcctTableModel extends QoraTableModel<String, AT> implements Observer
+public class AcctTableModel extends TableModelCls<String, AT> implements Observer
 {
 	public static final int COLUMN_AT_NAME = 0;
 	public static final int COLUMN_AT_DESCRIPTION = 1;

@@ -45,16 +45,16 @@ import javax.swing.event.ListSelectionListener;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.naming.Name;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.GZIP;
 import utils.MenuPopupUtil;
 import utils.Pair;
-import utils.Qorakeys;
+import utils.Corekeys;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.naming.Name;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @SuppressWarnings("serial")
@@ -75,7 +75,7 @@ public class UpdateNameFrame extends JFrame
 
 	public UpdateNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Update Name"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Update Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -129,7 +129,7 @@ public class UpdateNameFrame extends JFrame
 		
 		//LABEL NAME
       	labelGBC.gridy = 1;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name:"));
+      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
       	this.add(nameLabel, labelGBC);
       	
       		
@@ -141,7 +141,7 @@ public class UpdateNameFrame extends JFrame
         
         //LABEL OWNER
       	labelGBC.gridy = 2;
-      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner:"));
+      	JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
       	this.add(ownerLabel, labelGBC);
       	
       		
@@ -152,7 +152,7 @@ public class UpdateNameFrame extends JFrame
       	
       	 //LABEL KEY
       	labelGBC.gridy = 3;
-      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key:"));
+      	JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
       	this.add(keyLabel, labelGBC);
       	
       	//TXT KEY
@@ -163,7 +163,7 @@ public class UpdateNameFrame extends JFrame
       	
         //LABEL VALUE
       	labelGBC.gridy = 5;
-      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value:"));
+      	JLabel valueLabel = new JLabel(Lang.getInstance().translate("Value") + ":");
       	this.add(valueLabel, labelGBC);
       		
       	//TXTAREA VALUE
@@ -303,7 +303,7 @@ public class UpdateNameFrame extends JFrame
       	//LABEL FEE
 		labelGBC.gridx = 0;
 		labelGBC.gridy = 9;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -442,7 +442,7 @@ public class UpdateNameFrame extends JFrame
 			
 		}else
 		{
-			keyvaluepairs.add(new Pair<String, String>(Qorakeys.DEFAULT.toString(), value));
+			keyvaluepairs.add(new Pair<String, String>(Corekeys.DEFAULT.toString(), value));
 		}
 		
 		namesModel.setData(keyvaluepairs);

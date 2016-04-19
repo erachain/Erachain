@@ -1,5 +1,5 @@
 package utils;
-
+// 30/03
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,29 +9,32 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import api.BlogPostResource;
+
 import com.google.common.collect.Lists;
 import com.twitter.Extractor;
 
-import api.BlogPostResource;
 import controller.Controller;
-import database.PostCommentMap;
+import core.crypto.Base58;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
+import core.web.BlogBlackWhiteList;
+import core.web.BlogProfile;
+import core.web.NameStorageMap;
+import core.web.Profile;
+import core.web.blog.BlogEntry;
 import database.DBSet;
-import qora.crypto.Base58;
-import qora.transaction.ArbitraryTransaction;
-import qora.transaction.Transaction;
-import qora.web.BlogBlackWhiteList;
-import qora.web.BlogProfile;
-import qora.web.NameStorageMap;
-import qora.web.Profile;
-import qora.web.blog.BlogEntry;
+import database.PostCommentMap;
 
 public class BlogUtils {
 
+	
+	private static final Logger LOGGER = Logger.getLogger(BlogUtils.class);
 	public static int COMMENT_SERVICE_ID = 778;
 
 	/**
@@ -232,7 +235,7 @@ public class BlogUtils {
 		List<BlogEntry> results = new ArrayList<>();
 
 		List<byte[]> blogPostList = DBSet.getInstance().getBlogPostMap()
-				.get(blogOpt == null ? "QORA" : blogOpt);
+				.get(blogOpt == null ? "DATACHAINS.world" : blogOpt);
 
 		List<byte[]> list = blogPostList != null ? Lists
 				.newArrayList(blogPostList) : new ArrayList<byte[]>();
@@ -336,7 +339,7 @@ public class BlogUtils {
 			transaction = (ArbitraryTransaction) Controller.getInstance()
 					.getTransaction(signature);
 		} catch (Exception e) {
-			System.err.println(ExceptionUtils.getStackTrace(e));
+			LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 		return transaction == null ? null : BlogUtils

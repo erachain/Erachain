@@ -1,5 +1,5 @@
 package gui.models;
-
+// 30/03
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -33,19 +33,19 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.transaction.MessageTransaction;
+import core.transaction.Transaction;
+import core.wallet.Wallet;
 import database.DBSet;
 import gui.PasswordPane;
 import lang.Lang;
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.transaction.MessageTransaction;
-import qora.transaction.Transaction;
-import qora.wallet.Wallet;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
@@ -54,6 +54,10 @@ import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class MessagesTableModel extends JTable implements Observer{
+	
+	
+	private static final Logger LOGGER = Logger
+			.getLogger(MessagesTableModel.class);
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
@@ -81,17 +85,17 @@ public class MessagesTableModel extends JTable implements Observer{
 		topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
 		this.getColumn("").setCellRenderer( topRenderer );
 		
-		List<Transaction> transactions = new ArrayList<Transaction>();;
+		List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.MESSAGE_TRANSACTION)
+			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
 				transactions.add(transaction);
 			}
 		}
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.MESSAGE_TRANSACTION, 0));	
+			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 		for (Transaction messagetx : transactions) {
@@ -361,7 +365,7 @@ public class MessagesTableModel extends JTable implements Observer{
 		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{		
 			boolean is;
-			if(((Transaction) message.getValue()).getType() == Transaction.MESSAGE_TRANSACTION)
+			if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
@@ -495,6 +499,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				try {
 					decrypt = AEScrypto.dataDecrypt(messageBufs.get(row).getMessage(), privateKey, publicKey);
 				} catch ( InvalidCipherTextException | NullPointerException e1 ) {
+					LOGGER.error(e1.getMessage(),e1);
 					messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
 				} 
 		
@@ -504,7 +509,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				}
 				else
 				{
-					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Base58.encode(decrypt));
+					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Converter.toHex(decrypt));
 					messageBufs.get(row).setOpend(true);
 					menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
 				}
@@ -601,7 +606,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				}
 				if( !this.encrypted )
 				{
-					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Base58.encode( this.rawMessage );
+					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Converter.toHex( this.rawMessage );
 				}
 			}
 			return this.decryptedMessage;
@@ -769,13 +774,15 @@ public class MessagesTableModel extends JTable implements Observer{
 			return	  "<html>\n"
 					+ "<body width='" + width + "'>\n"
 					+ "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'>\n"
-					+ "<font size='2' color='" + colorTextHeader + "'>\n"+Lang.getInstance().translate("From:") + this.sender
-					+ "\n<br>\nTo:"
+					+ "<font size='2' color='" + colorTextHeader + "'>\n"+Lang.getInstance().translate("From") + ":" + this.sender
+					+ "\n<br>\n" + Lang.getInstance().translate("To") + ": "
 					+ this.recipient + "\n</font></td>\n"
 					+ "<td bgcolor='" + colorHeader + "' align='right' width='" + (width/2-1) + "'>\n"
 					+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
 					+ DateTimeFormat.timestamptoString(this.timestamp) + "\n<br></font>\n"
-					+ "<font" + fontSize + " color='" + colorTextHeader + "'>"+Lang.getInstance().translate("Amount:") + " " +  NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . " + Lang.getInstance().translate("Fee:") + " "
+					+ "<font" + fontSize + " color='" + colorTextHeader + "'>"+Lang.getInstance().translate("Amount") + ": "
+					+ NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "
+					+ Lang.getInstance().translate("Fee") + ": "
 					+ NumberAsString.getInstance().numberAsString(fee)+"</font>"
 					+ "</td></tr></table>"
 					+ "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='"+colorTextBackground+"'><td width='25'>"+imginout
@@ -831,15 +838,15 @@ public class MessagesTableModel extends JTable implements Observer{
 			
 			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort();
 			
-			return 	  Lang.getInstance().translate("Date:" + " " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
-					+ Lang.getInstance().translate("Sender:") + " " + this.sender + "\n"
-					+ Lang.getInstance().translate("Recipient:") + " " + this.recipient + "\n"
-					+ Lang.getInstance().translate("Amount:") + " " +  NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee:")+" " + NumberAsString.getInstance().numberAsString(this.fee) + "\n"
-					+ Lang.getInstance().translate("Type:") + " " + imginout + ". " + imgLock + "\n"
-					+ Lang.getInstance().translate("Confirmations:") + " " + strConfirmations + "\n"
+			return 	  Lang.getInstance().translate("Date") + ": " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
+					+ Lang.getInstance().translate("Sender") + ": " + this.sender + "\n"
+					+ Lang.getInstance().translate("Recipient") + ": " + this.recipient + "\n"
+					+ Lang.getInstance().translate("Amount") + ": " + NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee") + ": " + NumberAsString.getInstance().numberAsString(this.fee) + "\n"
+					+ Lang.getInstance().translate("Type") + ": " + imginout + ". " + imgLock + "\n"
+					+ Lang.getInstance().translate("Confirmations") + ": " + strConfirmations + "\n"
 					+ Lang.getInstance().translate("[MESSAGE START]\n")
 					+ getDecrMessage() + "\n"
-					+ Lang.getInstance().translate("[MESSAGE END]\n"));
+					+ Lang.getInstance().translate("[MESSAGE END]\n");
 		}
 	}
 

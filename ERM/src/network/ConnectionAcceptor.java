@@ -2,12 +2,13 @@ package network;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Logger;
+ import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.transaction.Transaction;
+import gui.status.WalletStatus;
 import lang.Lang;
 import ntp.NTP;
-import qora.transaction.Transaction;
 import settings.Settings;
 
 public class ConnectionAcceptor extends Thread{
@@ -17,6 +18,8 @@ public class ConnectionAcceptor extends Thread{
 	private ServerSocket socket;
 	
 	private boolean isRun;
+	
+	static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());
 	
 	public ConnectionAcceptor(ConnectionCallback callback)
 	{
@@ -65,12 +68,15 @@ public class ConnectionAcceptor extends Thread{
 							 * || connectionSocket.getInetAddress().isAnyLocalAddress() 
 							 * || connectionSocket.getInetAddress().isLoopbackAddress() 
 							 *  */
+							
+							/*
 							(
 									(NTP.getTime() < Transaction.getPOWFIX_RELEASE() ) 
 									&& 
 									callback.isConnectedTo(connectionSocket.getInetAddress())
 							)
 							||
+							*/
 							PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress()))
 					{
 						//DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
@@ -85,8 +91,8 @@ public class ConnectionAcceptor extends Thread{
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				Logger.getGlobal().warning(Lang.getInstance().translate("Error accepting new connection"));			
+				LOGGER.error(e.getMessage(),e);
+				LOGGER.warn(Lang.getInstance().translate("Error accepting new connection"));			
 			}
 		}
 	}

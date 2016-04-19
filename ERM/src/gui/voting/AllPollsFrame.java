@@ -28,24 +28,25 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.voting.Poll;
 import database.PollMap;
-import gui.QoraRowSorter;
-import gui.models.AssetsAllComboBoxModel;
+import gui.CoreRowSorter;
+import gui.items.ComboBoxModelItemsAll;
 import gui.models.PollsTableModel;
 import lang.Lang;
-import qora.assets.Asset;
-import qora.voting.Poll;
 
 @SuppressWarnings("serial")
 public class AllPollsFrame extends JFrame{
 
 	private PollsTableModel pollsTableModel;
-	private JComboBox<Asset> cbxAssets;
+	private JComboBox<ItemCls> cbxAssets;
 	
 	public AllPollsFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("All Polls"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("All Polls"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -119,7 +120,7 @@ public class AllPollsFrame extends JFrame{
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(PollsTableModel.COLUMN_NAME, PollMap.DEFAULT_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(this.pollsTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.pollsTableModel, indexes);
 		pollsTable.setRowSorter(sorter);
 
 		pollsTable.addMouseListener(new MouseAdapter() 
@@ -146,8 +147,8 @@ public class AllPollsFrame extends JFrame{
 				{
 					row = pollsTable.convertRowIndexToModel(row);
 					Poll poll = pollsTableModel.getPoll(row);
-					Asset asset = (Asset) cbxAssets.getSelectedItem();
-					new PollFrame(poll, asset);
+					AssetCls item = (AssetCls) cbxAssets.getSelectedItem();
+					new PollFrame(poll, item);
 				}
 		     }
 		});
@@ -180,23 +181,23 @@ public class AllPollsFrame extends JFrame{
 			}
 		});
 
-		this.add(new JLabel(Lang.getInstance().translate("Search:")), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 		this.add(new JScrollPane(pollsTable), tableGBC);
 
-		this.add(new JLabel(Lang.getInstance().translate("Check:")), assetLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
 		
-		cbxAssets = new JComboBox<Asset>(new AssetsAllComboBoxModel());
+		cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
 		this.add(cbxAssets, assetsGBC);
 		
 		cbxAssets.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 
-		    	Asset asset = ((Asset) cbxAssets.getSelectedItem());
+		    	ItemCls asset = ((ItemCls)cbxAssets.getSelectedItem());
 
 		    	if(asset != null)
 		    	{
-		    		pollsTableModel.setAsset(asset);
+		    		pollsTableModel.setAsset((AssetCls)asset);
 		    	}
 		    }
 		});

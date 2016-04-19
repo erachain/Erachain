@@ -3,14 +3,13 @@ package network.message;
 import java.io.DataInputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-
-import qora.block.Block;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
+ import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Ints;
 
+import core.block.Block;
+import core.crypto.Crypto;
+import core.transaction.Transaction;
 import lang.Lang;
 import network.Peer;
 
@@ -18,6 +17,8 @@ public class MessageFactory {
 
 	private static MessageFactory instance;
 	
+	static Logger LOGGER = Logger.getLogger(MessageFactory.class.getName());
+
 	public static MessageFactory getInstance()
 	{
 		if(instance == null)
@@ -233,7 +234,7 @@ public class MessageFactory {
 		default:
 			
 			//UNKNOWN MESSAGE
-			Logger.getGlobal().info(Lang.getInstance().translate("Received unknown type message!"));
+			LOGGER.info(Lang.getInstance().translate("Received unknown type message!"));
 			return new Message(type);
 			
 		}

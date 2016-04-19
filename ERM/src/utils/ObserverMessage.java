@@ -61,7 +61,32 @@ public class ObserverMessage {
 	
 	public static final int WALLET_SYNC_STATUS = 43;
 	public static final int BLOCKCHAIN_SYNC_STATUS = 44;
+
+	public static final int ADD_IMPRINT_TYPE = 45;
+	public static final int REMOVE_IMPRINT_TYPE = 46;
+	public static final int LIST_IMPRINT_TYPE = 47;
+	//not used public static final int LIST_IMPRINT_FAVORITES_TYPE = 48;
+
+	public static final int ADD_NOTE_TYPE = 49;
+	public static final int REMOVE_NOTE_TYPE = 50;
+	public static final int LIST_NOTE_TYPE = 51;
+	public static final int LIST_NOTE_FAVORITES_TYPE = 52;
 		
+	public static final int ADD_PERSON_TYPE = 53;
+	public static final int REMOVE_PERSON_TYPE = 54;
+	public static final int LIST_PERSON_TYPE = 55;
+	public static final int LIST_PERSON_FAVORITES_TYPE = 56;
+
+	public static final int ADD_STATUS_TYPE = 57;
+	public static final int REMOVE_STATUS_TYPE = 58;
+	public static final int LIST_STATUS_TYPE = 59;
+	public static final int LIST_STATUS_FAVORITES_TYPE = 60;
+
+	public static final int ADD_UNION_TYPE = 61;
+	public static final int REMOVE_UNION_TYPE = 62;
+	public static final int LIST_UNION_TYPE = 63;
+	public static final int LIST_UNION_FAVORITES_TYPE = 64;
+
 	private int type;
 	private Object value;
 	

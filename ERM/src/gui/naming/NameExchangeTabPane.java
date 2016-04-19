@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.QoraRowSorter;
+import gui.CoreRowSorter;
 import gui.models.WalletNameSalesTableModel;
 import lang.Lang;
 
@@ -18,8 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
+import core.naming.NameSale;
 import database.wallet.NameSaleMap;
-import qora.naming.NameSale;
 
 
 public class NameExchangeTabPane extends JTabbedPane{
@@ -46,7 +46,7 @@ public class NameExchangeTabPane extends JTabbedPane{
 		indexes.put(WalletNameSalesTableModel.COLUMN_NAME, NameSaleMap.NAME_INDEX);
 		indexes.put(WalletNameSalesTableModel.COLUMN_OWNER, NameSaleMap.SELLER_INDEX);
 		indexes.put(WalletNameSalesTableModel.COLUMN_PRICE, NameSaleMap.AMOUNT_INDEX);
-		QoraRowSorter sorter = new QoraRowSorter(this.walletNameSalesTableModel, indexes);
+		CoreRowSorter sorter = new CoreRowSorter(this.walletNameSalesTableModel, indexes);
 		walletNameSalesTable.setRowSorter(sorter);
 			
 		//MENU

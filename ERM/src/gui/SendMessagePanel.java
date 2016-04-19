@@ -1,7 +1,7 @@
 package gui;
 
+import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
-import gui.models.AssetsComboBoxModel;
 import gui.models.MessagesTableModel;
 import lang.Lang;
 import ntp.NTP;
@@ -37,13 +37,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import qora.account.Account;
-import qora.account.PrivateKeyAccount;
-import qora.assets.Asset;
-import qora.crypto.AEScrypto;
-import qora.crypto.Base58;
-import qora.crypto.Crypto;
-import qora.transaction.Transaction;
 //import settings.Settings;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -52,6 +45,13 @@ import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
@@ -69,7 +69,7 @@ public class SendMessagePanel extends JPanel
 	private JCheckBox isText;
 	private JButton sendButton;
 	private AccountsComboBoxModel accountsModel;
-	private JComboBox<Asset> cbxFavorites;
+	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
@@ -95,8 +95,9 @@ public class SendMessagePanel extends JPanel
 		favoritesGBC.gridx = 0;	
 		favoritesGBC.gridy = 0;	
 		
-		cbxFavorites = new JComboBox<Asset>(new AssetsComboBoxModel());
+		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
+		
 		this.accountsModel = new AccountsComboBoxModel();
         
 		//LABEL FROM
@@ -107,7 +108,7 @@ public class SendMessagePanel extends JPanel
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
 		labelFromGBC.gridy = 1;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From:"));
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
 		
@@ -130,7 +131,7 @@ public class SendMessagePanel extends JPanel
 		cbxFavorites.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 
-		    	Asset asset = ((Asset) cbxFavorites.getSelectedItem());
+		    	AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 
 		    	if(asset != null)
 		    	{
@@ -190,7 +191,7 @@ public class SendMessagePanel extends JPanel
 		labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelDetailsGBC.weightx = 0;	
 		labelDetailsGBC.gridx = 0;
-      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details:"));
+      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
       	this.add(recDetailsLabel, labelDetailsGBC);
         
       	//RECEIVER DETAILS 
@@ -216,7 +217,7 @@ public class SendMessagePanel extends JPanel
       	labelMessageGBC.gridx = 0;
       	labelMessageGBC.gridy = 4;
       	
-      	messageLabel = new JLabel(Lang.getInstance().translate("Message:"));
+      	messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
       	
 		//TXT MESSAGE
 		GridBagConstraints txtMessageGBC = new GridBagConstraints();
@@ -250,7 +251,7 @@ public class SendMessagePanel extends JPanel
 		labelIsTextGBC.weightx = 0;	
 		labelIsTextGBC.gridx = 0;     
 
-		final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message:"));
+		final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
       	isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
       	this.add(isTextLabel, labelIsTextGBC);
      	
@@ -277,7 +278,7 @@ public class SendMessagePanel extends JPanel
 		labelEncGBC.gridx = 2;
 		labelEncGBC.gridy = 5;
 		
-		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message:"));
+		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
 		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.add(encLabel, labelEncGBC);
 		
@@ -303,7 +304,7 @@ public class SendMessagePanel extends JPanel
 		amountlabelGBC.gridx = 0;
 		amountlabelGBC.gridy = 6;
 		
-		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount:"));
+		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.add(amountLabel, amountlabelGBC);
         
@@ -347,7 +348,7 @@ public class SendMessagePanel extends JPanel
 		feelabelGBC.fill = GridBagConstraints.BOTH;
 		feelabelGBC.weightx = 0;	
 		feelabelGBC.gridx = 2;
-		final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee:"));
+		final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		feeLabel.setVerticalAlignment(SwingConstants.TOP);
 		this.add(feeLabel, feelabelGBC);
@@ -423,7 +424,7 @@ public class SendMessagePanel extends JPanel
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message:") + "<br>("+ txtMessage.getText().length()+"/4000)</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 	}
@@ -431,7 +432,7 @@ public class SendMessagePanel extends JPanel
 	private void refreshReceiverDetails()
 	{
 		String toValue = txtTo.getText();
-		Asset asset = ((Asset) cbxFavorites.getSelectedItem());
+		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 		
 		if(toValue.isEmpty())
 		{
@@ -617,7 +618,7 @@ public class SendMessagePanel extends JPanel
 			byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
-			Asset asset = (Asset) this.cbxFavorites.getSelectedItem();
+			AssetCls asset = (AssetCls) this.cbxFavorites.getSelectedItem();
 			long key = asset.getKey(); 
 			
 			Pair<Transaction, Integer> result;
@@ -643,12 +644,14 @@ public class SendMessagePanel extends JPanel
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
 
-			
+
+			/*
 			if(key != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
 			{	
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets transactions will be enabled at %ss%!").replace("%ss%", DateTimeFormat.timestamptoString(Transaction.getPOWFIX_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			*/
 			
 			//CREATE TX MESSAGE
 			result = Controller.getInstance().sendMessage(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);

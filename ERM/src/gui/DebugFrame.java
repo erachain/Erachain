@@ -19,7 +19,7 @@ public class DebugFrame extends JFrame{
 	public DebugFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("Qora") + " - " + Lang.getInstance().translate("Debug"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Debug"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

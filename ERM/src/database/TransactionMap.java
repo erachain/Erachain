@@ -19,7 +19,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import qora.transaction.Transaction;
+import core.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
 import database.DBSet;
