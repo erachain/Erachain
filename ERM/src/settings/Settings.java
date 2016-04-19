@@ -50,7 +50,7 @@ public class Settings {
 	public static final int BLOCK_MAX_SIGNATURES = 5000;
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1460992991336L; // CORE RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1461055038336L; // CORE RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC

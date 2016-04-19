@@ -38,6 +38,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.imprints.Imprint;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -168,7 +169,7 @@ public class IssueImprintFrame extends JFrame
       	this.txtAmount = new JTextField();
         this.add(this.txtAmount, txtGBC);
 
-        this.txtareaDescription.setText("");
+        //this.txtareaDescription.setText("");
         /*
         //LABEL DESCRIPTION
       	labelGBC.gridy = gridy;
@@ -178,7 +179,6 @@ public class IssueImprintFrame extends JFrame
       	//TXTAREA DESCRIPTION
       	txtGBC.gridy = gridy++;
       	this.txtareaDescription = new JTextArea();
-      	*/
        	
       	this.txtareaDescription.setRows(6);
       	this.txtareaDescription.setColumns(20);
@@ -188,6 +188,8 @@ public class IssueImprintFrame extends JFrame
       	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
       	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(scrollDescription, txtGBC);
+
+      	*/
       	      	
         //LABEL FEE POW
       	labelGBC.gridy = 6;
@@ -269,10 +271,9 @@ public class IssueImprintFrame extends JFrame
 			// NAME TOTAL
 			String name_total = this.txtNumber.getText().trim() + this.txtDate.getText().trim()
 				+ this.txtDebitor.getText().trim() + this.txtCreditor.getText().trim() + this.txtAmount.getText().trim();
-			byte[] digest = Crypto.getInstance().digest(name_total.getBytes(StandardCharsets.UTF_8));
 
-			// CUT LEN
-			name_total = Base58.encode(digest).substring(0, 30);
+			// CUT BYTES LEN
+			name_total = Imprint.hashNameToBase58(name_total);
 			String description = ""; //this.txtareaDescription.getText();
 						
 			//CREATE IMPRINT
