@@ -165,7 +165,7 @@ public abstract class ItemCls {
 	public int getDataLength(boolean includeReference) 
 	{
 		return BASE_LENGTH
-				+ this.name.getBytes().length // BASE58 - not UTF
+				+ this.name.getBytes(StandardCharsets.UTF_8).length // BASE58 - not UTF
 				+ this.description.getBytes(StandardCharsets.UTF_8).length
 				+ (includeReference? REFERENCE_LENGTH: 0);
 	}	

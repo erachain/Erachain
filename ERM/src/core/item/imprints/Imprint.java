@@ -107,4 +107,14 @@ public class Imprint extends ImprintCls {
 		return imprint;
 	}
 	
+	@Override
+	public int getDataLength(boolean includeReference) 
+	{
+		return BASE_LENGTH
+				+ this.name.getBytes().length // it is Base58 - not UTF
+				+ this.description.getBytes(StandardCharsets.UTF_8).length
+				+ (includeReference? REFERENCE_LENGTH: 0);
+	}	
+
+	
 }
