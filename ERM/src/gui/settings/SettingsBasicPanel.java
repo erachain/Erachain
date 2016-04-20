@@ -422,7 +422,7 @@ public class SettingsBasicPanel extends JPanel
 	        				
 	        				String stringFromInternet = "";
 	        				try {
-	        					String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/available.json";
+	        					String url = Lang.translationsUrl +  "available.json";
 
 	        					URL u = new URL(url);
 	        					InputStream in = u.openStream();
@@ -465,7 +465,7 @@ public class SettingsBasicPanel extends JPanel
 	        							public void actionPerformed(ActionEvent e) 
 	        							{
 	        								try {
-	        		        					String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/languages/" + langFileName;
+	        		        					String url = Lang.translationsUrl  + langFileName;
 
 	        		        					FileUtils.copyURLToFile(new URL(url), new File(Settings.getInstance().getLangDir(), langFileName));
 	

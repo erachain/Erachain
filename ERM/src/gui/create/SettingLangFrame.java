@@ -99,7 +99,7 @@ public class SettingLangFrame extends JDialog {
         String stringFromInternet = "";
 		try {
 			//String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/available.json";
-			String url = Lang.translationsUrl + "languages/available.json";
+			String url = Lang.translationsUrl + "available.json";
 
 			URL u = new URL(url);
 			InputStream in = u.openStream();
@@ -171,7 +171,7 @@ public class SettingLangFrame extends JDialog {
 			
 			if(listLang.getSelectedIndex() > 0) 
 			{
-				String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/languages/" + langFileName;
+				String url = Lang.translationsUrl + langFileName;
 				FileUtils.copyURLToFile(new URL(url), new File(Settings.getInstance().getLangDir(), langFileName));
 			}
 			JSONObject settingsLangJSON = Settings.getInstance().Dump();
