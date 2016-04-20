@@ -450,10 +450,6 @@ public class DeployATFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				break;	
-			case Transaction.FEE_LESS_REQUIRED:
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fee below the minimum for this size of a transaction!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				this.deployButton.setEnabled(true);
-				break;
 			case Transaction.NEGATIVE_AMOUNT:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Quantity must be at least 0!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);

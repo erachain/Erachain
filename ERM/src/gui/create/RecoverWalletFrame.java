@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import core.crypto.Base58;
 import lang.Lang;
+import settings.Settings;
 
 @SuppressWarnings("serial")
 public class RecoverWalletFrame extends JFrame
@@ -152,7 +153,7 @@ public class RecoverWalletFrame extends JFrame
 		labelGBC.gridy = 8;
 		labelGBC.insets.top = 5;
 		this.amountTxt = new JTextField();
-		this.amountTxt.setText("10");
+		this.amountTxt.setText("" + Settings.DEFAULT_ACCOUNTS);
 		this.add(this.amountTxt, labelGBC);
 		
 		

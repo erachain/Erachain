@@ -497,6 +497,11 @@ public class Wallet extends Observable implements Observer
 	    
 	    this.initiateItemsFavorites();
 	    
+	    // SOME 
+	    //Account initAccount = this.getAccounts().get(0);
+	    //initAccount.setConfirmedBalance(Transaction.DIL_KEY, BigDecimal.valueOf(0.00001).setScale(8));
+
+	    
 	    return true;
 	}
 	

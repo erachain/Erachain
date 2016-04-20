@@ -338,8 +338,6 @@ public class ATResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);	
 			case Transaction.NOT_ENOUGH_FEE:
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);	
-			case Transaction.FEE_LESS_REQUIRED:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_FEE_LESS_REQUIRED);
 			case Transaction.NEGATIVE_AMOUNT:
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);	
 			case Transaction.NO_BALANCE:

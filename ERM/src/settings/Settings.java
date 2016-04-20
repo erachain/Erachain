@@ -60,6 +60,7 @@ public class Settings {
 	
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
+	public static final int DEFAULT_ACCOUNTS = 3;
 	
 	//WEB
 	private static final int DEFAULT_WEB_PORT = 9090;

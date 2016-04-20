@@ -585,11 +585,6 @@ public class NamesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);
 
-		case Transaction.FEE_LESS_REQUIRED:
-			
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_FEE_LESS_REQUIRED);
-
 		case Transaction.NO_BALANCE:
 
 			throw ApiErrorFactory.getInstance().createError(

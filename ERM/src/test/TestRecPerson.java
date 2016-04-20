@@ -24,6 +24,7 @@ import core.item.persons.PersonHuman;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.IssuePersonRecord;
+import core.transaction.PaymentTransaction;
 import core.transaction.R_SertifyPerson;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
@@ -134,6 +135,24 @@ public class TestRecPerson {
 		assertEquals(false, issuePersonTransaction.isSignatureValid());
 	}
 		
+	
+	@Test
+	public void validateIssuePersonRecord() 
+	{
+
+		init();
+		
+		issuePersonTransaction.sign(maker, false);
+
+		//CHECK IF ISSUE PERSON IS VALID
+		assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+
+		//CREATE INVALID ISSUE PERSON INVALID RECIPIENT ADDRESS
+		// NOT VOTE ACCOUNT
+		maker.setConfirmedBalance(VOTE_KEY, BigDecimal.ZERO, db);
+		assertEquals(Transaction.ACCOUNT_NOT_PERSON, issuePersonTransaction.isValid(db, releaserReference));
+				
+	}
 
 	
 	@Test

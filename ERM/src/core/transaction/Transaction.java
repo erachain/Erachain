@@ -80,7 +80,7 @@ public abstract class Transaction {
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
 	
-	public static final int FEE_LESS_REQUIRED = 40;
+	//public static final int FEE_LESS_REQUIRED = 40;
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
@@ -88,6 +88,8 @@ public abstract class Transaction {
 
 	public static final int NOT_ENOUGH_ERM = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
+	public static final int ACCOUNT_NOT_PERSON = 52;
+	public static final int DUPLICATE_KEY = 53;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	

@@ -124,7 +124,13 @@ public abstract class IssueItemRecord extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 				
-		return super.isValid(db, releaserReference);
+		int res = super.isValid(db, releaserReference);
+		if (res != Transaction.VALIDATE_OK) return res;
+		
+		// CHECH MAKER IS PERSON?
+		if (!creator.isPerson(db)) return ACCOUNT_NOT_PERSON;
+		
+		return VALIDATE_OK;
 	
 	}
 	
