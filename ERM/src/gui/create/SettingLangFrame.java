@@ -98,7 +98,8 @@ public class SettingLangFrame extends JDialog {
       	// read internet 
         String stringFromInternet = "";
 		try {
-			String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/available.json";
+			//String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/available.json";
+			String url = Lang.translationsUrl + "languages/available.json";
 
 			URL u = new URL(url);
 			InputStream in = u.openStream();
