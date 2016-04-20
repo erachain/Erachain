@@ -1,6 +1,10 @@
 package core.account;
 
+import java.math.BigDecimal;
+
 import core.crypto.Crypto;
+import core.transaction.Transaction;
+import database.DBSet;
 
 public class PublicKeyAccount extends Account {
 
@@ -20,6 +24,15 @@ public class PublicKeyAccount extends Account {
 	public byte[] getPublicKey() 
 	{
 		return publicKey;
+	}
+	
+	public boolean isPerson(DBSet db) {
+		
+		BigDecimal vote = this.getConfirmedBalance(Transaction.LAEV_KEY, db);
+		if (vote.compareTo(BigDecimal.ONE) < 1) return false;
+
+		return true;
+		
 	}
 	
 }

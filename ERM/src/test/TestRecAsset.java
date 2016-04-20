@@ -47,7 +47,7 @@ public class TestRecAsset {
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
-	byte[] seed = Crypto.getInstance().digest("test".getBytes());
+	byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	
@@ -271,7 +271,7 @@ public class TestRecAsset {
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
@@ -306,7 +306,7 @@ public class TestRecAsset {
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 				
 		//CREATE VALID ASSET TRANSFER
 		Transaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
@@ -358,11 +358,11 @@ public class TestRecAsset {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 					
 		//CREATE VALID ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
 
 		//CONVERT TO BYTES
@@ -436,11 +436,10 @@ public class TestRecAsset {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		long key = 221;
 		maker.setConfirmedBalance(key, BigDecimal.valueOf(200).setScale(8), db);
 		Transaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
@@ -468,7 +467,7 @@ public class TestRecAsset {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER

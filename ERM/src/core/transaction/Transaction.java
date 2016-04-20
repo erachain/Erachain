@@ -80,7 +80,7 @@ public abstract class Transaction {
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
 	
-	public static final int FEE_LESS_REQUIRED = 40;
+	//public static final int FEE_LESS_REQUIRED = 40;
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
@@ -88,6 +88,8 @@ public abstract class Transaction {
 
 	public static final int NOT_ENOUGH_ERM = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
+	public static final int ACCOUNT_NOT_PERSON = 52;
+	public static final int DUPLICATE_KEY = 53;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	
@@ -212,7 +214,7 @@ public abstract class Transaction {
 	protected static final int TYPE_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
-	protected static final int REFERENCE_LENGTH = 64;
+	public static final int REFERENCE_LENGTH = 64;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
@@ -457,7 +459,7 @@ public abstract class Transaction {
 	
 	public boolean isSignatureValid() {
 
-		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]) return false;
+		if ( this.signature == null || this.signature.length != 64 || this.signature == new byte[64]) return false;
 		
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );

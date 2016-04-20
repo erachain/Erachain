@@ -22,6 +22,8 @@ import core.transaction.IssueNoteRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 
+import utils.Corekeys;
+
 //import com.google.common.primitives.Longs;
 
 import database.DBSet;
@@ -62,6 +64,12 @@ public class TestRecNote {
 
 	}
 	
+	@Test
+	public void testAddreessVersion() 
+	{
+		int vers = Corekeys.findAddressVersion("E");
+		assertEquals(-1111, vers);
+	}
 	
 	//ISSUE NOTE TRANSACTION
 	

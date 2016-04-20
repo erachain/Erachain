@@ -24,7 +24,7 @@ import database.DBSet;
 
 public class TransferAssetTransaction extends TransactionAmount {
 
-	private static final byte TYPE_ID = (byte)SEND_ASSET_TRANSACTION;
+	private static final byte TYPE_ID = (byte)TRANSFER_ASSET_TRANSACTION_OLD;
 	private static final String NAME_ID = "OLD: Send Asset";
 	//private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH; 
 	

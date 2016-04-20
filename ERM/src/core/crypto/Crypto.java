@@ -17,7 +17,7 @@ import core.account.PrivateKeyAccount;
 
 public class Crypto {
 
-	public static final byte ADDRESS_VERSION = 58;
+	public static final byte ADDRESS_VERSION = 15;
 	public static final byte AT_ADDRESS_VERSION = 23;
 	
 	private static Crypto instance;

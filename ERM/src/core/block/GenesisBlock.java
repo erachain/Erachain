@@ -29,7 +29,7 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference =  new byte[]{19,66,8,21,0,0,0,0};
-	private static long genesisGeneratingBalance = 1111111111L; // starting max volume for generating
+	private static long genesisGeneratingBalance = 12000000L; // starting max volume for generating	
 	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[]{0,1,2,3,4,13,31,13,31,13,31});
 
 	private String testnetInfo; 
@@ -37,7 +37,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance, genesisGenerator, generateHash(null), null, 0);
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance / 5, genesisGenerator, generateHash(null), null, 0);
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		
@@ -72,11 +72,11 @@ public class GenesisBlock extends Block{
 		} else {
 			Account recipient;
 			Long timestamp = genesisTimestamp;
-			BigDecimal bdAmount = new BigDecimal("1111111111.").setScale(8);
+			BigDecimal bdAmount;
 			List<String> recipients = Arrays.asList(					
-					"QStUHLofuyCBy3UR2Rr8WRNnPc56WZYzWu","QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc","QYgYu43QEMv2cf1QC8nq5PwVRQrNVk81MM",
-					"Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP","QiZSovPpdyAhLW66P2KkF5UynR9RtVsLPN","QYMA8MopsHnWx4B28zUFArAsCmZoPx3ooG",
-					"QXuzwBv17fmDQD3y5Emhu7qiFoRYCDE8jS","QVcP2HUjxrGrb6ARWmu6h6x1fCTxatFw2H","QLdMWd4QAhLuAtq3G1WCrHd6WTJ7GV4jdk");
+					"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ","7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz","7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB",
+					"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC","77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy","77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy",
+					"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5","7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r","7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 			
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 
@@ -102,7 +102,8 @@ public class GenesisBlock extends Block{
 			{
 				recipient = new Account(address);
 				
-				bdAmount = new BigDecimal(asset0.getQuantity()).divide(new BigDecimal(9));
+				bdAmount = new BigDecimal(asset0.getQuantity()).setScale(8)
+						.divide(new BigDecimal(10).setScale(8)).setScale(8);
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp++));
 
 				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
@@ -123,11 +124,11 @@ public class GenesisBlock extends Block{
 		switch(key)
 		{
 		case 1:
-			return new AssetVenture(genesisGenerator, "OIL", "It is an OILing drops used for fees", 99999999L, (byte) 8, true);
+			return new AssetVenture(genesisGenerator, "LAEV", "It is a Life ans Vote for the voting participants of the environment", 999999999999999999L, (byte)0, false);
 		case 2:
-			return new AssetVenture(genesisGenerator, "GEM", "It is a GEM for the voting participants of the environment", 999999999999999999L, (byte) 0, false);
+			return new AssetVenture(genesisGenerator, "DIL", "It is an DILing drops used for fees", 99999999L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, "ERM", "It is the basic unit of Environment Real Management", 9999999999L, (byte) 6, true);
+		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 

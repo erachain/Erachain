@@ -50,7 +50,7 @@ public class Settings {
 	public static final int BLOCK_MAX_SIGNATURES = 5000;
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1460992991336L; // CORE RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1461055038336L; // CORE RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -60,6 +60,7 @@ public class Settings {
 	
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
+	public static final int DEFAULT_ACCOUNTS = 3;
 	
 	//WEB
 	private static final int DEFAULT_WEB_PORT = 9090;
@@ -348,7 +349,7 @@ public class Settings {
 			if(this.cacheInternetPeers.size() == 0 || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
-				URL u = new URL("https://raw.githubusercontent.com/Qoracoin/Qora/master/Qora/peers.json");
+				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase/master/ERM/peers.json");
 				InputStream in = u.openStream();
 				String stringInternetSettings = IOUtils.toString( in );
 				JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);

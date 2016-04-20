@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import controller.Controller;
 import core.crypto.Base58;
 import lang.Lang;
+import settings.Settings;
 
 @SuppressWarnings("serial")
 public class CreateWalletFrame extends JFrame {
@@ -199,10 +200,12 @@ public class CreateWalletFrame extends JFrame {
 	public void onConfirm(String password) 
 	{
 		//CREATE WALLET
-		Controller.getInstance().recoverWallet(this.seed, password, 10);
+		Controller.getInstance().recoverWallet(this.seed, password, Settings.DEFAULT_ACCOUNTS);
 		
 		//LET GUI KNOW
 		parent.onWalletCreated();
+		
+		
 		
 		//CLOSE THIS WINDOW
 		this.dispose();

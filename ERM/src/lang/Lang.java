@@ -1,6 +1,5 @@
 package lang;
 
-// 30/03
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,23 +15,12 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import settings.Settings;
-import utils.Pair;
-
 
 public class Lang {
-
-	public static String[] transactionTypes = Lang.getInstance().translate(new String[]{"Extended",
-			"Genesis", "Genesis Issue", "Genesis Send", "Reserved_4", "Payment",
-			"Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase",
-			"Poll Creation", "Poll Vote", "Reserved", "Reserved",
-			"Arbitrary Transaction", "Reserved", 
-			"Issue Asset", "Transfer Asset", "Order Creation", "Cancel Order",
-			"Multi Payment", "Reserved", "Deploy AT", "Reserved", "Message Transaction",
-			"Accounting", "JsonSend"});
-
-	public static final String translationsUrl = "https://raw.githubusercontent.com/Qoracoin/translations/master/";
+												
+	public static final String translationsUrl = "https://raw.githubusercontent.com/icreator/ERMbase/master/";
+	
 	private static final Logger LOGGER = Logger.getLogger(Lang.class);
-
 	private static Lang instance;
 	private Map<String, String> noTranslateMap;
 	
@@ -142,12 +130,37 @@ public class Lang {
 		}
 				
 		return langJsonObject;
-		
 	}
 
-	public List<LangFile> getListOfAvailable()
+	public List<LangFile> getLangListAvailable()
 	{
 		List<LangFile> lngList = new ArrayList<>();
+
+		List<String> fileList = getFileListAvailable();
+		
+		lngList.add( new LangFile() );
+
+        for(int i=0; i<fileList.size(); i++)           
+        {
+        	if(!fileList.get(i).equals("en.json"))
+        	{
+        		try {
+        			JSONObject langFile = openLangFile(fileList.get(i));
+        			String lang_name = (String)langFile.get("_lang_name_");
+        			long time_of_translation = ((Long)langFile.get("_timestamp_of_translation_")).longValue();
+        			lngList.add( new LangFile( lang_name, fileList.get(i), time_of_translation) );
+        		} catch (Exception e) {
+        			LOGGER.error(e.getMessage(),e);
+        		}
+        	}
+        }
+        
+        return lngList;
+	}
+	
+	public List<String> getFileListAvailable()
+	{
+		List<String> lngFileList = new ArrayList<>();
 		
 		File[] fileList;        
         File dir = new File(Settings.getInstance().getLangDir());
@@ -158,24 +171,15 @@ public class Lang {
         
         fileList = dir.listFiles();
         
-		lngList.add( new LangFile() );
-
+        lngFileList.add("en.json");
+        
         for(int i=0; i<fileList.length; i++)           
         {
         	if(fileList[i].isFile() && fileList[i].getName().endsWith(".json")) {
-        		try {
-        			JSONObject langFile = openLangFile(fileList[i].getName());
-        			String lang_name = (String)langFile.get("_lang_name_");
-        			long time_of_translation = ((Long)langFile.get("_timestamp_of_translation_")).longValue();
-        			lngList.add( new LangFile( lang_name, fileList[i].getName(), time_of_translation) );
-        		} catch (Exception e) {
-        			LOGGER.error(e.getMessage(),e);
-        		}
+        		lngFileList.add(fileList[i].getName());
         	}
         }
         
-        return lngList;
+        return lngFileList;
 	}
-	
-		
 }

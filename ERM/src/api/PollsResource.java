@@ -156,11 +156,7 @@ public class PollsResource
 			case Transaction.NOT_ENOUGH_FEE:
 					
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-				
-			case Transaction.FEE_LESS_REQUIRED:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_FEE_LESS_REQUIRED);
-					
+									
 			case Transaction.NO_BALANCE:	
 					
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
@@ -279,11 +275,7 @@ public class PollsResource
 			case Transaction.NOT_ENOUGH_FEE:
 					
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-				
-			case Transaction.FEE_LESS_REQUIRED:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_FEE_LESS_REQUIRED);
-					
+									
 			case Transaction.NO_BALANCE:	
 					
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
