@@ -392,7 +392,7 @@ public class SettingsBasicPanel extends JPanel
         
         cbxListOfAvailableLangs = new JComboBox<LangFile>();
         
-        for (LangFile langFile : Lang.getInstance().getListOfAvailable()) {
+        for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
         	cbxListOfAvailableLangs.addItem(langFile);
         	
         	if(langFile.getFileName().equals(Settings.getInstance().getLang())) {
@@ -475,7 +475,7 @@ public class SettingsBasicPanel extends JPanel
 	        								
 	        						        cbxListOfAvailableLangs.removeAllItems();
 	        						        
-	        						        for (LangFile langFile : Lang.getInstance().getListOfAvailable()) {
+	        						        for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
 	        						        	cbxListOfAvailableLangs.addItem(langFile);
 	        						        	
 	        						        	if(langFile.getFileName().equals(langFileName)) {
