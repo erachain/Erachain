@@ -2,9 +2,9 @@
 /Data Files
 /wallet*
 /bin/
-/languages/
 /ACCOUNTS.txt
 /ERM.iml
+*.iml
 
 /log.txt
 peers.json
