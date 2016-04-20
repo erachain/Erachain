@@ -142,7 +142,7 @@ public class Lang {
 
         for(int i=0; i<fileList.size(); i++)           
         {
-        	if(!fileList.get(i).equals("en.json"))
+        	if(!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json"))
         	{
         		try {
         			JSONObject langFile = openLangFile(fileList.get(i));
