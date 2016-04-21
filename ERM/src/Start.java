@@ -89,10 +89,10 @@ public class Start {
 					throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
 				}
 				
-				LOGGER.info(Lang.getInstance().translate("Starting %qora% / version: %version% / build date: %builddate% / ...")
+				LOGGER.info(Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
 						.replace("%version%", Controller.getInstance().getVersion())
 						.replace("%builddate%", Controller.getInstance().getBuildDateString())
-						.replace("%qora%", Lang.getInstance().translate("DATACHAINS.world"))
+						.replace("%app%", Lang.getInstance().translate("DATACHAINS.world"))
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
