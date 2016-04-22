@@ -155,10 +155,10 @@ public class TransactionFactory {
 			//PARSE ISSUE ASSET TRANSACTION
 			return GenesisIssueNoteTransaction.Parse(data);
 
-		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
+		case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
-			return GenesisIssueAssetTransaction.Parse(data);
+			//PARSE ISSUE STATUS TRANSACTION
+			return GenesisIssueStatusTransaction.Parse(data);
 
 		case Transaction.GENESIS_TRANSACTION:
 			

@@ -41,7 +41,7 @@ public abstract class UnionCls extends ItemCls{
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getStatusMap();
+		return db.getItemStatusMap();
 	}
 	public IssueItemMap getDBIssueMap(DBSet db)
 	{

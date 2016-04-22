@@ -299,7 +299,7 @@ public class IssueItemFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 				
-			case Transaction.ACCOUNT_NOT_PERSON:
+			case Transaction.ACCOUNT_NOT_PERSONALIZED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	

@@ -69,7 +69,7 @@ public class OrderTests
 		
 		//ADD ERM ASSET
     	AssetCls ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte)2, true);
-    	dbSet.getAssetMap().set(0l, ermAsset);
+    	dbSet.getItemAssetMap().set(0l, ermAsset);
 		
 		//CREATE ASSET A
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

@@ -22,11 +22,13 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.statuses.StatusCls;
 import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
-import database.BalanceMap;
+import core.item.statuses.StatusCls;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 import utils.Converter;
 
@@ -40,8 +42,7 @@ public class R_SertifyPerson extends Transaction {
 	private static final BigDecimal MIN_VOTE_BALANCE = BigDecimal.valueOf(10).setScale(8);
 
 	// how many OIL gift
-	public static final BigDecimal OIL_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
-	public static final BigDecimal VOTE_AMOUNT = BigDecimal.ONE.setScale(8);
+	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
 
 	protected long key;
 	protected Integer duration; // duration in days 
@@ -372,21 +373,20 @@ public class R_SertifyPerson extends Transaction {
 		{
 			return INVALID_ADDRESS;
 		}
-		
-		BigDecimal balERM = this.creator.getConfirmedBalance(ERMO_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-		{
-			return Transaction.NOT_ENOUGH_ERM;
-		}
-		
-		BigDecimal balVOTE = this.creator.getConfirmedBalance(0l, db);
-		if ( balVOTE.compareTo(MIN_VOTE_BALANCE)<0 )
-		{
-			return Transaction.INVALID_AMOUNT;
-		}
 
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
+		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+		{
+			return Transaction.NOT_ENOUGH_RIGHTS;
+		}
+
+		if ( !this.creator.isPerson(db) )
+		{
+			return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		}
 		
 		// ITEM EXIST?
 		if (!db.getPersonMap().contains(this.key))
@@ -402,12 +402,11 @@ public class R_SertifyPerson extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 
-		// send VOTE_KEY
-		this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db).subtract(OIL_AMOUNT), db);						
-		this.creator.setConfirmedBalance(LAEV_KEY, this.creator.getConfirmedBalance(LAEV_KEY, db).subtract(VOTE_AMOUNT), db);						
+		// send FEE_KEY
+		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
 		//UPDATE USER
-		this.userAccount1.setConfirmedBalance(Transaction.DIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.DIL_KEY, db).add(OIL_AMOUNT), db);
-		this.userAccount1.setConfirmedBalance(Transaction.LAEV_KEY, this.userAccount1.getConfirmedBalance(Transaction.LAEV_KEY, db).add(VOTE_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
+		this.userAccount1.setConfirmedStatus(StatusCls.ALIVE_KEY, 0L, db);
 		
 		if (!asPack) {
 
@@ -426,12 +425,11 @@ public class R_SertifyPerson extends Transaction {
 		super.orphan(db, asPack);
 		
 		// BACK VOTE_KEY
-		this.creator.setConfirmedBalance(Transaction.DIL_KEY, this.creator.getConfirmedBalance(Transaction.DIL_KEY, db).add(OIL_AMOUNT), db);						
-		this.creator.setConfirmedBalance(Transaction.LAEV_KEY, this.creator.getConfirmedBalance(Transaction.LAEV_KEY, db).add(VOTE_AMOUNT), db);						
+		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
 						
 		//UPDATE RECIPIENT
-		this.userAccount1.setConfirmedBalance(Transaction.DIL_KEY, this.userAccount1.getConfirmedBalance(Transaction.DIL_KEY, db).subtract(OIL_AMOUNT), db);
-		this.userAccount1.setConfirmedBalance(Transaction.LAEV_KEY, this.userAccount1.getConfirmedBalance(Transaction.LAEV_KEY, db).subtract(VOTE_AMOUNT), db);
+		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
+		this.userAccount1.removeConfirmedStatus(StatusCls.ALIVE_KEY, db);
 		
 		if (!asPack) {
 			

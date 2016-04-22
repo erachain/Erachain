@@ -267,6 +267,9 @@
 	"Issue":"Выпустить",
 	"Issue Asset Transaction":"Транзакция Выпуска Актива",
 	"Issue Asset":"Выпуск Актива",
+	"Issue Imprint":"Выпуск Отпечатка",
+	"Imprint issue has been sent!":"Выпуск Отпечатка заявлен!",
+	
 	"KEEP THIS SEED PRIVATE AND SECURE!":"СОХРАНЯЙТЕ ЭТОТ SEED В ТАЙНЕ И БЕЗОПАСНОСТИ",
 	"key already exists, edit is false":"",
 	"Key":"Ключ",
@@ -451,6 +454,7 @@
 	"The name is free, you can register it!":"Это имя свободно, вы можете зарегистрировать его!",
 	"The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him.":"",
 	"There are atleast two entries with duplicate keys (Bad key: %key%)":"",
+	"This Imprint already exists!":"Такой Отпечаток уже существует!",
 	"this blog is disabled":"этот блог отключен",
 	"this blog is empty":"этот блог пуст",
 	"This seed is the result of a Base58 encoded 256bit random key.":"Этот seed - результат Base58-закодированного случайного 256-битного ключа.",

@@ -2,6 +2,7 @@ package core.account;
 //04/01 +- 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -14,6 +15,7 @@ import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
@@ -48,7 +50,7 @@ public class Account {
 	
 	//BALANCE
 	
-	
+	// GET
 	public BigDecimal getUnconfirmedBalance()
 	{
 		return this.getUnconfirmedBalance(DBSet.getInstance());
@@ -66,7 +68,7 @@ public class Account {
 	
 	public BigDecimal getConfirmedBalance(DBSet db)
 	{
-		return db.getBalanceMap().get(getAddress());
+		return db.getAssetBalanceMap().get(getAddress());
 	}
 	
 	public BigDecimal getConfirmedBalance(long key)
@@ -76,9 +78,14 @@ public class Account {
 	
 	public BigDecimal getConfirmedBalance(long key, DBSet db)
 	{
-		return db.getBalanceMap().get(getAddress(), key);
+		return db.getAssetBalanceMap().get(getAddress(), key);
+	}
+	public Long getConfirmedStatus(long key, DBSet db)
+	{
+		return db.getStatusTimeMap().get(getAddress(), key).get(0);
 	}
 
+	// SET
 	public void setConfirmedBalance(BigDecimal amount)
 	{
 		this.setConfirmedBalance(amount, DBSet.getInstance());
@@ -87,19 +94,53 @@ public class Account {
 	public void setConfirmedBalance(BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceMap().set(getAddress(), amount);
+		db.getAssetBalanceMap().set(getAddress(), amount);
 	}
-	
+		
+	//
 	public void setConfirmedBalance(long key, BigDecimal amount)
 	{
 		this.setConfirmedBalance(key, amount, DBSet.getInstance());
 	}
-	
+
 	public void setConfirmedBalance(long key, BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceMap().set(getAddress(), key, amount);
+		db.getAssetBalanceMap().set(getAddress(), key, amount);
 	}
+
+	// STATUS
+	public void setConfirmedStatus(long key, Long  time)
+	{
+		this.setConfirmedStatus(key, time, DBSet.getInstance());
+	}
+	
+	public void removeConfirmedStatus(long key, DBSet db)
+	{
+		//UPDATE TIMES LIST IN DB
+		String address = getAddress();
+
+		List<Long> times = db.getStatusTimeMap().get(getAddress(), key);
+		
+		if (times.isEmpty()) return;
+		
+		times.remove(0);
+		db.getStatusTimeMap().set(address, key, times);
+	}
+	
+	public void setConfirmedStatus(long key, Long time, DBSet db)
+	{
+		//UPDATE PRIMARY TIME IN DB
+		String address = getAddress();
+
+		List<Long> times = db.getStatusTimeMap().get(getAddress(), key);
+		
+		if (!times.isEmpty() & times.get(0) == time) return;
+		
+		times.add(time);
+		db.getStatusTimeMap().set(address, key, times);
+	}
+
 	
 	public BigDecimal getBalance(int confirmations)
 	{
@@ -258,14 +299,14 @@ public class Account {
 				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
 				+ " - " + this.getAddress();
 				*/
-		return this.getConfirmedBalance(Transaction.DIL_KEY)
+		return this.getConfirmedBalance(AssetCls.DILE_KEY)
 				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.DIL_KEY)) + "}"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(AssetCls.DILE_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	

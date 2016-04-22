@@ -3,8 +3,10 @@ package core.account;
 import java.math.BigDecimal;
 
 import core.crypto.Crypto;
-import core.transaction.Transaction;
+//import core.transaction.Transaction;
+import core.item.statuses.StatusCls;
 import database.DBSet;
+import ntp.NTP;
 
 public class PublicKeyAccount extends Account {
 
@@ -28,8 +30,13 @@ public class PublicKeyAccount extends Account {
 	
 	public boolean isPerson(DBSet db) {
 		
-		BigDecimal vote = this.getConfirmedBalance(Transaction.LAEV_KEY, db);
-		if (vote.compareTo(BigDecimal.ONE) < 1) return false;
+		Long timestamp = this.getConfirmedStatus(StatusCls.ALIVE_KEY, db);
+		if (timestamp < 0 ) return false;
+		if (timestamp == 0 ) return true;
+		
+		// TEST TIME and EXPIRE TIME
+		long time = NTP.getTime();
+		if (timestamp < time ) return false;
 
 		return true;
 		

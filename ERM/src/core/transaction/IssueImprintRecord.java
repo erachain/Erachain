@@ -148,7 +148,7 @@ public class IssueImprintRecord extends IssueItemRecord
 		if (result != Transaction.VALIDATE_OK) return result;
 		
 		// CHECK reference in DB
-		if (item.getDBIssueMap(db).contains(item.getReference())) return Transaction.INVALID_AMOUNT;
+		if (item.getDBIssueMap(db).contains(item.getReference())) return Transaction.DUPLICATE_KEY;
 
 		return Transaction.VALIDATE_OK; 		
 	

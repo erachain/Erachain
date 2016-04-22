@@ -23,7 +23,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.payment.Payment;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class MultiPaymentTransaction extends Transaction {
@@ -222,10 +222,10 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, fork).subtract(this.fee), fork);
+		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, fork).subtract(this.fee), fork);
 		
 		//CHECK IF CREATOR HAS ENOUGH OIL BALANCE
-		if(this.creator.getConfirmedBalance(DIL_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
 		}	
@@ -252,7 +252,7 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 			
 			//CHECK IF AMOUNT IS DIVISIBLE
-			AssetCls aa = (AssetCls)db.getAssetMap().get(payment.getAsset()); 
+			AssetCls aa = (AssetCls)db.getItemAssetMap().get(payment.getAsset()); 
 			if(!aa.isDivisible())
 			{
 				//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
@@ -366,7 +366,7 @@ public class MultiPaymentTransaction extends Transaction {
 		for(Payment payment: this.payments)
 		{
 			//IF OIL ASSET
-			if(payment.getAsset() == BalanceMap.FEE_KEY)
+			if(payment.getAsset() == ItemAssetBalanceMap.FEE_KEY)
 			{
 				//IF CREATOR
 				if(address.equals(this.creator.getAddress()))
@@ -389,7 +389,7 @@ public class MultiPaymentTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

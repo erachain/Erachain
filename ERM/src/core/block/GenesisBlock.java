@@ -14,10 +14,16 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.notes.Note;
+import core.item.notes.NoteCls;
+import core.item.statuses.Status;
+import core.item.statuses.StatusCls;
+import core.transaction.Transaction;
 import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueStatusTransaction;
 import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
@@ -80,36 +86,46 @@ public class GenesisBlock extends Block{
 			
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 
+			// NOTES
 			//CREATE MY NOTE
-			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(0), timestamp++));
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeAssetNote(0), timestamp++));
 			//CREATE PERSONALIZE NOTE
-			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(1), timestamp++));
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeAssetNote(1), timestamp++));
 			//CREATE ESTABLISH NOTE
-			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeNote(2), timestamp++));
+			this.addTransaction(new GenesisIssueNoteTransaction(issuer, makeAssetNote(2), timestamp++));
+
+			// STATUSES
+			// ALIVE
+			this.addTransaction(new GenesisIssueStatusTransaction(issuer, makeStatus(0), timestamp++));
+			// DEAD
+			this.addTransaction(new GenesisIssueStatusTransaction(issuer, makeStatus(1), timestamp++));
+			// CITIZEN
+			this.addTransaction(new GenesisIssueStatusTransaction(issuer, makeStatus(2), timestamp++));
+			// MEMBER
+			this.addTransaction(new GenesisIssueStatusTransaction(issuer, makeStatus(3), timestamp++));
 			
 			AssetVenture asset0;
 			//CREATE ERM ASSET
-			asset0 = makeVenture(0);
+			asset0 = makeAssetVenture(0);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, timestamp++));
 			//CREATE JOB ASSET
-			AssetVenture asset1 = makeVenture(1);
+			AssetVenture asset1 = makeAssetVenture(1);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, timestamp++));
 			//CREATE VOTE ASSET
-			AssetVenture asset2 = makeVenture(2);
+			AssetVenture asset2 = makeAssetVenture(2);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, timestamp++));
 			
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
 				
-				bdAmount = new BigDecimal(asset0.getQuantity()).setScale(8)
-						.divide(new BigDecimal(10).setScale(8)).setScale(8);
+				bdAmount = new BigDecimal(asset0.getQuantity()).setScale(8).multiply(new BigDecimal(0.10));
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp++));
 
-				bdAmount = new BigDecimal(asset1.getQuantity()).divide(new BigDecimal(9));
+				bdAmount = new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(0.10));
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp++));
 				
-				bdAmount = new BigDecimal(asset2.getQuantity()).divide(new BigDecimal(9));
+				bdAmount = new BigDecimal(asset2.getQuantity()).multiply(new BigDecimal(0.10));
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 2l, bdAmount, timestamp++));
 			}
 			
@@ -119,28 +135,40 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public static AssetVenture makeVenture(int key) 
+	public static AssetVenture makeAssetVenture(int key) 
 	{
 		switch(key)
 		{
-		case 1:
-			return new AssetVenture(genesisGenerator, "LAEV", "It is a Life ans Vote for the voting participants of the environment", 999999999999999999L, (byte)0, false);
-		case 2:
-			return new AssetVenture(genesisGenerator, "DIL", "It is an DILing drops used for fees", 99999999L, (byte)8, true);
+		case (int)Transaction.FEE_KEY:
+			return new AssetVenture(genesisGenerator, "LIEV", "It is an drops of life used for deals", 99999999L, (byte)8, true);
 		}
 		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
-	public static Note makeNote(int key) 
+	public static Note makeAssetNote(int key) 
 	{
 		switch(key)
 		{
-		case 1:
+		case (int)NoteCls.PERSONALIZE_KEY:
 			return new Note(genesisGenerator, "Introduce Myself", "I, %First Name% %Middle Name% %Last Name%, date of birth \"%date of Birth%\", place of birth \"%Place of Birth%\", race \"%Race%\", height \"%height%\", color \"%Color%\", eye color \"Eye Color\", hair color \"%Hair Color%\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
-		case 2:
+		case (int)NoteCls.ESTABLISH_UNION_KEY:
 			return new Note(genesisGenerator, "Establish the Company", "Company name \"%Company Name%\" in country \"%Country%\"");
 		}
 		return new Note(genesisGenerator, "Introduce Me", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+	}
+	// make notes
+	public static Status makeStatus(int key) 
+	{
+		switch(key)
+		{
+		case (int)StatusCls.DEAD_KEY:
+			return new Status(genesisGenerator, "dead", "Person is dead");
+		case (int)StatusCls.CITIZEN_KEY:
+			return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
+		case (int)StatusCls.MEMBER_KEY:
+			return new Status(genesisGenerator, "Member", "I am member of %union%");
+		}
+		return new Status(genesisGenerator, "Alive", "I am alive.");
 	}
 
 	public String getTestNetInfo() 

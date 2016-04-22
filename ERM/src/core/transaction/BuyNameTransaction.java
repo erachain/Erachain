@@ -21,7 +21,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.naming.Name;
 import core.naming.NameSale;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class BuyNameTransaction extends Transaction
@@ -222,7 +222,7 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -248,10 +248,10 @@ public class BuyNameTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), DIL_KEY, this.fee);
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.nameSale.getAmount());
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.nameSale.getAmount());
 		
-		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), BalanceMap.FEE_KEY, this.nameSale.getAmount());
+		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), ItemAssetBalanceMap.FEE_KEY, this.nameSale.getAmount());
 		
 		return assetAmount;
 	}

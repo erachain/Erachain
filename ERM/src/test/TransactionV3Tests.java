@@ -134,8 +134,8 @@ public class TransactionV3Tests {
 		ermAsset.setReference(assetReference);
 		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(assetReference);
-		databaseSet.getAssetMap().set(0l, ermAsset);
-		databaseSet.getAssetMap().set(61l, aTFundingAsset);
+		databaseSet.getItemAssetMap().set(0l, ermAsset);
+		databaseSet.getItemAssetMap().set(61l, aTFundingAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
 		genesisBlock.process(databaseSet);
@@ -230,8 +230,8 @@ public class TransactionV3Tests {
 		ermAsset.setReference(assetReference);
 		AssetCls aTFundingAsset = new AssetVenture(genesisBlock.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(genesisBlock.getGeneratorSignature());
-		databaseSet.getAssetMap().set(0l, ermAsset);
-		databaseSet.getAssetMap().set(61l, aTFundingAsset);
+		databaseSet.getItemAssetMap().set(0l, ermAsset);
+		databaseSet.getItemAssetMap().set(61l, aTFundingAsset);
 
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

@@ -165,7 +165,7 @@ public class TrNoteTestAsPack {
 				
 		//CHECK NOTE EXISTS SENDER
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(true, db.getNoteMap().contains(key));
+		assertEquals(true, db.getItemNoteMap().contains(key));
 		
 		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2);
@@ -173,12 +173,12 @@ public class TrNoteTestAsPack {
 		issueNoteTransaction_2.process(db, asPack);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
 		issueNoteTransaction_2.orphan(db, asPack);
-		ItemNoteMap noteMap = db.getNoteMap();
+		ItemNoteMap noteMap = db.getItemNoteMap();
 		int mapSize = noteMap.size();
 		assertEquals(0, mapSize - 4);
 		
 		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(db.getNoteMap().get(key).toBytes(includeReference), note.toBytes(includeReference)));
+		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(includeReference), note.toBytes(includeReference)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(makerReference, maker.getLastReference(db)));
@@ -204,7 +204,7 @@ public class TrNoteTestAsPack {
 		issueNoteRecord.orphan(db, asPack);
 				
 		//CHECK NOTE EXISTS SENDER
-		assertEquals(false, db.getNoteMap().contains(key));
+		assertEquals(false, db.getItemNoteMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(makerReference, maker.getLastReference(db)));

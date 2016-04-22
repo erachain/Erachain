@@ -22,7 +22,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class RecordReleasePack extends Transaction {
@@ -310,7 +310,7 @@ public class RecordReleasePack extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
 		
 		for(Transaction transaction: this.transactions)
 		{

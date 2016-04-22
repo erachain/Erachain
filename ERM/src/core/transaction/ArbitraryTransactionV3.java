@@ -234,7 +234,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		super.process(fork, false);
 
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -259,7 +259,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			}
 
 			// CHECK IF AMOUNT IS DIVISIBLE
-			AssetCls aa = (AssetCls) db.getAssetMap().get(payment.getAsset());
+			AssetCls aa = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
 			if (!aa.isDivisible()) {
 				// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 				if (payment.getAmount().stripTrailingZeros().scale() > 0) {

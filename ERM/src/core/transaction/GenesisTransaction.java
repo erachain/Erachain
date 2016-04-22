@@ -18,7 +18,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class GenesisTransaction extends Transaction {
@@ -240,7 +240,7 @@ public class GenesisTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<String, Map<Long, BigDecimal>>();
 		
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), BalanceMap.FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

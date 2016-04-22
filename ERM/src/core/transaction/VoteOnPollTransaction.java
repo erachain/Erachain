@@ -21,7 +21,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class VoteOnPollTransaction extends Transaction 
@@ -337,7 +337,7 @@ public class VoteOnPollTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {

@@ -16,6 +16,7 @@ import org.junit.Test;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import core.item.notes.Note;
 import core.item.notes.NoteCls;
 import core.transaction.IssueNoteRecord;
@@ -36,7 +37,8 @@ public class TestRecNote {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = Transaction.DIL_KEY;
+	long FEE_KEY = AssetCls.DILE_KEY;
+	long VOTE_KEY = AssetCls.ERMO_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -61,6 +63,7 @@ public class TestRecNote {
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(VOTE_KEY, BigDecimal.valueOf(10).setScale(8), db);
 
 	}
 	
@@ -180,7 +183,7 @@ public class TestRecNote {
 				
 		//CHECK NOTE EXISTS SENDER
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(true, db.getNoteMap().contains(key));
+		assertEquals(true, db.getItemNoteMap().contains(key));
 		
 		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
@@ -188,12 +191,12 @@ public class TestRecNote {
 		issueNoteTransaction_2.process(db, false);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
 		issueNoteTransaction_2.orphan(db, false);
-		ItemNoteMap noteMap = db.getNoteMap();
+		ItemNoteMap noteMap = db.getItemNoteMap();
 		int mapSize = noteMap.size();
 		assertEquals(0, mapSize - 4);
 		
 		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(db.getNoteMap().get(key).toBytes(true), note.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(true), note.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
@@ -218,7 +221,7 @@ public class TestRecNote {
 		issueNoteRecord.orphan(db, false);
 				
 		//CHECK NOTE EXISTS SENDER
-		assertEquals(false, db.getNoteMap().contains(key));
+		assertEquals(false, db.getItemNoteMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), maker.getLastReference(db)));

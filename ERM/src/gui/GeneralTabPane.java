@@ -124,13 +124,13 @@ public class GeneralTabPane extends JTabbedPane{
         this.addTab(Lang.getInstance().translate("Voting"), new VotingPanel());       
         
 		//ATs
-		this.addTab(Lang.getInstance().translate("AT"), new ATPanel());
+		//this.addTab(Lang.getInstance().translate("AT"), new ATPanel());
 
 		//AT TXs
-		this.addTab(Lang.getInstance().translate("AT Transactions"), new ATTransactionsPanel());
+		//this.addTab(Lang.getInstance().translate("AT Transactions"), new ATTransactionsPanel());
 
 		//AT Acct
-		this.addTab(Lang.getInstance().translate("ACCT"), new AcctPanel());
+		//this.addTab(Lang.getInstance().translate("ACCT"), new AcctPanel());
 	}
 	
 }

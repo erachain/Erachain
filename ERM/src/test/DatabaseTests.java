@@ -41,37 +41,37 @@ public class DatabaseTests {
 		DBSet fork = databaseSet.fork();
 		
 		//SET BALANCE
-		databaseSet.getBalanceMap().set("test", BigDecimal.ONE);
+		databaseSet.getAssetBalanceMap().set("test", BigDecimal.ONE);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
 		
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.ONE, fork.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test"));
 		
 		//SET BALANCE IN FORK
-		fork.getBalanceMap().set("test", BigDecimal.TEN);
+		fork.getAssetBalanceMap().set("test", BigDecimal.TEN);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
 				
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.TEN, fork.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test"));
 		
 		//CREATE SECOND FORK
 		DBSet fork2 = fork.fork();
 		
 		//SET BALANCE IN FORK2
-		fork2.getBalanceMap().set("test", BigDecimal.ZERO);
+		fork2.getAssetBalanceMap().set("test", BigDecimal.ZERO);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
 						
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.TEN, fork.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test"));
 		
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.ZERO, fork2.getBalanceMap().get("test"));
+		assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get("test"));
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class DatabaseTests {
 		GenesisBlock gb = new GenesisBlock();
 		gb.process();
 		
-		ItemAssetMap db = DBSet.getInstance().getAssetMap();
+		ItemAssetMap db = DBSet.getInstance().getItemAssetMap();
 		Collection<ItemCls> assets = db.getValues();
 		for (ItemCls asset:assets) {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
@@ -131,7 +131,7 @@ public class DatabaseTests {
 		
 		long key = asset.getKey(db);
 		
-		ItemAssetMap assetDB = db.getAssetMap();
+		ItemAssetMap assetDB = db.getItemAssetMap();
 		Collection<ItemCls> assets = assetDB.getValues();
 		for (ItemCls asset_2:assets) {
 			AssetCls aa = (AssetCls) asset_2;

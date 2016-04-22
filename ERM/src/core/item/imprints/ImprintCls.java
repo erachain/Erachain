@@ -31,7 +31,7 @@ public abstract class ImprintCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getImprintMap();
+		return db.getItemImprintMap();
 	}
 	public IssueItemMap getDBIssueMap(DBSet db)
 	{

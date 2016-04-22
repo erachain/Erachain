@@ -18,7 +18,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 import utils.Converter;
 
@@ -56,6 +56,9 @@ public class MessageTransaction extends TransactionAmount {
 	}
 	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+	}
+	public MessageTransaction(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference, signature);
 	}
 	// as pack
 	public MessageTransaction(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, byte[] reference) {

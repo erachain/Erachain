@@ -50,7 +50,7 @@ public class Accounting extends Account {
 	
 	public BigDecimal getConfirmedBalance(DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress());
+		return db.getAssetBalanceAccountingMap().get(getAddress());
 	}
 	
 	public BigDecimal getConfirmedBalance(long key)
@@ -60,7 +60,7 @@ public class Accounting extends Account {
 	
 	public BigDecimal getConfirmedBalance(long key, DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress(), key);
+		return db.getAssetBalanceAccountingMap().get(getAddress(), key);
 	}
 	public BigDecimal getConfirmedBalance(byte[] hkey)
 	{
@@ -69,7 +69,7 @@ public class Accounting extends Account {
 	
 	public BigDecimal getConfirmedBalance(byte[] hkey, DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress(), 2l);
+		return db.getAssetBalanceAccountingMap().get(getAddress(), 2l);
 	}
 
 	public void setConfirmedBalance(BigDecimal amount)
@@ -80,7 +80,7 @@ public class Accounting extends Account {
 	public void setConfirmedBalance(BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceAccountingMap().set(getAddress(), amount);
+		db.getAssetBalanceAccountingMap().set(getAddress(), amount);
 	}
 	
 	public void setConfirmedBalance(long key, BigDecimal amount)
@@ -103,7 +103,7 @@ public class Accounting extends Account {
 	public void setConfirmedBalance(long key, BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceAccountingMap().set(getAddress(), key, amount);
+		db.getAssetBalanceAccountingMap().set(getAddress(), key, amount);
 	}
 
 	public BigDecimal getBalance(int confirmations)

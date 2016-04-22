@@ -20,7 +20,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.Order;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class CancelOrderTransaction extends Transaction
@@ -184,7 +184,7 @@ public class CancelOrderTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -281,7 +281,7 @@ public class CancelOrderTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), DIL_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
 		Order order;
 

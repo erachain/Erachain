@@ -194,7 +194,7 @@ public class GenesisIssueNoteTransaction extends Transaction
 		this.creator.setLastReference(this.signature, db);
 
 		//INSERT INTO DATABASE
-		ItemNoteMap noteMap = db.getNoteMap();
+		ItemNoteMap noteMap = db.getItemNoteMap();
 		int mapSize = noteMap.size();
 		//LOGGER.info("GENESIS MAP SIZE: " + noteMap.size());
 		long key = 0l;
@@ -220,7 +220,7 @@ public class GenesisIssueNoteTransaction extends Transaction
 				
 		//DELETE FROM DATABASE
 		long noteKey = db.getIssueNoteMap().get(this);
-		db.getNoteMap().delete(noteKey);	
+		db.getItemNoteMap().delete(noteKey);	
 				
 		//DELETE ORPHAN DATA
 		db.getIssueNoteMap().delete(this);

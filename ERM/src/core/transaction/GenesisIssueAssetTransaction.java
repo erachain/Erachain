@@ -204,7 +204,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 		this.creator.setLastReference(this.signature, db);
 
 		//INSERT INTO DATABASE
-		ItemAssetMap assetMap = db.getAssetMap();
+		ItemAssetMap assetMap = db.getItemAssetMap();
 		int mapSize = assetMap.size();
 		//LOGGER.info("GENESIS MAP SIZE: " + assetMap.size());
 		long key = 0l;
@@ -235,7 +235,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 				
 		//DELETE FROM DATABASE
 		long assetKey = db.getIssueAssetMap().get(this);
-		db.getAssetMap().delete(assetKey);	
+		db.getItemAssetMap().delete(assetKey);	
 		
 		//REMOVE ASSETS FROM OWNER
 		this.creator.setConfirmedBalance(assetKey, BigDecimal.ZERO.setScale(8), db);

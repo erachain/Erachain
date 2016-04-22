@@ -28,6 +28,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import database.DBSet;
 import settings.Settings;
 
@@ -86,9 +87,9 @@ public abstract class Transaction {
 	
 	public static final int INVALID_DURATION = 42;
 
-	public static final int NOT_ENOUGH_ERM = 50;
+	public static final int NOT_ENOUGH_RIGHTS = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
-	public static final int ACCOUNT_NOT_PERSON = 52;
+	public static final int ACCOUNT_NOT_PERSONALIZED = 52;
 	public static final int DUPLICATE_KEY = 53;
 
 	public static final int NOT_YET_RELEASED = 1000;
@@ -147,13 +148,12 @@ public abstract class Transaction {
 	//public static final int ACCOUNTING_TRANSACTION = 26;
 	//public static final int JSON_TRANSACTION = 27;
 
-	// CORE KEY
-	public static final long ERMO_KEY = 0l;
-	// PERSON KEY
-	public static final long LAEV_KEY = 1l;
-	// FEE KEY
-	public static final long DIL_KEY = 2l;
 	// FEE PARAMETERS
+	public static final long RIGHTS_KEY = AssetCls.ERMO_KEY;
+
+	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
+
+	public static final long FEE_KEY = AssetCls.DILE_KEY;
 	public static final int FEE_PER_BYTE = 1;
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
 	public static final float FEE_POW_BASE = (float)1.5;
@@ -490,7 +490,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -513,7 +513,7 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db)
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
@@ -533,7 +533,7 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db).add(this.fee), db);
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
 				this.creator.setLastReference(this.reference, db);

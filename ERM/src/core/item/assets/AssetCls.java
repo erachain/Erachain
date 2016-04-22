@@ -13,6 +13,11 @@ import database.IssueItemMap;
 
 public abstract class AssetCls extends ItemCls {
 
+	// CORE KEY
+	public static final long ERMO_KEY = 0l;
+	// FEE KEY
+	public static final long DILE_KEY = 2l;
+
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;
 	public static final int NAME = 3;
@@ -35,7 +40,7 @@ public abstract class AssetCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getAssetMap();
+		return db.getItemAssetMap();
 	}
 	public IssueItemMap getDBIssueMap(DBSet db)
 	{

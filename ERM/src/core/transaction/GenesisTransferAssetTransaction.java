@@ -21,7 +21,7 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class GenesisTransferAssetTransaction extends Transaction {
@@ -211,7 +211,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 						
 		//CHECK IF AMOUNT IS DIVISIBLE
 		// genesis assets not in DB yet and need take it from genesis maker
-		if(!GenesisBlock.makeVenture((int)this.key).isDivisible())
+		if(!GenesisBlock.makeAssetVenture((int)this.key).isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 			if(this.getAmount().stripTrailingZeros().scale() > 0)
@@ -300,7 +300,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		String address = account.getAddress();
 		
 		//IF OIL ASSET
-		if(this.key == BalanceMap.FEE_KEY)
+		if(this.key == ItemAssetBalanceMap.FEE_KEY)
 		{
 			//IF CREATOR
 			if(address.equals(this.creator.getAddress()))

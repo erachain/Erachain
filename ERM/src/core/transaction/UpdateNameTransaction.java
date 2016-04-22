@@ -19,7 +19,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.naming.Name;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class UpdateNameTransaction extends Transaction 
@@ -200,7 +200,7 @@ public class UpdateNameTransaction extends Transaction
 		}
 		
 		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -286,7 +286,7 @@ public class UpdateNameTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {
