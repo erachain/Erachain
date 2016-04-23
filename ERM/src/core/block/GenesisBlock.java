@@ -26,7 +26,8 @@ import core.transaction.GenesisIssueNoteTransaction;
 import core.transaction.GenesisIssueStatusTransaction;
 import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
-import core.transaction.Transaction;
+import core.transaction.GenesisTransferStatusTransaction;
+//import core.transaction.Transaction;
 import database.DBSet;
 import settings.Settings;
 import utils.Pair;
@@ -80,9 +81,15 @@ public class GenesisBlock extends Block{
 			Long timestamp = genesisTimestamp;
 			BigDecimal bdAmount;
 			List<String> recipients = Arrays.asList(					
-					"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ","7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz","7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB",
-					"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC","77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy","77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy",
-					"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5","7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r","7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
+					"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ","7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz",//"7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB",
+					"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC","77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy",//"77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy",
+					"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5","7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r"//,"7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"
+					);
+
+			List<String> minoreRecipients = Arrays.asList(					
+					"7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd","78T3Eof2c4EyhuHc3qCunJ3Wk3TCYyQTnb","7NavQiMdL4nSsDMppnVoc6gtoCnREZXrEC",
+					"753BpHWMyKxKVjsSUiceBab1mydcVEoKDD","7QGXujqsuJeb9YeW5L83vaEu3SsWXsRtXc","7RLwEuNLN6tJaksaKH1CuBmDGPnmLNDwri",
+					"73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo");
 			
 			PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
 
@@ -106,27 +113,42 @@ public class GenesisBlock extends Block{
 			
 			AssetVenture asset0;
 			//CREATE ERM ASSET
-			asset0 = makeAssetVenture(0);
+			asset0 = makeAssetVenture(Transaction.RIGHTS_KEY);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset0, timestamp++));
 			//CREATE JOB ASSET
-			AssetVenture asset1 = makeAssetVenture(1);
+			AssetVenture asset1 = makeAssetVenture(Transaction.FEE_KEY);
 			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset1, timestamp++));
-			//CREATE VOTE ASSET
-			AssetVenture asset2 = makeAssetVenture(2);
-			this.addTransaction(new GenesisIssueAssetTransaction(issuer, asset2, timestamp++));
 			
+			// TRANSFERS
+			float koeff = (float)0.10;
 			for(String address: recipients)
 			{
 				recipient = new Account(address);
 				
-				bdAmount = new BigDecimal(asset0.getQuantity()).setScale(8).multiply(new BigDecimal(0.10));
+				bdAmount = new BigDecimal(asset0.getQuantity() * koeff).setScale(8);
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp++));
 
-				bdAmount = new BigDecimal(asset1.getQuantity()).multiply(new BigDecimal(0.10));
+				bdAmount = new BigDecimal(asset1.getQuantity() * koeff).setScale(8);
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp++));
 				
-				bdAmount = new BigDecimal(asset2.getQuantity()).multiply(new BigDecimal(0.10));
-				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 2l, bdAmount, timestamp++));
+				// STATUS ALIVE
+				this.addTransaction(new GenesisTransferStatusTransaction(issuer, recipient, 0l, timestamp++));
+				
+			}
+			koeff = (float)0.00001;
+			for(String address: minoreRecipients)
+			{
+				recipient = new Account(address);
+				
+				bdAmount = new BigDecimal(asset0.getQuantity() * koeff).setScale(8);
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 0l, bdAmount, timestamp++));
+
+				bdAmount = new BigDecimal(asset1.getQuantity() * koeff).setScale(8);
+				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp++));
+				
+				// STATUS ALIVE
+				this.addTransaction(new GenesisTransferStatusTransaction(issuer, recipient, 0l, timestamp++));
+
 			}
 			
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
@@ -135,9 +157,9 @@ public class GenesisBlock extends Block{
 	}
 
 	// make assets
-	public static AssetVenture makeAssetVenture(int key) 
+	public static AssetVenture makeAssetVenture(long key) 
 	{
-		switch(key)
+		switch((int)key)
 		{
 		case (int)Transaction.FEE_KEY:
 			return new AssetVenture(genesisGenerator, "LIEV", "It is an drops of life used for deals", 99999999L, (byte)8, true);
