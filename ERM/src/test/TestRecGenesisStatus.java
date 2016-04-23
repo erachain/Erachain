@@ -228,10 +228,7 @@ public class TestRecGenesisStatus {
 		
 		//CHECK STATUS IS CORRECT
 		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true), status.toBytes(true)));
-		
-		//CHECK STATUS BALANCE SENDER
-		assertEquals(0, db.getStatusTimeMap().get(maker.getAddress(), key).get(0).longValue());
-				
+						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(genesisIssueStatusTransaction.getSignature(), maker.getLastReference(db)));
 	}
@@ -246,16 +243,10 @@ public class TestRecGenesisStatus {
 		assertEquals(true, Arrays.equals(genesisIssueStatusTransaction.getSignature(), maker.getLastReference(db)));
 		
 		genesisIssueStatusTransaction.orphan(db, false);
-		
-		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(key,db));
-		
+				
 		//CHECK STATUS EXISTS SENDER
 		assertEquals(false, db.getItemStatusMap().contains(key));
-		
-		//CHECK STATUS BALANCE SENDER
-		assertEquals(0, db.getStatusTimeMap().get(maker.getAddress(), key).get(0).longValue());
-				
+						
 		//CHECK REFERENCE SENDER
 		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueStatusTransaction.getReference(), maker.getLastReference(db)));
 		assertEquals(true, Arrays.equals(new byte[0], maker.getLastReference(db)));
@@ -271,7 +262,7 @@ public class TestRecGenesisStatus {
 		initIssue(false);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 		
 		//CREATE STATUS TRANSFER
@@ -289,7 +280,7 @@ public class TestRecGenesisStatus {
 		initIssue(true);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
 
 		//CREATE VALID STATUS TRANSFER
 		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
@@ -329,7 +320,7 @@ public class TestRecGenesisStatus {
 		initIssue(true);		
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID STATUS TRANSFER
 		GenesisTransferStatusTransaction genesisTransferStatus = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
@@ -395,65 +386,29 @@ public class TestRecGenesisStatus {
 	}
 	
 	@Test
-	public void processGenesisTransferStatusTransaction()
+	public void process_orphan_GenesisTransferStatusTransaction()
 	{
 
 		initIssue(false);		
-		BigDecimal maker_balance = maker.getConfirmedBalance(FEE_KEY, db);
 		genesisIssueStatusTransaction.process(false);
-		
-		//CHECK BALANCE SENDER
-		assertEquals(maker_balance, maker.getConfirmedBalance(key, db));
-			
+					
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+		assertEquals(-1, (long)recipient.getConfirmedStatus(key, db));
 			
 		//CREATE STATUS TRANSFER
 		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
 		// statusTransfer.sign(sender); // not  NEED
 		statusTransfer.process(db, false);
-		
-		//CHECK BALANCE SENDER
-		assertEquals(maker_balance, maker.getConfirmedBalance(key, db));
-				
+						
 		//CHECK BALANCE RECIPIENT
-		assertEquals(maker_balance, recipient.getConfirmedBalance(key, db));
-		
-		/* not NEED
-		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(statusTransfer.getSignature(), sender.getLastReference(databaseSet)));
-		*/
-		
+		assertEquals(0, (long)recipient.getConfirmedStatus(key, db));
+				
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(statusTransfer.getSignature(), recipient.getLastReference(db)));
-	}
 	
-	@Test
-	public void orphanGenesisTransferStatusTransaction()
-	{
-		
-		initIssue(false);		
-		BigDecimal maker_balance = maker.getConfirmedBalance(FEE_KEY, db);
-					
-		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-			
-		//CREATE STATUS TRANSFER
-		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
-		// statusTransfer.sign(sender); not NEED
-		statusTransfer.process(db, false);
 		statusTransfer.orphan(db, false);
-		
-		//CHECK BALANCE SENDER
-		assertEquals(maker_balance, maker.getConfirmedBalance(key, db));
-				
-		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
-		
-		/* not NEED
-		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(transaction.getSignature(), sender.getLastReference(databaseSet)));
-		*/
+		assertEquals(-1, (long)recipient.getConfirmedStatus(key, db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(statusTransfer.getSignature(), recipient.getLastReference(db)));

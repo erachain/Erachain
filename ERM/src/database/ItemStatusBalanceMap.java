@@ -3,6 +3,7 @@ package database;
 //import java.math.Long;
 import java.util.Collection;
 import java.util.List;
+//import java.math.Long;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,7 @@ import core.transaction.Transaction;
 import utils.ObserverMessage;
 import database.DBSet;
 
-public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>> 
+public class ItemStatusBalanceMap extends DBMap<Tuple2<String, Long>, Long> 
 {
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	
@@ -31,7 +32,7 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 	@SuppressWarnings("rawtypes")
 	private BTreeMap statusKeyMap;
 	
-	public ItemStatusTimeMap(DBSet databaseSet, DB database)
+	public ItemStatusBalanceMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
 		
@@ -40,7 +41,7 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 		//this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
 	}
 
-	public ItemStatusTimeMap(ItemStatusTimeMap parent) 
+	public ItemStatusBalanceMap(ItemStatusBalanceMap parent) 
 	{
 		super(parent);
 	}
@@ -49,45 +50,42 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 
 	@SuppressWarnings({ "unchecked"})
 	@Override
-	protected Map<Tuple2<String, Long>, List<Long>> getMap(DB database) 
+	protected Map<Tuple2<String, Long>, Long> getMap(DB database) 
 	{
 		//OPEN MAP
-		BTreeMap<Tuple2<String, Long>, List<Long>> map =  database.createTreeMap("status_times")
+		BTreeMap<Tuple2<String, Long>, Long> map =  database.createTreeMap("balances_status")
 				.keySerializer(BTreeKeySerializer.TUPLE2)
 				.counterEnable()
 				.makeOrGet();
 		
 		//HAVE/WANT KEY
-		this.statusKeyMap = database.createTreeMap("times_key_status")
+		this.statusKeyMap = database.createTreeMap("balances_key_status")
 				.comparator(Fun.COMPARATOR)
 				.counterEnable()
 				.makeOrGet();
 		
-		/*
 		//BIND STATUS KEY
-		Bind.secondaryKey(map, this.statusKeyMap, new Fun.Function2<Tuple3<Long, Long, String>, Tuple2<String, Long>, List<Long>>() {
+		Bind.secondaryKey(map, this.statusKeyMap, new Fun.Function2<Tuple3<Long, Long, String>, Tuple2<String, Long>, Long>() {
 			@Override
-			public Tuple3<Long, Long, String> run(Tuple2<String, Long> key, List<Long> value) {
-				return new Tuple3<Long, List<Long>, String>(key.b, value, key.a);
+			public Tuple3<Long, Long, String> run(Tuple2<String, Long> key, Long value) {
+				return new Tuple3<Long, Long, String>(key.b, -value, key.a);
 			}	
 		});
-		*/
 		
 		//RETURN
 		return map;
 	}
 
 	@Override
-	protected Map<Tuple2<String, Long>, List<Long>> getMemoryMap() 
+	protected Map<Tuple2<String, Long>, Long> getMemoryMap() 
 	{
-		return new TreeMap<Tuple2<String, Long>, List<Long>>(Fun.TUPLE2_COMPARATOR);
+		return new TreeMap<Tuple2<String, Long>, Long>(Fun.TUPLE2_COMPARATOR);
 	}
 
 	@Override
-	protected List<Long> getDefaultValue() 
+	protected Long getDefaultValue() 
 	{
-		//List<Long> times = Arrays.asList();
-		return new ArrayList<Long>();
+		return -1L;
 	}
 	
 	@Override
@@ -96,28 +94,28 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 		return this.observableData;
 	}
 	
-	public void set(String address, List<Long> value)
+	public void set(String address, Long value)
 	{
 		this.set(address, ALIVE_KEY, value);
 	}
 	
-	public void set(String address, long key, List<Long> value)
+	public void set(String address, long key, Long value)
 	{
 		this.set(new Tuple2<String, Long>(address, key), value);
 	}
 	
-	public List<Long> get(String address)
+	public Long get(String address)
 	{
 		return this.get(address, ALIVE_KEY);
 	}
 	
-	public List<Long> get(String address, long key)
+	public Long get(String address, long key)
 	{
 		return this.get(new Tuple2<String, Long>(address, key));
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<String, Long>, List<Long>> getTimesSortableList(long key)
+	public SortableList<Tuple2<String, Long>, Long> getBalancesSortableList(long key)
 	{
 		//FILTER ALL KEYS
 		Collection<Tuple2<String, Long>> keys = ((BTreeMap<Tuple3, Tuple2<String, Long>>) this.statusKeyMap).subMap(
@@ -125,11 +123,11 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 				Fun.t3(key, Fun.HI(), Fun.HI())).values();
 		
 		//RETURN
-		return new SortableList<Tuple2<String, Long>, List<Long>>(this, keys);
+		return new SortableList<Tuple2<String, Long>, Long>(this, keys);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<String, Long>, List<Long>> getTimesSortableList(Account account) 
+	public SortableList<Tuple2<String, Long>, Long> getBalancesSortableList(Account account) 
 	{
 		BTreeMap map = (BTreeMap) this.map;
 		
@@ -139,6 +137,6 @@ public class ItemStatusTimeMap extends DBMap<Tuple2<String, Long>, List<Long>>
 				Fun.t2(account.getAddress(), Fun.HI())).keySet();
 		
 		//RETURN
-		return new SortableList<Tuple2<String, Long>, List<Long>>(this, keys);
+		return new SortableList<Tuple2<String, Long>, Long>(this, keys);
 	}
 }

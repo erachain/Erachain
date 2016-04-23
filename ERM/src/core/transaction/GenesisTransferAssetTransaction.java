@@ -101,7 +101,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{
-			throw new Exception("Data does not match block length");
+			throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
 		}
 		
 		// READ TYPE

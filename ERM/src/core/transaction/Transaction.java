@@ -312,6 +312,20 @@ public abstract class Transaction {
 	public BigDecimal getAmount(Account account) {
 		return this.viewAmount(account);
 	}
+	// TIME
+	public Long viewTime() {
+		return 0L;
+	}
+	public Long getTime() {
+		return this.viewTime();
+	}
+	public Long viewTime(Account account)
+	{
+		return 0L;
+	}
+	public Long getTime(Account account) {
+		return this.viewTime(account);
+	}
 	
 	public BigDecimal getFee()
 	{
@@ -623,7 +637,7 @@ public abstract class Transaction {
 	{
 		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(8).subtract(amount));
 	}
-	
+
 	public static Map<String, Map<Long, BigDecimal>> addAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount, String address, Long assetKey, BigDecimal amount) 
 	{
 		Map<String, Map<Long, BigDecimal>> newAllAssetAmount;
@@ -656,6 +670,39 @@ public abstract class Transaction {
 		}
 		
 		return newAllAssetAmount;
+	}
+	public static Map<String, Map<Long, Long>> addStatusTime(Map<String, Map<Long, Long>> allStatusTime, String address, Long assetKey, Long time) 
+	{
+		Map<String, Map<Long, Long>> newAllStatusTime;
+		if(allStatusTime != null) {
+			newAllStatusTime = new LinkedHashMap<String, Map<Long, Long>>(allStatusTime);
+		} else {
+			newAllStatusTime = new LinkedHashMap<String, Map<Long, Long>>();
+		}
+
+		Map<Long, Long> newStatusTimetOfAddress;
+		
+		if(!newAllStatusTime.containsKey(address)){
+			newStatusTimetOfAddress = new LinkedHashMap<Long, Long>();
+			newStatusTimetOfAddress.put(assetKey, time);
+			
+			newAllStatusTime.put(address, newStatusTimetOfAddress);
+		} else {
+			if(!newAllStatusTime.get(address).containsKey(assetKey)) {
+				newStatusTimetOfAddress = new LinkedHashMap<Long, Long>(newAllStatusTime.get(address));
+				newStatusTimetOfAddress.put(assetKey, time);
+
+				newAllStatusTime.put(address, newStatusTimetOfAddress);
+			} else {
+				newStatusTimetOfAddress = new LinkedHashMap<Long, Long>(newAllStatusTime.get(address));
+				Long newTime = newAllStatusTime.get(address).get(assetKey) + time;
+				newStatusTimetOfAddress.put(assetKey, newTime);
+				
+				newAllStatusTime.put(address, newStatusTimetOfAddress);
+			}
+		}
+		
+		return newAllStatusTime;
 	}
 
 }

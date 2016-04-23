@@ -144,6 +144,11 @@ public class TransactionFactory {
 			
 			//PARSE ISSUE PERSON TRANSACTION
 			return IssuePersonRecord.Parse(data, releaserReference);
+
+		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
+			
+			//PARSE TRANSFER ASSET TRANSACTION
+			return GenesisTransferStatusTransaction.Parse(data);	
 			
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
@@ -160,10 +165,10 @@ public class TransactionFactory {
 			//PARSE ISSUE STATUS TRANSACTION
 			return GenesisIssueStatusTransaction.Parse(data);
 
-		case Transaction.GENESIS_TRANSACTION:
+		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE GENESIS TRANSACTION
-			return GenesisTransaction.Parse(data);
+			return GenesisIssueAssetTransaction.Parse(data);
 			
 		}
 

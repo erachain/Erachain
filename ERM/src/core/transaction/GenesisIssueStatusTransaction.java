@@ -29,6 +29,7 @@ import core.item.statuses.StatusFactory;
 import database.ItemStatusMap;
 //import database.BalanceMap;
 import database.DBSet;
+import database.ItemStatusMap;
 
 public class GenesisIssueStatusTransaction extends Transaction 
 {

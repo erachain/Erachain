@@ -22,13 +22,14 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.ItemAssetBalanceMap;
+import database.ItemStatusBalanceMap;
 import database.DBSet;
 
 public class GenesisTransferStatusTransaction extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Genesis Assign Status";
+	//private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
 
@@ -92,7 +93,7 @@ public class GenesisTransferStatusTransaction extends Transaction {
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{
-			throw new Exception("Data does not match block length");
+			throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
 		}
 		
 		// READ TYPE
@@ -197,6 +198,7 @@ public class GenesisTransferStatusTransaction extends Transaction {
 	@Override
 	public void process(DBSet db, boolean asPack) 
 	{
+		//UPDATE CREATOR
 						
 		//UPDATE RECIPIENT
 		this.recipient.setConfirmedStatus(this.key, 0L, db);
@@ -210,9 +212,10 @@ public class GenesisTransferStatusTransaction extends Transaction {
 	@Override
 	public void orphan(DBSet db, boolean asPack) 
 	{
-						
+		//UPDATE CREATOR
+		
 		//UPDATE RECIPIENT
-		this.recipient.removeConfirmedStatus(this.key, db);
+		this.recipient.setConfirmedStatus(this.key, -1L, db);
 		
 		//UPDATE REFERENCE OF CREATOR
 		// not needthis.creator.setLastReference(this.reference, db);		
@@ -251,6 +254,19 @@ public class GenesisTransferStatusTransaction extends Transaction {
 		return false;
 	}
 
+	@Override
+	public Long viewTime(Account account) 
+	{
+		return 0L;
+	}
+
+	//@Override
+	public Map<String, Map<Long, Long>> getStatusTime() 
+	{
+		Map<String, Map<Long, Long>> statusTime = new LinkedHashMap<>();
+						
+		return statusTime;
+	}
 	public int calcBaseFee() {
 		return 0;
 	}

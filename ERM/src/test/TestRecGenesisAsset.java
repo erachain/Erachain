@@ -307,7 +307,7 @@ public class TestRecGenesisAsset {
 		initIssue(true);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
@@ -350,7 +350,7 @@ public class TestRecGenesisAsset {
 		initIssue(true);		
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
 		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);

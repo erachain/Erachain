@@ -43,9 +43,10 @@ public class R_SertifyPerson extends Transaction {
 
 	// how many OIL gift
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
+	private static final int DEFAULT_DURATION = 3 * 356;
 
 	protected long key;
-	protected Integer duration; // duration in days 
+	protected Integer duration = DEFAULT_DURATION; 
 	protected PublicKeyAccount userAccount1;
 	protected PublicKeyAccount userAccount2;
 	protected PublicKeyAccount userAccount3;
@@ -406,7 +407,8 @@ public class R_SertifyPerson extends Transaction {
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
 		//UPDATE USER
 		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
-		this.userAccount1.setConfirmedStatus(StatusCls.ALIVE_KEY, 0L, db);
+		this.userAccount1.setConfirmedStatus(StatusCls.ALIVE_KEY, this.userAccount1.getConfirmedStatus(StatusCls.ALIVE_KEY, db)
+				+ this.duration * 86400, db);
 		
 		if (!asPack) {
 
@@ -429,7 +431,6 @@ public class R_SertifyPerson extends Transaction {
 						
 		//UPDATE RECIPIENT
 		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
-		this.userAccount1.removeConfirmedStatus(StatusCls.ALIVE_KEY, db);
 		
 		if (!asPack) {
 			

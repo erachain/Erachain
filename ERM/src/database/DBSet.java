@@ -23,7 +23,7 @@ public class DBSet implements Observer, IDB {
 	
 	private ItemAssetBalanceMap assetBalanceMap;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
-	private ItemStatusTimeMap statusTimeMap;
+	private ItemStatusBalanceMap statusBalanceMap;
 	private BlockMap blockMap;
 	private ChildMap childMap;
 	private HeightMap heightMap;
@@ -114,7 +114,7 @@ public class DBSet implements Observer, IDB {
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
-			this.statusTimeMap = new ItemStatusTimeMap(this, database);
+			this.statusBalanceMap = new ItemStatusBalanceMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
 			this.blockMap = new BlockMap(this, database);
 			this.childMap = new ChildMap(this, database);
@@ -167,7 +167,7 @@ public class DBSet implements Observer, IDB {
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
-		this.statusTimeMap = new ItemStatusTimeMap(parent.statusTimeMap);
+		this.statusBalanceMap = new ItemStatusBalanceMap(parent.statusBalanceMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
 		this.blockMap = new BlockMap(parent.blockMap);
 		this.childMap = new ChildMap(this.blockMap, parent.childMap);
@@ -215,7 +215,7 @@ public class DBSet implements Observer, IDB {
 		
 		this.assetBalanceMap.reset();
 		this.assetBalanceAccountingMap.reset();
-		this.statusTimeMap.reset();
+		this.statusBalanceMap.reset();
 		this.heightMap.reset();
 		this.referenceMap.reset();
 		this.peerMap.reset();
@@ -265,9 +265,9 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.assetBalanceAccountingMap;
 	}
-	public ItemStatusTimeMap getStatusTimeMap() 
+	public ItemStatusBalanceMap getStatusBalanceMap() 
 	{
-		return this.statusTimeMap;
+		return this.statusBalanceMap;
 	}
 
 	public BlockMap getBlockMap() 

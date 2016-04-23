@@ -82,7 +82,7 @@ public class Account {
 	}
 	public Long getConfirmedStatus(long key, DBSet db)
 	{
-		return db.getStatusTimeMap().get(getAddress(), key).get(0);
+		return db.getStatusBalanceMap().get(getAddress(), key);
 	}
 
 	// SET
@@ -114,32 +114,12 @@ public class Account {
 	{
 		this.setConfirmedStatus(key, time, DBSet.getInstance());
 	}
-	
-	public void removeConfirmedStatus(long key, DBSet db)
-	{
-		//UPDATE TIMES LIST IN DB
-		String address = getAddress();
-
-		List<Long> times = db.getStatusTimeMap().get(getAddress(), key);
 		
-		if (times.isEmpty()) return;
-		
-		times.remove(0);
-		db.getStatusTimeMap().set(address, key, times);
-	}
-	
 	public void setConfirmedStatus(long key, Long time, DBSet db)
 	{
 		//UPDATE PRIMARY TIME IN DB
-		String address = getAddress();
-
-		List<Long> times = db.getStatusTimeMap().get(getAddress(), key);
-		
-		if (!times.isEmpty() & times.get(0) == time) return;
-		
-		times.add(time);
-		db.getStatusTimeMap().set(address, key, times);
-	}
+		db.getStatusBalanceMap().set(getAddress(), key, time);
+			}
 
 	
 	public BigDecimal getBalance(int confirmations)
