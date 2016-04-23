@@ -92,6 +92,12 @@ public abstract class Transaction {
 	public static final int ACCOUNT_NOT_PERSONALIZED = 52;
 	public static final int DUPLICATE_KEY = 53;
 
+	public static final int ITEM_ASSET_DOES_NOT_EXIST = 55;
+	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 56;
+	public static final int ITEM_NOTE_NOT_EXIST = 57;
+	public static final int ITEM_PERSON_NOT_EXIST = 58;
+	public static final int ITEM_UNION_NOT_EXIST = 59;
+
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******

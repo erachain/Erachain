@@ -20,9 +20,11 @@ import core.transaction.Transaction;
 import utils.ObserverMessage;
 import database.DBSet;
 
+// balances for all account in blockchain
+// TODO SOFT HARD TRUE
 public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal> 
 {
-	public static final long FEE_KEY = AssetCls.DILE_KEY;
+	//public static final long FEE_KEY = AssetCls.DILE_KEY;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -91,20 +93,24 @@ public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 		return this.observableData;
 	}
 	
+	/*
 	public void set(String address, BigDecimal value)
 	{
 		this.set(address, FEE_KEY, value);
 	}
+	*/
 	
 	public void set(String address, long key, BigDecimal value)
 	{
 		this.set(new Tuple2<String, Long>(address, key), value);
 	}
 	
+	/*
 	public BigDecimal get(String address)
 	{
 		return this.get(address, FEE_KEY);
 	}
+	*/
 	
 	public BigDecimal get(String address, long key)
 	{

@@ -15,7 +15,7 @@ import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
-import core.item.assets.AssetCls;
+//import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
@@ -23,6 +23,7 @@ import database.DBSet;
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
+	private static final long FEE_KEY = Transaction.FEE_KEY;
 
 	protected String address;
 	
@@ -51,26 +52,24 @@ public class Account {
 	//BALANCE
 	
 	// GET
-	public BigDecimal getUnconfirmedBalance()
+	public BigDecimal getUnconfirmedBalance(long key)
 	{
-		return this.getUnconfirmedBalance(DBSet.getInstance());
+		return this.getUnconfirmedBalance(key, DBSet.getInstance());
 	}
 	
-	public BigDecimal getUnconfirmedBalance(DBSet db)
+	public BigDecimal getUnconfirmedBalance(long key, DBSet db)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress());
+		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
 	}
 	
 	public BigDecimal getConfirmedBalance()
 	{
 		return this.getConfirmedBalance(DBSet.getInstance());
 	}
-	
 	public BigDecimal getConfirmedBalance(DBSet db)
 	{
-		return db.getAssetBalanceMap().get(getAddress());
+		return db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY);
 	}
-	
 	public BigDecimal getConfirmedBalance(long key)
 	{
 		return this.getConfirmedBalance(key, DBSet.getInstance());
@@ -80,9 +79,9 @@ public class Account {
 	{
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
-	public Long getConfirmedStatus(long key, DBSet db)
+	public Long setConfirmedPersonStatus(long personKey, long statusKey, DBSet db)
 	{
-		return db.getStatusBalanceMap().get(getAddress(), key);
+		return db.getPersonStatusMap().get(personKey, statusKey);
 	}
 
 	// SET
@@ -90,13 +89,11 @@ public class Account {
 	{
 		this.setConfirmedBalance(amount, DBSet.getInstance());
 	}
-	
 	public void setConfirmedBalance(BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getAssetBalanceMap().set(getAddress(), amount);
+		db.getAssetBalanceMap().set(getAddress(), Transaction.FEE_KEY, amount);
 	}
-		
 	//
 	public void setConfirmedBalance(long key, BigDecimal amount)
 	{
@@ -110,39 +107,47 @@ public class Account {
 	}
 
 	// STATUS
-	public void setConfirmedStatus(long key, Long  time)
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Long  time)
 	{
-		this.setConfirmedStatus(key, time, DBSet.getInstance());
+		this.setConfirmedPersonStatus(personKey, statusKey, time, DBSet.getInstance());
 	}
 		
-	public void setConfirmedStatus(long key, Long time, DBSet db)
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Long time, DBSet db)
 	{
 		//UPDATE PRIMARY TIME IN DB
-		db.getStatusBalanceMap().set(getAddress(), key, time);
-			}
+		db.getPersonStatusMap().set(personKey, statusKey, time);
+	}
 
 	
+	public BigDecimal getBalance(int confirmations, long key)
+	{
+		return this.getBalance(confirmations, key, DBSet.getInstance());
+	}
 	public BigDecimal getBalance(int confirmations)
 	{
-		return this.getBalance(confirmations, DBSet.getInstance());
+		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
+	}
+	public BigDecimal getBalance(int confirmations, DBSet db)
+	{
+		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
 	}
 	
-	public BigDecimal getBalance(int confirmations, DBSet db)
+	public BigDecimal getBalance(int confirmations, long key, DBSet db)
 	{
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(db);
+			return this.getUnconfirmedBalance(key, db);
 		}
 		
 		//IF 1 CONFIRMATION
 		if(confirmations == 1)
 		{
-			return this.getConfirmedBalance(db);
+			return this.getConfirmedBalance(key, db);
 		}
 		
 		//GO TO PARENT BLOCK 10
-		BigDecimal balance = this.getConfirmedBalance(db);
+		BigDecimal balance = this.getConfirmedBalance(key, db);
 		Block block = db.getBlockMap().getLastBlock();
 		
 		for(int i=1; i<confirmations && block != null && block instanceof Block; i++)
@@ -184,7 +189,7 @@ public class Account {
 	public void calculateGeneratingBalance(DBSet db)
 	{
 		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS
-		BigDecimal balance = this.getConfirmedBalance(db);
+		BigDecimal balance = this.getConfirmedBalance(FEE_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
 		
@@ -279,14 +284,14 @@ public class Account {
 				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
 				+ " - " + this.getAddress();
 				*/
-		return this.getConfirmedBalance(AssetCls.DILE_KEY)
+		return this.getConfirmedBalance(Transaction.FEE_KEY)
 				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(AssetCls.DILE_KEY)) + "}"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.FEE_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	

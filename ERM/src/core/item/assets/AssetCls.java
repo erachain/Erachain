@@ -16,7 +16,7 @@ public abstract class AssetCls extends ItemCls {
 	// CORE KEY
 	public static final long ERMO_KEY = 0l;
 	// FEE KEY
-	public static final long DILE_KEY = 2l;
+	public static final long DILE_KEY = 1l;
 
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;

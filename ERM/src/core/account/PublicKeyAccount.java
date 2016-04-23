@@ -10,6 +10,7 @@ import ntp.NTP;
 
 public class PublicKeyAccount extends Account {
 
+	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	protected byte[] publicKey;
 	
 	public PublicKeyAccount(byte[] publicKey)
@@ -30,13 +31,18 @@ public class PublicKeyAccount extends Account {
 	
 	public boolean isPerson(DBSet db) {
 		
-		Long timestamp = this.getConfirmedStatus(StatusCls.ALIVE_KEY, db);
+		// IF NOT PERSON HAS THAT ADDRESS
+		Long personKey = db.getAddressPersonMap().get(this.address);
+		if (personKey < 0) return false;
+		
+		// IF PERSON NOT ALIVE
+		Long timestamp = db.getPersonStatusMap().get(personKey, ALIVE_KEY);
 		if (timestamp < 0 ) return false;
 		if (timestamp == 0 ) return true;
 		
 		// TEST TIME and EXPIRE TIME
-		long time = NTP.getTime();
-		if (timestamp < time ) return false;
+		long current_time = NTP.getTime();
+		if (timestamp < current_time ) return false;
 
 		return true;
 		

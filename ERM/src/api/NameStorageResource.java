@@ -390,7 +390,7 @@ public class NameStorageResource {
 								ApiErrorFactory.ERROR_INVALID_ADDRESS);
 					}
 					
-					if (account.getBalance(1, DBSet.getInstance()).compareTo(
+					if (account.getBalance(1, Transaction.FEE_KEY, DBSet.getInstance()).compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
 								ApiErrorFactory.ERROR_NO_BALANCE);

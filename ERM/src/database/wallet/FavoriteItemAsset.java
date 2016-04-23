@@ -15,7 +15,7 @@ public class FavoriteItemAsset extends FavoriteItem {
 	// favorites init SET
 	public FavoriteItemAsset(WalletDatabase walletDatabase, DB database) 
 	{
-		super(walletDatabase, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", 3);
+		super(walletDatabase, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", 2);
 
 	}
 }

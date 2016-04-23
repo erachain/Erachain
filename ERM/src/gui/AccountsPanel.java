@@ -39,6 +39,7 @@ import utils.TableMenuPopupUtil;
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener
@@ -127,7 +128,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getUnconfirmedBalance().toPlainString());
+				StringSelection value = new StringSelection(account.getUnconfirmedBalance(Transaction.FEE_KEY).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});

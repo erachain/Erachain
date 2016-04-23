@@ -444,10 +444,10 @@ public class TestRecAsset {
 		maker.setConfirmedBalance(key, BigDecimal.valueOf(200).setScale(8), db);
 		Transaction assetTransfer = new TransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
+		assetTransfer.isValid(db, releaserReference);
 		assetTransfer.process(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
@@ -480,11 +480,9 @@ public class TestRecAsset {
 		assetTransfer.orphan(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -710,7 +708,6 @@ public class TestRecAsset {
 		messageTransaction.process(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
@@ -745,7 +742,6 @@ public class TestRecAsset {
 		messageTransaction.orphan(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT

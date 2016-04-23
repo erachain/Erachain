@@ -300,7 +300,7 @@ public class GenesisTransferAssetTransaction extends Transaction {
 		String address = account.getAddress();
 		
 		//IF OIL ASSET
-		if(this.key == ItemAssetBalanceMap.FEE_KEY)
+		if(this.key == FEE_KEY)
 		{
 			//IF CREATOR
 			if(address.equals(this.creator.getAddress()))

@@ -87,6 +87,11 @@ public class ObserverMessage {
 	public static final int LIST_UNION_TYPE = 63;
 	public static final int LIST_UNION_FAVORITES_TYPE = 64;
 
+	public static final int ADD_PERSON_STATUS_TYPE = 65;
+	public static final int REMOVE_PERSON_STATUS_TYPE = 66;
+	public static final int LIST_PERSON_STATUS_TYPE = 67;
+	public static final int LIST_PERSON_STATUS_FAVORITES_TYPE = 68;
+
 	private int type;
 	private Object value;
 	

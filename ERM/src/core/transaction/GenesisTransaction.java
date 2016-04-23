@@ -240,7 +240,7 @@ public class GenesisTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<String, Map<Long, BigDecimal>>();
 		
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

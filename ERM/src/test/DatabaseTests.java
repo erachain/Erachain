@@ -41,37 +41,37 @@ public class DatabaseTests {
 		DBSet fork = databaseSet.fork();
 		
 		//SET BALANCE
-		databaseSet.getAssetBalanceMap().set("test", BigDecimal.ONE);
+		databaseSet.getAssetBalanceMap().set("test", 1L, BigDecimal.ONE);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test", 1L));
 		
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//SET BALANCE IN FORK
-		fork.getAssetBalanceMap().set("test", BigDecimal.TEN);
+		fork.getAssetBalanceMap().set("test", 1L, BigDecimal.TEN);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test", 1L));
 				
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//CREATE SECOND FORK
 		DBSet fork2 = fork.fork();
 		
 		//SET BALANCE IN FORK2
-		fork2.getAssetBalanceMap().set("test", BigDecimal.ZERO);
+		fork2.getAssetBalanceMap().set("test", 1L, BigDecimal.ZERO);
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.ONE, databaseSet.getAssetBalanceMap().get("test", 1L));
 						
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//CHECK VALUE IN FORK
-		assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get("test"));
+		assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get("test", 1L));
 	}
 	
 	@Test

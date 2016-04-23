@@ -203,10 +203,10 @@ public class PaymentTransaction extends TransactionAmount {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.amount);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

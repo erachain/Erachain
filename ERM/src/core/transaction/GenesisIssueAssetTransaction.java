@@ -80,10 +80,7 @@ public class GenesisIssueAssetTransaction extends Transaction
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
 		transaction.put("creator", this.creator.getAddress());
-		transaction.put("name", this.getAsset().getName());
-		transaction.put("description", this.getAsset().getDescription());
-		transaction.put("quantity", this.getAsset().getQuantity());
-		transaction.put("divisible", this.getAsset().isDivisible());
+		transaction.put("asset", this.asset.toJson());
 				
 		return transaction;	
 	}

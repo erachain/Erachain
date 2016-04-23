@@ -366,7 +366,7 @@ public class MultiPaymentTransaction extends Transaction {
 		for(Payment payment: this.payments)
 		{
 			//IF OIL ASSET
-			if(payment.getAsset() == ItemAssetBalanceMap.FEE_KEY)
+			if(payment.getAsset() == FEE_KEY)
 			{
 				//IF CREATOR
 				if(address.equals(this.creator.getAddress()))
@@ -389,7 +389,7 @@ public class MultiPaymentTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

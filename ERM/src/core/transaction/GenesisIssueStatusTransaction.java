@@ -80,8 +80,7 @@ public class GenesisIssueStatusTransaction extends Transaction
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
 		transaction.put("creator", this.creator.getAddress());
-		transaction.put("name", this.status.getName());
-		transaction.put("description", this.status.getDescription());
+		transaction.put("status", this.status.toJson());
 				
 		return transaction;	
 	}

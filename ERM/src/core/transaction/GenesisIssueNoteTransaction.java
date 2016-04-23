@@ -36,6 +36,7 @@ public class GenesisIssueNoteTransaction extends Transaction
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_NOTE_TRANSACTION;
 	private static final String NAME_ID = "Genesis Issue Note";
 	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + CREATOR_LENGTH + TIMESTAMP_LENGTH;
+
 	private NoteCls note;
 	
 	public GenesisIssueNoteTransaction(PublicKeyAccount creator, NoteCls note, long timestamp) 
@@ -49,7 +50,6 @@ public class GenesisIssueNoteTransaction extends Transaction
 	}
 
 	//GETTERS/SETTERS
-	//public static String getName() { return "Genesis Issue Note"; }
 	
 	public void generateSignature() {
 		
@@ -79,8 +79,7 @@ public class GenesisIssueNoteTransaction extends Transaction
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
 		transaction.put("creator", this.creator.getAddress());
-		transaction.put("name", this.note.getName());
-		transaction.put("description", this.note.getDescription());
+		transaction.put("note", this.note.toJson());
 				
 		return transaction;	
 	}

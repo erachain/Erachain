@@ -379,7 +379,7 @@ public class AddressesResource {
 					ApiErrorFactory.ERROR_INVALID_ADDRESS);
 		}
 
-		return new Account(address).getBalance(confirmations).toPlainString();
+		return new Account(address).getBalance(confirmations, Transaction.FEE_KEY).toPlainString();
 	}
 
 	@SuppressWarnings("unchecked")

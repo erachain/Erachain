@@ -22,7 +22,7 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.ItemStatusBalanceMap;
+import database.PersonStatusMap;
 import database.DBSet;
 
 public class GenesisTransferStatusTransaction extends Transaction {
@@ -201,7 +201,7 @@ public class GenesisTransferStatusTransaction extends Transaction {
 		//UPDATE CREATOR
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedStatus(this.key, 0L, db);
+		//this.recipient.setConfirmedStatus(this.key, 0L, db);
 		
 		//UPDATE REFERENCE OF CREATOR
 		// not need this.creator.setLastReference(this.signature, db);
@@ -215,7 +215,7 @@ public class GenesisTransferStatusTransaction extends Transaction {
 		//UPDATE CREATOR
 		
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedStatus(this.key, -1L, db);
+		//this.recipient.setConfirmedStatus(this.key, -1L, db);
 		
 		//UPDATE REFERENCE OF CREATOR
 		// not needthis.creator.setLastReference(this.reference, db);		

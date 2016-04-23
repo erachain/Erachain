@@ -340,7 +340,7 @@ public class CreatePollTransaction extends Transaction
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
 	{
-		return subAssetAmount(null, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.fee);
+		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 
 	public int calcBaseFee() {

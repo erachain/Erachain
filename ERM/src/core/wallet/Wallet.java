@@ -163,9 +163,13 @@ public class Wallet extends Observable implements Observer
 		return database != null;
 	}
 	
+	public BigDecimal getUnconfirmedBalance(String address, long key)
+	{
+		return this.database.getAccountMap().getUnconfirmedBalance(address, key);
+	}
 	public BigDecimal getUnconfirmedBalance(String address)
 	{
-		return this.database.getAccountMap().getUnconfirmedBalance(address);
+		return getUnconfirmedBalance(address, Transaction.FEE_KEY);
 	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
@@ -520,7 +524,7 @@ public class Wallet extends Observable implements Observer
 	    int nonce = this.secureDatabase.getAndIncrementNonce();
 	    
 	    //GENERATE ACCOUNT SEED
-	    byte[] accountSeed = this.generateAccountSeed(seed, nonce);
+	    byte[] accountSeed = generateAccountSeed(seed, nonce);
 	    PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
 	    
 	    //CHECK IF ACCOUNT ALREADY EXISTS

@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+//import org.mapdb.Fun.Tuple2;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -45,7 +46,7 @@ public class R_SertifyPerson extends Transaction {
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
 	private static final int DEFAULT_DURATION = 3 * 356;
 
-	protected long key;
+	protected Long key; // PERSON KEY
 	protected Integer duration = DEFAULT_DURATION; 
 	protected PublicKeyAccount userAccount1;
 	protected PublicKeyAccount userAccount2;
@@ -361,7 +362,7 @@ public class R_SertifyPerson extends Transaction {
 	public int isValid(DBSet db, byte[] releaserReference) {
 		
 		//CHECK DURATION
-		if(duration < 100 | duration > 777)
+		if(duration < 0 | duration > 777)
 		{
 			return INVALID_DURATION;
 		}
@@ -384,6 +385,12 @@ public class R_SertifyPerson extends Transaction {
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		}
 
+		
+		if ( !db.getPersonMap().contains(this.key) )
+		{
+			return Transaction.ITEM_PERSON_NOT_EXIST;
+		}
+
 		if ( !this.creator.isPerson(db) )
 		{
 			return Transaction.ACCOUNT_NOT_PERSONALIZED;
@@ -403,12 +410,26 @@ public class R_SertifyPerson extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 
-		// send FEE_KEY
+		// send GIFT FEE_KEY
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
-		//UPDATE USER
 		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
-		this.userAccount1.setConfirmedStatus(StatusCls.ALIVE_KEY, this.userAccount1.getConfirmedStatus(StatusCls.ALIVE_KEY, db)
-				+ this.duration * 86400, db);
+		
+		// SET ALIVE PERSON
+		db.getPersonStatusMap().set(this.key, StatusCls.ALIVE_KEY, this.duration * (long)86400);
+
+		// TODO need MAP List<address> for ONE PERSON - Tuple2<Long, List<String>>
+		// SET PERSON ADDRESS
+		db.getAddressPersonMap().set(this.userAccount1.getAddress(), this.key);
+		db.getPersonAddressMap().set(this.key, this.userAccount1.getAddress());
+		
+		if (this.userAccount2 !=null) {
+			db.getAddressPersonMap().set(this.userAccount2.getAddress(), this.key);
+			//db.getPersonAddressMap().set(this.key, this.userAccount2.getAddress());			
+		}
+		if (this.userAccount3 !=null) {
+			db.getAddressPersonMap().set(this.userAccount3.getAddress(), this.key);
+			//db.getPersonAddressMap().set(this.key, this.userAccount3.getAddress());			
+		}
 		
 		if (!asPack) {
 
@@ -426,11 +447,25 @@ public class R_SertifyPerson extends Transaction {
 		//UPDATE SENDER
 		super.orphan(db, asPack);
 		
-		// BACK VOTE_KEY
+		// BACK GIFT FEE_KEY
 		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
-						
-		//UPDATE RECIPIENT
 		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
+						
+		// SET ALIVE PERSON
+		db.getPersonStatusMap().set(this.key, StatusCls.ALIVE_KEY, -this.duration * (long)86400);
+
+		//UPDATE RECIPIENT
+		db.getAddressPersonMap().delete(this.userAccount1.getAddress());
+		db.getPersonAddressMap().delete(this.key);
+		if (this.userAccount2 !=null) {
+			db.getAddressPersonMap().delete(this.userAccount2.getAddress());
+			// TODO db.getPersonAddressMap().delete(this.key, this.userAccount2.getAddress());
+		}
+		if (this.userAccount3 !=null) {
+			db.getAddressPersonMap().delete(this.userAccount3.getAddress());			
+			// TODO db.getPersonAddressMap().delete(this.key, this.userAccount3.getAddress());
+		}
+
 		
 		if (!asPack) {
 			

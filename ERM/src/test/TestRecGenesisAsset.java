@@ -288,7 +288,7 @@ public class TestRecGenesisAsset {
 		initIssue(false);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 		
 		//CREATE ASSET TRANSFER
@@ -423,15 +423,18 @@ public class TestRecGenesisAsset {
 		
 		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
+		//assertEquals(total, amoSend);
 		
 		//CHECK BALANCE SENDER
 		assertEquals(total, maker.getConfirmedBalance(key, db));
 			
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
+		
 		// assetTransfer.sign(sender); // not  NEED
 		assetTransfer.process(db, false);
 		
@@ -460,7 +463,7 @@ public class TestRecGenesisAsset {
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 			
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);

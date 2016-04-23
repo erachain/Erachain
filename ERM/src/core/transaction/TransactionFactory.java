@@ -145,6 +145,11 @@ public class TransactionFactory {
 			//PARSE ISSUE PERSON TRANSACTION
 			return IssuePersonRecord.Parse(data, releaserReference);
 
+		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
+			
+			//PARSE TRANSFER ASSET TRANSACTION
+			return GenesisCertifyPersonRecord.Parse(data);	
+
 		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
@@ -155,6 +160,11 @@ public class TransactionFactory {
 			//PARSE TRANSFER ASSET TRANSACTION
 			return GenesisTransferAssetTransaction.Parse(data);	
 		
+		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
+			
+			//PARSE ISSUE ASSET TRANSACTION
+			return GenesisIssuePersonRecord.Parse(data);
+
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION

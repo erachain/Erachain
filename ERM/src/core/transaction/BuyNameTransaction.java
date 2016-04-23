@@ -216,7 +216,7 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, db).compareTo(this.nameSale.getAmount()) == -1)
+		if(this.creator.getBalance(1, Transaction.FEE_KEY, db).compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
 		}
@@ -249,9 +249,9 @@ public class BuyNameTransaction extends Transaction
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), ItemAssetBalanceMap.FEE_KEY, this.nameSale.getAmount());
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.nameSale.getAmount());
 		
-		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), ItemAssetBalanceMap.FEE_KEY, this.nameSale.getAmount());
+		assetAmount = addAssetAmount(assetAmount, this.getSeller().getAddress(), FEE_KEY, this.nameSale.getAmount());
 		
 		return assetAmount;
 	}
