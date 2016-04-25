@@ -14,10 +14,10 @@ import database.ItemStatusMap;
 public abstract class StatusCls extends ItemCls {
 
 	// PERSON KEY
-	public static final long ALIVE_KEY = 0l;
-	public static final long DEAD_KEY = 1l;
-	public static final long CITIZEN_KEY = 2l;
-	public static final long MEMBER_KEY = 3l;
+	public static final Long ALIVE_KEY = 0l;
+	public static final Long DEAD_KEY = 1l;
+	public static final Long CITIZEN_KEY = 2l;
+	public static final Long MEMBER_KEY = 3l;
 
 	public static final int STATUS = 1;
 	public static final int TITLE = 2;

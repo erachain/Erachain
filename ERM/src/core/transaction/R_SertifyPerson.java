@@ -11,13 +11,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-//import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -33,44 +35,44 @@ import database.ItemAssetBalanceMap;
 import database.DBSet;
 import utils.Converter;
 
+// this.duration = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
 public class R_SertifyPerson extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Sertify Person";
-	private static final int USER_ACCOUNT_LENGTH = Transaction.CREATOR_LENGTH;
+	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DURATION_LENGTH = 4; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
-	private static final BigDecimal MIN_VOTE_BALANCE = BigDecimal.valueOf(10).setScale(8);
 
 	// how many OIL gift
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
 	private static final int DEFAULT_DURATION = 3 * 356;
 
 	protected Long key; // PERSON KEY
-	protected Integer duration = DEFAULT_DURATION; 
-	protected PublicKeyAccount userAccount1;
-	protected PublicKeyAccount userAccount2;
-	protected PublicKeyAccount userAccount3;
+	protected Integer duration; // in days
+	protected PublicKeyAccount personAddress1;
+	protected PublicKeyAccount personAddress2;
+	protected PublicKeyAccount personAddress3;
 	protected byte[] userSignature1;
 	protected byte[] userSignature2;
 	protected byte[] userSignature3;
-	private static final int SELF_LENGTH = 3 * (USER_ACCOUNT_LENGTH + SIGNATURE_LENGTH) + DURATION_LENGTH
+	private static final int SELF_LENGTH = 3 * (USER_ADDRESS_LENGTH + SIGNATURE_LENGTH) + DURATION_LENGTH
 			+ KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
-			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
+			PublicKeyAccount personAddress1, PublicKeyAccount personAddress2, PublicKeyAccount personAddress3,
 			int duration, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.TYPE_NAME = NAME_ID;
 		this.key = key;
-		this.userAccount1 = userAccount1;
-		this.userAccount2 = userAccount2;
-		this.userAccount3 = userAccount3;
-		this.duration = duration; 
+		this.personAddress1 = personAddress1;
+		this.personAddress2 = personAddress2;
+		this.personAddress3 = personAddress3;
+		this.duration = duration;
 	}
 	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
@@ -134,15 +136,15 @@ public class R_SertifyPerson extends Transaction {
 
 	public PublicKeyAccount getUserAccount1() 
 	{
-		return this.userAccount1;
+		return this.personAddress1;
 	}
 	public PublicKeyAccount getUserAccount2() 
 	{
-		return this.userAccount2;
+		return this.personAddress2;
 	}
 	public PublicKeyAccount getUserAccount3() 
 	{
-		return this.userAccount3;
+		return this.personAddress3;
 	}
 	
 	public byte[] getUserSignature1() 
@@ -171,9 +173,9 @@ public class R_SertifyPerson extends Transaction {
 
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("key", this.key);
-		transaction.put("userAccount1", this.userAccount1.getAddress());
-		transaction.put("userAccount2", this.userAccount2.getAddress());
-		transaction.put("userAccount3", this.userAccount3.getAddress());
+		transaction.put("userAccount1", this.personAddress1.getAddress());
+		transaction.put("userAccount2", this.personAddress2.getAddress());
+		transaction.put("userAccount3", this.personAddress3.getAddress());
 		transaction.put("duration", this.duration);
 		
 		return transaction;	
@@ -255,19 +257,19 @@ public class R_SertifyPerson extends Transaction {
 		position += KEY_LENGTH;
 
 		//READ USER ACCOUNT1
-		byte[] userAccount1Bytes = Arrays.copyOfRange(data, position, position + USER_ACCOUNT_LENGTH);
+		byte[] userAccount1Bytes = Arrays.copyOfRange(data, position, position + USER_ADDRESS_LENGTH);
 		PublicKeyAccount userAccount1 = new PublicKeyAccount(userAccount1Bytes);
-		position += USER_ACCOUNT_LENGTH;
+		position += USER_ADDRESS_LENGTH;
 
 		//READ USER ACCOUNT2
-		byte[] userAccount2Bytes = Arrays.copyOfRange(data, position, position + USER_ACCOUNT_LENGTH);
+		byte[] userAccount2Bytes = Arrays.copyOfRange(data, position, position + USER_ADDRESS_LENGTH);
 		PublicKeyAccount userAccount2 = new PublicKeyAccount(userAccount2Bytes);
-		position += USER_ACCOUNT_LENGTH;
+		position += USER_ADDRESS_LENGTH;
 
 		//READ USER ACCOUNT1
-		byte[] userAccount3Bytes = Arrays.copyOfRange(data, position, position + USER_ACCOUNT_LENGTH);
+		byte[] userAccount3Bytes = Arrays.copyOfRange(data, position, position + USER_ADDRESS_LENGTH);
 		PublicKeyAccount userAccount3 = new PublicKeyAccount(userAccount3Bytes);
-		position += USER_ACCOUNT_LENGTH;
+		position += USER_ADDRESS_LENGTH;
 
 		// READ DURATION
 		int duration = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DURATION_LENGTH));
@@ -310,11 +312,21 @@ public class R_SertifyPerson extends Transaction {
 		data = Bytes.concat(data, keyBytes);
 		
 		//WRITE USER ACCOUNT1
-		data = Bytes.concat(data, this.userAccount1.getPublicKey());
+		data = Bytes.concat(data, this.personAddress1.getPublicKey());
+		
 		//WRITE USER ACCOUNT2
-		data = Bytes.concat(data, this.userAccount2.getPublicKey());
+		if (this.personAddress2 == null) {
+			data = new byte[USER_ADDRESS_LENGTH];
+		} else {
+			data = Bytes.concat(data, this.personAddress2.getPublicKey());
+		}
+		
 		//WRITE USER ACCOUNT3
-		data = Bytes.concat(data, this.userAccount3.getPublicKey());
+		if (this.personAddress3 == null) {
+			data = new byte[USER_ADDRESS_LENGTH];
+		} else {
+			data = Bytes.concat(data, this.personAddress3.getPublicKey());
+		}
 
 		//WRITE DURATION
 		data = Bytes.concat(data, Ints.toByteArray(this.duration));
@@ -322,8 +334,8 @@ public class R_SertifyPerson extends Transaction {
 		//USER SIGNATUREs
 		if (withSign) {
 			data = Bytes.concat(data, this.userSignature1);
-			data = Bytes.concat(data, this.userSignature2);
-			data = Bytes.concat(data, this.userSignature3);
+			data = Bytes.concat(data, this.userSignature2 == null? new byte[SIGNATURE_LENGTH]: this.userSignature2);
+			data = Bytes.concat(data, this.userSignature3 == null? new byte[SIGNATURE_LENGTH]: this.userSignature3);
 		}
 
 		return data;	
@@ -343,8 +355,6 @@ public class R_SertifyPerson extends Transaction {
 
 		if ( this.signature == null | this.signature.length != 64 | this.signature == new byte[64]
 			| this.userSignature1 == null | this.userSignature1.length != 64 | this.userSignature1 == new byte[64]
-			| this.userSignature2 == null | this.userSignature2.length != 64 | this.userSignature2 == new byte[64]
-			| this.userSignature3 == null | this.userSignature3.length != 64 | this.userSignature3 == new byte[64]
 					)
 			return false;
 		
@@ -353,9 +363,11 @@ public class R_SertifyPerson extends Transaction {
 
 		Crypto crypto = Crypto.getInstance();
 		return crypto.verify(creator.getPublicKey(), signature, data)
-				& crypto.verify(this.userAccount1.getPublicKey(), this.userSignature1, data)
-				& crypto.verify(this.userAccount2.getPublicKey(), this.userSignature2, data)
-				& crypto.verify(this.userAccount3.getPublicKey(), this.userSignature3, data);
+				& crypto.verify(this.personAddress1.getPublicKey(), this.userSignature1, data)
+				& (this.personAddress2 == null
+						|| crypto.verify(this.personAddress2.getPublicKey(), this.userSignature2, data))
+				& (this.personAddress3 == null
+						|| crypto.verify(this.personAddress3.getPublicKey(), this.userSignature3, data));
 	}
 
 	//
@@ -368,9 +380,9 @@ public class R_SertifyPerson extends Transaction {
 		}
 	
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(this.userAccount1 == null | !Crypto.getInstance().isValidAddress(this.userAccount1.getAddress())
-			| this.userAccount2 == null | !Crypto.getInstance().isValidAddress(this.userAccount2.getAddress())
-			| this.userAccount3 == null | !Crypto.getInstance().isValidAddress(this.userAccount3.getAddress())
+		if(this.personAddress1 == null || !Crypto.getInstance().isValidAddress(this.personAddress1.getAddress())
+			//| this.personAddress2 == null || !Crypto.getInstance().isValidAddress(this.personAddress2.getAddress())
+			//| this.personAddress3 == null || !Crypto.getInstance().isValidAddress(this.personAddress3.getAddress())
 				)
 		{
 			return INVALID_ADDRESS;
@@ -412,31 +424,35 @@ public class R_SertifyPerson extends Transaction {
 
 		// send GIFT FEE_KEY
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
-		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
+		this.personAddress1.setConfirmedBalance(Transaction.FEE_KEY, this.personAddress1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
-		// SET ALIVE PERSON
-		db.getPersonStatusMap().set(this.key, StatusCls.ALIVE_KEY, this.duration * (long)86400);
+		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.duration,
+				Controller.getInstance().getHeight(), this.reference);
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.duration,
+				Controller.getInstance().getHeight(), this.reference);
+		// SET ALIVE PERSON for DURATION
+		db.getPersonStatusMap().addItem(this.key, itemP);
 
 		// TODO need MAP List<address> for ONE PERSON - Tuple2<Long, List<String>>
 		// SET PERSON ADDRESS
-		db.getAddressPersonMap().set(this.userAccount1.getAddress(), this.key);
-		db.getPersonAddressMap().set(this.key, this.userAccount1.getAddress());
+		db.getAddressPersonMap().addItem(this.personAddress1.getAddress(), itemA);
+		db.getPersonAddressMap().addItem(this.key, this.personAddress1.getAddress(), itemP);
 		
-		if (this.userAccount2 !=null) {
-			db.getAddressPersonMap().set(this.userAccount2.getAddress(), this.key);
-			//db.getPersonAddressMap().set(this.key, this.userAccount2.getAddress());			
+		if (this.personAddress2 !=null) {
+			db.getAddressPersonMap().addItem(this.personAddress2.getAddress(), itemA);
+			db.getPersonAddressMap().addItem(this.key, this.personAddress2.getAddress(), itemP);
 		}
-		if (this.userAccount3 !=null) {
-			db.getAddressPersonMap().set(this.userAccount3.getAddress(), this.key);
-			//db.getPersonAddressMap().set(this.key, this.userAccount3.getAddress());			
+		if (this.personAddress3 !=null) {
+			db.getAddressPersonMap().addItem(this.personAddress3.getAddress(), itemA);
+			db.getPersonAddressMap().addItem(this.key, this.personAddress3.getAddress(), itemP);
 		}
 		
 		if (!asPack) {
 
 			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
-			if(Arrays.equals(this.userAccount1.getLastReference(db), new byte[0]))
+			if(Arrays.equals(this.personAddress1.getLastReference(db), new byte[0]))
 			{
-				this.userAccount1.setLastReference(this.signature, db);
+				this.personAddress1.setLastReference(this.signature, db);
 			}
 		}
 
@@ -449,30 +465,30 @@ public class R_SertifyPerson extends Transaction {
 		
 		// BACK GIFT FEE_KEY
 		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
-		this.userAccount1.setConfirmedBalance(Transaction.FEE_KEY, this.userAccount1.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
+		this.personAddress1.setConfirmedBalance(Transaction.FEE_KEY, this.personAddress1.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
 						
-		// SET ALIVE PERSON
-		db.getPersonStatusMap().set(this.key, StatusCls.ALIVE_KEY, -this.duration * (long)86400);
+		// UNDO ALIVE PERSON for DURATION
+		db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
 		//UPDATE RECIPIENT
-		db.getAddressPersonMap().delete(this.userAccount1.getAddress());
-		db.getPersonAddressMap().delete(this.key);
-		if (this.userAccount2 !=null) {
-			db.getAddressPersonMap().delete(this.userAccount2.getAddress());
-			// TODO db.getPersonAddressMap().delete(this.key, this.userAccount2.getAddress());
+		db.getAddressPersonMap().removeItem(this.personAddress1.getAddress());
+		db.getPersonAddressMap().removeItem(this.key, this.personAddress1.getAddress());
+		if (this.personAddress2 !=null) {
+			db.getAddressPersonMap().removeItem(this.personAddress2.getAddress());
+			db.getPersonAddressMap().removeItem(this.key, this.personAddress2.getAddress());
 		}
-		if (this.userAccount3 !=null) {
-			db.getAddressPersonMap().delete(this.userAccount3.getAddress());			
-			// TODO db.getPersonAddressMap().delete(this.key, this.userAccount3.getAddress());
+		if (this.personAddress3 !=null) {
+			db.getAddressPersonMap().removeItem(this.personAddress3.getAddress());
+			db.getPersonAddressMap().removeItem(this.key, this.personAddress3.getAddress());
 		}
 
 		
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(Arrays.equals(this.userAccount1.getLastReference(db), this.signature))
+			if(Arrays.equals(this.personAddress1.getLastReference(db), this.signature))
 			{
-				this.userAccount1.removeReference(db);
+				this.personAddress1.removeReference(db);
 			}	
 		}
 	}
@@ -490,9 +506,9 @@ public class R_SertifyPerson extends Transaction {
 	public HashSet<Account> getRecipientAccounts() {
 		HashSet<Account> accounts = new HashSet<Account>();
 		
-		accounts.add(this.userAccount1);
-		accounts.add(this.userAccount2);
-		accounts.add(this.userAccount3);
+		accounts.add(this.personAddress1);
+		accounts.add(this.personAddress2);
+		accounts.add(this.personAddress3);
 		
 		return accounts;
 	}
@@ -503,9 +519,9 @@ public class R_SertifyPerson extends Transaction {
 		String address = account.getAddress();
 		
 		if(address.equals(creator.getAddress())
-				|| address.equals(userAccount1.getAddress())
-				|| address.equals(userAccount2.getAddress())
-				|| address.equals(userAccount3.getAddress())
+				|| address.equals(personAddress1.getAddress())
+				|| address.equals(personAddress2.getAddress())
+				|| address.equals(personAddress3.getAddress())
 				)
 		{
 			return true;

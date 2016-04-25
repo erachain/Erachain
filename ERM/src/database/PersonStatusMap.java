@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 //import java.math.Long;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,9 +24,17 @@ import core.transaction.Transaction;
 import utils.ObserverMessage;
 import database.DBSet;
 
-public class PersonStatusMap extends DBMap<Tuple2<Long, Long>, Long> 
+// days for ALIVE status
+// minutes for others?
+public class PersonStatusMap extends DBMap<Long, // personKey
+			TreeMap<Integer, // statusKey
+					Stack<Tuple3<
+						Integer, // duration
+						Integer, // block.getHeight
+						byte[] // transaction.getReference
+				>>>>
 {
-	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	public static final Long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -50,42 +59,47 @@ public class PersonStatusMap extends DBMap<Tuple2<Long, Long>, Long>
 
 	@SuppressWarnings({ "unchecked"})
 	@Override
-	protected Map<Tuple2<Long, Long>, Long> getMap(DB database) 
+	protected Map<Long, TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>>> getMap(DB database) 
 	{
 		//OPEN MAP
-		BTreeMap<Tuple2<Long, Long>, Long> map =  database.createTreeMap("person_status")
-				.keySerializer(BTreeKeySerializer.TUPLE2)
+		BTreeMap<Long, TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>>> map =  database.createTreeMap("person_status")
+				.keySerializer(BTreeKeySerializer.BASIC)
 				.counterEnable()
 				.makeOrGet();
 		
+		/*
 		//HAVE/WANT KEY
 		this.statusKeyMap = database.createTreeMap("person_status_key")
 				.comparator(Fun.COMPARATOR)
 				.counterEnable()
 				.makeOrGet();
+		*/
 		
+		/*
 		//BIND STATUS KEY
-		Bind.secondaryKey(map, this.statusKeyMap, new Fun.Function2<Tuple3<Long, Long, Long>, Tuple2<Long, Long>, Long>() {
+		Bind.secondaryKey(map, this.statusKeyMap, new Fun.Function2<Tuple3<Long, Integer, Long>, Tuple2<Long, Long>, Integer>() {
 			@Override
-			public Tuple3<Long, Long, Long> run(Tuple2<Long, Long> key, Long value) {
-				return new Tuple3<Long, Long, Long>(key.b, -value, key.a);
+			public Tuple3<Long, Integer, Long> run(Tuple2<Long, Long> key, Integer value) {
+				return new Tuple3<Long, Integer, Long>(key.b, -value, key.a);
 			}	
 		});
+		*/
 		
 		//RETURN
 		return map;
 	}
 
 	@Override
-	protected Map<Tuple2<Long, Long>, Long> getMemoryMap() 
+	protected Map<Long, TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>>> getMemoryMap() 
 	{
-		return new TreeMap<Tuple2<Long, Long>, Long>(Fun.TUPLE2_COMPARATOR);
+		// HashMap ?
+		return new TreeMap<Long, TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>>>();
 	}
 
 	@Override
-	protected Long getDefaultValue() 
+	protected TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>> getDefaultValue() 
 	{
-		return -1L;
+		return new TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>>();
 	}
 	
 	@Override
@@ -93,28 +107,54 @@ public class PersonStatusMap extends DBMap<Tuple2<Long, Long>, Long>
 	{
 		return this.observableData;
 	}
+
+	public void addItem(Long person, Long status, Tuple3<Integer, Integer, byte[]> item)
+	{
+
+		TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>> value = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = value.get(status.intValue());
+		if (stack == null) stack = new Stack<Tuple3<Integer, Integer, byte[]>>();
 		
-	public void set(long person, long status, Long value)
-	{
-		this.set(new Tuple2<Long, Long>(person, status), value);
+		stack.add(item);
+		value.put(status.intValue(), stack);
+		
+		this.set(person, value);
 	}
-	public void set(long person, Long value)
+	public void addItem(Long person, Tuple3<Integer, Integer, byte[]> item)
 	{
-		this.set(new Tuple2<Long, Long>(person, ALIVE_KEY), value);
-	}
-	
-	public Long get(long person)
-	{
-		return this.get(person, ALIVE_KEY);
+		addItem(person, ALIVE_KEY, item);
 	}
 	
-	public Long get(long person, long key)
+	public Tuple3<Integer, Integer, byte[]> getItem(Long person)
 	{
-		return this.get(new Tuple2<Long, Long>(person, key));
+		return this.getItem(person, ALIVE_KEY);
 	}
 	
+	public Tuple3<Integer, Integer, byte[]> getItem(Long person, Long status)
+	{
+		TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>> value = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = value.get(status.intValue());
+		return stack != null? stack.size()> 0? stack.peek(): null : null;
+	}
+	public void removeItem(Long person, Long status)
+	{
+		TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>> value = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = value.get(status.intValue());
+		if (stack==null) return;
+
+		stack.pop();
+		value.put(status.intValue(), stack);
+		this.set(person, value);
+		
+	}
+	public void removeItem(Long person)
+	{
+		this.removeItem(person, ALIVE_KEY);
+	}
+	
+	/*
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<Long, Long>, Long> getBalancesSortableList(long key)
+	public SortableList<Tuple2<Long, Stack<Tuple2<byte[], Integer>>> getBalancesSortableList(Long key)
 	{
 		//FILTER ALL KEYS
 		Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.statusKeyMap).subMap(
@@ -122,11 +162,11 @@ public class PersonStatusMap extends DBMap<Tuple2<Long, Long>, Long>
 				Fun.t3(key, Fun.HI(), Fun.HI())).values();
 		
 		//RETURN
-		return new SortableList<Tuple2<Long, Long>, Long>(this, keys);
+		return new SortableList<Tuple2<Long, Long>, Stack<Tuple2<byte[], Integer>>>(this, keys);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<Long, Long>, Long> getBalancesSortableList(Account account) 
+	public SortableList<Tuple2<Long, Long>, Stack<Tuple2<byte[], Integer>>> getBalancesSortableList(Account account) 
 	{
 		BTreeMap map = (BTreeMap) this.map;
 		
@@ -136,6 +176,7 @@ public class PersonStatusMap extends DBMap<Tuple2<Long, Long>, Long>
 				Fun.t2(account.getAddress(), Fun.HI())).keySet();
 		
 		//RETURN
-		return new SortableList<Tuple2<Long, Long>, Long>(this, keys);
+		return new SortableList<Tuple2<Long, Long>, Stack<Tuple2<byte[], Integer>>>(this, keys);
 	}
+	*/
 }

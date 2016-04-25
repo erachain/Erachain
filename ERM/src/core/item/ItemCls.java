@@ -220,11 +220,11 @@ public abstract class ItemCls {
 			dbMap.set(0l, this);
 		} else {
 			key = dbMap.add(this);
-			//this.asset.setKey(key);
 		}
 		
 		//SET ORPHAN DATA
 		this.getDBIssueMap(db).set(this.reference, key);
+		this.key = key;
 		
 		return key;
 		

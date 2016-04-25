@@ -11,6 +11,8 @@ import java.util.Map;
 import ntp.NTP;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -26,12 +28,12 @@ import core.item.statuses.StatusCls;
 import database.ItemAssetBalanceMap;
 import database.DBSet;
 
-public class GenesisCertifyPersonRecord extends Transaction {
+public class GenesisCertifyPersonRecord extends Genesis_Record {
 
 	private static final byte TYPE_ID = (byte)Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Genesis Certify Person";
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
-	private static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + TIMESTAMP_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
+	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
 
 	private Account recipient;
 	private long key;
@@ -46,19 +48,6 @@ public class GenesisCertifyPersonRecord extends Transaction {
 	
 	//GETTERS/SETTERS
 	//public static String getName() { return NAME; }
-
-	public void generateSignature() {
-		
-		//return generateSignature1(this.recipient, this.amount, this.timestamp);
-		byte[] data = this.toBytes( false, null );
-
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);
-		digest = Bytes.concat(digest, digest);
-				
-		this.signature = digest;		
-
-	}
 
 	public Account getRecipient()
 	{
@@ -75,10 +64,9 @@ public class GenesisCertifyPersonRecord extends Transaction {
 	public JSONObject toJson() 
 	{
 		//GET BASE
-		JSONObject transaction = this.getJsonBase();
+		JSONObject transaction = super.toJson();
 				
 		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-		transaction.put("creator", this.creator.getAddress());
 		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("person", this.key);
 				
@@ -131,27 +119,8 @@ public class GenesisCertifyPersonRecord extends Transaction {
 	@Override
 	public byte[] toBytes(boolean withSign, byte[] releaserReference)
 	{
-		//byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		byte[] data = new byte[]{TYPE_ID};
-		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		//data = Bytes.concat(data, typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		/*
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		*/
-		
+		byte[] data = super.toBytes(withSign, releaserReference);
+				
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 		
@@ -171,13 +140,6 @@ public class GenesisCertifyPersonRecord extends Transaction {
 
 
 	//VALIDATE
-	@Override
-	public boolean isSignatureValid()
-	{
-		
-		byte[] digest = this.getSignature();
-		return Arrays.equals(digest, this.signature);
-	}
 
 	@Override
 	public int isValid(DBSet db, byte[] releaserReference) 
@@ -204,11 +166,15 @@ public class GenesisCertifyPersonRecord extends Transaction {
 	{
 
 		//UPDATE RECIPIENT
-		db.getAddressPersonMap().set(this.recipient.getAddress(), this.key);
-		db.getPersonAddressMap().set(this.key, this.recipient.getAddress());
-		// SET ALIVE PERSON PERMANENT
-		db.getPersonStatusMap().set(this.key, StatusCls.ALIVE_KEY, 0l);
+		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
+		// SET ALIVE PERSON for DURATION
+		db.getPersonStatusMap().addItem(this.key, itemP);
 
+		// SET PERSON ADDRESS
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, Integer.MAX_VALUE, 0, this.signature);
+		db.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
+		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemP);
+		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.signature, db);
 	}
@@ -217,11 +183,12 @@ public class GenesisCertifyPersonRecord extends Transaction {
 	public void orphan(DBSet db, boolean asPack) 
 	{
 								
+		// UNDO ALIVE PERSON for DURATION
+		db.getPersonStatusMap().removeItem(this.key);
+
 		//UPDATE RECIPIENT
-		db.getAddressPersonMap().delete(this.recipient.getAddress());
-		db.getPersonAddressMap().delete(this.key);
-		// REMOVE ALIVE PERSON PERMANENT
-		db.getPersonStatusMap().delete(new Tuple2<Long, Long>(this.key, StatusCls.ALIVE_KEY));
+		db.getAddressPersonMap().removeItem(this.recipient.getAddress());
+		db.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
 		//UPDATE REFERENCE OF CREATOR
 		// not needthis.creator.setLastReference(this.reference, db);		
@@ -258,7 +225,4 @@ public class GenesisCertifyPersonRecord extends Transaction {
 		return false;
 	}
 
-	public int calcBaseFee() {
-		return 0;
-	}
 }

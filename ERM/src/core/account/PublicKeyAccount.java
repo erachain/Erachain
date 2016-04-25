@@ -1,12 +1,15 @@
 package core.account;
 
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
+
+//import org.mapdb.Fun.Tuple2;
+//import org.mapdb.Fun.Tuple3;
 
 import core.crypto.Crypto;
 //import core.transaction.Transaction;
 import core.item.statuses.StatusCls;
-import database.DBSet;
-import ntp.NTP;
+//import database.DBSet;
+//import ntp.NTP;
 
 public class PublicKeyAccount extends Account {
 
@@ -27,25 +30,6 @@ public class PublicKeyAccount extends Account {
 	public byte[] getPublicKey() 
 	{
 		return publicKey;
-	}
-	
-	public boolean isPerson(DBSet db) {
-		
-		// IF NOT PERSON HAS THAT ADDRESS
-		Long personKey = db.getAddressPersonMap().get(this.address);
-		if (personKey < 0) return false;
-		
-		// IF PERSON NOT ALIVE
-		Long timestamp = db.getPersonStatusMap().get(personKey, ALIVE_KEY);
-		if (timestamp < 0 ) return false;
-		if (timestamp == 0 ) return true;
-		
-		// TEST TIME and EXPIRE TIME
-		long current_time = NTP.getTime();
-		if (timestamp < current_time ) return false;
-
-		return true;
-		
 	}
 	
 }

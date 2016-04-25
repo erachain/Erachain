@@ -18,11 +18,15 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.notes.Note;
 import core.item.notes.NoteCls;
+import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
+import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusTransaction;
 import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
@@ -135,6 +139,9 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferStatusTransaction(issuer, recipient, 0l, timestamp++));
 				
 			}
+			PersonCls person;
+			long i = 0;
+
 			koeff = (float)0.00001;
 			for(String address: minoreRecipients)
 			{
@@ -147,7 +154,17 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(issuer, recipient, 1l, bdAmount, timestamp++));
 				
 				// STATUS ALIVE
-				this.addTransaction(new GenesisTransferStatusTransaction(issuer, recipient, 0l, timestamp++));
+				person = new PersonHuman(issuer, "ERMOLAEV DMITRII SERGEEVICH", -timestamp++,
+						(byte)1, "Slav", (float)1.1, (float)1.1,
+						"white", "gray", "dark", (int) 188, "icreator");
+				//byte[] rawPerson = person.toBytes(true); // reference is new byte[64]
+				//assertEquals(rawPerson.length, person.getDataLength());
+						
+				//CREATE ISSUE PERSON TRANSACTION
+				this.addTransaction(new GenesisIssuePersonRecord(person, timestamp));
+
+				// CERTIFY PERSON
+				this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++, timestamp++));
 
 			}
 			
@@ -181,16 +198,10 @@ public class GenesisBlock extends Block{
 	// make notes
 	public static Status makeStatus(int key) 
 	{
-		switch(key)
-		{
-		case (int)StatusCls.DEAD_KEY:
-			return new Status(genesisGenerator, "dead", "Person is dead");
-		case (int)StatusCls.CITIZEN_KEY:
-			return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
-		case (int)StatusCls.MEMBER_KEY:
-			return new Status(genesisGenerator, "Member", "I am member of %union%");
-		}
-		return new Status(genesisGenerator, "Alive", "I am alive.");
+		if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		else if (key == StatusCls.CITIZEN_KEY) return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
+		else if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "I am member of %union%");
+		else return new Status(genesisGenerator, "Alive", "I am alive.");
 	}
 
 	public String getTestNetInfo() 

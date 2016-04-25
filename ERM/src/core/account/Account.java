@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 //import com.google.common.primitives.Bytes;
 
@@ -15,15 +17,19 @@ import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.statuses.StatusCls;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
+import ntp.NTP;
 
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
+	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+
 
 	protected String address;
 	
@@ -79,10 +85,12 @@ public class Account {
 	{
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
-	public Long setConfirmedPersonStatus(long personKey, long statusKey, DBSet db)
+	/*
+	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int duration, DBSet db)
 	{
-		return db.getPersonStatusMap().get(personKey, statusKey);
+		return db.getPersonStatusMap().addItem(personKey, statusKey, duration);
 	}
+	*/
 
 	// SET
 	public void setConfirmedBalance(BigDecimal amount)
@@ -107,16 +115,18 @@ public class Account {
 	}
 
 	// STATUS
-	public void setConfirmedPersonStatus(long personKey, long statusKey, Long  time)
+	/*
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Integer days)
 	{
-		this.setConfirmedPersonStatus(personKey, statusKey, time, DBSet.getInstance());
+		this.setConfirmedPersonStatus(personKey, statusKey, days, DBSet.getInstance());
 	}
 		
-	public void setConfirmedPersonStatus(long personKey, long statusKey, Long time, DBSet db)
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Integer days, DBSet db)
 	{
 		//UPDATE PRIMARY TIME IN DB
-		db.getPersonStatusMap().set(personKey, statusKey, time);
+		db.getPersonStatusMap().set(personKey, statusKey, days);
 	}
+	*/
 
 	
 	public BigDecimal getBalance(int confirmations, long key)
@@ -312,4 +322,39 @@ public class Account {
 		
 		return false;	
 	}
+
+	public Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db) {
+		
+		// IF NOT PERSON HAS THAT ADDRESS
+		Tuple4<Long, Integer, Integer, byte[]> item = db.getAddressPersonMap().getItem(this.address);
+		return item;
+				
+	}
+	
+	public boolean isPerson(DBSet db) {
+		
+		// IF DURATION ADDRESS to PERSON IS ENDED
+		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		if (addressDuration == null) return false;
+		// TEST TIME and EXPIRE TIME
+		long current_time = NTP.getTime();
+		
+		// TEST TIME and EXPIRE TIME
+		int days = addressDuration.b;		
+		if (days < 0 ) return false;
+		if (days * (long)86400 < current_time ) return false;
+
+		// IF PERSON ALIVE
+		Long personKey = addressDuration.a;
+		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		
+		// TEST TIME and EXPIRE TIME
+		days = personDuration.a;
+		if (days < 0 ) return false;
+		if (days * (long)86400 < current_time ) return false;
+
+		return true;
+		
+	}
+
 }

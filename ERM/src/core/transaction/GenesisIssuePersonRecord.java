@@ -16,7 +16,8 @@ import java.util.Arrays;
 //import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
-import core.account.PublicKeyAccount;
+//import core.account.Account;
+//import core.account.PublicKeyAccount;
 //import core.crypto.Crypto;
 //import core.item.ItemCls;
 import core.item.persons.PersonCls;
@@ -28,9 +29,9 @@ public class GenesisIssuePersonRecord extends GenesisIssueItem_Record
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Genesis Issue Person";
 
-	public GenesisIssuePersonRecord(PublicKeyAccount creator, PersonCls item, long timestamp) 
+	public GenesisIssuePersonRecord(PersonCls item, long timestamp) 
 	{
-		super(TYPE_ID, NAME_ID,  creator, item, timestamp);
+		super(TYPE_ID, NAME_ID, item, timestamp);
 	}
 	
 	//GETTERS/SETTERS
@@ -57,17 +58,12 @@ public class GenesisIssuePersonRecord extends GenesisIssueItem_Record
 		long timestamp = Longs.fromByteArray(timestampBytes);	
 		position += TIMESTAMP_LENGTH;
 						
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
-
 		//READ PERSON
 		// read without reference
 		PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += note.getDataLength(false);
 
-		return new GenesisIssuePersonRecord(creator, person, timestamp);
+		return new GenesisIssuePersonRecord(person, timestamp);
 		
 	}	
 	

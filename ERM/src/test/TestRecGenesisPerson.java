@@ -34,6 +34,7 @@ import core.transaction.TransactionFactory;
 import database.DBSet;
 import database.AddressPersonMap;
 import database.PersonAddressMap;
+import database.PersonStatusMap;
 
 public class TestRecGenesisPerson {
 
@@ -57,6 +58,7 @@ public class TestRecGenesisPerson {
 	PersonCls person;
 	long keyPerson = -1l;
 	GenesisIssuePersonRecord genesisIssuePersonTransaction;
+	PersonStatusMap dbPS;
 	PersonAddressMap dbPA;
 	AddressPersonMap dbAP;
 	
@@ -66,6 +68,7 @@ public class TestRecGenesisPerson {
 		db = DBSet.createEmptyDatabaseSet();
 		dbPA = db.getPersonAddressMap();
 		dbAP = db.getAddressPersonMap();
+		dbPS = db.getPersonStatusMap();
 		
 		//CREATE PERSON
 		//person = GenesisBlock.makePerson(0);
@@ -76,7 +79,7 @@ public class TestRecGenesisPerson {
 		//assertEquals(rawPerson.length, person.getDataLength());
 				
 		//CREATE ISSUE PERSON TRANSACTION
-		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(maker, person, timestamp);
+		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person, timestamp);
 		if (toProcess)
 		{ 
 			genesisIssuePersonTransaction.process(db, false);
@@ -117,10 +120,7 @@ public class TestRecGenesisPerson {
 			
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), parsedGenesisIssuePersonRecord.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(genesisIssuePersonTransaction.getCreator().getAddress(), parsedGenesisIssuePersonRecord.getCreator().getAddress());
-						
+									
 			//CHECK NAME
 			assertEquals(genesisIssuePersonTransaction.getItem().getName(), parsedGenesisIssuePersonRecord.getItem().getName());
 				
@@ -181,10 +181,7 @@ public class TestRecGenesisPerson {
 			
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), parsedGenesisIssuePersonRecord.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(genesisIssuePersonTransaction.getCreator().getAddress(), parsedGenesisIssuePersonRecord.getCreator().getAddress());
-			
+						
 			//CHECK OWNER
 			assertEquals(genesisIssuePersonTransaction.getItem().getCreator().getAddress(), parsedGenesisIssuePersonRecord.getItem().getCreator().getAddress());
 			
@@ -240,8 +237,6 @@ public class TestRecGenesisPerson {
 		//CHECK PERSON IS CORRECT
 		assertEquals(true, Arrays.equals(db.getPersonMap().get(key).toBytes(true), person.toBytes(true)));
 						
-		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 	}
 	
 	
@@ -250,17 +245,11 @@ public class TestRecGenesisPerson {
 	{
 		
 		initIssue(true);
-
-		assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 		
 		genesisIssuePersonTransaction.orphan(db, false);
 				
 		//CHECK PERSON EXISTS SENDER
 		assertEquals(false, db.getPersonMap().contains(keyPerson));
-						
-		//CHECK REFERENCE SENDER
-		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getReference(), maker.getLastReference(db)));
-		assertEquals(true, Arrays.equals(new byte[0], maker.getLastReference(db)));
 
 	}
 
@@ -381,36 +370,44 @@ public class TestRecGenesisPerson {
 	public void process_orphan_GenesisCertifyPersonRecord()
 	{
 
-		initIssue(false);		
-		genesisIssuePersonTransaction.process(false);
+		initIssue(true);
 
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE PERSON TRANSFER
 		GenesisCertifyPersonRecord personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson, timestamp);
+		String address = personTransfer.getRecipient().getAddress();
 
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
 	
 		// ADDRESS -> PERSON
-		assertEquals((long)dbAP.get(personTransfer.getRecipient().getAddress()), -1);
+		assertEquals( null, dbAP.getItem(address));
 		// PERSON -> ADDRESS
-		assertEquals(dbPA.get(this.keyPerson), null);
+		assertEquals( null, dbPA.getItem(keyPerson, address));
 		// PERSON STATUS ALIVE
-		assertEquals((long)db.getPersonStatusMap().get(this.keyPerson, StatusCls.ALIVE_KEY), -1);
+		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
 
+		/// PROCESS /////
 		personTransfer.process(db, false);
 
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
 		
-		// ADDRESS -> PERSON
-		assertEquals((long)dbAP.get(personTransfer.getRecipient().getAddress()), 0);
+		// .a - personKey, .b - duration, .c - block height, .d - reference
+		assertEquals( (long)keyPerson, (long)dbAP.getItem(address).a);
+		assertEquals( Integer.MAX_VALUE, (int)dbAP.getItem(address).b);
+		assertEquals( 0, (int)dbAP.getItem(address).c);
+		assertEquals( true, Arrays.equals(dbAP.getItem(address).d, personTransfer.getSignature()));
 		// PERSON -> ADDRESS
-		assertEquals(dbPA.get(this.keyPerson), personTransfer.getRecipient().getAddress());
+		assertEquals( Integer.MAX_VALUE, (int)dbPA.getItem(keyPerson, address).a);
+		assertEquals( 0, (int)dbPA.getItem(keyPerson, address).b);
+		assertEquals( true, Arrays.equals(dbPA.getItem(keyPerson, address).c, personTransfer.getSignature()));
 		// PERSON STATUS ALIVE
-		assertEquals((long)db.getPersonStatusMap().get(this.keyPerson, StatusCls.ALIVE_KEY), 0l);
+		assertEquals( Integer.MAX_VALUE, (int)dbPS.getItem(keyPerson).a);
+		assertEquals( 0, (int)dbPS.getItem(keyPerson).b);
+		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson).c, personTransfer.getSignature()));
 	
 		personTransfer.orphan(db, false);
 		
@@ -418,11 +415,11 @@ public class TestRecGenesisPerson {
 		assertEquals(false, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
 	
 		// ADDRESS -> PERSON
-		assertEquals((long)dbAP.get(personTransfer.getRecipient().getAddress()), -1);
+		assertEquals( null, dbAP.getItem(address));
 		// PERSON -> ADDRESS
-		assertEquals(dbPA.get(this.keyPerson), null);
+		assertEquals( null, dbPA.getItem(keyPerson, address));
 		// PERSON STATUS ALIVE
-		assertEquals((long)db.getPersonStatusMap().get(this.keyPerson, StatusCls.ALIVE_KEY), -1);
+		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
 
 	}
 }
