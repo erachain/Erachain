@@ -20,6 +20,7 @@ import lang.Lang;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -35,7 +36,7 @@ import core.item.persons.PersonCls;
 import gui.items.AllItemsFrame;
 
 @SuppressWarnings("serial")
-public class AllPersonsFrame extends JFrame { //AllItemsFrame {
+public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllItemsFrame {
 	
 	private TableModelPersons tableModelPersons;
 	
@@ -50,7 +51,17 @@ public class AllPersonsFrame extends JFrame { //AllItemsFrame {
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
+		
+		this.setBorder(new EmptyBorder(10, 10, 10, 10));
+		this.setSize(500, 500);
+		this.setLocation(40, 40);
+		this.setVisible(true);
+		this.setMaximizable(true);
+		this.setTitle(Lang.getInstance().translate("Persons"));
+		this.setClosable(true);
+		this.setResizable(true);
+	
+	//	this.setIconImages(icons);
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -174,7 +185,7 @@ public class AllPersonsFrame extends JFrame { //AllItemsFrame {
 		this.pack();
 		//this.setSize(500, this.getHeight());
 		this.setResizable(true);
-		this.setLocationRelativeTo(null);
+	//	this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
 

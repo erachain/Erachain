@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -12,6 +13,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -21,10 +24,14 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
+import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.PersonsPanel;
+import gui.items.persons.SearchPersons;
 import gui.settings.SettingsFrame;
 import lang.Lang;
 import settings.Settings;
 import utils.URLViewer;
+import gui.MainFrame;
 
 public class Menu extends JMenuBar 
 {
@@ -44,6 +51,8 @@ public class Menu extends JMenuBar
         JMenu fileMenu = new JMenu(Lang.getInstance().translate("File"));
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));
         this.add(fileMenu);
+        
+      
 
         //LOCK
 
@@ -202,5 +211,101 @@ public class Menu extends JMenuBar
         JMenuItem aboutItem = new JMenuItem("About");
         aboutItem.getAccessibleContext().setAccessibleDescription("Information about the application");
         helpMenu.add(aboutItem);  */ 
+       
+        // work menu
+        
+        JMenu workMenu = new JMenu(Lang.getInstance().translate("Work"));
+        workMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Work"));
+        this.add(workMenu);
+ /*        
+        //Search person
+        JMenuItem searchPerson = new JMenuItem(Lang.getInstance().translate("Search"));
+        searchPerson.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Search Persons"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        searchPerson.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             //   new SettingsFrame();
+        		
+        		new SearchPersons();
+        		
+        		
+        	}
+        });
+        workMenu.add(searchPerson);   
+        
+*/
+        
+        // меню Accounts
+        JMenuItem accountsmenu = new JMenuItem(Lang.getInstance().translate("Accounts"));
+        accountsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        accountsmenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		// выводим окно если оно не отображено
+        		selectOrAdd(new AccountsPanel(), MainFrame.desktopPane.getAllFrames());
+        		
+        	
+        		
+        	}
+        });
+        workMenu.add(accountsmenu);     
+
+        // меню Persons
+        JMenuItem personsmenu = new JMenuItem(Lang.getInstance().translate("Persons"));
+        personsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        personsmenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        // выводим окно или делаем фокус если уже открыто
+        		selectOrAdd( new AllPersonsFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        workMenu.add(personsmenu);  
+        
+        
+        
+	}
+	
+	
+	// подпрограмма выводит в панели окно или передает фокус если окно уже открыто
+	// item открываемое окно
+	// массив всех открытых окон в панели
+	void selectOrAdd(JInternalFrame item, JInternalFrame[] a ){
+		    		
+		//проверка если уже открыто такое окно то передаем только фокус на него
+		int k= -1;
+		for (int i=0 ; i < a.length; i=i+1) {
+//			String s = a[i].getClass().getName();
+			if (a[i].getClass().getName() == item.getClass().getName()){
+				k=i;
+			}
+			
+		};
+		if (k==-1){
+		MainFrame.desktopPane.add(item);
+		 try {
+			 item.setSelected(true);
+	        } catch (java.beans.PropertyVetoException e1) {}
+		}
+		else {
+			try {
+				a[k].setSelected(true);
+			} catch (PropertyVetoException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}	
+		
+		
+	
 	}
 }
