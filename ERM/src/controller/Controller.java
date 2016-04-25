@@ -1460,7 +1460,8 @@ public class Controller extends Observable {
 	// BLOCKCHAIN
 
 	public int getHeight() {
-		return this.blockChain.getHeight();
+		// need for TESTs
+		return this.blockChain != null? this.blockChain.getHeight(): -1;
 	}
 
 	public Block getLastBlock() {

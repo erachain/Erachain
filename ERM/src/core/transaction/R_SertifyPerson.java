@@ -32,6 +32,7 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.statuses.StatusCls;
 import database.ItemAssetBalanceMap;
+import ntp.NTP;
 import database.DBSet;
 import utils.Converter;
 
@@ -46,7 +47,7 @@ public class R_SertifyPerson extends Transaction {
 
 	// how many OIL gift
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
-	private static final int DEFAULT_DURATION = 3 * 356;
+	public static final int DEFAULT_DURATION = 3 * 356;
 
 	protected Long key; // PERSON KEY
 	protected Integer duration; // in days
@@ -72,7 +73,7 @@ public class R_SertifyPerson extends Transaction {
 		this.personAddress1 = personAddress1;
 		this.personAddress2 = personAddress2;
 		this.personAddress3 = personAddress3;
-		this.duration = duration;
+		this.duration = duration;			
 	}
 	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
@@ -80,6 +81,16 @@ public class R_SertifyPerson extends Transaction {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
 				duration, timestamp, reference);
+	}
+	// set default date
+	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
+			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
+			long timestamp, byte[] reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
+				userAccount1, userAccount2, userAccount3,
+				0, timestamp, reference);
+		
+		this.duration = DEFAULT_DURATION + (int)(NTP.getTime() / 86400);
 	}
 	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
@@ -427,9 +438,9 @@ public class R_SertifyPerson extends Transaction {
 		this.personAddress1.setConfirmedBalance(Transaction.FEE_KEY, this.personAddress1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
 		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.duration,
-				Controller.getInstance().getHeight(), this.reference);
+				Controller.getInstance().getHeight(), this.signature);
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.duration,
-				Controller.getInstance().getHeight(), this.reference);
+				Controller.getInstance().getHeight(), this.signature);
 		// SET ALIVE PERSON for DURATION
 		db.getPersonStatusMap().addItem(this.key, itemP);
 

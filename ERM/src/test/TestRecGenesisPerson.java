@@ -58,6 +58,7 @@ public class TestRecGenesisPerson {
 	PersonCls person;
 	long keyPerson = -1l;
 	GenesisIssuePersonRecord genesisIssuePersonTransaction;
+
 	PersonStatusMap dbPS;
 	PersonAddressMap dbPA;
 	AddressPersonMap dbAP;
