@@ -385,7 +385,7 @@ public class R_SertifyPerson extends Transaction {
 	public int isValid(DBSet db, byte[] releaserReference) {
 		
 		//CHECK DURATION
-		if(duration < 0 | duration > 777)
+		if(duration < 0)
 		{
 			return INVALID_DURATION;
 		}

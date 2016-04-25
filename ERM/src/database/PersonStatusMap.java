@@ -26,7 +26,8 @@ import database.DBSet;
 
 // days for ALIVE status
 // minutes for others?
-public class PersonStatusMap extends DBMap<Long, // personKey
+public class PersonStatusMap extends DBMap<
+			Long, // personKey
 			TreeMap<Integer, // statusKey
 					Stack<Tuple3<
 						Integer, // duration

@@ -7,8 +7,12 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
- import org.apache.log4j.Logger;
+import java.util.Stack;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import ntp.NTP;
 
@@ -556,6 +560,24 @@ public class TestRecPerson {
 		
 		initPersonalize();
 		
+		// .a - personKey, .b - duration, .c - block height, .d - reference
+		// PERSON STATUS ALIVE
+		assertEquals( null, dbPS.getItem(personKey));
+		assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
+
+		// ADDRESSES
+		assertEquals( null, dbAP.getItem(userAddress1));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress1));
+
+		assertEquals( null, dbAP.getItem(userAddress2));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress2));
+
+		assertEquals( null, dbAP.getItem(userAddress3));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress3));
+
 		int to_day = (int)(NTP.getTime() / 86400);
 		int to_date = R_SertifyPerson.DEFAULT_DURATION + to_day;
 		assertEquals( to_date, r_SertifyPerson.getDuration());
@@ -693,7 +715,7 @@ public class TestRecPerson {
 		// TEST LIST and STACK
 		int duration2 = to_day - 12;
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3, duration,
+				userAccount1, userAccount2, userAccount3, duration2,
 				timestamp, certifier.getLastReference(db));
 		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
 		r_SertifyPerson.sign(certifier, false);

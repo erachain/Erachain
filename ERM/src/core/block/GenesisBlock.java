@@ -179,7 +179,7 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)Transaction.FEE_KEY:
-			return new AssetVenture(genesisGenerator, "LIEV", "It is an drops of life used for deals", 99999999L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, "LAEV", "It is an drops of life used for deals", 99999999L, (byte)8, true);
 		}
 		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance, (byte)0, true);
 	}

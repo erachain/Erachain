@@ -1,7 +1,8 @@
 package database;
 
-import java.util.HashMap;
 import java.util.Map;
+//import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Stack;
 
 import org.mapdb.BTreeKeySerializer;
@@ -15,14 +16,15 @@ import database.serializer.NameSerializer;
 
 // Person contains an addresses
 public class PersonAddressMap extends DBMap<
-			Tuple2<Long, // personKey
-				String>, // address
-			Stack<Tuple3<Integer, // duration
-				Integer, // block.getHeight
-				byte[] // transaction.getReference
-		>>> 
+				Long, // personKey
+				TreeMap<
+					String, // address
+					Stack<Tuple3<Integer, // duration
+						Integer, // block.getHeight
+						byte[] // transaction.getReference
+		>>>>
 {
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // hashMap ?
 	
 	public PersonAddressMap(DBSet databaseSet, DB database)
 	{
@@ -37,25 +39,25 @@ public class PersonAddressMap extends DBMap<
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Tuple2<Long, String>, Stack<Tuple3<Integer, Integer, byte[]>>> getMap(DB database) 
+	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("person_address")
-				.keySerializer(BTreeKeySerializer.TUPLE2)
+				.keySerializer(BTreeKeySerializer.BASIC)
 				.counterEnable()
 				.makeOrGet();
 	}
 
 	@Override
-	protected Map<Tuple2<Long, String>, Stack<Tuple3<Integer, Integer, byte[]>>> getMemoryMap() 
+	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>> getMemoryMap() 
 	{
-		return new HashMap<Tuple2<Long, String>, Stack<Tuple3<Integer, Integer, byte[]>>>();
+		return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>>();
 	}
 
 	@Override
-	protected Stack<Tuple3<Integer, Integer, byte[]>> getDefaultValue() 
+	protected TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> getDefaultValue() 
 	{
-		return new Stack<Tuple3<Integer, Integer, byte[]>>();
+		return new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>();
 	}
 	
 	@Override
@@ -67,27 +69,41 @@ public class PersonAddressMap extends DBMap<
 	///////////////////////////////
 	public void addItem(Long person, String address, Tuple3<Integer, Integer, byte[]> item)
 	{
-		Tuple2<Long, String> key = new Tuple2<Long, String>(person, address);
-		Stack<Tuple3<Integer, Integer, byte[]>> value = this.get(key);
+		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
+		if (stack == null) stack = new Stack<Tuple3<Integer, Integer, byte[]>>();
 		
-		value.add(item);
+		stack.push(item);
 		
-		this.set(key, value);
+		tree.put(address, stack);
+		
+		this.set(person, tree);
 	}
 	
+	// GET ALL ITEMS
+	public TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> getItems(Long person)
+	{
+		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
+		return tree;
+	}
+
 	public Tuple3<Integer, Integer, byte[]> getItem(Long person, String address)
 	{
-		Stack<Tuple3<Integer, Integer, byte[]>> value = this.get(new Tuple2<Long, String>(person, address));
-		return value.size()> 0? value.peek(): null;
+		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
+		if (stack == null) return null;
+		return stack.size()> 0? stack.peek(): null;
 	}
+	
 	public void removeItem(Long person, String address)
 	{
-		Tuple2<Long, String> key = new Tuple2<Long, String>(person, address);
-		Stack<Tuple3<Integer, Integer, byte[]>> value = this.get(key);
-		if (value==null || value.size() == 0) return;
+		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
+		if (stack==null || stack.size() == 0) return;
 
-		value.pop();
-		this.set(key, value);
+		stack.pop();
+		tree.put(address, stack);
+		this.set(person, tree);
 		
 	}
 

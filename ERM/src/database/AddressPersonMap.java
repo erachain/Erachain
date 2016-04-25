@@ -16,7 +16,11 @@ import org.mapdb.Fun.Tuple4;
 
 // address+key -> Stack person + duration + block.height + transaction.reference
 // Controller.getInstance().getHeight()
-public class AddressPersonMap extends DBMap<String, Stack<Tuple4<Long, Integer, Integer, byte[]>>> 
+public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
+		Long, // person key
+		Integer, // duration day
+		Integer, // block height 
+		byte[]>>> // transaction reference
 {
 	private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
 	
