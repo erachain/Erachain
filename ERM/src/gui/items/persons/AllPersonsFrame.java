@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -8,9 +9,15 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,6 +25,7 @@ import java.util.TreeMap;
 import gui.CoreRowSorter;
 import lang.Lang;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -30,9 +38,15 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Queues.Stack;
+
 import core.item.persons.PersonCls;
+import database.DBSet;
 import gui.items.AllItemsFrame;
 
 @SuppressWarnings("serial")
@@ -54,7 +68,6 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		this.setSize(500, 500);
-		this.setLocation(40, 40);
 		this.setVisible(true);
 		this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Persons"));
@@ -103,6 +116,18 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		tableGBC.gridx = 0;	
 		tableGBC.gridy = 1;	
 		
+		
+		//account TABLe
+		GridBagConstraints tableAccount = new GridBagConstraints();
+		tableAccount.insets = new Insets(0, 5, 5, 0);
+		tableAccount.fill = GridBagConstraints.BOTH;  
+		tableAccount.anchor = GridBagConstraints.NORTHWEST;
+		tableAccount.weightx = 1;	
+		tableAccount.weighty = 1;	
+		tableAccount.gridwidth = 2;
+		tableAccount.gridx = 0;	
+		tableAccount.gridy = 2;		
+		
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
 		final JTable personsTable = new JTable(this.tableModelPersons);
@@ -145,7 +170,58 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				tableModelPersons.fireTableDataChanged();
 			}
 		});
+		
+		// select row table persons
+		//CREATE SEARCH FIELD
+				final JLabel Address1 = new JLabel();
+				Address1.setBackground(new Color(255, 255, 255, 0));
+			//	Address1.set
+			//	JScrollPane Address1 = new JScrollPane();
+		// обработка изменения положения курсора в таблице
+				personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				//создаем объект персоны
+				PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+				//читаем таблицу персон.
+				Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
+				// преобразование в дату
+				Date Acti = new Date(Long.valueOf(t3.a.toString()));
+				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+				Date birs= new Date(Long.valueOf(person.getBirthday()));
+				
+				String message ="<html><div></div><div> <p><b> Код: "   + person.getKey()        			+ "</p>"
+						+ "<p> <b> ИМЯ: "   			 + person.getName().toString()		+ "</p>" 
+				        + "<p> Действительно до: "   + formatDate.format(Acti)			+"</p>"
+				        + "<p> Дата рождения: "      + formatDate.format(birs)			+"</p>";
+				// Читаем адреса клиента
+				TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+		
+				message =message + "<p> Счет: "+ Addresses.lastKey() +"<p></div></html>";
+				Address1.setText( message);
+					//	personsTable.getValueAt(personsTable.getSelectedRow(),0).toString() +"  " +  personsTable.getValueAt(personsTable.getSelectedRow(),1).toString() 
+					//	+ " Статус:" + formatDate.format(d));	
+			
+				
+				
+		//	String a = person.getName().toString();
+			
+			
+			
+			
+			
+			}
+
+			
+	      //  SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+	       
+					
+				});
+		
+		
+//Address1.setText( personsTable.getValueAt(personsTable.getSelectedRow(),0).toString());
 		// MENU
 		JPopupMenu nameSalesMenu = new JPopupMenu();
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
@@ -176,11 +252,12 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				}
 			}
 		});
-
+	
 		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 		this.add(new JScrollPane(personsTable), tableGBC);
-		
+		this.add(new JScrollPane(Address1), tableAccount);
+	
 		//PACK
 		this.pack();
 		//this.setSize(500, this.getHeight());

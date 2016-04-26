@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -14,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.border.EmptyBorder;
 
+import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -21,6 +23,7 @@ import settings.Settings;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
+private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
 
 	public MainFrame()
@@ -49,6 +52,9 @@ public static  JDesktopPane desktopPane;
         
         // создаем рабочий стол Swing
         desktopPane = new JDesktopPane();
+     //   bqColor bq = new bqColor();
+        desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
+      //  setSelectionBackground(new Color(209, 232, 255, 255))
       //  desktopPane.setSize(500, 300);
         // добавляем его в центр окна
         add(desktopPane);
@@ -72,9 +78,11 @@ public static  JDesktopPane desktopPane;
         frame1.setResizable(true);
         //ADD GENERAL TABPANE TO FRAME
         desktopPane.add(frame1);
-       // JInternalFrame Jfacc = new AccountsPanel();
-        desktopPane.add(new AccountsPanel());
         
+       // JInternalFrame Jfacc = new AccountsPanel();
+        
+        desktopPane.add(new AllPersonsFrame());
+        desktopPane.add(new AccountsPanel());
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
         
