@@ -20,9 +20,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 //import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
-import core.item.notes.Note;
 import core.item.notes.NoteCls;
-//import core.item.persons.PersonCls;
+import core.item.notes.Note;
+import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
@@ -60,7 +60,7 @@ public class GenesisBlock extends Block{
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
-		PersonHuman user;
+		PersonCls user;
 
 		// ISSUE ITEMS
 		this.initItems();
@@ -119,7 +119,7 @@ public class GenesisBlock extends Block{
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
 							"Скорняков Александр Викторович", "1963-08-21 10:10:10.0", (byte)1, "Slav", (float)1.1330, (float)13.9224,
-							"белый", "серо-зеленый", "светло-коричневый", (int) 188, ""))
+							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
 				);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -128,7 +128,7 @@ public class GenesisBlock extends Block{
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
 							"Бородин Олег", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))					
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, ""))					
 				);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
@@ -143,7 +143,7 @@ public class GenesisBlock extends Block{
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(100, new PersonHuman(new Account("753BpHWMyKxKVjsSUiceBab1mydcVEoKDD"),
 							"неизвестный участник", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "")),
 					Arrays.asList(100, new PersonHuman(new Account("7QGXujqsuJeb9YeW5L83vaEu3SsWXsRtXc"),
 							"неизвестный участник", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),

@@ -102,6 +102,8 @@ public class TransactionV3Tests {
 		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
+		assertEquals(rawMessageTransactionV3.length, messageTransactionV3.getDataLength(false));
+
 		
 		MessageTransaction messageTransactionV3_2 = null;
 		try {

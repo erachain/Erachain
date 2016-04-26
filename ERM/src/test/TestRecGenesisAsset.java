@@ -40,7 +40,6 @@ public class TestRecGenesisAsset {
 	long OIL_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
-	//long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;

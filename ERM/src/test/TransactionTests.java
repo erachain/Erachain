@@ -1389,7 +1389,7 @@ public class TransactionTests {
 		LOGGER.debug("nameSale ");
 		LOGGER.info("nameSale " + nameSale.getName(databaseSet));
 		LOGGER.info("nameSale " + nameSale.getName(databaseSet));
-		LOGGER.info("nameSale " + nameSale.getName(databaseSet).getOwner());
+		//LOGGER.info("nameSale " + nameSale.getName(databaseSet).getOwner());
 
 		//CREATE CANCEL NAME SALE
 		BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));	

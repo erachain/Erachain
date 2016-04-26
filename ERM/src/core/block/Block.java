@@ -585,7 +585,7 @@ public class Block {
 		}
 
 		//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-		if(this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp)
+		if(true & (this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp))
 		{
 			return false;
 		}
