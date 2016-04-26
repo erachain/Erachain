@@ -101,7 +101,7 @@ public class TestRecPerson {
 		gb.process(db);
 		
 		// GET RIGHTS TO CERTIFIER
-		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L, timestamp);
+		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L);
 		genesis_certify.process(db, false);
 		
 		certifier.setLastReference(gb.getGeneratorSignature(), db);
@@ -329,22 +329,8 @@ public class TestRecPerson {
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issuePersonTransaction.getSignature(), certifier.getLastReference(db)));
-	}
-	
-	
-	@Test
-	public void orphanIssuePersonRecord()
-	{
-		
-		init();				
-				
-		issuePersonTransaction.sign(certifier, false);
-		issuePersonTransaction.process(db, false);
-		personKey = db.getIssuePersonMap().get(issuePersonTransaction);
-		assertEquals(true, personKey >= 0);
-		
-		assertEquals(true, Arrays.equals(issuePersonTransaction.getSignature(), certifier.getLastReference(db)));
-		
+
+		//////// ORPHAN /////////
 		issuePersonTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
@@ -560,7 +546,7 @@ public class TestRecPerson {
 		
 		initPersonalize();
 		
-		// .a - personKey, .b - duration, .c - block height, .d - reference
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		assertEquals( null, dbPS.getItem(personKey));
 		assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
@@ -618,7 +604,7 @@ public class TestRecPerson {
 		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));
 		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
 		
-		// .a - personKey, .b - duration, .c - block height, .d - reference
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		assertEquals( to_date, (int)dbPS.getItem(personKey).a);
 		assertEquals( -1, (int)dbPS.getItem(personKey).b);
@@ -678,7 +664,7 @@ public class TestRecPerson {
 		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));
 		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
 		
-		// .a - personKey, .b - duration, .c - block height, .d - reference
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		assertEquals( null, dbPS.getItem(personKey));
 
@@ -701,32 +687,32 @@ public class TestRecPerson {
 
 		/////////////////////////////////////////////// TEST DURATIONS
 		// TRY DURATIONS
-		int duration = to_day + 22;
+		int end_date = to_day + 22;
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3, duration,
+				userAccount1, userAccount2, userAccount3, end_date,
 				timestamp, certifier.getLastReference(db));
 		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
 		r_SertifyPerson.sign(certifier, false);
 		r_SertifyPerson.process(db, false);
 
-		assertEquals(duration, (int)userAccount1.getPersonDuration(db).b);
+		assertEquals(end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));
 
 		// TEST LIST and STACK
-		int duration2 = to_day - 12;
+		int end_date2 = to_day - 12;
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3, duration2,
+				userAccount1, userAccount2, userAccount3, end_date2,
 				timestamp, certifier.getLastReference(db));
 		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
 		r_SertifyPerson.sign(certifier, false);
 		r_SertifyPerson.process(db, false);
 
-		assertEquals(duration2, (int)userAccount2.getPersonDuration(db).b);
+		assertEquals(end_date2, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(false, userAccount2.isPerson(db));
 
 		r_SertifyPerson.orphan(db, false);
 
-		assertEquals(duration, (int)userAccount2.getPersonDuration(db).b);
+		assertEquals(end_date, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));
 	}
 	

@@ -19,7 +19,7 @@ import database.DBSet;
 //import database.DBMap;
 import database.Item_Map;
 //import database.wallet.FavoriteItem;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 
 public abstract class ItemCls {
 
@@ -71,7 +71,7 @@ public abstract class ItemCls {
 	public abstract String getItemSubType();
 
 	public abstract Item_Map getDBMap(DBSet db);
-	public abstract IssueItemMap getDBIssueMap(DBSet db);
+	public abstract Issue_ItemMap getDBIssueMap(DBSet db);
 
 
 	public byte[] getType()
@@ -233,7 +233,7 @@ public abstract class ItemCls {
 	public long removeFromMap(DBSet db)
 	{
 		//DELETE FROM DATABASE
-		IssueItemMap issueDB = this.getDBIssueMap(db);
+		Issue_ItemMap issueDB = this.getDBIssueMap(db);
 		long key = issueDB.get(this.reference);
 		this.getDBMap(db).delete(key);	
 				

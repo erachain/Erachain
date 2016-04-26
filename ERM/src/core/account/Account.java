@@ -86,9 +86,9 @@ public class Account {
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
 	/*
-	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int duration, DBSet db)
+	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int end_date, DBSet db)
 	{
-		return db.getPersonStatusMap().addItem(personKey, statusKey, duration);
+		return db.getPersonStatusMap().addItem(personKey, statusKey, end_date);
 	}
 	*/
 

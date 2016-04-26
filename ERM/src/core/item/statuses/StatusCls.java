@@ -7,7 +7,7 @@ import core.item.ItemCls;
 // import org.apache.log4j.Logger;
 
 import database.DBSet;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 import database.Item_Map;
 import database.ItemStatusMap;
 
@@ -41,7 +41,7 @@ public abstract class StatusCls extends ItemCls {
 	{
 		return db.getItemStatusMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssueStatusMap();
 	}

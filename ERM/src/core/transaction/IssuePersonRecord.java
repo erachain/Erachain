@@ -75,7 +75,7 @@ public class IssuePersonRecord extends IssueItemRecord
 		if (res != Transaction.VALIDATE_OK) return res;
 		
 		// CHECH MAKER IS PERSON?
-		if (!creator.isPerson(db)) return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		if (!this.creator.isPerson(db)) return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		
 		return VALIDATE_OK;
 	

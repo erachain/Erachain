@@ -33,11 +33,11 @@ import database.DBSet;
 public class Genesis_Record extends Transaction 
 {
 	
-	protected static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH + TIMESTAMP_LENGTH;
+	protected static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH;
 	
-	public Genesis_Record(byte type, String NAME_ID, long timestamp) 
+	public Genesis_Record(byte type, String NAME_ID) 
 	{
-		super(type, NAME_ID, timestamp);
+		super(type, NAME_ID);
 	}
 
 	//GETTERS/SETTERS
@@ -77,19 +77,13 @@ public class Genesis_Record extends Transaction
 		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
 		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
 		//data = Bytes.concat(data, TYPE_ID);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-				
+						
 		return data;
 	}
 	
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include item REFERENCE
 		return BASE_LENGTH;
 	}
 	
@@ -116,7 +110,7 @@ public class Genesis_Record extends Transaction
 	@Override
 	public boolean isInvolved(Account account) 
 	{	
-		return false;		
+		return false;	
 	}
 
 	public int calcBaseFee() {

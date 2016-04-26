@@ -36,7 +36,7 @@ import ntp.NTP;
 import database.DBSet;
 import utils.Converter;
 
-// this.duration = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
+// this.end_date = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
 public class R_SertifyPerson extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PERSON_TRANSACTION;
@@ -50,7 +50,7 @@ public class R_SertifyPerson extends Transaction {
 	public static final int DEFAULT_DURATION = 3 * 356;
 
 	protected Long key; // PERSON KEY
-	protected Integer duration; // in days
+	protected Integer end_date; // in days
 	protected PublicKeyAccount personAddress1;
 	protected PublicKeyAccount personAddress2;
 	protected PublicKeyAccount personAddress3;
@@ -65,7 +65,7 @@ public class R_SertifyPerson extends Transaction {
 
 	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount personAddress1, PublicKeyAccount personAddress2, PublicKeyAccount personAddress3,
-			int duration, long timestamp, byte[] reference) {
+			int end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.TYPE_NAME = NAME_ID;
@@ -73,14 +73,14 @@ public class R_SertifyPerson extends Transaction {
 		this.personAddress1 = personAddress1;
 		this.personAddress2 = personAddress2;
 		this.personAddress3 = personAddress3;
-		this.duration = duration;			
+		this.end_date = end_date;			
 	}
 	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
-			int duration, long timestamp, byte[] reference) {
+			int end_date, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
-				duration, timestamp, reference);
+				end_date, timestamp, reference);
 	}
 	// set default date
 	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
@@ -90,15 +90,15 @@ public class R_SertifyPerson extends Transaction {
 				userAccount1, userAccount2, userAccount3,
 				0, timestamp, reference);
 		
-		this.duration = DEFAULT_DURATION + (int)(NTP.getTime() / 86400);
+		this.end_date = DEFAULT_DURATION + (int)(NTP.getTime() / 86400);
 	}
 	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
-			int duration, long timestamp, byte[] reference, byte[] signature,
+			int end_date, long timestamp, byte[] reference, byte[] signature,
 			 byte[] userSignature1,  byte[] userSignature2,  byte[] userSignature3) {
 		this(typeBytes, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
-				duration, timestamp, reference);
+				end_date, timestamp, reference);
 		this.signature = signature;
 		this.userSignature1 = userSignature1;
 		this.userSignature2 = userSignature2;
@@ -108,11 +108,11 @@ public class R_SertifyPerson extends Transaction {
 	// as pack
 	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
-			int duration, byte[] signature,
+			int end_date, byte[] signature,
 			 byte[] userSignature1,  byte[] userSignature2,  byte[] userSignature3) {
 		this(typeBytes, creator, (byte)0, key,
 				userAccount1, userAccount2, userAccount3,
-				duration, 0l, null);
+				end_date, 0l, null);
 		this.signature = signature;
 		this.userSignature1 = userSignature1;
 		this.userSignature2 = userSignature2;
@@ -120,20 +120,20 @@ public class R_SertifyPerson extends Transaction {
 	}
 	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
-			int duration, long timestamp, byte[] reference, byte[] signature,
+			int end_date, long timestamp, byte[] reference, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
-				duration, timestamp, reference);
+				end_date, timestamp, reference);
 	}
 	// as pack
 	public R_SertifyPerson(PublicKeyAccount creator, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
-			int duration, byte[] signature,
+			int end_date, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, key,
 				userAccount1, userAccount2, userAccount3,
-				duration, 0l, null);
+				end_date, 0l, null);
 	}
 	
 	//GETTERS/SETTERS
@@ -172,7 +172,7 @@ public class R_SertifyPerson extends Transaction {
 	}
 	public int getDuration() 
 	{
-		return this.duration;
+		return this.end_date;
 	}
 			
 	@SuppressWarnings("unchecked")
@@ -187,7 +187,7 @@ public class R_SertifyPerson extends Transaction {
 		transaction.put("userAccount1", this.personAddress1.getAddress());
 		transaction.put("userAccount2", this.personAddress2.getAddress());
 		transaction.put("userAccount3", this.personAddress3.getAddress());
-		transaction.put("duration", this.duration);
+		transaction.put("end_date", this.end_date);
 		
 		return transaction;	
 	}
@@ -283,7 +283,7 @@ public class R_SertifyPerson extends Transaction {
 		position += USER_ADDRESS_LENGTH;
 
 		// READ DURATION
-		int duration = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DURATION_LENGTH));
+		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DURATION_LENGTH));
 		position += DURATION_LENGTH;
 				
 		//READ USER1 SIGNATURE
@@ -301,12 +301,12 @@ public class R_SertifyPerson extends Transaction {
 		if (!asPack) {
 			return new R_SertifyPerson(typeBytes, creator, feePow, key,
 					userAccount1, userAccount2, userAccount3,
-					duration, timestamp, reference, signature,
+					end_date, timestamp, reference, signature,
 					 userSignature1,  userSignature2,  userSignature3);
 		} else {
 			return new R_SertifyPerson(typeBytes, creator, key,
 					userAccount1, userAccount2, userAccount3,
-					duration, signature,
+					end_date, signature,
 					 userSignature1,  userSignature2,  userSignature3);
 		}
 
@@ -340,7 +340,7 @@ public class R_SertifyPerson extends Transaction {
 		}
 
 		//WRITE DURATION
-		data = Bytes.concat(data, Ints.toByteArray(this.duration));
+		data = Bytes.concat(data, Ints.toByteArray(this.end_date));
 
 		//USER SIGNATUREs
 		if (withSign) {
@@ -385,7 +385,7 @@ public class R_SertifyPerson extends Transaction {
 	public int isValid(DBSet db, byte[] releaserReference) {
 		
 		//CHECK DURATION
-		if(duration < 0)
+		if(end_date < 0)
 		{
 			return INVALID_DURATION;
 		}
@@ -437,9 +437,9 @@ public class R_SertifyPerson extends Transaction {
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
 		this.personAddress1.setConfirmedBalance(Transaction.FEE_KEY, this.personAddress1.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.duration,
+		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.duration,
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
 		// SET ALIVE PERSON for DURATION
 		db.getPersonStatusMap().addItem(this.key, itemP);

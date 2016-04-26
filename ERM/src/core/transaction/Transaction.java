@@ -139,7 +139,7 @@ public abstract class Transaction {
 	public static final int RELEASE_PACK = 70;
 
 	// old
-	public static final int GENESIS_TRANSACTION = 4 + 130;
+	// public static final int GENESIS_TRANSACTION = 4 + 130;
 	public static final int PAYMENT_TRANSACTION = 5 + 130;
 	public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
 	public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
@@ -247,12 +247,10 @@ public abstract class Transaction {
 	protected PublicKeyAccount creator;
 	
 	// need for genesis
-	protected Transaction(byte type, String type_name, long timestamp)
+	protected Transaction(byte type, String type_name)
 	{
 		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
 		this.TYPE_NAME = type_name;
-		this.timestamp = timestamp;
-
 	}
 	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
@@ -395,17 +393,22 @@ public abstract class Transaction {
 	{
 		JSONObject transaction = new JSONObject();
 		
-		transaction.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
-		transaction.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-		transaction.put("type2", Byte.toUnsignedInt(this.typeBytes[2]));
-		transaction.put("type3", Byte.toUnsignedInt(this.typeBytes[3]));
+		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.getRecordType());
-		transaction.put("fee", this.fee.toPlainString());
-		transaction.put("timestamp", this.timestamp);
 		transaction.put("reference", Base58.encode(this.reference));
 		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
-		if (this.creator != null ) transaction.put("creator", this.creator.getAddress());
+		if (this.creator == null )
+		{
+			transaction.put("creator", "genesis");			
+		} else {
+			transaction.put("fee", this.fee.toPlainString());
+			transaction.put("timestamp", this.timestamp);
+			transaction.put("creator", this.creator.getAddress());
+			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
+			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
+			transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
+		}
 		
 		return transaction;
 	}

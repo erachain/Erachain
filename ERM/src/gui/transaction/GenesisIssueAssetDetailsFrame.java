@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
 import core.transaction.GenesisIssueAssetTransaction;
+import core.item.assets.AssetCls;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -29,6 +30,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
+		AssetCls asset = (AssetCls)assetIssue.getItem();
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -97,18 +99,6 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);
 		
-		//LABEL TIMESTAMP
-		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
-		this.add(timestampLabel, labelGBC);
-						
-		//TIMESTAMP
-		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(assetIssue.getTimestamp()));
-		timestamp.setEditable(false);
-		MenuPopupUtil.installContextMenu(timestamp);
-		this.add(timestamp, detailGBC);
-				
 		//LABEL OWNER
 		labelGBC.gridy = 5;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
@@ -116,7 +106,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(assetIssue.getAsset().getCreator().getAddress());
+		JTextField owner = new JTextField("genesis");
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
@@ -128,7 +118,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(assetIssue.getAsset().getName());
+		JTextField name = new JTextField(asset.getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -140,7 +130,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 				
 		//DESCRIPTION
 		detailGBC.gridy = 7;
-		JTextArea txtAreaDescription = new JTextArea(assetIssue.getAsset().getDescription());
+		JTextArea txtAreaDescription = new JTextArea(asset.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
@@ -154,7 +144,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 				
 		//QUANTITY
 		detailGBC.gridy = 8;
-		JTextField quantity = new JTextField(assetIssue.getAsset().getQuantity().toString());
+		JTextField quantity = new JTextField(asset.getQuantity().toString());
 		quantity.setEditable(false);
 		MenuPopupUtil.installContextMenu(quantity);
 		this.add(quantity, detailGBC);	
@@ -167,7 +157,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		//QUANTITY
 		detailGBC.gridy = 9;
 		JCheckBox divisible = new JCheckBox();
-		divisible.setSelected(assetIssue.getAsset().isDivisible());
+		divisible.setSelected(asset.isDivisible());
 		divisible.setEnabled(false);
 		this.add(divisible, detailGBC);	
 				

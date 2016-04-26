@@ -38,9 +38,9 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	private Account recipient;
 	private long key;
 	
-	public GenesisCertifyPersonRecord(Account recipient, long key, long timestamp) 
+	public GenesisCertifyPersonRecord(Account recipient, long key) 
 	{
-		super(TYPE_ID, NAME_ID, timestamp);
+		super(TYPE_ID, NAME_ID);
 		this.recipient = recipient;
 		this.key = key;
 		this.generateSignature();
@@ -86,23 +86,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		// READ TYPE
 		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
 		int position = SIMPLE_TYPE_LENGTH;
-	
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-		
-		/*
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
-		
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
-		*/
-		
+					
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
@@ -113,7 +97,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		long key = Longs.fromByteArray(keyBytes);	
 		position += KEY_LENGTH;
 						
-		return new GenesisCertifyPersonRecord(recipient, key, timestamp);	
+		return new GenesisCertifyPersonRecord(recipient, key);	
 	}	
 	
 	@Override
@@ -198,12 +182,6 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 
 	//REST
 	
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		return this.getRecipientAccounts();
-	}
-
 	@Override
 	public HashSet<Account> getRecipientAccounts()
 	{

@@ -157,10 +157,12 @@ public class TransactionFactory {
 			//PARSE TRANSFER ASSET TRANSACTION
 			return GenesisCertifyPersonRecord.Parse(data);	
 
+		/*
 		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
-			return GenesisTransferStatusTransaction.Parse(data);	
+			return GenesisTransferStatusTransaction.Parse(data);
+			*/	
 			
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			

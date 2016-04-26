@@ -66,7 +66,7 @@ public class TestRecGenesisAsset {
 		//assertEquals(rawAsset.length, asset.getDataLength());
 				
 		//CREATE ISSUE ASSET TRANSACTION
-		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(maker, asset, timestamp);
+		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
 		if (toProcess)
 		{ 
 			genesisIssueAssetTransaction.process(db, false);
@@ -292,8 +292,7 @@ public class TestRecGenesisAsset {
 		long timestamp = NTP.getTime();
 		
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key
-				, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		//assetTransfer.sign(sender);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
@@ -310,7 +309,7 @@ public class TestRecGenesisAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
@@ -319,25 +318,25 @@ public class TestRecGenesisAsset {
 
 		//CREATE VALID ASSET TRANSFER
 		maker.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), db);
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));			
 		
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
-		assetTransfer = new GenesisTransferAssetTransaction(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(new Account("test"), key, BigDecimal.valueOf(100).setScale(8));
 	
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(-100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(-100).setScale(8));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));	
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		// nor need for genesis - assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));
@@ -353,7 +352,7 @@ public class TestRecGenesisAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
-		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		//genesisTransferAsset.sign(maker);
 		//genesisTransferAsset.process(db);
 
@@ -432,7 +431,7 @@ public class TestRecGenesisAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
 		
 		// assetTransfer.sign(sender); // not  NEED
@@ -466,7 +465,7 @@ public class TestRecGenesisAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
 		// assetTransfer.sign(sender); not NEED
 		assetTransfer.process(db, false);
 		assetTransfer.orphan(db, false);

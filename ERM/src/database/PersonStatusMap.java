@@ -30,7 +30,7 @@ public class PersonStatusMap extends DBMap<
 			Long, // personKey
 			TreeMap<Integer, // statusKey
 					Stack<Tuple3<
-						Integer, // duration
+						Integer, // end_date
 						Integer, // block.getHeight
 						byte[] // transaction.getReference
 				>>>>

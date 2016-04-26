@@ -2,6 +2,7 @@ package core.item.persons;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
 
@@ -15,7 +16,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.item.ItemCls;
 import database.DBSet;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 import database.Item_Map;
 import database.ItemPersonMap;
 
@@ -68,6 +69,15 @@ public abstract class PersonCls extends ItemCls {
 		this.hairСolor = hairСolor;
 		this.height = height;
 	}
+	public PersonCls(byte[] typeBytes, Account creator, String name, String birthday,
+			byte gender, String race, float birthLatitude, float birthLongitude,
+			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+	{
+		this(typeBytes, creator, name, 0,
+				gender, race, birthLatitude, birthLongitude,
+				skinColor, eyeColor, hairСolor, (byte)height, description);
+		this.birthday = Timestamp.valueOf(birthday).getTime();
+	}
 	
 	public PersonCls(int type, Account creator, String name, long birthday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
@@ -115,7 +125,7 @@ public abstract class PersonCls extends ItemCls {
 	{
 		return db.getPersonMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssuePersonMap();
 	}

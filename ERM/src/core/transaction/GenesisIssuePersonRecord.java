@@ -24,14 +24,14 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 //import database.ItemMap;
 
-public class GenesisIssuePersonRecord extends GenesisIssueItem_Record 
+public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Genesis Issue Person";
 
-	public GenesisIssuePersonRecord(PersonCls item, long timestamp) 
+	public GenesisIssuePersonRecord(PersonCls item) 
 	{
-		super(TYPE_ID, NAME_ID, item, timestamp);
+		super(TYPE_ID, NAME_ID, item);
 	}
 	
 	//GETTERS/SETTERS
@@ -50,20 +50,14 @@ public class GenesisIssuePersonRecord extends GenesisIssueItem_Record
 		}
 		
 		// READ TYPE
-		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
 		int position = SIMPLE_TYPE_LENGTH;
-	
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-						
+							
 		//READ PERSON
 		// read without reference
 		PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += note.getDataLength(false);
 
-		return new GenesisIssuePersonRecord(person, timestamp);
+		return new GenesisIssuePersonRecord(person);
 		
 	}	
 	

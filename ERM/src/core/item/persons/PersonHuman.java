@@ -24,6 +24,14 @@ public class PersonHuman extends PersonCls {
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
+	public PersonHuman(Account creator, String fullName, String birthday,
+			byte gender, String race, float birthLatitude, float birthLongitude,
+			String skinColor, String eyeColor, String hairСolor, int height, String description)
+	{
+		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday,
+				gender, race, birthLatitude, birthLongitude,
+				skinColor, eyeColor, hairСolor, (byte)height, description);
+	}
 	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description)

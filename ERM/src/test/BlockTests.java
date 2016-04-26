@@ -267,9 +267,8 @@ public class BlockTests
 		
 		// (issuer, recipient, 0l, bdAmount, timestamp)
 		// need add VOLUME for generating new block - 0l asset!
-		transaction = new GenesisTransferAssetTransaction(genesisBlock.getGenerator(),
-				generator, 0l,
-				BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		transaction = new GenesisTransferAssetTransaction(generator,
+				0l, BigDecimal.valueOf(1000).setScale(8));
 		transaction.process(databaseSet, false);
 		
 		//GENERATE NEXT BLOCK

@@ -96,19 +96,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);
-		
-		//LABEL TIMESTAMP
-		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
-		this.add(timestampLabel, labelGBC);
 						
-		//TIMESTAMP
-		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(noteIssue.getTimestamp()));
-		timestamp.setEditable(false);
-		MenuPopupUtil.installContextMenu(timestamp);
-		this.add(timestamp, detailGBC);
-				
 		//LABEL OWNER
 		labelGBC.gridy = 5;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
@@ -116,7 +104,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(noteIssue.getNote().getCreator().getAddress());
+		JTextField owner = new JTextField("genesis");
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);

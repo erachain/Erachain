@@ -80,7 +80,7 @@ public class TestRecGenesisPerson {
 		//assertEquals(rawPerson.length, person.getDataLength());
 				
 		//CREATE ISSUE PERSON TRANSACTION
-		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person, timestamp);
+		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
 		if (toProcess)
 		{ 
 			genesisIssuePersonTransaction.process(db, false);
@@ -267,7 +267,7 @@ public class TestRecGenesisPerson {
 		long timestamp = NTP.getTime();
 		
 		//CREATE PERSON TRANSFER
-		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson, timestamp);
+		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
 		//personTransfer.sign(sender);
 		
 		//CHECK IF PERSON TRANSFER SIGNATURE IS VALID
@@ -284,7 +284,7 @@ public class TestRecGenesisPerson {
 		Account recipient = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
 
 		//CREATE VALID PERSON TRANSFER
-		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson, timestamp);
+		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
 
 		//CHECK IF PERSON TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, personTransfer.isValid(db, releaserReference));
@@ -295,12 +295,12 @@ public class TestRecGenesisPerson {
 		assertEquals(Transaction.VALIDATE_OK, personTransfer.isValid(db, releaserReference));			
 		
 		//CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-		personTransfer = new GenesisCertifyPersonRecord(new Account("test"), keyPerson, timestamp);	
+		personTransfer = new GenesisCertifyPersonRecord(new Account("test"), keyPerson);	
 		//CHECK IF PERSON TRANSFER IS INVALID
 		assertEquals(Transaction.INVALID_ADDRESS, personTransfer.isValid(db, releaserReference));
 				
 		//CREATE INVALID PERSON
-		personTransfer = new GenesisCertifyPersonRecord(new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"), 111, timestamp);
+		personTransfer = new GenesisCertifyPersonRecord(new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"), 111);
 		//CHECK IF PERSON TRANSFER IS INVALID
 		assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personTransfer.isValid(db, releaserReference));	
 		
@@ -316,7 +316,7 @@ public class TestRecGenesisPerson {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID PERSON TRANSFER
-		GenesisCertifyPersonRecord genesisTransferPerson = new GenesisCertifyPersonRecord(recipient, keyPerson, timestamp);
+		GenesisCertifyPersonRecord genesisTransferPerson = new GenesisCertifyPersonRecord(recipient, keyPerson);
 
 		//CONVERT TO BYTES
 		byte[] rawGenesisTransferPerson = genesisTransferPerson.toBytes(true, null);
@@ -377,7 +377,7 @@ public class TestRecGenesisPerson {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE PERSON TRANSFER
-		GenesisCertifyPersonRecord personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson, timestamp);
+		GenesisCertifyPersonRecord personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
 		String address = personTransfer.getRecipient().getAddress();
 
 		//CHECK REFERENCE RECIPIENT
@@ -396,7 +396,7 @@ public class TestRecGenesisPerson {
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
 		
-		// .a - personKey, .b - duration, .c - block height, .d - reference
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		assertEquals( (long)keyPerson, (long)dbAP.getItem(address).a);
 		assertEquals( Integer.MAX_VALUE, (int)dbAP.getItem(address).b);
 		assertEquals( 0, (int)dbAP.getItem(address).c);
@@ -409,7 +409,10 @@ public class TestRecGenesisPerson {
 		assertEquals( Integer.MAX_VALUE, (int)dbPS.getItem(keyPerson).a);
 		assertEquals( 0, (int)dbPS.getItem(keyPerson).b);
 		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson).c, personTransfer.getSignature()));
-	
+
+		assertEquals(true, personTransfer.getRecipient().isPerson(db));
+		assertEquals(true, recipient.isPerson(db));
+
 		personTransfer.orphan(db, false);
 		
 		//CHECK REFERENCE RECIPIENT
@@ -421,6 +424,10 @@ public class TestRecGenesisPerson {
 		assertEquals( null, dbPA.getItem(keyPerson, address));
 		// PERSON STATUS ALIVE
 		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
+		
+		assertEquals(false, personTransfer.getRecipient().isPerson(db));
+		assertEquals(false, recipient.isPerson(db));
+
 
 	}
 }

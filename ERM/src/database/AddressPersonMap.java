@@ -14,11 +14,11 @@ import org.mapdb.Fun;
 //import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
-// address+key -> Stack person + duration + block.height + transaction.reference
+// address+key -> Stack person + end_date + block.height + transaction.reference
 // Controller.getInstance().getHeight()
 public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		Long, // person key
-		Integer, // duration day
+		Integer, // end_date day
 		Integer, // block height 
 		byte[]>>> // transaction reference
 {

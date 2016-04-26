@@ -668,13 +668,7 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//CHECK IF NOT GENESISTRANSACTION
-			if(transaction instanceof GenesisTransaction
-					| transaction instanceof GenesisIssueAssetTransaction
-					| transaction instanceof GenesisIssueNoteTransaction
-					| transaction instanceof GenesisTransferAssetTransaction )
-			{
-				return false;
-			}
+			if(transaction.getCreator() == null) return false; // ALL GENESIS transaction
 
 			Integer min = 0;
 			if ( db.getBlockMap().getParentList() != null )

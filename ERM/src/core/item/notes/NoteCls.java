@@ -7,7 +7,7 @@ import core.item.ItemCls;
 import database.DBSet;
 import database.Item_Map;
 //import database.wallet.FavoriteItemNote;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 
 public abstract class NoteCls extends ItemCls {
 	
@@ -39,7 +39,7 @@ public abstract class NoteCls extends ItemCls {
 	{
 		return db.getItemNoteMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssueNoteMap();
 	}	

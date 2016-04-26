@@ -28,7 +28,6 @@ import core.account.Account;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.GenesisIssueNoteTransaction;
-import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
@@ -79,13 +78,8 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 		Bind.secondaryKey(map, this.senderKey, new Fun.Function2<String, Tuple2<Integer,Integer>, Transaction>(){
 			@Override
 			public String run(Tuple2<Integer, Integer> key, Transaction val) {
-				// TODO Auto-generated method stub
-				if ( val instanceof GenesisTransaction 
-						| val instanceof GenesisIssueAssetTransaction
-						| val instanceof GenesisIssueNoteTransaction
-						| val instanceof GenesisTransferAssetTransaction)
-					return "genesis";
-				return val.getCreator().getAddress();
+				Account account = val.getCreator();
+				return account == null? "genesis": account.getAddress();
 			}
 		});
 		

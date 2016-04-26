@@ -19,7 +19,7 @@ public class PersonAddressMap extends DBMap<
 				Long, // personKey
 				TreeMap<
 					String, // address
-					Stack<Tuple3<Integer, // duration
+					Stack<Tuple3<Integer, // end_date
 						Integer, // block.getHeight
 						byte[] // transaction.getReference
 		>>>>

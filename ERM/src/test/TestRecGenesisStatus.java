@@ -65,7 +65,7 @@ public class TestRecGenesisStatus {
 		//assertEquals(rawStatus.length, status.getDataLength());
 				
 		//CREATE ISSUE STATUS TRANSACTION
-		genesisIssueStatusTransaction = new GenesisIssueStatusTransaction(maker, status, timestamp);
+		genesisIssueStatusTransaction = new GenesisIssueStatusTransaction(status);
 		if (toProcess)
 		{ 
 			genesisIssueStatusTransaction.process(db, false);
@@ -266,7 +266,7 @@ public class TestRecGenesisStatus {
 		long timestamp = NTP.getTime();
 		
 		//CREATE STATUS TRANSFER
-		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		Transaction statusTransfer = new GenesisTransferStatusTransaction(recipient, key);
 		//statusTransfer.sign(sender);
 		
 		//CHECK IF STATUS TRANSFER SIGNATURE IS VALID
@@ -283,7 +283,7 @@ public class TestRecGenesisStatus {
 		Account recipient = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
 
 		//CREATE VALID STATUS TRANSFER
-		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		Transaction statusTransfer = new GenesisTransferStatusTransaction(recipient, key);
 
 		//CHECK IF STATUS TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, statusTransfer.isValid(db, releaserReference));
@@ -292,13 +292,13 @@ public class TestRecGenesisStatus {
 
 		//CREATE VALID STATUS TRANSFER
 		maker.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), db);
-		statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		statusTransfer = new GenesisTransferStatusTransaction(recipient, key);
 
 		//CHECK IF STATUS TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, statusTransfer.isValid(db, releaserReference));			
 		
 		//CREATE INVALID STATUS TRANSFER INVALID RECIPIENT ADDRESS
-		statusTransfer = new GenesisTransferStatusTransaction(maker, new Account("test"), key, timestamp);
+		statusTransfer = new GenesisTransferStatusTransaction(new Account("test"), key);
 	
 		//CHECK IF STATUS TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, statusTransfer.isValid(db, releaserReference));
@@ -307,7 +307,7 @@ public class TestRecGenesisStatus {
 		assertNotEquals(Transaction.VALIDATE_OK, statusTransfer.isValid(db, releaserReference));	
 		
 		//CREATE INVALID STATUS TRANSFER NOT ENOUGH STATUS BALANCE
-		statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		statusTransfer = new GenesisTransferStatusTransaction(recipient, key);
 		
 		//CHECK IF STATUS TRANSFER IS INVALID
 		// nor need for genesis - assertNotEquals(Transaction.VALIDATE_OK, statusTransfer.isValid(db));
@@ -323,7 +323,7 @@ public class TestRecGenesisStatus {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID STATUS TRANSFER
-		GenesisTransferStatusTransaction genesisTransferStatus = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		GenesisTransferStatusTransaction genesisTransferStatus = new GenesisTransferStatusTransaction(recipient, key);
 		//genesisTransferStatus.sign(maker);
 		//genesisTransferStatus.process(db);
 
@@ -397,7 +397,7 @@ public class TestRecGenesisStatus {
 		//assertEquals(-1, (long)recipient.getConfirmedStatus(key, db));
 			
 		//CREATE STATUS TRANSFER
-		Transaction statusTransfer = new GenesisTransferStatusTransaction(maker, recipient, key, timestamp);
+		Transaction statusTransfer = new GenesisTransferStatusTransaction(recipient, key);
 		// statusTransfer.sign(sender); // not  NEED
 		statusTransfer.process(db, false);
 						
