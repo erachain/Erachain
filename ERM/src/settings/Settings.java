@@ -48,9 +48,10 @@ public class Settings {
 	
 	// BLOCK
 	public static final int BLOCK_MAX_SIGNATURES = 5000;
+	public static final BigDecimal BLOCK_GENERATING_BALANCE_NEED = new BigDecimal(100);
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1461569994336L; // CORE RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1461666085336L; // CORE RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -85,7 +86,7 @@ public class Settings {
 	private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
 	private static final boolean ALLOW_FEE_LESS_REQUIRED = false;
 	
-	private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
+	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
 
 	//DATE FORMAT
 	private static final String DEFAULT_TIME_ZONE = "";
@@ -736,11 +737,13 @@ public class Settings {
 		
 		return ALLOW_FEE_LESS_REQUIRED;
 	}
-	
+
+	/*
 	public BigDecimal getBigFee() 
 	{
 		return DEFAULT_BIG_FEE;
 	}
+	*/
 	
 	public boolean isGuiEnabled() 
 	{

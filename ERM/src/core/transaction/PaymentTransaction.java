@@ -28,7 +28,7 @@ public class PaymentTransaction extends TransactionAmount {
 		
 	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, RIGHTS_KEY, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, FEE_KEY, timestamp, reference);
 	}
 	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{

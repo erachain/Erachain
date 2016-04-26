@@ -28,7 +28,7 @@ public abstract class TransactionAmount extends Transaction {
 
 	protected Account recipient;
 	protected BigDecimal amount;
-	protected long key;
+	protected long key = Transaction.FEE_KEY;
 
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)

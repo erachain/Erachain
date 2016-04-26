@@ -86,6 +86,8 @@ public class AT_Constants {
 	}
 	
 	public short AT_VERSION( int blockHeight ){
+		
+		//if (AT_VERSION.floorEntry( blockHeight ) == null) return 1;		
 		return AT_VERSION.floorEntry( blockHeight ).getValue();
 	}
 	
@@ -138,6 +140,7 @@ public class AT_Constants {
 	}
 	
 	public int MAX_PAYLOAD_FOR_BLOCK( int height ){
+		//if (MAX_PAYLOAD_FOR_BLOCK.size() == 0) return 0;
 		return MAX_PAYLOAD_FOR_BLOCK.get( AT_VERSION( height ) );
 	}
 

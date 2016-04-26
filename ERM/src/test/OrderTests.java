@@ -20,7 +20,6 @@ import core.item.assets.AssetVenture;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.transaction.CreateOrderTransaction;
-import core.transaction.GenesisTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
@@ -29,6 +28,11 @@ import database.DBSet;
 public class OrderTests 
 {
 	byte[] releaserReference = null;
+	long ERM_KEY = Transaction.RIGHTS_KEY;
+	long FEE_KEY = Transaction.FEE_KEY;
+	byte FEE_POWER = (byte)0;
+	byte[] assetReference = new byte[64];
+	long timestamp = NTP.getTime();
 
 	@Test
 	public void validateSignatureOrderTransaction() 
@@ -43,8 +47,9 @@ public class OrderTests
 		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
 		
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		sender.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();		
@@ -76,8 +81,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount account = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(account, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//Transaction transaction = new GenesisTransaction(account, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		account.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		
 		//CREATE ASSET
 		AssetCls asset = new AssetVenture(account, "a", "a", 50000l, (byte)2, false);
@@ -135,8 +142,10 @@ public class OrderTests
 		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		sender.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+
 				
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
@@ -211,8 +220,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte)2, false);
@@ -226,8 +237,10 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte)8, false);
@@ -318,8 +331,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		
 		
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, false);
@@ -333,9 +348,10 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
-		
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
@@ -419,8 +435,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
@@ -434,8 +452,10 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, false);
@@ -526,8 +546,9 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 		
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
@@ -541,8 +562,10 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
@@ -632,9 +655,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
-		
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
@@ -647,8 +671,9 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
@@ -739,9 +764,10 @@ public class OrderTests
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
 		
-		Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
-		
+		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		//CREATE ASSET
 		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
 		
@@ -754,9 +780,10 @@ public class OrderTests
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount accountB = new PrivateKeyAccount(privateKey);
 		
-		transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(dbSet, false);
-		
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(dbSet, false);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		

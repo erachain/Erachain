@@ -30,10 +30,6 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.DeployATTransaction;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
-import core.transaction.GenesisTransaction;
-import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 

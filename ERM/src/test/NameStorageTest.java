@@ -17,7 +17,7 @@ import core.crypto.Crypto;
 import core.naming.Name;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.ArbitraryTransactionV3;
-import core.transaction.GenesisTransaction;
+//import core.transaction.GenesisTransaction;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.Transaction;
 import utils.Pair;
@@ -31,6 +31,13 @@ public class NameStorageTest {
 	private DBSet databaseSet;
 	private PrivateKeyAccount sender;
 	byte[] releaserReference = null;
+
+	long ERM_KEY = Transaction.RIGHTS_KEY;
+	long FEE_KEY = Transaction.FEE_KEY;
+	byte FEE_POWER = (byte)0;
+	byte[] assetReference = new byte[64];
+	long timestamp = NTP.getTime();
+
 
 	@Before
 	public void setup() {
@@ -49,14 +56,18 @@ public class NameStorageTest {
 		PrivateKeyAccount buyer = new PrivateKeyAccount(privateKey);
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		Transaction transaction = new GenesisTransaction(sender, BigDecimal
-				.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(sender, BigDecimal
+		//		.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		//sender.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		sender.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE BUYER HAS FUNDS
-		transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
-				.setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
+		//		.setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		buyer.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 
 		// CREATE SIGNATURE
 		long timestamp = NTP.getTime();

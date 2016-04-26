@@ -935,8 +935,8 @@ public class Controller extends Observable {
 				Transaction transaction = transactionMessage.getTransaction();
 
 				// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-				if (!transaction.isSignatureValid()
-						|| transaction.getType() == Transaction.GENESIS_TRANSACTION) {
+				if (transaction.getCreator() != null 
+						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
 					this.network.onError(message.getSender(), Lang.getInstance().translate("invalid transaction signature"));
 

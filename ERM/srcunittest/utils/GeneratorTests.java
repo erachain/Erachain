@@ -12,11 +12,10 @@ import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
-import core.transaction.GenesisTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
-import ntp.NTP;
+//import ntp.NTP;
 
 public class GeneratorTests {
 
@@ -38,12 +37,10 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(10000000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
-
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(10000000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		generator.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
-
+		generator.setConfirmedBalance(Transaction.FEE_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
 				
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();

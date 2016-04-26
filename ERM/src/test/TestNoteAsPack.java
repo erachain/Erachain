@@ -27,9 +27,9 @@ import core.transaction.TransactionFactory;
 import database.DBSet;
 import database.ItemNoteMap;
 
-public class TrNoteTestAsPack {
+public class TestNoteAsPack {
 
-	static Logger LOGGER = Logger.getLogger(TrNoteTestAsPack.class.getName());
+	static Logger LOGGER = Logger.getLogger(TestNoteAsPack.class.getName());
 
 	byte[] releaserReference = null;
 

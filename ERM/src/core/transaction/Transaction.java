@@ -417,7 +417,7 @@ public abstract class Transaction {
 	{
 		
 		// use this.reference in any case
-		byte[] data = this.toBytes( false, null );
+		byte[] data = this.toBytes( asPack, null );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);

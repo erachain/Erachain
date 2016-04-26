@@ -27,6 +27,7 @@ import ntp.NTP;
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
+	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 
@@ -199,7 +200,7 @@ public class Account {
 	public void calculateGeneratingBalance(DBSet db)
 	{
 		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS
-		BigDecimal balance = this.getConfirmedBalance(FEE_KEY, db);
+		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
 		

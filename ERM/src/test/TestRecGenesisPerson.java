@@ -25,7 +25,6 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
 import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.GenesisTransaction;
 import core.transaction.GenesisCertifyPersonRecord;
 //import core.transaction.IssuePersonTransaction;
 //import core.transaction.R_SignNote;

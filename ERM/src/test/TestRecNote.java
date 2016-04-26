@@ -63,7 +63,6 @@ public class TestRecNote {
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
-		maker.setConfirmedBalance(VOTE_KEY, BigDecimal.valueOf(10).setScale(8), db);
 
 	}
 	

@@ -17,21 +17,20 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
-import core.item.notes.NoteCls;
-import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.item.assets.AssetCls;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class GenesisIssueNoteDetailsFrame extends JFrame
+public class GenesisPersonalizeFrame extends JFrame
 {
-	public GenesisIssueNoteDetailsFrame(GenesisIssueNoteTransaction noteIssue)
+	public GenesisPersonalizeFrame(GenesisIssueAssetTransaction assetIssue)
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
-		NoteCls note = (NoteCls)noteIssue.getItem();
-
+		AssetCls asset = (AssetCls)assetIssue.getItem();
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -73,7 +72,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Issue Note Transaction"));
+		JLabel type = new JLabel(Lang.getInstance().translate("Issue Asset Transaction"));
 		this.add(type, detailGBC);
 		
 		//LABEL SIGNATURE
@@ -83,7 +82,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 				
 		//SIGNATURE
 		detailGBC.gridy = 1;
-		JTextField signature = new JTextField(Base58.encode(noteIssue.getSignature()));
+		JTextField signature = new JTextField(Base58.encode(assetIssue.getSignature()));
 		signature.setEditable(false);
 		MenuPopupUtil.installContextMenu(signature);
 		this.add(signature, detailGBC);
@@ -95,11 +94,11 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 						
 		//REFERENCE
 		detailGBC.gridy = 2;
-		JTextField reference = new JTextField(Base58.encode(noteIssue.getReference()));
+		JTextField reference = new JTextField(Base58.encode(assetIssue.getReference()));
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);
-						
+		
 		//LABEL OWNER
 		labelGBC.gridy = 5;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
@@ -119,7 +118,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(note.getName());
+		JTextField name = new JTextField(asset.getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -131,13 +130,37 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 				
 		//DESCRIPTION
 		detailGBC.gridy = 7;
-		JTextArea txtAreaDescription = new JTextArea(note.getDescription());
+		JTextArea txtAreaDescription = new JTextArea(asset.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
 		MenuPopupUtil.installContextMenu(txtAreaDescription);
 		this.add(txtAreaDescription, detailGBC);		
-						
+		
+		//LABEL QUANTITY
+		labelGBC.gridy = 8;
+		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
+		this.add(quantityLabel, labelGBC);
+				
+		//QUANTITY
+		detailGBC.gridy = 8;
+		JTextField quantity = new JTextField(asset.getQuantity().toString());
+		quantity.setEditable(false);
+		MenuPopupUtil.installContextMenu(quantity);
+		this.add(quantity, detailGBC);	
+		
+		//LABEL DIVISIBLE
+		labelGBC.gridy = 9;
+		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
+		this.add(divisibleLabel, labelGBC);
+				
+		//QUANTITY
+		detailGBC.gridy = 9;
+		JCheckBox divisible = new JCheckBox();
+		divisible.setSelected(asset.isDivisible());
+		divisible.setEnabled(false);
+		this.add(divisible, detailGBC);	
+				
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 11;
 		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
@@ -145,7 +168,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 								
 		//CONFIRMATIONS
 		detailGBC.gridy = 11;
-		JLabel confirmations = new JLabel(String.valueOf(noteIssue.getConfirmations()));
+		JLabel confirmations = new JLabel(String.valueOf(assetIssue.getConfirmations()));
 		this.add(confirmations, detailGBC);	
 		           
         //PACK
