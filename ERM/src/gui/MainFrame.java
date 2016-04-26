@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
@@ -8,14 +9,19 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.border.EmptyBorder;
 
+import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
+public static  JDesktopPane desktopPane;
 
 	public MainFrame()
 	{
@@ -40,11 +46,34 @@ public class MainFrame extends JFrame{
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);
         
+        
+        // создаем рабочий стол Swing
+        desktopPane = new JDesktopPane();
+      //  desktopPane.setSize(500, 300);
+        // добавляем его в центр окна
+        add(desktopPane);
+        
+        
         //GENERAL TABPANE
         GeneralTabPane generalTabPane = new GeneralTabPane();
         
+        //
+        JInternalFrame frame1 = new JInternalFrame();
+        
+        frame1.add(generalTabPane);
+        frame1.setVisible(true);
+        frame1.setBorder(new EmptyBorder(10, 10, 10, 10));
+        frame1.setSize(500, 500);
+        frame1.setLocation(500, 80);
+        frame1.setVisible(true);
+        frame1.setMaximizable(true);
+        frame1.setTitle(Lang.getInstance().translate("Old Panels"));
+    //    frame1.setClosable(true);
+        frame1.setResizable(true);
         //ADD GENERAL TABPANE TO FRAME
-        this.add(generalTabPane);
+        desktopPane.add(frame1);
+       // JInternalFrame Jfacc = new AccountsPanel();
+        desktopPane.add(new AccountsPanel());
         
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
@@ -58,9 +87,27 @@ public class MainFrame extends JFrame{
             }
         });
         
+   
+      //класс взаимодействия с оконной системой ОС
+
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Dimension screens = kit.getScreenSize();
+
+        int w,h;
+
+        w = screens.width;
+
+        h = screens.height;
+
+        setSize((int) (w/1.5),(int) (h/1.5));
+
+        setLocation(w/6, h/6);
+        
+        
         //SHOW FRAME
-        this.pack();
-        this.setLocationRelativeTo(null);
+      //  this.pack();
+     //   this.setLocationRelativeTo(null);
         this.setVisible(true);
         
 	}

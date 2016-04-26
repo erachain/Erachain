@@ -89,10 +89,14 @@ public class AccountMap extends Observable {
 		
 		return BigDecimal.ZERO.setScale(8);
 	}
+	public BigDecimal getUnconfirmedBalance(String address, long key) 
+	{		
+		return getUnconfirmedBalance(address);
+	}
 	
 	public void add(Account account)
 	{
-		this.addressMap.put(account.getAddress(), account.getConfirmedBalance());
+		this.addressMap.put(account.getAddress(), account.getConfirmedBalance(0L));
 		
 		if(this.accounts == null)
 		{

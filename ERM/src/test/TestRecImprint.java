@@ -20,6 +20,7 @@ import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
 import core.transaction.IssueImprintRecord;
@@ -38,7 +39,7 @@ public class TestRecImprint {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = Transaction.DIL_KEY;
+	long FEE_KEY = AssetCls.DILE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] imprintReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -52,7 +53,7 @@ public class TestRecImprint {
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	
-	String name_total = "123890TYRH76576567567tytryrtyr6fdhgdfdskdfhuiweyriusdfyf8s7fssudfgdytrttygd";
+	String name_total = "123890TYRH76576567567tytryrtyr61fdhgdfdskdfhuiweyriusdfyf8s7fssudfgdytrttygd";
 	byte[] digest;
 
 	Imprint imprint;
@@ -177,6 +178,7 @@ public class TestRecImprint {
 						
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
 		issueImprintRecord.sign(maker, false);
 		
 		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(db, releaserReference));
@@ -189,7 +191,7 @@ public class TestRecImprint {
 		///////// NOT FONT THROUGHT db.get(issueImprintRecord)
 		//long key = db.getIssueImprintMap().get(issueImprintRecord);
 		long key = issueImprintRecord.getItem().getKey();
-		assertEquals(true, db.getImprintMap().contains(key));
+		assertEquals(true, db.getItemImprintMap().contains(key));
 		
 		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), "e");				
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
@@ -197,12 +199,12 @@ public class TestRecImprint {
 		issueImprintTransaction_2.process(db, false);
 		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
 		issueImprintTransaction_2.orphan(db, false);
-		ItemImprintMap imprintMap = db.getImprintMap();
+		ItemImprintMap imprintMap = db.getItemImprintMap();
 		int mapSize = imprintMap.size();
 		assertEquals(0, mapSize - 1);
 		
 		//CHECK IMPRINT IS CORRECT
-		assertEquals(true, Arrays.equals(db.getImprintMap().get(key).toBytes(true), imprint.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true), imprint.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference(db)));
@@ -225,7 +227,7 @@ public class TestRecImprint {
 		issueImprintRecord.orphan(db, false);
 				
 		//CHECK IMPRINT EXISTS SENDER
-		assertEquals(false, db.getImprintMap().contains(key));
+		assertEquals(false, db.getItemImprintMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueImprintRecord.getReference(), maker.getLastReference(db)));

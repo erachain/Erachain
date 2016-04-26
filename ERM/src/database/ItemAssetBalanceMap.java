@@ -15,19 +15,23 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import core.account.Account;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import utils.ObserverMessage;
 import database.DBSet;
 
-public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal> 
+// balances for all account in blockchain
+// TODO SOFT HARD TRUE
+public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal> 
 {
-	public static final long FEE_KEY = 0l;
+	//public static final long FEE_KEY = AssetCls.DILE_KEY;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	@SuppressWarnings("rawtypes")
 	private BTreeMap assetKeyMap;
 	
-	public BalanceMap(DBSet databaseSet, DB database)
+	public ItemAssetBalanceMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
 		
@@ -36,7 +40,7 @@ public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 		//this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
 	}
 
-	public BalanceMap(BalanceMap parent) 
+	public ItemAssetBalanceMap(ItemAssetBalanceMap parent) 
 	{
 		super(parent);
 	}
@@ -89,20 +93,24 @@ public class BalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 		return this.observableData;
 	}
 	
+	/*
 	public void set(String address, BigDecimal value)
 	{
 		this.set(address, FEE_KEY, value);
 	}
+	*/
 	
 	public void set(String address, long key, BigDecimal value)
 	{
 		this.set(new Tuple2<String, Long>(address, key), value);
 	}
 	
+	/*
 	public BigDecimal get(String address)
 	{
 		return this.get(address, FEE_KEY);
 	}
+	*/
 	
 	public BigDecimal get(String address, long key)
 	{

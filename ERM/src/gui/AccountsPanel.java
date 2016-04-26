@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -39,9 +40,14 @@ import utils.TableMenuPopupUtil;
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class AccountsPanel extends JPanel implements ItemListener
+//public class AccountsPanel extends JPanel implements ItemListener
+public class AccountsPanel extends JInternalFrame implements ItemListener
+
+
+//JInternalFrame
 {
 	private static JComboBox<AssetCls> cbxFavorites;
 	private AccountsTableModel tableModel;
@@ -53,6 +59,14 @@ public class AccountsPanel extends JPanel implements ItemListener
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
+		this.setSize(500, 500);
+		this.setLocation(20, 20);
+		this.setVisible(true);
+		this.setMaximizable(true);
+		this.setTitle(Lang.getInstance().translate("Accounts"));
+	//	this.setClosable(true);
+		this.setResizable(true);
+	//	this..setBorder(true);
 		
 		//TABLE GBC
 		GridBagConstraints tableGBC = new GridBagConstraints();
@@ -127,7 +141,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getUnconfirmedBalance().toPlainString());
+				StringSelection value = new StringSelection(account.getUnconfirmedBalance(Transaction.FEE_KEY).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});

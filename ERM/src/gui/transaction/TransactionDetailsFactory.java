@@ -8,10 +8,12 @@ import core.transaction.CancelOrderTransaction;
 import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
+
+import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.GenesisIssueNoteTransaction;
-import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
+
 import core.transaction.IssueAssetTransaction;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
@@ -121,15 +123,7 @@ public class TransactionDetailsFactory
 		case Transaction.SEND_ASSET_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
-		/*
-		case Transaction.ACCOUNTING_TRANSACTION:
-			AccountingTransaction accountingTransaction = (AccountingTransaction)transaction;
-			return new AccountingTransactionDetailsFrame(accountingTransaction);
-			
-		case Transaction.JSON_TRANSACTION:
-			JsonTransaction json1Transaction = (JsonTransaction)transaction;
-			return new Json1TransactionDetailsFrame(json1Transaction);
-		*/
+
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
@@ -145,10 +139,10 @@ public class TransactionDetailsFactory
 			GenesisIssueAssetTransaction genesisIssueAssetTransaction = (GenesisIssueAssetTransaction) transaction;
 			return new GenesisIssueAssetDetailsFrame(genesisIssueAssetTransaction);	
 
-		case Transaction.GENESIS_TRANSACTION:
+		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
 			
-			GenesisTransaction genesis = (GenesisTransaction) transaction;
-			return new GenesisDetailsFrame(genesis);
+			GenesisCertifyPersonRecord record = (GenesisCertifyPersonRecord) transaction;
+			return new GenesisCertifyPersonRecordFrame(record);
 		}
 		
 		return null;

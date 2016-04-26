@@ -83,7 +83,7 @@ public class Order implements Comparable<Order> {
 	
 	public AssetCls getHaveAsset(DBSet db)
 	{
-		return (AssetCls)db.getAssetMap().get(this.have);
+		return (AssetCls)db.getItemAssetMap().get(this.have);
 	}
 
 	public long getWant() 
@@ -98,7 +98,7 @@ public class Order implements Comparable<Order> {
 	
 	public AssetCls getWantAsset(DBSet db)
 	{
-		return (AssetCls)db.getAssetMap().get(this.want);
+		return (AssetCls)db.getItemAssetMap().get(this.want);
 	}
 
 	public BigDecimal getAmount() 

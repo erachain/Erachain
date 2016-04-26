@@ -28,6 +28,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import database.DBSet;
 import settings.Settings;
 
@@ -86,10 +87,16 @@ public abstract class Transaction {
 	
 	public static final int INVALID_DURATION = 42;
 
-	public static final int NOT_ENOUGH_ERM = 50;
+	public static final int NOT_ENOUGH_RIGHTS = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
-	public static final int ACCOUNT_NOT_PERSON = 52;
+	public static final int ACCOUNT_NOT_PERSONALIZED = 52;
 	public static final int DUPLICATE_KEY = 53;
+
+	public static final int ITEM_ASSET_DOES_NOT_EXIST = 55;
+	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 56;
+	public static final int ITEM_NOTE_NOT_EXIST = 57;
+	public static final int ITEM_PERSON_NOT_EXIST = 58;
+	public static final int ITEM_UNION_NOT_EXIST = 59;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	
@@ -132,7 +139,7 @@ public abstract class Transaction {
 	public static final int RELEASE_PACK = 70;
 
 	// old
-	public static final int GENESIS_TRANSACTION = 4 + 130;
+	// public static final int GENESIS_TRANSACTION = 4 + 130;
 	public static final int PAYMENT_TRANSACTION = 5 + 130;
 	public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
 	public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
@@ -147,13 +154,12 @@ public abstract class Transaction {
 	//public static final int ACCOUNTING_TRANSACTION = 26;
 	//public static final int JSON_TRANSACTION = 27;
 
-	// CORE KEY
-	public static final long ERMO_KEY = 0l;
-	// PERSON KEY
-	public static final long LAEV_KEY = 1l;
-	// FEE KEY
-	public static final long DIL_KEY = 2l;
 	// FEE PARAMETERS
+	public static final long RIGHTS_KEY = AssetCls.ERMO_KEY;
+
+	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
+
+	public static final long FEE_KEY = AssetCls.DILE_KEY;
 	public static final int FEE_PER_BYTE = 1;
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
 	public static final float FEE_POW_BASE = (float)1.5;
@@ -241,12 +247,10 @@ public abstract class Transaction {
 	protected PublicKeyAccount creator;
 	
 	// need for genesis
-	protected Transaction(byte type, String type_name, long timestamp)
+	protected Transaction(byte type, String type_name)
 	{
 		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
 		this.TYPE_NAME = type_name;
-		this.timestamp = timestamp;
-
 	}
 	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
 	{
@@ -312,6 +316,20 @@ public abstract class Transaction {
 	public BigDecimal getAmount(Account account) {
 		return this.viewAmount(account);
 	}
+	// TIME
+	public Long viewTime() {
+		return 0L;
+	}
+	public Long getTime() {
+		return this.viewTime();
+	}
+	public Long viewTime(Account account)
+	{
+		return 0L;
+	}
+	public Long getTime(Account account) {
+		return this.viewTime(account);
+	}
 	
 	public BigDecimal getFee()
 	{
@@ -375,17 +393,22 @@ public abstract class Transaction {
 	{
 		JSONObject transaction = new JSONObject();
 		
-		transaction.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
-		transaction.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-		transaction.put("type2", Byte.toUnsignedInt(this.typeBytes[2]));
-		transaction.put("type3", Byte.toUnsignedInt(this.typeBytes[3]));
+		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.getRecordType());
-		transaction.put("fee", this.fee.toPlainString());
-		transaction.put("timestamp", this.timestamp);
 		transaction.put("reference", Base58.encode(this.reference));
 		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
-		if (this.creator != null ) transaction.put("creator", this.creator.getAddress());
+		if (this.creator == null )
+		{
+			transaction.put("creator", "genesis");			
+		} else {
+			transaction.put("fee", this.fee.toPlainString());
+			transaction.put("timestamp", this.timestamp);
+			transaction.put("creator", this.creator.getAddress());
+			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
+			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
+			transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
+		}
 		
 		return transaction;
 	}
@@ -394,7 +417,7 @@ public abstract class Transaction {
 	{
 		
 		// use this.reference in any case
-		byte[] data = this.toBytes( false, null );
+		byte[] data = this.toBytes( asPack, null );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);
@@ -490,7 +513,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -513,7 +536,7 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db)
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
@@ -533,7 +556,7 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(DIL_KEY, this.creator.getConfirmedBalance(DIL_KEY, db).add(this.fee), db);
+				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
 				this.creator.setLastReference(this.reference, db);
@@ -623,7 +646,7 @@ public abstract class Transaction {
 	{
 		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(8).subtract(amount));
 	}
-	
+
 	public static Map<String, Map<Long, BigDecimal>> addAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount, String address, Long assetKey, BigDecimal amount) 
 	{
 		Map<String, Map<Long, BigDecimal>> newAllAssetAmount;
@@ -656,6 +679,39 @@ public abstract class Transaction {
 		}
 		
 		return newAllAssetAmount;
+	}
+	public static Map<String, Map<Long, Long>> addStatusTime(Map<String, Map<Long, Long>> allStatusTime, String address, Long assetKey, Long time) 
+	{
+		Map<String, Map<Long, Long>> newAllStatusTime;
+		if(allStatusTime != null) {
+			newAllStatusTime = new LinkedHashMap<String, Map<Long, Long>>(allStatusTime);
+		} else {
+			newAllStatusTime = new LinkedHashMap<String, Map<Long, Long>>();
+		}
+
+		Map<Long, Long> newStatusTimetOfAddress;
+		
+		if(!newAllStatusTime.containsKey(address)){
+			newStatusTimetOfAddress = new LinkedHashMap<Long, Long>();
+			newStatusTimetOfAddress.put(assetKey, time);
+			
+			newAllStatusTime.put(address, newStatusTimetOfAddress);
+		} else {
+			if(!newAllStatusTime.get(address).containsKey(assetKey)) {
+				newStatusTimetOfAddress = new LinkedHashMap<Long, Long>(newAllStatusTime.get(address));
+				newStatusTimetOfAddress.put(assetKey, time);
+
+				newAllStatusTime.put(address, newStatusTimetOfAddress);
+			} else {
+				newStatusTimetOfAddress = new LinkedHashMap<Long, Long>(newAllStatusTime.get(address));
+				Long newTime = newAllStatusTime.get(address).get(assetKey) + time;
+				newStatusTimetOfAddress.put(assetKey, newTime);
+				
+				newAllStatusTime.put(address, newStatusTimetOfAddress);
+			}
+		}
+		
+		return newAllStatusTime;
 	}
 
 }

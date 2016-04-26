@@ -2,10 +2,13 @@ package core.account;
 //04/01 +- 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 //import com.google.common.primitives.Bytes;
 
@@ -14,13 +17,20 @@ import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.statuses.StatusCls;
+//import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import utils.NumberAsString;
 import database.DBSet;
+import ntp.NTP;
 
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
+	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
+	private static final long FEE_KEY = Transaction.FEE_KEY;
+	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+
 
 	protected String address;
 	
@@ -48,27 +58,25 @@ public class Account {
 	
 	//BALANCE
 	
-	
-	public BigDecimal getUnconfirmedBalance()
+	// GET
+	public BigDecimal getUnconfirmedBalance(long key)
 	{
-		return this.getUnconfirmedBalance(DBSet.getInstance());
+		return this.getUnconfirmedBalance(key, DBSet.getInstance());
 	}
 	
-	public BigDecimal getUnconfirmedBalance(DBSet db)
+	public BigDecimal getUnconfirmedBalance(long key, DBSet db)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress());
+		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
 	}
 	
 	public BigDecimal getConfirmedBalance()
 	{
 		return this.getConfirmedBalance(DBSet.getInstance());
 	}
-	
 	public BigDecimal getConfirmedBalance(DBSet db)
 	{
-		return db.getBalanceMap().get(getAddress());
+		return db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY);
 	}
-	
 	public BigDecimal getConfirmedBalance(long key)
 	{
 		return this.getConfirmedBalance(key, DBSet.getInstance());
@@ -76,52 +84,81 @@ public class Account {
 	
 	public BigDecimal getConfirmedBalance(long key, DBSet db)
 	{
-		return db.getBalanceMap().get(getAddress(), key);
+		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
+	/*
+	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int end_date, DBSet db)
+	{
+		return db.getPersonStatusMap().addItem(personKey, statusKey, end_date);
+	}
+	*/
 
+	// SET
 	public void setConfirmedBalance(BigDecimal amount)
 	{
 		this.setConfirmedBalance(amount, DBSet.getInstance());
 	}
-	
 	public void setConfirmedBalance(BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceMap().set(getAddress(), amount);
+		db.getAssetBalanceMap().set(getAddress(), Transaction.FEE_KEY, amount);
 	}
-	
+	//
 	public void setConfirmedBalance(long key, BigDecimal amount)
 	{
 		this.setConfirmedBalance(key, amount, DBSet.getInstance());
 	}
-	
+
 	public void setConfirmedBalance(long key, BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceMap().set(getAddress(), key, amount);
+		db.getAssetBalanceMap().set(getAddress(), key, amount);
 	}
+
+	// STATUS
+	/*
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Integer days)
+	{
+		this.setConfirmedPersonStatus(personKey, statusKey, days, DBSet.getInstance());
+	}
+		
+	public void setConfirmedPersonStatus(long personKey, long statusKey, Integer days, DBSet db)
+	{
+		//UPDATE PRIMARY TIME IN DB
+		db.getPersonStatusMap().set(personKey, statusKey, days);
+	}
+	*/
+
 	
+	public BigDecimal getBalance(int confirmations, long key)
+	{
+		return this.getBalance(confirmations, key, DBSet.getInstance());
+	}
 	public BigDecimal getBalance(int confirmations)
 	{
-		return this.getBalance(confirmations, DBSet.getInstance());
+		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
+	}
+	public BigDecimal getBalance(int confirmations, DBSet db)
+	{
+		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
 	}
 	
-	public BigDecimal getBalance(int confirmations, DBSet db)
+	public BigDecimal getBalance(int confirmations, long key, DBSet db)
 	{
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(db);
+			return this.getUnconfirmedBalance(key, db);
 		}
 		
 		//IF 1 CONFIRMATION
 		if(confirmations == 1)
 		{
-			return this.getConfirmedBalance(db);
+			return this.getConfirmedBalance(key, db);
 		}
 		
 		//GO TO PARENT BLOCK 10
-		BigDecimal balance = this.getConfirmedBalance(db);
+		BigDecimal balance = this.getConfirmedBalance(key, db);
 		Block block = db.getBlockMap().getLastBlock();
 		
 		for(int i=1; i<confirmations && block != null && block instanceof Block; i++)
@@ -163,7 +200,7 @@ public class Account {
 	public void calculateGeneratingBalance(DBSet db)
 	{
 		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS
-		BigDecimal balance = this.getConfirmedBalance(db);
+		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
 		
@@ -258,14 +295,14 @@ public class Account {
 				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
 				+ " - " + this.getAddress();
 				*/
-		return this.getConfirmedBalance(Transaction.DIL_KEY)
+		return this.getConfirmedBalance(Transaction.FEE_KEY)
 				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.DIL_KEY)) + "}"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.FEE_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	
@@ -286,4 +323,39 @@ public class Account {
 		
 		return false;	
 	}
+
+	public Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db) {
+		
+		// IF NOT PERSON HAS THAT ADDRESS
+		Tuple4<Long, Integer, Integer, byte[]> item = db.getAddressPersonMap().getItem(this.address);
+		return item;
+				
+	}
+	
+	public boolean isPerson(DBSet db) {
+		
+		// IF DURATION ADDRESS to PERSON IS ENDED
+		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		if (addressDuration == null) return false;
+		// TEST TIME and EXPIRE TIME
+		long current_time = NTP.getTime();
+		
+		// TEST TIME and EXPIRE TIME
+		int days = addressDuration.b;		
+		if (days < 0 ) return false;
+		if (days * (long)86400 < current_time ) return false;
+
+		// IF PERSON ALIVE
+		Long personKey = addressDuration.a;
+		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		
+		// TEST TIME and EXPIRE TIME
+		days = personDuration.a;
+		if (days < 0 ) return false;
+		if (days * (long)86400 < current_time ) return false;
+
+		return true;
+		
+	}
+
 }

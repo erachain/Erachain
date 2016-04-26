@@ -14,17 +14,24 @@ import org.junit.Test;
 
 import core.BlockGenerator;
 import core.Synchronizer;
+import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
-import core.transaction.GenesisTransaction;
 import core.transaction.Transaction;
+import core.transaction.GenesisTransferAssetTransaction;
 import database.DBSet;
 
 public class SynchronizerTests {
 
 	static Logger LOGGER = Logger.getLogger(SynchronizerTests.class.getName());
+
+	long ERM_KEY = Transaction.RIGHTS_KEY;
+	long FEE_KEY = Transaction.FEE_KEY;
+	byte FEE_POWER = (byte)0;
+	byte[] assetReference = new byte[64];
+	long timestamp = NTP.getTime();
 
 	@Test
 	public void synchronizeNoCommonBlock()
@@ -42,8 +49,9 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -74,8 +82,10 @@ public class SynchronizerTests {
 		generator = new PrivateKeyAccount(privateKey);
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+
 		
 		//FORK
 		DBSet fork = databaseSet.fork();	
@@ -155,9 +165,12 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
-		transaction.process(databaseSet2, false);
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		//transaction.process(databaseSet2, false);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
+
 		
 		//CREATE KNOWN ACCOUNT 2
 		byte[] seed2 = Crypto.getInstance().digest("test2".getBytes());
@@ -165,9 +178,13 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator2 = new PrivateKeyAccount(privateKey2);
 		
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR2 HAS FUNDS
-		transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		transaction.process(databaseSet, false);
 		transaction.process(databaseSet2, false);
+		//generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
+		//generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet2);
+		
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;

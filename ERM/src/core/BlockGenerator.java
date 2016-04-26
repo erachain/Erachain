@@ -277,7 +277,7 @@ public class BlockGenerator extends Thread implements Observer
 	public Block generateNextBlock(DBSet db, PrivateKeyAccount account, Block block)
 	{
 		//CHECK IF ACCOUNT HAS BALANCE
-		if(account.getGeneratingBalance(db) == BigDecimal.ZERO)
+		if(account.getGeneratingBalance(db).compareTo(Settings.BLOCK_GENERATING_BALANCE_NEED) < 0)
 		{
 			return null;
 		}

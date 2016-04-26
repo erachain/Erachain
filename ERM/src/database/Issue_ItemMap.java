@@ -12,20 +12,20 @@ import com.google.common.primitives.UnsignedBytes;
 import core.transaction.Transaction;
 import database.DBSet;
 
-public class IssueItemMap extends DBMap<byte[], Long> 
+public class Issue_ItemMap extends DBMap<byte[], Long> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	protected String name;
 
-	public IssueItemMap(DBSet databaseSet, DB database, String name)
+	public Issue_ItemMap(DBSet databaseSet, DB database, String name)
 	{
 		super(databaseSet, database);
 		this.name = name;
 
 	}
 
-	public IssueItemMap(IssueItemMap parent) 
+	public Issue_ItemMap(Issue_ItemMap parent) 
 	{
 		super(parent);
 	}

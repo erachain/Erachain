@@ -11,9 +11,9 @@ import com.google.common.primitives.UnsignedBytes;
 
 import core.transaction.Transaction;
 import database.DBSet;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 
-public class IssueNoteMap extends IssueItemMap 
+public class IssueNoteMap extends Issue_ItemMap 
 {
 	//private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	

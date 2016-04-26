@@ -18,14 +18,14 @@ import core.account.Account;
 import utils.ObserverMessage;
 import database.DBSet;
 
-public class BalanceMapHKey extends DBMap<Tuple2<String, byte[]>, BigDecimal> 
+public class ItemAssetBalanceMapHKey extends DBMap<Tuple2<String, byte[]>, BigDecimal> 
 {	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	@SuppressWarnings("rawtypes")
 	private BTreeMap hKeyMap;
 	
-	public BalanceMapHKey(DBSet databaseSet, DB database)
+	public ItemAssetBalanceMapHKey(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
 		
@@ -34,7 +34,7 @@ public class BalanceMapHKey extends DBMap<Tuple2<String, byte[]>, BigDecimal>
 		//this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
 	}
 
-	public BalanceMapHKey(BalanceMapHKey parent) 
+	public ItemAssetBalanceMapHKey(ItemAssetBalanceMapHKey parent) 
 	{
 		super(parent);
 	}

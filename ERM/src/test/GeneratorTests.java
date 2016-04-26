@@ -14,12 +14,18 @@ import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
-import core.transaction.GenesisTransaction;
+//import core.transaction.GenesisTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
 
 public class GeneratorTests {
+
+	long ERM_KEY = Transaction.RIGHTS_KEY;
+	long FEE_KEY = Transaction.FEE_KEY;
+	byte FEE_POWER = (byte)0;
+	byte[] assetReference = new byte[64];
+	long timestamp = NTP.getTime();
 
 	@Test
 	public void generateNewBlock() 
@@ -37,8 +43,11 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 				
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
+
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -82,15 +91,18 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
-				
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
+
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
-		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		DBSet snapshot = databaseSet.fork();
 		for(int i=0; i<10; i++)
 		{
@@ -130,15 +142,19 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
-		transaction.process(databaseSet, false);
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
+		//transaction.process(databaseSet, false);
+		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
+
 				
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
-		Account recipient = new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		DBSet snapshot = databaseSet.fork();
 		for(int i=0; i<10000; i++)
 		{

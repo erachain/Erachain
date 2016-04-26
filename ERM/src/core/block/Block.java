@@ -30,10 +30,6 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.DeployATTransaction;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
-import core.transaction.GenesisTransaction;
-import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 
@@ -668,13 +664,7 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//CHECK IF NOT GENESISTRANSACTION
-			if(transaction instanceof GenesisTransaction
-					| transaction instanceof GenesisIssueAssetTransaction
-					| transaction instanceof GenesisIssueNoteTransaction
-					| transaction instanceof GenesisTransferAssetTransaction )
-			{
-				return false;
-			}
+			if(transaction.getCreator() == null) return false; // ALL GENESIS transaction
 
 			Integer min = 0;
 			if ( db.getBlockMap().getParentList() != null )

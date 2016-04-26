@@ -86,7 +86,6 @@ public abstract class IssueItemRecord extends Transaction
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
 		
-		//WRITE NOTE
 		// without reference
 		data = Bytes.concat(data, this.item.toBytes(false));
 				
@@ -124,13 +123,7 @@ public abstract class IssueItemRecord extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 				
-		int res = super.isValid(db, releaserReference);
-		if (res != Transaction.VALIDATE_OK) return res;
-		
-		// CHECH MAKER IS PERSON?
-		if (!creator.isPerson(db)) return ACCOUNT_NOT_PERSON;
-		
-		return VALIDATE_OK;
+		return super.isValid(db, releaserReference);
 	
 	}
 	

@@ -125,6 +125,13 @@ public class TransactionFactory {
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
+			
+		case Transaction.CERTIFY_PERSON_TRANSACTION:
+			
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_SertifyPerson.Parse(data, releaserReference);
+			
+			
 		case Transaction.ISSUE_ASSET_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION
@@ -144,26 +151,43 @@ public class TransactionFactory {
 			
 			//PARSE ISSUE PERSON TRANSACTION
 			return IssuePersonRecord.Parse(data, releaserReference);
+
+		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
+			
+			//PARSE TRANSFER ASSET TRANSACTION
+			return GenesisCertifyPersonRecord.Parse(data);	
+
+		/*
+		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
+			
+			//PARSE TRANSFER ASSET TRANSACTION
+			return GenesisTransferStatusTransaction.Parse(data);
+			*/	
 			
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
 			return GenesisTransferAssetTransaction.Parse(data);	
 		
+		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
+			
+			//PARSE ISSUE ASSET TRANSACTION
+			return GenesisIssuePersonRecord.Parse(data);
+
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 			
 			//PARSE ISSUE ASSET TRANSACTION
 			return GenesisIssueNoteTransaction.Parse(data);
 
+		case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
+			
+			//PARSE ISSUE STATUS TRANSACTION
+			return GenesisIssueStatusTransaction.Parse(data);
+
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
-			return GenesisIssueAssetTransaction.Parse(data);
-
-		case Transaction.GENESIS_TRANSACTION:
-			
 			//PARSE GENESIS TRANSACTION
-			return GenesisTransaction.Parse(data);
+			return GenesisIssueAssetTransaction.Parse(data);
 			
 		}
 

@@ -24,7 +24,6 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.R_SignNote;
@@ -32,16 +31,16 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import database.DBSet;;
 
-public class TransactionTests2 {
+public class TestRecGenesisAsset {
 
-	static Logger LOGGER = Logger.getLogger(TransactionTests2.class.getName());
+	static Logger LOGGER = Logger.getLogger(TestRecGenesisAsset.class.getName());
 
 	byte[] releaserReference = null;
 
 	long OIL_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
-	long timestamp = NTP.getTime();
+	//long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -61,12 +60,12 @@ public class TransactionTests2 {
 		db = DBSet.createEmptyDatabaseSet();
 		
 		//CREATE ASSET
-		asset = GenesisBlock.makeVenture(0);
+		asset = GenesisBlock.makeAssetVenture(0);
 		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
 		//assertEquals(rawAsset.length, asset.getDataLength());
 				
 		//CREATE ISSUE ASSET TRANSACTION
-		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(maker, asset, timestamp);
+		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
 		if (toProcess)
 		{ 
 			genesisIssueAssetTransaction.process(db, false);
@@ -107,30 +106,23 @@ public class TransactionTests2 {
 			
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), parsedGenesisIssueAssetTransaction.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(genesisIssueAssetTransaction.getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getCreator().getAddress());
-						
+									
 			//CHECK NAME
-			assertEquals(genesisIssueAssetTransaction.getAsset().getName(), parsedGenesisIssueAssetTransaction.getAsset().getName());
+			assertEquals(genesisIssueAssetTransaction.getItem().getName(), parsedGenesisIssueAssetTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(genesisIssueAssetTransaction.getAsset().getDescription(), parsedGenesisIssueAssetTransaction.getAsset().getDescription());
+			assertEquals(genesisIssueAssetTransaction.getItem().getDescription(), parsedGenesisIssueAssetTransaction.getItem().getDescription());
 				
+			AssetCls asset = (AssetCls)genesisIssueAssetTransaction.getItem();
+			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
+
 			//CHECK QUANTITY
-			assertEquals(genesisIssueAssetTransaction.getAsset().getQuantity(), parsedGenesisIssueAssetTransaction.getAsset().getQuantity());
+			assertEquals(asset.getQuantity(), asset1.getQuantity());
 			
 			//DIVISIBLE
-			assertEquals(genesisIssueAssetTransaction.getAsset().isDivisible(), parsedGenesisIssueAssetTransaction.getAsset().isDivisible());
+			assertEquals(asset.isDivisible(), asset1.isDivisible());
+						
 			
-			//CHECK FEE
-			assertEquals(genesisIssueAssetTransaction.getFee(), parsedGenesisIssueAssetTransaction.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), parsedGenesisIssueAssetTransaction.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(genesisIssueAssetTransaction.getTimestamp(), parsedGenesisIssueAssetTransaction.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -177,33 +169,21 @@ public class TransactionTests2 {
 			
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), parsedGenesisIssueAssetTransaction.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(genesisIssueAssetTransaction.getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getCreator().getAddress());
-			
-			//CHECK OWNER
-			assertEquals(genesisIssueAssetTransaction.getAsset().getCreator().getAddress(), parsedGenesisIssueAssetTransaction.getAsset().getCreator().getAddress());
-			
+						
 			//CHECK NAME
-			assertEquals(genesisIssueAssetTransaction.getAsset().getName(), parsedGenesisIssueAssetTransaction.getAsset().getName());
+			assertEquals(genesisIssueAssetTransaction.getItem().getName(), parsedGenesisIssueAssetTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(genesisIssueAssetTransaction.getAsset().getDescription(), parsedGenesisIssueAssetTransaction.getAsset().getDescription());
+			assertEquals(genesisIssueAssetTransaction.getItem().getDescription(), parsedGenesisIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(genesisIssueAssetTransaction.getAsset().getQuantity(), parsedGenesisIssueAssetTransaction.getAsset().getQuantity());
+			AssetCls asset = (AssetCls)genesisIssueAssetTransaction.getItem();
+			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
+			assertEquals(asset.getQuantity(), asset1.getQuantity());
 			
 			//DIVISIBLE
-			assertEquals(genesisIssueAssetTransaction.getAsset().isDivisible(), parsedGenesisIssueAssetTransaction.getAsset().isDivisible());
+			assertEquals(asset.isDivisible(), asset1.isDivisible());
 			
-			//CHECK FEE
-			assertEquals(genesisIssueAssetTransaction.getFee(), parsedGenesisIssueAssetTransaction.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), parsedGenesisIssueAssetTransaction.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(genesisIssueAssetTransaction.getTimestamp(), parsedGenesisIssueAssetTransaction.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -235,21 +215,21 @@ public class TransactionTests2 {
 		initIssue(true);		
 		LOGGER.info("asset KEY: " + key);
 		
-		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
+		//CHECK BALANCE ISSUER - null
+		//assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(genesisIssueAssetTransaction);
-		assertEquals(true, db.getAssetMap().contains(key));
+		assertEquals(true, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET IS CORRECT
-		assertEquals(true, Arrays.equals(db.getAssetMap().get(key).toBytes(true), asset.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true), asset.toBytes(true)));
 		
-		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
+		//CHECK ASSET BALANCE SENDER - null
+		//assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
 				
-		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
+		//CHECK REFERENCE SENDER - null
+		//assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
 	}
 	
 	
@@ -259,8 +239,8 @@ public class TransactionTests2 {
 		
 		initIssue(true);
 
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
-		assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
+		//assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
+		//assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
 		
 		genesisIssueAssetTransaction.orphan(db, false);
 		
@@ -268,10 +248,10 @@ public class TransactionTests2 {
 		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
-		assertEquals(false, db.getAssetMap().contains(key));
+		assertEquals(false, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(0, db.getBalanceMap().get(maker.getAddress(), key).longValue());
+		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).longValue());
 				
 		//CHECK REFERENCE SENDER
 		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
@@ -288,12 +268,10 @@ public class TransactionTests2 {
 		initIssue(false);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		long timestamp = NTP.getTime();
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key
-				, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		//assetTransfer.sign(sender);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
@@ -307,10 +285,10 @@ public class TransactionTests2 {
 		initIssue(true);
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
@@ -319,25 +297,25 @@ public class TransactionTests2 {
 
 		//CREATE VALID ASSET TRANSFER
 		maker.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), db);
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));			
 		
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
-		assetTransfer = new GenesisTransferAssetTransaction(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(new Account("test"), key, BigDecimal.valueOf(100).setScale(8));
 	
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(-100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(-100).setScale(8));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));	
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-		assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		// nor need for genesis - assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db));
@@ -350,10 +328,10 @@ public class TransactionTests2 {
 		initIssue(true);		
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
-		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp);
+		GenesisTransferAssetTransaction genesisTransferAsset = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		//genesisTransferAsset.sign(maker);
 		//genesisTransferAsset.process(db);
 
@@ -384,14 +362,6 @@ public class TransactionTests2 {
 			//CHECK AMOUNT RECIPIENT
 			assertEquals(genesisTransferAsset.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
 			
-			//CHECK FEE
-			assertEquals(genesisTransferAsset.getFee(), parsedAssetTransfer.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisTransferAsset.getReference(), parsedAssetTransfer.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(genesisTransferAsset.getTimestamp(), parsedAssetTransfer.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -423,20 +393,23 @@ public class TransactionTests2 {
 		
 		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
+		//assertEquals(total, amoSend);
 		
-		//CHECK BALANCE SENDER
-		assertEquals(total, maker.getConfirmedBalance(key, db));
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total, maker.getConfirmedBalance(key, db));
 			
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
+		
 		// assetTransfer.sign(sender); // not  NEED
 		assetTransfer.process(db, false);
 		
-		//CHECK BALANCE SENDER
-		assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
 		assertEquals(amoSend, recipient.getConfirmedBalance(key, db));
@@ -460,16 +433,16 @@ public class TransactionTests2 {
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 			
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 			
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new GenesisTransferAssetTransaction(maker, recipient, key, amoSend, timestamp);
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
 		// assetTransfer.sign(sender); not NEED
 		assetTransfer.process(db, false);
 		assetTransfer.orphan(db, false);
 		
-		//CHECK BALANCE SENDER
-		assertEquals(total, maker.getConfirmedBalance(key, db));
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total, maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));

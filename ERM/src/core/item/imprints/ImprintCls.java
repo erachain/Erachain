@@ -7,7 +7,7 @@ import core.item.ItemCls;
 import database.DBSet;
 import database.Item_Map;
 //import database.wallet.FavoriteItemImprint;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 
 public abstract class ImprintCls extends ItemCls {
 		
@@ -31,9 +31,9 @@ public abstract class ImprintCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getImprintMap();
+		return db.getItemImprintMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssueImprintMap();
 	}	

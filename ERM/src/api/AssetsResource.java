@@ -45,7 +45,7 @@ public class AssetsResource
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getAssetMap().contains(assetAsLong)) {
+		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 		}
@@ -69,7 +69,7 @@ public class AssetsResource
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getAssetMap().contains(assetAsLong)) {
+		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 		}

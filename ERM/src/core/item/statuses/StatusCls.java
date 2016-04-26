@@ -7,14 +7,21 @@ import core.item.ItemCls;
 // import org.apache.log4j.Logger;
 
 import database.DBSet;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 import database.Item_Map;
 import database.ItemStatusMap;
 
 public abstract class StatusCls extends ItemCls {
 
+	// PERSON KEY
+	public static final Long ALIVE_KEY = 0l;
+	public static final Long DEAD_KEY = 1l;
+	public static final Long CITIZEN_KEY = 2l;
+	public static final Long MEMBER_KEY = 3l;
+
 	public static final int STATUS = 1;
 	public static final int TITLE = 2;
+	public static final int POSITION = 3;
 	
 	public StatusCls(byte[] typeBytes, Account creator, String name, String description)
 	{
@@ -32,9 +39,9 @@ public abstract class StatusCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getStatusMap();
+		return db.getItemStatusMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssueStatusMap();
 	}

@@ -7,10 +7,14 @@ import core.item.ItemCls;
 import database.DBSet;
 import database.Item_Map;
 //import database.wallet.FavoriteItemNote;
-import database.IssueItemMap;
+import database.Issue_ItemMap;
 
 public abstract class NoteCls extends ItemCls {
 	
+	// PERS KEY
+	public static final long PERSONALIZE_KEY = 1l;
+	public static final long ESTABLISH_UNION_KEY = 2l;
+
 	protected static final int NOTE = 1;
 	protected static final int SAMPLE = 2;
 	protected static final int PAPER = 3;
@@ -33,9 +37,9 @@ public abstract class NoteCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getNoteMap();
+		return db.getItemNoteMap();
 	}
-	public IssueItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{
 		return db.getIssueNoteMap();
 	}	

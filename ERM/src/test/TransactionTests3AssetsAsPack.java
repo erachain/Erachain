@@ -216,13 +216,13 @@ public class TransactionTests3AssetsAsPack {
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
-		assertEquals(true, db.getAssetMap().contains(key));
+		assertEquals(true, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET IS CORRECT
-		assertEquals(true, Arrays.equals(db.getAssetMap().get(key).toBytes(true), asset.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true), asset.toBytes(true)));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
+		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), releaserReference));
@@ -251,10 +251,10 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
-		assertEquals(false, db.getAssetMap().contains(key));
+		assertEquals(false, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(0, db.getBalanceMap().get(maker.getAddress(), key).longValue());
+		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).longValue());
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueAssetTransaction.getReference(), releaserReference));

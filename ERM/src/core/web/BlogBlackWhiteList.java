@@ -20,6 +20,7 @@ import controller.Controller;
 import core.account.Account;
 import core.crypto.Crypto;
 import core.naming.Name;
+import core.transaction.Transaction;
 import database.DBSet;
 
 /**
@@ -37,6 +38,9 @@ public class BlogBlackWhiteList {
 	 * @return An object containing all names or accounts that are
 	 *         allowed/forbidden the blogowner is always part of the whitelist
 	 */
+	
+	private static final long FEE_KEY = Transaction.FEE_KEY;
+
 	public static BlogBlackWhiteList getBlogBlackWhiteList(String blogname) {
 
 		if (blogname == null) {
@@ -239,13 +243,13 @@ public class BlogBlackWhiteList {
 		if (removeZeroBalance) {
 			for (Name name : resultingNames) {
 				// No balance account not shown
-				if (name.getOwner().getBalance(0).compareTo(BigDecimal.ZERO) <= 0) {
+				if (name.getOwner().getBalance(0, FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
 					resultingNames.remove(name);
 				}
 			}
 
 			for (Account account : resultingAccounts) {
-				if (account.getBalance(0).compareTo(BigDecimal.ZERO) <= 0) {
+				if (account.getBalance(0, FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
 					resultingAccounts.remove(account);
 				}
 			}

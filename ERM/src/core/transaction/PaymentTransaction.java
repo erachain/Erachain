@@ -17,7 +17,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class PaymentTransaction extends TransactionAmount {
@@ -28,7 +28,7 @@ public class PaymentTransaction extends TransactionAmount {
 		
 	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, ERMO_KEY, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, FEE_KEY, timestamp, reference);
 	}
 	public PaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, Account recipient, BigDecimal amount, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -203,10 +203,10 @@ public class PaymentTransaction extends TransactionAmount {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), BalanceMap.FEE_KEY, this.amount);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

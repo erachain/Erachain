@@ -28,7 +28,7 @@ public abstract class TransactionAmount extends Transaction {
 
 	protected Account recipient;
 	protected BigDecimal amount;
-	protected long key;
+	protected long key = Transaction.FEE_KEY;
 
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
@@ -214,9 +214,9 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		*/
 
-		if (this.key != DIL_KEY) {
+		if (this.key != FEE_KEY) {
 			// CHECK FEE
-			if(this.creator.getConfirmedBalance(DIL_KEY, db).compareTo(this.fee) == -1)
+			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
@@ -226,7 +226,7 @@ public abstract class TransactionAmount extends Transaction {
 				return NO_BALANCE;
 			}
 		} else {
-			if(this.creator.getConfirmedBalance(DIL_KEY, db)
+			if(this.creator.getConfirmedBalance(FEE_KEY, db)
 					.compareTo( this.amount.add(this.fee) ) == -1)
 			{
 				return NO_BALANCE;
@@ -249,7 +249,7 @@ public abstract class TransactionAmount extends Transaction {
 		if (!asPack) {
 
 			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
-			if(this.key == DIL_KEY)
+			if(this.key == FEE_KEY)
 			{
 				if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
 				{
@@ -272,7 +272,7 @@ public abstract class TransactionAmount extends Transaction {
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(this.key == DIL_KEY)
+			if(this.key == FEE_KEY)
 			{
 				if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
 				{
@@ -286,7 +286,7 @@ public abstract class TransactionAmount extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), DIL_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
 		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);

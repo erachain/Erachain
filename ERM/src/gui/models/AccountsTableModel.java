@@ -93,30 +93,15 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			}
 			*/
 		case COLUMN_CONFIRMED_BALANCE:
-			
-			if(this.asset == null || this.asset.getKey() == 0l)
-			{
-				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance());	
-			}
-			else
-			{
-				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));
-			}
-			
+			if (this.asset == null) return "-";
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));			
 		case COLUMN_WAINTING_BALANCE:
-			
-			if(this.asset == null || this.asset.getKey() == 0l)
-			{
-				return NumberAsString.getInstance().numberAsString(
-						account.getUnconfirmedBalance().subtract(account.getConfirmedBalance()));	
-			}
-			else
-			{
-				return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).
-						subtract(account.getConfirmedBalance(this.asset.getKey())));
-			}
+			if (this.asset == null) return "-";
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).
+					subtract(account.getConfirmedBalance(this.asset.getKey())));
 		case COLUMN_OIL_BALANCE:
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.DIL_KEY));
+			if (this.asset == null) return "-";
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
 			
 			
 		/*	

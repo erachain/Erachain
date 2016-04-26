@@ -50,7 +50,7 @@ public class Status extends StatusCls {
 		
 		if(nameLength < 1 || nameLength > MAX_NAME_LENGTH)
 		{
-			throw new Exception("Invalid name length");
+			throw new Exception("Invalid name length " + nameLength );
 		}
 		
 		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);

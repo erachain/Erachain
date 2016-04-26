@@ -52,7 +52,7 @@ public class AssetsFavorites implements Observer{
 		List<Long> favoritesUpadate = new ArrayList<Long>();
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getBalanceMap().getBalancesSortableList(account);
+			SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
 			
 			for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
 				if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {

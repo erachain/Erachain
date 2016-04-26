@@ -58,7 +58,7 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 import database.SortableList;
 import settings.Settings;
@@ -74,6 +74,9 @@ public class BlockExplorer
 	
 	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
 	private static BlockExplorer blockExplorer;
+	
+	private static final long FEE_KEY = Transaction.FEE_KEY;
+
 
 	public static BlockExplorer getInstance()
 	{
@@ -544,7 +547,7 @@ public class BlockExplorer
 			foundList.put(i, "name");
 		}	
 
-		if (query.matches("\\d+") && DBSet.getInstance().getAssetMap().contains(Long.valueOf(query)))
+		if (query.matches("\\d+") && DBSet.getInstance().getItemAssetMap().contains(Long.valueOf(query)))
 		{
 			i++;
 			foundList.put(i, "asset");
@@ -1391,11 +1394,11 @@ public class BlockExplorer
 		List<Tuple2<String, BigDecimal>> top100s = new ArrayList<Tuple2<String, BigDecimal>>();
 
 
-		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getBalanceMap().getKeys();
+		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getAssetBalanceMap().getKeys();
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
 			{
-				BigDecimal ball =  DBSet.getInstance().getBalanceMap().get(addr);
+				BigDecimal ball =  DBSet.getInstance().getAssetBalanceMap().get(addr);
 				all = all.add(ball);
 
 				top100s.add(Fun.t2(addr.a, ball));
@@ -1879,7 +1882,7 @@ public class BlockExplorer
 			return output; 
 		}
 
-		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		for (Pair<Tuple2<String, Long>, BigDecimal> assetsBalance : assetsBalances) 	
 		{
@@ -1898,7 +1901,7 @@ public class BlockExplorer
 	{
 		Map<Long, BigDecimal> output = new LinkedHashMap();
 
-		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		for (Pair<Tuple2<String, Long>, BigDecimal> assetsBalance : assetsBalances) 	
 		{
@@ -2063,7 +2066,7 @@ public class BlockExplorer
 		Map<String, BigDecimal> generatedFee = new LinkedHashMap<>();  
 		Map<String, Integer> blocksGeneratedCount = new LinkedHashMap<>();  
 		
-		Map<Long, BigDecimal> zeroAmount = new LinkedHashMap<Long, BigDecimal>(){{put(BalanceMap.FEE_KEY, BigDecimal.ZERO);}};
+		Map<Long, BigDecimal> zeroAmount = new LinkedHashMap<Long, BigDecimal>(){{put(FEE_KEY, BigDecimal.ZERO);}};
 		
 		int i = 1;
 		for ( BlExpUnit unit : all ) {
@@ -2088,7 +2091,7 @@ public class BlockExplorer
 				BigDecimal fee = ((Block)unit.getUnit()).getTotalFee();
 				String generator = ((Block)unit.getUnit()).getGenerator().getAddress();
 				
-				tXincome = Transaction.addAssetAmount(tXincome, generator, BalanceMap.FEE_KEY, fee);
+				tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
 
 				generatedFee.put(
 						generator, 
@@ -2149,12 +2152,12 @@ public class BlockExplorer
 
 				if (addresses.contains(atTransaction.getSender())) 
 				{
-					tXincome = Transaction.subAssetAmount(tXincome, atTransaction.getSender(), BalanceMap.FEE_KEY, BigDecimal.valueOf( atTransaction.getAmount() , 8));
+					tXincome = Transaction.subAssetAmount(tXincome, atTransaction.getSender(), FEE_KEY, BigDecimal.valueOf( atTransaction.getAmount() , 8));
 				}
 				
 				if(addresses.contains(atTransaction.getRecipient())) 
 				{
-					tXincome = Transaction.addAssetAmount(tXincome, atTransaction.getRecipient(), BalanceMap.FEE_KEY, BigDecimal.valueOf( atTransaction.getAmount() , 8));
+					tXincome = Transaction.addAssetAmount(tXincome, atTransaction.getRecipient(), FEE_KEY, BigDecimal.valueOf( atTransaction.getAmount() , 8));
 				}
 
 				aTTxsCount++;
@@ -2200,7 +2203,7 @@ public class BlockExplorer
 							);
 				}
 					
-				if ((newTotalBalance.containsKey(BalanceMap.FEE_KEY)) && newTotalBalance.get(BalanceMap.FEE_KEY).compareTo(BigDecimal.ZERO) < 0) 
+				if ((newTotalBalance.containsKey(FEE_KEY)) && newTotalBalance.get(FEE_KEY).compareTo(BigDecimal.ZERO) < 0) 
 				{
 					LOGGER.info(i);
 				}
@@ -2224,7 +2227,7 @@ public class BlockExplorer
 		Map<Long, String> sentCoinsPrint = new LinkedHashMap();
 		for (Map.Entry<Long, BigDecimal> e : sentCoins.entrySet())	
 		{
-			if (e.getKey() == BalanceMap.FEE_KEY) 
+			if (e.getKey() == FEE_KEY) 
 			{
 				sentCoinsPrint.put(e.getKey(), e.getValue().subtract(spentFee).toPlainString());
 			}
@@ -2496,7 +2499,7 @@ public class BlockExplorer
 				transactionJSON.putAll(jsonUnitPrint(unit.getUnit(), null));
 
 				Map tXbalanceChange = new LinkedHashMap();
-				Map<Long, Boolean> assetIsChange = new LinkedHashMap(){{ put(BalanceMap.FEE_KEY, true); }};
+				Map<Long, Boolean> assetIsChange = new LinkedHashMap(){{ put(FEE_KEY, true); }};
 
 				for(Map.Entry<String, Map<Long, BigDecimal>> addrsMap : tXincomes.get(counter - 1).entrySet()) 
 				{

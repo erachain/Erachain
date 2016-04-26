@@ -25,7 +25,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 
 public class IssueAssetTransaction extends Transaction 
@@ -234,7 +234,7 @@ public class IssueAssetTransaction extends Transaction
 		this.asset.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
-		long key = db.getAssetMap().add(this.asset);
+		long key = db.getItemAssetMap().add(this.asset);
 		//this.asset.setKey(key);
 		
 		//ADD ASSETS TO OWNER
@@ -256,7 +256,7 @@ public class IssueAssetTransaction extends Transaction
 				
 		//DELETE FROM DATABASE
 		long key = db.getIssueAssetMap().get(this);
-		db.getAssetMap().delete(key);	
+		db.getItemAssetMap().delete(key);	
 		
 		//REMOVE ASSETS FROM OWNER
 		//this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
@@ -313,7 +313,7 @@ public class IssueAssetTransaction extends Transaction
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), BalanceMap.FEE_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), this.asset.getKey(), new BigDecimal(this.asset.getQuantity()).setScale(8));
 

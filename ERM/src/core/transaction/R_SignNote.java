@@ -311,7 +311,7 @@ public class R_SignNote extends Transaction {
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		// ITEM EXIST? - for assets transfer not need - amount expect instead
-		if (!db.getNoteMap().contains(this.key))
+		if (!db.getItemNoteMap().contains(this.key))
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
 		return Transaction.VALIDATE_OK;

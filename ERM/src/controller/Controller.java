@@ -96,11 +96,11 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "0.26.0 beta";
-	private String buildTime = "2016-03-10 00:00:00 UTC";
+	private String version = "2.12.03";
+	private String buildTime = "2016-04-20 00:00:00 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "0.03.0";
+	public static final String releaseVersion = "2.03.0";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -582,13 +582,13 @@ public class Controller extends Observable {
 		DBSet.getInstance().getPollMap().addObserver(o);
 
 		// ADD OBSERVER TO ASSETS
-		DBSet.getInstance().getAssetMap().addObserver(o);
+		DBSet.getInstance().getItemAssetMap().addObserver(o);
 
 		// ADD OBSERVER TO IMPRINTS
-		DBSet.getInstance().getImprintMap().addObserver(o);
+		DBSet.getInstance().getItemImprintMap().addObserver(o);
 
 		// ADD OBSERVER TO NOTES
-		DBSet.getInstance().getNoteMap().addObserver(o);
+		DBSet.getInstance().getItemNoteMap().addObserver(o);
 
 		// ADD OBSERVER TO PERSONS
 		DBSet.getInstance().getPersonMap().addObserver(o);
@@ -600,7 +600,7 @@ public class Controller extends Observable {
 		DBSet.getInstance().getTradeMap().addObserver(o);
 
 		// ADD OBSERVER TO BALANCES
-		DBSet.getInstance().getBalanceMap().addObserver(o);
+		DBSet.getInstance().getAssetBalanceMap().addObserver(o);
 
 		// ADD OBSERVER TO ATMAP
 		DBSet.getInstance().getATMap().addObserver(o);
@@ -935,8 +935,8 @@ public class Controller extends Observable {
 				Transaction transaction = transactionMessage.getTransaction();
 
 				// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-				if (!transaction.isSignatureValid()
-						|| transaction.getType() == Transaction.GENESIS_TRANSACTION) {
+				if (transaction.getCreator() != null 
+						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
 					this.network.onError(message.getSender(), Lang.getInstance().translate("invalid transaction signature"));
 
@@ -1192,8 +1192,8 @@ public class Controller extends Observable {
 		}
 	}
 
-	public BigDecimal getUnconfirmedBalance(String address) {
-		return this.wallet.getUnconfirmedBalance(address);
+	public BigDecimal getUnconfirmedBalance(String address, long key) {
+		return this.wallet.getUnconfirmedBalance(address, key);
 	}
 
 	public void addWalletListener(Observer o) {
@@ -1397,11 +1397,11 @@ public class Controller extends Observable {
 		switch(type)
 			{
 			case ItemCls.ASSET_TYPE:
-				return DBSet.getInstance().getAssetMap();
+				return DBSet.getInstance().getItemAssetMap();
 			case ItemCls.IMPRINT_TYPE:
-				return DBSet.getInstance().getImprintMap();
+				return DBSet.getInstance().getItemImprintMap();
 			case ItemCls.NOTE_TYPE:
-				return DBSet.getInstance().getNoteMap();
+				return DBSet.getInstance().getItemNoteMap();
 			case ItemCls.PERSON_TYPE:
 				return DBSet.getInstance().getPersonMap();
 		}
@@ -1460,7 +1460,8 @@ public class Controller extends Observable {
 	// BLOCKCHAIN
 
 	public int getHeight() {
-		return this.blockChain.getHeight();
+		// need for TESTs
+		return this.blockChain != null? this.blockChain.getHeight(): -1;
 	}
 
 	public Block getLastBlock() {
@@ -1511,12 +1512,12 @@ public class Controller extends Observable {
 	// BALANCES
 
 	public SortableList<Tuple2<String, Long>, BigDecimal> getBalances(long key) {
-		return DBSet.getInstance().getBalanceMap().getBalancesSortableList(key);
+		return DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(key);
 	}
 
 	public SortableList<Tuple2<String, Long>, BigDecimal> getBalances(
 			Account account) {
-		return DBSet.getInstance().getBalanceMap()
+		return DBSet.getInstance().getAssetBalanceMap()
 				.getBalancesSortableList(account);
 	}
 
@@ -1544,7 +1545,7 @@ public class Controller extends Observable {
 	}
 	*/
 	public AssetCls getAsset(long key) {
-		return (AssetCls) DBSet.getInstance().getAssetMap().get(key);
+		return (AssetCls) DBSet.getInstance().getItemAssetMap().get(key);
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
@@ -1569,12 +1570,12 @@ public class Controller extends Observable {
 
 	// IMPRINTS
 	public ImprintCls getImprint(long key) {
-		return (ImprintCls)DBSet.getInstance().getImprintMap().get(key);
+		return (ImprintCls)DBSet.getInstance().getItemImprintMap().get(key);
 	}
 
 	// NOTES
 	public NoteCls getNote(long key) {
-		return (NoteCls)DBSet.getInstance().getNoteMap().get(key);
+		return (NoteCls)DBSet.getInstance().getItemNoteMap().get(key);
 	}
 
 	// PERSONS
@@ -1588,13 +1589,13 @@ public class Controller extends Observable {
 		switch(type)
 			{
 			case ItemCls.ASSET_TYPE: {
-				return DBSet.getInstance().getAssetMap().get(key);
+				return DBSet.getInstance().getItemAssetMap().get(key);
 			}
 			case ItemCls.IMPRINT_TYPE: {
-				return DBSet.getInstance().getImprintMap().get(key);
+				return DBSet.getInstance().getItemImprintMap().get(key);
 			}
 			case ItemCls.NOTE_TYPE: {
-				return DBSet.getInstance().getNoteMap().get(key);
+				return DBSet.getInstance().getItemNoteMap().get(key);
 			}
 			case ItemCls.PERSON_TYPE: {
 				return DBSet.getInstance().getPersonMap().get(key);	

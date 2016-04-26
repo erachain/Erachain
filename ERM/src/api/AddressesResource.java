@@ -336,12 +336,12 @@ public class AddressesResource {
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getAssetMap().contains(assetAsLong)) {
+		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 		}
 
-		return DBSet.getInstance().getBalanceMap().get(address, assetAsLong)
+		return DBSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
 				.toPlainString();
 	}
 	
@@ -355,7 +355,7 @@ public class AddressesResource {
 					ApiErrorFactory.ERROR_INVALID_ADDRESS);
 		}
 
-		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject assetsBalancesJSON = new JSONObject();
 		
@@ -379,7 +379,7 @@ public class AddressesResource {
 					ApiErrorFactory.ERROR_INVALID_ADDRESS);
 		}
 
-		return new Account(address).getBalance(confirmations).toPlainString();
+		return new Account(address).getBalance(confirmations, Transaction.FEE_KEY).toPlainString();
 	}
 
 	@SuppressWarnings("unchecked")

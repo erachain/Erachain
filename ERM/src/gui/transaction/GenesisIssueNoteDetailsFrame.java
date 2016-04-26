@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
+import core.item.notes.NoteCls;
 import core.transaction.GenesisIssueNoteTransaction;
 import lang.Lang;
 import utils.DateTimeFormat;
@@ -29,6 +30,8 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
 		
+		NoteCls note = (NoteCls)noteIssue.getItem();
+
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -96,19 +99,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);
-		
-		//LABEL TIMESTAMP
-		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
-		this.add(timestampLabel, labelGBC);
 						
-		//TIMESTAMP
-		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(noteIssue.getTimestamp()));
-		timestamp.setEditable(false);
-		MenuPopupUtil.installContextMenu(timestamp);
-		this.add(timestamp, detailGBC);
-				
 		//LABEL OWNER
 		labelGBC.gridy = 5;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
@@ -116,7 +107,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(noteIssue.getNote().getCreator().getAddress());
+		JTextField owner = new JTextField("genesis");
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
@@ -128,7 +119,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(noteIssue.getNote().getName());
+		JTextField name = new JTextField(note.getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -140,7 +131,7 @@ public class GenesisIssueNoteDetailsFrame extends JFrame
 				
 		//DESCRIPTION
 		detailGBC.gridy = 7;
-		JTextArea txtAreaDescription = new JTextArea(noteIssue.getNote().getDescription());
+		JTextArea txtAreaDescription = new JTextArea(note.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);

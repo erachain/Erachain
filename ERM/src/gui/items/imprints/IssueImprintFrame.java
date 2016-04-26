@@ -291,7 +291,7 @@ public class IssueImprintFrame extends JFrame
 
 			case Transaction.DUPLICATE_KEY:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("This KEY already exists!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("This Imprint already exists!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.NOT_ENOUGH_FEE:
@@ -309,7 +309,7 @@ public class IssueImprintFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 								
-			case Transaction.ACCOUNT_NOT_PERSON:
+			case Transaction.ACCOUNT_NOT_PERSONALIZED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	

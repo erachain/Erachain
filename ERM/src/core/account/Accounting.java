@@ -21,6 +21,7 @@ import database.DBSet;
 public class Accounting extends Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
+	private static final long FEE_KEY = Transaction.FEE_KEY;
 		
 	public Accounting(String address)
 	{
@@ -40,18 +41,20 @@ public class Accounting extends Account {
 	
 	public BigDecimal getUnconfirmedBalance(DBSet db)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress());
+		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), FEE_KEY);
 	}
 	
 	public BigDecimal getConfirmedBalance()
 	{
-		return this.getConfirmedBalance(DBSet.getInstance());
+		return this.getConfirmedBalance(FEE_KEY, DBSet.getInstance());
 	}
 	
+	/*
 	public BigDecimal getConfirmedBalance(DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress());
+		return db.getAssetBalanceAccountingMap().get(getAddress());
 	}
+	*/
 	
 	public BigDecimal getConfirmedBalance(long key)
 	{
@@ -60,7 +63,7 @@ public class Accounting extends Account {
 	
 	public BigDecimal getConfirmedBalance(long key, DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress(), key);
+		return db.getAssetBalanceAccountingMap().get(getAddress(), key);
 	}
 	public BigDecimal getConfirmedBalance(byte[] hkey)
 	{
@@ -69,20 +72,21 @@ public class Accounting extends Account {
 	
 	public BigDecimal getConfirmedBalance(byte[] hkey, DBSet db)
 	{
-		return db.getBalanceAccountingMap().get(getAddress(), 2l);
+		return db.getAssetBalanceAccountingMap().get(getAddress(), 2l);
 	}
 
 	public void setConfirmedBalance(BigDecimal amount)
 	{
-		this.setConfirmedBalance(amount, DBSet.getInstance());
+		this.setConfirmedBalance(FEE_KEY, amount, DBSet.getInstance());
 	}
 	
+	/*
 	public void setConfirmedBalance(BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceAccountingMap().set(getAddress(), amount);
+		db.getAssetBalanceAccountingMap().set(getAddress(), amount);
 	}
-	
+	*/
 	public void setConfirmedBalance(long key, BigDecimal amount)
 	{
 		this.setConfirmedBalance(key, amount, DBSet.getInstance());
@@ -103,7 +107,7 @@ public class Accounting extends Account {
 	public void setConfirmedBalance(long key, BigDecimal amount, DBSet db)
 	{
 		//UPDATE BALANCE IN DB
-		db.getBalanceAccountingMap().set(getAddress(), key, amount);
+		db.getAssetBalanceAccountingMap().set(getAddress(), key, amount);
 	}
 
 	public BigDecimal getBalance(int confirmations)
@@ -116,17 +120,17 @@ public class Accounting extends Account {
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(db);
+			return this.getUnconfirmedBalance(FEE_KEY, db);
 		}
 		
 		//IF 1 CONFIRMATION
 		if(confirmations == 1)
 		{
-			return this.getConfirmedBalance(db);
+			return this.getConfirmedBalance(FEE_KEY, db);
 		}
 		
 		//GO TO PARENT BLOCK 10
-		BigDecimal balance = this.getConfirmedBalance(db);
+		BigDecimal balance = this.getConfirmedBalance(FEE_KEY, db);
 		Block block = db.getBlockMap().getLastBlock();
 		
 		for(int i=1; i<confirmations && block != null && block instanceof Block; i++)

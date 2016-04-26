@@ -1,13 +1,19 @@
 package core.account;
 
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
+
+//import org.mapdb.Fun.Tuple2;
+//import org.mapdb.Fun.Tuple3;
 
 import core.crypto.Crypto;
-import core.transaction.Transaction;
-import database.DBSet;
+//import core.transaction.Transaction;
+import core.item.statuses.StatusCls;
+//import database.DBSet;
+//import ntp.NTP;
 
 public class PublicKeyAccount extends Account {
 
+	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	protected byte[] publicKey;
 	
 	public PublicKeyAccount(byte[] publicKey)
@@ -24,15 +30,6 @@ public class PublicKeyAccount extends Account {
 	public byte[] getPublicKey() 
 	{
 		return publicKey;
-	}
-	
-	public boolean isPerson(DBSet db) {
-		
-		BigDecimal vote = this.getConfirmedBalance(Transaction.LAEV_KEY, db);
-		if (vote.compareTo(BigDecimal.ONE) < 1) return false;
-
-		return true;
-		
 	}
 	
 }

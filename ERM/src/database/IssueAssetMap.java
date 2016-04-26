@@ -12,7 +12,7 @@ import com.google.common.primitives.UnsignedBytes;
 import core.transaction.Transaction;
 import database.DBSet;
 
-public class IssueAssetMap extends IssueItemMap 
+public class IssueAssetMap extends Issue_ItemMap 
 {
 	//private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	

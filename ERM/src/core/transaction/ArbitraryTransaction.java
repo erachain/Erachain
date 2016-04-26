@@ -25,7 +25,7 @@ import core.crypto.Crypto;
 import core.naming.Name;
 import core.payment.Payment;
 import core.web.blog.BlogEntry;
-import database.BalanceMap;
+import database.ItemAssetBalanceMap;
 import database.DBSet;
 import utils.BlogUtils;
 import utils.StorageUtils;
@@ -163,7 +163,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
 			// IF ERM ASSET
-			if (payment.getAsset() == DIL_KEY) {
+			if (payment.getAsset() == FEE_KEY) {
 				// IF SENDER
 				if (address.equals(this.creator.getAddress())) {
 					amount = amount.subtract(payment.getAmount());
@@ -184,7 +184,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), DIL_KEY, this.fee);
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		for(Payment payment: this.payments)
 		{

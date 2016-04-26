@@ -12,6 +12,7 @@ import com.google.common.primitives.Ints;
 
 import core.account.Account;
 import core.crypto.Base58;
+import core.item.assets.AssetCls;
 import database.DBSet;
 
 public class Name {
@@ -188,6 +189,6 @@ public class Name {
 	
 	public String getNameBalanceString()
 	{
-		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0)) + " - " + this.getName();
+		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0, AssetCls.DILE_KEY)) + " - " + this.getName();
 	}
 }
