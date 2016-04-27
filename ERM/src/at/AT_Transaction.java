@@ -23,43 +23,49 @@ public class AT_Transaction{
 	
 	private byte[] senderId = new byte[ AT_Constants.AT_ID_SIZE ];
 	private byte[] recipientId = new byte[ AT_Constants.AT_ID_SIZE ];
+	private long key;
 	private long amount;
 	private byte[] message;
 	private int blockHeight;
 	private int seq;
 	private final int BASE_SIZE = 2 * AT_Constants.AT_ID_SIZE + 8 + 4 + 4 + 4;
 	
-	AT_Transaction( byte[] senderId , byte[] recipientId , long amount , byte[] message ){
+	AT_Transaction( byte[] senderId , byte[] recipientId , long key, long amount, byte[] message ){
 		this.senderId = senderId.clone();
 		this.recipientId = recipientId.clone();
+		this.key = key;
 		this.amount = amount;
 		this.message = (message != null) ? message.clone() : null;
 	}
 	
 	public AT_Transaction(int blockHeight, int seq, byte[] senderId,
-			byte[] recipientId, long amount, byte[] message) {
+			byte[] recipientId, long key, long amount, byte[] message) {
 		this.blockHeight = blockHeight;
 		this.seq = seq;
 		this.senderId = senderId;
 		this.recipientId = recipientId;
+		this.key = key;
 		this.amount = amount;
 		this.message = message;
 	}
 
+	public Long getKey(){
+		return this.key;
+	}
 	public Long getAmount(){
-		return amount;
+		return this.amount;
 	}
 	
 	public byte[] getSenderId(){
-		return senderId;
+		return this.senderId;
 	}
 	
 	public byte[] getRecipientId(){
-		return recipientId;
+		return this.recipientId;
 	}
 	
 	public byte[] getMessage() {
-		return message;
+		return this.message;
 	}
 	
 	public int getBlockHeight()
@@ -74,7 +80,7 @@ public class AT_Transaction{
 	
 	public int getSize()
 	{
-		return ( message != null ) ? BASE_SIZE + message.length : BASE_SIZE;
+		return ( this.message != null ) ? BASE_SIZE + this.message.length : BASE_SIZE;
 	}
 	
 	public byte[] toBytes()
@@ -93,6 +99,7 @@ public class AT_Transaction{
 		bf.putInt( seq );
 		bf.put( senderId );
 		bf.put( (recipientId != null) ? recipientId : new byte[ AT_Constants.AT_ID_SIZE ] );
+		bf.putLong( key );
 		bf.putLong( amount );
 		bf.putInt( (message != null) ? message.length : 0 );
 		if ( message != null )
@@ -117,6 +124,7 @@ public class AT_Transaction{
 		byte[] recipientId = new byte[AT_Constants.AT_ID_SIZE];
 		bf.get( senderId, 0, senderId.length );
 		bf.get( recipientId, 0, recipientId.length );
+		long key = bf.getLong();
 		long amount = bf.getLong();
 		int messageLength = bf.getInt();
 		byte[] message = null;
@@ -126,7 +134,7 @@ public class AT_Transaction{
 			bf.get(message, 0, messageLength);
 		}
 		
-		return new AT_Transaction(blockHeight, seq, senderId, recipientId, amount, message);
+		return new AT_Transaction(blockHeight, seq, senderId, recipientId, key, amount, message);
 		
 	}
 	
@@ -153,6 +161,7 @@ public class AT_Transaction{
 		ob.put("seq", seq);
 		ob.put("sender", getSender());
 		ob.put("recipient", getRecipient());
+		ob.put("key", key);
 		ob.put("amount", BigDecimal.valueOf( amount , 8).toPlainString());
 		ob.put("message", ( message != null ) ? Converter.toHex(message) : "");
 		return ob;
@@ -170,6 +179,7 @@ public class AT_Transaction{
 					&&	(Arrays.equals(this.getSenderId(), otherAtTx.getSenderId()))
 					&&	(Arrays.equals(this.getRecipientId(), otherAtTx.getRecipientId()))
 					&&	(Arrays.equals(this.getMessage(), otherAtTx.getMessage()))
+					&&	(this.getKey() == otherAtTx.getKey())
 					&&	(this.getAmount() == otherAtTx.getAmount());
 		}
 		

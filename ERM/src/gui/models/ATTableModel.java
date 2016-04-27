@@ -7,6 +7,7 @@ import at.AT;
 import controller.Controller;
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.SortableList;
@@ -90,7 +91,7 @@ public class ATTableModel extends TableModelCls<Long, AT> implements Observer
 		case COLUMN_AMOUNT:
 		{
 			Account account = new Account(Base58.encode(at.getId()));
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance());
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
 		}	
 		case COLUMN_CREATOR:
 			

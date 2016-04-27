@@ -231,14 +231,14 @@ public class TransactionTests {
 		BigDecimal fee = payment.getFee();
 		payment.process(databaseSet, false);
 
-		LOGGER.info("getConfirmedBalance: " + maker.getConfirmedBalance(databaseSet));
+		LOGGER.info("getConfirmedBalance: " + maker.getConfirmedBalance(FEE_KEY, databaseSet));
 		LOGGER.info("getConfirmedBalance OIL_KEY:" + maker.getConfirmedBalance(FEE_KEY, databaseSet));
 
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1).subtract(amount).subtract(fee).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1).subtract(amount).subtract(fee).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(amount, recipient.getConfirmedBalance(databaseSet));
+		assertEquals(amount, recipient.getConfirmedBalance(FEE_KEY, databaseSet));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(payment.getSignature(), maker.getLastReference(databaseSet)));
@@ -258,8 +258,8 @@ public class TransactionTests {
 		payment.sign(maker, false);
 		payment.process(databaseSet, false);
 		
-		BigDecimal amount1 = maker.getConfirmedBalance(databaseSet);
-		BigDecimal amount2 = recipient.getConfirmedBalance(databaseSet);
+		BigDecimal amount1 = maker.getConfirmedBalance(FEE_KEY, databaseSet);
+		BigDecimal amount2 = recipient.getConfirmedBalance(FEE_KEY, databaseSet);
 
 		//CREATE PAYMENT2
 		Transaction payment2  = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
@@ -270,10 +270,10 @@ public class TransactionTests {
 		payment2.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0,amount1.compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0,amount1.compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK BALANCE RECIPIENT
-		assertEquals(amount2, recipient.getConfirmedBalance(databaseSet));
+		assertEquals(amount2, recipient.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(payment.getSignature(), maker.getLastReference(databaseSet)));
@@ -467,8 +467,8 @@ public class TransactionTests {
 		nameRegistration.process(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		//assertEquals(0, maker.getConfirmedBalance(databaseSet));
-		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		//assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
+		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
@@ -492,7 +492,7 @@ public class TransactionTests {
 		nameRegistration.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));
@@ -693,7 +693,7 @@ public class TransactionTests {
 		nameUpdate.process(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameUpdate.getSignature(), maker.getLastReference(databaseSet)));
@@ -735,7 +735,7 @@ public class TransactionTests {
 		nameUpdate.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
@@ -949,7 +949,7 @@ public class TransactionTests {
 		nameSaleTransaction.process(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
@@ -974,7 +974,7 @@ public class TransactionTests {
 		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
-		BigDecimal bal = maker.getConfirmedBalance(databaseSet);
+		BigDecimal bal = maker.getConfirmedBalance(FEE_KEY, databaseSet);
 		
 		//CREATE SIGNATURE
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
@@ -986,8 +986,8 @@ public class TransactionTests {
 		nameSaleTransaction.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		//assertEquals(0, maker.getConfirmedBalance(databaseSet));
-		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(databaseSet)));
+		//assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
+		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
@@ -1202,7 +1202,7 @@ public class TransactionTests {
 		cancelNameSaleTransaction.process(databaseSet, false);	
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(cancelNameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
@@ -1241,7 +1241,7 @@ public class TransactionTests {
 		cancelNameSaleTransaction.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0,BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0,BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(nameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
@@ -1353,14 +1353,14 @@ public class TransactionTests {
 		assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
-		buyer.setConfirmedBalance(BigDecimal.ZERO.setScale(8), databaseSet);
+		buyer.setConfirmedBalance(FEE_KEY, BigDecimal.ZERO.setScale(8), databaseSet);
 		namePurchaseTransaction = new BuyNameTransaction(buyer,nameSale,nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastReference(databaseSet));		
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(databaseSet, releaserReference));
 
 		// setConfirmedBalance(long key, BigDecimal amount, DBSet db)
-		buyer.setConfirmedBalance(BigDecimal.valueOf(2000).setScale(8), databaseSet);
+		buyer.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(2000).setScale(8), databaseSet);
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
 		namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, new byte[]{});		
@@ -1477,11 +1477,11 @@ public class TransactionTests {
 		purchaseNameTransaction.process(databaseSet, false);	
 		
 		//CHECK BALANCE SENDER
-		//assertEquals(BigDecimal.valueOf(498).setScale(8), buyer.getConfirmedBalance(databaseSet));
-		assertEquals(0, BigDecimal.valueOf(500).setScale(8).compareTo(buyer.getConfirmedBalance(databaseSet)));
+		//assertEquals(BigDecimal.valueOf(498).setScale(8), buyer.getConfirmedBalance(FEE_KEY, databaseSet));
+		assertEquals(0, BigDecimal.valueOf(500).setScale(8).compareTo(buyer.getConfirmedBalance(FEE_KEY, databaseSet)));
 		
 		//CHECK BALANCE SELLER
-		assertEquals(0, BigDecimal.valueOf(1500).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1500).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE BUYER
 		assertEquals(true, Arrays.equals(purchaseNameTransaction.getSignature(), buyer.getLastReference(databaseSet)));
@@ -1524,10 +1524,10 @@ public class TransactionTests {
 		purchaseNameTransaction.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), buyer.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), buyer.getConfirmedBalance(FEE_KEY, databaseSet));
 		
 		//CHECK BALANCE SELLER
-		assertEquals(0, BigDecimal.valueOf(9999).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(9999).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE BUYER
 		assertEquals(true, Arrays.equals(last_ref, buyer.getLastReference(databaseSet)));
@@ -1746,7 +1746,7 @@ public class TransactionTests {
 		pollCreation.process(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1).subtract(pollCreation.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1).subtract(pollCreation.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(pollCreation.getSignature(), maker.getLastReference(databaseSet)));
@@ -1770,7 +1770,7 @@ public class TransactionTests {
 		pollCreation.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));
@@ -1967,7 +1967,7 @@ public class TransactionTests {
 		pollCreation.sign(maker, false);
 		pollCreation.process(databaseSet, false);
 
-		BigDecimal bal = maker.getConfirmedBalance(databaseSet);
+		BigDecimal bal = maker.getConfirmedBalance(FEE_KEY, databaseSet);
 		
 		//CREATE POLL VOTE
 		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
@@ -1977,7 +1977,7 @@ public class TransactionTests {
 		pollVote.process(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		// NOT NEED !!!! vote not use FEE and not change REFERENCE
 		///////CHECK REFERENCE SENDER
@@ -1992,7 +1992,7 @@ public class TransactionTests {
 		pollVote.process(databaseSet, false);
 				
 		//CHECK BALANCE SENDER
-		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		// NOT NEED !!!! vote not use FEE and not change REFERENCE
 		/////CHECK REFERENCE SENDER
@@ -2025,8 +2025,8 @@ public class TransactionTests {
 		pollVote.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		//assertEquals(0, maker.getConfirmedBalance(databaseSet));
-		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		//assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
+		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(pollCreation.getSignature(), maker.getLastReference(databaseSet)));
@@ -2183,7 +2183,7 @@ public class TransactionTests {
 		arbitraryTransaction.process(databaseSet, false);				
 		
 		//CHECK BALANCE SENDER
-		assertEquals(0, BigDecimal.valueOf(1).subtract(arbitraryTransaction.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(databaseSet)));
+		assertEquals(0, BigDecimal.valueOf(1).subtract(arbitraryTransaction.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(arbitraryTransaction.getSignature(), maker.getLastReference(databaseSet)));
@@ -2202,7 +2202,7 @@ public class TransactionTests {
 		arbitraryTransaction.orphan(databaseSet, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));

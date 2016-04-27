@@ -9,6 +9,7 @@ import at.AT_API_Helper;
 import controller.Controller;
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import utils.Converter;
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -103,7 +104,7 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 		
 		case COLUMN_AT_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(new Account(Base58.encode(at.getId())).getConfirmedBalance());
+			return NumberAsString.getInstance().numberAsString(new Account(Base58.encode(at.getId())).getConfirmedBalance(Transaction.FEE_KEY));
 		
 		case COLUMN_AT_SECRET:
 			

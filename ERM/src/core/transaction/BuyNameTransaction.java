@@ -263,11 +263,11 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
+		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
-		this.seller.setConfirmedBalance(this.seller.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
+		this.seller.setConfirmedBalance(Transaction.FEE_KEY, this.seller.getConfirmedBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 						
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		name = new Name(this.creator, name.getName(), name.getValue());
@@ -283,10 +283,10 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.nameSale.getAmount()), db);
+		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
-		this.seller.setConfirmedBalance(this.seller.getConfirmedBalance(db).subtract(this.nameSale.getAmount()), db);
+		this.seller.setConfirmedBalance(Transaction.FEE_KEY, this.seller.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		Name name = this.nameSale.getName(db);

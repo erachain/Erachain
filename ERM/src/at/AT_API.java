@@ -347,13 +347,15 @@ public interface AT_API {
 	 * bool if B is a valid address then send it $addr amount
 	 * if this amount is greater than the AT's balance then it will also
 	 * return false
+	 * @param key TODO
 	 */
-	public void send_to_Address_in_B( long val , AT_Machine_State state );
+	public void send_to_Address_in_B( long key , long val, AT_Machine_State state );
 	
 	/**
 	 * bool if B is a valid address then send it entire balance
+	 * @param key TODO
 	 */
-	public void send_All_to_Address_in_B( AT_Machine_State state );
+	public void send_All_to_Address_in_B( long key, AT_Machine_State state );
 	
 	/**
 	 * bool if B is a valid address then send it the old balance

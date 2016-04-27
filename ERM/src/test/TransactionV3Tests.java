@@ -32,7 +32,7 @@ public class TransactionV3Tests {
 
 	byte[] releaserReference = null;
 
-	long OIL_KEY = 1l;
+	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -58,7 +58,7 @@ public class TransactionV3Tests {
 		
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
 
@@ -97,7 +97,7 @@ public class TransactionV3Tests {
 		
 		messageTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), creator.getConfirmedBalance(OIL_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), creator.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getConfirmedBalance(key, db));
 		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(key, db));
 		
@@ -184,7 +184,7 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(databaseSet, false);
 		
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(FEE_KEY, databaseSet));
 		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getConfirmedBalance(61l, databaseSet));
 		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, databaseSet));
@@ -269,7 +269,7 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(databaseSet, false);
 		
-		assertEquals(BigDecimal.valueOf(999.999988).setScale(8), creator.getConfirmedBalance(databaseSet));
+		assertEquals(BigDecimal.valueOf(999.999988).setScale(8), creator.getConfirmedBalance(FEE_KEY, databaseSet));
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
 
 		

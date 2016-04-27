@@ -20,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 import at.AT;
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import lang.Lang;
 import utils.Converter;
 
@@ -130,7 +131,7 @@ public class ATDetailsFrame extends JFrame {
 
 		//QUANTITY
 		detailGBC.gridy = 5;
-		JTextField txtQuantity = new JTextField(new Account(Base58.encode(at.getId())).getConfirmedBalance().toPlainString());
+		JTextField txtQuantity = new JTextField(new Account(Base58.encode(at.getId())).getConfirmedBalance(Transaction.FEE_KEY).toPlainString());
 		txtQuantity.setEditable(false);
 		this.add(txtQuantity, detailGBC);		
 

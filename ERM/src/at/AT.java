@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import database.DBSet;
 
 public class AT extends AT_Machine_State {
@@ -168,7 +169,7 @@ public class AT extends AT_Machine_State {
 	public JSONObject toJSON()
 	{
 		JSONObject atJSON = new JSONObject();
-		atJSON.put("accountBalance", new Account(Base58.encode(getId())).getConfirmedBalance().toPlainString() );
+		atJSON.put("accountBalance", new Account(Base58.encode(getId())).getConfirmedBalance(Transaction.FEE_KEY).toPlainString() );
 		atJSON.put("name", this.name);
 		atJSON.put("description", description);
 		atJSON.put("type", type);

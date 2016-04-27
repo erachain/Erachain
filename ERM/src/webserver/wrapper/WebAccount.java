@@ -3,6 +3,7 @@ package webserver.wrapper;
 import java.math.BigDecimal;
 
 import core.account.Account;
+import core.transaction.Transaction;
 
 /**
  * Web respresentation of an Account for read only usage with pebble
@@ -18,7 +19,7 @@ public class WebAccount {
 	public WebAccount(Account account) {
 		
 		address = account.getAddress();
-		balance = account.getBalance(0);
+		balance = account.getBalance(0, Transaction.FEE_KEY);
 		stringRepresentation = account.toString();
 	}
 

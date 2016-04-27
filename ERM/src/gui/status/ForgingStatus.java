@@ -18,6 +18,7 @@ import utils.ObserverMessage;
 import controller.Controller;
 import core.BlockGenerator;
 import core.account.Account;
+import core.transaction.Transaction;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -46,7 +47,7 @@ public class ForgingStatus extends JLabel implements Observer {
 		           	
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
-			        	totalBalance = totalBalance.add(account.getConfirmedBalance());
+			        	totalBalance = totalBalance.add(account.getConfirmedBalance(Transaction.RIGHTS_KEY));
 			        }
 			        long totalBalanceInt = totalBalance.longValue();
 		            

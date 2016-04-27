@@ -451,7 +451,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -711,7 +711,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -745,7 +745,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER

@@ -642,7 +642,7 @@ public class Wallet extends Observable implements Observer
 		{
 			for(Account account: accounts)
 			{
-				this.database.getAccountMap().update(account, account.getConfirmedBalance());
+				this.database.getAccountMap().update(account, account.getConfirmedBalance(Transaction.FEE_KEY));
 			}
 		}
 		LOGGER.info("Resetted balances");

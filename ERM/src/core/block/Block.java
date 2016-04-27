@@ -737,7 +737,7 @@ public class Block {
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.generator.setConfirmedBalance(this.generator.getConfirmedBalance(db).add(blockFee), db);
+			this.generator.setConfirmedBalance(Transaction.FEE_KEY, this.generator.getConfirmedBalance(Transaction.FEE_KEY, db).add(blockFee), db);
 		}
 
 		Block parent = this.getParent(db);
@@ -796,14 +796,14 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setConfirmedBalance( recipient.getConfirmedBalance( db ).subtract( BigDecimal.valueOf( amount, 8 ) ) , db );
+				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  db ).subtract( BigDecimal.valueOf( amount, 8 ) ) , db );
 				if ( Arrays.equals(recipient.getLastReference(db),new byte[64]))
 				{
 					recipient.removeReference(db);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setConfirmedBalance( sender.getConfirmedBalance( db ).add( BigDecimal.valueOf( amount, 8 ) ) , db );
+			sender.setConfirmedBalance(Transaction.FEE_KEY,  sender.getConfirmedBalance(Transaction.FEE_KEY,  db ).add( BigDecimal.valueOf( amount, 8 ) ) , db );
 
 		}
 
@@ -815,7 +815,7 @@ public class Block {
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.generator.setConfirmedBalance(this.generator.getConfirmedBalance(db).subtract(blockFee), db);
+			this.generator.setConfirmedBalance(Transaction.FEE_KEY, this.generator.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(blockFee), db);
 		}
 
 		//DELETE AT TRANSACTIONS FROM DB

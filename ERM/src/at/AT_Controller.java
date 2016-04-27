@@ -23,6 +23,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.transaction.Transaction;
 import database.DBSet;
 
 public abstract class AT_Controller {
@@ -308,7 +309,7 @@ public abstract class AT_Controller {
 						at.setG_balance( 0L );
 					}
 
-					AT_Transaction feeTx = new AT_Transaction( at.getId() , new byte[ AT_Constants.AT_ID_SIZE ], fee , null );
+					AT_Transaction feeTx = new AT_Transaction( at.getId() , new byte[ AT_Constants.AT_ID_SIZE ], Transaction.FEE_KEY , fee, null );
 					at.addTransaction( feeTx );
 
 					payload += costOfOneAT;
@@ -414,7 +415,7 @@ public abstract class AT_Controller {
 
 				//atFees.put( Base58.encode( atId ) , fee );
 
-				AT_Transaction feeTx = new AT_Transaction( atId, new byte[ AT_Constants.AT_ID_SIZE ], fee , null );
+				AT_Transaction feeTx = new AT_Transaction( atId, new byte[ AT_Constants.AT_ID_SIZE ], Transaction.FEE_KEY , fee, null );
 				at.addTransaction( feeTx );
 
 				//totalFee += fee;
@@ -443,7 +444,7 @@ public abstract class AT_Controller {
 		{
 			String atId = Base58.encode( at.getId() );
 			Account account = new Account(atId);
-			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getConfirmedBalance(dbSet));
+			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getConfirmedBalance(Transaction.FEE_KEY, dbSet));
 			//atLastState.put( atId ,  tempAtStates.get( atId ) );
 			dbSet.getATMap().update( at , blockHeight );
 			dbSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
@@ -546,14 +547,14 @@ public abstract class AT_Controller {
 					{
 						recipient.setLastReference(new byte[64], dbSet);
 					}
-					recipient.setConfirmedBalance( recipient.getConfirmedBalance( dbSet ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
+					recipient.setConfirmedBalance( Transaction.FEE_KEY, recipient.getConfirmedBalance( Transaction.FEE_KEY, dbSet ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
 				}
 				else
 				{
 					totalFees += tx.getAmount();
 				}
-				sender.setConfirmedBalance( sender.getConfirmedBalance( dbSet ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
-				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getConfirmedBalance(dbSet));
+				sender.setConfirmedBalance( Transaction.FEE_KEY, sender.getConfirmedBalance( Transaction.FEE_KEY, dbSet ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
+				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getConfirmedBalance(Transaction.FEE_KEY, dbSet));
 			}
 
 		}
@@ -570,7 +571,7 @@ public abstract class AT_Controller {
 	{
 		Account account = new Account( Base58.encode( id ) );
 
-		BigDecimal balance = account.getConfirmedBalance( dbSet );
+		BigDecimal balance = account.getConfirmedBalance( Transaction.FEE_KEY, dbSet );
 
 		byte[] balanceBytes = balance.unscaledValue().toByteArray();
 		byte[] fill = new byte[8 - balanceBytes.length];

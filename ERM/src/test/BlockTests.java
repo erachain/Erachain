@@ -499,20 +499,20 @@ public class BlockTests
 		
 		//CHECK BALANCE GENERATOR
 		assertEquals(generator.getConfirmedBalance(ERM_KEY, databaseSet), BigDecimal.valueOf(990).setScale(8));
-		assertEquals(generator.getConfirmedBalance(databaseSet), BigDecimal.valueOf(900).setScale(8));
+		assertEquals(generator.getConfirmedBalance(FEE_KEY, databaseSet), BigDecimal.valueOf(900).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
 		assertEquals(true, Arrays.equals(generator.getLastReference(databaseSet), payment2.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT
 		assertEquals(recipient.getConfirmedBalance(ERM_KEY, databaseSet), BigDecimal.valueOf(10).setScale(8));
-		assertEquals(recipient.getConfirmedBalance(databaseSet), BigDecimal.valueOf(100).setScale(8));
+		assertEquals(recipient.getConfirmedBalance(FEE_KEY, databaseSet), BigDecimal.valueOf(100).setScale(8));
 		
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT2
-		assertEquals(recipient2.getConfirmedBalance(databaseSet), BigDecimal.valueOf(0).setScale(8));
+		assertEquals(recipient2.getConfirmedBalance(FEE_KEY, databaseSet), BigDecimal.valueOf(0).setScale(8));
 				
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(recipient2.getLastReference(databaseSet), payment2.getSignature()));
@@ -596,19 +596,19 @@ public class BlockTests
 		block.orphan(databaseSet);
 		
 		//CHECK BALANCE GENERATOR
-		assertEquals(true, generator.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
+		assertEquals(true, generator.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
 		
 		//CHECK LAST REFERENCE GENERATOR
 		assertEquals(true, Arrays.equals(generator.getLastReference(databaseSet), genesisBlock.getGeneratorSignature()));
 		
 		//CHECK BALANCE RECIPIENT
-		assertEquals(true, recipient.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
+		assertEquals(true, recipient.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
 		
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT2
-		assertEquals(true, recipient2.getConfirmedBalance(databaseSet).compareTo(BigDecimal.valueOf(0)) == 0);
+		assertEquals(true, recipient2.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(0)) == 0);
 				
 		//CHECK LAST REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(recipient2.getLastReference(databaseSet), new byte[0]));
