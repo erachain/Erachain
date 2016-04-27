@@ -44,7 +44,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_SIZE = 8;
 	
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
-	ItemAssetMap dbItemAssetMap;
+	//ItemAssetMap dbItemAssetMap;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{
 			"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
@@ -54,7 +54,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public WalletTransactionsTableModel()
 	{
 		Controller.getInstance().addWalletListener(this);
-		dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+		//dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+		
 	}
 	
 	@Override
@@ -111,13 +112,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				recipient = transAmo.getRecipient();
-				ItemCls item = dbItemAssetMap.get(transAmo.getKey());
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getKey());
 				itemName = item.toString();
 			} else if ( transaction instanceof GenesisTransferAssetTransaction)
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
 				recipient = transGen.getRecipient();				
-				ItemCls item = dbItemAssetMap.get(transGen.getKey());
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
 				itemName = item.toString();
 			} else if ( transaction instanceof Issue_ItemRecord)
 			{

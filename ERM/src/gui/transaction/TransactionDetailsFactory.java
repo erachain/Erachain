@@ -15,6 +15,7 @@ import core.transaction.GenesisIssueNoteTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
 
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssuePersonRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
@@ -105,6 +106,11 @@ public class TransactionDetailsFactory
 			TransferAssetTransaction transferAssetTransaction = (TransferAssetTransaction) transaction;
 			return new TransferAssetDetailsFrame(transferAssetTransaction);		
 			
+		case Transaction.ISSUE_PERSON_TRANSACTION:
+			
+			IssuePersonRecord issuePerson = (IssuePersonRecord) transaction;
+			return new IssuePersonDetailsFrame(issuePerson);	
+
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			
 			CreateOrderTransaction createOrderTransaction = (CreateOrderTransaction) transaction;

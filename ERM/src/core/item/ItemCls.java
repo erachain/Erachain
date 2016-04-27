@@ -179,11 +179,13 @@ public abstract class ItemCls {
 	public String toString()
 	{		
 		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name;
+		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name;
 	}
 	
 	public String getShort()
 	{
 		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
 	}
 	
 	@SuppressWarnings("unchecked")
