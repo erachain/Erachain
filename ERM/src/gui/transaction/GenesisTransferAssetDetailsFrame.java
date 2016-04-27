@@ -69,9 +69,10 @@ public class GenesisTransferAssetDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Transfer Check Transaction"));
+		JLabel type = new JLabel(Lang.getInstance().translate(assetTransfer.getRecordType()));
 		this.add(type, detailGBC);
 				
+		/*
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
 		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
@@ -103,10 +104,11 @@ public class GenesisTransferAssetDetailsFrame extends JFrame
 		
 		//SENDER
 		detailGBC.gridy = 4;
-		JTextField sender = new JTextField(assetTransfer.getCreator().getAddress());
+		JTextField sender = new JTextField("genesis");
 		sender.setEditable(false);
 		MenuPopupUtil.installContextMenu(sender);
 		this.add(sender, detailGBC);
+		*/
 		
 		//LABEL RECIPIENT
 		labelGBC.gridy = 5;
@@ -122,7 +124,7 @@ public class GenesisTransferAssetDetailsFrame extends JFrame
 		
 		//LABEL ASSET
 		labelGBC.gridy = 6;
-		JLabel assetLabel = new JLabel(Lang.getInstance().translate("Check") + ":");
+		JLabel assetLabel = new JLabel(Lang.getInstance().translate("Asset") + ":");
 		this.add(assetLabel, labelGBC);
 		
 		//ASSET

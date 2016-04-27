@@ -60,7 +60,7 @@ public class GeneralTabPane extends JTabbedPane{
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
 		indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_ADDRESS, TransactionMap.ADDRESS_INDEX);
+		indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
 		indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
 		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
 		transactionsTable.setRowSorter(sorter);

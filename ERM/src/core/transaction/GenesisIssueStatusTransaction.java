@@ -35,7 +35,7 @@ public class GenesisIssueStatusTransaction extends GenesisIssue_ItemRecord
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_STATUS_TRANSACTION;
-	private static final String NAME_ID = "Genesis Issue Status";
+	private static final String NAME_ID = "GENESIS Issue Status";
 	
 	public GenesisIssueStatusTransaction(StatusCls status) 
 	{

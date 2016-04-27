@@ -31,7 +31,7 @@ import database.DBSet;
 public class GenesisCertifyPersonRecord extends Genesis_Record {
 
 	private static final byte TYPE_ID = (byte)Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
-	private static final String NAME_ID = "Genesis Certify Person";
+	private static final String NAME_ID = "GENESIS Certify Person";
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
 

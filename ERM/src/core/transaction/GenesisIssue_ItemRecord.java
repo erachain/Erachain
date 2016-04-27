@@ -139,4 +139,11 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 
 	}
 
+	/*
+	@Override
+	public boolean isInvolved(Account account) 
+	{
+		return true;
+	}
+	*/
 }
