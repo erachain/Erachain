@@ -416,8 +416,10 @@ public abstract class Transaction {
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
 		
-		// use this.reference in any case
-		byte[] data = this.toBytes( asPack, null );
+		// use this.reference in any case and for Pack too
+		// nut not with SIGN
+		boolean withSign = false;
+		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);

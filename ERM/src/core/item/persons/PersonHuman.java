@@ -45,6 +45,7 @@ public class PersonHuman extends PersonCls {
 	public String getItemSubType() { return "human"; }
 
 	//PARSE
+	// TODO - когда нулевая длдлинна и ошибка - но в ГУИ ошибка нне высветилась и создалась плоая запись и она развалила сеть
 	// includeReference - TRUE only for store in local DB
 	public static PersonHuman parse(byte[] data, boolean includeReference) throws Exception
 	{	
@@ -106,7 +107,7 @@ public class PersonHuman extends PersonCls {
 		int raceLength = Byte.toUnsignedInt(data[position]);
 		position ++;
 		
-		if(raceLength < 1 || raceLength > MAX_RACE_LENGTH)
+		if(raceLength < 0 || raceLength > MAX_RACE_LENGTH)
 		{
 			throw new Exception("Invalid race length");
 		}
@@ -127,7 +128,7 @@ public class PersonHuman extends PersonCls {
 		int skinColorLength = Byte.toUnsignedInt(data[position]);
 		position ++;
 		
-		if(skinColorLength < 1 || skinColorLength > MAX_SKIN_COLOR_LENGTH)
+		if(skinColorLength < 0 || skinColorLength > MAX_SKIN_COLOR_LENGTH)
 		{
 			throw new Exception("Invalid skin color length");
 		}
@@ -140,7 +141,7 @@ public class PersonHuman extends PersonCls {
 		int eyeColorLength = Byte.toUnsignedInt(data[position]);
 		position ++;
 		
-		if(eyeColorLength < 1 || eyeColorLength > MAX_EYE_COLOR_LENGTH)
+		if(eyeColorLength < 0 || eyeColorLength > MAX_EYE_COLOR_LENGTH)
 		{
 			throw new Exception("Invalid eye color length");
 		}
@@ -153,7 +154,7 @@ public class PersonHuman extends PersonCls {
 		int hairСolorLength = Byte.toUnsignedInt(data[position]);
 		position ++;
 		
-		if(hairСolorLength < 1 || hairСolorLength > MAX_HAIR_COLOR_LENGTH)
+		if(hairСolorLength < 0 || hairСolorLength > MAX_HAIR_COLOR_LENGTH)
 		{
 			throw new Exception("Invalid hair color length");
 		}

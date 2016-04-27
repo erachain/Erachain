@@ -204,10 +204,10 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user));
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
-				this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
+				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
 
 			}
 
@@ -228,10 +228,10 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user));
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
-				this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
+				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
 
 			}
 
@@ -252,10 +252,10 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user));
+				///this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
-				this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
+				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
 
 			}
 			
