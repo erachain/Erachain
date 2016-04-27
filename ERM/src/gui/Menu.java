@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
 import gui.settings.SettingsFrame;
@@ -214,9 +215,9 @@ public class Menu extends JMenuBar
        
         // work menu
         
-        JMenu workMenu = new JMenu(Lang.getInstance().translate("Work"));
-        workMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Work"));
-        this.add(workMenu);
+        JMenu PersonMenu = new JMenu(Lang.getInstance().translate("Persons"));
+        PersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons"));
+        this.add(PersonMenu);
  /*        
         //Search person
         JMenuItem searchPerson = new JMenuItem(Lang.getInstance().translate("Search"));
@@ -253,13 +254,13 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        workMenu.add(accountsmenu);     
+        PersonMenu.add(accountsmenu);     
 
         // меню Persons
-        JMenuItem personsmenu = new JMenuItem(Lang.getInstance().translate("Persons"));
-        personsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons"));
+        JMenuItem Allpersonsmenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
+        Allpersonsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        personsmenu.addActionListener(new ActionListener()
+        Allpersonsmenu.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)
         	{
@@ -269,8 +270,23 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        workMenu.add(personsmenu);  
+        PersonMenu.add(Allpersonsmenu);  
         
+        // issue Person menu
+        JMenuItem Issuepersonmenu = new JMenuItem(Lang.getInstance().translate("Issue Person"));
+        Issuepersonmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue Person"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        Issuepersonmenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        // выводим окно или делаем фокус если уже открыто
+        		selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        PersonMenu.add(Issuepersonmenu);  
         
         
 	}

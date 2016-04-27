@@ -21,6 +21,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -38,7 +39,7 @@ import core.account.PrivateKeyAccount;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class IssuePersonFrame extends JFrame
+public class IssuePersonFrame extends JInternalFrame //JFrame
 {
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtScale;
@@ -69,7 +70,16 @@ public class IssuePersonFrame extends JFrame
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
+	//	this.setIconImages(icons);
+		
+		this.setVisible(true);
+		this.setMaximizable(true);
+		this.setTitle(Lang.getInstance().translate("Issue Person"));
+		this.setClosable(true);
+		this.setResizable(true);
+		setPreferredSize(new Dimension(500, 600));
+		this.setLocation(150, 20);
+		
 		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
@@ -123,7 +133,7 @@ public class IssuePersonFrame extends JFrame
         
         //LABEL NAME
       	labelGBC.gridy = gridy;
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+      	JLabel nameLabel = new JLabel("<HTML><p style='color:#ff0000'> " +Lang.getInstance().translate("Name") + ": </p></html>");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -275,7 +285,7 @@ public class IssuePersonFrame extends JFrame
         //PACK
 		this.pack();
         this.setResizable(false);
-        this.setLocationRelativeTo(null);
+   //     this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 	

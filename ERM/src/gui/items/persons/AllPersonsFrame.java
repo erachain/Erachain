@@ -1,6 +1,7 @@
 package gui.items.persons;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gui.CoreRowSorter;
+import gui.MainFrame;
 import lang.Lang;
 
 import javax.naming.ldap.SortKey;
@@ -79,13 +81,17 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		this.setSize(500, 500);
+	//	MainFrame mainFram = new MainFrame();
+	
 		this.setVisible(true);
 		this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Persons"));
 		this.setClosable(true);
 		this.setResizable(true);
+		
 	
+		
+		this.setLocation(50, 20);
 	//	this.setIconImages(icons);
 		
 		//CLOSE
@@ -132,13 +138,14 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		//account TABLe
 		GridBagConstraints tableAccount = new GridBagConstraints();
 		tableAccount.insets = new Insets(0, 5, 5, 0);
-		tableAccount.fill = GridBagConstraints.BOTH;  
-		tableAccount.anchor = GridBagConstraints.NORTHWEST;
-		tableAccount.weightx = 1;	
-		tableAccount.weighty = 1;	
+		tableAccount.fill = GridBagConstraints.BOTH;
+		tableAccount.gridwidth = GridBagConstraints.REMAINDER; 
+		tableAccount.anchor = GridBagConstraints.NORTH;//.NORTHWEST;
+		tableAccount.weightx = 1.0;	
+		tableAccount.weighty = 1.0;	
 		tableAccount.gridwidth = 2;
-		tableAccount.gridx = 0;	
-		tableAccount.gridy = 2;		
+		tableAccount.gridx =15;	
+		tableAccount.gridy = 1;		
 		
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
@@ -296,7 +303,8 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		
 //Address1.setText( personsTable.getValueAt(personsTable.getSelectedRow(),0).toString());
 		// MENU
-		JPopupMenu nameSalesMenu = new JPopupMenu();
+	/*
+	JPopupMenu nameSalesMenu = new JPopupMenu();
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 		details.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -310,6 +318,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		nameSalesMenu.add(details);
 
 		personsTable.setComponentPopupMenu(nameSalesMenu);
+*/		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -321,7 +330,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				{
 					row = personsTable.convertRowIndexToModel(row);
 					PersonCls person = tableModelPersons.getPerson(row);
-					new PersonFrame(person);
+		//			new PersonFrame(person);
 				}
 			}
 		});
@@ -334,7 +343,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 
 		this.add(new JScrollPane(personsTable), tableGBC);
 		this.add(new JScrollPane(Address1), tableAccount);
-	
+		setPreferredSize(new Dimension(1000, 600));
 		//PACK
 		this.pack();
 		//this.setSize(500, this.getHeight());

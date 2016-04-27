@@ -16,6 +16,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.border.EmptyBorder;
 
 import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -81,7 +82,7 @@ public static  JDesktopPane desktopPane;
         
        // JInternalFrame Jfacc = new AccountsPanel();
         
-        desktopPane.add(new AllPersonsFrame());
+        desktopPane.add(new IssuePersonFrame());
         desktopPane.add(new AccountsPanel());
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
