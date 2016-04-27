@@ -25,7 +25,7 @@ public class IssueStatusMap extends Issue_ItemMap
 	{
 		super(parent);
 	}
-	
+
 	/*
 	protected void createIndexes(DB database){}
 

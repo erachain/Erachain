@@ -28,19 +28,19 @@ import core.item.assets.AssetFactory;
 import database.ItemAssetBalanceMap;
 import database.DBSet;
 
-public class IssueAssetTransaction extends Transaction 
+public class IssueAssetTransaction extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Issue Asset";
 
 	//private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-	private AssetCls asset;
+	//private AssetCls asset;
 	
 	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
-		this.asset = asset;
+		super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);		
+		//this.asset = asset;
 	}
 	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -71,11 +71,14 @@ public class IssueAssetTransaction extends Transaction
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Asset"; }
 
-	public AssetCls getAsset()
+	/*
+	public AssetCls getItem()
 	{
 		return this.asset;
 	}
+	*/
 	
+	/*
 	
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)
@@ -83,6 +86,7 @@ public class IssueAssetTransaction extends Transaction
 		super.sign(creator, asPack);
 		this.asset.setReference(this.signature);
 	}
+	*/
 
 	//PARSE CONVERT
 	
@@ -91,15 +95,12 @@ public class IssueAssetTransaction extends Transaction
 	public JSONObject toJson() 
 	{
 		//GET BASE
-		JSONObject transaction = this.getJsonBase();
-				
+		JSONObject transaction = super.toJson();
+		AssetCls asset = (AssetCls)this.getItem(); 
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put("creator", this.getAsset().getCreator().getAddress());
-		transaction.put("name", this.getAsset().getName());
-		transaction.put("description", this.getAsset().getDescription());
-		transaction.put("quantity", this.getAsset().getQuantity());
-		transaction.put("scale", this.getAsset().getScale());
-		transaction.put("divisible", this.getAsset().isDivisible());
+		transaction.put("quantity", asset.getQuantity());
+		transaction.put("scale", asset.getScale());
+		transaction.put("divisible", asset.isDivisible());
 				
 		return transaction;	
 	}
@@ -127,13 +128,11 @@ public class IssueAssetTransaction extends Transaction
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		byte[] reference = null;
 		if (!asPack) {
 			//READ REFERENCE
 			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 			position += REFERENCE_LENGTH;
-		} else {
-			reference = releaserReference;
 		}
 		
 		//READ CREATOR
@@ -168,6 +167,7 @@ public class IssueAssetTransaction extends Transaction
 	}	
 	
 	
+	/*
 	//@Override
 	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
 	{
@@ -180,7 +180,9 @@ public class IssueAssetTransaction extends Transaction
 				
 		return data;
 	}
+	*/
 	
+	/*
 	@Override
 	public int getDataLength(boolean asPack)
 	{
@@ -191,6 +193,7 @@ public class IssueAssetTransaction extends Transaction
 			return BASE_LENGTH + this.asset.getDataLength(false);
 		}
 	}
+	*/
 	
 	//VALIDATE
 		
@@ -198,29 +201,18 @@ public class IssueAssetTransaction extends Transaction
 	public int isValid(DBSet db, byte[] releaserReference) 
 	{
 		
-		//CHECK NAME LENGTH
-		int nameLength = this.asset.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > AssetCls.MAX_NAME_LENGTH || nameLength < 1)
-		{
-			return INVALID_NAME_LENGTH;
-		}
-		
-		//CHECK DESCRIPTION LENGTH
-		int descriptionLength = this.asset.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000 || descriptionLength < 1)
-		{
-			return INVALID_DESCRIPTION_LENGTH;
-		}
+		int result = super.isValid(db, releaserReference);
+		if(result != Transaction.VALIDATE_OK) return result;
 		
 		//CHECK QUANTITY
-		long maxQuantity = this.asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-		if(this.asset.getQuantity() < 1 || this.asset.getQuantity() > maxQuantity)
+		AssetCls asset = (AssetCls)this.getItem();
+		long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+		if(asset.getQuantity() < 1 || asset.getQuantity() > maxQuantity)
 		{
 			return INVALID_QUANTITY;
 		}
 		
-		return super.isValid(db, releaserReference);
-
+		return Transaction.VALIDATE_OK;
 	}
 	
 	//PROCESS/ORPHAN
@@ -230,21 +222,11 @@ public class IssueAssetTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
-								
-		this.asset.setReference(this.signature);
-		
-		//INSERT INTO DATABASE
-		long key = db.getItemAssetMap().add(this.asset);
-		//this.asset.setKey(key);
-		
+										
 		//ADD ASSETS TO OWNER
-		//this.asset.getCreator().setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
-		this.creator.setConfirmedBalance(key, new BigDecimal(this.asset.getQuantity()).setScale(8), db);
+		this.creator.setConfirmedBalance(this.getItem().getKey(),
+				new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(8), db);
 		
-		//SET ORPHAN DATA
-		db.getIssueAssetMap().set(this.signature, key);
-
-		//LOGGER.info("issue ASSET KEY: " + asset.getKey(db));
 
 	}
 
@@ -253,20 +235,12 @@ public class IssueAssetTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
-				
-		//DELETE FROM DATABASE
-		long key = db.getIssueAssetMap().get(this);
-		db.getItemAssetMap().delete(key);	
-		
+
 		//REMOVE ASSETS FROM OWNER
-		//this.asset.getCreator().setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
-		this.creator.setConfirmedBalance(key, BigDecimal.ZERO.setScale(8), db);
-		
-		//DELETE ORPHAN DATA
-		db.getIssueAssetMap().delete(this);
+		this.creator.setConfirmedBalance(this.getItem().getKey(), BigDecimal.ZERO.setScale(8), db);
 	}
 
-
+	/*
 	@Override
 	public HashSet<Account> getInvolvedAccounts() 
 	{
@@ -293,7 +267,7 @@ public class IssueAssetTransaction extends Transaction
 		
 		return false;
 	}
-
+	*/
 
 	//@Override
 	public BigDecimal viewAmount(Account account) 
@@ -314,8 +288,10 @@ public class IssueAssetTransaction extends Transaction
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		
-		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), this.asset.getKey(), new BigDecimal(this.asset.getQuantity()).setScale(8));
+
+		AssetCls asset = (AssetCls)this.getItem();
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(),
+				new BigDecimal(asset.getQuantity()).setScale(8));
 
 		return assetAmount;
 	}

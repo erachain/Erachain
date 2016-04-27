@@ -25,6 +25,7 @@ public class IssueUnionMap extends Issue_ItemMap
 	{
 		super(parent);
 	}
+
 	/*
 	protected void createIndexes(DB database){}
 

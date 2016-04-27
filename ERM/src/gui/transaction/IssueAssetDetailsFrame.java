@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
+import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
 import lang.Lang;
 import utils.DateTimeFormat;
@@ -128,7 +129,7 @@ public class IssueAssetDetailsFrame extends JFrame
 				
 		//OWNER
 		detailGBC.gridy = 5;
-		JTextField owner = new JTextField(assetIssue.getAsset().getCreator().getAddress());
+		JTextField owner = new JTextField(assetIssue.getItem().getCreator().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
@@ -140,7 +141,7 @@ public class IssueAssetDetailsFrame extends JFrame
 		
 		//NAME
 		detailGBC.gridy = 6;
-		JTextField name = new JTextField(assetIssue.getAsset().getName());
+		JTextField name = new JTextField(assetIssue.getItem().getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -152,7 +153,7 @@ public class IssueAssetDetailsFrame extends JFrame
 				
 		//DESCRIPTION
 		detailGBC.gridy = 7;
-		JTextArea txtAreaDescription = new JTextArea(assetIssue.getAsset().getDescription());
+		JTextArea txtAreaDescription = new JTextArea(assetIssue.getItem().getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
@@ -166,7 +167,7 @@ public class IssueAssetDetailsFrame extends JFrame
 				
 		//QUANTITY
 		detailGBC.gridy = 8;
-		JTextField quantity = new JTextField(assetIssue.getAsset().getQuantity().toString());
+		JTextField quantity = new JTextField(((AssetCls)assetIssue.getItem()).getQuantity().toString());
 		quantity.setEditable(false);
 		MenuPopupUtil.installContextMenu(quantity);
 		this.add(quantity, detailGBC);	
@@ -179,7 +180,7 @@ public class IssueAssetDetailsFrame extends JFrame
 		//QUANTITY
 		detailGBC.gridy = 9;
 		JCheckBox divisible = new JCheckBox();
-		divisible.setSelected(assetIssue.getAsset().isDivisible());
+		divisible.setSelected(((AssetCls)assetIssue.getItem()).isDivisible());
 		divisible.setEnabled(false);
 		this.add(divisible, detailGBC);	
 		

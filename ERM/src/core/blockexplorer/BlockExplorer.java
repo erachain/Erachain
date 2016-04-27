@@ -1042,7 +1042,7 @@ public class BlockExplorer
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getCreator().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction)transaction);
-			if(issueAssetTransaction.getAsset().getName().equals(asset.getName()))
+			if(issueAssetTransaction.getItem().getName().equals(asset.getName()))
 			{
 				assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
 				assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
@@ -1582,11 +1582,11 @@ public class BlockExplorer
 
 			if(transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) 
 			{
-				long assetkey = ((IssueAssetTransaction) transaction).getAsset().getKey();
+				long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
 				
 				transactionDataJSON.put("asset", assetkey);
 				
-				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getAsset().getName());
+				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
 			}
 
 			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 

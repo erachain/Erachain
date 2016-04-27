@@ -1388,10 +1388,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getAsset().getCreator().getAddress()))
+		if(this.accountExists(assetIssue.getItem().getCreator().getAddress()))
 		{
 			//ADD ASSET
-			this.database.getAssetMap().add(assetIssue.getAsset());
+			this.database.getAssetMap().add(assetIssue.getItem());
 		}
 	}
 	
@@ -1404,10 +1404,10 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getAsset().getCreator().getAddress()))
+		if(this.accountExists(assetIssue.getItem().getCreator().getAddress()))
 		{
 			//DELETE ASSET
-			this.database.getAssetMap().delete(assetIssue.getAsset());
+			this.database.getAssetMap().delete(assetIssue.getItem());
 		}
 	}
 

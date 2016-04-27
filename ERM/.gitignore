@@ -10,3 +10,4 @@
 peers.json
 settings.json
 *.zip
+/log.txt.1
