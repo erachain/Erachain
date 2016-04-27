@@ -854,7 +854,7 @@ public class TransactionTests {
 		nameSaleTransaction.process(databaseSet, false);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(Transaction.NAME_ALREADY_FOR_SALE, nameSaleTransaction.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.NAME_ALREADY_ON_SALE, nameSaleTransaction.isValid(databaseSet, releaserReference));
 	}
 
 	@Test
@@ -1842,19 +1842,19 @@ public class TransactionTests {
 		pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
 		
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.POLL_NO_EXISTS, pollVote.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE INVALID OPTION
 		pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
 		
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.OPTION_NO_EXISTS, pollVote.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE INVALID OPTION
 		pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
 				
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.OPTION_NO_EXISTS, pollVote.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CRTEATE INVALID POLL VOTE VOTED ALREADY
 		pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));

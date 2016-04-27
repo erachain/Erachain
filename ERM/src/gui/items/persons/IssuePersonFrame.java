@@ -13,6 +13,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.transaction.Transaction;
+import gui.transaction.TransactionErrorPan;
 
 @SuppressWarnings("serial")
 public class IssuePersonFrame extends JInternalFrame //JFrame
@@ -182,10 +184,6 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       	//this.txtGender.setText("1");
         this.add(this.txtGender, txtGBC);
         
-       
-        	
-        
-        
         
         
         //LABEL Birthday
@@ -195,9 +193,9 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       		
       	//TXT Birthday
       	txtGBC.gridy = gridy++;
-      	//this.txtBirthday = new JTextField();
-      	this.txtBirthday = new JFormattedTextField(new Date()); 
-     // 	this.txtBirthday.setText("2");
+      	this.txtBirthday = new JTextField();
+      	//this.txtBirthday = new JFormattedTextField(new Date()); 
+      	this.txtBirthday.setText("1970-08-12");
         this.add(this.txtBirthday, txtGBC);
         
         
@@ -360,81 +358,90 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 		//READ CREATOR
 		Account sender = (Account) this.cbxFrom.getSelectedItem();
 
-		long parse = 0;
+		int parse = 0;
+		int feePow = 0;
+		byte gender = 0;
+		long birthday = 0;
+		float birthLatitude = 0;
+		float birthLongitude = 0;
+		int height = 0;
 		try
 		{
 			
 			//READ FEE POW
-			int feePow = Integer.parseInt(this.txtFeePow.getText());
+			feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ GENDER
-			byte gender = (byte) (this.txtGender.getSelectedIndex());
-			long birthday = Long.parseLong(this.txtBirthday.getText());
+			parse++;
+			gender = (byte) (this.txtGender.getSelectedIndex());
 			
-			float birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
-			float birthLongitude = Float.parseFloat(this.txtBirthLongitude.getText());
-
-			int height = Integer.parseInt(this.txtHeight.getText());
-						
-			//CREATE ASSET
-			//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
-			//byte gender, String race, float birthLatitude, float birthLongitude,
-			//String skinColor, String eyeColor, String hairСolor, int height, String description
-			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
-					creator, this.txtName.getText(), feePow, birthday,
-					gender, this.txtRace.getText(), birthLatitude, birthLongitude,
-					this.txtSkinColor.getText(), this.txtEyeColor.getText(),
-					this.txtHairСolor.getText(), height, this.txtareaDescription.getText()
-					);
+			parse++;
+			//birthday = Long.parseLong(this.txtBirthday.getText());
+			// 1970-08-12 03:05:07
+			String bd = this.txtBirthday.getText();
+			if (bd.length() < 11) bd = bd + " 00:00:00";
+			Timestamp ts = Timestamp.valueOf(bd);
+			birthday = ts.getTime();
 			
-			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				this.dispose();
-				break;	
-								
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-												
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_DESCRIPTION_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
+			parse++;
+			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
+			
+			parse++;
+			birthLongitude = Float.parseFloat(this.txtBirthLongitude.getText());
 
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			}
+			parse++;
+			height = Integer.parseInt(this.txtHeight.getText());
+			
 		}
 		catch(Exception e)
 		{
-			if(parse == 0)
+			String mess = "Invalid pars... " + parse;
+			switch(parse)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			case 0:
+				mess = "Invalid fee power 0..6";
+				break;
+			case 1:
+				mess = "Invalid gender";
+				break;
+			case 2:
+				mess = "Invalid birthday [YYYY-MM-DD]";
+				break;
+			case 3:
+				mess = "Invalid birth Latitude -180..180";
+				break;
+			case 4:
+				mess = "Invalid birth Longitude -90..90";
+				break;
+			case 5:
+				mess = "Invalid height 10..255 ";
+				break;
 			}
-			else
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			
+			this.issueButton.setEnabled(true);
+			return;
+		}
+						
+		//CREATE ASSET
+		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+		//byte gender, String race, float birthLatitude, float birthLongitude,
+		//String skinColor, String eyeColor, String hairСolor, int height, String description
+		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
+				creator, this.txtName.getText(), feePow, birthday,
+				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
+				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
+				this.txtHairСolor.getText(), height, this.txtareaDescription.getText()
+				);
+		
+		//CHECK VALIDATE MESSAGE
+		if (result.getB() == Transaction.VALIDATE_OK) {
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			this.dispose();
+		} else {
+		
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(TransactionErrorPan.mess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE

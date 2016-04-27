@@ -190,7 +190,7 @@ public class UpdateNameTransaction extends Transaction
 		//CHECK IF NAMESALE EXISTS
 		if(db.getNameExchangeMap().contains(this.name.getName()))
 		{
-			return NAME_ALREADY_FOR_SALE;
+			return NAME_ALREADY_ON_SALE;
 		}
 		
 		//CHECK IF CREATOR IS CREATOR

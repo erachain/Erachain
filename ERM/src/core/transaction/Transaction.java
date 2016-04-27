@@ -49,7 +49,7 @@ public abstract class Transaction {
 	
 	public static final int NAME_DOES_NOT_EXIST = 10;
 	public static final int INVALID_NAME_CREATOR = 11;
-	public static final int NAME_ALREADY_FOR_SALE = 12;
+	public static final int NAME_ALREADY_ON_SALE = 12;
 	public static final int NAME_NOT_FOR_SALE = 13;
 	public static final int BUYER_ALREADY_OWNER = 14;
 	public static final int INVALID_AMOUNT = 15;
@@ -63,8 +63,8 @@ public abstract class Transaction {
 	public static final int DUPLICATE_OPTION = 21;
 	public static final int POLL_ALREADY_CREATED = 22;
 	public static final int POLL_ALREADY_HAS_VOTES = 23;
-	public static final int POLL_NO_EXISTS = 24;
-	public static final int OPTION_NO_EXISTS = 25;
+	public static final int POLL_NOT_EXISTS = 24;
+	public static final int OPTION_NOT_EXISTS = 25;
 	public static final int ALREADY_VOTED_FOR_THAT_OPTION = 26;
 	public static final int INVALID_DATA_LENGTH = 27;
 	
@@ -85,7 +85,7 @@ public abstract class Transaction {
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
-	public static final int INVALID_DURATION = 42;
+	public static final int INVALID_DATE = 42;
 
 	public static final int NOT_ENOUGH_RIGHTS = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
