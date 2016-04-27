@@ -41,7 +41,13 @@ public class Genesis_Record extends Transaction
 	}
 
 	//GETTERS/SETTERS
-	
+
+	@Override
+	public byte[] getReference()
+	{
+		return this.signature;
+	}			
+
 	public void generateSignature() {
 		
 		//return generateSignature1(this.recipient, this.amount, this.timestamp);

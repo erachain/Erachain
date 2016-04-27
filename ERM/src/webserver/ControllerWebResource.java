@@ -7,6 +7,7 @@ import java.util.List;
 import controller.Controller;
 import core.account.Account;
 import core.naming.Name;
+import core.transaction.Transaction;
 import webserver.wrapper.WebAccount;
 import webserver.wrapper.WebName;
 
@@ -38,7 +39,7 @@ private static ControllerWebResource instance = new ControllerWebResource();
 		for (Name name : myNames) {
 			if(Boolean.valueOf(removeZeroBalance))
 			{
-				if (name.getOwner().getBalance(0).compareTo(BigDecimal.ZERO) > 0) {
+				if (name.getOwner().getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) > 0) {
 					results.add(new WebName(name));
 				}
 				
@@ -62,7 +63,7 @@ private static ControllerWebResource instance = new ControllerWebResource();
 			for (Account account : realAccs) {
 				if(Boolean.valueOf(removeZeroBalance))
 				{
-					if (account.getBalance(0).compareTo(BigDecimal.ZERO) > 0) {
+					if (account.getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) > 0) {
 						results.add(new WebAccount(account));
 					}
 				}else

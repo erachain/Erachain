@@ -244,11 +244,24 @@ public class IssueNoteFrame extends JFrame
 		Account sender = (Account) this.cbxFrom.getSelectedItem();
 		
 		long parse = 0;
+		int feePow = 0;
 		try
 		{
 			
 			//READ FEE POW
-			int feePow = Integer.parseInt(this.txtFeePow.getText());
+			feePow = Integer.parseInt(this.txtFeePow.getText());
+		}
+		catch(Exception e)
+		{
+			if(parse == 0)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+		}
 						
 			//CREATE NOTE
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -290,18 +303,6 @@ public class IssueNoteFrame extends JFrame
 				break;		
 				
 			}
-		}
-		catch(Exception e)
-		{
-			if(parse == 0)
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
-		}
 		
 		//ENABLE
 		this.issueButton.setEnabled(true);

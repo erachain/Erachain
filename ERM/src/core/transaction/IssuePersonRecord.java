@@ -1,5 +1,6 @@
 package core.transaction;
 
+import java.math.BigDecimal;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
+import core.transaction.Transaction;
 //import database.ItemMap;
 import database.DBSet;
 
@@ -30,6 +32,7 @@ public class IssuePersonRecord extends IssueItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
+	
 	
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference) 
 	{
@@ -75,7 +78,12 @@ public class IssuePersonRecord extends IssueItemRecord
 		if (res != Transaction.VALIDATE_OK) return res;
 		
 		// CHECH MAKER IS PERSON?
-		if (!this.creator.isPerson(db)) return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		if (!this.creator.isPerson(db)
+				// OR RIGHTS_KEY ENOUGHT
+				&& this.creator.getConfirmedBalance(Transaction.RIGHTS_KEY, db)
+						.compareTo(new BigDecimal(1000)) < 0)
+			
+			return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		
 		return VALIDATE_OK;
 	

@@ -1374,13 +1374,13 @@ public class WebResource {
 			
 			for (Name name : resultingNames) {
 				// No balance account not shown
-				if (name.getOwner().getBalance(0).compareTo(BigDecimal.ZERO) <= 0) {
+				if (name.getOwner().getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
 					resultingNames.remove(name);
 				}
 			}
 
 			for (Account account : resultingAccounts) {
-				if (account.getBalance(0).compareTo(BigDecimal.ZERO) <= 0) {
+				if (account.getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
 					resultingAccounts.remove(account);
 				}
 			}
