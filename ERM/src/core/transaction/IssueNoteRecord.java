@@ -26,7 +26,7 @@ import core.item.notes.NoteFactory;
 //import database.ItemMap;
 import database.DBSet;
 
-public class IssueNoteRecord extends IssueItemRecord 
+public class IssueNoteRecord extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_NOTE_TRANSACTION;
 	private static final String NAME_ID = "Issue Note";

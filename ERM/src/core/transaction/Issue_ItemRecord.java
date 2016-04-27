@@ -24,7 +24,7 @@ import core.item.ItemCls;
 //import database.ItemItemMap;
 import database.DBSet;
 
-public abstract class IssueItemRecord extends Transaction 
+public abstract class Issue_ItemRecord extends Transaction 
 {
 
 	//private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
@@ -32,18 +32,18 @@ public abstract class IssueItemRecord extends Transaction
 
 	private ItemCls item;
 	
-	public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference) 
+	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 		this.item = item;
 	}
-	public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
 	}
-	public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) 
+	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) 
 	{
 		this(typeBytes, NAME_ID, creator, item, (byte)0, 0l, null);		
 		this.signature = signature;
@@ -111,7 +111,7 @@ public abstract class IssueItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 1)
+		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 3)
 		{
 			return INVALID_NAME_LENGTH;
 		}

@@ -98,6 +98,15 @@ public abstract class Transaction {
 	public static final int ITEM_PERSON_NOT_EXIST = 58;
 	public static final int ITEM_UNION_NOT_EXIST = 59;
 
+	public static final int ITEM_PERSON_LATITUDE_ERROR = 60;
+	public static final int ITEM_PERSON_LONGITUDE_ERROR = 61;
+	public static final int ITEM_PERSON_RACE_ERROR = 62;
+	public static final int ITEM_PERSON_GENDER_ERROR = 63;
+	public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 64;
+	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 65;
+	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 66;
+	public static final int ITEM_PERSON_HEIGHT_ERROR = 67;
+
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******
