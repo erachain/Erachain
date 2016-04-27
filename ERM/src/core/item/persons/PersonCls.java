@@ -116,8 +116,8 @@ public abstract class PersonCls extends ItemCls {
 	public String getHairСolor() {
 		return this.hairСolor;
 	}
-	public byte getHeight() {
-		return this.height;
+	public int getHeight() {
+		return Byte.toUnsignedInt(this.height);
 	}
 	
 	// DB

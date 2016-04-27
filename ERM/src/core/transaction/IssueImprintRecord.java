@@ -27,7 +27,7 @@ import core.item.imprints.Imprint;
 import database.DBSet;
 
 // reference - as item.name
-public class IssueImprintRecord extends IssueItemRecord 
+public class IssueImprintRecord extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_IMPRINT_TRANSACTION;
 	private static final String NAME_ID = "Issue Imprint";

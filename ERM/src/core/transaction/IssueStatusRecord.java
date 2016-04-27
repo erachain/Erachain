@@ -27,7 +27,7 @@ import core.item.statuses.StatusFactory;
 //import database.ItemMap;
 import database.DBSet;
 
-public class IssueStatusRecord extends IssueItemRecord 
+public class IssueStatusRecord extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Issue Status";

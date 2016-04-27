@@ -142,7 +142,7 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				long key = cbxFavorites.getItemAt(cbxFavorites.getSelectedIndex()).getKey();
-				StringSelection value = new StringSelection(account.getUnconfirmedBalance(key).toPlainString());
+				StringSelection value = new StringSelection(account.getConfirmedBalance(key).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});

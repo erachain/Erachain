@@ -28,7 +28,7 @@ import core.transaction.Transaction;
 //import database.ItemMap;
 import database.DBSet;
 
-public class IssuePersonRecord extends IssueItemRecord 
+public class IssuePersonRecord extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
@@ -76,6 +76,16 @@ public class IssuePersonRecord extends IssueItemRecord
 						
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) return res;
+		
+		PersonCls person = (PersonCls) this.getItem();
+		if (person.getBirthLatitude() > 180 || person.getBirthLatitude() < -180) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
+		if (person.getBirthLongitude() > 90 || person.getBirthLongitude() < -90) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
+		if (person.getRace().length() <1 || person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
+		if (person.getGender() < 0 || person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
+		if (person.getSkinColor().length() <1 || person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
+		if (person.getEyeColor().length() <1 || person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
+		if (person.getHairСolor().length() <1 || person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
+		if (person.getHeight() < 10 || person.getHeight() > 255) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
 		// CHECH MAKER IS PERSON?
 		if (!this.creator.isPerson(db)
