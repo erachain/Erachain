@@ -228,25 +228,48 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
+				String Date_Acti;
+				String Date_birs;
+				String message;
 				// TODO Auto-generated method stub
+				// устанавливаем формат даты
+				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 				//создаем объект персоны
 				PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
 				//читаем таблицу персон.
 				Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
 				// преобразование в дату
-				Date Acti = new Date(Long.valueOf(t3.a.toString()));
-				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-				Date birs= new Date(Long.valueOf(person.getBirthday()));
 				
-				String message ="<html><div></div><div> <p><b> Код: "   + person.getKey()        			+ "</p>"
-						+ "<p> <b> ИМЯ: "   			 + person.getName().toString()		+ "</p>" 
-				        + "<p> Действительно до: "   + formatDate.format(Acti)			+"</p>"
-				        + "<p> Дата рождения: "      + formatDate.format(birs)			+"</p>";
-				// Читаем адреса клиента
-				TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-		
-				message =message + "<p> Счет:  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div></html>";
-				Address1.setText( message);
+				
+				if (t3 != null){
+				Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
+				} else
+				{
+					Date_Acti =Lang.getInstance().translate("Not found!");}
+				
+				
+				
+				if (person.isConfirmed()){
+				 Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+				
+				 message ="<html><div></div><div> <p><b> Код: "   + person.getKey()        			+ "</p>"
+							+ "<p> <b> ИМЯ: "   			 + person.getName().toString()		+ "</p>" 
+					        + "<p> Действительно до: "   + Date_Acti			+"</p>"
+					        + "<p> Дата рождения: "      + Date_birs			+"</p>";
+					// Читаем адреса клиента
+					TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+			    if ( !Addresses.isEmpty()){
+					message =message + "<p> Счет:  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+			    }
+			    else{
+				message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
+				}
+				}else{
+				message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
+				}
+				message = message + "</html>";
+						
+				
 					//	personsTable.getValueAt(personsTable.getSelectedRow(),0).toString() +"  " +  personsTable.getValueAt(personsTable.getSelectedRow(),1).toString() 
 					//	+ " Статус:" + formatDate.format(d));	
 		//	AllPersonsFrame.this.resize(AllPersonsFrame.this.getSize());
@@ -254,8 +277,8 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				
 		//	String a = person.getName().toString();
 			
-			
-			//Address1.get
+				Address1.setText(message);
+			//.get
 			
 			
 			}
