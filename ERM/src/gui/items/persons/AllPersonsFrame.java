@@ -259,14 +259,14 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				if (person.isConfirmed()){
 				 Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
 				
-				 message ="<html><div></div><div> <p><b> Код: "   + person.getKey()        			+ "</p>"
-							+ "<p> <b> ИМЯ: "   			 + person.getName().toString()		+ "</p>" 
-					        + "<p> Действительно до: "   + Date_Acti			+"</p>"
-					        + "<p> Дата рождения: "      + Date_birs			+"</p>";
+				 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
+							+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + person.getName().toString()		+ "</p>" 
+					        + "<p>  "  + Lang.getInstance().translate("To do")  +":"        		  + Date_Acti			+"</p>"
+					        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>";
 					// Читаем адреса клиента
 					TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 			    if ( !Addresses.isEmpty()){
-					message =message + "<p> Счет:  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+					message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
 			    }
 			    else{
 				message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
@@ -338,7 +338,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 
         
 		
-		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
+		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 
 		this.add(new JScrollPane(personsTable), tableGBC);

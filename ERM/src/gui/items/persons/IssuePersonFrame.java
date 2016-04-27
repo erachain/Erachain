@@ -14,12 +14,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -47,7 +49,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
 	private JTextField txtBirthday;
-	private JTextField txtGender;
+	private JComboBox txtGender;
 	private JTextField txtRace;
 	private JTextField txtBirthLatitude;
 	private JTextField txtBirthLongitude;
@@ -60,6 +62,9 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 	public IssuePersonFrame()
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Person"));
+		
+		String colorText ="ff0000"; // цвет текста в форме
+		
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -77,7 +82,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 		this.setTitle(Lang.getInstance().translate("Issue Person"));
 		this.setClosable(true);
 		this.setResizable(true);
-		setPreferredSize(new Dimension(500, 600));
+		setPreferredSize(new Dimension(800, 600));
 		this.setLocation(150, 20);
 		
 		
@@ -133,7 +138,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
         
         //LABEL NAME
       	labelGBC.gridy = gridy;
-      	JLabel nameLabel = new JLabel("<HTML><p style='color:#ff0000'> " +Lang.getInstance().translate("Name") + ": </p></html>");
+      	JLabel nameLabel = new JLabel("<HTML><p style=':#" + colorText +"'>" +Lang.getInstance().translate("Name") + ": </p></html>");
       	this.add(nameLabel, labelGBC);
       		
       	//TXT NAME
@@ -163,12 +168,25 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       	labelGBC.gridy = gridy;
       	JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");
       	this.add(genderLabel, labelGBC);
-      		
+      	
+      	
+      	String[] items = {
+      			Lang.getInstance().translate("Man"),
+      			Lang.getInstance().translate("Woman"),
+      			Lang.getInstance().translate("-")
+        	};	
       	//TXT GENDER
       	txtGBC.gridy = gridy++;
-      	this.txtGender = new JTextField();
-      	this.txtGender.setText("1");
+      	//this.txtGender = new JTextField();
+      	 txtGender = new JComboBox(items);
+      	//this.txtGender.setText("1");
         this.add(this.txtGender, txtGBC);
+        
+       
+        	
+        
+        
+        
         
         //LABEL Birthday
       	labelGBC.gridy = gridy;
@@ -177,9 +195,25 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       		
       	//TXT Birthday
       	txtGBC.gridy = gridy++;
-      	this.txtBirthday = new JTextField();
-      	this.txtBirthday.setText("2");
+      	//this.txtBirthday = new JTextField();
+      	this.txtBirthday = new JFormattedTextField(new Date()); 
+     // 	this.txtBirthday.setText("2");
         this.add(this.txtBirthday, txtGBC);
+        
+        
+        
+
+      //. . . . . . . .
+
+      //Редактируем дату... Потом нажимаем клавишу <Enter>
+
+      //. . . . . . . .
+
+    //  public void actionPerformed(ActionEvent e){ newDate = (Date)ftf.getValue();
+
+    //  }
+        
+        
 
         //LABEL RACE
       	labelGBC.gridy = gridy;
@@ -334,7 +368,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ GENDER
-			byte gender = Byte.parseByte(this.txtGender.getText());
+			byte gender = (byte) (this.txtGender.getSelectedIndex());
 			long birthday = Long.parseLong(this.txtBirthday.getText());
 			
 			float birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
