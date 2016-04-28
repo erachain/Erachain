@@ -23,7 +23,7 @@ import org.mapdb.BTreeMap;
 import utils.ObserverMessage;
 import utils.Pair;
 import database.DBMap;
-import database.serializer.AssetSerializer;
+import database.serializer.ItemSerializer;
 import database.serializer.TransactionSerializer;
 public class WItemAssetMap extends WItem_Map
 {	
@@ -54,7 +54,7 @@ public class WItemAssetMap extends WItem_Map
 		//OPEN MAP
 		return database.createTreeMap(NAME)
 				.keySerializer(BTreeKeySerializer.TUPLE2)
-				.valueSerializer(new AssetSerializer())
+				.valueSerializer(new ItemSerializer(TYPE))
 				.counterEnable()
 				.makeOrGet();
 	}

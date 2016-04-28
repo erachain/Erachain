@@ -80,7 +80,7 @@ public static  JDesktopPane desktopPane;
     //    frame1.setClosable(true);
         frame1.setResizable(true);
         //ADD GENERAL TABPANE TO FRAME
-    //    desktopPane.add(frame1);
+        desktopPane.add(frame1);
         
        // JInternalFrame Jfacc = new AccountsPanel();
         

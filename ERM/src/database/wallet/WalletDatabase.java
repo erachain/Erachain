@@ -10,6 +10,7 @@ import core.item.assets.AssetCls;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
 
 import org.mapdb.DB;
@@ -37,11 +38,13 @@ public class WalletDatabase implements IDB
 	private WItemImprintMap imprintMap;
 	private WItemNoteMap noteMap;
 	private WItemPersonMap personMap;
+	private WItemStatusMap statusMap;
 	private WItemUnionMap unionMap;
 	private OrderMap orderMap;
 	private FavoriteItemAsset assetFavoritesSet;
 	private FavoriteItemNote noteFavoritesSet;
 	private FavoriteItemPerson personFavoritesSet;
+	private FavoriteItemStatus statusFavoritesSet;
 	private FavoriteItemUnion unionFavoritesSet;
 	
 	public static boolean exists()
@@ -75,11 +78,13 @@ public class WalletDatabase implements IDB
 	    this.imprintMap = new WItemImprintMap(this, this.database);
 	    this.noteMap = new WItemNoteMap(this, this.database);
 	    this.personMap = new WItemPersonMap(this, this.database);
+	    this.statusMap = new WItemStatusMap(this, this.database);
 	    this.unionMap = new WItemUnionMap(this, this.database);
 	    this.orderMap = new OrderMap(this, this.database);
 	    this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
 	    this.noteFavoritesSet = new FavoriteItemNote(this, this.database);
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
+	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
 	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
 	}
 	
@@ -172,6 +177,10 @@ public class WalletDatabase implements IDB
 	{
 		return this.personMap;
 	}
+	public WItemStatusMap getStatusMap()
+	{
+		return this.statusMap;
+	}
 	public WItemUnionMap getUnionMap()
 	{
 		return this.unionMap;
@@ -186,6 +195,8 @@ public class WalletDatabase implements IDB
 			return this.noteMap;
 		} else if (item instanceof PersonCls) { 
 			return this.personMap;
+		} else if (item instanceof StatusCls) { 
+			return this.statusMap;
 		} else if (item instanceof UnionCls) { 
 			return this.unionMap;
 		} else {
@@ -204,6 +215,8 @@ public class WalletDatabase implements IDB
 				return this.noteMap;
 			case ItemCls.PERSON_TYPE:
 				return this.personMap;
+			case ItemCls.STATUS_TYPE:
+				return this.statusMap;
 			case ItemCls.UNION_TYPE:
 				return this.unionMap;
 		}
@@ -258,6 +271,10 @@ public class WalletDatabase implements IDB
 	{
 		return this.personFavoritesSet;
 	}
+	public FavoriteItemStatus getStatusFavoritesSet()
+	{
+		return this.statusFavoritesSet;
+	}
 	public FavoriteItemUnion getUnionFavoritesSet()
 	{
 		return this.unionFavoritesSet;
@@ -272,6 +289,8 @@ public class WalletDatabase implements IDB
 			return this.noteFavoritesSet;
 		} else if (item instanceof PersonCls) { 
 			return this.personFavoritesSet;
+		} else if (item instanceof StatusCls) { 
+			return this.statusFavoritesSet;
 		} else if (item instanceof UnionCls) { 
 			return this.unionFavoritesSet;
 		} else {
@@ -292,6 +311,7 @@ public class WalletDatabase implements IDB
 		this.noteMap.delete(account);
 		this.unionMap.delete(account);
 		this.personMap.delete(account);
+		this.statusMap.delete(account);
 		this.orderMap.delete(account);
 	}
 	

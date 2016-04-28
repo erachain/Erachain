@@ -11,7 +11,7 @@ import core.item.assets.AssetCls;
 import database.DBSet;
 import database.Item_Map;
 import database.serializer.ItemSerializer;
-import database.serializer.AssetSerializer;
+//import database.serializer.AssetSerializer;
 import utils.ObserverMessage;
 
 public class ItemAssetMap extends Item_Map 

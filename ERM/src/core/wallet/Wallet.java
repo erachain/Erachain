@@ -967,6 +967,12 @@ public class Wallet extends Observable implements Observer
 		//REGISTER ON PERSONS
 		this.database.getPersonMap().addObserver(o);
 
+		//REGISTER ON STATUS
+		this.database.getStatusMap().addObserver(o);
+
+		//REGISTER ON UNION
+		this.database.getUnionMap().addObserver(o);
+
 		//REGISTER ON ORDERS
 		this.database.getOrderMap().addObserver(o);
 		
@@ -978,6 +984,12 @@ public class Wallet extends Observable implements Observer
 
 		//REGISTER ON PERSON FAVORITES
 		this.database.getPersonFavoritesSet().addObserver(o);
+
+		//REGISTER ON STATUS FAVORITES
+		this.database.getStatusFavoritesSet().addObserver(o);
+
+		//REGISTER ON UNION FAVORITES
+		this.database.getUnionFavoritesSet().addObserver(o);
 
 		//SEND STATUS
 		int status = STATUS_LOCKED;

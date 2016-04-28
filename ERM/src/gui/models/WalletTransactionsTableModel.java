@@ -124,6 +124,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
+				// SET SIGNATURE AND KEY for ITEM
+				item.setReference(transIssue.getSignature());
+				item.getKey();
 				itemName = item.toString();
 			}
 			
