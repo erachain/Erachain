@@ -135,17 +135,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_TIMESTAMP:
 				
-				long tt = transaction.getTimestamp();
-				return tt > 1000? DateTimeFormat.timestamptoString(transaction.getTimestamp()):"--";
+				return transaction.viewTimestamp();
 				
 			case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.getRecordType());
+				return Lang.getInstance().translate(transaction.viewTypeName());
 				
 			case COLUMN_CREATOR:
 				
-				return creator==null?"--":creator.getAddress();
+				return transaction.viewCreator();
 				
 			case COLUMN_ITEM:
 				return itemName;
@@ -160,21 +159,14 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_RECIPIENT:
 				
-				return recipient==null?"--":recipient.getAddress();
+				return transaction.viewRecipient();
 
 			case COLUMN_FEE:
 				
-				if (creator == null) return "--";
-
-				address = creator.getAddress();
-				
-				String fee = transaction.getFeePow() + ":"+transaction.getFee();
-				if(address.equals(transaction.getCreator().getAddress()))
-					return fee;
-				return "{" + fee + "}";			
+				return transaction.viewFee();			
 
 			case COLUMN_SIZE:
-				return transaction.getDataLength(false);
+				return transaction.viewSize(false);
 			}
 			
 			return null;

@@ -191,32 +191,29 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
 			this.delete(key);
 		}
 	}
-	
-	public void delete(ItemCls item)
+		
+	public void delete(String address, byte[] reference) 
 	{
-		this.delete(item.getCreator(), item);
+		this.delete(new Tuple2<String, String>(address, new String(reference)));	
 	}
 	
-	public void delete(Account account, ItemCls item) 
-	{
-		this.delete(new Tuple2<String, String>(account.getAddress(), new String(item.getReference())));	
-	}
-	
-	public void deleteAll(List<Account> accounts)
+	/*
+	public void deleteAll1(List<Account> accounts)
 	{
 		for(Account account: accounts)
 		{
 			this.delete(account);
 		}
 	}
+	*/
 	
-	public boolean add(ItemCls item)
+	public boolean add(String address, byte[] reference, ItemCls item)
 	{
-		return this.set(new Tuple2<String, String>(item.getCreator().getAddress(),
-				new String(item.getReference())), item);
+		return this.set(new Tuple2<String, String>(address, new String(reference)), item);
 	}
 	
-	public void addAll(Map<Account, List<ItemCls>> items)
+	/*
+	public void addAll1(Map<Account, List<ItemCls>> items)
 	{
 		//FOR EACH ACCOUNT
 	    for(Account account: items.keySet())
@@ -228,4 +225,5 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
 	    	}
 	    }
 	}
+    */
 }

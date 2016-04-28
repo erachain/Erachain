@@ -30,7 +30,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import database.DBSet;
+import lang.Lang;
 import settings.Settings;
+import utils.DateTimeFormat;
 
 public abstract class Transaction {
 	
@@ -280,7 +282,6 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	public String getRecordType() { return this.TYPE_NAME; }
 	
 	public int getType()
 	{
@@ -310,21 +311,8 @@ public abstract class Transaction {
 		//24HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
 		return this.timestamp + (1000*60*60*24);
 	}
-	
-	public BigDecimal viewAmount() {
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal getAmount() {
-		return this.viewAmount();
-	}
 
-	public BigDecimal viewAmount(Account account)
-	{
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal getAmount(Account account) {
-		return this.viewAmount(account);
-	}
+	/*
 	// TIME
 	public Long viewTime() {
 		return 0L;
@@ -339,6 +327,7 @@ public abstract class Transaction {
 	public Long getTime(Account account) {
 		return this.viewTime(account);
 	}
+	*/
 	
 	public BigDecimal getFee()
 	{
@@ -395,6 +384,54 @@ public abstract class Transaction {
 		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
 	}
 
+	// VIEW
+	public String viewType() {
+		return Byte.toUnsignedInt(typeBytes[0])+"."+Byte.toUnsignedInt(typeBytes[1]);
+	}
+	public String viewTypeName() {
+		return TYPE_NAME;
+	}
+	public String viewProperies() {
+		return Byte.toUnsignedInt(typeBytes[2])+"."+Byte.toUnsignedInt(typeBytes[3]);
+	}
+	public String viewSubTypeName() {
+		return "";
+	}
+
+	public String viewCreator() {
+		return creator==null?"GENESIS":creator.getAddress();
+	}
+	public String viewRecipient() {
+		return "-";
+	}
+	public String viewReference() {
+		return reference==null?"GENESIS":Base58.encode(reference);
+	}
+	public String viewTimestamp() {
+		return timestamp<1000?"GENESIS":DateTimeFormat.timestamptoString(timestamp);
+	}
+	public int viewSize(boolean asPack) {
+		return getDataLength(asPack);
+	}
+	public String viewFee() {
+		return fee.multiply(new BigDecimal(100000000)).setScale(0).toPlainString() + "[" + feePow + "]";
+	}
+
+	public BigDecimal viewAmount() {
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount() {
+		return this.viewAmount();
+	}
+
+	public BigDecimal viewAmount(Account account)
+	{
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount(Account account) {
+		return this.viewAmount(account);
+	}
+
 	//PARSE/CONVERT
 	
 	@SuppressWarnings("unchecked")
@@ -403,7 +440,7 @@ public abstract class Transaction {
 		JSONObject transaction = new JSONObject();
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
-		transaction.put("record_type", this.getRecordType());
+		transaction.put("record_type", this.viewTypeName());
 		transaction.put("reference", Base58.encode(this.reference));
 		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());

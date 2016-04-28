@@ -72,7 +72,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate(assetIssue.getRecordType()));
+		JLabel type = new JLabel(assetIssue.viewType() + " " + Lang.getInstance().translate(assetIssue.viewTypeName()));
 		this.add(type, detailGBC);
 		
 		/*

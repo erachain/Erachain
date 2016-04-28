@@ -38,10 +38,12 @@ import core.transaction.CancelOrderTransaction;
 import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
-import core.transaction.IssueAssetTransaction;
-import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
-import core.transaction.IssuePersonRecord;
+import core.transaction.Issue_ItemRecord;
+//import core.transaction.IssueAssetTransaction;
+//import core.transaction.IssueImprintRecord;
+//import core.transaction.IssueNoteRecord;
+//import core.transaction.IssuePersonRecord;
+//import core.transaction.IssueUnionRecord;
 import core.transaction.PaymentTransaction;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -599,6 +601,7 @@ public class Wallet extends Observable implements Observer
 		this.database.getImprintMap().reset();
 		this.database.getNoteMap().reset();
 		this.database.getPersonMap().reset();
+		this.database.getUnionMap().reset();
 		this.database.getOrderMap().reset();
 		LOGGER.info("Resetted maps");
 		
@@ -1379,7 +1382,7 @@ public class Wallet extends Observable implements Observer
 		}
 	}
 	
-	private void processAssetIssue(IssueAssetTransaction assetIssue)
+	private void processItemIssue(Issue_ItemRecord issueItem)
 	{
 		//CHECK IF WALLET IS OPEN
 		if(!this.exists())
@@ -1388,14 +1391,20 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getItem().getCreator().getAddress()))
+		ItemCls item = issueItem.getItem();
+		Account creator = item.getCreator();
+		if (creator == null) return;
+		
+		//issueItem
+		
+		if(this.accountExists(creator.getAddress()))
 		{
 			//ADD ASSET
-			this.database.getAssetMap().add(assetIssue.getItem());
+			this.database.getItemMap(item).add(creator.getAddress(), issueItem.getSignature(), item);
 		}
 	}
 	
-	private void orphanAssetIssue(IssueAssetTransaction assetIssue)
+	private void orphanItemIssue(Issue_ItemRecord issueItem)
 	{
 		//CHECK IF WALLET IS OPEN
 		if(!this.exists())
@@ -1404,105 +1413,14 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK IF WE ARE OWNER
-		if(this.accountExists(assetIssue.getItem().getCreator().getAddress()))
+		ItemCls item = issueItem.getItem();
+		Account creator = item.getCreator();
+		if (creator == null) return;
+		
+		if(this.accountExists(creator.getAddress()))
 		{
 			//DELETE ASSET
-			this.database.getAssetMap().delete(assetIssue.getItem());
-		}
-	}
-
-	private void processImprintIssue(IssueImprintRecord imprintIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(imprintIssue.getItem().getCreator().getAddress()))
-		{
-			//ADD IMPRINT
-			this.database.getImprintMap().add((ImprintCls)imprintIssue.getItem());
-		}
-	}
-	
-	private void orphanImprintIssue(IssueImprintRecord imprintIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(imprintIssue.getItem().getCreator().getAddress()))
-		{
-			//DELETE IMPRINT
-			this.database.getImprintMap().delete((ImprintCls)imprintIssue.getItem());
-		}
-	}
-
-	private void processNoteIssue(IssueNoteRecord noteIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(noteIssue.getItem().getCreator().getAddress()))
-		{
-			//ADD NOTE
-			this.database.getNoteMap().add((NoteCls)noteIssue.getItem());
-		}
-	}
-	
-	private void orphanNoteIssue(IssueNoteRecord noteIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(noteIssue.getItem().getCreator().getAddress()))
-		{
-			//DELETE NOTE
-			this.database.getNoteMap().delete((NoteCls)noteIssue.getItem());
-		}
-	}
-
-	private void processPersonIssue(IssuePersonRecord personIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(personIssue.getItem().getCreator().getAddress()))
-		{
-			//ADD PERSON
-			this.database.getPersonMap().add((PersonCls)personIssue.getItem());
-		}
-	}
-	private void orphanPersonIssue(IssuePersonRecord personIssue)
-	{
-		//CHECK IF WALLET IS OPEN
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(personIssue.getItem().getCreator().getAddress()))
-		{
-			//DELETE PERSON
-			this.database.getPersonMap().delete((PersonCls)personIssue.getItem());
+			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getReference());
 		}
 	}
 
@@ -1644,33 +1562,17 @@ public class Wallet extends Observable implements Observer
 					this.processPollVote((VoteOnPollTransaction) transaction);
 				}
 				
-				//CHECK IF ASSET ISSUE
-				else if(transaction instanceof IssueAssetTransaction)
+				//CHECK IF ITEM ISSUE
+				else if(transaction instanceof Issue_ItemRecord)
 				{
-					this.processAssetIssue((IssueAssetTransaction) transaction);
-				}
-				//CHECK IF IMPRINT ISSUE
-				else if(transaction instanceof IssueImprintRecord)
-				{
-					this.processImprintIssue((IssueImprintRecord) transaction);
-				}
-				//CHECK IF NOTE ISSUE
-				else if(transaction instanceof IssueNoteRecord)
-				{
-					this.processNoteIssue((IssueNoteRecord) transaction);
-				}
-				
-				//CHECK IF PERSON ISSUE
-				else if(transaction instanceof IssuePersonRecord)
-				{
-					this.processPersonIssue((IssuePersonRecord) transaction);
+					this.processItemIssue((Issue_ItemRecord) transaction);
 				}
 				
 				//CHECK IF ORDER CREATION
-				/*if(transaction instanceof CreateOrderTransaction)
+				if(transaction instanceof CreateOrderTransaction)
 				{
 					this.processOrderCreation((CreateOrderTransaction) transaction);
-				}*/
+				}
 				
 				//CHECK IF ORDER CANCEL
 				else if(transaction instanceof CancelOrderTransaction)
@@ -1704,27 +1606,11 @@ public class Wallet extends Observable implements Observer
 				this.processPollCreation((CreatePollTransaction) transaction);
 			}
 			
-			//CHECK IF ASSET ISSUE
-			else if(transaction instanceof IssueAssetTransaction)
+			//CHECK IF ITEM ISSUE
+			else if(transaction instanceof Issue_ItemRecord)
 			{
-				this.processAssetIssue((IssueAssetTransaction) transaction);
+				this.processItemIssue((Issue_ItemRecord) transaction);
 			}
-			//CHECK IF IMPRINT ISSUE
-			else if(transaction instanceof IssueImprintRecord)
-			{
-				this.processImprintIssue((IssueImprintRecord) transaction);
-			}
-			//CHECK IF NOTE ISSUE
-			else if(transaction instanceof IssueNoteRecord)
-			{
-				this.processNoteIssue((IssueNoteRecord) transaction);
-			}
-			//CHECK IF PERSON ISSUE
-			else if(transaction instanceof IssuePersonRecord)
-			{
-				this.processPersonIssue((IssuePersonRecord) transaction);
-			}
-			
 			//CHECK IF ORDER CREATION
 			else if(transaction instanceof CreateOrderTransaction)
 			{
@@ -1786,25 +1672,10 @@ public class Wallet extends Observable implements Observer
 					this.orphanPollVote((VoteOnPollTransaction) transaction);
 				}
 				
-				//CHECK IF ASSET ISSUE
-				else if(transaction instanceof IssueAssetTransaction)
+				//CHECK IF ITEM ISSUE
+				else if(transaction instanceof Issue_ItemRecord)
 				{
-					this.orphanAssetIssue((IssueAssetTransaction) transaction);
-				}
-				//CHECK IF IMPRINT ISSUE
-				else if(transaction instanceof IssueImprintRecord)
-				{
-					this.orphanImprintIssue((IssueImprintRecord) transaction);
-				}
-				//CHECK IF NOTE ISSUE
-				else if(transaction instanceof IssueNoteRecord)
-				{
-					this.orphanNoteIssue((IssueNoteRecord) transaction);
-				}
-				//CHECK IF PERSON ISSUE
-				else if(transaction instanceof IssuePersonRecord)
-				{
-					this.orphanPersonIssue((IssuePersonRecord) transaction);
+					this.orphanItemIssue((Issue_ItemRecord) transaction);
 				}
 				
 				//CHECK IF ORDER CREATION
@@ -1844,25 +1715,10 @@ public class Wallet extends Observable implements Observer
 				this.orphanPollCreation((CreatePollTransaction) transaction);
 			}
 			
-			//CHECK IF ASSET ISSUE
-			else if(transaction instanceof IssueAssetTransaction)
+			//CHECK IF ITEM ISSUE
+			else if(transaction instanceof Issue_ItemRecord)
 			{
-				this.orphanAssetIssue((IssueAssetTransaction) transaction);
-			}
-			//CHECK IF IMPRINT ISSUE
-			else if(transaction instanceof IssueImprintRecord)
-			{
-				this.orphanImprintIssue((IssueImprintRecord) transaction);
-			}
-			//CHECK IF NOTE ISSUE
-			else if(transaction instanceof IssueNoteRecord)
-			{
-				this.orphanNoteIssue((IssueNoteRecord) transaction);
-			}
-			//CHECK IF PERSON ISSUE
-			else if(transaction instanceof IssuePersonRecord)
-			{
-				this.orphanPersonIssue((IssuePersonRecord) transaction);
+				this.orphanItemIssue((Issue_ItemRecord) transaction);
 			}
 			
 			//CHECK IF ORDER CREATION

@@ -69,9 +69,15 @@ public abstract class TransactionAmount extends Transaction {
 		return "transAmount";
 	}
 
+	// VIEW
+	@Override
+	public String viewRecipient() {
+		return recipient.getAddress();
+	}
+
 	@Override
 	public BigDecimal viewAmount() {
-		return this.amount;
+		return amount;
 	}
 	
 	@Override
