@@ -19,6 +19,7 @@ import database.DBSet;
 import database.Issue_ItemMap;
 import database.Item_Map;
 import database.ItemPersonMap;
+import utils.DateTimeFormat;
 
 public abstract class PersonCls extends ItemCls {
 
@@ -206,14 +207,16 @@ public abstract class PersonCls extends ItemCls {
 	@Override
 	public String toString()
 	{		
-		return "(" + this.key + ":" + this.typeBytes.toString() + ") " + this.name + "." + this.birthday;
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name + " "
+				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
 	@Override
 	public String getShort()
 	{
-		return "(" + this.key + ":" + this.typeBytes.toString() + ") "
-				+ this.name.substring(0, Math.min(this.name.length(), 20)) + "." + this.birthday;
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") "
+				+ this.name.substring(0, Math.min(this.name.length(), 20)) + " "
+				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
 	@SuppressWarnings("unchecked")

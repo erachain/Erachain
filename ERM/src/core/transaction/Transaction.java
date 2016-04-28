@@ -402,7 +402,7 @@ public abstract class Transaction {
 		return creator==null?"GENESIS":creator.getAddress();
 	}
 	public String viewRecipient() {
-		return "-";
+		return "--";
 	}
 	public String viewReference() {
 		return reference==null?"GENESIS":Base58.encode(reference);
@@ -414,7 +414,8 @@ public abstract class Transaction {
 		return getDataLength(asPack);
 	}
 	public String viewFee() {
-		return fee.multiply(new BigDecimal(100000000)).setScale(0).toPlainString() + "[" + feePow + "]";
+		return fee.multiply(new BigDecimal(1000)).setScale(5)
+				.toPlainString() + "[" + feePow + "]";
 	}
 
 	public BigDecimal viewAmount() {

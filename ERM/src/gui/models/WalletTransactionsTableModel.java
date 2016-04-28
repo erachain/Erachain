@@ -19,6 +19,7 @@ import core.account.Account;
 import core.item.ItemCls;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Issue_ItemRecord;
+import core.transaction.IssueImprintRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.TransferAssetTransaction;
@@ -107,7 +108,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			
 			Transaction transaction = data.getB();
 			creator = transaction.getCreator();
-			String itemName = "--";
+			String itemName = "";
 			if (transaction instanceof TransactionAmount)
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
@@ -124,10 +125,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
-				// SET SIGNATURE AND KEY for ITEM
-				item.setReference(transIssue.getSignature());
-				item.getKey();
-				itemName = item.toString();
+				// SET REFERENCE for ITEM as SIGNATURE record
+				if (!(transIssue instanceof IssueImprintRecord))
+				{
+					item.setReference(transIssue.getSignature());
+				}
+				//item.getKey();
+				itemName = item.getShort();
 			}
 			
 			switch(column)
@@ -154,7 +158,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_AMOUNT:
 								
-				if (recipient==null) return "--";
+				if (recipient==null) return "";
 				
 				String address = recipient.getAddress();
 

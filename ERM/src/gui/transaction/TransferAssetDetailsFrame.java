@@ -176,7 +176,7 @@ public class TransferAssetDetailsFrame extends JFrame
 						
 		//FEE
 		detailGBC.gridy = 9;
-		JTextField size = new JTextField(assetTransfer.viewSize(false));
+		JTextField size = new JTextField(assetTransfer.viewSize(false) + "");
 		size.setEditable(false);
 		MenuPopupUtil.installContextMenu(size);
 		this.add(size, detailGBC);	
