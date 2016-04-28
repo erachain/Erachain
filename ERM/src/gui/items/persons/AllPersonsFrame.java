@@ -1,5 +1,7 @@
 package gui.items.persons;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -10,35 +12,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import gui.CoreRowSorter;
 import lang.Lang;
 
+import javax.naming.ldap.SortKey;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.TableColumn;
-
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.mapdb.Fun.Tuple3;
 import core.item.persons.PersonCls;
-import gui.items.AllItemsFrame;
+import database.DBSet;
+import database.ItemPersonMap;
+
+
 
 @SuppressWarnings("serial")
-public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllItemsFrame {
+public class AllPersonsFrame extends JInternalFrame {
 	
 	private TableModelPersons tableModelPersons;
+	private JButton ConfirmButton;
 	
 
 	public AllPersonsFrame() {
@@ -53,14 +62,17 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		this.setSize(500, 500);
-		this.setLocation(40, 40);
+	//	MainFrame mainFram = new MainFrame();
+	
 		this.setVisible(true);
 		this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Persons"));
 		this.setClosable(true);
 		this.setResizable(true);
+		
 	
+		
+		this.setLocation(50, 20);
 	//	this.setIconImages(icons);
 		
 		//CLOSE
@@ -91,17 +103,10 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		searchGBC.gridwidth = 1;
 		searchGBC.gridx = 1;
 		searchGBC.gridy = 0;
+	
 		
-		//TABLE GBC
-		GridBagConstraints tableGBC = new GridBagConstraints();
-		tableGBC.insets = new Insets(0, 5, 5, 0);
-		tableGBC.fill = GridBagConstraints.BOTH;  
-		tableGBC.anchor = GridBagConstraints.NORTHWEST;
-		tableGBC.weightx = 1;	
-		tableGBC.weighty = 1;	
-		tableGBC.gridwidth = 2;
-		tableGBC.gridx = 0;	
-		tableGBC.gridy = 1;	
+		
+		
 		
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
@@ -113,11 +118,14 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		divisibleColumn.setCellRenderer(personsTable.getDefaultRenderer(Boolean.class));
 		*/
 		
-		//ASSETS SORTER
+		//BLOCKS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+		indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX); // указываем, что первая колонка состоит из чисел
 		CoreRowSorter sorter = new CoreRowSorter(this.tableModelPersons, indexes);
+	//	sorter.setSortKeys(<list>(new SortKey("1"), new SortKey("2")));
 		personsTable.setRowSorter(sorter);
-		
+				  
+		  
 		//CREATE SEARCH FIELD
 		final JTextField txtSearch = new JTextField();
 
@@ -145,9 +153,85 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				tableModelPersons.fireTableDataChanged();
 			}
 		});
+		
+		
+		// button confirm
+	        ConfirmButton = new JButton(Lang.getInstance().translate("Confirm"));
+	        ConfirmButton.setPreferredSize(new Dimension(100, 25));
+	        ConfirmButton.setEnabled(false);
+	        ConfirmButton.addActionListener(new ActionListener()
+			{
+			    public void actionPerformed(ActionEvent e)
+			    {
+			// открываем диалоговое окно ввода данных для подтверждения персоны 
+			    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
+			// обрабатываем полученные данные от диалогового окна
+			    	//if(fm.isOK()){
+	                //    JOptionPane.showMessageDialog(Form1.this, "OK");
+	                //}
+			    }
+			});
+	    	
+				
+		// select row table persons
+				
+		JEditorPane Address1 = new JEditorPane();
+		Address1.setContentType("text/html");
+		Address1.setText("<HTML>Select person"); // Document text is provided below.
+		Address1.setBackground(new Color(255, 255, 255, 0));
+		// обработка изменения положения курсора в таблице
+				personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 
+					@Override
+					public void valueChanged(ListSelectionEvent arg0) {
+						String Date_Acti;
+						String Date_birs;
+						String message;
+				// TODO Auto-generated method stub
+				// устанавливаем формат даты
+						SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+				//создаем объект персоны
+						PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+				//читаем таблицу персон.
+						Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
+				// преобразование в дату
+				
+				
+						if (t3 != null){
+							Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
+						} else
+						{
+							Date_Acti =Lang.getInstance().translate("Not found!");
+						};
+						if (person.isConfirmed()){
+							Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+							 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
+							+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + person.getName().toString()		+ "</p>" 
+					        + "<p>  "  + Lang.getInstance().translate("To do")  +":"        		  + Date_Acti			+"</p>"
+					        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>";
+							 // Читаем адреса клиента
+							 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+							 if ( !Addresses.isEmpty()){
+								 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+							 }
+							 else{
+								 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
+								 ConfirmButton.setEnabled(true);
+							 }
+						}else{
+							ConfirmButton.setEnabled(false);
+							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
+						}
+						message = message + "</html>";
+						
+							
+				Address1.setText(message);
+				AllPersonsFrame.this.setSize(AllPersonsFrame.this.getSize());//.setPreferredSize(new Dimension(100,100));		
+			}; 
+		});
 		// MENU
-		JPopupMenu nameSalesMenu = new JPopupMenu();
+	/*
+	JPopupMenu nameSalesMenu = new JPopupMenu();
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 		details.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -161,6 +245,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		nameSalesMenu.add(details);
 
 		personsTable.setComponentPopupMenu(nameSalesMenu);
+		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -172,15 +257,57 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 				{
 					row = personsTable.convertRowIndexToModel(row);
 					PersonCls person = tableModelPersons.getPerson(row);
-					new PersonFrame(person);
+		//			new PersonFrame(person);
 				}
 			}
 		});
-
-		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
+	
+*/
+		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
-		this.add(new JScrollPane(personsTable), tableGBC);
-		
+        
+        // Create a constraints object, and specify some default values
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
+        c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
+
+        // Create and add a bunch of buttons, specifying different grid
+        // position, and size for each.
+        // Give the first button a resize weight of 1.0 and all others
+        // a weight of 0.0. The first button will get all extra space.
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 4;
+        c.gridheight = 6;
+        c.weightx = c.weighty = 1.0;
+        this.add(new JScrollPane(personsTable), c);
+
+        c.gridx = 4;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = c.weighty = 0.0;
+        this.add(this.ConfirmButton, c);
+
+        
+        c.gridx = 4;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.gridheight = GridBagConstraints.REMAINDER; //3;
+        c.fill = GridBagConstraints.BOTH;//.HORIZONTAL;
+        c.anchor = GridBagConstraints.NORTH;
+        c.weightx = c.weighty = 0;
+       
+        this.add(new JScrollPane(Address1), c);
+
+       // c.gridx = 4;
+       // c.gridy = 2;
+       // c.gridwidth = 1;
+       // c.gridheight = 2;
+       // this.add(new JButton("Button #4"), c);
+
+        
+		setPreferredSize(new Dimension(1000, 600));
 		//PACK
 		this.pack();
 		//this.setSize(500, this.getHeight());
@@ -188,5 +315,13 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 	//	this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
+	
+	
+
+
+
+   
+	
+
 
 }

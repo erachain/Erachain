@@ -387,7 +387,7 @@ public class R_SertifyPerson extends Transaction {
 		//CHECK DURATION
 		if(end_date < 0)
 		{
-			return INVALID_DURATION;
+			return INVALID_DATE;
 		}
 	
 		//CHECK IF RECIPIENT IS VALID ADDRESS

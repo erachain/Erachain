@@ -34,7 +34,7 @@ public class GenesisIssueNoteTransaction extends GenesisIssue_ItemRecord
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_NOTE_TRANSACTION;
-	private static final String NAME_ID = "Genesis Issue Note";
+	private static final String NAME_ID = "GENESIS Issue Note";
 	
 	public GenesisIssueNoteTransaction(NoteCls note) 
 	{

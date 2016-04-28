@@ -90,7 +90,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.getRecordType());
+				return Lang.getInstance().translate(transaction.viewTypeName());
 				
 			case COLUMN_AMOUNT:
 				

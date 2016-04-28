@@ -39,7 +39,7 @@ public class TransactionTests3AssetsAsPack {
 	byte[] releaserReference;
 	static boolean asPack = false;
 	
-	long OIL_KEY = 1l;
+	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = 0l;
@@ -65,7 +65,7 @@ public class TransactionTests3AssetsAsPack {
 		
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		asset = new AssetVenture(maker, "a", "a", 50000l, (byte) 2, true);
 		//key = asset.getKey(db);
@@ -147,19 +147,19 @@ public class TransactionTests3AssetsAsPack {
 			assertEquals(issueAssetTransaction.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueAssetTransaction.getAsset().getCreator().getAddress(), parsedIssueAssetTransaction.getAsset().getCreator().getAddress());
+			assertEquals(issueAssetTransaction.getItem().getCreator().getAddress(), parsedIssueAssetTransaction.getItem().getCreator().getAddress());
 			
 			//CHECK NAME
-			assertEquals(issueAssetTransaction.getAsset().getName(), parsedIssueAssetTransaction.getAsset().getName());
+			assertEquals(issueAssetTransaction.getItem().getName(), parsedIssueAssetTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(issueAssetTransaction.getAsset().getDescription(), parsedIssueAssetTransaction.getAsset().getDescription());
+			assertEquals(issueAssetTransaction.getItem().getDescription(), parsedIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(issueAssetTransaction.getAsset().getQuantity(), parsedIssueAssetTransaction.getAsset().getQuantity());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
 			
 			//DIVISIBLE
-			assertEquals(issueAssetTransaction.getAsset().isDivisible(), parsedIssueAssetTransaction.getAsset().isDivisible());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
 			
 			//CHECK FEE
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());	
@@ -440,11 +440,11 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer.process(db, asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -474,11 +474,11 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer.orphan(db, asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -525,7 +525,7 @@ public class TransactionTests3AssetsAsPack {
 		key = asset.getKey(db);
 
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
 		createOrderTransaction.process(db, asPack);
 		
@@ -558,7 +558,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE INVALID CANCEL ORDER NO BALANCE
 		DBSet fork = db.fork();
 		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});		
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.ZERO, fork);		
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.ZERO, fork);		
 		
 		//CHECK IF CANCEL ORDER IS INVALID
 		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
@@ -654,7 +654,7 @@ public class TransactionTests3AssetsAsPack {
 		key = asset.getKey(db);
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
 		createOrderTransaction.process(db, asPack);
 		
@@ -692,7 +692,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, OIL_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
 		createOrderTransaction.process(db, asPack);
 
@@ -752,7 +752,7 @@ public class TransactionTests3AssetsAsPack {
 		
 		messageTransaction.process(db, asPack);
 		
-		assertEquals(BigDecimal.valueOf(1).setScale(8), creator.getConfirmedBalance(OIL_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), creator.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getConfirmedBalance(key, db));
 		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(key, db));
 		

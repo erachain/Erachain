@@ -35,7 +35,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_ASSET_TRANSACTION;
-	private static final String NAME_ID = "Genesis Issue Asset";
+	private static final String NAME_ID = "GENESIS Issue Asset";
 	
 	public GenesisIssueAssetTransaction(AssetCls asset) 
 	{

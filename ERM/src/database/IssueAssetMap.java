@@ -25,7 +25,13 @@ public class IssueAssetMap extends Issue_ItemMap
 	{
 		super(parent);
 	}
-	
+
+	@Override
+	protected Long getDefaultValue() 
+	{
+		return -1l;
+	}
+
 	/*
 	protected void createIndexes(DB database){}
 

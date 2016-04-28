@@ -18,6 +18,7 @@ import java.util.Arrays;
 import org.apache.log4j.Logger;
 
 import at.RIPEMD160;
+import core.transaction.Transaction;
 
 
 
@@ -749,13 +750,13 @@ public class AT_API_Impl implements AT_API
 	}
 
 	@Override
-	public void send_to_Address_in_B( long val , AT_Machine_State state ) {
-		platform.send_to_Address_in_B( val , state );
+	public void send_to_Address_in_B( long key , long val, AT_Machine_State state ) {
+		platform.send_to_Address_in_B( Transaction.FEE_KEY , val, state );
 	}
 
 	@Override
-	public void send_All_to_Address_in_B( AT_Machine_State state ) {
-		platform.send_All_to_Address_in_B( state );
+	public void send_All_to_Address_in_B( long key, AT_Machine_State state ) {
+		platform.send_All_to_Address_in_B( Transaction.FEE_KEY, state );
 	}
 
 	@Override

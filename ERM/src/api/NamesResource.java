@@ -580,7 +580,7 @@ public class NamesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_NAME_NO_EXISTS);
 
-		case Transaction.NAME_ALREADY_FOR_SALE:
+		case Transaction.NAME_ALREADY_ON_SALE:
 
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);

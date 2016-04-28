@@ -260,11 +260,11 @@ public class PollsResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);	
 			
-			case Transaction.POLL_NO_EXISTS:
+			case Transaction.POLL_NOT_EXISTS:
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_NO_EXISTS);
 				
-			case Transaction.OPTION_NO_EXISTS:
+			case Transaction.OPTION_NOT_EXISTS:
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_OPTION_NO_EXISTS);	
 				

@@ -27,7 +27,7 @@ import database.DBSet;
 public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	private static final byte TYPE_ID = (byte)Transaction.GENESIS_SEND_ASSET_TRANSACTION;
-	private static final String NAME_ID = "Genesis Send Asset";
+	private static final String NAME_ID = "GENESIS Send Asset";
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;

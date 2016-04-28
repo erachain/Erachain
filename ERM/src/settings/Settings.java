@@ -47,7 +47,7 @@ public class Settings {
 	//private static final String[] DEFAULT_PEERS = { };
 	
 	// BLOCK
-	public static final int BLOCK_MAX_SIGNATURES = 5000;
+	public static final int BLOCK_MAX_SIGNATURES = 500;
 	public static final BigDecimal BLOCK_GENERATING_BALANCE_NEED = new BigDecimal(100);
 
 	//TESTNET 

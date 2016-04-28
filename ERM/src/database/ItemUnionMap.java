@@ -11,7 +11,7 @@ import org.mapdb.DB;
 import core.item.ItemCls;
 import utils.ObserverMessage;
 import database.DBSet;
-import database.serializer.AssetSerializer;
+import database.serializer.ItemSerializer;
 
 public class ItemUnionMap extends Item_Map
 {
@@ -42,8 +42,8 @@ public class ItemUnionMap extends Item_Map
 		
 		//OPEN MAP
 		return database.createTreeMap(NAME)
-				//.valueSerializer(new ItemSerializer(TYPE))
-				.valueSerializer(new AssetSerializer())
+				.valueSerializer(new ItemSerializer(TYPE))
+				//.valueSerializer(new AssetSerializer())
 				.makeOrGet();
 	}
 

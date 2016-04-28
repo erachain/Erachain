@@ -27,7 +27,7 @@ import core.item.persons.PersonFactory;
 public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_PERSON_TRANSACTION;
-	private static final String NAME_ID = "Genesis Issue Person";
+	private static final String NAME_ID = "GENESIS Issue Person";
 
 	public GenesisIssuePersonRecord(PersonCls item) 
 	{

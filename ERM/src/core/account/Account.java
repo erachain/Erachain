@@ -20,6 +20,7 @@ import core.crypto.Base58;
 import core.item.statuses.StatusCls;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import utils.NumberAsString;
 import database.DBSet;
 import ntp.NTP;
@@ -35,7 +36,7 @@ public class Account {
 	protected String address;
 	
 	private byte[] lastBlockSignature;
-	private BigDecimal generatingBalance;
+	private BigDecimal generatingBalance; //used  for forging balance
 	
 	protected Account()
 	{
@@ -68,7 +69,7 @@ public class Account {
 	{
 		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
 	}
-	
+	/*
 	public BigDecimal getConfirmedBalance()
 	{
 		return this.getConfirmedBalance(DBSet.getInstance());
@@ -77,6 +78,7 @@ public class Account {
 	{
 		return db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY);
 	}
+	*/
 	public BigDecimal getConfirmedBalance(long key)
 	{
 		return this.getConfirmedBalance(key, DBSet.getInstance());
@@ -94,6 +96,7 @@ public class Account {
 	*/
 
 	// SET
+	/*
 	public void setConfirmedBalance(BigDecimal amount)
 	{
 		this.setConfirmedBalance(amount, DBSet.getInstance());
@@ -103,6 +106,7 @@ public class Account {
 		//UPDATE BALANCE IN DB
 		db.getAssetBalanceMap().set(getAddress(), Transaction.FEE_KEY, amount);
 	}
+	*/
 	//
 	public void setConfirmedBalance(long key, BigDecimal amount)
 	{
@@ -134,6 +138,7 @@ public class Account {
 	{
 		return this.getBalance(confirmations, key, DBSet.getInstance());
 	}
+	/*
 	public BigDecimal getBalance(int confirmations)
 	{
 		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
@@ -142,7 +147,7 @@ public class Account {
 	{
 		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
 	}
-	
+	*/
 	public BigDecimal getBalance(int confirmations, long key, DBSet db)
 	{
 		//CHECK IF UNCONFIRMED BALANCE
@@ -197,9 +202,10 @@ public class Account {
 		}
 	}
 	
+	// balance FOR generation
 	public void calculateGeneratingBalance(DBSet db)
 	{
-		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS
+		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - foe ERM_KEY only
 		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
@@ -208,9 +214,11 @@ public class Account {
 		{
 			for(Transaction transaction: block.getTransactions())
 			{
-				if(transaction.isInvolved(this))
+				if(transaction.isInvolved(this) & transaction instanceof TransactionAmount)
 				{
-					if(transaction.viewAmount(this).compareTo(BigDecimal.ZERO) == 1)
+					TransactionAmount ta = (TransactionAmount)transaction;
+					
+					if(ta.getKey() == ERM_KEY & transaction.viewAmount(this).compareTo(BigDecimal.ZERO) == 1)
 					{
 						balance = balance.subtract(transaction.viewAmount(this));
 					}

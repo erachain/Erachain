@@ -232,14 +232,14 @@ public class VoteOnPollTransaction extends Transaction
 		//CHECK POLL EXISTS
 		if(!db.getPollMap().contains(this.poll))
 		{
-			return POLL_NO_EXISTS;
+			return POLL_NOT_EXISTS;
 		}
 		
 		//CHECK OPTION EXISTS
 		Poll poll = db.getPollMap().get(this.poll);
 		if(poll.getOptions().size()-1 < this.option || this.option < 0)
 		{
-			return OPTION_NO_EXISTS;
+			return OPTION_NOT_EXISTS;
 		}
 		
 		//CHECK IF NOT VOTED ALREADY

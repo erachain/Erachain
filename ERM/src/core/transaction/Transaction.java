@@ -30,7 +30,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import database.DBSet;
+import lang.Lang;
 import settings.Settings;
+import utils.DateTimeFormat;
 
 public abstract class Transaction {
 	
@@ -49,7 +51,7 @@ public abstract class Transaction {
 	
 	public static final int NAME_DOES_NOT_EXIST = 10;
 	public static final int INVALID_NAME_CREATOR = 11;
-	public static final int NAME_ALREADY_FOR_SALE = 12;
+	public static final int NAME_ALREADY_ON_SALE = 12;
 	public static final int NAME_NOT_FOR_SALE = 13;
 	public static final int BUYER_ALREADY_OWNER = 14;
 	public static final int INVALID_AMOUNT = 15;
@@ -63,8 +65,8 @@ public abstract class Transaction {
 	public static final int DUPLICATE_OPTION = 21;
 	public static final int POLL_ALREADY_CREATED = 22;
 	public static final int POLL_ALREADY_HAS_VOTES = 23;
-	public static final int POLL_NO_EXISTS = 24;
-	public static final int OPTION_NO_EXISTS = 25;
+	public static final int POLL_NOT_EXISTS = 24;
+	public static final int OPTION_NOT_EXISTS = 25;
 	public static final int ALREADY_VOTED_FOR_THAT_OPTION = 26;
 	public static final int INVALID_DATA_LENGTH = 27;
 	
@@ -85,7 +87,7 @@ public abstract class Transaction {
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
-	public static final int INVALID_DURATION = 42;
+	public static final int INVALID_DATE = 42;
 
 	public static final int NOT_ENOUGH_RIGHTS = 50;
 	public static final int ITEM_DOES_NOT_EXIST = 51;
@@ -97,6 +99,15 @@ public abstract class Transaction {
 	public static final int ITEM_NOTE_NOT_EXIST = 57;
 	public static final int ITEM_PERSON_NOT_EXIST = 58;
 	public static final int ITEM_UNION_NOT_EXIST = 59;
+
+	public static final int ITEM_PERSON_LATITUDE_ERROR = 60;
+	public static final int ITEM_PERSON_LONGITUDE_ERROR = 61;
+	public static final int ITEM_PERSON_RACE_ERROR = 62;
+	public static final int ITEM_PERSON_GENDER_ERROR = 63;
+	public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 64;
+	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 65;
+	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 66;
+	public static final int ITEM_PERSON_HEIGHT_ERROR = 67;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	
@@ -271,7 +282,6 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	public String getRecordType() { return this.TYPE_NAME; }
 	
 	public int getType()
 	{
@@ -301,21 +311,8 @@ public abstract class Transaction {
 		//24HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
 		return this.timestamp + (1000*60*60*24);
 	}
-	
-	public BigDecimal viewAmount() {
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal getAmount() {
-		return this.viewAmount();
-	}
 
-	public BigDecimal viewAmount(Account account)
-	{
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal getAmount(Account account) {
-		return this.viewAmount(account);
-	}
+	/*
 	// TIME
 	public Long viewTime() {
 		return 0L;
@@ -330,6 +327,7 @@ public abstract class Transaction {
 	public Long getTime(Account account) {
 		return this.viewTime(account);
 	}
+	*/
 	
 	public BigDecimal getFee()
 	{
@@ -386,6 +384,55 @@ public abstract class Transaction {
 		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
 	}
 
+	// VIEW
+	public String viewType() {
+		return Byte.toUnsignedInt(typeBytes[0])+"."+Byte.toUnsignedInt(typeBytes[1]);
+	}
+	public String viewTypeName() {
+		return TYPE_NAME;
+	}
+	public String viewProperies() {
+		return Byte.toUnsignedInt(typeBytes[2])+"."+Byte.toUnsignedInt(typeBytes[3]);
+	}
+	public String viewSubTypeName() {
+		return "";
+	}
+
+	public String viewCreator() {
+		return creator==null?"GENESIS":creator.getAddress();
+	}
+	public String viewRecipient() {
+		return "--";
+	}
+	public String viewReference() {
+		return reference==null?"GENESIS":Base58.encode(reference);
+	}
+	public String viewTimestamp() {
+		return timestamp<1000?"GENESIS":DateTimeFormat.timestamptoString(timestamp);
+	}
+	public int viewSize(boolean asPack) {
+		return getDataLength(asPack);
+	}
+	public String viewFee() {
+		return fee.multiply(new BigDecimal(1000)).setScale(5)
+				.toPlainString() + "[" + feePow + "]";
+	}
+
+	public BigDecimal viewAmount() {
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount() {
+		return this.viewAmount();
+	}
+
+	public BigDecimal viewAmount(Account account)
+	{
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount(Account account) {
+		return this.viewAmount(account);
+	}
+
 	//PARSE/CONVERT
 	
 	@SuppressWarnings("unchecked")
@@ -394,7 +441,7 @@ public abstract class Transaction {
 		JSONObject transaction = new JSONObject();
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
-		transaction.put("record_type", this.getRecordType());
+		transaction.put("record_type", this.viewTypeName());
 		transaction.put("reference", Base58.encode(this.reference));
 		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
@@ -416,8 +463,10 @@ public abstract class Transaction {
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
 		
-		// use this.reference in any case
-		byte[] data = this.toBytes( asPack, null );
+		// use this.reference in any case and for Pack too
+		// nut not with SIGN
+		boolean withSign = false;
+		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;
 
 		this.signature = Crypto.getInstance().sign(creator, data);

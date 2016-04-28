@@ -8,6 +8,8 @@
 
 package at;
 
+import core.transaction.Transaction;
+
 public class AT_API_Controller{
 	
 	static AT_API_Impl atApi = new AT_API_Impl();
@@ -219,7 +221,7 @@ public class AT_API_Controller{
 		}
 		else if ( func_num == 1027 )
 		{
-			atApi.send_All_to_Address_in_B( state );
+			atApi.send_All_to_Address_in_B( Transaction.FEE_KEY, state );
 		}
 		else if ( func_num == 1028 )
 		{
@@ -280,7 +282,7 @@ public class AT_API_Controller{
 		}
 		else if ( func_num == 1026 )
 		{
-			atApi.send_to_Address_in_B( val , state );
+			atApi.send_to_Address_in_B( Transaction.FEE_KEY , val, state );
 		}
 		else if ( func_num == 1280 )
 		{

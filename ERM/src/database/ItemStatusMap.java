@@ -10,8 +10,8 @@ import core.item.ItemCls;
 import core.item.statuses.StatusCls;
 import utils.ObserverMessage;
 import database.DBSet;
-//import database.serializer.PersonSerializer;
-import database.serializer.StatusSerializer;
+import database.serializer.ItemSerializer;
+//import database.serializer.StatusSerializer;
 
 public class ItemStatusMap extends Item_Map 
 {
@@ -41,8 +41,8 @@ public class ItemStatusMap extends Item_Map
 		
 		//OPEN MAP
 		return database.createTreeMap(NAME)
-				//.valueSerializer(new ItemSerializer(TYPE))
-				.valueSerializer(new StatusSerializer())
+				.valueSerializer(new ItemSerializer(TYPE))
+				//.valueSerializer(new StatusSerializer())
 				.makeOrGet();
 	}
 

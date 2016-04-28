@@ -10,6 +10,8 @@ import core.item.assets.AssetCls;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -36,10 +38,14 @@ public class WalletDatabase implements IDB
 	private WItemImprintMap imprintMap;
 	private WItemNoteMap noteMap;
 	private WItemPersonMap personMap;
+	private WItemStatusMap statusMap;
+	private WItemUnionMap unionMap;
 	private OrderMap orderMap;
 	private FavoriteItemAsset assetFavoritesSet;
 	private FavoriteItemNote noteFavoritesSet;
 	private FavoriteItemPerson personFavoritesSet;
+	private FavoriteItemStatus statusFavoritesSet;
+	private FavoriteItemUnion unionFavoritesSet;
 	
 	public static boolean exists()
 	{
@@ -72,10 +78,14 @@ public class WalletDatabase implements IDB
 	    this.imprintMap = new WItemImprintMap(this, this.database);
 	    this.noteMap = new WItemNoteMap(this, this.database);
 	    this.personMap = new WItemPersonMap(this, this.database);
+	    this.statusMap = new WItemStatusMap(this, this.database);
+	    this.unionMap = new WItemUnionMap(this, this.database);
 	    this.orderMap = new OrderMap(this, this.database);
 	    this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
 	    this.noteFavoritesSet = new FavoriteItemNote(this, this.database);
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
+	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
+	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
 	}
 	
 	public void setVersion(int version)
@@ -167,16 +177,28 @@ public class WalletDatabase implements IDB
 	{
 		return this.personMap;
 	}
+	public WItemStatusMap getStatusMap()
+	{
+		return this.statusMap;
+	}
+	public WItemUnionMap getUnionMap()
+	{
+		return this.unionMap;
+	}
 	public WItem_Map getItemMap(ItemCls item)
 	{
 		if (item instanceof AssetCls) { 
-			return (WItem_Map)this.assetMap;
+			return this.assetMap;
 		} else if (item instanceof ImprintCls) { 
-			return (WItem_Map)this.imprintMap;
+			return this.imprintMap;
 		} else if (item instanceof NoteCls) { 
-			return (WItem_Map)this.noteMap;
+			return this.noteMap;
 		} else if (item instanceof PersonCls) { 
-			return (WItem_Map)this.personMap;
+			return this.personMap;
+		} else if (item instanceof StatusCls) { 
+			return this.statusMap;
+		} else if (item instanceof UnionCls) { 
+			return this.unionMap;
 		} else {
 			return null;
 		}
@@ -193,39 +215,24 @@ public class WalletDatabase implements IDB
 				return this.noteMap;
 			case ItemCls.PERSON_TYPE:
 				return this.personMap;
+			case ItemCls.STATUS_TYPE:
+				return this.statusMap;
+			case ItemCls.UNION_TYPE:
+				return this.unionMap;
 		}
 		return null;
 	}
 
 	public void addItemToFavorite(ItemCls item)
 	{
-		if (item instanceof AssetCls) { 
-			this.assetFavoritesSet.add(item.getKey());
-		} else if (item instanceof NoteCls) { 
-			this.noteFavoritesSet.add(item.getKey());
-		} else if (item instanceof PersonCls) { 
-			this.personFavoritesSet.add(item.getKey());
-		}
+		getItemFavoritesSet(item).add(item.getKey());
 	}
 	
 	public void removeItemFromFavorite(ItemCls item) {
-		if (item instanceof AssetCls) { 
-			this.assetFavoritesSet.delete(item.getKey());
-		} else if (item instanceof NoteCls) { 
-			this.noteFavoritesSet.delete(item.getKey());
-		} else if (item instanceof PersonCls) { 
-			this.personFavoritesSet.delete(item.getKey());
-		}
+		getItemFavoritesSet(item).delete(item.getKey());
 	}
 	public boolean isItemFavorite(ItemCls item) {
-		if (item instanceof AssetCls) { 
-			return this.assetFavoritesSet.contains(item.getKey());
-		} else if (item instanceof NoteCls) { 
-			return this.noteFavoritesSet.contains(item.getKey());
-		} else if (item instanceof PersonCls) { 
-			return this.personFavoritesSet.contains(item.getKey());
-		}
-		return false;
+		return getItemFavoritesSet(item).contains(item.getKey());
 	}
 	
 	/*
@@ -264,18 +271,31 @@ public class WalletDatabase implements IDB
 	{
 		return this.personFavoritesSet;
 	}
-	public FavoriteItem getFavoriteItemSet(ItemCls item)
+	public FavoriteItemStatus getStatusFavoritesSet()
 	{
-		if (item instanceof NoteCls) { 
-			return this.noteFavoritesSet;
-		} else if (item instanceof AssetCls) { 
+		return this.statusFavoritesSet;
+	}
+	public FavoriteItemUnion getUnionFavoritesSet()
+	{
+		return this.unionFavoritesSet;
+	}
+	public FavoriteItem getItemFavoritesSet(ItemCls item)
+	{
+		if (item instanceof AssetCls) { 
 			return this.assetFavoritesSet;
+		//} else if (item instanceof ImprintCls) { 
+		//	return this.imprintFavoritesSet;
+		} else if (item instanceof NoteCls) { 
+			return this.noteFavoritesSet;
 		} else if (item instanceof PersonCls) { 
 			return this.personFavoritesSet;
+		} else if (item instanceof StatusCls) { 
+			return this.statusFavoritesSet;
+		} else if (item instanceof UnionCls) { 
+			return this.unionFavoritesSet;
 		} else {
 			return null;
 		}
-		
 	}
 	
 	public void delete(Account account)
@@ -289,7 +309,9 @@ public class WalletDatabase implements IDB
 		this.assetMap.delete(account);
 		this.imprintMap.delete(account);
 		this.noteMap.delete(account);
+		this.unionMap.delete(account);
 		this.personMap.delete(account);
+		this.statusMap.delete(account);
 		this.orderMap.delete(account);
 	}
 	

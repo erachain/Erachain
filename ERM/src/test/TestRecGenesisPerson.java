@@ -44,7 +44,6 @@ public class TestRecGenesisPerson {
 	long FEE_KEY = Transaction.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] packedReference = new byte[64];
-	long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -127,14 +126,6 @@ public class TestRecGenesisPerson {
 			//CHECK DESCRIPTION
 			assertEquals(genesisIssuePersonTransaction.getItem().getDescription(), parsedGenesisIssuePersonRecord.getItem().getDescription());
 							
-			//CHECK FEE
-			assertEquals(genesisIssuePersonTransaction.getFeePow(), parsedGenesisIssuePersonRecord.getFeePow());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getReference(), parsedGenesisIssuePersonRecord.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(genesisIssuePersonTransaction.getTimestamp(), parsedGenesisIssuePersonRecord.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -191,14 +182,6 @@ public class TestRecGenesisPerson {
 			//CHECK DESCRIPTION
 			assertEquals(genesisIssuePersonTransaction.getItem().getDescription(), parsedGenesisIssuePersonRecord.getItem().getDescription());
 							
-			//CHECK FEE
-			assertEquals(genesisIssuePersonTransaction.getFeePow(), parsedGenesisIssuePersonRecord.getFeePow());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getReference(), parsedGenesisIssuePersonRecord.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(genesisIssuePersonTransaction.getTimestamp(), parsedGenesisIssuePersonRecord.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -263,7 +246,6 @@ public class TestRecGenesisPerson {
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-		long timestamp = NTP.getTime();
 		
 		//CREATE PERSON TRANSFER
 		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
@@ -338,11 +320,6 @@ public class TestRecGenesisPerson {
 			//CHECK KEY
 			assertEquals(genesisTransferPerson.getKey(), parsedPersonTransfer.getKey());	
 									
-			//CHECK FEE
-			assertEquals(genesisTransferPerson.getFeePow(), parsedPersonTransfer.getFeePow());	
-						
-			//CHECK TIMESTAMP
-			assertEquals(genesisTransferPerson.getTimestamp(), parsedPersonTransfer.getTimestamp());				
 		}
 		catch (Exception e) 
 		{

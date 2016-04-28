@@ -1,6 +1,7 @@
 package test;
 
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -11,7 +12,6 @@ import java.util.Arrays;
 
 import ntp.NTP;
 
-import org.junit.Test;
 
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;

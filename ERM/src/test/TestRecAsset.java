@@ -66,7 +66,7 @@ public class TestRecAsset {
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
-		asset = new AssetVenture(maker, "a", "a", 50000l, (byte) 2, true);
+		asset = new AssetVenture(maker, "aasdasd", "asdasda", 50000l, (byte) 2, true);
 		//key = asset.getKey(db);
 
 
@@ -141,19 +141,19 @@ public class TestRecAsset {
 			assertEquals(issueAssetTransaction.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueAssetTransaction.getAsset().getCreator().getAddress(), parsedIssueAssetTransaction.getAsset().getCreator().getAddress());
+			assertEquals(issueAssetTransaction.getItem().getCreator().getAddress(), parsedIssueAssetTransaction.getItem().getCreator().getAddress());
 			
 			//CHECK NAME
-			assertEquals(issueAssetTransaction.getAsset().getName(), parsedIssueAssetTransaction.getAsset().getName());
+			assertEquals(issueAssetTransaction.getItem().getName(), parsedIssueAssetTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(issueAssetTransaction.getAsset().getDescription(), parsedIssueAssetTransaction.getAsset().getDescription());
+			assertEquals(issueAssetTransaction.getItem().getDescription(), parsedIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(issueAssetTransaction.getAsset().getQuantity(), parsedIssueAssetTransaction.getAsset().getQuantity());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
 			
 			//DIVISIBLE
-			assertEquals(issueAssetTransaction.getAsset().isDivisible(), parsedIssueAssetTransaction.getAsset().isDivisible());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
 			
 			//CHECK FEE
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());	
@@ -451,7 +451,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -711,7 +711,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
@@ -745,7 +745,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER

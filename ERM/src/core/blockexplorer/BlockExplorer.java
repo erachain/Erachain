@@ -805,8 +805,8 @@ public class BlockExplorer
 		Comparator<Pair<Account, PollOption>> comparator = new Comparator<Pair<Account, PollOption>>() {
 			public int compare(Pair<Account, PollOption> c1, Pair<Account, PollOption> c2) {
 
-				BigDecimal c1votes = c1.getA().getConfirmedBalance();
-				BigDecimal c2votes = c2.getA().getConfirmedBalance();
+				BigDecimal c1votes = c1.getA().getConfirmedBalance(Transaction.FEE_KEY);
+				BigDecimal c2votes = c2.getA().getConfirmedBalance(Transaction.FEE_KEY);
 
 				return c2votes.compareTo(c1votes);
 			}
@@ -823,7 +823,7 @@ public class BlockExplorer
 		{
 			Map voteJSON = new LinkedHashMap();
 			voteJSON.put("option", vote.getB().getName());
-			voteJSON.put("votes", vote.getA().getConfirmedBalance().toPlainString());
+			voteJSON.put("votes", vote.getA().getConfirmedBalance(Transaction.FEE_KEY).toPlainString());
 
 			votesJSON.put(vote.getA().getAddress(), voteJSON);
 		}
@@ -1042,7 +1042,7 @@ public class BlockExplorer
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getCreator().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction)transaction);
-			if(issueAssetTransaction.getAsset().getName().equals(asset.getName()))
+			if(issueAssetTransaction.getItem().getName().equals(asset.getName()))
 			{
 				assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
 				assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
@@ -1582,11 +1582,11 @@ public class BlockExplorer
 
 			if(transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) 
 			{
-				long assetkey = ((IssueAssetTransaction) transaction).getAsset().getKey();
+				long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
 				
 				transactionDataJSON.put("asset", assetkey);
 				
-				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getAsset().getName());
+				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
 			}
 
 			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 

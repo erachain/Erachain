@@ -212,7 +212,7 @@ public class NameSalesResource
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);		
 			
-			case Transaction.NAME_ALREADY_FOR_SALE:
+			case Transaction.NAME_ALREADY_ON_SALE:
 				
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);	
 				

@@ -16,10 +16,17 @@ import utils.PlaySound;
 import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
+import core.item.ItemCls;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Issue_ItemRecord;
+import core.transaction.IssueImprintRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.PaymentTransaction;
+import core.transaction.TransferAssetTransaction;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import database.DBSet;
+import database.ItemAssetMap;
 import database.SortableList;
 import database.wallet.TransactionMap;
 import lang.Lang;
@@ -30,20 +37,26 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_CONFIRMATIONS = 0;
 	public static final int COLUMN_TIMESTAMP = 1;
 	public static final int COLUMN_TYPE = 2;
-	public static final int COLUMN_ADDRESS = 3;
-	public static final int COLUMN_AMOUNT = 4;
-	public static final int COLUMN_FEE = 5;
+	public static final int COLUMN_CREATOR = 3;
+	public static final int COLUMN_ITEM = 4;
+	public static final int COLUMN_AMOUNT = 5;
+	public static final int COLUMN_RECIPIENT = 6;
+	public static final int COLUMN_FEE = 7;
+	public static final int COLUMN_SIZE = 8;
 	
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
+	//ItemAssetMap dbItemAssetMap;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Confirmations", "Timestamp", "Type", "Creator", "Amount", "Fee"});
-	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{
+			"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
 
 	static Logger LOGGER = Logger.getLogger(WalletTransactionsTableModel.class.getName());
 
 	public WalletTransactionsTableModel()
 	{
 		Controller.getInstance().addWalletListener(this);
+		//dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
+		
 	}
 	
 	@Override
@@ -91,9 +104,35 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			
 			Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
 			Account creator = new Account(data.getA().a);
-			//Account recipient = new Account(data.getA().b);
+			Account recipient = null; //new Account(data.getA().b);
 			
 			Transaction transaction = data.getB();
+			creator = transaction.getCreator();
+			String itemName = "";
+			if (transaction instanceof TransactionAmount)
+			{
+				TransactionAmount transAmo = (TransactionAmount)transaction;
+				recipient = transAmo.getRecipient();
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getKey());
+				itemName = item.toString();
+			} else if ( transaction instanceof GenesisTransferAssetTransaction)
+			{
+				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
+				recipient = transGen.getRecipient();				
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
+				itemName = item.toString();
+			} else if ( transaction instanceof Issue_ItemRecord)
+			{
+				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
+				ItemCls item = transIssue.getItem();
+				// SET REFERENCE for ITEM as SIGNATURE record
+				if (!(transIssue instanceof IssueImprintRecord))
+				{
+					item.setReference(transIssue.getSignature());
+				}
+				//item.getKey();
+				itemName = item.getShort();
+			}
 			
 			switch(column)
 			{
@@ -103,30 +142,38 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(transaction.getTimestamp());
+				return transaction.viewTimestamp();
 				
 			case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.getRecordType());
+				return Lang.getInstance().translate(transaction.viewTypeName());
 				
-			case COLUMN_ADDRESS:
+			case COLUMN_CREATOR:
 				
-				return creator.getAddress();
+				return transaction.viewCreator();
 				
-			case COLUMN_AMOUNT:
-				
-				String address = creator.getAddress();
+			case COLUMN_ITEM:
+				return itemName;
 
-				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(creator));			
+			case COLUMN_AMOUNT:
+								
+				if (recipient==null) return "";
+				
+				String address = recipient.getAddress();
+
+				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(recipient));			
+
+			case COLUMN_RECIPIENT:
+				
+				return transaction.viewRecipient();
 
 			case COLUMN_FEE:
 				
-				address = creator.getAddress();
-				
-				if(address.equals(transaction.getCreator().getAddress()))
-					return NumberAsString.getInstance().numberAsString(transaction.getFee());			
-				return "{" + NumberAsString.getInstance().numberAsString(transaction.getFee()) + "}";			
+				return transaction.viewFee();			
+
+			case COLUMN_SIZE:
+				return transaction.viewSize(false);
 			}
 			
 			return null;
@@ -179,7 +226,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		{		
 			if(DBSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
 			{
-				if(((Transaction) message.getValue()).getType() == Transaction.PAYMENT_TRANSACTION)
+				int type = ((Transaction) message.getValue()).getType(); 
+				if( type == Transaction.PAYMENT_TRANSACTION)
 				{
 					PaymentTransaction paymentTransaction = (PaymentTransaction) message.getValue();
 					Account account = Controller.getInstance().getAccountByAddress(paymentTransaction.getRecipient().getAddress());	
@@ -198,8 +246,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
 					}
 				}
-				else if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
+				else if( type == Transaction.SEND_ASSET_TRANSACTION)
 				{
+					MessageTransaction messageTransaction = (MessageTransaction) message.getValue();
 					Account account = Controller.getInstance().getAccountByAddress(((MessageTransaction) message.getValue()).getRecipient().getAddress());	
 					if(account != null)
 					{
@@ -207,7 +256,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 						{
 							PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature()) ;
 						}
+						
+						SysTray.getInstance().sendMessage("Payment received", "From: " + messageTransaction.getCreator().getAddress() + "\nTo: " + account.getAddress()
+						+ "\n" + "Asset Key" + ": " + messageTransaction.getKey()
+						+ ", " + "Amount" + ": " + messageTransaction.getAmount().toPlainString(), MessageType.INFO);
 					}
+					
 					else if(Settings.getInstance().isSoundNewTransactionEnabled())
 					{
 						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());

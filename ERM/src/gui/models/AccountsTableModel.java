@@ -166,9 +166,9 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		
 		for(Account account: this.accounts)
 		{
-			if(this.asset == null || this.asset.getKey() == 0l)
+			if(this.asset == null)
 			{
-				totalBalance = totalBalance.add(account.getConfirmedBalance());
+				totalBalance = totalBalance.add(account.getConfirmedBalance(Transaction.FEE_KEY));
 			}
 			else
 			{

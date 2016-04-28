@@ -330,7 +330,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	}
 
 	@Override
-	public void send_to_Address_in_B( long val , AT_Machine_State state ) {
+	public void send_to_Address_in_B( long key , long val, AT_Machine_State state ) {
 
 		if ( val < 1 ) return;
 
@@ -351,7 +351,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 			b.get(finalAddress, 0, finalAddress.length);
 
-			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , val , null);
+			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , key , val, null);
 			state.addTransaction( tx );
 
 			state.setG_balance( state.getG_balance() - val );
@@ -373,7 +373,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 			b.get(finalAddress, 0, finalAddress.length);
 
-			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , state.getG_balance() , null);
+			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , key , state.getG_balance(), null);
 			state.addTransaction( tx );
 
 			state.setG_balance( 0L );
@@ -381,7 +381,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	}
 
 	@Override
-	public void send_All_to_Address_in_B( AT_Machine_State state ) 
+	public void send_All_to_Address_in_B( long key, AT_Machine_State state ) 
 	{
 		ByteBuffer b = ByteBuffer.allocate( state.get_B1().length * 4 );
 		b.order( ByteOrder.LITTLE_ENDIAN );
@@ -395,7 +395,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		b.clear();
 		b.get(recipientBytes, 0, AT_Constants.AT_ID_SIZE);
 
-		AT_Transaction tx = new AT_Transaction( state.getId(),  recipientBytes , state.getG_balance() , null);
+		AT_Transaction tx = new AT_Transaction( state.getId(),  recipientBytes , key , state.getG_balance(), null);
 		state.addTransaction( tx );
 
 		state.setG_balance( 0L );
@@ -420,7 +420,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 		if ( state.getP_balance() > state.getG_balance()  )
 		{
-			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , state.getG_balance() , null);
+			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , Transaction.FEE_KEY , state.getG_balance(), null);
 			state.addTransaction( tx );
 
 			state.setG_balance( 0L );
@@ -429,7 +429,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		}
 		else
 		{
-			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , state.getP_balance() , null);
+			AT_Transaction tx = new AT_Transaction( state.getId(),  finalAddress , Transaction.FEE_KEY , state.getP_balance(), null);
 			state.addTransaction( tx );
 
 			state.setG_balance( state.getG_balance() - state.getP_balance() );
@@ -463,7 +463,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 		b.get(finalAddress, 0 , finalAddress.length );
 
-		AT_Transaction tx = new AT_Transaction( state.getId(), finalAddress , 0L, a.array() );
+		AT_Transaction tx = new AT_Transaction( state.getId(), finalAddress , Transaction.FEE_KEY, 0L, a.array() );
 		state.addTransaction(tx);
 
 	}

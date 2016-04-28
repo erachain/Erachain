@@ -69,7 +69,8 @@ public class TransferAssetDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Transfer Check Transaction"));
+		JLabel type = new JLabel(assetTransfer.viewType() + ":" + assetTransfer.viewProperies() + " "
+				+ Lang.getInstance().translate(assetTransfer.viewTypeName()));
 		this.add(type, detailGBC);
 		
 		//LABEL SIGNATURE
@@ -91,7 +92,7 @@ public class TransferAssetDetailsFrame extends JFrame
 						
 		//REFERENCE
 		detailGBC.gridy = 2;
-		JTextField reference = new JTextField(Base58.encode(assetTransfer.getReference()));
+		JTextField reference = new JTextField(assetTransfer.viewReference());
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);
@@ -103,7 +104,7 @@ public class TransferAssetDetailsFrame extends JFrame
 						
 		//TIMESTAMP
 		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(assetTransfer.getTimestamp()));
+		JTextField timestamp = new JTextField(assetTransfer.viewTimestamp());
 		timestamp.setEditable(false);
 		MenuPopupUtil.installContextMenu(timestamp);
 		this.add(timestamp, detailGBC);
@@ -115,7 +116,7 @@ public class TransferAssetDetailsFrame extends JFrame
 		
 		//SENDER
 		detailGBC.gridy = 4;
-		JTextField sender = new JTextField(assetTransfer.getCreator().getAddress());
+		JTextField sender = new JTextField(assetTransfer.viewCreator());
 		sender.setEditable(false);
 		MenuPopupUtil.installContextMenu(sender);
 		this.add(sender, detailGBC);
@@ -127,14 +128,14 @@ public class TransferAssetDetailsFrame extends JFrame
 		
 		//RECIPIENT
 		detailGBC.gridy = 5;
-		JTextField recipient = new JTextField(assetTransfer.getRecipient().getAddress());
+		JTextField recipient = new JTextField(assetTransfer.viewRecipient());
 		recipient.setEditable(false);
 		MenuPopupUtil.installContextMenu(recipient);
 		this.add(recipient, detailGBC);		
 		
 		//LABEL ASSET
 		labelGBC.gridy = 6;
-		JLabel assetLabel = new JLabel(Lang.getInstance().translate("Check") + ":");
+		JLabel assetLabel = new JLabel(Lang.getInstance().translate("Asset") + ":");
 		this.add(assetLabel, labelGBC);
 		
 		//ASSET
@@ -163,18 +164,30 @@ public class TransferAssetDetailsFrame extends JFrame
 						
 		//FEE
 		detailGBC.gridy = 8;
-		JTextField fee = new JTextField(assetTransfer.getFee().toPlainString());
+		JTextField fee = new JTextField(assetTransfer.viewFee());
 		fee.setEditable(false);
 		MenuPopupUtil.installContextMenu(fee);
 		this.add(fee, detailGBC);	
 		
-		//LABEL CONFIRMATIONS
+		//LABEL SIZE
 		labelGBC.gridy = 9;
+		JLabel sizeLabel = new JLabel(Lang.getInstance().translate("Size") + ":");
+		this.add(sizeLabel, labelGBC);
+						
+		//FEE
+		detailGBC.gridy = 9;
+		JTextField size = new JTextField(assetTransfer.viewSize(false) + "");
+		size.setEditable(false);
+		MenuPopupUtil.installContextMenu(size);
+		this.add(size, detailGBC);	
+
+		//LABEL CONFIRMATIONS
+		labelGBC.gridy = 10;
 		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
 		this.add(confirmationsLabel, labelGBC);
 								
 		//CONFIRMATIONS
-		detailGBC.gridy = 9;
+		detailGBC.gridy = 10;
 		JLabel confirmations = new JLabel(String.valueOf(assetTransfer.getConfirmations()));
 		this.add(confirmations, detailGBC);	
 		           

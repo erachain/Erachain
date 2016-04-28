@@ -8,7 +8,7 @@ import org.mapdb.Fun.Tuple2;
 
 import core.item.ItemCls;
 import utils.ObserverMessage;
-import database.serializer.ImprintSerializer;
+import database.serializer.ItemSerializer;
 
 public class WItemImprintMap extends WItem_Map
 {
@@ -40,7 +40,7 @@ public class WItemImprintMap extends WItem_Map
 		//OPEN MAP
 		return database.createTreeMap(NAME)
 				.keySerializer(BTreeKeySerializer.TUPLE2)
-				.valueSerializer(new ImprintSerializer())
+				.valueSerializer(new ItemSerializer(TYPE))
 				.counterEnable()
 				.makeOrGet();
 	}

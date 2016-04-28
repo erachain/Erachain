@@ -2,10 +2,10 @@
 	"weballowed":[
 		"127.0.0.1"
 	],
-	"rpcallowed":[
-		
-	],
 	"lang":"ru.json",
+	"rpcallowed":[
+		"127.0.0.1"
+	],
 	"knownpeers":[
 		
 	]

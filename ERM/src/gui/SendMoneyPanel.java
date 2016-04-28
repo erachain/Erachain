@@ -341,7 +341,7 @@ public class SendMoneyPanel extends JPanel
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			AssetCls asset = (AssetCls) this.cbxFavorites.getSelectedItem();
 			Pair<Transaction, Integer> result;
-			if(asset.getKey() == 0l)
+			if(asset.getKey() == Transaction.FEE_KEY)
 			{
 				//CREATE PAYMENT
 				result = Controller.getInstance().sendPayment(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, amount, feePow);

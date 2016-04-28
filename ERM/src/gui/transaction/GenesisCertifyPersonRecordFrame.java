@@ -87,6 +87,7 @@ public class GenesisCertifyPersonRecordFrame extends JFrame
 		MenuPopupUtil.installContextMenu(signature);
 		this.add(signature, detailGBC);
 		
+		/*
 		//LABEL REFERENCE
 		labelGBC.gridy = 2;
 		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
@@ -110,6 +111,7 @@ public class GenesisCertifyPersonRecordFrame extends JFrame
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
+		*/
 		
 		//LABEL NAME
 		labelGBC.gridy = 6;
@@ -123,6 +125,7 @@ public class GenesisCertifyPersonRecordFrame extends JFrame
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
 		
+		/*
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 7;
 		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
@@ -160,6 +163,7 @@ public class GenesisCertifyPersonRecordFrame extends JFrame
 		divisible.setSelected(asset.isDivisible());
 		divisible.setEnabled(false);
 		this.add(divisible, detailGBC);	
+		*/
 				
 		//LABEL CONFIRMATIONS
 		labelGBC.gridy = 11;

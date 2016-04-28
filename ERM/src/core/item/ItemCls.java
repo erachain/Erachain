@@ -91,7 +91,11 @@ public abstract class ItemCls {
 	}
 	public long getKey(DBSet db) {
 		// TODO if ophran ?
-		if (this.key <0) this.key = this.getDBIssueMap(db).get(this.reference);
+		if (this.key <0 & this.reference != null) {
+			if (this.getDBIssueMap(db).contains(this.reference)) {
+				this.key = this.getDBIssueMap(db).get(this.reference);
+			}
+		}
 		return this.key;
 	}
 	
@@ -174,12 +178,14 @@ public abstract class ItemCls {
 	
 	public String toString()
 	{		
-		return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name;
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name;
+		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name;
 	}
 	
 	public String getShort()
 	{
-		return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -234,8 +240,8 @@ public abstract class ItemCls {
 	{
 		//DELETE FROM DATABASE
 		Issue_ItemMap issueDB = this.getDBIssueMap(db);
-		long key = issueDB.get(this.reference);
-		this.getDBMap(db).delete(key);	
+		//long key = ;
+		this.getDBMap(db).delete(this.getKey());	
 				
 		//DELETE ORPHAN DATA
 		issueDB.delete(this.reference);

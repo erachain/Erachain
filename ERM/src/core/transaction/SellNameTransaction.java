@@ -193,7 +193,7 @@ public class SellNameTransaction extends Transaction
 		//CHECK IF NOT FOR SALE ALREADY
 		if(db.getNameExchangeMap().contains(this.nameSale))
 		{
-			return NAME_ALREADY_FOR_SALE;
+			return NAME_ALREADY_ON_SALE;
 		}
 		
 		//CHECK IF AMOUNT POSITIVE

@@ -559,7 +559,7 @@ public class UpdateNameFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("That name does not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
-			case Transaction.NAME_ALREADY_FOR_SALE:
+			case Transaction.NAME_ALREADY_ON_SALE:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("That name is already for sale!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;

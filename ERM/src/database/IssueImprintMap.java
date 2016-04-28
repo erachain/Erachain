@@ -26,6 +26,7 @@ public class IssueImprintMap extends Issue_ItemMap
 	{
 		super(parent);
 	}
+
 	/*
 	
 	protected void createIndexes(DB database){}

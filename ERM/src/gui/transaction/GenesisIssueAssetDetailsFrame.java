@@ -72,9 +72,10 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 						
 		//TYPE
 		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Issue Asset Transaction"));
+		JLabel type = new JLabel(assetIssue.viewType() + " " + Lang.getInstance().translate(assetIssue.viewTypeName()));
 		this.add(type, detailGBC);
 		
+		/*
 		//LABEL SIGNATURE
 		labelGBC.gridy = 1;
 		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
@@ -110,6 +111,7 @@ public class GenesisIssueAssetDetailsFrame extends JFrame
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
+		*/
 		
 		//LABEL NAME
 		labelGBC.gridy = 6;

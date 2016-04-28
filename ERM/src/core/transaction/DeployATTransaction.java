@@ -408,14 +408,14 @@ public class DeployATTransaction extends Transaction
 	{
 		//UPDATE ISSUER
 		super.process(db, asPack);
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).subtract(this.amount), db);
+		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.amount), db);
 
 		//CREATE AT ID = ADDRESS
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 
 		Account atAccount = new Account(atId);
 	
-		atAccount.setConfirmedBalance( this.amount , db );
+		atAccount.setConfirmedBalance(Transaction.FEE_KEY, this.amount , db );
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		if(Arrays.equals(atAccount.getLastReference(db), new byte[0]))
@@ -470,14 +470,14 @@ public class DeployATTransaction extends Transaction
 
 		//UPDATE ISSUER
 		super.orphan(db, asPack);
-		this.creator.setConfirmedBalance(this.creator.getConfirmedBalance(db).add(this.amount), db);
+		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(this.amount), db);
 		
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 		
 		Account atAccount = new Account(atId);
 		
 		//UPDATE RECIPIENT
-		atAccount.setConfirmedBalance(atAccount.getConfirmedBalance(db).subtract(this.amount), db);
+		atAccount.setConfirmedBalance(Transaction.FEE_KEY, atAccount.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.amount), db);
 			
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.reference, db);
