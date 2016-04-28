@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.math.BigDecimal;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.MaskFormatter;
 
 //import settings.Settings;
 import utils.DateTimeFormat;
@@ -194,23 +196,17 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       	//TXT Birthday
       	txtGBC.gridy = gridy++;
       	this.txtBirthday = new JTextField();
-      	//this.txtBirthday = new JFormattedTextField(new Date()); 
-      	this.txtBirthday.setText("1970-08-12");
+      	// Маска ввода
+      	MaskFormatter mf1 = null;
+      	try {
+			 mf1 = new MaskFormatter("##-##-####");
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+      	this.txtBirthday = new JFormattedTextField(mf1); 
+      	this.txtBirthday.setText("12-08-1970");
         this.add(this.txtBirthday, txtGBC);
-        
-        
-        
-
-      //. . . . . . . .
-
-      //Редактируем дату... Потом нажимаем клавишу <Enter>
-
-      //. . . . . . . .
-
-    //  public void actionPerformed(ActionEvent e){ newDate = (Date)ftf.getValue();
-
-    //  }
-        
         
 
         //LABEL RACE

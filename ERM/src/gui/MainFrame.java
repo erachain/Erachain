@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
+import gui.items.persons.PersonConfirm;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -24,6 +25,7 @@ import settings.Settings;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
+	
 private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
 
@@ -85,6 +87,7 @@ public static  JDesktopPane desktopPane;
         //desktopPane.add(new IssuePersonFrame());
     //    desktopPane.add(new AccountsPanel());
         desktopPane.add(new AllPersonsFrame());
+     // new PersonConfirm(); 
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
         
