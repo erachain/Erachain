@@ -199,13 +199,13 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
       	// Маска ввода
       	MaskFormatter mf1 = null;
       	try {
-			 mf1 = new MaskFormatter("##-##-####");
+			 mf1 = new MaskFormatter("####-##-##");
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
       	this.txtBirthday = new JFormattedTextField(mf1); 
-      	this.txtBirthday.setText("12-08-1970");
+      	this.txtBirthday.setText("1970-12-08");
         this.add(this.txtBirthday, txtGBC);
         
 
