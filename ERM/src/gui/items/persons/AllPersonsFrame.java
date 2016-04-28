@@ -28,7 +28,10 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -38,6 +41,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.mapdb.Fun.Tuple3;
 import core.item.persons.PersonCls;
+import database.AddressPersonMap;
 import database.DBSet;
 import database.ItemPersonMap;
 
@@ -120,9 +124,11 @@ public class AllPersonsFrame extends JInternalFrame {
 		
 		//BLOCKS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX); // указываем, что первая колонка состоит из чисел
+		indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX);// указываем, что первая колонка состоит из чисел
 		CoreRowSorter sorter = new CoreRowSorter(this.tableModelPersons, indexes);
 	//	sorter.setSortKeys(<list>(new SortKey("1"), new SortKey("2")));
+		
+		
 		personsTable.setRowSorter(sorter);
 				  
 		  
@@ -230,21 +236,30 @@ public class AllPersonsFrame extends JInternalFrame {
 			}; 
 		});
 		// MENU
-	/*
-	JPopupMenu nameSalesMenu = new JPopupMenu();
-		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
-		details.addActionListener(new ActionListener() {
+	
+	JPopupMenu All_Persons_Table_menu = new JPopupMenu();
+		JMenuItem Confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
+		Confirm_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/*
 				int row = personsTable.getSelectedRow();
 				row = personsTable.convertRowIndexToModel(row);
 
 				PersonCls person = tableModelPersons.getPerson(row);
 				new PersonFrame(person);
+				*/
+				// открываем диалоговое окно ввода данных для подтверждения персоны 
+		    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
+		// обрабатываем полученные данные от диалогового окна
+		    	//if(fm.isOK()){
+                //    JOptionPane.showMessageDialog(Form1.this, "OK");
+                //}
+			
 			}
 		});
-		nameSalesMenu.add(details);
+		All_Persons_Table_menu.add(Confirm_Menu);
 
-		personsTable.setComponentPopupMenu(nameSalesMenu);
+		personsTable.setComponentPopupMenu(All_Persons_Table_menu);
 		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override
@@ -262,7 +277,7 @@ public class AllPersonsFrame extends JInternalFrame {
 			}
 		});
 	
-*/
+
 		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
         
@@ -270,7 +285,7 @@ public class AllPersonsFrame extends JInternalFrame {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
         c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
-
+/*
         // Create and add a bunch of buttons, specifying different grid
         // position, and size for each.
         // Give the first button a resize weight of 1.0 and all others
@@ -299,12 +314,18 @@ public class AllPersonsFrame extends JInternalFrame {
         c.weightx = c.weighty = 0;
        
         this.add(new JScrollPane(Address1), c);
-
-       // c.gridx = 4;
-       // c.gridy = 2;
-       // c.gridwidth = 1;
-       // c.gridheight = 2;
+*/
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 4;
+        c.gridheight = 2;
+        c.weightx = c.weighty = 1.0;
        // this.add(new JButton("Button #4"), c);
+        
+        
+        JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
+        PersJSpline.setDividerLocation(600);
+        this.add(PersJSpline,c);
 
         
 		setPreferredSize(new Dimension(1000, 600));
