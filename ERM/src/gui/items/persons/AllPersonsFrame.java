@@ -18,6 +18,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +68,7 @@ import gui.models.BlocksTableModel;
 public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllItemsFrame {
 	
 	private TableModelPersons tableModelPersons;
+	private JButton ConfirmButton;
 	
 
 	public AllPersonsFrame() {
@@ -122,30 +124,10 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		searchGBC.gridwidth = 1;
 		searchGBC.gridx = 1;
 		searchGBC.gridy = 0;
-		
-		//TABLE GBC
-		GridBagConstraints tableGBC = new GridBagConstraints();
-		tableGBC.insets = new Insets(0, 5, 5, 0);
-		tableGBC.fill = GridBagConstraints.BOTH;  
-		tableGBC.anchor = GridBagConstraints.NORTHWEST;
-		tableGBC.weightx = 1;	
-		tableGBC.weighty = 1;	
-		tableGBC.gridwidth = 2;
-		tableGBC.gridx = 0;	
-		tableGBC.gridy = 1;	
+	
 		
 		
-		//account TABLe
-		GridBagConstraints tableAccount = new GridBagConstraints();
-		tableAccount.insets = new Insets(0, 5, 5, 0);
-		tableAccount.fill = GridBagConstraints.BOTH;
-		tableAccount.gridwidth = GridBagConstraints.REMAINDER; 
-		tableAccount.anchor = GridBagConstraints.NORTH;//.NORTHWEST;
-		tableAccount.weightx = 1.0;	
-		tableAccount.weighty = 1.0;	
-		tableAccount.gridwidth = 2;
-		tableAccount.gridx =15;	
-		tableAccount.gridy = 1;		
+		
 		
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
@@ -219,11 +201,11 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		
 		// select row table persons
 		//CREATE SEARCH FIELD
-				final JLabel Address1 = new JLabel(""); //<HTML><input value = '2222' name = 'nnn' id = 'iii' class='cccc'></HTML>");
+		//		final JLabel Address1 = new JLabel(""); //<HTML><input value = '2222' name = 'nnn' id = 'iii' class='cccc'></HTML>");
 		
-	//	JEditorPane Address1 = new JEditorPane();
-	//	Address1.setContentType("text/html");
-	//	Address1.setText("<HTML><input value = '2222' name = 'nnn' id = 'iii' class='cccc'></HTML>"); // Document text is provided below.
+		JEditorPane Address1 = new JEditorPane();
+		Address1.setContentType("text/html");
+		Address1.setText("<HTML>Select person"); // Document text is provided below.
 		// HTMLDocument d = (HTMLDocument) p.getDocument();
 		
 		
@@ -285,6 +267,7 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 		//	String a = person.getName().toString();
 			
 				Address1.setText(message);
+				AllPersonsFrame.this.setSize(AllPersonsFrame.this.getSize());//.setPreferredSize(new Dimension(100,100));
 			//.get
 			
 			
@@ -335,14 +318,73 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 			}
 		});
 	
-
+// button confirm
+		  
+      //  buttonGBC.gridy = gridy;
+        this.ConfirmButton = new JButton(Lang.getInstance().translate("Confirm"));
+        this.ConfirmButton.setPreferredSize(new Dimension(100, 25));
+        this.ConfirmButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		//        onIssueClick();
+		    	//selectOrAdd( new PersonConfirm(), MainFrame.desktopPane.getAllFrames());
+		    	 new PersonConfirm();
+		    }
+		});
+    	
+        
+        		
         
 		
 		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 
-		this.add(new JScrollPane(personsTable), tableGBC);
-		this.add(new JScrollPane(Address1), tableAccount);
+	//	this.add(new JScrollPane(personsTable), tableGBC);
+	//	this.add(this.ConfirmButton, Con_ButtonConfirm);
+	//	this.add(new JScrollPane(Address1), tableAccount);
+//		this.add(new JLabel(" 1 "), C_empty);
+        
+        // Create a constraints object, and specify some default values
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
+        c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
+
+        // Create and add a bunch of buttons, specifying different grid
+        // position, and size for each.
+        // Give the first button a resize weight of 1.0 and all others
+        // a weight of 0.0. The first button will get all extra space.
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 4;
+        c.gridheight = 6;
+        c.weightx = c.weighty = 1.0;
+        this.add(new JScrollPane(personsTable), c);
+
+        c.gridx = 4;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = c.weighty = 0.0;
+        this.add(this.ConfirmButton, c);
+
+        
+        c.gridx = 4;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.gridheight = GridBagConstraints.REMAINDER; //3;
+        c.fill = GridBagConstraints.BOTH;//.HORIZONTAL;
+        c.anchor = GridBagConstraints.NORTH;
+        c.weightx = c.weighty = 0;
+        this.add(new JScrollPane(Address1), c);
+
+       // c.gridx = 4;
+       // c.gridy = 2;
+       // c.gridwidth = 1;
+       // c.gridheight = 2;
+       // this.add(new JButton("Button #4"), c);
+
+        
 		setPreferredSize(new Dimension(1000, 600));
 		//PACK
 		this.pack();
@@ -351,5 +393,34 @@ public class AllPersonsFrame extends JInternalFrame {//extends JFrame { //AllIte
 	//	this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
+	
+	// подпрограмма выводит в панели окно или передает фокус если окно уже открыто
+	// item открываемое окно
+	// массив всех открытых окон в панели
+	void selectOrAdd(JInternalFrame item, JInternalFrame[] a ){
+		    		
+		//проверка если уже открыто такое окно то передаем только фокус на него
+		int k= -1;
+		for (int i=0 ; i < a.length; i=i+1) {
+//			String s = a[i].getClass().getName();
+			if (a[i].getClass().getName() == item.getClass().getName()){
+				k=i;
+			}
+			
+		};
+		if (k==-1){
+		MainFrame.desktopPane.add(item);
+		 try {
+			 item.setSelected(true);
+	        } catch (java.beans.PropertyVetoException e1) {}
+		}
+		else {
+			try {
+				a[k].setSelected(true);
+			} catch (PropertyVetoException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}	
 
-}
+}}
