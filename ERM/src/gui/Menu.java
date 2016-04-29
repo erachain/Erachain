@@ -24,6 +24,8 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
+import gui.items.imprints.ImprintsPanel;
+import gui.items.imprints.ImprintsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.AllPersonsView;
 import gui.items.persons.IssuePersonFrame;
@@ -54,7 +56,38 @@ public class Menu extends JMenuBar
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));
         this.add(fileMenu);
         
+        JMenu accountsMenu = new JMenu(Lang.getInstance().translate("Accounts"));
+        fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts menu"));
+        this.add(accountsMenu);
       
+        JMenu dealsMenu = new JMenu(Lang.getInstance().translate("Deals"));
+        dealsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Deals menu"));
+        this.add(dealsMenu);
+
+        JMenu personsMenu = new JMenu(Lang.getInstance().translate("Persons"));
+        personsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons menu"));
+        this.add(personsMenu);
+
+        JMenu statusesMenu = new JMenu(Lang.getInstance().translate("Statuses"));
+        statusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statuses menu"));
+        this.add(statusesMenu);
+
+        JMenu unionsMenu = new JMenu(Lang.getInstance().translate("Unions"));
+        unionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Unions menu"));
+        this.add(unionsMenu);
+
+        JMenu assetsMenu = new JMenu(Lang.getInstance().translate("Assets"));
+        assetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assets menu"));
+        this.add(assetsMenu);
+
+        JMenu imprintsMenu = new JMenu(Lang.getInstance().translate("Imprints"));
+        imprintsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints menu"));
+        this.add(imprintsMenu);
+
+        JMenu recordsMenu = new JMenu(Lang.getInstance().translate("Records"));
+        recordsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records menu"));
+        this.add(recordsMenu);
+
 
         //LOCK
 
@@ -216,10 +249,69 @@ public class Menu extends JMenuBar
        
         // work menu
         
-        JMenu PersonMenu = new JMenu(Lang.getInstance().translate("Persons"));
-        PersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons"));
-        this.add(PersonMenu);
- /*        
+        // Accounts menu
+        JMenuItem accountsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
+        accountsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts List"));
+        accountsMenuList.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		selectOrAdd(new AccountsPanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        accountsMenu.add(accountsMenu);     
+
+        // DEALS
+        JMenuItem dealsMenuSend = new JMenuItem(Lang.getInstance().translate("Send"));
+        dealsMenuSend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send"));
+        dealsMenuSend.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		selectOrAdd(new SendMoneyPanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        dealsMenu.add(dealsMenuSend);     
+
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Message"));
+        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Message"));
+        dealsMenuSendMessage.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new SendMessagePanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        dealsMenu.add(dealsMenuSendMessage);     
+
+        // Imprints menu
+        JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
+        imprintsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints List"));
+        imprintsMenuList.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        imprintsMenu.add(imprintsMenuList);     
+
+        // Records menu
+        JMenuItem recordsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
+        recordsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records List"));
+        recordsMenuList.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        recordsMenu.add(recordsMenuList);     
+
+        /*        
         //Search person
         JMenuItem searchPerson = new JMenuItem(Lang.getInstance().translate("Search"));
         searchPerson.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Search Persons"));
@@ -239,23 +331,6 @@ public class Menu extends JMenuBar
         
 */
         
-        // меню Accounts
-        JMenuItem accountsmenu = new JMenuItem(Lang.getInstance().translate("Accounts"));
-        accountsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts"));
-   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        accountsmenu.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-             
-        		// выводим окно если оно не отображено
-        		selectOrAdd(new AccountsPanel(), MainFrame.desktopPane.getAllFrames());
-        		
-        	
-        		
-        	}
-        });
-        PersonMenu.add(accountsmenu);     
 
         // меню Persons
         JMenuItem Allpersonsmenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
@@ -271,7 +346,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        PersonMenu.add(Allpersonsmenu);  
+        personsMenu.add(Allpersonsmenu);  
         
         // issue Person menu
         JMenuItem Issuepersonmenu = new JMenuItem(Lang.getInstance().translate("Issue Person"));
@@ -287,7 +362,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        PersonMenu.add(Issuepersonmenu);  
+        personsMenu.add(Issuepersonmenu);  
         
         
 	}
