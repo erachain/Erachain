@@ -81,20 +81,13 @@ public abstract class TransactionAmount extends Transaction {
 	}
 	
 	@Override
-	public BigDecimal viewAmount(Account account) {
+	public BigDecimal viewAmount(String address) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
 		
-		//IF SENDER
 		if(address.equals(this.creator.getAddress()))
 		{
+			//IF SENDER
 			amount = amount.subtract(this.amount);
-			/*
-			if(this.key == FEE_KEY)
-			{
-				amount = amount.subtract(this.fee);
-			}
-			*/
 		} else if(address.equals(this.recipient.getAddress()))
 		{
 			//IF RECIPIENT
@@ -102,6 +95,11 @@ public abstract class TransactionAmount extends Transaction {
 		}
 
 		return amount;
+	}
+	@Override
+	public BigDecimal viewAmount(Account account) {
+		String address = account.getAddress();
+		return viewAmount(address);
 	}
 	
 	//PARSE/CONVERT
