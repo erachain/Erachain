@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -24,7 +25,7 @@ import lang.Lang;
 
 public class PersonConfirm extends JDialog { // InternalFrame  {
 
-	public PersonConfirm(JInternalFrame  owner) {
+	public PersonConfirm(JComponent  apers) {
 		super();
 	
 		final JTextField Address1 = new JTextField();
@@ -36,7 +37,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		//	MainFrame mainFram = new MainFrame();
 	
 		setSize(400,300);
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(apers);
         setModalityType(ModalityType.TOOLKIT_MODAL);
         setDefaultCloseOperation(HIDE_ON_CLOSE);    	
 		

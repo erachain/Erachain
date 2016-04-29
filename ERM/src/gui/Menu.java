@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.AllPersonsView;
 import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
@@ -266,7 +267,7 @@ public class Menu extends JMenuBar
         	{
              
         // выводим окно или делаем фокус если уже открыто
-        		selectOrAdd( new AllPersonsFrame(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new AllPersonsView(), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });

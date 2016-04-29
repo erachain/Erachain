@@ -10,12 +10,16 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.AllPersonsView;
 import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.PersonConfirm;
 import gui.items.persons.SearchPersons;
@@ -46,7 +50,31 @@ public static  JDesktopPane desktopPane;
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		this.setIconImages(icons);
 		
-        //MENU
+       
+		// tool bar
+		JToolBar tb1 = new JToolBar(" Панель 1"),
+
+				tb2 = new JToolBar(" Панель 2");
+
+				tb1.setRollover(true);
+
+				tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
+
+				tb1.add(new JButton(new ImageIcon("About24.gif")));
+
+				tb2.add(new JButton("Первая")); tb2.add(new JButton("Вторая"));
+
+				tb2.add(new JButton("Третья"));
+
+				//add(tb1, BorderLayout.NORTH); 
+				add(tb2, BorderLayout.NORTH);
+
+			
+
+	
+		
+		
+		//MENU
         Menu menu = new Menu();
 
         //ADD MENU TO FRAME
@@ -86,7 +114,8 @@ public static  JDesktopPane desktopPane;
         
         //desktopPane.add(new IssuePersonFrame());
     //    desktopPane.add(new AccountsPanel());
-        desktopPane.add(new AllPersonsFrame());
+    //    desktopPane.add(new AllPersonsFrame());
+        desktopPane.add(new AllPersonsView());
      // new PersonConfirm(); 
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);

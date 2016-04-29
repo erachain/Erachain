@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -22,6 +23,7 @@ import gui.CoreRowSorter;
 import lang.Lang;
 
 import javax.naming.ldap.SortKey;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -29,11 +31,13 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -48,7 +52,7 @@ import database.ItemPersonMap;
 
 
 @SuppressWarnings("serial")
-public class AllPersonsFrame extends JInternalFrame {
+public class AllPersonsFrame extends JPanel {//JInternalFrame {
 	
 	private TableModelPersons tableModelPersons;
 	private JButton ConfirmButton;
@@ -56,7 +60,7 @@ public class AllPersonsFrame extends JInternalFrame {
 
 	public AllPersonsFrame() {
 		
-		super(Lang.getInstance().translate("All Persons"));
+//		super(Lang.getInstance().translate("All Persons"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -68,11 +72,11 @@ public class AllPersonsFrame extends JInternalFrame {
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 	//	MainFrame mainFram = new MainFrame();
 	
-		this.setVisible(true);
-		this.setMaximizable(true);
-		this.setTitle(Lang.getInstance().translate("Persons"));
-		this.setClosable(true);
-		this.setResizable(true);
+	//	this.setVisible(true);
+//		this.setMaximizable(true);
+//		this.setTitle(Lang.getInstance().translate("Persons"));
+//		this.setClosable(true);
+//		this.setResizable(true);
 		
 	
 		
@@ -80,13 +84,13 @@ public class AllPersonsFrame extends JInternalFrame {
 	//	this.setIconImages(icons);
 		
 		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
 		//PADDING
-		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
+//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 		
 		//SEACH LABEL GBC
 		GridBagConstraints searchLabelGBC = new GridBagConstraints();
@@ -96,7 +100,7 @@ public class AllPersonsFrame extends JInternalFrame {
 		searchLabelGBC.weightx = 0;	
 		searchLabelGBC.gridwidth = 1;
 		searchLabelGBC.gridx = 0;
-		searchLabelGBC.gridy = 0;
+		searchLabelGBC.gridy = 1;
 		
 		//SEACH GBC
 		GridBagConstraints searchGBC = new GridBagConstraints();
@@ -106,9 +110,18 @@ public class AllPersonsFrame extends JInternalFrame {
 		searchGBC.weightx = 1;	
 		searchGBC.gridwidth = 1;
 		searchGBC.gridx = 1;
-		searchGBC.gridy = 0;
+		searchGBC.gridy = 1;
 	
 		
+		//SEACH GBC
+				GridBagConstraints ToolB = new GridBagConstraints();
+				searchGBC.insets = new Insets(0, 5, 5, 0);
+				searchGBC.fill = GridBagConstraints.HORIZONTAL;   
+				searchGBC.anchor = GridBagConstraints.NORTHWEST;
+				searchGBC.weightx = 1;	
+				searchGBC.gridwidth = 1;
+				searchGBC.gridx = 1;
+				searchGBC.gridy = 0;
 		
 		
 		
@@ -170,7 +183,7 @@ public class AllPersonsFrame extends JInternalFrame {
 			    public void actionPerformed(ActionEvent e)
 			    {
 			// открываем диалоговое окно ввода данных для подтверждения персоны 
-			    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
+		//	    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
 			// обрабатываем полученные данные от диалогового окна
 			    	//if(fm.isOK()){
 	                //    JOptionPane.showMessageDialog(Form1.this, "OK");
@@ -185,9 +198,16 @@ public class AllPersonsFrame extends JInternalFrame {
 		Address1.setContentType("text/html");
 		Address1.setText("<HTML>Select person"); // Document text is provided below.
 		Address1.setBackground(new Color(255, 255, 255, 0));
+		
+		
+		 JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
+		
+		
+		
 		// обработка изменения положения курсора в таблице
 				personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-
+					
+					@SuppressWarnings("deprecation")
 					@Override
 					public void valueChanged(ListSelectionEvent arg0) {
 						String Date_Acti;
@@ -232,9 +252,31 @@ public class AllPersonsFrame extends JInternalFrame {
 						
 							
 				Address1.setText(message);
-				AllPersonsFrame.this.setSize(AllPersonsFrame.this.getSize());//.setPreferredSize(new Dimension(100,100));		
+				PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());//.setPreferredSize(new Dimension(100,100));		
 			}; 
 		});
+				
+				
+				
+	 // tool bar
+				// tool bar
+				JToolBar tb1 = new JToolBar(" Панель 1"),
+
+						tb2 = new JToolBar(" Панель 2");
+
+						tb1.setRollover(true);
+
+						tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
+
+						tb1.add(new JButton(new ImageIcon("About24.gif")));
+
+						tb2.add(new JButton("Первая")); tb2.add(new JButton("Вторая"));
+
+						tb2.add(new JButton("Третья"));
+
+						//add(tb1, BorderLayout.NORTH); 
+						//add(tb2, ToolB);
+
 		// MENU
 	
 	JPopupMenu All_Persons_Table_menu = new JPopupMenu();
@@ -323,16 +365,16 @@ public class AllPersonsFrame extends JInternalFrame {
        // this.add(new JButton("Button #4"), c);
         
         
-        JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
+   //     JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
         PersJSpline.setDividerLocation(600);
         this.add(PersJSpline,c);
 
         
-		setPreferredSize(new Dimension(1000, 600));
+//		setPreferredSize(new Dimension(1000, 600));
 		//PACK
-		this.pack();
+//		this.pack();
 		//this.setSize(500, this.getHeight());
-		this.setResizable(true);
+//		this.setResizable(true);
 	//	this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
