@@ -22,7 +22,7 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 
 	private SortableList<Long, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator"});
 	
 	public TableModelPersons()
 	{

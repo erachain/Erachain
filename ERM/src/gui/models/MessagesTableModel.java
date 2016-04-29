@@ -769,7 +769,7 @@ public class MessagesTableModel extends JTable implements Observer{
 			}
 			
 
-			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort();
+			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance());
 		
 			return	  "<html>\n"
 					+ "<body width='" + width + "'>\n"

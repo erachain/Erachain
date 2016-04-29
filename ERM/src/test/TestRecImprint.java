@@ -185,7 +185,7 @@ public class TestRecImprint {
 		
 		issueImprintRecord.process(db, false);
 		
-		LOGGER.info("imprint KEY: " + imprint.getKey(db));
+		LOGGER.info("imprint KEY: " + imprint.getKey());
 				
 		//CHECK IMPRINT EXISTS SENDER
 		///////// NOT FONT THROUGHT db.get(issueImprintRecord)
@@ -197,7 +197,7 @@ public class TestRecImprint {
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueImprintTransaction_2.sign(maker, false);
 		issueImprintTransaction_2.process(db, false);
-		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
+		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey());
 		issueImprintTransaction_2.orphan(db, false);
 		ItemImprintMap imprintMap = db.getItemImprintMap();
 		int mapSize = imprintMap.size();

@@ -126,7 +126,7 @@ public class TestRecPerson {
 		issuePersonTransaction.sign(certifier, false);
 		
 		issuePersonTransaction.process(db, false);
-		personKey = person.getKey(db);
+		personKey = person.getKey();
 		
 		//CREATE PERSONALIZE REcORD
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
@@ -313,7 +313,7 @@ public class TestRecPerson {
 		
 		issuePersonTransaction.process(db, false);
 		
-		LOGGER.info("person KEY: " + person.getKey(db));
+		LOGGER.info("person KEY: " + person.getKey());
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getConfirmedBalance(ERM_KEY, db));
@@ -548,8 +548,8 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
-		assertEquals( null, dbPS.getItem(personKey));
-		assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
+		// exist assertEquals( null, dbPS.getItem(personKey));
+		// exist assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));

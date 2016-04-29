@@ -29,7 +29,7 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class SendMoneyPanel extends JPanel 
+public class SendMoneyPanel extends JInternalFrame 
 {
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;

@@ -103,34 +103,29 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			}
 			
 			Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
-			Account creator = new Account(data.getA().a);
-			Account recipient = null; //new Account(data.getA().b);
+			String creator_address = data.getA().a;
+			//Account creator = new Account(data.getA().a);
+			//Account recipient = null; // = new Account(data.getA().b);
 			
 			Transaction transaction = data.getB();
-			creator = transaction.getCreator();
+			//creator = transaction.getCreator();
 			String itemName = "";
 			if (transaction instanceof TransactionAmount)
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
-				recipient = transAmo.getRecipient();
+				//recipient = transAmo.getRecipient();
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getKey());
 				itemName = item.toString();
 			} else if ( transaction instanceof GenesisTransferAssetTransaction)
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
-				recipient = transGen.getRecipient();				
+				//recipient = transGen.getRecipient();				
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
 				itemName = item.toString();
 			} else if ( transaction instanceof Issue_ItemRecord)
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
-				// SET REFERENCE for ITEM as SIGNATURE record
-				if (!(transIssue instanceof IssueImprintRecord))
-				{
-					item.setReference(transIssue.getSignature());
-				}
-				//item.getKey();
 				itemName = item.getShort();
 			}
 			
@@ -146,7 +141,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_TYPE:
 				
-				//return Lang.transactionTypes[transaction.getType()];
 				return Lang.getInstance().translate(transaction.viewTypeName());
 				
 			case COLUMN_CREATOR:
@@ -158,11 +152,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_AMOUNT:
 								
-				if (recipient==null) return "";
+				if (creator_address==null) return "";
 				
-				String address = recipient.getAddress();
-
-				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(recipient));			
+				return NumberAsString.getInstance().numberAsString(
+						transaction.viewAmount(creator_address));			
 
 			case COLUMN_RECIPIENT:
 				

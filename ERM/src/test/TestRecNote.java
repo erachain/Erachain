@@ -178,7 +178,7 @@ public class TestRecNote {
 		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, false);
 		
-		LOGGER.info("note KEY: " + note.getKey(db));
+		LOGGER.info("note KEY: " + note.getKey());
 				
 		//CHECK NOTE EXISTS SENDER
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
@@ -188,7 +188,7 @@ public class TestRecNote {
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueNoteTransaction_2.sign(maker, false);
 		issueNoteTransaction_2.process(db, false);
-		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
+		LOGGER.info("note_2 KEY: " + note_2.getKey());
 		issueNoteTransaction_2.orphan(db, false);
 		ItemNoteMap noteMap = db.getItemNoteMap();
 		int mapSize = noteMap.size();

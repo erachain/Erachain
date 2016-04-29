@@ -152,6 +152,16 @@ public class TransactionFactory {
 			//PARSE ISSUE PERSON TRANSACTION
 			return IssuePersonRecord.Parse(data, releaserReference);
 
+		case Transaction.ISSUE_STATUS_TRANSACTION:
+			
+			//PARSE ISSUE NOTE TRANSACTION
+			return IssueStatusRecord.Parse(data, releaserReference);
+
+		case Transaction.ISSUE_UNION_TRANSACTION:
+			
+			//PARSE ISSUE NOTE TRANSACTION
+			return IssueUnionRecord.Parse(data, releaserReference);
+
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION

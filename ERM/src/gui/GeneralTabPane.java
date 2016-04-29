@@ -41,16 +41,16 @@ public class GeneralTabPane extends JTabbedPane{
 		super();
 		
 		//ACCOUNTS
-		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
+		//this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
         
 		//STATEMENT
 		this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
 
 		//SEND
-		this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
+		//this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
 
 		//MESSAGE
-		this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel());
+		//this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel());
 			   
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
@@ -104,10 +104,10 @@ public class GeneralTabPane extends JTabbedPane{
         this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
         
         //NOTES
-        this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
+        //this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
 
         //NOTES
-        this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
+        //this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
 
         //NOTES
         this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());

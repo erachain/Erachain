@@ -39,14 +39,11 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	}
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, status, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference, signature);		
 	}
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte[] signature) 
 	{
-		this(typeBytes, creator, status, (byte)0, 0l, null);		
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, status, (byte)0, 0l, null, signature);		
 	}
 	public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{

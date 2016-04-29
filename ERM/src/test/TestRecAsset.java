@@ -67,7 +67,7 @@ public class TestRecAsset {
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		asset = new AssetVenture(maker, "aasdasd", "asdasda", 50000l, (byte) 2, true);
-		//key = asset.getKey(db);
+		//key = asset.getKey();
 
 
 	}
@@ -203,10 +203,10 @@ public class TestRecAsset {
 		
 		issueAssetTransaction.process(db, false);
 		
-		LOGGER.info("asset KEY: " + asset.getKey(db));
+		LOGGER.info("asset KEY: " + asset.getKey());
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(asset.getKey(db), db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(asset.getKey(), db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
@@ -302,7 +302,7 @@ public class TestRecAsset {
 
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
-		long key = asset.getKey(db);
+		long key = asset.getKey();
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
@@ -547,7 +547,7 @@ public class TestRecAsset {
 
 		issueMessageTransaction.sign(maker, false);
 		issueMessageTransaction.process(db, false);
-		long key = asset.getKey(db);
+		long key = asset.getKey();
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
@@ -789,7 +789,7 @@ public class TestRecAsset {
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
 		//LOGGER.info("MessageTransaction .creator.getBalance(1, db): " + account.getBalance(1, dbSet));
-		key = asset.getKey(db);
+		key = asset.getKey();
 
 		//CREATE ORDER
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
@@ -918,7 +918,7 @@ public class TestRecAsset {
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
-		key = asset.getKey(db);
+		key = asset.getKey();
 		
 		//CREATE ORDER
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
@@ -951,7 +951,7 @@ public class TestRecAsset {
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
 		issueAssetTransaction.process(db, false);
 
-		long key = asset.getKey(db);
+		long key = asset.getKey();
 		LOGGER.info("asset.getReg(): " + asset.getReference());
 		LOGGER.info("asset.getKey(): " + key);
 

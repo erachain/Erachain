@@ -86,17 +86,25 @@ public abstract class ItemCls {
 	public String getName() {
 		return this.name;
 	}
-	public long getKey() {
-		return this.getKey(DBSet.getInstance());
-	}
 	public long getKey(DBSet db) {
-		// TODO if ophran ?
-		if (this.key <0 & this.reference != null) {
+		// resolve key in that DB
+		resolveKey(DBSet.getInstance());
+		return this.key;
+	}
+	public long getKey() {
+		return getKey(DBSet.getInstance());
+	}
+	public long resolveKey(DBSet db) {
+		if (this.key <0 // & this.reference != null
+				) {
 			if (this.getDBIssueMap(db).contains(this.reference)) {
 				this.key = this.getDBIssueMap(db).get(this.reference);
 			}
 		}
 		return this.key;
+	}
+	public void resetKey() {
+		this.key = -1;
 	}
 	
 	public String getDescription() {
@@ -107,7 +115,9 @@ public abstract class ItemCls {
 		return this.reference;
 	}
 	public void setReference(byte[] reference) {
+		// TODO - if few itens issued in one recor - need reference to include nonce here
 		this.reference = reference;
+
 	}
 		
 	public boolean isConfirmed() {
@@ -176,16 +186,24 @@ public abstract class ItemCls {
 	
 	//OTHER
 	
-	public String toString()
+	public String toString(DBSet db)
 	{		
-		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name;
-		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name;
+		long key = this.getKey(db);
+		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name;
+	}
+	public String toString()
+	{
+		return toString(DBSet.getInstance());
 	}
 	
+	public String getShort(DBSet db)
+	{
+		long key = this.getKey(db);
+		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+	}
 	public String getShort()
 	{
-		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
-		//return "(" + this.key + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		return getShort(DBSet.getInstance());
 	}
 	
 	@SuppressWarnings("unchecked")

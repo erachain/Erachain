@@ -1335,7 +1335,7 @@ public class BlockExplorer
 			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
-					BigDecimal amount = transaction.getAmount(account); 
+					BigDecimal amount = transaction.viewAmount(account); 
 					if(amount.compareTo(BigDecimal.ZERO) > 0)
 					{
 						totalAmount = totalAmount.add(amount);
@@ -2757,7 +2757,7 @@ public class BlockExplorer
 		BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
 		for (Transaction transaction : block.getTransactions()) {
 			for (Account account : transaction.getInvolvedAccounts()) {
-				BigDecimal amount = transaction.getAmount(account); 
+				BigDecimal amount = transaction.viewAmount(account); 
 				if(amount.compareTo(BigDecimal.ZERO) > 0)
 				{
 					totalAmount = totalAmount.add(amount);

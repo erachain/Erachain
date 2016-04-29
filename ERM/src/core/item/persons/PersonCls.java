@@ -205,16 +205,18 @@ public abstract class PersonCls extends ItemCls {
 	//OTHER
 
 	@Override
-	public String toString()
-	{		
-		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") " + this.name + " "
+	public String toString(DBSet db)
+	{
+		long key = this.getKey(db);
+		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
 	@Override
-	public String getShort()
+	public String getShort(DBSet db)
 	{
-		return "(" + this.getKey() + ":" + this.typeBytes[0] + ") "
+		long key = this.getKey(db);
+		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") "
 				+ this.name.substring(0, Math.min(this.name.length(), 20)) + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}

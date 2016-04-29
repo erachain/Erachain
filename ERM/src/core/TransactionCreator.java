@@ -30,6 +30,7 @@ import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
+import core.transaction.Issue_ItemRecord;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
@@ -533,6 +534,12 @@ public class TransactionCreator
 			if (!asPack) {
 				//PROCESS IN FORK
 				transaction.process(this.fork, asPack);
+				
+				// if it ISSUE - reset key to -1
+				if (transaction instanceof Issue_ItemRecord) {
+					Issue_ItemRecord issueItem = (Issue_ItemRecord)transaction;
+					issueItem.getItem().resetKey();
+				}
 						
 				//CONTROLLER ONTRANSACTION
 				Controller.getInstance().onTransactionCreate(transaction);

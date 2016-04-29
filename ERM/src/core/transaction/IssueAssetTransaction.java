@@ -44,15 +44,12 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	}
 	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, asset, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);		
 	}
 	// as pack
-	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte[] signature) 
 	{
-		this(typeBytes, creator, asset, (byte)0, 0l, reference);
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, asset, (byte)0, 0l, null, signature);		
 	}
 	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -162,7 +159,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		if (!asPack) {
 			return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes);
 		} else {
-			return new IssueAssetTransaction(typeBytes, creator, asset, reference, signatureBytes);
+			return new IssueAssetTransaction(typeBytes, creator, asset, signatureBytes);
 		}
 	}	
 	
