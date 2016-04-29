@@ -37,14 +37,11 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	}
 	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, union, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);		
 	}
 	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte[] signature) 
 	{
-		this(typeBytes, creator, union, (byte)0, 0l, null);		
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, union, (byte)0, 0l, null, signature);		
 	}
 	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{

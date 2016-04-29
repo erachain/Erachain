@@ -37,14 +37,11 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	}
 	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, note, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, note, feePow, timestamp, reference, signature);		
 	}
 	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte[] signature) 
 	{
-		this(typeBytes, creator, note, (byte)0, 0l, null);		
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, note, (byte)0, 0l, null, signature);		
 	}
 	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{

@@ -129,7 +129,7 @@ public class DatabaseTests {
 		issueAssetTransaction.process(false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
-		long key = asset.getKey(db);
+		long key = asset.getKey();
 		
 		ItemAssetMap assetDB = db.getItemAssetMap();
 		Collection<ItemCls> assets = assetDB.getValues();

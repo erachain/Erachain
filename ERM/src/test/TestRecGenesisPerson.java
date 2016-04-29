@@ -82,7 +82,7 @@ public class TestRecGenesisPerson {
 		if (toProcess)
 		{ 
 			genesisIssuePersonTransaction.process(db, false);
-			keyPerson = person.getKey(db);
+			keyPerson = person.getKey();
 		}
 		
 	}

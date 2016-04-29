@@ -126,7 +126,7 @@ public class TestRecPerson {
 		issuePersonTransaction.sign(certifier, false);
 		
 		issuePersonTransaction.process(db, false);
-		personKey = person.getKey(db);
+		personKey = person.getKey();
 		
 		//CREATE PERSONALIZE REcORD
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
@@ -313,7 +313,7 @@ public class TestRecPerson {
 		
 		issuePersonTransaction.process(db, false);
 		
-		LOGGER.info("person KEY: " + person.getKey(db));
+		LOGGER.info("person KEY: " + person.getKey());
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getConfirmedBalance(ERM_KEY, db));

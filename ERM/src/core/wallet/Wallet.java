@@ -1404,6 +1404,7 @@ public class Wallet extends Observable implements Observer
 		
 		//CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
+		//item.resolveKey(DBSet.getInstance());
 		Account creator = item.getCreator();
 		if (creator == null) return;
 		

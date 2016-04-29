@@ -34,19 +34,23 @@ public abstract class Issue_ItemRecord extends Transaction
 	
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference) 
 	{
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.item = item;
 	}
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
 		this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);		
 		this.signature = signature;
-		this.calcFee();
+		if (item.getReference() == null) item.setReference(signature); // set reference
+		//item.resolveKey(DBSet.getInstance());
+		if (timestamp > 1000 ) this.calcFee(); // not asPaack
 	}
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) 
 	{
 		this(typeBytes, NAME_ID, creator, item, (byte)0, 0l, null);		
 		this.signature = signature;
+		if (this.item.getReference() == null) this.item.setReference(signature);
+		//item.resolveKey(DBSet.getInstance());
 	}
 
 	//GETTERS/SETTERS

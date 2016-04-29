@@ -161,7 +161,7 @@ public class TestNoteAsPack {
 		byte[] makerReference = maker.getLastReference(db);
 		issueNoteRecord.process(db, asPack);
 		
-		LOGGER.info("note KEY: " + note.getKey(db));
+		LOGGER.info("note KEY: " + note.getKey());
 				
 		//CHECK NOTE EXISTS SENDER
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
@@ -171,7 +171,7 @@ public class TestNoteAsPack {
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2);
 		issueNoteTransaction_2.sign(maker, asPack);
 		issueNoteTransaction_2.process(db, asPack);
-		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
+		LOGGER.info("note_2 KEY: " + note_2.getKey());
 		issueNoteTransaction_2.orphan(db, asPack);
 		ItemNoteMap noteMap = db.getItemNoteMap();
 		int mapSize = noteMap.size();

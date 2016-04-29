@@ -40,14 +40,11 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	}
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, person, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);		
 	}
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte[] signature) 
 	{
-		this(typeBytes, creator, person, (byte)0, 0l, null);		
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, person, (byte)0, 0l, null, signature);		
 	}
 	public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{

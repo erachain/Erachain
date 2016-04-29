@@ -2394,10 +2394,10 @@ public class TransactionTests {
 		
 		issueAssetTransaction.process(db, false);
 		
-		LOGGER.info("asset KEY: " + asset.getKey(db));
+		LOGGER.info("asset KEY: " + asset.getKey());
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance(asset.getKey(db), db));
+		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance(asset.getKey(), db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);

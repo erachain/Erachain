@@ -38,14 +38,12 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	}
 	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, imprint, feePow, timestamp, reference);		
-		this.signature = signature;
-		this.calcFee();
+		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, reference, signature);		
 	}
+	// asPack
 	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte[] signature) 
 	{
-		this(typeBytes, creator, imprint, (byte)0, 0l, null);		
-		this.signature = signature;
+		super(typeBytes, NAME_ID, creator, imprint, (byte)0, 0l, null, signature);		
 	}
 	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
