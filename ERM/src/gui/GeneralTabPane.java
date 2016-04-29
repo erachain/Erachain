@@ -41,7 +41,7 @@ public class GeneralTabPane extends JTabbedPane{
 		super();
 		
 		//ACCOUNTS
-		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
+		//this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
         
 		//STATEMENT
 		this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
@@ -107,7 +107,7 @@ public class GeneralTabPane extends JTabbedPane{
         this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
 
         //NOTES
-        this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
+        //this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
 
         //NOTES
         this.addTab(Lang.getInstance().translate("Notes"), new NotesPanel());
