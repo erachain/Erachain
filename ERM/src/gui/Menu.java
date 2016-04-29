@@ -211,7 +211,7 @@ public class Menu extends JMenuBar
         	}
         });
        
-        fileMenu.add(quitItem);    
+        fileMenu.add(quitItem);
         
         fileMenu.addMenuListener(new MenuListener()
         {
@@ -260,7 +260,7 @@ public class Menu extends JMenuBar
         		selectOrAdd(new AccountsPanel(), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        accountsMenu.add(accountsMenu);     
+        accountsMenu.add(accountsMenuList);     
 
         // DEALS
         JMenuItem dealsMenuSend = new JMenuItem(Lang.getInstance().translate("Send"));
