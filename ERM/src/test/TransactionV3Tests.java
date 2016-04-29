@@ -107,7 +107,7 @@ public class TransactionV3Tests {
 		
 		MessageTransaction messageTransactionV3_2 = null;
 		try {
-			messageTransactionV3_2 = (MessageTransaction) MessageTransaction.Parse(Arrays.copyOfRange(rawMessageTransactionV3, 4, rawMessageTransactionV3.length), releaserReference);
+			messageTransactionV3_2 = (MessageTransaction) MessageTransaction.Parse(rawMessageTransactionV3, releaserReference);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 		}
@@ -128,19 +128,15 @@ public class TransactionV3Tests {
 	public void validateArbitraryTransactionV3() 
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+		init();
 		
 		//ADD ERM ASSET
-		AssetCls ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte) 2, true);
-		ermAsset.setReference(assetReference);
 		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(assetReference);
-		databaseSet.getItemAssetMap().set(0l, ermAsset);
-		databaseSet.getItemAssetMap().set(61l, aTFundingAsset);
+		db.getItemAssetMap().set(61l, aTFundingAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
+		genesisBlock.process(db);
 		
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -148,7 +144,6 @@ public class TransactionV3Tests {
 		
 		byte[] data = "test123!".getBytes();
 		
-		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
 		Account recipient1 = new Account("79MXwfzHPDGWoQUgyPXRf2fxKuzY1osNsg");		
 		Account recipient2 = new Account("76abzpJK61F4TAZFkqev2EY5duHVUvycZX");		
 		Account recipient3 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");		
@@ -157,7 +152,7 @@ public class TransactionV3Tests {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		creator.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		maker.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
@@ -165,30 +160,30 @@ public class TransactionV3Tests {
 		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(8)));
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
-				creator, payments, 111,
+				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, creator.getLastReference(databaseSet)
+				timestamp, maker.getLastReference(db)
 				);
-		arbitraryTransactionV3.sign(creator, false);
+		arbitraryTransactionV3.sign(maker, false);
 		
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(databaseSet, false);
+		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(FEE_KEY, databaseSet));
-		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getConfirmedBalance(61l, databaseSet));
-		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, databaseSet));
-		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getConfirmedBalance(61l, databaseSet));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getConfirmedBalance(61l, db));
+		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getConfirmedBalance(61l, db));
+		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, db));
+		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getConfirmedBalance(61l, db));
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 		
@@ -218,59 +213,49 @@ public class TransactionV3Tests {
 	@Test
 	public void validateArbitraryTransactionV3withoutPayments() 
 	{
-		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		    	
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
 
-		//ADD ERM ASSET
-		AssetCls ermAsset = new AssetVenture(genesisBlock.getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte) 2, true);
-		ermAsset.setReference(assetReference);
-		AssetCls aTFundingAsset = new AssetVenture(genesisBlock.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
-		aTFundingAsset.setReference(genesisBlock.getGeneratorSignature());
-		databaseSet.getItemAssetMap().set(0l, ermAsset);
-		databaseSet.getItemAssetMap().set(61l, aTFundingAsset);
+		init();
+		
+		AssetCls aTFundingAsset = new AssetVenture(gb.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
+		aTFundingAsset.setReference(gb.getGeneratorSignature());
+		db.getItemAssetMap().set(61l, aTFundingAsset);
 
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		
 		byte[] data = "test123!".getBytes();
-		
-		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-		
+				
 		long timestamp = NTP.getTime();
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		creator.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		maker.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
-				creator, payments, 111,
+				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, creator.getLastReference(databaseSet)
+				timestamp, maker.getLastReference(db)
 				);
-		arbitraryTransactionV3.sign(creator, false);
+		arbitraryTransactionV3.sign(maker, false);
 		
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(databaseSet, releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(databaseSet, false);
+		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(999.999988).setScale(8), creator.getConfirmedBalance(FEE_KEY, databaseSet));
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), creator.getConfirmedBalance(61l, databaseSet));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getConfirmedBalance(61l, db));
 
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);

@@ -402,7 +402,7 @@ public abstract class Transaction {
 		return creator==null?"GENESIS":creator.getAddress();
 	}
 	public String viewRecipient() {
-		return "--";
+		return "";
 	}
 	public String viewReference() {
 		return reference==null?"GENESIS":Base58.encode(reference);

@@ -37,9 +37,9 @@ public class TestRecStatus {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
+	long ERM_KEY = AssetCls.ERMO_KEY;
 	long FEE_KEY = AssetCls.DILE_KEY;
-	long VOTE_KEY = AssetCls.ERMO_KEY;
-	byte FEE_POWER = (byte)1;
+	byte FEE_POWER = (byte)0;
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
@@ -51,7 +51,8 @@ public class TestRecStatus {
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
-	
+	int mapSize;
+	ItemStatusMap statusMap;
 
 	// INIT STATUSS
 	private void init() {
@@ -62,8 +63,10 @@ public class TestRecStatus {
 		
 		// OIL FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
-		maker.setConfirmedBalance(VOTE_KEY, BigDecimal.valueOf(10).setScale(8), db);
+		statusMap = db.getItemStatusMap();
+		mapSize = statusMap.size();
 
 	}
 	
@@ -164,7 +167,7 @@ public class TestRecStatus {
 
 	
 	@Test
-	public void processIssueStatusTransaction()
+	public void process_orphanIssueStatusTransaction()
 	{
 		
 		init();				
@@ -174,7 +177,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
 		
-		assertEquals(Transaction.VALIDATE_OK, issueStatusRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
 		
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(db, false);
@@ -191,35 +194,20 @@ public class TestRecStatus {
 		issueStatusTransaction_2.process(db, false);
 		LOGGER.info("status_2 KEY: " + status_2.getKey());
 		issueStatusTransaction_2.orphan(db, false);
-		ItemStatusMap statusMap = db.getItemStatusMap();
-		int mapSize = statusMap.size();
-		assertEquals(0, mapSize - 4);
+		assertEquals(mapSize + 1, statusMap.size());
 		
 		//CHECK STATUS IS CORRECT
 		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true), status.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueStatusRecord.getSignature(), maker.getLastReference(db)));
-	}
-	
-	
-	@Test
-	public void orphanIssueStatusTransaction()
-	{
-		
-		init();				
-				
-		Status status = new Status(maker, "test", "strontje");
-				
-		//CREATE ISSUE STATUS TRANSACTION
-		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueStatusRecord.sign(maker, false);
-		issueStatusRecord.process(db, false);
-		long key = db.getIssueStatusMap().get(issueStatusRecord);
-		assertEquals(true, Arrays.equals(issueStatusRecord.getSignature(), maker.getLastReference(db)));
+
+		////// ORPHAN ///////
 		
 		issueStatusRecord.orphan(db, false);
 				
+		assertEquals(mapSize, statusMap.size());
+
 		//CHECK STATUS EXISTS SENDER
 		assertEquals(false, db.getItemStatusMap().contains(key));
 						
