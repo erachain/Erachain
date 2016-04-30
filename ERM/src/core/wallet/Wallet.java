@@ -183,6 +183,10 @@ public class Wallet extends Observable implements Observer
 	{
 		return this.database.getAccountMap().getUnconfirmedBalance(address, key);
 	}
+	public BigDecimal getUnconfirmedBalance(Account account, long key)
+	{
+		return getUnconfirmedBalance(account.getAddress(), key);
+	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
 	{

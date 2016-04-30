@@ -102,8 +102,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));			
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()).
-					subtract(account.getConfirmedBalance(this.asset.getKey())));
+			return NumberAsString.getInstance().numberAsString(account.getUnconfirmedBalance(this.asset.getKey())
+					.subtract(account.getConfirmedBalance(this.asset.getKey())));
 		case COLUMN_OIL_BALANCE:
 			if (this.asset == null) return "-";
 			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));

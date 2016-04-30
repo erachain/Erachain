@@ -188,12 +188,10 @@ public class AccountMap extends Observable {
 		
 		return BigDecimal.ZERO.setScale(8);
 	}
-	/*
-	public BigDecimal getUnconfirmedBalance(String address, long key) 
+	public BigDecimal getUnconfirmedBalance(Account account, Long key) 
 	{		
-		return getUnconfirmedBalance(new Tuple2<String, Long>(address, key));
+		return getUnconfirmedBalance(account.getAddress(), key);
 	}
-	*/
 
 	/*
 	public void add(PublicKeyAccount account, long key)
