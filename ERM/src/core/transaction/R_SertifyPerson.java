@@ -68,17 +68,17 @@ public class R_SertifyPerson extends Transaction {
 			int end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
-		this.TYPE_NAME = NAME_ID;
 		this.key = key;
 		this.personAddress1 = personAddress1;
 		this.personAddress2 = personAddress2;
 		this.personAddress3 = personAddress3;
 		this.end_date = end_date;			
 	}
-	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
+
+	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
 			int end_date, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
+		this(new byte[]{TYPE_ID, (byte)version, 0, 0}, creator, feePow, key,
 				userAccount1, userAccount2, userAccount3,
 				end_date, timestamp, reference);
 	}
@@ -126,6 +126,7 @@ public class R_SertifyPerson extends Transaction {
 				userAccount1, userAccount2, userAccount3,
 				end_date, timestamp, reference);
 	}
+
 	// as pack
 	public R_SertifyPerson(PublicKeyAccount creator, long key,
 			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,

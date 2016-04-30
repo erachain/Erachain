@@ -291,7 +291,9 @@ public class AllPersonsFrame extends JPanel {//JInternalFrame {
 				new PersonFrame(person);
 				*/
 				// открываем диалоговое окно ввода данных для подтверждения персоны 
-		    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
+				PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+
+		    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this, person);	
 		// обрабатываем полученные данные от диалогового окна
 		    	//if(fm.isOK()){
                 //    JOptionPane.showMessageDialog(Form1.this, "OK");

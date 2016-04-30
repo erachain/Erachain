@@ -1,15 +1,65 @@
 package gui.transaction;
 
+import java.sql.Timestamp;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+
+import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+
 //import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
 
 import core.transaction.Transaction;
 //import lang.Lang;
+import gui.PasswordPane;
+import lang.Lang;
+import utils.Pair;
 
-public class TransactionErrorPan 
+public class OnDealClick 
 {
 
-	public static String mess(int error)
+	public static boolean proccess1(JButton button)
+	{
+		//DISABLE
+		button.setEnabled(false);
+	
+		//CHECK IF NETWORK OK
+		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		{
+			//NETWORK NOT OK
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			button.setEnabled(true);
+			
+			return false;
+		}
+		
+		//CHECK IF WALLET UNLOCKED
+		if(!Controller.getInstance().isWalletUnlocked())
+		{
+			//ASK FOR PASSWORD
+			String password = PasswordPane.showUnlockWalletDialog(); 
+			if(!Controller.getInstance().unlockWallet(password))
+			{
+				//WRONG PASSWORD
+				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				
+				//ENABLE
+				button.setEnabled(true);
+				
+				return false;
+			}
+		}
+		return true;
+		
+	}
+	
+	public static String resultMess(int error)
 	{
 		String mess = "Unknown error: " + error;
 

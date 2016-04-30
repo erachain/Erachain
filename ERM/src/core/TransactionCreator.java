@@ -10,6 +10,7 @@ import java.util.List;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
@@ -38,6 +39,7 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
+import core.transaction.R_SertifyPerson;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -454,6 +456,26 @@ public class TransactionCreator
 		recordNoteTx.sign(creator, asPack);
 			
 		return afterCreate(recordNoteTx, asPack);
+	}
+
+	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator, int feePow, long key,
+			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
+			int end_date) {
+		
+		this.checkUpdate();
+		
+		Transaction record;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE SERTIFY PERSON TRANSACTION
+		//int version = 5; // without user sign
+		record = new R_SertifyPerson(version, creator, (byte)feePow, key,
+				userAccount1, userAccount2, userAccount3,
+				end_date,  timestamp, creator.getLastReference(this.fork));
+		record.sign(creator, asPack);
+			
+		return afterCreate(record, asPack);
 	}
 
 	/*

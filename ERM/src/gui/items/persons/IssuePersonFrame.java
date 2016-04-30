@@ -42,7 +42,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.transaction.Transaction;
-import gui.transaction.TransactionErrorPan;
+import gui.transaction.OnDealClick;
 
 @SuppressWarnings("serial")
 public class IssuePersonFrame extends JInternalFrame //JFrame
@@ -437,7 +437,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 			this.dispose();
 		} else {
 		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(TransactionErrorPan.mess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE
