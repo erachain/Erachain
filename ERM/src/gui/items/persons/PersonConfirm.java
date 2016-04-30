@@ -24,6 +24,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.MainFrame;
@@ -36,7 +37,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	public PersonConfirm(JComponent  apers, PersonCls person) {
 		super();
 	
-		final JTextField addressTxt = new JTextField();
+		final JTextField pubKey1Txt = new JTextField();
 		final JTextField toDate = new JTextField();
 		
 		
@@ -99,7 +100,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    c.gridwidth = 4;
 	    c.gridheight = 1;
 	    c.weightx = c.weighty = 0;
-	    this.add(addressTxt, c);
+	    this.add(pubKey1Txt, c);
 
 	    c.gridx = 0;
 	    c.gridy = 1;
@@ -137,7 +138,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(person, Button_Confirm, addressTxt, toDate);
+		    	onGoClick(person, Button_Confirm, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate);
 		    }
 		});
 	    
@@ -172,18 +173,18 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	}
 	
 	public void onGoClick(PersonCls person, JButton Button_Confirm,
-			JTextField pubKey1Txt, JTextField pubKey12Txt, JTextField pubKey13Txt, JTextField toDate)
+			JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDate)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
     	// программа обработки при нажатии confirm
-    	String address = addressTxt.getText();
+    	String address = pubKey1Txt.getText();
     	int toDateVol = Integer.parseInt(toDate.getText());
     	int feePow = 0;
-    	PublicKeyAccount userAccount1;
-    	PublicKeyAccount userAccount2;
-    	PublicKeyAccount userAccount3;
+    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
+    	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
+    	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
     	
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(address);
