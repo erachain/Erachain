@@ -8,6 +8,7 @@ import org.mapdb.DB;
 import core.account.Account;
 import database.DBSet;
 
+// used for seek transactions by creator address
 public class ReferenceMap extends DBMap<String, byte[]> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

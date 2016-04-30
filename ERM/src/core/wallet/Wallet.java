@@ -52,8 +52,12 @@ import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
+
+//import core.wallet.ItemsFavorites;
+import core.wallet.AssetsFavorites;
 import core.wallet.NotesFavorites;
 import core.wallet.PersonsFavorites;
+
 import database.DBSet;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.WalletDatabase;
@@ -66,6 +70,7 @@ public class Wallet extends Observable implements Observer
 	public static final int STATUS_UNLOCKED = 1;
 	public static final int STATUS_LOCKED = 0;
 	
+	private static final long FEE_KEY = Transaction.FEE_KEY;
 	private WalletDatabase database;
 	private SecureWalletDatabase secureDatabase;
 	
@@ -150,6 +155,14 @@ public class Wallet extends Observable implements Observer
 	{
 		return this.database.getAccountMap().getAccounts();
 	}
+	public List<PublicKeyAccount> getPublicKeyAccounts()
+	{
+		return this.database.getAccountMap().getPublicKeyAccounts();
+	}
+	public List<Tuple2<Account, Long>> getAccountsAssets()
+	{
+		return this.database.getAccountMap().getAccountsAssets();
+	}
 	
 	public boolean accountExists(String address)
 	{
@@ -169,10 +182,6 @@ public class Wallet extends Observable implements Observer
 	public BigDecimal getUnconfirmedBalance(String address, long key)
 	{
 		return this.database.getAccountMap().getUnconfirmedBalance(address, key);
-	}
-	public BigDecimal getUnconfirmedBalance(String address)
-	{
-		return getUnconfirmedBalance(address, Transaction.FEE_KEY);
 	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
@@ -197,12 +206,12 @@ public class Wallet extends Observable implements Observer
 
 	public PublicKeyAccount getPublicKeyAccount(String address)
 	{
-		if(this.secureDatabase == null)
+		if(this.database == null)
 		{
 			return null;
 		}
 		
-		return this.secureDatabase.getAccountSeedMap().getPublicKeyAccount(address);
+		return this.database.getAccountMap().getPublicKeyAccount(address);
 	}
 
 	public boolean exists()
@@ -315,26 +324,7 @@ public class Wallet extends Observable implements Observer
 		return this.database.getPollMap().get(account);
 	}
 	
-	/*
-	public void addAssetFavorite(AssetCls asset)
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		this.database.getAssetFavoritesSet().add(asset.getKey());
-	}
-	public void addNoteFavorite(NoteCls note)
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		this.database.getNoteFavoritesSet().add(note.getKey());
-	}
-	*/
+
 	public void addItemFavorite(ItemCls item)
 	{
 		if(!this.exists())
@@ -345,6 +335,7 @@ public class Wallet extends Observable implements Observer
 		this.database.addItemToFavorite(item);
 	}
 
+	/*
 	public void replaseAssetFavorite()
 	{
 		if(!this.exists())
@@ -378,6 +369,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());	
 		}
 	}
+	*/
 	// тут нужно понять где это используется
 	public void replaseFavoriteItems(int type)
 	{
@@ -593,15 +585,29 @@ public class Wallet extends Observable implements Observer
 	}
 	
 	//SYNCRHONIZE
+
+	// UPDATE all accounts for all assets unconfirmed balance
+	public void update_account_assets()
+	{
+		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
+
+		synchronized(accounts_assets)
+		{
+			for(Tuple2<Account, Long> account_asset: accounts_assets)
+			{
+				this.database.getAccountMap().update(
+						account_asset.a, account_asset.b, account_asset.a.getConfirmedBalance(account_asset.b));
+			}
+		}
+
+	}
 	
 	public void synchronize()
 	{
 		if(Controller.getInstance().isProcessingWalletSynchronize()) {
 			return;
 		}
-		
-		List<Account> accounts = this.getAccounts();
-		
+				
 		//RESET MAPS
 		this.database.getTransactionMap().reset();
 		this.database.getBlockMap().reset();
@@ -612,6 +618,7 @@ public class Wallet extends Observable implements Observer
 		this.database.getImprintMap().reset();
 		this.database.getNoteMap().reset();
 		this.database.getPersonMap().reset();
+		this.database.getStatusMap().reset();
 		this.database.getUnionMap().reset();
 		this.database.getOrderMap().reset();
 		LOGGER.info("Resetted maps");
@@ -651,14 +658,9 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		
-		//RESET UNCONFIRMED BALANCE
-		synchronized(accounts)
-		{
-			for(Account account: accounts)
-			{
-				this.database.getAccountMap().update(account, account.getConfirmedBalance(Transaction.FEE_KEY));
-			}
-		}
+		//RESET UNCONFIRMED BALANCE for accounts + assets
+		update_account_assets();
+		
 		LOGGER.info("Resetted balances");
 
 		Controller.getInstance().walletSyncStatusUpdate(-1);
@@ -1012,6 +1014,35 @@ public class Wallet extends Observable implements Observer
 		o.update(this, new ObserverMessage(ObserverMessage.WALLET_STATUS, status));
 	}
 
+	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan)
+	{
+		//UPDATE UNCONFIRMED BALANCE for ASSET
+		long key = transaction.getAssetKey();
+		BigDecimal fee = asOrphan?BigDecimal.ZERO.subtract(transaction.viewFee(account)):transaction.viewFee(account);
+		if (key >= 0)
+		{
+			// ASSET TRANSFERED + FEE
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress(), key);
+			BigDecimal amount = asOrphan?BigDecimal.ZERO.subtract(transaction.getAmount(account)):transaction.getAmount(account);
+			unconfirmedBalance = unconfirmedBalance.add(amount);
+			if (key == FEE_KEY)
+			{
+				unconfirmedBalance = unconfirmedBalance.subtract(fee);
+			} else {
+				this.database.getAccountMap().update(account, FEE_KEY,
+						this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));								
+			}
+			this.database.getAccountMap().update(account, key, unconfirmedBalance);
+		} else {
+			// ONLY FEE
+			if (fee.compareTo(BigDecimal.ZERO) != 0)
+			{
+				this.database.getAccountMap().update(account, FEE_KEY,
+					this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));
+			}
+		}
+
+	}
 	private void processTransaction(Transaction transaction)
 	{
 		//CHECK IF WALLET IS OPEN
@@ -1032,9 +1063,8 @@ public class Wallet extends Observable implements Observer
 					//ADD TO ACCOUNT TRANSACTIONS
 					if(!this.database.getTransactionMap().add(account, transaction))
 					{					
-						//UPDATE UNCONFIRMED BALANCE
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).add(transaction.viewAmount(account));
-						this.database.getAccountMap().update(account, unconfirmedBalance);
+						//UPDATE UNCONFIRMED BALANCE for ASSET
+						deal_transaction(account, transaction, false);
 					}
 				}
 			}
@@ -1056,10 +1086,12 @@ public class Wallet extends Observable implements Observer
 			for(Account account: accounts)
 			{
 				//CHECK IF INVOLVED
-				if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
+				//if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
+				if(atTx.b.getRecipient() == account.getAddress() )
 				{				
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).add( BigDecimal.valueOf(atTx.b.getAmount(),8));
-						this.database.getAccountMap().update(account, unconfirmedBalance);
+						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
+								account.getAddress(), atTx.b.getKey()).add(BigDecimal.valueOf(atTx.b.getAmount(),8));
+						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
 					
 				}
 			}
@@ -1088,8 +1120,7 @@ public class Wallet extends Observable implements Observer
 					this.database.getTransactionMap().delete(account, transaction);
 					
 					//UPDATE UNCONFIRMED BALANCE
-					BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).subtract(transaction.viewAmount(account));
-					this.database.getAccountMap().update(account, unconfirmedBalance);
+					deal_transaction(account, transaction, true);
 				}
 			}
 		}
@@ -1112,8 +1143,9 @@ public class Wallet extends Observable implements Observer
 				//CHECK IF INVOLVED
 				if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
 				{				
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress()).subtract( BigDecimal.valueOf(atTx.b.getAmount(),8));
-						this.database.getAccountMap().update(account, unconfirmedBalance);
+						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
+								account.getAddress(), atTx.b.getKey()).subtract( BigDecimal.valueOf(atTx.b.getAmount(),8));
+						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
 					
 				}
 			}
@@ -1146,8 +1178,8 @@ public class Wallet extends Observable implements Observer
 			this.database.getBlockMap().add(block);
 				
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress()).add(block.getTotalFee());
-			this.database.getAccountMap().update(block.getGenerator(), unconfirmedBalance);
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress(), FEE_KEY).add(block.getTotalFee());
+			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
 		}
 	}
 
@@ -1166,8 +1198,8 @@ public class Wallet extends Observable implements Observer
 			this.database.getBlockMap().delete(block);
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress()).subtract(block.getTotalFee());
-			this.database.getAccountMap().update(block.getGenerator(), unconfirmedBalance);
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress(), FEE_KEY).subtract(block.getTotalFee());
+			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
 		}
 	}
 	

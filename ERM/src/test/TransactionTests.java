@@ -182,10 +182,10 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(payment.getSignature(), parsedPayment.getSignature()));
 			
 			//CHECK AMOUNT SENDER
-			assertEquals(payment.viewAmount(maker), parsedPayment.viewAmount(maker));	
+			assertEquals(payment.getAmount(maker), parsedPayment.getAmount(maker));	
 			
 			//CHECK AMOUNT RECIPIENT
-			assertEquals(payment.viewAmount(recipient), parsedPayment.viewAmount(recipient));	
+			assertEquals(payment.getAmount(recipient), parsedPayment.getAmount(recipient));	
 			
 			//CHECK FEE
 			assertEquals(payment.getFee(), parsedPayment.getFee());	
@@ -410,7 +410,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(nameRegistration.getSignature(), parsedRegistration.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(nameRegistration.viewAmount(maker), parsedRegistration.viewAmount(maker));	
+			assertEquals(nameRegistration.getAmount(maker), parsedRegistration.getAmount(maker));	
 			
 			//CHECK NAME OWNER
 			assertEquals(nameRegistration.getName().getOwner().getAddress(), parsedRegistration.getName().getOwner().getAddress());	
@@ -626,7 +626,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(nameUpdate.getSignature(), parsedUpdate.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(nameUpdate.viewAmount(maker), parsedUpdate.viewAmount(maker));	
+			assertEquals(nameUpdate.getAmount(maker), parsedUpdate.getAmount(maker));	
 			
 			//CHECK OWNER
 			assertEquals(nameUpdate.getCreator().getAddress(), parsedUpdate.getCreator().getAddress());	
@@ -885,7 +885,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(nameSaleTransaction.getSignature(), parsedNameSale.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(nameSaleTransaction.viewAmount(maker), parsedNameSale.viewAmount(maker));	
+			assertEquals(nameSaleTransaction.getAmount(maker), parsedNameSale.getAmount(maker));	
 			
 			//CHECK OWNER
 			assertEquals(nameSaleTransaction.getCreator().getAddress(), parsedNameSale.getCreator().getAddress());	
@@ -1134,7 +1134,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(cancelNameSaleTransaction.getSignature(), parsedCancelNameSale.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(cancelNameSaleTransaction.viewAmount(maker), parsedCancelNameSale.viewAmount(maker));	
+			assertEquals(cancelNameSaleTransaction.getAmount(maker), parsedCancelNameSale.getAmount(maker));	
 			
 			//CHECK OWNER
 			assertEquals(cancelNameSaleTransaction.getCreator().getAddress(), parsedCancelNameSale.getCreator().getAddress());	
@@ -1409,7 +1409,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(namePurchaseTransaction.getSignature(), parsedNamePurchase.getSignature()));
 			
 			//CHECK AMOUNT BUYER
-			assertEquals(namePurchaseTransaction.viewAmount(maker), parsedNamePurchase.viewAmount(maker));	
+			assertEquals(namePurchaseTransaction.getAmount(maker), parsedNamePurchase.getAmount(maker));	
 			
 			//CHECK OWNER
 			assertEquals(namePurchaseTransaction.getBuyer().getAddress(), parsedNamePurchase.getBuyer().getAddress());	
@@ -1680,7 +1680,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(pollCreation.getSignature(), parsedPollCreation.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(pollCreation.viewAmount(maker), parsedPollCreation.viewAmount(maker));	
+			assertEquals(pollCreation.getAmount(maker), parsedPollCreation.getAmount(maker));	
 			
 			//CHECK POLL CREATOR
 			assertEquals(pollCreation.getPoll().getCreator().getAddress(), parsedPollCreation.getPoll().getCreator().getAddress());	
@@ -1911,7 +1911,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(pollVote.getSignature(), parsedPollVote.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(pollVote.viewAmount(maker), parsedPollVote.viewAmount(maker));	
+			assertEquals(pollVote.getAmount(maker), parsedPollVote.getAmount(maker));	
 			
 			//CHECK CREATOR
 			assertEquals(pollVote.getCreator().getAddress(), parsedPollVote.getCreator().getAddress());	
@@ -2128,7 +2128,7 @@ public class TransactionTests {
 			assertEquals(true, Arrays.equals(arbitraryTransaction.getSignature(), parsedArbitraryTransaction.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(arbitraryTransaction.viewAmount(maker), parsedArbitraryTransaction.viewAmount(maker));	
+			assertEquals(arbitraryTransaction.getAmount(maker), parsedArbitraryTransaction.getAmount(maker));	
 			
 			//CHECK CREATOR
 			assertEquals(arbitraryTransaction.getCreator().getAddress(), parsedArbitraryTransaction.getCreator().getAddress());	

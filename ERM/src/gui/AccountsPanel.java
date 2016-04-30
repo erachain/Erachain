@@ -141,12 +141,12 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 				int row = table.getSelectedRow();
 				row = table.convertRowIndexToModel(row);
 				
-				Account account = tableModel.getAccount(row);
-				PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
-						account.getAddress());
+				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
+				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
+				//		account.getAddress());
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(Base58.encode(publicKeyAccount.getPublicKey()));
+				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
 			    clipboard.setContents(value, null);
 			}
 		});

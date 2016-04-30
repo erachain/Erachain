@@ -61,6 +61,12 @@ public abstract class TransactionAmount extends Transaction {
 	{
 		return this.key;
 	}
+	public long getAssetKey()
+	{
+		return this.key;
+	}
+
+	@Override
 	public BigDecimal getAmount() {
 		return this.amount;
 	}
@@ -74,14 +80,9 @@ public abstract class TransactionAmount extends Transaction {
 	public String viewRecipient() {
 		return recipient.getAddress();
 	}
-
-	@Override
-	public BigDecimal viewAmount() {
-		return amount;
-	}
 	
 	@Override
-	public BigDecimal viewAmount(String address) {
+	public BigDecimal getAmount(String address) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		
 		if(address.equals(this.creator.getAddress()))
@@ -97,9 +98,9 @@ public abstract class TransactionAmount extends Transaction {
 		return amount;
 	}
 	@Override
-	public BigDecimal viewAmount(Account account) {
+	public BigDecimal getAmount(Account account) {
 		String address = account.getAddress();
-		return viewAmount(address);
+		return getAmount(address);
 	}
 	
 	//PARSE/CONVERT

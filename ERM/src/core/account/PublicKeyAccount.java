@@ -1,5 +1,7 @@
 package core.account;
 
+import core.crypto.Base58;
+
 //import java.math.BigDecimal;
 
 //import org.mapdb.Fun.Tuple2;
@@ -21,15 +23,24 @@ public class PublicKeyAccount extends Account {
 		this.publicKey = publicKey;
 		this.address = Crypto.getInstance().getAddress(this.publicKey);
 	}
+	public PublicKeyAccount(String publicKey)
+	{
+		this(Base58.decode(publicKey));
+	}
 	
 	protected PublicKeyAccount()
 	{
 
 	}
 	
-	public byte[] getPublicKey() 
+	public byte[] getPublicKey()
 	{
 		return publicKey;
 	}
-	
+
+	public String getBase58()
+	{
+		return Base58.encode(publicKey);
+	}
+
 }

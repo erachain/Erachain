@@ -402,10 +402,10 @@ public class TestRecAsset {
 			assertEquals(assetTransfer.getKey(), parsedAssetTransfer.getKey());	
 			
 			//CHECK AMOUNT
-			assertEquals(assetTransfer.viewAmount(maker), parsedAssetTransfer.viewAmount(maker));	
+			assertEquals(assetTransfer.getAmount(maker), parsedAssetTransfer.getAmount(maker));	
 			
 			//CHECK AMOUNT RECIPIENT
-			assertEquals(assetTransfer.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
+			assertEquals(assetTransfer.getAmount(recipient), parsedAssetTransfer.getAmount(recipient));	
 						
 		}
 		catch (Exception e) 
@@ -661,10 +661,10 @@ public class TestRecAsset {
 			assertEquals(messageTransaction.getKey(), parsedAssetTransfer.getKey());	
 			
 			//CHECK AMOUNT
-			assertEquals(messageTransaction.viewAmount(maker), parsedAssetTransfer.viewAmount(maker));	
+			assertEquals(messageTransaction.getAmount(maker), parsedAssetTransfer.getAmount(maker));	
 			
 			//CHECK AMOUNT RECIPIENT
-			assertEquals(messageTransaction.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
+			assertEquals(messageTransaction.getAmount(recipient), parsedAssetTransfer.getAmount(recipient));	
 						
 		}
 		catch (Exception e) 
@@ -867,7 +867,7 @@ public class TestRecAsset {
 			assertEquals(true, Arrays.equals(cancelOrderTransaction.getSignature(), parsedCancelOrder.getSignature()));
 			
 			//CHECK AMOUNT CREATOR
-			assertEquals(cancelOrderTransaction.viewAmount(maker), parsedCancelOrder.viewAmount(maker));	
+			assertEquals(cancelOrderTransaction.getAmount(maker), parsedCancelOrder.getAmount(maker));	
 			
 			//CHECK OWNER
 			assertEquals(cancelOrderTransaction.getCreator().getAddress(), parsedCancelOrder.getCreator().getAddress());	

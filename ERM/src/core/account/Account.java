@@ -172,7 +172,7 @@ public class Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.viewAmount(this));
+					balance = balance.subtract(transaction.getAmount(this));
 				}
 			}
 				
@@ -218,9 +218,9 @@ public class Account {
 				{
 					TransactionAmount ta = (TransactionAmount)transaction;
 					
-					if(ta.getKey() == ERM_KEY & transaction.viewAmount(this).compareTo(BigDecimal.ZERO) == 1)
+					if(ta.getKey() == ERM_KEY & transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1)
 					{
-						balance = balance.subtract(transaction.viewAmount(this));
+						balance = balance.subtract(transaction.getAmount(this));
 					}
 				}
 			}

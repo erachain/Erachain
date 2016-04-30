@@ -98,7 +98,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction>
 		   	@Override
 		    public BigDecimal run(Tuple2<String, String> key, Transaction value) {
 		   		Account account = new Account(key.a);
-		   		return value.viewAmount(account);
+		   		return value.getAmount(account);
 		    }
 		});		
 	}

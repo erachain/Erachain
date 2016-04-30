@@ -155,7 +155,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				if (creator_address==null) return "";
 				
 				return NumberAsString.getInstance().numberAsString(
-						transaction.viewAmount(creator_address));			
+						transaction.getAmount(creator_address));			
 
 			case COLUMN_RECIPIENT:
 				

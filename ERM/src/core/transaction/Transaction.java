@@ -418,20 +418,33 @@ public abstract class Transaction {
 				.toPlainString() + "[" + feePow + "]";
 	}
 
-	public BigDecimal viewAmount() {
-		return BigDecimal.ZERO;
-	}
 	public BigDecimal getAmount() {
-		return this.viewAmount();
+		return BigDecimal.ZERO;
 	}
 
-	public BigDecimal viewAmount(Account account)
+	public BigDecimal getAmount(Account account)
 	{
 		return BigDecimal.ZERO;
 	}
-	public BigDecimal viewAmount(String account)
+	public BigDecimal getAmount(String account)
 	{
 		return BigDecimal.ZERO;
+	}
+	
+	public BigDecimal viewFee(String address)
+	{
+		if (this.creator != null)
+			if (this.creator.getAddress() == address) return this.fee;
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal viewFee(Account account)
+	{
+		return this.viewFee(account.getAddress());
+	}
+
+	public long getAssetKey()
+	{
+		return -1l;
 	}
 	/*
 	public BigDecimal getAmount(Account account) {

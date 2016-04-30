@@ -94,7 +94,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				
 			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.viewAmount(transaction.getCreator()));
+				return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
 				
 			case COLUMN_FEE:
 				

@@ -11,6 +11,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import lang.Lang;
@@ -26,19 +27,23 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	public static final int COLUMN_OIL_BALANCE = 3;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", "OILs"});
-	private List<Account> accounts;
+	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset = null;
 	
 	public AccountsTableModel()
 	{
-		this.accounts = Controller.getInstance().getAccounts();
+		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 		Controller.getInstance().addWalletListener(this);
 		Controller.getInstance().addObserver(this);
 	}
 	
 	public Account getAccount(int row)
 	{
-		return accounts.get(row);
+		return (Account)publicKeyAccounts.get(row);
+	}
+	public PublicKeyAccount getPublicKeyAccount(int row)
+	{
+		return publicKeyAccounts.get(row);
 	}
 	
 	public void setAsset(AssetCls asset) 
@@ -62,18 +67,18 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	@Override
 	public int getRowCount() 
 	{
-		 return this.accounts.size();
+		 return this.publicKeyAccounts.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.accounts == null || row > this.accounts.size() - 1 )
+		if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
 		{
 			return null;
 		}
 		
-		Account account = this.accounts.get(row);
+		Account account = this.publicKeyAccounts.get(row);
 		
 		switch(column)
 		{
@@ -148,7 +153,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			
 			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
 			{
-				this.accounts = Controller.getInstance().getAccounts();	
+				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();	
 				
 				this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
 			}
@@ -164,7 +169,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	{
 		BigDecimal totalBalance = BigDecimal.ZERO.setScale(8);
 		
-		for(Account account: this.accounts)
+		for(Account account: this.publicKeyAccounts)
 		{
 			if(this.asset == null)
 			{

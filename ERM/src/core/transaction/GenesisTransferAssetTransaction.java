@@ -62,7 +62,11 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		return this.key;
 	}
-	
+	public long getAssetKey()
+	{
+		return this.key;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 
@@ -224,7 +228,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	}
 
 	//@Override
-	public BigDecimal viewAmount(Account account) 
+	public BigDecimal getAmount(Account account) 
 	{
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();

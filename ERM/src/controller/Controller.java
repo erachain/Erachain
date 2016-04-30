@@ -442,6 +442,7 @@ public class Controller extends Observable {
 		this.addObserver(DBSet.getInstance());
 	}
 
+	/*
 	public void replaseAssetsFavorites() {
 		if(this.wallet != null) {
 			this.wallet.replaseAssetFavorite();
@@ -457,6 +458,8 @@ public class Controller extends Observable {
 			this.wallet.replasePersonFavorite();
 		}
 	}
+	*/
+	
 	public void replaseFavoriteItems(int type) {
 		if(this.wallet != null) {
 			this.wallet.replaseFavoriteItems(type);
@@ -1167,6 +1170,10 @@ public class Controller extends Observable {
 
 		return this.wallet.getAccounts();
 	}
+	public List<PublicKeyAccount> getPublicKeyAccounts() {
+
+		return this.wallet.getPublicKeyAccounts();
+	}
 
 	public List<PrivateKeyAccount> getPrivateKeyAccounts() {
 
@@ -1180,14 +1187,6 @@ public class Controller extends Observable {
 	public PrivateKeyAccount getPrivateKeyAccountByAddress(String address) {
 		if(this.doesWalletExists()) {
 			return this.wallet.getPrivateKeyAccount(address);
-		} else {
-			return null;
-		}
-	}
-
-	public PublicKeyAccount getPublicKeyAccountByAddress(String address) {
-		if(this.doesWalletExists()) {
-			return this.wallet.getPublicKeyAccount(address);
 		} else {
 			return null;
 		}
@@ -1885,8 +1884,17 @@ public class Controller extends Observable {
 		return DBSet.getInstance().getBlockMap().get(b);
 	}
 
+	public PublicKeyAccount getPublicKeyByAddress1(String address) {
+		if(this.doesWalletExists()) {
+			return this.wallet.getPublicKeyAccount(address);
+		} else {
+			return null;
+		}
+	}
+
 	public byte[] getPublicKeyByAddress(String address) {
 
+		
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			return null;
 		}

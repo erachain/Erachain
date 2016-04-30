@@ -10,7 +10,7 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
-import core.item.assets.AssetCls;
+import core.item.ItemCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -19,11 +19,15 @@ import utils.ObserverMessage;
 import utils.Pair;		
 
 
-public class AssetsFavorites implements Observer{
+public class ItemsFavorites_not implements Observer{
 
 	private List<Long> favorites;
+	private int type;
 	
-	public AssetsFavorites() {
+	
+	public ItemsFavorites_not(int type) {
+		
+		this.type = type;
 		this.favorites = new ArrayList<Long>(); 
 		
 		Controller.getInstance().addWalletListener(this);
@@ -38,11 +42,11 @@ public class AssetsFavorites implements Observer{
 		return this.favorites;
 	}
 	
-	public List<AssetCls> getAssets()
+	public List<ItemCls> getItems()
 	{
-		List<AssetCls> assets = new ArrayList<AssetCls>();
+		List<ItemCls> assets = new ArrayList<ItemCls>();
 		for (Long key : this.favorites) {
-			assets.add(Controller.getInstance().getAsset(key));
+			assets.add(Controller.getInstance().getItem(this.type, key));
 		}
 		return assets;
 	}
@@ -65,7 +69,7 @@ public class AssetsFavorites implements Observer{
 		this.favorites = favoritesUpadate;
 
 		//Controller.getInstance().replaseAssetsFavorites();
-		//////Controller.getInstance().replaseAssetsFavorites();
+		Controller.getInstance().replaseFavoriteItems(this.type);
 
 	}
 	

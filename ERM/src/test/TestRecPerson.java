@@ -504,7 +504,7 @@ public class TestRecPerson {
 			assertEquals(r_SertifyPerson.getKey(), parsedPersonTransfer.getKey());	
 			
 			//CHECK AMOUNT
-			assertEquals(r_SertifyPerson.viewAmount(certifier), parsedPersonTransfer.viewAmount(certifier));
+			assertEquals(r_SertifyPerson.getAmount(certifier), parsedPersonTransfer.getAmount(certifier));
 						
 			//CHECK USER SIGNATURES
 			assertEquals(true, Arrays.equals(r_SertifyPerson.getUserSignature1(), parsedPersonTransfer.getUserSignature1()));

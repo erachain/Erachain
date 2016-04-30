@@ -176,8 +176,7 @@ public class Crypto {
 				
 				//CHECK IF CHECKSUMS ARE THE SAME
 				return Arrays.equals(checkSum, checkSumTwo);
-			}
-			if(addressBytes[0] == AT_ADDRESS_VERSION)
+			} else if(addressBytes[0] == AT_ADDRESS_VERSION)
 			{
 				//TODO CHECK IF AT WITH THAT ID EXISTS
 				//if (AT.getAT(addressBytes) != null)

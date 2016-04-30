@@ -356,10 +356,10 @@ public class TestRecGenesisAsset {
 			assertEquals(genesisTransferAsset.getKey(), parsedAssetTransfer.getKey());	
 			
 			//CHECK AMOUNT SENDER
-			assertEquals(genesisTransferAsset.viewAmount(maker), parsedAssetTransfer.viewAmount(maker));	
+			assertEquals(genesisTransferAsset.getAmount(maker), parsedAssetTransfer.getAmount(maker));	
 			
 			//CHECK AMOUNT RECIPIENT
-			assertEquals(genesisTransferAsset.viewAmount(recipient), parsedAssetTransfer.viewAmount(recipient));	
+			assertEquals(genesisTransferAsset.getAmount(recipient), parsedAssetTransfer.getAmount(recipient));	
 			
 		}
 		catch (Exception e) 
