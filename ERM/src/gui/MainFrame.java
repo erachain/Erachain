@@ -18,9 +18,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
+import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
-import gui.items.persons.AllPersonsView;
 import gui.items.persons.IssuePersonFrame;
+
 import gui.items.persons.PersonConfirm;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
@@ -115,10 +116,11 @@ public static  JDesktopPane desktopPane;
         //desktopPane.add(new IssuePersonFrame());
     //    desktopPane.add(new AccountsPanel());
     //    desktopPane.add(new AllPersonsFrame());
-        desktopPane.add(new AllPersonsView());
+       
      // new PersonConfirm(); 
         //STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
+   //     this.add(new Person1());
         
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter()
@@ -151,6 +153,7 @@ public static  JDesktopPane desktopPane;
       //  this.pack();
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
+        desktopPane.add(new AllPersonsFrame(this));
         
 	}
 }

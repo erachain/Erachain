@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import gui.items.imprints.ImprintsPanel;
 import gui.items.imprints.ImprintsPanel;
+import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
-import gui.items.persons.AllPersonsView;
 import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
@@ -342,7 +342,7 @@ public class Menu extends JMenuBar
         	{
              
         // выводим окно или делаем фокус если уже открыто
-        		selectOrAdd( new AllPersonsView(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new AllPersonsFrame(new MainFrame()), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
@@ -371,7 +371,7 @@ public class Menu extends JMenuBar
 	// подпрограмма выводит в панели окно или передает фокус если окно уже открыто
 	// item открываемое окно
 	// массив всех открытых окон в панели
-	void selectOrAdd(JInternalFrame item, JInternalFrame[] a ){
+	public static void selectOrAdd(JInternalFrame item, JInternalFrame[] a ){
 		    		
 		//проверка если уже открыто такое окно то передаем только фокус на него
 		int k= -1;
