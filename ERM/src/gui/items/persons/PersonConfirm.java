@@ -38,6 +38,8 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		super();
 	
 		final JTextField pubKey1Txt = new JTextField();
+		final JTextField pubKey2Txt = new JTextField();
+		final JTextField pubKey3Txt = new JTextField();
 		final JTextField toDate = new JTextField();
 		
 		
@@ -89,33 +91,46 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    // a weight of 0.0. The first button will get all extra space.
 	    c.gridx = 0;
 	    c.gridy = 0;
-	    c.gridwidth = 1;
+	    c.gridwidth = 5;
 	    c.gridheight =1;
 	    c.weightx = c.weighty = 0;
-	    this.add(new JLabel(Lang.getInstance().translate("Address for ") + person.getName() +":"), c);
+	    this.add(new JLabel(Lang.getInstance().translate("Public Keys of") + " " + person.getName() +":"), c);
 	    
-
-	    c.gridx = 1;
-	    c.gridy = 0;
-	    c.gridwidth = 4;
+	    c.gridx = 0;
+	    c.gridy = 1;
+	    c.gridwidth = 5;
 	    c.gridheight = 1;
 	    c.weightx = c.weighty = 0;
 	    this.add(pubKey1Txt, c);
 
 	    c.gridx = 0;
-	    c.gridy = 1;
-	    c.gridwidth = 1;
+	    c.gridy = 2;
+	    c.gridwidth = 5;
 	    c.gridheight = 1;
-	    this.add(new JLabel(Lang.getInstance().translate("To do") +":"), c);
+	    c.weightx = c.weighty = 0;
+	    this.add(pubKey2Txt, c);
+	    
+	    c.gridx = 0;
+	    c.gridy = 3;
+	    c.gridwidth = 5;
+	    c.gridheight = 1;
+	    c.weightx = c.weighty = 0;
+	    this.add(pubKey3Txt, c);
 
-	    c.gridx = 1;
-	    c.gridy = 1;
-	    c.gridwidth = 4;
+	    c.gridx = 0;
+	    c.gridy = 4;
+	    c.gridwidth = 2;
+	    c.gridheight = 1;
+	    this.add(new JLabel(Lang.getInstance().translate("To date") +":"), c);
+
+	    c.gridx = 2;
+	    c.gridy = 4;
+	    c.gridwidth = 3;
 	    c.gridheight = 1;
 	    this.add(toDate, c);
 
 	    c.gridx = 2;
-	    c.gridy = 2;
+	    c.gridy = 5;
 	    c.gridwidth = 1;
 	    c.gridheight = 1;
 	    JButton Button_Cancel = new JButton(Lang.getInstance().translate("Cancel"));
@@ -129,7 +144,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    this.add( Button_Cancel, c);
 
 	    c.gridx = 4;
-	    c.gridy = 2;
+	    c.gridy = 5;
 	    c.gridwidth = 1;
 	    c.gridheight = 1;
 	    JButton Button_Confirm = new JButton(Lang.getInstance().translate("Confirm"));

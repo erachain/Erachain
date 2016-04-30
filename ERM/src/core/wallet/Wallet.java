@@ -21,6 +21,7 @@ import at.AT_Transaction;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
@@ -193,7 +194,17 @@ public class Wallet extends Observable implements Observer
 		
 		return this.secureDatabase.getAccountSeedMap().getPrivateKeyAccount(address);
 	}
-	
+
+	public PublicKeyAccount getPublicKeyAccount(String address)
+	{
+		if(this.secureDatabase == null)
+		{
+			return null;
+		}
+		
+		return this.secureDatabase.getAccountSeedMap().getPublicKeyAccount(address);
+	}
+
 	public boolean exists()
 	{
 		return WalletDatabase.exists();

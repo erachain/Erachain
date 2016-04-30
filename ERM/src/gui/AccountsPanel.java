@@ -39,6 +39,9 @@ import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
@@ -129,6 +132,25 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 			}
 		});
 		menu.add(copyAddress);
+
+		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public key"));
+		copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				Account account = tableModel.getAccount(row);
+				PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
+						account.getAddress());
+				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(Base58.encode(publicKeyAccount.getPublicKey()));
+			    clipboard.setContents(value, null);
+			}
+		});
+		menu.add(copyPublicKey);
 				
 		JMenuItem copyBalance = new JMenuItem(Lang.getInstance().translate("Copy Balance"));
 		copyBalance.addActionListener(new ActionListener()

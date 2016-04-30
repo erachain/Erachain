@@ -1185,6 +1185,14 @@ public class Controller extends Observable {
 		}
 	}
 
+	public PublicKeyAccount getPublicKeyAccountByAddress(String address) {
+		if(this.doesWalletExists()) {
+			return this.wallet.getPublicKeyAccount(address);
+		} else {
+			return null;
+		}
+	}
+
 	public Account getAccountByAddress(String address) {
 		if(this.doesWalletExists()) {
 			return this.wallet.getAccount(address);
