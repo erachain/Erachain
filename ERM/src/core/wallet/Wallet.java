@@ -1021,20 +1021,24 @@ public class Wallet extends Observable implements Observer
 	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan)
 	{
 		//UPDATE UNCONFIRMED BALANCE for ASSET
+		// TODO: fee doubled?
 		long key = transaction.getAssetKey();
-		BigDecimal fee = asOrphan?BigDecimal.ZERO.subtract(transaction.viewFee(account)):transaction.viewFee(account);
+		BigDecimal fee = asOrphan?BigDecimal.ZERO.subtract(transaction.getFee(account)):transaction.getFee(account);
 		if (key >= 0)
 		{
 			// ASSET TRANSFERED + FEE
 			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress(), key);
 			BigDecimal amount = asOrphan?BigDecimal.ZERO.subtract(transaction.getAmount(account)):transaction.getAmount(account);
 			unconfirmedBalance = unconfirmedBalance.add(amount);
-			if (key == FEE_KEY)
+			if (fee.compareTo(BigDecimal.ZERO) != 0)
 			{
-				unconfirmedBalance = unconfirmedBalance.subtract(fee);
-			} else {
-				this.database.getAccountMap().update(account, FEE_KEY,
-						this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));								
+				if (key == FEE_KEY)
+				{
+					unconfirmedBalance = unconfirmedBalance.subtract(fee);
+				} else {
+					this.database.getAccountMap().update(account, FEE_KEY,
+						this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));
+				}
 			}
 			this.database.getAccountMap().update(account, key, unconfirmedBalance);
 		} else {

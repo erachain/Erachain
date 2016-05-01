@@ -328,7 +328,30 @@ public abstract class Transaction {
 		return this.viewTime(account);
 	}
 	*/
+	public BigDecimal getAmount() {
+		return BigDecimal.ZERO;
+	}
+
+	public BigDecimal getAmount(Account account)
+	{
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getAmount(String account)
+	{
+		return BigDecimal.ZERO;
+	}
 	
+	public BigDecimal getFee(String address)
+	{
+		if (this.creator != null)
+			if (this.creator.getAddress() == address) return this.fee;
+		return BigDecimal.ZERO;
+	}
+	public BigDecimal getFee(Account account)
+	{
+		return this.getFee(account.getAddress());
+	}
+
 	public BigDecimal getFee()
 	{
 		return this.fee;
@@ -337,6 +360,11 @@ public abstract class Transaction {
 	{
 		return this.feePow;
 	}	
+
+	public long getAssetKey()
+	{
+		return -1l;
+	}
 	
 	public byte[] getSignature()
 	{
@@ -417,40 +445,6 @@ public abstract class Transaction {
 		return fee.multiply(new BigDecimal(1000)).setScale(5)
 				.toPlainString() + "[" + feePow + "]";
 	}
-
-	public BigDecimal getAmount() {
-		return BigDecimal.ZERO;
-	}
-
-	public BigDecimal getAmount(Account account)
-	{
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal getAmount(String account)
-	{
-		return BigDecimal.ZERO;
-	}
-	
-	public BigDecimal viewFee(String address)
-	{
-		if (this.creator != null)
-			if (this.creator.getAddress() == address) return this.fee;
-		return BigDecimal.ZERO;
-	}
-	public BigDecimal viewFee(Account account)
-	{
-		return this.viewFee(account.getAddress());
-	}
-
-	public long getAssetKey()
-	{
-		return -1l;
-	}
-	/*
-	public BigDecimal getAmount(Account account) {
-		return this.viewAmount(account);
-	}
-	*/
 
 	//PARSE/CONVERT
 	
