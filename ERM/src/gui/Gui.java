@@ -71,6 +71,7 @@ public class Gui extends JFrame{
         {
         	if (Settings.getInstance().isGuiEnabled())
         		mainframe =	new MainFrame();
+        		mainframe.setVisible(true);        	
         }
         
 	}

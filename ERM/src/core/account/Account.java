@@ -62,11 +62,6 @@ public class Account {
 	// GET
 	public BigDecimal getUnconfirmedBalance(long key)
 	{
-		return this.getUnconfirmedBalance(key, DBSet.getInstance());
-	}
-	
-	public BigDecimal getUnconfirmedBalance(long key, DBSet db)
-	{
 		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
 	}
 	/*
@@ -153,7 +148,7 @@ public class Account {
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(key, db);
+			return this.getUnconfirmedBalance(key);
 		}
 		
 		//IF 1 CONFIRMATION
@@ -172,7 +167,7 @@ public class Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.viewAmount(this));
+					balance = balance.subtract(transaction.getAmount(this));
 				}
 			}
 				
@@ -218,9 +213,9 @@ public class Account {
 				{
 					TransactionAmount ta = (TransactionAmount)transaction;
 					
-					if(ta.getKey() == ERM_KEY & transaction.viewAmount(this).compareTo(BigDecimal.ZERO) == 1)
+					if(ta.getKey() == ERM_KEY & transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1)
 					{
-						balance = balance.subtract(transaction.viewAmount(this));
+						balance = balance.subtract(transaction.getAmount(this));
 					}
 				}
 			}
@@ -303,14 +298,14 @@ public class Account {
 				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
 				+ " - " + this.getAddress();
 				*/
-		return this.getConfirmedBalance(Transaction.FEE_KEY)
+		return this.getConfirmedBalance(FEE_KEY)
 				+ " - " + this.getAddress();
 	}
 	
 	public String toString(long key)
 	{
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(Transaction.FEE_KEY)) + "}"
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
 				+ " - " + this.getAddress();
 	}
 	

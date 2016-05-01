@@ -327,7 +327,7 @@ public class CreatePollTransaction extends Transaction
 	}
 
 	//@Override
-	public BigDecimal viewAmount(Account account) 
+	public BigDecimal getAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{

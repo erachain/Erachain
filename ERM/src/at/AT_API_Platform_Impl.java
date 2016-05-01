@@ -555,8 +555,8 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	{
 		if (tx instanceof TransactionAmount) {
 			tx = (TransactionAmount) tx;
-			byte[] amountB = ( height >= FIX_HEIGHT_0 ) ? 	tx.viewAmount( recipient ).unscaledValue().toByteArray():
-				tx.viewAmount( tx.getCreator() ).unscaledValue().toByteArray();
+			byte[] amountB = ( height >= FIX_HEIGHT_0 ) ? 	tx.getAmount( recipient ).unscaledValue().toByteArray():
+				tx.getAmount( tx.getCreator() ).unscaledValue().toByteArray();
 			if ( amountB.length < 8 )
 			{
 				byte[] fill = new byte[ 8 - amountB.length ];

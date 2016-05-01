@@ -151,7 +151,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	}
 
 	//@Override
-	public BigDecimal viewAmount(Account account) {
+	public BigDecimal getAmount(Account account) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		String address = account.getAddress();
 

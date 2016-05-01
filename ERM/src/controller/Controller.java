@@ -50,6 +50,7 @@ import core.TransactionCreator;
 import core.BlockGenerator.ForgingStatus;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -96,8 +97,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.12.03";
-	private String buildTime = "2016-04-20 00:00:00 UTC";
+	private String version = "2.12.05";
+	private String buildTime = "2016-04-29 00:00:00 UTC";
 	private long buildTimestamp;
 	
 	public static final String releaseVersion = "2.03.0";
@@ -441,6 +442,7 @@ public class Controller extends Observable {
 		this.addObserver(DBSet.getInstance());
 	}
 
+	/*
 	public void replaseAssetsFavorites() {
 		if(this.wallet != null) {
 			this.wallet.replaseAssetFavorite();
@@ -456,6 +458,8 @@ public class Controller extends Observable {
 			this.wallet.replasePersonFavorite();
 		}
 	}
+	*/
+	
 	public void replaseFavoriteItems(int type) {
 		if(this.wallet != null) {
 			this.wallet.replaseFavoriteItems(type);
@@ -1166,6 +1170,10 @@ public class Controller extends Observable {
 
 		return this.wallet.getAccounts();
 	}
+	public List<PublicKeyAccount> getPublicKeyAccounts() {
+
+		return this.wallet.getPublicKeyAccounts();
+	}
 
 	public List<PrivateKeyAccount> getPrivateKeyAccounts() {
 
@@ -1841,6 +1849,15 @@ public class Controller extends Observable {
 			return this.transactionCreator.recordNote(asPack, sender, feePow, key, isText, message);
 		}
 	}
+
+	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
+			int feePow, long key,
+			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3, int end_date) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_SertifyPerson( version, asPack, creator, feePow, key,
+					userAccount1, userAccount2, userAccount3, end_date);
+		}
+	}
 	
 	/*
 	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
@@ -1867,8 +1884,17 @@ public class Controller extends Observable {
 		return DBSet.getInstance().getBlockMap().get(b);
 	}
 
+	public PublicKeyAccount getPublicKeyByAddress1(String address) {
+		if(this.doesWalletExists()) {
+			return this.wallet.getPublicKeyAccount(address);
+		} else {
+			return null;
+		}
+	}
+
 	public byte[] getPublicKeyByAddress(String address) {
 
+		
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			return null;
 		}

@@ -10,6 +10,7 @@ import org.mapdb.DB;
 import com.google.common.primitives.UnsignedBytes;
 
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 
 public class AccountSeedMap {
 
@@ -57,7 +58,7 @@ public class AccountSeedMap {
 	}
 
 
-	public PrivateKeyAccount getPrivateKeyAccount(String address) 
+	public PrivateKeyAccount getPrivateKeyAccount(String address)
 	{
 		if(this.privateKeyAccounts == null)
 		{
@@ -71,6 +72,26 @@ public class AccountSeedMap {
 				if(privateKeyAccount.getAddress().equals(address))
 				{
 					return privateKeyAccount;
+				}
+			}
+		}
+		
+		return null;
+	}
+	public PublicKeyAccount getPublicKeyAccount(String address)
+	{
+		if(this.privateKeyAccounts == null)
+		{
+			this.loadPrivateKeyAccounts();
+		}
+		
+		synchronized(this.privateKeyAccounts)
+		{
+			for(PrivateKeyAccount privateKeyAccount: this.privateKeyAccounts)
+			{
+				if(privateKeyAccount.getAddress().equals(address))
+				{
+					return new PublicKeyAccount(privateKeyAccount.getPublicKey());
 				}
 			}
 		}

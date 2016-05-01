@@ -64,7 +64,8 @@ public class AssetsFavorites implements Observer{
 		}
 		this.favorites = favoritesUpadate;
 
-		Controller.getInstance().replaseAssetsFavorites();
+		//Controller.getInstance().replaseAssetsFavorites();
+		//////Controller.getInstance().replaseAssetsFavorites();
 
 	}
 	

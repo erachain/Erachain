@@ -120,7 +120,7 @@ public class Accounting extends Account {
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(FEE_KEY, db);
+			return this.getUnconfirmedBalance(FEE_KEY);
 		}
 		
 		//IF 1 CONFIRMATION
@@ -139,7 +139,7 @@ public class Accounting extends Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.viewAmount(this));
+					balance = balance.subtract(transaction.getAmount(this));
 				}
 			}
 				

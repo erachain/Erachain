@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -27,7 +28,7 @@ import javax.swing.table.TableColumn;
 import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
-import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.PersonFrame;
 import gui.items.persons.IssuePersonFrame;
 //import gui.items.persons.MyOrdersFrame;
@@ -55,16 +56,26 @@ public class PersonsPanel extends JPanel
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
-		//TABLE GBC
 		GridBagConstraints tableGBC = new GridBagConstraints();
+		tableGBC.fill = GridBagConstraints.BOTH; 
+		tableGBC.anchor = GridBagConstraints.NORTHWEST;
+		tableGBC.weightx = 0;
+		tableGBC.weighty = 0;
+		tableGBC.gridwidth = 10;
+		tableGBC.gridx = 0;	
+		tableGBC.gridy= 0;
+		this.add(new JLabel(Lang.getInstance().translate("My Persons")), tableGBC );
+		
+		//TABLE GBC
+		 tableGBC = new GridBagConstraints();
 		tableGBC.fill = GridBagConstraints.BOTH; 
 		tableGBC.anchor = GridBagConstraints.NORTHWEST;
 		tableGBC.weightx = 1;
 		tableGBC.weighty = 1;
 		tableGBC.gridwidth = 10;
 		tableGBC.gridx = 0;	
-		tableGBC.gridy= 0;	
-		
+		tableGBC.gridy= 1;	
+		/*
 		//BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
 		buttonGBC.insets = new Insets(10, 0, 0, 10);
@@ -72,7 +83,7 @@ public class PersonsPanel extends JPanel
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
 		buttonGBC.gridx = 0;
 		buttonGBC.gridy = 1;
-		
+		*/
 		//TABLE
 		final WalletItemPersonsTableModel personsModel = new WalletItemPersonsTableModel();
 		final JTable table = new JTable(personsModel);
@@ -154,7 +165,7 @@ public class PersonsPanel extends JPanel
 		
 		//ADD NAMING SERVICE TABLE
 		this.add(new JScrollPane(table), tableGBC);
-		
+	/*	
 		//ADD REGISTER BUTTON
 		JButton issueButton = new JButton(Lang.getInstance().translate("Issue Person"));
 		issueButton.setPreferredSize(new Dimension(120, 25));
@@ -166,7 +177,9 @@ public class PersonsPanel extends JPanel
 		    }
 		});	
 		this.add(issueButton, buttonGBC);
+	*/
 		
+		/*	
 		//ADD ALL BUTTON
 		buttonGBC.gridx = 1;
 		JButton allButton = new JButton(Lang.getInstance().translate("All Persons"));
@@ -179,7 +192,8 @@ public class PersonsPanel extends JPanel
 			}
 		});	
 		this.add(allButton, buttonGBC);
-		
+	*/
+		/*	
 		//ADD MY ORDERS BUTTON
 		buttonGBC.gridx = 2;
 		JButton myOrdersButton = new JButton(Lang.getInstance().translate("My Persons"));
@@ -192,6 +206,7 @@ public class PersonsPanel extends JPanel
 			}
 		});	
 		this.add(myOrdersButton, buttonGBC);
+		*/
 	}
 	
 	public void onIssueClick()
@@ -201,7 +216,7 @@ public class PersonsPanel extends JPanel
 	
 	public void onAllClick()
 	{
-		new AllPersonsFrame();
+		new AllPersonsPanel();
 	}
 	
 	public void onMyOrdersClick()

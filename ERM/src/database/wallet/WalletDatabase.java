@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.mapdb.Atomic.Var;
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.imprints.ImprintCls;
@@ -298,7 +298,7 @@ public class WalletDatabase implements IDB
 		}
 	}
 	
-	public void delete(Account account)
+	public void delete(PublicKeyAccount account)
 	{
 		this.accountMap.delete(account);
 		this.blockMap.delete(account);

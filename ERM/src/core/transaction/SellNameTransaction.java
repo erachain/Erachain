@@ -279,7 +279,7 @@ public class SellNameTransaction extends Transaction
 	}
 
 	//@Override
-	public BigDecimal viewAmount(Account account) 
+	public BigDecimal getAmount(Account account) 
 	{
 		String address = account.getAddress();
 		
