@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -45,12 +46,15 @@ public class Menu extends JMenuBar
 	public static JMenuItem lockItem;
 	private ImageIcon lockedIcon;
 	private ImageIcon unlockedIcon;
+	private JFrame parent;
+
 	private static final Logger LOGGER = Logger.getLogger(Menu.class);
 
-	public Menu()
+	public Menu(JFrame parent)
 	{
 		super();
 		
+		this.parent = parent;
 		//FILE MENU
         JMenu fileMenu = new JMenu(Lang.getInstance().translate("File"));
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));
@@ -333,26 +337,27 @@ public class Menu extends JMenuBar
         
 
         // меню Persons
-        JMenuItem Allpersonsmenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
-        Allpersonsmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
+        JMenuItem allPersonsMenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
+        allPersonsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        Allpersonsmenu.addActionListener(new ActionListener()
+        allPersonsMenu.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)
         	{
              
         // выводим окно или делаем фокус если уже открыто
-        		selectOrAdd( new AllPersonsFrame(new MainFrame()), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AllPersonsFrame(new MainFrame()), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
-        personsMenu.add(Allpersonsmenu);  
+        personsMenu.add(allPersonsMenu);  
         
         // issue Person menu
-        JMenuItem Issuepersonmenu = new JMenuItem(Lang.getInstance().translate("Issue Person"));
-        Issuepersonmenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue Person"));
+        JMenuItem issuePersonMenu = new JMenuItem(Lang.getInstance().translate("Issue Person"));
+        issuePersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue Person"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        Issuepersonmenu.addActionListener(new ActionListener()
+        issuePersonMenu.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)
         	{
@@ -362,7 +367,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        personsMenu.add(Issuepersonmenu);  
+        personsMenu.add(issuePersonMenu);  
         
         
 	}

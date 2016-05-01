@@ -76,7 +76,7 @@ public static  JDesktopPane desktopPane;
 		
 		
 		//MENU
-        Menu menu = new Menu();
+        Menu menu = new Menu(this);
 
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);

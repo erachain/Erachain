@@ -35,39 +35,33 @@ public class AllPersonsFrame extends JInternalFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AllPersonsFrame (JFrame parent) {
-		
+	public AllPersonsFrame (JFrame parent)
+	{
+	
 		// tool bar
-				JToolBar tb2 = new JToolBar(Lang.getInstance().translate("Toolbar persons"));
-
-				JButton issueButton = new JButton(Lang.getInstance().translate("Issue Person"));
-						tb2.add(issueButton);
-						issueButton.addActionListener(new ActionListener()
-						{
-						    public void actionPerformed(ActionEvent e)
-						    {
-						    	 Menu.selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
-						    }
-
-							
-						});	
-						
-						
-						
-					//	tb2.add(new JButton("Вторая"));
-
-					//	tb2.add(new JButton("Третья"));
-
-						//add(tb1, BorderLayout.NORTH); 
-						getContentPane().add(tb2, BorderLayout.NORTH);
+		JToolBar tb2 = new JToolBar(Lang.getInstance().translate("Toolbar persons"));
 	
+		JButton issueButton = new JButton(Lang.getInstance().translate("Issue Person"));
+				tb2.add(issueButton);
+				issueButton.addActionListener(new ActionListener()
+				{
+				    public void actionPerformed(ActionEvent e)
+				    {
+				    	 Menu.selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+				    }
 	
+					
+				});	
+				
+				
+				
+			//	tb2.add(new JButton("Вторая"));
 	
+			//	tb2.add(new JButton("Третья"));
 	
-						
-						
-						
-						
+				//add(tb1, BorderLayout.NORTH); 
+				getContentPane().add(tb2, BorderLayout.NORTH);
+	
 	
 //	getContentPane().add(this,BorderLayout.CENTER);
 	
