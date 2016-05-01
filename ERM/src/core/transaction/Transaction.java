@@ -344,7 +344,8 @@ public abstract class Transaction {
 	public BigDecimal getFee(String address)
 	{
 		if (this.creator != null)
-			if (this.creator.getAddress() == address) return this.fee;
+			if (this.creator.getAddress().equals(address))
+				return this.fee;
 		return BigDecimal.ZERO;
 	}
 	public BigDecimal getFee(Account account)
