@@ -16,6 +16,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import core.account.Account;
+import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
@@ -33,19 +34,21 @@ public class CreateOrderTransaction extends Transaction
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH;
 
 	private Order order;
-	private long have;
-	private long want;
-	private BigDecimal amount;
-	private BigDecimal price;
+	//private long have;
+	//private long want;
+	//private BigDecimal amount;
+	//private BigDecimal price;
 	
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
-		this.have = have;
-		this.want = want;
-		this.amount = amount;
-		this.price = price;
+		//this.have = have;
+		//this.want = want;
+		//this.amount = amount;
+		//this.price = price;
+		this.order = new Order(new BigInteger(new byte[1]), creator, have, want, amount, price, timestamp);
+
 	}
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
@@ -68,17 +71,27 @@ public class CreateOrderTransaction extends Transaction
 	//GETTERS/SETTERS
 	//public static String getName() { return "Create Order"; }
 
+	/*
 	public void makeOrder()
 	{
 		if (this.order == null) this.order = new Order(new BigInteger(this.signature),
 				this.creator, this.have, this.want, this.amount, this.price, this.timestamp);
 	}
+	*/
 
 	public Order getOrder()
 	{
 		return this.order;
 	}
 	
+	//@Override
+	public void sign(PrivateKeyAccount creator, boolean asPack)
+	{
+		super.sign(creator, asPack);
+		// in IMPRINT reference already setted before sign
+		if (this.order.getId() == null) this.order.setId(this.signature);
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception
@@ -88,8 +101,7 @@ public class CreateOrderTransaction extends Transaction
 		{
 			throw new Exception("Data does not match block length");
 		}
-		
-		
+				
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
