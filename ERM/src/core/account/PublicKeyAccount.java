@@ -20,6 +20,7 @@ import utils.NameUtils.NameResult;
 
 public class PublicKeyAccount extends Account {
 
+	public static final int PUBLIC_KEY_LENGTH = 32;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	protected byte[] publicKey;
 	
@@ -49,16 +50,12 @@ public class PublicKeyAccount extends Account {
 	}
 
 	//CHECK IF IS VALID PUBLIC KEY and MAKE NEW
-	public static Pair<Integer, PublicKeyAccount> isValidPublicKey(byte[] publicKey)
+	public static boolean isValidPublicKey(byte[] publicKey)
 	{
-		if (publicKey.length != Transaction.len)
-		PublicKeyAccount account = new PublicKeyAccount(publicKey);
-		if(!Crypto.getInstance().isValidAddress(account.getAddress()))
-			return new Pair<Integer, PublicKeyAccount>(ApiErrorFactory.ERROR_INVALID_ADDRESS, null);
-		
-		return new Pair<Integer, PublicKeyAccount>(null, account);
+		if (publicKey.length != PUBLIC_KEY_LENGTH) return false;
+		return true;
 	}
-	public static Pair<Integer, PublicKeyAccount> isValidPublicKey(String publicKey)
+	public static boolean isValidPublicKey(String publicKey)
 	{
 		return isValidPublicKey(Base58.decode(publicKey));
 	}

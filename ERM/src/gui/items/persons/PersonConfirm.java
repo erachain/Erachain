@@ -314,13 +314,12 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		}
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		Pair<Integer, PublicKeyAccount> result = PublicKeyAccount.isValidPublicKey(toValue);
-		Account account = result.getB(); 
 		
-		if (account == null) {
+		if (!PublicKeyAccount.isValidPublicKey(toValue)) {
 			// SHOW error message
-			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(result.getA()));
+			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_INVALID_ADDRESS));
 		} else {
+			PublicKeyAccount account = new PublicKeyAccount(toValue); 
 			// SHOW account for FEE asset
 			String personDetails;
 			Tuple4<Long, Integer, Integer, byte[]> addressDuration = account.getPersonDuration(DBSet.getInstance());
@@ -346,7 +345,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 				//personDetails = personDetails; 
 			}
 
-			pubKeyDetails.setText("<html><h3>" + personDetails + "</h3>" + result.getB().toString(Transaction.FEE_KEY) + "</html>");
+			pubKeyDetails.setText("<html><h3>" + personDetails + "</h3>" + account.toString(Transaction.FEE_KEY) + "</html>");
 			
 		}
 		

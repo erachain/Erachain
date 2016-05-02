@@ -238,7 +238,7 @@ public abstract class Transaction {
 	protected static final int KEY_LENGTH = 8;
 	protected static final int FEE_POWER_LENGTH = 1;
 	//protected static final int HKEY_LENGTH = 20;
-	protected static final int CREATOR_LENGTH = 32;
+	protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	// not need now protected static final int FEE_LENGTH = 8;
 	public static final int SIGNATURE_LENGTH = 64;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
