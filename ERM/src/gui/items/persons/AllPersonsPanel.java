@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import gui.CoreRowSorter;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 import javax.naming.ldap.SortKey;
@@ -43,6 +44,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+
 import org.mapdb.Fun.Tuple3;
 import core.item.persons.PersonCls;
 import database.AddressPersonMap;
@@ -128,6 +132,18 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
 		final JTable personsTable = new JTable(this.tableModelPersons);
+		
+		TableColumnModel columnModel = personsTable.getColumnModel(); // read column model
+		columnModel.getColumn(0).setMaxWidth((100));
+		//columnModel.getColumn(1).setMaxWidth((250));
+		//columnModel.getColumn(2).setMaxWidth((120));//sizeWidthToFit();
+		//Custom renderer for the String column;
+		personsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		personsTable.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+	//	TableCellRenderer a = personsTable.getDefaultRenderer(Long.class);
+	
+	//	cellRenderer render = new CellRenderer();
+	//	columnModel.getColumn(0).setCellRenderer(cellRenderer);
 
 		/*
 		//CHECKBOX FOR DIVISIBLE
@@ -136,14 +152,14 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 		*/
 		
 		//BLOCKS SORTER
-		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX);// указываем, что первая колонка состоит из чисел
-		CoreRowSorter sorter = new CoreRowSorter(this.tableModelPersons, indexes);
-		personsTable.setRowSorter(sorter);
+	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+	//	indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX);// указываем, что первая колонка состоит из чисел
+	//	CoreRowSorter sorter = new CoreRowSorter(this.tableModelPersons, indexes);
+	//	personsTable.setRowSorter(sorter);
 	
 		
-	//	personsTable.setFillsViewportHeight(true);
-	//	personsTable.setAutoCreateRowSorter(true);
+		personsTable.setFillsViewportHeight(true);
+		personsTable.setAutoCreateRowSorter(true);
 		
 		
 				  
@@ -220,7 +236,13 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 				// устанавливаем формат даты
 						SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 				//создаем объект персоны
-						PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+						PersonCls person;
+						
+						
+							if (personsTable.getSelectedRow() >= 0 ){
+							person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
+						
+						
 				//читаем таблицу персон.
 						Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
 				// преобразование в дату
@@ -256,8 +278,13 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 							
 				Address1.setText(message);
 				PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());//.setPreferredSize(new Dimension(100,100));		
-			}; 
-		});
+			 
+			
+					
+					}
+					}
+					
+					});
 				
 				
 				

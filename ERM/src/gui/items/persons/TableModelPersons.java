@@ -35,6 +35,11 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 		return this.persons;
 	}
 	
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+         return getValueAt(0, c).getClass();
+     }
+	
 	public PersonCls getPerson(int row)
 	{
 		return this.persons.get(row).getB();
