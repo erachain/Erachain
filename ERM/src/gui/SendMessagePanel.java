@@ -430,6 +430,27 @@ public class SendMessagePanel extends JInternalFrame //JPanel
 				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
+		
+        this.pack();
+     //   this.setLocationRelativeTo(null);
+ 
+		this.setMaximizable(true);
+		this.setTitle(Lang.getInstance().translate("Persons"));
+		this.setClosable(true);
+//		this.setResizable(true);
+		
+	
+		this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+		this.setLocation(20, 20);
+	//	this.setIconImages(icons);
+		
+		//CLOSE
+		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        this.setResizable(true);
+        //splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+        this.setVisible(true);
+
+        
 	}
 
 	private void refreshReceiverDetails()
@@ -731,6 +752,8 @@ public class SendMessagePanel extends JInternalFrame //JPanel
 		//ENABLE
 		this.sendButton.setEnabled(true);
 	}
+	
+	
 	
 }
 
