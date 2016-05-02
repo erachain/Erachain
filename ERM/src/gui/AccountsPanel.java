@@ -1,6 +1,7 @@
 package gui;
 
 import gui.items.assets.AssetsComboBoxModel;
+import gui.items.persons.AllPersonsFrame;
 import gui.models.AccountsTableModel;
 import lang.Lang;
 
@@ -21,6 +22,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -52,12 +54,15 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 
 //JInternalFrame
 {
+	private JFrame parent;
+
 	private static JComboBox<AssetCls> cbxFavorites;
 	private AccountsTableModel tableModel;
 
 	@SuppressWarnings("unchecked")
-	public AccountsPanel()
+	public AccountsPanel(JFrame parent)
 	{
+		this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		
 		//PADDING
@@ -116,6 +121,25 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
 		
+		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+		sendAsset.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				AssetCls asset = getAsset();
+				Account account = tableModel.getAccount(row);
+				
+        		//Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), MainFrame.desktopPane.getAllFrames());
+				Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), null);
+				
+				
+			}
+		});
+		menu.add(sendAsset);
+
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
 		copyAddress.addActionListener(new ActionListener()
 		{

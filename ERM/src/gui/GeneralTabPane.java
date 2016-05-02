@@ -41,7 +41,7 @@ public class GeneralTabPane extends JTabbedPane{
 		super();
 		
 		//ACCOUNTS
-		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
+		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel(null));
         
 		//STATEMENT
 		this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
@@ -50,7 +50,7 @@ public class GeneralTabPane extends JTabbedPane{
 		this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
 
 		//MESSAGE
-		this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel());
+		this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel(null, null, null));
 			   
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();

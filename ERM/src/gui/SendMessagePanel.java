@@ -24,6 +24,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -55,7 +56,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SendMessagePanel extends JPanel 
+public class SendMessagePanel extends JInternalFrame //JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -73,7 +74,7 @@ public class SendMessagePanel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SendMessagePanel()
+	public SendMessagePanel(JFrame parent, AssetCls asset, Account account)
 	{
 		
 		
@@ -97,6 +98,7 @@ public class SendMessagePanel extends JPanel
 		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
+		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		this.accountsModel = new AccountsComboBoxModel();
         
@@ -125,6 +127,7 @@ public class SendMessagePanel extends JPanel
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
 		this.add(this.cbxFrom, cbxFromGBC);
+		if (account != null) cbxFrom.setSelectedItem(account);
 		
 		//ON FAVORITES CHANGE
 
