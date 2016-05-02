@@ -126,6 +126,9 @@ public class GenesisBlock extends Block{
 					Arrays.asList(1000, new PersonHuman(new Account("7FoC1wAtbR9Z5iwtcw4Ju1u2DnLBQ1TNS7"),
 							"Симанков Дмитрий", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("78A24nTM2PPdpjLF2JWbghPDUhPK1zQ51Y"),
+							"Добрышкин Сергей", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
 							"Бородин Олег", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, ""))					

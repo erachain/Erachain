@@ -47,14 +47,14 @@ public class CreateOrderTransaction extends Transaction
 		//this.want = want;
 		//this.amount = amount;
 		//this.price = price;
-		this.order = new Order(new BigInteger(new byte[1]), creator, have, want, amount, price, timestamp);
+		this.order = new Order(null, creator, have, want, amount, price, timestamp);
 
 	}
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
 	{
-		this(typeBytes, creator, have, want, amount, price, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.signature = signature;
-		this.order = new Order(new BigInteger(this.signature), creator, have, want, amount, price, timestamp);
+		this.order = new Order(new BigInteger(signature), creator, have, want, amount, price, timestamp);
 		this.calcFee();
 		
 	}
@@ -89,7 +89,7 @@ public class CreateOrderTransaction extends Transaction
 	{
 		super.sign(creator, asPack);
 		// in IMPRINT reference already setted before sign
-		if (this.order.getId() == null) this.order.setId(this.signature);
+		this.order.setId(this.signature);
 	}
 
 	//PARSE CONVERT

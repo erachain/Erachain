@@ -51,7 +51,7 @@ public class Settings {
 	public static final BigDecimal BLOCK_GENERATING_BALANCE_NEED = new BigDecimal(100);
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1461666085336L; // CORE RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1462132300336L; // CORE RELEASE
 	private long genesisStamp = -1;
 	
 	//RPC
