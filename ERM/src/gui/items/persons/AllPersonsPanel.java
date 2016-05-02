@@ -24,6 +24,7 @@ import gui.models.Renderer_Right;
 import lang.Lang;
 
 import javax.naming.ldap.SortKey;
+import javax.swing.DefaultRowSorter;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -39,6 +40,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -46,6 +49,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 import org.mapdb.Fun.Tuple3;
 import core.item.persons.PersonCls;
@@ -158,9 +162,12 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 	//	personsTable.setRowSorter(sorter);
 	
 		
-		personsTable.setFillsViewportHeight(true);
-		personsTable.setAutoCreateRowSorter(true);
+	//	personsTable.setFillsViewportHeight(true);
+	//	personsTable.setAutoCreateRowSorter(true);
 		
+		RowSorter sorter =   new TableRowSorter(this.tableModelPersons);
+
+		personsTable.setRowSorter(sorter);	
 		
 				  
 		  
@@ -187,8 +194,14 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 				String search = txtSearch.getText();
 
 			 	// SET FILTER
-				tableModelPersons.getSortableList().setFilter(search);
+		//		tableModelPersons.getSortableList().setFilter(search);
 				tableModelPersons.fireTableDataChanged();
+				
+				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+				((DefaultRowSorter) sorter).setRowFilter(filter);
+				
+				tableModelPersons.fireTableDataChanged();
+				
 			}
 		});
 		
@@ -347,6 +360,9 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 					row = personsTable.convertRowIndexToModel(row);
 					PersonCls person = tableModelPersons.getPerson(row);
 		//			new PersonFrame(person);
+					
+					
+					
 				}
 			}
 		});
