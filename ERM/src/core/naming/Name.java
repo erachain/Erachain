@@ -21,7 +21,7 @@ public class Name {
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int VALUE_SIZE_LENGTH = 4;
 	
-	private Account owner;
+	private Account owner; // current owner of Name
 	private String name;
 	private String value;
 	

@@ -132,6 +132,8 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 				AssetCls asset = getAsset();
 				Account account = tableModel.getAccount(row);
 				
+				JInternalFrame frame = new JInternalFrame();
+				
         		//Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), MainFrame.desktopPane.getAllFrames());
 				Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), null);
 				

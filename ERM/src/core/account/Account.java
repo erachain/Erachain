@@ -10,19 +10,28 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
+import api.ApiErrorFactory;
+
 //import com.google.common.primitives.Bytes;
 
 import at.AT_Transaction;
+import database.Item_Map;
 import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.naming.Name;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
+import utils.NameUtils;
 import utils.NumberAsString;
+import utils.Pair;
+import utils.NameUtils.NameResult;
 import database.DBSet;
+import database.NameMap;
 import ntp.NTP;
 
 public class Account {
@@ -31,7 +40,6 @@ public class Account {
 	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
-
 
 	protected String address;
 	
@@ -327,12 +335,12 @@ public class Account {
 		return false;	
 	}
 
+	// personKey, days, block, reference
+	public static Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db, String address) {
+		return db.getAddressPersonMap().getItem(address);				
+	}
 	public Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db) {
-		
-		// IF NOT PERSON HAS THAT ADDRESS
-		Tuple4<Long, Integer, Integer, byte[]> item = db.getAddressPersonMap().getItem(this.address);
-		return item;
-				
+		return getPersonDuration(db, this.address);
 	}
 	
 	public boolean isPerson(DBSet db) {
@@ -343,7 +351,7 @@ public class Account {
 		// TEST TIME and EXPIRE TIME
 		long current_time = NTP.getTime();
 		
-		// TEST TIME and EXPIRE TIME
+		// TEST TIME and EXPIRE TIME for PERSONALIZE address
 		int days = addressDuration.b;		
 		if (days < 0 ) return false;
 		if (days * (long)86400 < current_time ) return false;
@@ -351,12 +359,11 @@ public class Account {
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
 		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
-		
-		// TEST TIME and EXPIRE TIME
+		// TEST TIME and EXPIRE TIME for ALIVE person
 		days = personDuration.a;
 		if (days < 0 ) return false;
 		if (days * (long)86400 < current_time ) return false;
-
+		
 		return true;
 		
 	}

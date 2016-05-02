@@ -233,6 +233,11 @@ public class ApiErrorFactory
 		this.errorMessages.put(ERROR_MESSAGESIZE_EXCEEDED, Lang.getInstance().translate("Message size exceeded!"));
 
 	}
+
+	public String messageError(int error)
+	{
+		return this.errorMessages.get(error);
+	}
 	
 	
 	@SuppressWarnings("unchecked")

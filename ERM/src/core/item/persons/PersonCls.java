@@ -15,11 +15,16 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.item.ItemCls;
+import core.naming.Name;
 import database.DBSet;
 import database.Issue_ItemMap;
 import database.Item_Map;
+import database.NameMap;
 import database.ItemPersonMap;
 import utils.DateTimeFormat;
+import utils.NameUtils;
+import utils.Pair;
+import utils.NameUtils.NameResult;
 
 public abstract class PersonCls extends ItemCls {
 
@@ -119,8 +124,8 @@ public abstract class PersonCls extends ItemCls {
 	}
 	public int getHeight() {
 		return Byte.toUnsignedInt(this.height);
-	}
-	
+	}	
+
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{

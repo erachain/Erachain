@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -10,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -18,10 +21,15 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+
+import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -30,10 +38,13 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.MainFrame;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import ntp.NTP;
 import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
@@ -46,9 +57,9 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		final JTextField pubKey1Txt = new JTextField();
 		final JTextField pubKey2Txt = new JTextField();
 		final JTextField pubKey3Txt = new JTextField();
-		final JTextField pubKey1Details = new JTextField();
-		final JTextField pubKey2Details = new JTextField();
-		final JTextField pubKey3Details = new JTextField();
+		final JLabel pubKey1Details = new JLabel();
+		final JLabel pubKey2Details = new JLabel();
+		final JLabel pubKey3Details = new JLabel();
 
 		final JTextField toDate = new JTextField();
 		
@@ -86,42 +97,45 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		// Create and specify a layout manager
 	    this.setLayout(new GridBagLayout());
 
+	    int gridy = 0;
 	    // Create a constraints object, and specify some default values
-	    GridBagConstraints c = new GridBagConstraints();
-	    
-	    c.insets = new Insets(0, 5, 5, 0);
-		c.fill = GridBagConstraints.HORIZONTAL;   
-		c.anchor = GridBagConstraints.NORTH;
-	    //c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
-	    //c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
+	    GridBagConstraints input = new GridBagConstraints();
+	    input.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
+		input.fill = GridBagConstraints.HORIZONTAL;   
+		input.anchor = GridBagConstraints.NORTHWEST;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
 
-	    GridBagConstraints label = new GridBagConstraints();
-	    
+	    GridBagConstraints label = new GridBagConstraints();	    
 	    label.insets = new Insets(0, 5, 5, 0);
 		label.fill = GridBagConstraints.HORIZONTAL;   
-		label.anchor = GridBagConstraints.NORTH;
+		label.anchor = GridBagConstraints.NORTHWEST;
 		label.gridx = 0;
-		label.gridheight = 2;
-	    //c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
-	    //c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
+		label.gridheight = 1;
+
+	    GridBagConstraints detail = new GridBagConstraints();
+	    detail.insets = new Insets(0, 5, 5, 0);
+	    detail.fill = GridBagConstraints.BOTH; // components grow in both dimensions
+	    detail.anchor = GridBagConstraints.NORTHWEST;
+	    detail.gridx = 0;
+	    detail.gridwidth = 5;
+	    detail.gridheight = 2;
+	    detail.weightx = -1;
+	    detail.weighty = -1;
 
 	    // Create and add a bunch of buttons, specifying different grid
 	    // position, and size for each.
 	    // Give the first button a resize weight of 1.0 and all others
 	    // a weight of 0.0. The first button will get all extra space.
-	    c.gridx = 0;
-	    c.gridy = 0;
-	    c.gridwidth = 5;
-	    c.gridheight =1;
-	    c.weightx = c.weighty = 0;
-	    this.add(new JLabel(Lang.getInstance().translate("Public Keys of") + " " + person.getName() +":"), c);
+	    input.gridx = 0;
+	    //c.weightx = c.weighty = 0;
+	    this.add(new JLabel(Lang.getInstance().translate("Public Keys of") + " " + person.getName() +":"), input);
 	    
-	    c.gridx = 0;
-	    c.gridy = 1;
-	    c.gridwidth = 5;
-	    c.gridheight = 1;
-	    c.weightx = c.weighty = 0;
-	    this.add(pubKey1Txt, c);
+	    input.gridy = ++gridy;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    //c.weightx = c.weighty = 0;
+	    this.add(pubKey1Txt, input);
 	    
 	    pubKey1Txt.getDocument().addDocumentListener(new DocumentListener() {
             
@@ -137,24 +151,27 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 				refreshReceiverDetails(pubKey1Txt, pubKey1Details);
 			}
         });
-
-        //LABEL RECEIVER DETAILS
-	    label.gridy = 2;
-	    this.add(new JLabel(Lang.getInstance().translate("Details") +":"), label);
-      		
-      	//RECEIVER DETAILS 
-      	c.gridy = 2;
-	    c.gridx = 1;
-      	pubKey1Details.setEditable(false);
-        this.add(pubKey1Details, c);
-
-
-	    c.gridx = 0;
-	    c.gridy = 3;
-	    c.gridwidth = 5;
-	    c.gridheight = 1;
-	    c.weightx = c.weighty = 0;
-	    this.add(pubKey2Txt, c);
+	          		
+	    JPanel htmlPanel1 = new JPanel();
+        htmlPanel1.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+         
+        String text = ""; //<html><h4>What is Google Labs?</h4>" +
+                  //" well, just plain crazy.</html>";
+         
+        //font = new Font(null, Font.PLAIN, 10);
+         
+        pubKey1Details.setText(text);
+        //pubKey1Details.
+        htmlPanel1.add(pubKey1Details);        
+        this.add(htmlPanel1, detail); // BorderLayout.SOUTH);
+ 
+        gridy = 10;
+	    input.gridx = 0;
+	    input.gridy = ++gridy;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    //c.weightx = c.weighty = 0;
+	    this.add(pubKey2Txt, input);
 	    
 	    pubKey2Txt.getDocument().addDocumentListener(new DocumentListener() {
             
@@ -171,22 +188,20 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 			}
         });
 	    
-        //LABEL RECEIVER DETAILS
-	    label.gridy = 4;
-	    this.add(new JLabel(Lang.getInstance().translate("Details") +":"), label);
-      		
-      	//RECEIVER DETAILS 
-      	c.gridy = 4;
-	    c.gridx = 1;
-      	pubKey2Details.setEditable(false);
-        this.add(pubKey2Details, c);
+	    JPanel htmlPanel2 = new JPanel();
+        htmlPanel2.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+        pubKey2Details.setText(text);
+        htmlPanel2.add(pubKey2Details);        
+        this.add(htmlPanel2, detail); // BorderLayout.SOUTH);
 
-	    c.gridx = 0;
-	    c.gridy = 5;
-	    c.gridwidth = 5;
-	    c.gridheight = 1;
-	    c.weightx = c.weighty = 0;
-	    this.add(pubKey3Txt, c);
+        gridy = 20;
+        
+	    input.gridx = 0;
+	    input.gridy = ++gridy;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    //c.weightx = c.weighty = 0;
+	    this.add(pubKey3Txt, input);
 
 	    pubKey3Txt.getDocument().addDocumentListener(new DocumentListener() {
             
@@ -203,32 +218,31 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 			}
         });
 
-        //LABEL RECEIVER DETAILS
-	    label.gridy = 6;
-	    this.add(new JLabel(Lang.getInstance().translate("Details") +":"), label);
-      		
-      	//RECEIVER DETAILS 
-      	c.gridy = 6;
-	    c.gridx = 1;
-      	pubKey3Details.setEditable(false);
-        this.add(pubKey3Details, c);
+	    JPanel htmlPanel3 = new JPanel();
+        htmlPanel3.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+         
+        pubKey3Details.setText(text);
+        htmlPanel3.add(pubKey3Details);        
+        this.add(htmlPanel3, detail); // BorderLayout.SOUTH);
 
-	    c.gridx = 0;
-	    c.gridy = 7;
-	    c.gridwidth = 2;
-	    c.gridheight = 1;
-	    this.add(new JLabel(Lang.getInstance().translate("To date") +":"), c);
+        gridy = 30;
 
-	    c.gridx = 2;
-	    c.gridy = 7;
-	    c.gridwidth = 3;
-	    c.gridheight = 1;
-	    this.add(toDate, c);
+        input.gridx = 0;
+	    input.gridy = ++gridy;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    this.add(new JLabel(Lang.getInstance().translate("To date") +":"), input);
 
-	    c.gridx = 2;
-	    c.gridy = 9;
-	    c.gridwidth = 1;
-	    c.gridheight = 1;
+	    input.gridx = 2;
+	    input.gridy = gridy;
+	    input.gridwidth = 3;
+	    input.gridheight = 1;
+	    this.add(toDate, input);
+
+	    input.gridx = 2;
+	    input.gridy = ++gridy;
+	    input.gridwidth = 1;
+	    input.gridheight = 1;
 	    JButton Button_Cancel = new JButton(Lang.getInstance().translate("Cancel"));
 	    Button_Cancel.addActionListener(new ActionListener()
 		{
@@ -237,14 +251,14 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		// программа обработки при нажатии cancel
 		    }
 		});
-	    this.add( Button_Cancel, c);
+	    this.add( Button_Cancel, input);
 
-	    c.gridx = 4;
-	    c.gridy = 9;
-	    c.gridwidth = 1;
-	    c.gridheight = 1;
+	    input.gridx = 4;
+	    input.gridy = gridy;
+	    input.gridwidth = 1;
+	    input.gridheight = 1;
 	    JButton Button_Confirm = new JButton(Lang.getInstance().translate("Confirm"));
-	    this.add(Button_Confirm, c);
+	    this.add(Button_Confirm, input);
 	    Button_Confirm.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -273,7 +287,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    this.add(new JButton("Button #9"), c);
     
 	    */
-	    setPreferredSize(new Dimension(700, 500));
+	    setPreferredSize(new Dimension(700, 700));
 		//PACK
 //		this.pack();
 		//this.setSize(500, this.getHeight());
@@ -283,7 +297,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		this.setVisible(true);
 	}
 	
-	private void refreshReceiverDetails(JTextField pubKeyTxt, JTextField pubKeyDetails)
+	private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails)
 	{
 		String toValue = pubKeyTxt.getText();
 		
@@ -300,8 +314,41 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		}
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		PublicKeyAccount account = new PublicKeyAccount(toValue);
-		pubKeyDetails.setText(account.toString(Transaction.FEE_KEY));
+		Pair<Integer, PublicKeyAccount> result = PublicKeyAccount.isValidPublicKey(toValue);
+		Account account = result.getB(); 
+		
+		if (account == null) {
+			// SHOW error message
+			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(result.getA()));
+		} else {
+			// SHOW account for FEE asset
+			String personDetails;
+			Tuple4<Long, Integer, Integer, byte[]> addressDuration = account.getPersonDuration(DBSet.getInstance());
+			
+			if (addressDuration == null) personDetails = Lang.getInstance().translate("Not personalized yet");
+			else
+			{
+				// TEST TIME and EXPIRE TIME
+				long current_time = NTP.getTime();
+				
+				// TEST TIME and EXPIRE TIME
+				int daysLeft = addressDuration.b - (int)(current_time / (long)86400);	
+				if (daysLeft < 0 ) personDetails = Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
+				else personDetails = Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
+
+				// IF PERSON ALIVE
+				Long personKey = addressDuration.a;
+				Tuple3<Integer, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
+				daysLeft = aliveDuration.a - (int)(current_time / (long)86400);
+				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
+				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
+				
+				//personDetails = personDetails; 
+			}
+
+			pubKeyDetails.setText("<html><h3>" + personDetails + "</h3>" + result.getB().toString(Transaction.FEE_KEY) + "</html>");
+			
+		}
 		
 		/*
 		if(!Crypto.getInstance().isValidAddress(toValue))
