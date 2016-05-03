@@ -349,26 +349,6 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 			
 		}
 		
-		/*
-		if(!Crypto.getInstance().isValidAddress(toValue))
-		{
-			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-					
-			if(nameToAdress.getB() == NameResult.OK)
-			{
-				Account account = nameToAdress.getA();
-				pubKeyDetails.setText(account.toString(Transaction.FEE_KEY));
-			}
-			else
-			{
-				pubKeyDetails.setText(nameToAdress.getB().getShortStatusMessage());
-			}
-		}else
-		{
-			Account account = new Account(toValue);
-			pubKeyDetails.setText(account.toString(Transaction.FEE_KEY));
-		}
-		*/	
 	}
 
 	public void onGoClick(PersonCls person, JButton Button_Confirm,
@@ -382,12 +362,15 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
     	int toDateVol = Integer.parseInt(toDate.getText());
     	int feePow = 0;
     	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
+    	if (!userAccount1.isValid()) userAccount1 = null;
     	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
+    	if (!userAccount2.isValid()) userAccount2 = null;
     	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
+    	if (!userAccount3.isValid()) userAccount3 = null;
     	
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(address);
-		int version = 5; // without user signs
+		int version = 4; // without user signs
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
 				feePow, person.getKey(), 
 				userAccount1, userAccount2, userAccount3, toDateVol);

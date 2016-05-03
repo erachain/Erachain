@@ -59,5 +59,9 @@ public class PublicKeyAccount extends Account {
 	{
 		return isValidPublicKey(Base58.decode(publicKey));
 	}
+	public boolean isValid()
+	{
+		return isValidPublicKey(this.publicKey);
+	}
 
 }
