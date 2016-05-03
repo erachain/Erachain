@@ -21,7 +21,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Status"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
 	
 	public WalletItemPersonsTableModel()
 	{
@@ -34,8 +34,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-       
-		return getValueAt(0, c).getClass();
+        return getValueAt(0, c).getClass();
     }
 	
 	public PersonCls getItem(int row)
