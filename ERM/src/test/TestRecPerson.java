@@ -21,6 +21,7 @@ import org.junit.Test;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -79,7 +80,9 @@ public class TestRecPerson {
     PrivateKeyAccount userAccount3 = new PrivateKeyAccount(accountSeed3);
     String userAddress3 = userAccount3.getAddress();
 
-	
+    List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
+    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+    	
 	PersonCls person;
 	long personKey = -1;
 	IssuePersonRecord issuePersonTransaction;
@@ -116,6 +119,14 @@ public class TestRecPerson {
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastReference(db));
 
+		sertifiedPrivateKeys.add(userAccount1);
+		sertifiedPrivateKeys.add(userAccount2);
+		sertifiedPrivateKeys.add(userAccount3);
+		
+	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount1.getPublicKey()));
+	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount2.getPublicKey()));
+	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount3.getPublicKey()));
+
 	}
 	
 	public void initPersonalize() {
@@ -130,7 +141,7 @@ public class TestRecPerson {
 		
 		//CREATE PERSONALIZE REcORD
 		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				timestamp, certifier.getLastReference(db));
 
 	}
@@ -364,19 +375,19 @@ public class TestRecPerson {
 								
 		//CREATE INVALID PERSONALIZE RECORD NOT ENOUGH ERM BALANCE
 		R_SertifyPerson personalizeRecord_0 = new R_SertifyPerson(0, userAccount1, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastReference(db));
 		assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));	
 
 		//CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
 		personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey + 10,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				356, timestamp, certifier.getLastReference(db));
 		assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(db, releaserReference));	
 
 		//CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
 		personalizeRecord_0 = new R_SertifyPerson(0, userAccount1, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastReference(db));
 		//CREATE INVALID ISSUE PERSON - NOT FEE
 		personalizeRecord_0.calcFee();
@@ -388,20 +399,14 @@ public class TestRecPerson {
 		userAccount1.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
+	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
+	    sertifiedPublicKeys011.add(null);
+	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount2.getPublicKey()));
+	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount3.getPublicKey()));
 		personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				null, userAccount2, userAccount3,
+				sertifiedPublicKeys011,
 				356, timestamp, certifier.getLastReference(db));
 		assertEquals(Transaction.INVALID_ADDRESS, personalizeRecord_0.isValid(db, releaserReference));
-
-		personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				userAccount1, null, userAccount3,
-				356, timestamp, certifier.getLastReference(db));
-		assertEquals(Transaction.VALIDATE_OK, personalizeRecord_0.isValid(db, releaserReference));
-
-		personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, null,
-				356, timestamp, certifier.getLastReference(db));
-		assertEquals(Transaction.VALIDATE_OK, personalizeRecord_0.isValid(db, releaserReference));
 
 	}
 	
@@ -414,7 +419,7 @@ public class TestRecPerson {
 		initPersonalize();
 		
 		// SIGN
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
 		
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS VALID
@@ -437,21 +442,22 @@ public class TestRecPerson {
 		// BACK TO VALID
 		r_SertifyPerson.sign(certifier, false);
 		assertEquals(true, r_SertifyPerson.isSignatureValid());
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount2);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS INVALID
 		assertEquals(false, r_SertifyPerson.isSignatureValid());
 
 		// CHECK NULL in USER ADDRESS
+	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
+	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount1.getPublicKey()));
+	    sertifiedPublicKeys011.add(null);
+	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount3.getPublicKey()));
 		R_SertifyPerson personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				userAccount1, null, userAccount3,
+				sertifiedPublicKeys011,
 				356, timestamp, certifier.getLastReference(db));
-		personalizeRecord_0.signUserAccounts(null, null, null);
+		personalizeRecord_0.signUserAccounts(sertifiedPrivateKeys);
 		personalizeRecord_0.sign(certifier, false);
 		assertEquals(false, personalizeRecord_0.isSignatureValid());
-		personalizeRecord_0.signUserAccounts(userAccount1, null, null);
-		assertEquals(false, personalizeRecord_0.isSignatureValid());
-		personalizeRecord_0.signUserAccounts(userAccount1, null, userAccount3);
 		assertEquals(true, personalizeRecord_0.isSignatureValid());
 
 	}
@@ -465,7 +471,7 @@ public class TestRecPerson {
 		initPersonalize();
 
 		// SIGN
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
 
 		//CONVERT TO BYTES
@@ -507,9 +513,8 @@ public class TestRecPerson {
 			assertEquals(r_SertifyPerson.getAmount(certifier), parsedPersonTransfer.getAmount(certifier));
 						
 			//CHECK USER SIGNATURES
-			assertEquals(true, Arrays.equals(r_SertifyPerson.getUserSignature1(), parsedPersonTransfer.getUserSignature1()));
-			assertEquals(true, Arrays.equals(r_SertifyPerson.getUserSignature2(), parsedPersonTransfer.getUserSignature2()));
-			assertEquals(true, Arrays.equals(r_SertifyPerson.getUserSignature3(), parsedPersonTransfer.getUserSignature3()));
+			assertEquals(true, Arrays.equals(r_SertifyPerson.getSertifiedPublicKeys().get(2).getPublicKey(),
+									parsedPersonTransfer.getSertifiedPublicKeys().get(2).getPublicKey()));
 			
 		}
 		catch (Exception e) 
@@ -566,7 +571,7 @@ public class TestRecPerson {
 
 		int to_day = (int)(NTP.getTime() / 86400);
 		int to_date = R_SertifyPerson.DEFAULT_DURATION + to_day;
-		assertEquals( to_date, r_SertifyPerson.getDuration());
+		assertEquals( to_date, r_SertifyPerson.getEndDate());
 		
 		BigDecimal oil_amount_diff = R_SertifyPerson.GIFTED_FEE_AMOUNT;
 		
@@ -576,7 +581,7 @@ public class TestRecPerson {
 		BigDecimal erm_amount_user = userAccount1.getConfirmedBalance(ERM_KEY, db);
 		BigDecimal oil_amount_user = userAccount1.getConfirmedBalance(FEE_KEY, db);
 		
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
 		r_SertifyPerson.process(db, false);
 		
@@ -689,9 +694,9 @@ public class TestRecPerson {
 		// TRY DURATIONS
 		int end_date = to_day + 22;
 		r_SertifyPerson = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				end_date, timestamp, certifier.getLastReference(db));
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
 		r_SertifyPerson.process(db, false);
 
@@ -701,9 +706,9 @@ public class TestRecPerson {
 		// TEST LIST and STACK
 		int end_date2 = to_day - 12;
 		r_SertifyPerson = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				userAccount1, userAccount2, userAccount3,
+				sertifiedPublicKeys,
 				end_date2, timestamp, certifier.getLastReference(db));
-		r_SertifyPerson.signUserAccounts(userAccount1, userAccount2, userAccount3);
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
 		r_SertifyPerson.process(db, false);
 

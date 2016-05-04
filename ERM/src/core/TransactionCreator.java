@@ -458,8 +458,9 @@ public class TransactionCreator
 		return afterCreate(recordNoteTx, asPack);
 	}
 
-	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator, int feePow, long key,
-			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3,
+	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow, long key,
+			List<PublicKeyAccount> userAccounts,
 			int end_date) {
 		
 		this.checkUpdate();
@@ -471,7 +472,7 @@ public class TransactionCreator
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
 		record = new R_SertifyPerson(version, creator, (byte)feePow, key,
-				userAccount1, userAccount2, userAccount3,
+				userAccounts,
 				end_date,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			

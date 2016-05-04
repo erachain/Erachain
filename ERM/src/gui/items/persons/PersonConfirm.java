@@ -10,6 +10,8 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -361,19 +363,22 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
     	String address = pubKey1Txt.getText();
     	int toDateVol = Integer.parseInt(toDate.getText());
     	int feePow = 0;
-    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
-    	if (!userAccount1.isValid()) userAccount1 = null;
+    	
+	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+	    PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
+    	if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
     	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
-    	if (!userAccount2.isValid()) userAccount2 = null;
+    	if (userAccount2.isValid()) sertifiedPublicKeys.add(userAccount2);
     	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
-    	if (!userAccount3.isValid()) userAccount3 = null;
+    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
     	
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(address);
-		int version = 4; // without user signs
+		int version = 0; // without user signs
+		
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
 				feePow, person.getKey(), 
-				userAccount1, userAccount2, userAccount3, toDateVol);
+				sertifiedPublicKeys, toDateVol);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
