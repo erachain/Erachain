@@ -69,6 +69,7 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 	public AllPersonsPanel() {
 		
 //		super(Lang.getInstance().translate("All Persons"));
+		GridBagConstraints gridBagConstraints;
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -78,73 +79,26 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-	//	MainFrame mainFram = new MainFrame();
-	
-	//	this.setVisible(true);
-//		this.setMaximizable(true);
-//		this.setTitle(Lang.getInstance().translate("Persons"));
-//		this.setClosable(true);
-//		this.setResizable(true);
-		
-	
 		
 		this.setLocation(50, 20);
 	//	this.setIconImages(icons);
 		
-		//CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
-		//PADDING
-//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		//SEACH LABEL GBC
-		GridBagConstraints searchLabelGBC = new GridBagConstraints();
-		searchLabelGBC.insets = new Insets(0, 5, 5, 0);
-		searchLabelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		searchLabelGBC.anchor = GridBagConstraints.NORTHWEST;
-		searchLabelGBC.weightx = 0;	
-		searchLabelGBC.gridwidth = 1;
-		searchLabelGBC.gridx = 0;
-		searchLabelGBC.gridy = 0;
-		
-		//SEACH GBC
-		GridBagConstraints searchGBC = new GridBagConstraints();
-		searchGBC.insets = new Insets(0, 5, 5, 0);
-		searchGBC.fill = GridBagConstraints.HORIZONTAL;   
-		searchGBC.anchor = GridBagConstraints.NORTHWEST;
-		searchGBC.weightx = 1;	
-		searchGBC.gridwidth = 1;
-		searchGBC.gridx = 1;
-		searchGBC.gridy = 0;
-	
-		
-		//SEACH GBC
-				GridBagConstraints ToolB = new GridBagConstraints();
-				searchGBC.insets = new Insets(0, 5, 5, 0);
-				searchGBC.fill = GridBagConstraints.HORIZONTAL;   
-				searchGBC.anchor = GridBagConstraints.NORTHWEST;
-				searchGBC.weightx = 1;	
-				searchGBC.gridwidth = 1;
-				searchGBC.gridx = 1;
-				searchGBC.gridy = 0;
-		
-		
-		
+			
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
 		final JTable personsTable = new JTable(this.tableModelPersons);
 		
 		TableColumnModel columnModel = personsTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
-		//columnModel.getColumn(1).setMaxWidth((250));
-		//columnModel.getColumn(2).setMaxWidth((120));//sizeWidthToFit();
+
 		//Custom renderer for the String column;
 		personsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 		personsTable.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-	//	TableCellRenderer a = personsTable.getDefaultRenderer(Long.class);
+
 	
 	//	cellRenderer render = new CellRenderer();
 	//	columnModel.getColumn(0).setCellRenderer(cellRenderer);
@@ -228,7 +182,7 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 				
 		JEditorPane Address1 = new JEditorPane();
 		Address1.setContentType("text/html");
-		Address1.setText("<HTML>Select person"); // Document text is provided below.
+		Address1.setText("<HTML>" + Lang.getInstance().translate("Select person")); // Document text is provided below.
 		Address1.setBackground(new Color(255, 255, 255, 0));
 		
 		
@@ -280,10 +234,10 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 							 }
 							 else{
 								 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-								 ConfirmButton.setEnabled(true);
+								
 							 }
 						}else{
-							ConfirmButton.setEnabled(false);
+							
 							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
 						}
 						message = message + "</html>";
@@ -301,7 +255,7 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 				
 				
 				
-	 // tool bar
+	/*
 				// tool bar
 				JToolBar tb1 = new JToolBar(" Панель 1"),
 
@@ -317,8 +271,7 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 
 						tb2.add(new JButton("Третья"));
 
-						//add(tb1, BorderLayout.NORTH); 
-						//add(tb2, ToolB);
+		*/			
 
 		// MENU
 	
@@ -368,54 +321,40 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 		});
 	
 
-		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
-		this.add(txtSearch, searchGBC);
-        
-        // Create a constraints object, and specify some default values
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH; // components grow in both dimensions
-        c.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
-/*
-        // Create and add a bunch of buttons, specifying different grid
-        // position, and size for each.
-        // Give the first button a resize weight of 1.0 and all others
-        // a weight of 0.0. The first button will get all extra space.
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 4;
-        c.gridheight = 6;
-        c.weightx = c.weighty = 1.0;
-        this.add(new JScrollPane(personsTable), c);
+		
+		
+		
+		
+	
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 10, 8, 8);
+        this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), gridBagConstraints);
 
-        c.gridx = 4;
-        c.gridy = 1;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = c.weighty = 0.0;
-        this.add(this.ConfirmButton, c);
-
-        
-        c.gridx = 4;
-        c.gridy = 2;
-        c.gridwidth = 1;
-        c.gridheight = GridBagConstraints.REMAINDER; //3;
-        c.fill = GridBagConstraints.BOTH;//.HORIZONTAL;
-        c.anchor = GridBagConstraints.NORTH;
-        c.weightx = c.weighty = 0;
+      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 9, 10);
        
-        this.add(new JScrollPane(Address1), c);
-*/
-        c.gridx = 0;
-        c.gridy = 2;
-        c.gridwidth = 4;
-        c.gridheight = 2;
-        c.weightx = c.weighty = 1.0;
-       // this.add(new JButton("Button #4"), c);
+        this.add(txtSearch, gridBagConstraints);
         
-        
-   //     JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 10, 6, 10);
+
+		
         PersJSpline.setDividerLocation(700);
-        this.add(PersJSpline,c);
+        this.add(PersJSpline, gridBagConstraints);
 
         
 //		setPreferredSize(new Dimension(1000, 600));

@@ -91,6 +91,8 @@ public class PersonsPanel extends JPanel
 		final WalletItemPersonsTableModel personsModel = new WalletItemPersonsTableModel();
 		final JTable table = new JTable(personsModel);
 		
+		
+		
 	//	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 	//	table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
 		
