@@ -211,21 +211,6 @@ public class R_SertifyPerson extends Transaction {
 		
 		return transaction;	
 	}
-
-	public void signUserAccount(byte[] data, PrivateKeyAccount userPrivateAccount)
-	{
-		byte[] publicKey = userPrivateAccount.getPublicKey();
-		int i = 0;
-		for ( PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
-		{
-			if (Arrays.equals((publicKey), publicAccount.getPublicKey()))
-			{
-				this.sertifiedSignatures.set(i, Crypto.getInstance().sign(userPrivateAccount, data));
-				break;
-			}
-			i++;
-		}		
-	}
 	
 	public void signUserAccounts(List<PrivateKeyAccount> userPrivateAccounts)
 	{
@@ -419,7 +404,7 @@ public class R_SertifyPerson extends Transaction {
 		{
 			for (int i = 0; i < pAccountsSize; i++)
 			{
-				if (crypto.verify(this.sertifiedPublicKeys.get(i).getPublicKey(), this.sertifiedSignatures.get(i), data))
+				if (!crypto.verify(this.sertifiedPublicKeys.get(i).getPublicKey(), this.sertifiedSignatures.get(i), data))
 					return false;
 			}
 		}
