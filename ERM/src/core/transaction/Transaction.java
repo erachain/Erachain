@@ -83,7 +83,7 @@ public abstract class Transaction {
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
 	
-	//public static final int FEE_LESS_REQUIRED = 40;
+	public static final int INVALID_PUBLIC_KEY = 40;
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
@@ -286,6 +286,14 @@ public abstract class Transaction {
 	public int getType()
 	{
 		return Byte.toUnsignedInt(this.typeBytes[0]);
+	}
+	public int getVersion()
+	{
+		return Byte.toUnsignedInt(this.typeBytes[1]);
+	}
+	public static int getVersion(byte[] typeBytes)
+	{
+		return Byte.toUnsignedInt(typeBytes[1]);
 	}
 	public byte[] getTypeBytes()
 	{

@@ -137,6 +137,7 @@ public class PersonStatusMap extends DBMap<
 		Stack<Tuple3<Integer, Integer, byte[]>> stack = value.get(status.intValue());
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
+	// remove only last item from stack for this status of person
 	public void removeItem(Long person, Long status)
 	{
 		TreeMap<Integer, Stack<Tuple3<Integer, Integer, byte[]>>> value = this.get(person);

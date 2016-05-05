@@ -92,6 +92,9 @@ public class TestRecPerson {
 	PersonAddressMap dbPA;
 	AddressPersonMap dbAP;
 
+	//int version = 0; // without signs of person
+	int version = 1; // with signs of person
+	
 	// INIT PERSONS
 	private void init() {
 		
@@ -140,7 +143,7 @@ public class TestRecPerson {
 		personKey = person.getKey();
 		
 		//CREATE PERSONALIZE REcORD
-		r_SertifyPerson = new R_SertifyPerson(certifier, FEE_POWER, personKey,
+		r_SertifyPerson = new R_SertifyPerson(version, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				timestamp, certifier.getLastReference(db));
 
@@ -163,8 +166,6 @@ public class TestRecPerson {
 		issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastReference(db), new byte[64]);		
 		//CHECK IF ISSUE PERSON IS INVALID
 		assertEquals(false, issuePersonTransaction.isSignatureValid());
-		assertEquals(false, issuePersonTransaction.isSignatureValid());
-
 
 	}
 		
@@ -400,13 +401,13 @@ public class TestRecPerson {
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
-	    sertifiedPublicKeys011.add(null);
+	    sertifiedPublicKeys011.add( new PublicKeyAccount(new byte[60]));
 	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount2.getPublicKey()));
 	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount3.getPublicKey()));
 		personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys011,
 				356, timestamp, certifier.getLastReference(db));
-		assertEquals(Transaction.INVALID_ADDRESS, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(db, releaserReference));
 
 	}
 	
@@ -416,12 +417,23 @@ public class TestRecPerson {
 		
 		init();
 		
+		// SIGN only by certifier
+		version = 0;
 		initPersonalize();
 		
-		// SIGN
-		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPerson.sign(certifier, false);
+		// TRUE
+		assertEquals(true, r_SertifyPerson.isSignatureValid());
+
+		version = 1;
+		r_SertifyPerson = new R_SertifyPerson(version, certifier, FEE_POWER, personKey,
+				sertifiedPublicKeys,
+				timestamp, certifier.getLastReference(db));
 		
+		r_SertifyPerson.sign(certifier, false);
+		// + sign by user
+		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
+		// true !
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS VALID
 		assertEquals(true, r_SertifyPerson.isSignatureValid());
 		

@@ -83,21 +83,21 @@ public class R_SertifyPerson extends Transaction {
 
 		this.key = key;
 		this.sertifiedPublicKeys = sertifiedPublicKeys;
-		this.end_date = end_date;			
+		this.end_date = end_date;		
 	}
 
 	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, (byte)version, 0, 0}, creator, feePow, key,
+		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
 				end_date, timestamp, reference);
 	}
 	// set default date
-	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
+		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
 				0, timestamp, reference);
 		
@@ -125,21 +125,21 @@ public class R_SertifyPerson extends Transaction {
 		this.signature = signature;
 		this.sertifiedSignatures = sertifiedSignatures;
 	}
-	public R_SertifyPerson(PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, key,
+		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
 				end_date, timestamp, reference);
 	}
 
 	// as pack
-	public R_SertifyPerson(PublicKeyAccount creator, long key,
+	public R_SertifyPerson(int version, PublicKeyAccount creator, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, key,
+		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, (byte)0, key,
 				sertifiedPublicKeys,
 				end_date, 0l, null);
 	}
@@ -236,18 +236,17 @@ public class R_SertifyPerson extends Transaction {
 
 		if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
 		
-		//int size = userPrivateAccount.size();
 		byte[] publicKey;
-		int i;
-		for ( PrivateKeyAccount privateAccount: userPrivateAccounts)
+		for ( PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
-			publicKey = privateAccount.getPublicKey();
-			i = 0;
-			for ( PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
+			for ( PrivateKeyAccount privateAccount: userPrivateAccounts)
 			{
+				publicKey = privateAccount.getPublicKey();
 				if (Arrays.equals((publicKey), publicAccount.getPublicKey()))
-					this.sertifiedSignatures.set(i, Crypto.getInstance().sign(privateAccount, data));
-				i++;
+				{
+					this.sertifiedSignatures.add(Crypto.getInstance().sign(privateAccount, data));
+					break;
+				}
 			}
 		}
 	}
@@ -308,7 +307,7 @@ public class R_SertifyPerson extends Transaction {
 		long key = Longs.fromByteArray(keyBytes);	
 		position += KEY_LENGTH;
 
-		byte[] item;
+		//byte[] item;
 		List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
 		List<byte[]> sertifiedSignatures = new ArrayList<byte[]>();
 		for (int i=0; i< getPublicKeysSize(typeBytes); i++)
@@ -317,9 +316,12 @@ public class R_SertifyPerson extends Transaction {
 			sertifiedPublicKeys.add(new PublicKeyAccount(Arrays.copyOfRange(data, position, position + USER_ADDRESS_LENGTH)));
 			position += USER_ADDRESS_LENGTH;			
 
-			//READ USER SIGNATURE
-			sertifiedSignatures.add( Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH));
-			position += SIGNATURE_LENGTH;
+			if (getVersion(typeBytes)==1)
+			{
+				//READ USER SIGNATURE
+				sertifiedSignatures.add( Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH));
+				position += SIGNATURE_LENGTH;
+			}
 		}
 
 		// READ DURATION
@@ -356,7 +358,7 @@ public class R_SertifyPerson extends Transaction {
 		{
 			data = Bytes.concat(data, publicAccount.getPublicKey());
 			
-			if (withSign)
+			if (withSign & this.getVersion()==1)
 			{
 				data = Bytes.concat(data, this.sertifiedSignatures.get(i++));
 			}
@@ -372,7 +374,10 @@ public class R_SertifyPerson extends Transaction {
 	public int getDataLength(boolean asPack)
 	{
 		// not include note reference
-		return asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
+		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
+		int accountsSize = this.sertifiedPublicKeys.size(); 
+		len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
+		return this.typeBytes[1] == 1? len + Transaction.SIGNATURE_LENGTH * accountsSize: len;
 	}
 
 	//VALIDATE
@@ -383,14 +388,22 @@ public class R_SertifyPerson extends Transaction {
 		if ( this.signature == null || this.signature.length != 64 || this.signature == new byte[64] )
 			return false;
 
-		byte[] singItem;
-		int pAccountsSize = this.sertifiedPublicKeys.size();
-		for (int i = 0; i < pAccountsSize; i++)
+		int pAccountsSize = 0;
+		if (this.getVersion() == 1)
 		{
-			singItem = this.sertifiedSignatures.get(i);
-			if (singItem == null || singItem.length != 64 || singItem == new byte[64])
-			{
+			pAccountsSize = this.sertifiedPublicKeys.size();
+			if (pAccountsSize > this.sertifiedSignatures.size())
 				return false;
+			
+			byte[] singItem;
+			for (int i = 0; i < pAccountsSize; i++)
+			{
+				//if (this.sertifiedSignatures.e(i);
+				singItem = this.sertifiedSignatures.get(i);
+				if (singItem == null || singItem.length != 64 || singItem == new byte[64])
+				{
+					return false;
+				}
 			}
 		}
 		
@@ -400,11 +413,15 @@ public class R_SertifyPerson extends Transaction {
 		Crypto crypto = Crypto.getInstance();
 		if (!crypto.verify(creator.getPublicKey(), signature, data))
 				return false;
-				
-		for (int i = 0; i < pAccountsSize; i++)
+
+		// if use signs from person
+		if (this.getVersion() == 1)
 		{
-			if (crypto.verify(this.sertifiedPublicKeys.get(i).getPublicKey(), this.sertifiedSignatures.get(i), data))
-				return false;
+			for (int i = 0; i < pAccountsSize; i++)
+			{
+				if (crypto.verify(this.sertifiedPublicKeys.get(i).getPublicKey(), this.sertifiedSignatures.get(i), data))
+					return false;
+			}
 		}
 
 		return true;
@@ -425,9 +442,9 @@ public class R_SertifyPerson extends Transaction {
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
 			//CHECK IF PERSON PUBLIC KEY IS VALID
-			if(publicAccount.isValid())
+			if(!publicAccount.isValid())
 			{
-				return INVALID_ADDRESS;
+				return INVALID_PUBLIC_KEY;
 			}
 		}
 
