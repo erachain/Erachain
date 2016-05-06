@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
- import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import ntp.NTP;
 
@@ -20,6 +20,7 @@ import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.Transaction;
@@ -36,8 +37,8 @@ public class BlockTests
 	long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
-	private GenesisBlock gb;
+	private DBSet db = DBSet.createEmptyDatabaseSet();
+	private GenesisBlock gb = new GenesisBlock();
 
 	static Logger LOGGER = Logger.getLogger(BlockTests.class.getName());
 
@@ -45,24 +46,20 @@ public class BlockTests
 	public void validateSignatureGenesisBlock()
 	{
 		
-		//CREATE EMPTY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-
-		Block genesisBlock = new GenesisBlock();
-		//genesisBlock.process(databaseSet);
+		gb.process(db);
 		
 		//CHECK IF SIGNATURE VALID  this.transactionsSignature [B@5ecddf8f [B@6c629d6e
 		// [B@5ecddf8f [B@6c629d6e
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
-				+ " : " + genesisBlock.getGeneratorSignature());
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature().length
+				+ " : " + gb.getGeneratorSignature());
 
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
-				+ " : " + genesisBlock.getGeneratorSignature());
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature().length
+				+ " : " + gb.getGeneratorSignature());
 
-		assertEquals(true, genesisBlock.isSignatureValid());
+		assertEquals(true, gb.isSignatureValid());
 		
 		//ADD TRANSACTION SIGNATURE
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature());
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature());
 		//newBlock.setTransactionsSignature(transactionsSignature);
 
 	}
@@ -70,84 +67,78 @@ public class BlockTests
 	@Test
 	public void validateGenesisBlock()
 	{
-		//CREATE EMPTY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		
-		//CREATE GENESIS BLOCK
-		Block genesisBlock = new GenesisBlock();
-		
+				
 		//CHECK IF VALID
-		assertEquals(true, genesisBlock.isValid(databaseSet));
+		assertEquals(true, gb.isValid(db));
 		
 		//ADD INVALID GENESIS TRANSACTION
-		//Transaction transaction = new GenesisTransaction(new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g"), BigDecimal.valueOf(-1000).setScale(8), NTP.getTime());
-		genesisBlock.addTransaction(new GenesisIssueAssetTransaction(GenesisBlock.makeAssetVenture(Transaction.RIGHTS_KEY)));
+		gb.addTransaction( new GenesisTransferAssetTransaction(
+				new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g"), 0l, BigDecimal.valueOf(-1000).setScale(8)));
 		
 		//CHECK IF INVALID
-		assertEquals(false, genesisBlock.isValid(databaseSet));
+		assertEquals(false, gb.isValid(db));
 		
 		//CREATE NEW BLOCK
-		genesisBlock = new GenesisBlock();
-		//databaseSet = DBSet.createEmptyDatabaseSet();
-		//genesisBlock.process(databaseSet);
+		gb = new GenesisBlock();
 		
 		//CHECK IF VALID
-		assertEquals(true, genesisBlock.isValid(databaseSet));
+		assertEquals(true, gb.isValid(db));
 		
 		//PROCESS
-		genesisBlock.process(databaseSet);
+		gb.process(db);
 		
 		//CHECK IF INVALID
-		assertEquals(false, genesisBlock.isValid(databaseSet));
+		assertEquals(false, gb.isValid(db));
 	}
 	
 	@Test
 	public void parseGenesisBlock()
 	{
-		//CREATE VALID BLOCK
-		Block genesisBlock = new GenesisBlock();
-		//genesisBlock.process();
+		//gb.process();
 				
 		//CONVERT TO BYTES
-		byte[] rawBlock = genesisBlock.toBytes();
-				
+		byte[] rawBlock = gb.toBytes();
+		//CHECK length
+		assertEquals(rawBlock.length, gb.getDataLength());
+			
+		Block parsedBlock = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
+			parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
 					
-			//CHECK length
-			assertEquals(rawBlock.length, parsedBlock.getDataLength());
-
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(genesisBlock.getSignature(), parsedBlock.getSignature()));
-					
-			//CHECK BASE TARGET
-			assertEquals(genesisBlock.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
-			
-			//CHECK FEE
-			assertEquals(genesisBlock.getTotalFee(), parsedBlock.getTotalFee());	
-
-			//CHECK TIMESTAMP
-			assertEquals(genesisBlock.getTimestamp(), parsedBlock.getTimestamp());
-
-			//CHECK TRANSACTION COUNT
-			assertEquals(genesisBlock.getTransactionCount(), parsedBlock.getTransactionCount());
-
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisBlock.getReference(), parsedBlock.getReference()));			
-
-			//CHECK GENERATOR
-			assertEquals(genesisBlock.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
-					
-			//CHECK INSTANCE
-			assertEquals(true, parsedBlock instanceof GenesisBlock);
-
 		}
 		catch (Exception e) 
 		{
 			fail("Exception while parsing transaction." + e);
 		}
+		
+		//CHECK length
+		assertEquals(rawBlock.length, parsedBlock.getDataLength());
+
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(gb.getSignature(), parsedBlock.getSignature()));
+				
+		//CHECK BASE TARGET
+		assertEquals(gb.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
+		
+		//CHECK FEE
+		assertEquals(gb.getTotalFee(), parsedBlock.getTotalFee());	
+
+		//CHECK TIMESTAMP
+		assertEquals(gb.getTimestamp(), parsedBlock.getTimestamp());
+
+		//CHECK TRANSACTION COUNT
+		assertEquals(gb.getTransactionCount(), parsedBlock.getTransactionCount());
+
+		//CHECK REFERENCE
+		assertEquals(true, Arrays.equals(gb.getReference(), parsedBlock.getReference()));			
+
+		//CHECK GENERATOR
+		assertEquals(gb.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
+				
+		//CHECK INSTANCE
+		////assertEquals(true, parsedBlock instanceof GenesisBlock);
 				
 		//PARSE TRANSACTION FROM WRONG BYTES
 		rawBlock = new byte[50];

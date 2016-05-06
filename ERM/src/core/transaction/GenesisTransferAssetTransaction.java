@@ -227,7 +227,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		return false;
 	}
 
-	//@Override
+	@Override
 	public BigDecimal getAmount(Account account) 
 	{
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);

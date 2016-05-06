@@ -100,7 +100,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		return new GenesisCertifyPersonRecord(recipient, key);	
 	}	
 	
-	@Override
+	//@Override
 	public byte[] toBytes(boolean withSign, byte[] releaserReference)
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);

@@ -162,10 +162,12 @@ public class TransactionFactory {
 			//PARSE ISSUE NOTE TRANSACTION
 			return IssueUnionRecord.Parse(data, releaserReference);
 
+		/*
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
-			return GenesisCertifyPersonRecord.Parse(data);	
+			return GenesisCertifyPersonRecord.Parse(data);
+			*/	
 
 		/*
 		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:

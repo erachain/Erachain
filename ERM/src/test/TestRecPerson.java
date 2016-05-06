@@ -29,6 +29,7 @@ import core.item.ItemFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
+import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.R_SertifyPerson;
@@ -83,6 +84,7 @@ public class TestRecPerson {
     List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
     List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
     	
+	PersonCls personGeneral;
 	PersonCls person;
 	long personKey = -1;
 	IssuePersonRecord issuePersonTransaction;
@@ -107,6 +109,12 @@ public class TestRecPerson {
 		gb.process(db);
 		
 		// GET RIGHTS TO CERTIFIER
+		byte gender = 1;
+		personGeneral = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as sertifier", timestamp - 12345678,
+				gender, "Slav", (float)128.12345, (float)33.7777,
+				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral, certifier);
+		genesis_issue_person.process(db, false);
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L);
 		genesis_certify.process(db, false);
 		
@@ -114,7 +122,6 @@ public class TestRecPerson {
 		certifier.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
-		byte gender = 1;
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", timestamp - 12345678,
 				gender, "Slav", (float)128.12345, (float)33.7777,
 				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
@@ -141,6 +148,9 @@ public class TestRecPerson {
 		
 		issuePersonTransaction.process(db, false);
 		personKey = person.getKey();
+
+		assertEquals( 1, personKey);
+		assertEquals( null, dbPS.getItem(personKey));
 		
 		//CREATE PERSONALIZE REcORD
 		r_SertifyPerson = new R_SertifyPerson(version, certifier, FEE_POWER, personKey,
@@ -454,23 +464,6 @@ public class TestRecPerson {
 		// BACK TO VALID
 		r_SertifyPerson.sign(certifier, false);
 		assertEquals(true, r_SertifyPerson.isSignatureValid());
-		r_SertifyPerson.signUserAccounts(sertifiedPrivateKeys);
-
-		//CHECK IF PERSONALIZE RECORD SIGNATURE IS INVALID
-		assertEquals(false, r_SertifyPerson.isSignatureValid());
-
-		// CHECK NULL in USER ADDRESS
-	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
-	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount1.getPublicKey()));
-	    sertifiedPublicKeys011.add(null);
-	    sertifiedPublicKeys011.add( new PublicKeyAccount(userAccount3.getPublicKey()));
-		R_SertifyPerson personalizeRecord_0 = new R_SertifyPerson(0, certifier, FEE_POWER, personKey,
-				sertifiedPublicKeys011,
-				356, timestamp, certifier.getLastReference(db));
-		personalizeRecord_0.signUserAccounts(sertifiedPrivateKeys);
-		personalizeRecord_0.sign(certifier, false);
-		assertEquals(false, personalizeRecord_0.isSignatureValid());
-		assertEquals(true, personalizeRecord_0.isSignatureValid());
 
 	}
 	
@@ -480,6 +473,7 @@ public class TestRecPerson {
 
 		init();
 		
+		version = 1;
 		initPersonalize();
 
 		// SIGN
@@ -557,6 +551,8 @@ public class TestRecPerson {
 		
 		init();
 
+		assertEquals( null, dbPS.getItem(personKey));
+
 		assertEquals(false, userAccount1.isPerson(db));
 		assertEquals(false, userAccount2.isPerson(db));
 		assertEquals(false, userAccount3.isPerson(db));
@@ -567,6 +563,11 @@ public class TestRecPerson {
 		// PERSON STATUS ALIVE
 		// exist assertEquals( null, dbPS.getItem(personKey));
 		// exist assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
+
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
+		// PERSON STATUS ALIVE
+		assertEquals(1, personKey);
+		assertEquals( null, dbPS.getItem(personKey));
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));

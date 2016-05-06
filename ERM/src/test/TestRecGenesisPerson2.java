@@ -25,9 +25,6 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
 import core.transaction.GenesisIssuePersonRecord;
-//import core.transaction.GenesisCertifyPersonRecord;
-//import core.transaction.IssuePersonTransaction;
-//import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import database.DBSet;
@@ -35,9 +32,9 @@ import database.AddressPersonMap;
 import database.PersonAddressMap;
 import database.PersonStatusMap;
 
-public class TestRecGenesisPerson {
+public class TestRecGenesisPerson2 {
 
-	static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson.class.getName());
+	static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson2.class.getName());
 
 	byte[] releaserReference = null;
 
@@ -86,9 +83,7 @@ public class TestRecGenesisPerson {
 		}
 		
 	}
-	
-	//GENESIS
-	
+		
 	// GENESIS ISSUE
 	@Test
 	public void validateGenesisIssuePersonRecord() 
@@ -146,7 +141,13 @@ public class TestRecGenesisPerson {
 		catch (Exception e) 
 		{
 			//EXCEPTION IS THROWN OK
-		}	
+		}
+		
+		//CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
+		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person, new Account("test"));	
+		//CHECK IF PERSON TRANSFER IS INVALID
+		assertEquals(Transaction.INVALID_ADDRESS, genesisIssuePersonTransaction.isValid(db, releaserReference));
+
 	}
 
 	
@@ -182,6 +183,8 @@ public class TestRecGenesisPerson {
 			//CHECK DESCRIPTION
 			assertEquals(genesisIssuePersonTransaction.getItem().getDescription(), parsedGenesisIssuePersonRecord.getItem().getDescription());
 							
+			assertEquals(genesisIssuePersonTransaction.getItem().getKey(), parsedGenesisIssuePersonRecord.getItem().getKey());	
+
 		}
 		catch (Exception e) 
 		{
@@ -207,159 +210,17 @@ public class TestRecGenesisPerson {
 
 	
 	@Test
-	public void processGenesisIssuePersonRecord()
+	public void process_orphan_GenesisIssuePersonRecord()
 	{
 		
-		initIssue(true);		
+
+		initIssue(false);		
 		LOGGER.info("person KEY: " + keyPerson);
-				
-		//CHECK PERSON EXISTS SENDER
-		long key = db.getIssuePersonMap().get(genesisIssuePersonTransaction);
-		assertEquals(true, db.getPersonMap().contains(key));
-		
-		//CHECK PERSON IS CORRECT
-		assertEquals(true, Arrays.equals(db.getPersonMap().get(key).toBytes(true), person.toBytes(true)));
-						
-	}
-	
-	
-	@Test
-	public void orphanIssuePersonTransaction()
-	{
-		
-		initIssue(true);
-		
-		genesisIssuePersonTransaction.orphan(db, false);
-				
-		//CHECK PERSON EXISTS SENDER
-		assertEquals(false, db.getPersonMap().contains(keyPerson));
 
-	}
-
-	/*
-	//GENESIS TRANSFER PERSON
-	
-	@Test
-	public void validateSignatureGenesisCertifyPersonRecord() 
-	{
-		
-		initIssue(false);
-		
-		//CREATE SIGNATURE
-		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-		
-		//CREATE PERSON TRANSFER
-		Transaction personTransfer = new GenesisIssuePersonRecord(recipient, keyPerson);
-		//personTransfer.sign(sender);
-		
-		//CHECK IF PERSON TRANSFER SIGNATURE IS VALID
-		assertEquals(true, personTransfer.isSignatureValid());		
-	}
-	
-	@Test
-	public void validateGenesisCertifyPersonRecord() 
-	{
-		
-		initIssue(true);
-		
-		//CREATE SIGNATURE
-		Account recipient = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
-
-		//CREATE VALID PERSON TRANSFER
-		Transaction personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
-
-		//CHECK IF PERSON TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, personTransfer.isValid(db, releaserReference));
-
-		personTransfer.process(db, false);
-
-		//CHECK IF PERSON TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, personTransfer.isValid(db, releaserReference));			
-		
-		//CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-		personTransfer = new GenesisCertifyPersonRecord(new Account("test"), keyPerson);	
-		//CHECK IF PERSON TRANSFER IS INVALID
-		assertEquals(Transaction.INVALID_ADDRESS, personTransfer.isValid(db, releaserReference));
-				
-		//CREATE INVALID PERSON
-		personTransfer = new GenesisCertifyPersonRecord(new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"), 111);
-		//CHECK IF PERSON TRANSFER IS INVALID
-		assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personTransfer.isValid(db, releaserReference));	
-		
-	}
-	
-	@Test
-	public void parseGenesisCertifyPersonRecord() 
-	{
-
-		initIssue(true);		
-		
-		//CREATE SIGNATURE
-		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-
-		//CREATE VALID PERSON TRANSFER
-		GenesisCertifyPersonRecord genesisTransferPerson = new GenesisCertifyPersonRecord(recipient, keyPerson);
-
-		//CONVERT TO BYTES
-		byte[] rawGenesisTransferPerson = genesisTransferPerson.toBytes(true, null);
-		
-		//CHECK DATALENGTH
-		assertEquals(rawGenesisTransferPerson.length, genesisTransferPerson.getDataLength(false));
-		
-		try 
-		{	
-			//PARSE FROM BYTES
-			GenesisCertifyPersonRecord parsedPersonTransfer = (GenesisCertifyPersonRecord) TransactionFactory.getInstance().parse(rawGenesisTransferPerson, releaserReference);
-			LOGGER.info(" 1: " + parsedPersonTransfer.getKey() );
-
-			//CHECK INSTANCE
-			assertEquals(true, parsedPersonTransfer instanceof GenesisCertifyPersonRecord);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(genesisTransferPerson.getSignature(), parsedPersonTransfer.getSignature()));
-			
-			//CHECK KEY
-			assertEquals(genesisTransferPerson.getKey(), parsedPersonTransfer.getKey());	
-									
-		}
-		catch (Exception e) 
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
-		
-		//PARSE TRANSACTION FROM WRONG BYTES
-		rawGenesisTransferPerson = new byte[genesisTransferPerson.getDataLength(false)];
-		
-		try 
-		{	
-			//PARSE FROM BYTES
-			TransactionFactory.getInstance().parse(rawGenesisTransferPerson, releaserReference);
-			
-			//FAIL
-			fail("this should throw an exception");
-		}
-		catch (Exception e) 
-		{
-			//EXCEPTION IS THROWN OK
-		}	
-	}
-	
-	@Test
-	public void process_orphan_GenesisCertifyPersonRecord()
-	{
-
-		initIssue(true);
-
-		//CREATE SIGNATURE
-		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-			
-		//CREATE PERSON TRANSFER
-		GenesisCertifyPersonRecord personTransfer = new GenesisCertifyPersonRecord(recipient, keyPerson);
-		String address = personTransfer.getRecipient().getAddress();
+		String address = genesisIssuePersonTransaction.getRecipient().getAddress();
 
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
-	
+		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 		// ADDRESS -> PERSON
 		assertEquals( null, dbAP.getItem(address));
 		// PERSON -> ADDRESS
@@ -367,33 +228,45 @@ public class TestRecGenesisPerson {
 		// PERSON STATUS ALIVE
 		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
 
-		/// PROCESS /////
-		personTransfer.process(db, false);
+		genesisIssuePersonTransaction.process(db, false);
+		keyPerson = person.getKey();
+
+		//CHECK PERSON EXISTS SENDER
+		assertEquals(true, db.getPersonMap().contains(keyPerson));
+		assertEquals(genesisIssuePersonTransaction.getItem().getKey(), keyPerson);
+		assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
+		
+		//CHECK PERSON IS CORRECT
+		assertEquals(true, Arrays.equals(db.getPersonMap().get(keyPerson).toBytes(true), person.toBytes(true)));
 
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
+		assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		assertEquals( (long)keyPerson, (long)dbAP.getItem(address).a);
 		assertEquals( Integer.MAX_VALUE, (int)dbAP.getItem(address).b);
 		assertEquals( 0, (int)dbAP.getItem(address).c);
-		assertEquals( true, Arrays.equals(dbAP.getItem(address).d, personTransfer.getSignature()));
+		assertEquals( true, Arrays.equals(dbAP.getItem(address).d, genesisIssuePersonTransaction.getSignature()));
 		// PERSON -> ADDRESS
 		assertEquals( Integer.MAX_VALUE, (int)dbPA.getItem(keyPerson, address).a);
 		assertEquals( 0, (int)dbPA.getItem(keyPerson, address).b);
-		assertEquals( true, Arrays.equals(dbPA.getItem(keyPerson, address).c, personTransfer.getSignature()));
+		assertEquals( true, Arrays.equals(dbPA.getItem(keyPerson, address).c, genesisIssuePersonTransaction.getSignature()));
 		// PERSON STATUS ALIVE
 		assertEquals( Integer.MAX_VALUE, (int)dbPS.getItem(keyPerson).a);
 		assertEquals( 0, (int)dbPS.getItem(keyPerson).b);
-		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson).c, personTransfer.getSignature()));
+		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson).c, genesisIssuePersonTransaction.getSignature()));
 
-		assertEquals(true, personTransfer.getRecipient().isPerson(db));
-		assertEquals(true, recipient.isPerson(db));
+		assertEquals(true, genesisIssuePersonTransaction.getRecipient().isPerson(db));
+		assertEquals(true, maker.isPerson(db));
 
-		personTransfer.orphan(db, false);
+		/////////////////
+		///// ORPHAN ////
+		genesisIssuePersonTransaction.orphan(db, false);
 		
+		assertEquals(false, db.getPersonMap().contains(keyPerson));
+
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(personTransfer.getSignature(), recipient.getLastReference(db)));
+		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 	
 		// ADDRESS -> PERSON
 		assertEquals( null, dbAP.getItem(address));
@@ -402,10 +275,8 @@ public class TestRecGenesisPerson {
 		// PERSON STATUS ALIVE
 		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
 		
-		assertEquals(false, personTransfer.getRecipient().isPerson(db));
-		assertEquals(false, recipient.isPerson(db));
-
+		assertEquals(false, genesisIssuePersonTransaction.getRecipient().isPerson(db));
+		assertEquals(false, maker.isPerson(db));
 
 	}
-	*/
 }

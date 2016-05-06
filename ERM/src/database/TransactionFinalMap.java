@@ -26,9 +26,6 @@ import com.google.common.collect.Sets;
 
 import core.account.Account;
 import core.transaction.ArbitraryTransaction;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
-import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
 import utils.BlExpUnit;
