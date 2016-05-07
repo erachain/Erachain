@@ -46,10 +46,7 @@ public class BlockTests
 	public void validateSignatureGenesisBlock()
 	{
 		
-		gb.process(db);
-		
-		//CHECK IF SIGNATURE VALID  this.transactionsSignature [B@5ecddf8f [B@6c629d6e
-		// [B@5ecddf8f [B@6c629d6e
+		//CHECK IF SIGNATURE VALID
 		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature().length
 				+ " : " + gb.getGeneratorSignature());
 
@@ -60,7 +57,12 @@ public class BlockTests
 		
 		//ADD TRANSACTION SIGNATURE
 		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature());
-		//newBlock.setTransactionsSignature(transactionsSignature);
+
+		//ADD a GENESIS TRANSACTION for invalid SIGNATURE
+		gb.addTransaction( new GenesisTransferAssetTransaction(
+				new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 0l, BigDecimal.valueOf(1).setScale(8)));
+
+		assertEquals(false, gb.isSignatureValid());
 
 	}
 	
@@ -160,12 +162,7 @@ public class BlockTests
 	@Test
 	public void validateSignatureBlock()
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-				
-		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
+		gb.process(db);
 				
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -175,13 +172,13 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setLastReference(gb.getGeneratorSignature(), db);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), db); // need for payments
 
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block newBlock = blockGenerator.generateNextBlock(db, generator, gb);
 		
 		//ADD TRANSACTION SIGNATURE
 		byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -206,14 +203,14 @@ public class BlockTests
 		assertEquals(false, newBlock.isSignatureValid());
 		
 		//VALID TRANSACTION SIGNATURE
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
+		newBlock = blockGenerator.generateNextBlock(db, generator, gb);	
 		
 		//ADD TRANSACTION
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(db));
 		payment.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet, null));
+		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, null));
 		newBlock.addTransaction(payment);
 		
 		//ADD TRANSACTION SIGNATURE
@@ -224,10 +221,10 @@ public class BlockTests
 		assertEquals(true, newBlock.isSignatureValid());	
 		
 		//INVALID TRANSACTION SIGNATURE
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
+		newBlock = blockGenerator.generateNextBlock(db, generator, gb);	
 		
 		//ADD TRANSACTION
-		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(databaseSet), payment.getSignature());
+		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(db), payment.getSignature());
 		newBlock.addTransaction(payment);
 				
 		//ADD TRANSACTION SIGNATURE

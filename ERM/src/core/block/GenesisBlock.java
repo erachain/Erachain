@@ -52,7 +52,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance / 5, genesisGenerator, generateHash(null), null, 0);
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance / 5, genesisGenerator, generateHeadHash());
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
@@ -107,7 +107,8 @@ public class GenesisBlock extends Block{
 
 			
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
-			this.setTransactionsSignature(generateHash(this.getTransactions()));
+			this.setTransactionsSignature(this.generateHash());
+			
 		} else {
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
@@ -208,10 +209,7 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
-
-				// CERTIFY PERSON
-				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
+				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
 
 			}
 
@@ -232,7 +230,7 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
+				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
 
 				// CERTIFY PERSON
 				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
@@ -256,7 +254,7 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
+				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
 
 				// CERTIFY PERSON
 				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
@@ -281,7 +279,8 @@ public class GenesisBlock extends Block{
 			}
 
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
-			this.setTransactionsSignature(generateHash(this.getTransactions()));
+			this.setTransactionsSignature(this.generateHash());
+			
 		}
 	}
 	
@@ -360,7 +359,7 @@ public class GenesisBlock extends Block{
 		return null;
 	}
 	
-	public static byte[] generateHash(List<Transaction> transactions)
+	public static byte[] generateHeadHash()
 	{
 		byte[] data = new byte[0];
 		
@@ -382,17 +381,6 @@ public class GenesisBlock extends Block{
 		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), 32, 0);
 		data = Bytes.concat(data, generatorBytes);
 		
-		/* icreator insert
-		if ( transactions != null )
-		{
-			//WRITE TRANSACTION SIGNATURE
-			for(Transaction transaction: transactions)
-			{
-				data = Bytes.concat(data, transaction.getSignature());
-			}
-		}
-		*/
-		
 		//DIGEST
 		byte[] digest = Crypto.getInstance().digest(data);		
 		digest = Bytes.concat(digest, digest);
@@ -400,20 +388,40 @@ public class GenesisBlock extends Block{
 		return digest;
 	}
 	
+	public byte[] generateHash()
+	{
+		byte[] data = new byte[0];
+		
+		/// icreator insert
+		//WRITE TRANSACTION SIGNATURE
+		for(Transaction transaction: this.getTransactions())
+		{
+			data = Bytes.concat(data, transaction.getSignature());
+		}
+		//DIGEST
+		byte[] digest = Crypto.getInstance().digest(data);		
+		digest = Bytes.concat(digest, digest);
+		
+		return digest;
+
+	}
+
+	
 	//VALIDATE
 	
 	@Override
 	public boolean isSignatureValid()
 	{
-		byte[] digest = generateHash(this.getTransactions());
-						
+		
 		//VALIDATE BLOCK SIGNATURE
+		byte[] digest = generateHeadHash();				
 		if(!Arrays.equals(digest, this.generatorSignature))
 		{
 			return false;
 		}
 		
 		//VALIDATE TRANSACTIONS SIGNATURE
+		digest = this.generateHash();
 		if(!Arrays.equals(digest, this.transactionsSignature))
 		{
 			return false;

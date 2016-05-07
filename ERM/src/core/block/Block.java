@@ -254,7 +254,10 @@ public class Block {
 		if(db.getHeightMap().contains(this.getSignature()))
 			return db.getHeightMap().get(this);
 		else
+		{
 			return -1;
+			//return 0; // icreator edit for TEST blocks
+		}
 	}
 
 	public void setTransactionsSignature(byte[] transactionsSignature) 
@@ -396,7 +399,7 @@ public class Block {
 
 		//WRITE VERSION
 		byte[] versionBytes = Ints.toByteArray(this.version);
-		//versionBytes = Bytes.ensureCapacity(versionBytes, 4, 0);
+		versionBytes = Bytes.ensureCapacity(versionBytes, 4, 0);
 		data = Bytes.concat(data, versionBytes);
 
 		//WRITE TIMESTAMP
@@ -410,7 +413,7 @@ public class Block {
 
 		//WRITE GENERATING BALANCE
 		byte[] baseTargetBytes = Longs.toByteArray(this.generatingBalance);
-		//baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, 8, 0);
+		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, 8, 0);
 		data = Bytes.concat(data,baseTargetBytes);
 
 		//WRITE GENERATOR
@@ -447,7 +450,7 @@ public class Block {
 
 		//WRITE TRANSACTION COUNT
 		byte[] transactionCountBytes = Ints.toByteArray(this.getTransactionCount());
-		//transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, 4, 0);
+		transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, 4, 0);
 		data = Bytes.concat(data, transactionCountBytes);
 
 		for(Transaction transaction: this.getTransactions())
@@ -455,7 +458,7 @@ public class Block {
 			//WRITE TRANSACTION LENGTH
 			int transactionLength = transaction.getDataLength(false);
 			byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-			//transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, 4, 0);
+			transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, 4, 0);
 			data = Bytes.concat(data, transactionLengthBytes);
 
 			//WRITE TRANSACTION
@@ -527,7 +530,7 @@ public class Block {
 		}
 
 		//VALIDATE TRANSACTIONS SIGNATURE
-		data = this.generatorSignature;		
+		data = this.generatorSignature;
 		for(Transaction transaction: this.getTransactions())
 		{
 			//CHECK IF TRANSACTION SIGNATURE IS VALID

@@ -21,6 +21,8 @@ public abstract class AssetCls extends ItemCls {
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;
 	public static final int NAME = 3;
+	
+	public static final int INITIAL_FAVORITES = 2;
 		
 	public AssetCls(byte[] typeBytes, Account creator, String name, String description)
 	{

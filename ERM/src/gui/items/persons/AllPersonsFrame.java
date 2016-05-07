@@ -54,21 +54,17 @@ public class AllPersonsFrame extends JInternalFrame{
 					
 				});	
 				
-	getContentPane().add(tb2, BorderLayout.NORTH);
+		getContentPane().add(tb2, BorderLayout.NORTH);
+		
+	    JTabbedPane main_jTabbedPane = new JTabbedPane();
 	
-    JTabbedPane main_jTabbedPane = new JTabbedPane();
-	
-	
-
-	
-	
-	AllPersonsPanel allPersonsFrame = new AllPersonsPanel();
+		
+		
+		AllPersonsPanel allPersonsFrame = new AllPersonsPanel();
 	
  
-	  MyPersonsPanel my_person_panel = new MyPersonsPanel();
+		MyPersonsPanel my_person_panel = new MyPersonsPanel();
 	 
-	
-     
         main_jTabbedPane.addTab(Lang.getInstance().translate("Search Person"), null, allPersonsFrame, "");
         main_jTabbedPane.addTab(Lang.getInstance().translate("My Persons"), null, my_person_panel, "");
         

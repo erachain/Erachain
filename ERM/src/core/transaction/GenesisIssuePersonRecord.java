@@ -112,7 +112,8 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		db.getPersonStatusMap().addItem(key, itemP);
 
 		// SET PERSON ADDRESS
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(key, Integer.MAX_VALUE, 0, this.signature);
+		// Integer.MAX_VALUE = 0 - permanent
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(key, 0, 0, this.signature);
 		db.getAddressPersonMap().addItem(recipient.getAddress(), itemA);
 		db.getPersonAddressMap().addItem(key, recipient.getAddress(), itemP);
 		

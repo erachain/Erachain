@@ -142,7 +142,7 @@ public class AssetDetailsPanel extends JPanel {
 		}
 		
 		//IF ASSET CONFIRMED AND NOT ERM
-		if(this.asset.getKey() > 2l)
+		if(this.asset.getKey() >= AssetCls.INITIAL_FAVORITES)
 		{
 			//FAVORITES
 			labelGBC.gridy++;

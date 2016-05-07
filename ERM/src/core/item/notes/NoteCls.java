@@ -18,7 +18,9 @@ public abstract class NoteCls extends ItemCls {
 	protected static final int NOTE = 1;
 	protected static final int SAMPLE = 2;
 	protected static final int PAPER = 3;
-	
+
+	public static final int INITIAL_FAVORITES = 3;
+
 	public NoteCls(byte[] typeBytes, Account creator, String name, String description)
 	{
 		super(typeBytes, creator, name, description);

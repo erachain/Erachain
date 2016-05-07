@@ -41,7 +41,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 	{
 		super(TYPE_ID, NAME_ID, asset);
 
-		this.generateSignature();
+		//this.generateSignature();
 
 	}
 
