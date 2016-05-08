@@ -179,13 +179,13 @@ public class Wallet extends Observable implements Observer
 		return database != null;
 	}
 	
-	public BigDecimal getUnconfirmedBalance(String address, long key)
-	{
-		return this.database.getAccountMap().getUnconfirmedBalance(address, key);
-	}
+	//public BigDecimal getUnconfirmedBalance(String address, long key)
+	//{
+	//	return this.database.getAccountMap().getUnconfirmedBalance(address, key);
+	//}
 	public BigDecimal getUnconfirmedBalance(Account account, long key)
 	{
-		return getUnconfirmedBalance(account.getAddress(), key);
+		return this.database.getAccountMap().getUnconfirmedBalance(account, key);
 	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
@@ -1027,7 +1027,7 @@ public class Wallet extends Observable implements Observer
 		if (key >= 0)
 		{
 			// ASSET TRANSFERED + FEE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account.getAddress(), key);
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account, key);
 			BigDecimal amount = asOrphan?BigDecimal.ZERO.subtract(transaction.getAmount(account)):transaction.getAmount(account);
 			unconfirmedBalance = unconfirmedBalance.add(amount);
 			if (fee.compareTo(BigDecimal.ZERO) != 0)
@@ -1037,7 +1037,7 @@ public class Wallet extends Observable implements Observer
 					unconfirmedBalance = unconfirmedBalance.subtract(fee);
 				} else {
 					this.database.getAccountMap().update(account, FEE_KEY,
-						this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));
+						this.getUnconfirmedBalance(account, FEE_KEY).subtract(fee));
 				}
 			}
 			this.database.getAccountMap().update(account, key, unconfirmedBalance);
@@ -1046,7 +1046,7 @@ public class Wallet extends Observable implements Observer
 			if (fee.compareTo(BigDecimal.ZERO) != 0)
 			{
 				this.database.getAccountMap().update(account, FEE_KEY,
-					this.getUnconfirmedBalance(account.getAddress(), FEE_KEY).subtract(fee));
+					this.getUnconfirmedBalance(account, FEE_KEY).subtract(fee));
 			}
 		}
 
@@ -1098,7 +1098,7 @@ public class Wallet extends Observable implements Observer
 				if(atTx.b.getRecipient() == account.getAddress() )
 				{				
 						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
-								account.getAddress(), atTx.b.getKey()).add(BigDecimal.valueOf(atTx.b.getAmount(),8));
+								account, atTx.b.getKey()).add(BigDecimal.valueOf(atTx.b.getAmount(),8));
 						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
 					
 				}
@@ -1152,7 +1152,7 @@ public class Wallet extends Observable implements Observer
 				if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
 				{				
 						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
-								account.getAddress(), atTx.b.getKey()).subtract( BigDecimal.valueOf(atTx.b.getAmount(),8));
+								account, atTx.b.getKey()).subtract( BigDecimal.valueOf(atTx.b.getAmount(),8));
 						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
 					
 				}
@@ -1186,7 +1186,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getBlockMap().add(block);
 				
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress(), FEE_KEY).add(block.getTotalFee());
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator(), FEE_KEY).add(block.getTotalFee());
 			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
 		}
 	}
@@ -1206,7 +1206,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getBlockMap().delete(block);
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator().getAddress(), FEE_KEY).subtract(block.getTotalFee());
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator(), FEE_KEY).subtract(block.getTotalFee());
 			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
 		}
 	}

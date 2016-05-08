@@ -70,7 +70,7 @@ public class Account {
 	// GET
 	public BigDecimal getUnconfirmedBalance(long key)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
+		return Controller.getInstance().getUnconfirmedBalance(this, key);
 	}
 	/*
 	public BigDecimal getConfirmedBalance()

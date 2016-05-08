@@ -41,7 +41,7 @@ public class Accounting extends Account {
 	
 	public BigDecimal getUnconfirmedBalance(DBSet db)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), FEE_KEY);
+		return Controller.getInstance().getUnconfirmedBalance(this, FEE_KEY);
 	}
 	
 	public BigDecimal getConfirmedBalance()
