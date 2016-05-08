@@ -47,7 +47,7 @@ import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
-import gui.SendMessageFrame;
+import gui.SendAssetFrame;
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener
 
@@ -131,7 +131,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				AssetCls asset = getAsset();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				Menu.selectOrAdd( new SendMessageFrame(asset, account), null);
+				Menu.selectOrAdd( new SendAssetFrame(asset, account), null);
 
 				/*
 				JInternalFrame frame = new JInternalFrame();

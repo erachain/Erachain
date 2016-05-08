@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JScrollPane;
 
-import gui.SendMessagePanel;
+import gui.SendAssetPanel;
 //import gui.items.persons.IssuePersonFrame;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonFrame;
@@ -38,7 +38,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.BoxLayout;
 
-public class SendMessageFrame extends JInternalFrame{
+public class SendAssetFrame extends JInternalFrame{
 
 
 	/**
@@ -46,10 +46,10 @@ public class SendMessageFrame extends JInternalFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SendMessageFrame (AssetCls asset, Account account)
+	public SendAssetFrame (AssetCls asset, Account account)
 	{
 	
-		SendMessagePanel panel = new SendMessagePanel(asset, account);
+		SendAssetPanel panel = new SendAssetPanel(asset, account);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         
        //SHOW FRAME

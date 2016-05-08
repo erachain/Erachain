@@ -58,7 +58,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SendMessagePanel extends JPanel
+public class SendAssetPanel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -76,10 +76,13 @@ public class SendMessagePanel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SendMessagePanel(AssetCls asset, Account account)
+	public SendAssetPanel(AssetCls asset, Account account)
 	{
 		
-		
+		if (asset == null)
+		{
+			asset = Controller.getInstance().getAsset(1l);
+		}
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};

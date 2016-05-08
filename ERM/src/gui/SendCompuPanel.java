@@ -29,7 +29,7 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class SendMoneyPanel extends JInternalFrame 
+public class SendCompuPanel extends JInternalFrame 
 {
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;
@@ -40,7 +40,7 @@ public class SendMoneyPanel extends JInternalFrame
 	private AccountsComboBoxModel accountsModel;
 	private JComboBox<AssetCls> cbxFavorites;
 	
-	public SendMoneyPanel()
+	public SendCompuPanel()
 	{
 		this.setLayout(new GridBagLayout());
 		

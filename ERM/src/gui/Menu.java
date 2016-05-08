@@ -6,12 +6,16 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -22,7 +26,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
@@ -30,8 +36,11 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import gui.AccountsPanel;
-import gui.SendMoneyPanel;
+import core.transaction.Transaction;
+import database.wallet.TransactionMap;
+import gui.AccountsFrame;
+//import gui.SendMoneyFrame;
+import gui.SendAssetFrame;
 import gui.items.imprints.ImprintsPanel;
 import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
@@ -39,7 +48,9 @@ import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MyPersonsPanel;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
+import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import settings.Settings;
 import utils.URLViewer;
@@ -281,76 +292,7 @@ public class Menu extends JMenuBar
         });
         accountsMenu.add(accountsMenuList);
 
-        // DEALS
-        JMenuItem dealsMenuSend = new JMenuItem(Lang.getInstance().translate("Send"));
-        dealsMenuSend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send"));
-        dealsMenuSend.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-        		selectOrAdd(new SendMoneyPanel(), MainFrame.desktopPane.getAllFrames());
-        	}
-        });
-        dealsMenu.add(dealsMenuSend);     
-
-        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Message"));
-        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Message"));
-        dealsMenuSendMessage.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-        		// 
-        		//selectOrAdd(new SendMessagePanel(), MainFrame.desktopPane.getAllFrames());
-        	}
-        });
-        dealsMenu.add(dealsMenuSendMessage);     
-
-        // Imprints menu
-        JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
-        imprintsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints List"));
-        imprintsMenuList.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
-        	}
-        });
-        imprintsMenu.add(imprintsMenuList);     
-
-        // Records menu
-        JMenuItem recordsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
-        recordsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records List"));
-        recordsMenuList.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
-        	}
-        });
-        recordsMenu.add(recordsMenuList);     
-
-        /*        
-        //Search person
-        JMenuItem searchPerson = new JMenuItem(Lang.getInstance().translate("Search"));
-        searchPerson.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Search Persons"));
-   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        searchPerson.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-             //   new SettingsFrame();
-        		
-        		new SearchPersons();
-        		
-        		
-        	}
-        });
-        workMenu.add(searchPerson);   
-        
-*/
-        
-
-        // меню Persons
+        ///// PERSONS
         JMenuItem allPersonsMenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
         allPersonsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
@@ -359,9 +301,6 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        // выводим окно или делаем фокус если уже открыто
-        		//selectOrAdd( new AllPersonsFrame(new MainFrame()), MainFrame.desktopPane.getAllFrames());
-        		
         		selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}
@@ -377,14 +316,50 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        // выводим окно или делаем фокус если уже открыто
         		selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
         personsMenu.add(issuePersonMenu);  
+
+        // DEALS
+
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Asset & Message"));
+        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        dealsMenuSendMessage.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		selectOrAdd(new SendAssetFrame(null, null), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        dealsMenu.add(dealsMenuSendMessage);     
+
+        // Imprints menu
+        JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
+        imprintsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints List"));
+        imprintsMenuList.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        imprintsMenu.add(imprintsMenuList);     
         
-        
+        //// RECORDS ////
+        // меню Persons
+        JMenuItem recordsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
+        recordsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Records"));
+        recordsMenuList.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		selectOrAdd( new RecordsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        recordsMenu.add(recordsMenuList);  
 	}
 	
 	
