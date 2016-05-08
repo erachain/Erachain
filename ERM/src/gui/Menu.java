@@ -77,7 +77,7 @@ public class Menu extends JMenuBar
         		selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
         	}
         });
-		*/
+        */
         this.add(accountsMenu);
       
         JMenu dealsMenu = new JMenu(Lang.getInstance().translate("Deals"));
@@ -279,7 +279,7 @@ public class Menu extends JMenuBar
         		selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        accountsMenu.add(accountsMenuList);     
+        accountsMenu.add(accountsMenuList);
 
         // DEALS
         JMenuItem dealsMenuSend = new JMenuItem(Lang.getInstance().translate("Send"));

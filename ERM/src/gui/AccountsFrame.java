@@ -11,9 +11,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import controller.Controller;
 import lang.Lang;
+import utils.NumberAsString;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -60,19 +64,17 @@ public class AccountsFrame extends JInternalFrame{
 				
 		getContentPane().add(tb2, BorderLayout.NORTH);
 		
-	    JTabbedPane main_jTabbedPane = new JTabbedPane();
-		
-	    AccountsPanel accountsPanel = new AccountsPanel();
-	    //this.add(accountsPanel);
+	    AccountsPanel accountsPanel = new AccountsPanel(parent);
+        getContentPane().add(accountsPanel, BorderLayout.CENTER);
 	 
+	    //JTabbedPane main_jTabbedPane = new JTabbedPane();
         //main_jTabbedPane.addTab(Lang.getInstance().translate("Search account"), null, allPersonsFrame, "");
         //main_jTabbedPane.addTab(Lang.getInstance().translate("My Persons"), null, my_person_panel, "");
+        //main_jTabbedPane.getAccessibleContext().setAccessibleName("");
+        //main_jTabbedPane.getAccessibleContext().setAccessibleDescription("");
         
         //getContentPane().add(main_jTabbedPane, BorderLayout.CENTER);
-        getContentPane().add(accountsPanel, BorderLayout.CENTER);
         
-        main_jTabbedPane.getAccessibleContext().setAccessibleName("");
-        main_jTabbedPane.getAccessibleContext().setAccessibleDescription("");
        //SHOW FRAME
         this.pack();
         this.setMaximizable(true);

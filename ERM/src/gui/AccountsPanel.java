@@ -47,9 +47,9 @@ import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
+import gui.SendMessageFrame;
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener
-//public class AccountsPanel extends JInternalFrame implements ItemListener
 
 
 //JInternalFrame
@@ -60,7 +60,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 	private AccountsTableModel tableModel;
 
 	@SuppressWarnings("unchecked")
-	public AccountsPanel()
+	public AccountsPanel(JFrame parent)
 	{
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
@@ -130,13 +130,28 @@ public class AccountsPanel extends JPanel implements ItemListener
 				
 				AssetCls asset = getAsset();
 				Account account = tableModel.getAccount(row);
-				
+        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
+				Menu.selectOrAdd( new SendMessageFrame(asset, account), null);
+
+				/*
 				JInternalFrame frame = new JInternalFrame();
-				frame.add(new SendMessagePanel(asset, account));
+				frame.getContentPane().add(new SendMessagePanel(asset, account));
+			       //SHOW FRAME
+				frame.pack();
+				frame.setMaximizable(true);
+				frame.setTitle(Lang.getInstance().translate("Accounts"));
+				frame.setClosable(true);
+				frame.setResizable(true);
+				//frame.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+				frame.setLocation(20, 20);
+				//CLOSE
+				frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+				frame.setResizable(true);
+				frame.setVisible(true);
 				
         		Menu.selectOrAdd( frame, MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( frame, null);
-				
+        		//MainFrame.desktopPane.add(frame);
+        		 */
 				
 			}
 		});
@@ -243,10 +258,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 		        table.setRowSelectionInterval(row, row);
 		     }
 		});
-		
-		//ADD ACCOUNTS TABLE
-		this.add(new JScrollPane(table), tableGBC);
-		
+				
 		//ADD TOTAL BALANCE
 		final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": " + tableModel.getTotalBalance().toPlainString());
 		this.add(totalBalance, buttonGBC);
@@ -259,6 +271,10 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}		
 		});
 		
+		//ADD ACCOUNTS TABLE
+		this.add(new JScrollPane(table), tableGBC);
+
+		/*
 		//ADD NEW ACCOUNT BUTTON
 		buttonGBC.gridy++;
 		JButton newButton = new JButton(Lang.getInstance().translate("New account"));
@@ -271,33 +287,13 @@ public class AccountsPanel extends JPanel implements ItemListener
 		    }
 		});	
 		this.add(newButton, buttonGBC);
+		*/
 		
-		//this.setVisible(true);
-
 	}
 	
 	public static AssetCls getAsset()
 	{
 		return (AssetCls) cbxFavorites.getSelectedItem();
-	}
-
-	public void onNewClick()
-	{
-		//CHECK IF WALLET UNLOCKED
-		if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
-			if(!Controller.getInstance().unlockWallet(password))
-			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
-		
-		//GENERATE NEW ACCOUNT
-		Controller.getInstance().generateNewAccount();
 	}
 	
 	@Override
