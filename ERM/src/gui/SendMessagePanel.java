@@ -6,6 +6,8 @@ import gui.models.MessagesTableModel;
 import lang.Lang;
 import ntp.NTP;
 
+import java.awt.Container;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -56,7 +58,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SendMessagePanel extends JInternalFrame //JPanel
+public class SendMessagePanel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -74,7 +76,7 @@ public class SendMessagePanel extends JInternalFrame //JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SendMessagePanel(JFrame parent, AssetCls asset, Account account)
+	public SendMessagePanel(AssetCls asset, Account account)
 	{
 		
 		
@@ -431,24 +433,27 @@ public class SendMessagePanel extends JInternalFrame //JPanel
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		
-        this.pack();
-     //   this.setLocationRelativeTo(null);
  
+        /*
+        this.pack();
+		this.setLocationRelativeTo(null);
 		this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Persons"));
 		this.setClosable(true);
-//		this.setResizable(true);
+		this.setResizable(true);
+		*/
 		
 	
-		this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
-		this.setLocation(20, 20);
+		//Container parent = this.getParent();
+		//this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+		//this.setLocation(20, 20);
 	//	this.setIconImages(icons);
 		
 		//CLOSE
-		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        this.setResizable(true);
+		//setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        //this.setResizable(true);
         //splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
-        this.setVisible(true);
+        //this.setVisible(true);
 
         
 	}

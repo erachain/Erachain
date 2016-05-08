@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,12 +15,15 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -31,6 +36,7 @@ import gui.items.imprints.ImprintsPanel;
 import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
+import gui.items.persons.MyPersonsPanel;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
 import gui.settings.SettingsFrame;
@@ -62,7 +68,16 @@ public class Menu extends JMenuBar
         this.add(fileMenu);
         
         JMenu accountsMenu = new JMenu(Lang.getInstance().translate("Accounts"));
-        fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts menu"));
+        accountsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts menu"));
+        /*
+        accountsMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+		*/
         this.add(accountsMenu);
       
         JMenu dealsMenu = new JMenu(Lang.getInstance().translate("Deals"));
@@ -261,8 +276,7 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		// 
-        		selectOrAdd(new AccountsPanel(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
         	}
         });
         accountsMenu.add(accountsMenuList);     
@@ -274,7 +288,6 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		// 
         		selectOrAdd(new SendMoneyPanel(), MainFrame.desktopPane.getAllFrames());
         	}
         });
@@ -348,6 +361,7 @@ public class Menu extends JMenuBar
              
         // выводим окно или делаем фокус если уже открыто
         		//selectOrAdd( new AllPersonsFrame(new MainFrame()), MainFrame.desktopPane.getAllFrames());
+        		
         		selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}

@@ -48,33 +48,32 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-//public class AccountsPanel extends JPanel implements ItemListener
-public class AccountsPanel extends JInternalFrame implements ItemListener
+public class AccountsPanel extends JPanel implements ItemListener
+//public class AccountsPanel extends JInternalFrame implements ItemListener
 
 
 //JInternalFrame
 {
-	private JFrame parent;
+	//private JFrame parent;
 
 	private static JComboBox<AssetCls> cbxFavorites;
 	private AccountsTableModel tableModel;
 
 	@SuppressWarnings("unchecked")
-	public AccountsPanel(JFrame parent)
+	public AccountsPanel()
 	{
-		this.parent = parent;
+		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		this.setSize(500, 500);
-		this.setLocation(20, 20);
-		this.setVisible(true);
-		this.setMaximizable(true);
-		this.setTitle(Lang.getInstance().translate("Accounts"));
-	//	this.setClosable(true);
-		this.setResizable(true);
-	//	this..setBorder(true);
+		//this.setSize(500, 500);
+		//this.setLocation(20, 20);
+		//this.setMaximizable(true);
+		//this.setTitle(Lang.getInstance().translate("Accounts"));
+		//this.setClosable(true);
+		//this.setResizable(true);
+		//this.setBorder(true);
 		
 		//TABLE GBC
 		GridBagConstraints tableGBC = new GridBagConstraints();
@@ -133,9 +132,10 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 				Account account = tableModel.getAccount(row);
 				
 				JInternalFrame frame = new JInternalFrame();
+				frame.add(new SendMessagePanel(asset, account));
 				
-        		//Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), MainFrame.desktopPane.getAllFrames());
-				Menu.selectOrAdd( new SendMessagePanel(parent, asset, account), null);
+        		Menu.selectOrAdd( frame, MainFrame.desktopPane.getAllFrames());
+				//Menu.selectOrAdd( frame, null);
 				
 				
 			}
@@ -271,6 +271,9 @@ public class AccountsPanel extends JInternalFrame implements ItemListener
 		    }
 		});	
 		this.add(newButton, buttonGBC);
+		
+		//this.setVisible(true);
+
 	}
 	
 	public static AssetCls getAsset()

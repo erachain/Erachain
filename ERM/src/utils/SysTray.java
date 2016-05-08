@@ -264,7 +264,7 @@ public class SysTray implements Observer{
 				    frame.setSize(800, 600);
 				    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				    frame.setVisible(true);
-					SendMessagePanel ap = new SendMessagePanel(null, null, null);
+					SendMessagePanel ap = new SendMessagePanel(null, null);
 					frame.getContentPane().add(ap);
 					
 			}
