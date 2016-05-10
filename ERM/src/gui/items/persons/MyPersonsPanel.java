@@ -216,7 +216,8 @@ public class MyPersonsPanel extends JPanel
 				
 				
 						if (t3 != null){
-							Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
+							if (t3.a == 0) Date_Acti = "+";
+							else Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
 						} else
 						{
 							Date_Acti =Lang.getInstance().translate("Not found!");
@@ -225,8 +226,9 @@ public class MyPersonsPanel extends JPanel
 							Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
 							 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
 							+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + person.getName().toString()		+ "</p>" 
-					        + "<p>  "  + Lang.getInstance().translate("To do")  +":"        		  + Date_Acti			+"</p>"
-					        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>";
+					        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>"
+					        + "<p>  "  + Lang.getInstance().translate("To Date")  +":"        		  + Date_Acti			+"</p>"
+					        ;
 							 // Читаем адреса клиента
 							 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 							 if ( !Addresses.isEmpty()){

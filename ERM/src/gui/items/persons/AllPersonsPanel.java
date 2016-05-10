@@ -53,6 +53,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.mapdb.Fun.Tuple3;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import database.AddressPersonMap;
 import database.DBSet;
 import database.ItemPersonMap;
@@ -181,8 +182,8 @@ public class AllPersonsPanel extends JPanel {
 					@SuppressWarnings("deprecation")
 					@Override
 					public void valueChanged(ListSelectionEvent arg0) {
-						String Date_Acti;
-						String Date_birs;
+						String dateAlive;
+						String date_birthday;
 						String message;
 				// TODO Auto-generated method stub
 				// устанавливаем формат даты
@@ -194,37 +195,56 @@ public class AllPersonsPanel extends JPanel {
 						if (personsTable.getSelectedRow() >= 0 ){
 							person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
 						
-						
-						//читаем таблицу персон.
-						Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey());
-						// преобразование в дату
-				
-				
-						if (t3 != null){
-							if (t3.b == 0) Date_Acti = "+";
-							else Date_Acti = formatDate.format( new Date(Long.valueOf(t3.b.toString())));
-						} else
-						{
-							Date_Acti = Lang.getInstance().translate("Not found!");
-						}
-						
-						if (person.isConfirmed()){
-							Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-							 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
-							+ "<p> <b> " + Lang.getInstance().translate("Name")+": " + person.getName().toString() + "</p>" 
-					        + "<p>" + Lang.getInstance().translate("Birthday")+": " + Date_birs +"</p>"
-					        + "<p><b>" + Lang.getInstance().translate("ALIVE")+": " + Date_Acti +"</b></p>";
 
-							 // Читаем адреса клиента
-							 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-							 if ( !Addresses.isEmpty()){
-								 message += "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
-								 
-							 }
-							 else{
-								 message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-								
-							 }
+						if (person.isConfirmed()){
+							date_birthday=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+							message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
+							+ "<p> <b> " + Lang.getInstance().translate("Name")+": " + person.getName().toString() + "</p>" 
+					        + "<p>" + Lang.getInstance().translate("Birthday")+": " + date_birthday +"</p>";
+
+							message += "<h2>"+ "Statuses" +"</h2>";
+							// GETT PERSON STATUS for ALIVE
+							Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey());
+					
+							if (t3Alive != null){
+								if (t3Alive.a == 0) dateAlive = "active";
+								else dateAlive = formatDate.format( new Date(Long.valueOf(t3Alive.a.toString())));
+							} else
+							{
+								dateAlive = Lang.getInstance().translate("unknown");
+							}
+							message += "<p><b>" + Lang.getInstance().translate("ALIVE")+": " + dateAlive +"</b></p>";
+
+							// GETT PERSON STATUS for DEAD
+							Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+					
+							if (t3Dead != null){
+								if (t3Dead.a == 0) dateAlive = "yes";
+								else dateAlive = formatDate.format( new Date(Long.valueOf(t3Dead.a.toString())));
+							} else
+							{
+								dateAlive = Lang.getInstance().translate("unknown");
+							}
+							message += "<p><b>" + Lang.getInstance().translate("DEAD")+": " + dateAlive +"</b></p>";
+
+							// GET CERTIFIED ACCOUNTS
+							message += "<h2>"+ "Accounts" +"</h2>";
+							TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+							if ( !addresses.isEmpty()){
+								// for each account seek active date
+								String active_date_str;
+								for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> e : addresses.entrySet())
+								{
+									Tuple3<Integer, Integer, byte[]> active_date = e.getValue().peek();
+									if (active_date.a == 0) active_date_str = "active";
+									else active_date_str = formatDate.format( new Date(Long.valueOf(active_date.a.toString())));
+									
+									message += "<p>"  +  active_date_str +": <input type='text' size='40' value='"+ e.getKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+								}
+							}
+							else{
+								message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
+							}
 						}else{
 							
 							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
