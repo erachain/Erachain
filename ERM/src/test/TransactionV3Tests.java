@@ -56,7 +56,7 @@ public class TransactionV3Tests {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 

@@ -54,7 +54,7 @@ public class R_SertifyPerson extends Transaction {
 	// need RIGHTS for non PERSON account
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
-	// how many OIL gift
+	// how many FEE gift
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
 	public static final int DEFAULT_DURATION = 3 * 356;
 
@@ -491,7 +491,7 @@ public class R_SertifyPerson extends Transaction {
 				
 		if (!asPack) {
 
-			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
+			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
 			if(Arrays.equals(pkAccount.getLastReference(db), new byte[0]))
 			{
 				pkAccount.setLastReference(this.signature, db);

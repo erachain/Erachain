@@ -49,6 +49,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
+import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBSet;
 
@@ -559,7 +560,7 @@ public class InitiateAcctFrame extends JFrame {
 				this.deployButton.setEnabled(true);
 				break;
 			case Transaction.NOT_ENOUGH_FEE:
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				break;	
 			case Transaction.NEGATIVE_AMOUNT:

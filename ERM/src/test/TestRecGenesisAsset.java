@@ -37,7 +37,7 @@ public class TestRecGenesisAsset {
 
 	byte[] releaserReference = null;
 
-	long OIL_KEY = 1l;
+	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	

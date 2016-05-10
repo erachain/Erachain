@@ -18,6 +18,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 //import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.notes.NoteCls;
@@ -320,9 +321,9 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)Transaction.FEE_KEY:
-			return new AssetVenture(genesisGenerator, "LAEV", "It is an drops of life used for deals", 99999999L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, "ERMO", "It is the basic unit of Environment Real Management Objects", genesisGeneratingBalance, (byte)0, true);
+		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
 	public static Note makeAssetNote(int key) 

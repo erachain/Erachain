@@ -38,7 +38,7 @@ public class TestRecStatus {
 
 	boolean asPack = false;
 	long ERM_KEY = AssetCls.ERMO_KEY;
-	long FEE_KEY = AssetCls.DILE_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -61,7 +61,7 @@ public class TestRecStatus {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);

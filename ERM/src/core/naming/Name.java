@@ -189,6 +189,6 @@ public class Name {
 	
 	public String getNameBalanceString()
 	{
-		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0, AssetCls.DILE_KEY)) + " - " + this.getName();
+		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0, AssetCls.FEE_KEY)) + " - " + this.getName();
 	}
 }

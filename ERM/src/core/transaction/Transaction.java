@@ -170,7 +170,7 @@ public abstract class Transaction {
 
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 
-	public static final long FEE_KEY = AssetCls.DILE_KEY;
+	public static final long FEE_KEY = AssetCls.FEE_KEY;
 	public static final int FEE_PER_BYTE = 1;
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
 	public static final float FEE_POW_BASE = (float)1.5;

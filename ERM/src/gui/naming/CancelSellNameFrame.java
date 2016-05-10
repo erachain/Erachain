@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
 import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
 import core.naming.NameSale;
 import core.transaction.Transaction;
 import utils.Pair;
@@ -255,7 +256,7 @@ public class CancelSellNameFrame extends JFrame
 				
 			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.NO_BALANCE:

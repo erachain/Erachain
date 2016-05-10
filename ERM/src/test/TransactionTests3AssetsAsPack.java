@@ -63,7 +63,7 @@ public class TransactionTests3AssetsAsPack {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -309,7 +309,7 @@ public class TransactionTests3AssetsAsPack {
 		
 		issueAssetTransaction.process(db, asPack);
 		long key = asset.getKey();
-		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
+		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE SIGNATURE

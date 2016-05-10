@@ -39,7 +39,7 @@ public class TestRecImprint {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = AssetCls.DILE_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] imprintReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -68,7 +68,7 @@ public class TestRecImprint {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 

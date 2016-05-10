@@ -15,8 +15,14 @@ public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
 	public static final long ERMO_KEY = 0l;
+	public static final String ERMO_ABBREV = "ERM"; // ERMO (main rights units)
+	public static final String ERMO_NAME = "ERMO";
+	public static final String ERMO_DESCR = "It is the basic unit of Environment Real Management Objects (" + ERMO_NAME + ")";
 	// FEE KEY
-	public static final long DILE_KEY = 1l;
+	public static final long FEE_KEY = 1l;
+	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
+	public static final String FEE_NAME = "COMPU";
+	public static final String FEE_DESCR = "It is an drops of computation used for deals (" + FEE_NAME + ")";
 
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;

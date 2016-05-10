@@ -333,7 +333,7 @@ public class NameStorageResource {
 								ApiErrorFactory.ERROR_TX_AMOUNT);
 					}
 					
-					//recalculating OIL amount
+					//recalculating FEE amount
 					BigDecimal newCompleteFee = BigDecimal.ZERO;
 					BigDecimal oldAmount = BigDecimal.ZERO;
 					List<Pair<byte[], BigDecimal>> newPairs = new ArrayList<Pair<byte[],BigDecimal>>();
@@ -369,7 +369,7 @@ public class NameStorageResource {
 					basicInfo = "Because of the size of the data this call will create "
 							+ allTxPairs.size()
 							+ " transactions.\nAll Arbitrary Transactions will cost: "
-							+ newCompleteFee.toPlainString() + " OIL.\nDetails:\n\n";
+							+ newCompleteFee.toPlainString() + " " + AssetCls.FEE_NAME + ".\nDetails:\n\n";
 
 //					basicInfo += StringUtils.join(askApicalls, "\n");
 					basicInfo += apicalls;

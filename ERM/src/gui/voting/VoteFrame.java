@@ -202,7 +202,7 @@ public class VoteFrame extends JFrame
       	
       	 //LABEL FEE
       	labelGBC.gridy = 6;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee(OIL)") + ":");
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE
@@ -301,7 +301,7 @@ public class VoteFrame extends JFrame
 				
 			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 								
 			case Transaction.NO_BALANCE:

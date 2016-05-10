@@ -600,7 +600,7 @@ public class TestRecPerson {
 		
 		//CHECK BALANCE SENDER
 		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, db));
-		// CHECK OIL BALANCE - FEE - GIFT
+		// CHECK FEE BALANCE - FEE - GIFT
 		assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPerson.getFee()),
 				certifier.getConfirmedBalance(FEE_KEY, db));
 				
@@ -616,7 +616,7 @@ public class TestRecPerson {
 		assertEquals(true, Arrays.equals(r_SertifyPerson.getSignature(), certifier.getLastReference(db)));
 		
 		//CHECK REFERENCE RECIPIENT
-		// TRUE - new reference for first send OIL
+		// TRUE - new reference for first send FEE
 		assertEquals(true, Arrays.equals(r_SertifyPerson.getSignature(), userAccount1.getLastReference(db)));
 		// byte[0]
 		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));

@@ -536,7 +536,7 @@ public class BlockTests
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 
-		// OIL FUND
+		// FEE FUND
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 								
