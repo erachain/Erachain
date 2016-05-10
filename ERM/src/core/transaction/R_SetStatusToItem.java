@@ -50,7 +50,7 @@ public class R_SetStatusToItem extends Transaction {
 	protected Long key; // STATUS KEY
 	protected ItemCls item; // ITEM
 	protected Integer end_date = 0; // in days; 0 - permanent active
-	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH;
+	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
@@ -120,7 +120,13 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.end_date;
 	}
-				
+
+	public void resetItemToDB(DBSet db) 
+	{
+		this.item = db.getItem_Map(this.item.getItemTypeInt())
+				.get(this.item.getKey());		
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 
@@ -228,7 +234,9 @@ public class R_SetStatusToItem extends Transaction {
 		
 		//WRITE ITEM KEYS
 		// TYPE
-		data = Bytes.concat(data, Longs.toByteArray(this.item.getType()[0]));
+		byte[] itemTypeKeyBytes = new byte[1];
+		itemTypeKeyBytes[0] = (byte)this.item.getItemTypeInt();
+		data = Bytes.concat(data, itemTypeKeyBytes);
 		// KEY
 		byte[] itemKeyBytes = Longs.toByteArray(this.item.getKey());
 		keyBytes = Bytes.ensureCapacity(itemKeyBytes, KEY_LENGTH, 0);
@@ -307,14 +315,11 @@ public class R_SetStatusToItem extends Transaction {
 		// TODO set STATUSES by reference of it record - not by key!
 		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
 		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().addItem(item.getKey(), this.key, new Tuple3<Integer, Integer, byte[]>(this.end_date,
-					Controller.getInstance().getHeight(), this.signature));
+			db.getPersonStatusMap().addItem(item.getKey(), this.key, itemP);
 		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().addItem(item.getKey(), this.key, new Tuple3<Integer, Integer, byte[]>(this.end_date,
-					Controller.getInstance().getHeight(), this.signature));
+			db.getAssetStatusMap().addItem(item.getKey(), this.key, itemP);
 		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().addItem(item.getKey(), this.key, new Tuple3<Integer, Integer, byte[]>(this.end_date,
-					Controller.getInstance().getHeight(), this.signature));
+			db.getUnionStatusMap().addItem(item.getKey(), this.key, itemP);
 
 	}
 

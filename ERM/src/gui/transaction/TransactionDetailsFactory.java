@@ -19,6 +19,7 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
+import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -110,6 +111,11 @@ public class TransactionDetailsFactory
 			
 			IssuePersonRecord issuePerson = (IssuePersonRecord) transaction;
 			return new IssuePersonDetailsFrame(issuePerson);	
+
+		case Transaction.SET_STATUS_TRANSACTION:
+			
+			R_SetStatusToItem setStatusToItem = (R_SetStatusToItem) transaction;
+			return new SetStatusToItemDetailsFrame(setStatusToItem);	
 
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			

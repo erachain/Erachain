@@ -12,6 +12,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.assets.Order;
@@ -43,6 +44,7 @@ import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
+import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -495,6 +497,25 @@ public class TransactionCreator
 		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
 				end_date,  timestamp, creator.getLastReference(this.fork));
+		record.sign(creator, asPack);
+			
+		return afterCreate(record, asPack);
+	}
+
+	public Pair<Transaction, Integer> R_SetStatusToItem(boolean asPack,
+			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
+			int end_date) {
+		
+		this.checkUpdate();
+		
+		Transaction record;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE SERTIFY PERSON TRANSACTION
+		//int version = 5; // without user sign
+		record = new R_SetStatusToItem(creator, (byte)feePow, key, item,
+				end_date, timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);

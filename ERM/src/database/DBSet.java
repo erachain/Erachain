@@ -8,6 +8,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import controller.Controller;
+import core.item.ItemCls;
 //import core.item.ItemCls;
 import core.web.NameStorageMap;
 import core.web.OrphanNameStorageHelperMap;
@@ -489,6 +490,32 @@ public class DBSet implements Observer, IDB {
 	public IssueUnionMap getIssueUnionMap()
 	{
 		return this.issueUnionMap;
+	}
+
+	public Item_Map getItem_Map(int type) {
+		
+		switch(type)
+			{
+			case ItemCls.ASSET_TYPE: {
+				return this.getItemAssetMap();
+			}
+			case ItemCls.IMPRINT_TYPE: {
+				return this.getItemImprintMap();
+			}
+			case ItemCls.NOTE_TYPE: {
+				return this.getItemNoteMap();
+			}
+			case ItemCls.PERSON_TYPE: {
+				return this.getItemPersonMap();
+			}
+			case ItemCls.STATUS_TYPE: {
+				return this.getItemStatusMap();	
+			}
+			case ItemCls.UNION_TYPE: {
+				return this.getItemUnionMap();
+			}
+		}
+		return null;
 	}
 
 	public ATMap getATMap()
