@@ -115,7 +115,7 @@ public class AssetPairSelect extends JFrame{
 					if(row < assetPairSelectTableModel.assets.size())
 					{
 						new ExchangeFrame(
-								(AssetCls)Controller.getInstance().getItemItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
+								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row));
 						((JFrame) (assetsPairTable.getTopLevelAncestor())).dispose();
 					}

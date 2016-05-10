@@ -87,10 +87,20 @@ public class ObserverMessage {
 	public static final int LIST_UNION_TYPE = 63;
 	public static final int LIST_UNION_FAVORITES_TYPE = 64;
 
-	public static final int ADD_PERSON_STATUS_TYPE = 65;
-	public static final int REMOVE_PERSON_STATUS_TYPE = 66;
-	public static final int LIST_PERSON_STATUS_TYPE = 67;
-	public static final int LIST_PERSON_STATUS_FAVORITES_TYPE = 68;
+	public static final int ADD_ASSET_STATUS_TYPE = 65;
+	public static final int REMOVE_ASSET_STATUS_TYPE = 66;
+	public static final int LIST_ASSET_STATUS_TYPE = 67;
+	public static final int LIST_ASSET_STATUS_FAVORITES_TYPE = 68;
+
+	public static final int ADD_PERSON_STATUS_TYPE = 69;
+	public static final int REMOVE_PERSON_STATUS_TYPE = 70;
+	public static final int LIST_PERSON_STATUS_TYPE = 71;
+	public static final int LIST_PERSON_STATUS_FAVORITES_TYPE = 72;
+
+	public static final int ADD_UNION_STATUS_TYPE = 73;
+	public static final int REMOVE_UNION_STATUS_TYPE = 74;
+	public static final int LIST_UNION_STATUS_TYPE = 75;
+	public static final int LIST_UNION_STATUS_FAVORITES_TYPE = 76;
 
 	private int type;
 	private Object value;

@@ -43,9 +43,9 @@ import utils.Converter;
 // typeBytes[1] - version =0 - not need sign by person;
 // 		 =1 - need sign by person
 // typeBytes[2] - size of personalized accounts
-public class R_SertifyPerson extends Transaction {
+public class R_SertifyPubKeys extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PERSON_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
 	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
@@ -76,7 +76,7 @@ public class R_SertifyPerson extends Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
-	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
@@ -86,7 +86,7 @@ public class R_SertifyPerson extends Transaction {
 		this.end_date = end_date;		
 	}
 
-	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
@@ -94,7 +94,7 @@ public class R_SertifyPerson extends Transaction {
 				end_date, timestamp, reference);
 	}
 	// set default date
-	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
@@ -103,7 +103,7 @@ public class R_SertifyPerson extends Transaction {
 		
 		this.end_date = DEFAULT_DURATION + (int)(NTP.getTime() / 86400);
 	}
-	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference, byte[] signature,
 			List<byte[]> sertifiedSignatures) {
@@ -115,7 +115,7 @@ public class R_SertifyPerson extends Transaction {
 		this.calcFee();
 	}
 	// as pack
-	public R_SertifyPerson(byte[] typeBytes, PublicKeyAccount creator, long key,
+	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, byte[] signature,
 			List<byte[]> sertifiedSignatures) {
@@ -125,7 +125,7 @@ public class R_SertifyPerson extends Transaction {
 		this.signature = signature;
 		this.sertifiedSignatures = sertifiedSignatures;
 	}
-	public R_SertifyPerson(int version, PublicKeyAccount creator, byte feePow, long key,
+	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, long timestamp, byte[] reference, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
@@ -135,7 +135,7 @@ public class R_SertifyPerson extends Transaction {
 	}
 
 	// as pack
-	public R_SertifyPerson(int version, PublicKeyAccount creator, long key,
+	public R_SertifyPubKeys(int version, PublicKeyAccount creator, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int end_date, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
@@ -314,12 +314,12 @@ public class R_SertifyPerson extends Transaction {
 		position += DATE_DAY_LENGTH;
 
 		if (!asPack) {
-			return new R_SertifyPerson(typeBytes, creator, feePow, key,
+			return new R_SertifyPubKeys(typeBytes, creator, feePow, key,
 					sertifiedPublicKeys,
 					end_date, timestamp, reference, signature,
 					sertifiedSignatures);
 		} else {
-			return new R_SertifyPerson(typeBytes, creator, key,
+			return new R_SertifyPubKeys(typeBytes, creator, key,
 					sertifiedPublicKeys,
 					end_date, signature,
 					sertifiedSignatures);
@@ -474,12 +474,6 @@ public class R_SertifyPerson extends Transaction {
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
 		
-		// SET ALIVE PERSON for DURATION
-		// TODO set STATUSES by reference of it record - not by key!
-		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
-		db.getPersonStatusMap().addItem(this.key, itemP);
-
-		// TODO need MAP List<address> for ONE PERSON - Tuple2<Long, List<String>>
 		// SET PERSON ADDRESS
 		String address;
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
@@ -510,9 +504,6 @@ public class R_SertifyPerson extends Transaction {
 		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
 		pkAccount.setConfirmedBalance(Transaction.FEE_KEY, pkAccount.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
 						
-		// UNDO ALIVE PERSON for DURATION
-		db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
-
 		//UPDATE RECIPIENT
 		String address;
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)

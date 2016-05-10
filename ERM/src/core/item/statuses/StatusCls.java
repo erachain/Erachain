@@ -36,7 +36,8 @@ public abstract class StatusCls extends ItemCls {
 	}
 
 	//GETTERS/SETTERS
-	public String getItemType() { return "status"; }
+	public int getItemTypeInt() { return ItemCls.STATUS_TYPE; }
+	public String getItemTypeStr() { return "status"; }
 
 	// DB
 	public Item_Map getDBMap(DBSet db)

@@ -8,6 +8,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import controller.Controller;
+//import core.item.ItemCls;
 import core.web.NameStorageMap;
 import core.web.OrphanNameStorageHelperMap;
 import core.web.OrphanNameStorageMap;
@@ -23,7 +24,9 @@ public class DBSet implements Observer, IDB {
 	
 	private ItemAssetBalanceMap assetBalanceMap;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
+	private AssetStatusMap assetStatusMap;
 	private PersonStatusMap personStatusMap;
+	private UnionStatusMap unionStatusMap;
 	private AddressPersonMap addressPersonMap;
 	private PersonAddressMap personAddressMap;
 	private BlockMap blockMap;
@@ -116,7 +119,9 @@ public class DBSet implements Observer, IDB {
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
+			this.assetStatusMap = new AssetStatusMap(this, database);
 			this.personStatusMap = new PersonStatusMap(this, database);
+			this.unionStatusMap = new UnionStatusMap(this, database);
 			this.addressPersonMap = new AddressPersonMap(this, database);
 			this.personAddressMap = new PersonAddressMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
@@ -171,7 +176,9 @@ public class DBSet implements Observer, IDB {
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
+		this.assetStatusMap = new AssetStatusMap(parent.assetStatusMap);
 		this.personStatusMap = new PersonStatusMap(parent.personStatusMap);
+		this.unionStatusMap = new UnionStatusMap(parent.unionStatusMap);
 		this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
 		this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
@@ -221,7 +228,9 @@ public class DBSet implements Observer, IDB {
 		
 		this.assetBalanceMap.reset();
 		this.assetBalanceAccountingMap.reset();
+		this.assetStatusMap.reset();
 		this.personStatusMap.reset();
+		this.unionStatusMap.reset();
 		this.addressPersonMap.reset();
 		this.personAddressMap.reset();;
 		this.heightMap.reset();
@@ -283,10 +292,29 @@ public class DBSet implements Observer, IDB {
 		return this.addressPersonMap;
 	}
 
-	public PersonStatusMap getPersonStatusMap() 
+	public AssetStatusMap getAssetStatusMap()
+	{
+		return this.assetStatusMap;
+	}
+	public PersonStatusMap getPersonStatusMap()
 	{
 		return this.personStatusMap;
 	}
+	public UnionStatusMap getUnionStatusMap()
+	{
+		return this.unionStatusMap;
+	}
+	/*
+	public ItemsStatusesMap getItemsStatusesMap(ItemCls item)
+	{
+		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
+			return this.personStatusMap;
+		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
+			return this.assetStatusMap;
+		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
+			return this.unionStatusMap;
+	}
+	*/
 
 	public BlockMap getBlockMap() 
 	{

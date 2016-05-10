@@ -96,7 +96,8 @@ public abstract class PersonCls extends ItemCls {
 
 	//GETTERS/SETTERS
 	
-	public String getItemType() { return "person"; }
+	public int getItemTypeInt() { return ItemCls.PERSON_TYPE; }
+	public String getItemTypeStr() { return "person"; }
 
 	public long getBirthday() {
 		return this.birthday;

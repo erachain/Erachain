@@ -26,7 +26,8 @@ public abstract class ImprintCls extends ItemCls {
 
 	//GETTERS/SETTERS
 		
-	public String getItemType() { return "imprint"; }
+	public int getItemTypeInt() { return ItemCls.IMPRINT_TYPE; }
+	public String getItemTypeStr() { return "imprint"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

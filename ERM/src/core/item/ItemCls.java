@@ -67,7 +67,8 @@ public abstract class ItemCls {
 
 	//GETTERS/SETTERS
 
-	public abstract String getItemType();
+	public abstract int getItemTypeInt();
+	public abstract String getItemTypeStr();
 	public abstract String getItemSubType();
 
 	public abstract Item_Map getDBMap(DBSet db);
@@ -212,7 +213,7 @@ public abstract class ItemCls {
 		JSONObject itemJSON = new JSONObject();
 
 		// ADD DATA
-		itemJSON.put("item_type", this.getItemType());
+		itemJSON.put("item_type", this.getItemTypeStr());
 		itemJSON.put("item_type_sub", this.getItemSubType());
 		itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
 		itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));

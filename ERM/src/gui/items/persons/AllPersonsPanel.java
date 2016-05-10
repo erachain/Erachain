@@ -198,9 +198,8 @@ public class AllPersonsPanel extends JPanel {
 
 						if (person.isConfirmed()){
 							date_birthday=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-							message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
-							+ "<p> <b> " + Lang.getInstance().translate("Name")+": " + person.getName().toString() + "</p>" 
-					        + "<p>" + Lang.getInstance().translate("Birthday")+": " + date_birthday +"</p>";
+							message ="<html><div>#" + "<b>" + person.getKey() + " : " + date_birthday + "</b>"
+							+ "<br>" + person.getName().toString() + "</div>";
 
 							message += "<h2>"+ "Statuses" +"</h2>";
 							// GETT PERSON STATUS for ALIVE
@@ -208,24 +207,24 @@ public class AllPersonsPanel extends JPanel {
 					
 							if (t3Alive != null){
 								if (t3Alive.a == 0) dateAlive = "active";
-								else dateAlive = formatDate.format( new Date(Long.valueOf(t3Alive.a.toString())));
+								else dateAlive = formatDate.format( new Date(t3Alive.a * (long)86400000));
 							} else
 							{
 								dateAlive = Lang.getInstance().translate("unknown");
 							}
-							message += "<p><b>" + Lang.getInstance().translate("ALIVE")+": " + dateAlive +"</b></p>";
+							message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
 
 							// GETT PERSON STATUS for DEAD
 							Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
 					
 							if (t3Dead != null){
 								if (t3Dead.a == 0) dateAlive = "yes";
-								else dateAlive = formatDate.format( new Date(Long.valueOf(t3Dead.a.toString())));
+								else dateAlive = formatDate.format( new Date(t3Dead.a * (long)86400000));
 							} else
 							{
 								dateAlive = Lang.getInstance().translate("unknown");
 							}
-							message += "<p><b>" + Lang.getInstance().translate("DEAD")+": " + dateAlive +"</b></p>";
+							message += "<div>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
 
 							// GET CERTIFIED ACCOUNTS
 							message += "<h2>"+ "Accounts" +"</h2>";
@@ -237,9 +236,10 @@ public class AllPersonsPanel extends JPanel {
 								{
 									Tuple3<Integer, Integer, byte[]> active_date = e.getValue().peek();
 									if (active_date.a == 0) active_date_str = "active";
-									else active_date_str = formatDate.format( new Date(Long.valueOf(active_date.a.toString())));
+									else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
 									
-									message += "<p>"  +  active_date_str +": <input type='text' size='40' value='"+ e.getKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+									message += "<div><input type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
+											+ " -> <b>" + active_date_str +"</b></div>";
 								}
 							}
 							else{
@@ -247,7 +247,7 @@ public class AllPersonsPanel extends JPanel {
 							}
 						}else{
 							
-							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
+							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	
 						}
 						message = message + "</html>";
 						

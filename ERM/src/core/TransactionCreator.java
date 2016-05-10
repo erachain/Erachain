@@ -42,7 +42,7 @@ import core.transaction.IssueStatusRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
-import core.transaction.R_SertifyPerson;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -492,7 +492,7 @@ public class TransactionCreator
 		
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
-		record = new R_SertifyPerson(version, creator, (byte)feePow, key,
+		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
 				end_date,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);

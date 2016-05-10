@@ -43,7 +43,8 @@ public abstract class AssetCls extends ItemCls {
 
 	//GETTERS/SETTERS
 
-	public String getItemType() { return "asset"; }
+	public int getItemTypeInt() { return ItemCls.ASSET_TYPE; }
+	public String getItemTypeStr() { return "asset"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

@@ -34,7 +34,8 @@ public abstract class NoteCls extends ItemCls {
 
 	//GETTERS/SETTERS
 		
-	public String getItemType() { return "note"; }
+	public int getItemTypeInt() { return ItemCls.NOTE_TYPE; }
+	public String getItemTypeStr() { return "note"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

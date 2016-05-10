@@ -1607,7 +1607,7 @@ public class Controller extends Observable {
 	}
 
 	// ALL ITEMS
-	public ItemCls getItemItem(int type, long key) {
+	public ItemCls getItem(int type, long key) {
 		
 		switch(type)
 			{
@@ -1621,7 +1621,13 @@ public class Controller extends Observable {
 				return DBSet.getInstance().getItemNoteMap().get(key);
 			}
 			case ItemCls.PERSON_TYPE: {
-				return DBSet.getInstance().getItemPersonMap().get(key);	
+				return DBSet.getInstance().getItemPersonMap().get(key);
+			}
+			case ItemCls.STATUS_TYPE: {
+				return DBSet.getInstance().getItemStatusMap().get(key);	
+			}
+			case ItemCls.UNION_TYPE: {
+				return DBSet.getInstance().getItemUnionMap().get(key);
 			}
 		}
 		return null;
