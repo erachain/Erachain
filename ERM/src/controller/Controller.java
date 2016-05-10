@@ -60,6 +60,7 @@ import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
+import core.item.statuses.StatusCls;
 import core.item.persons.PersonCls;
 import core.naming.Name;
 import core.naming.NameSale;
@@ -595,8 +596,14 @@ public class Controller extends Observable {
 		DBSet.getInstance().getItemNoteMap().addObserver(o);
 
 		// ADD OBSERVER TO PERSONS
-		DBSet.getInstance().getPersonMap().addObserver(o);
+		DBSet.getInstance().getItemPersonMap().addObserver(o);
 
+		// ADD OBSERVER TO STATUSES
+		DBSet.getInstance().getItemStatusMap().addObserver(o);
+
+		// ADD OBSERVER TO UNIONS
+		DBSet.getInstance().getItemUnionMap().addObserver(o);
+		
 		// ADD OBSERVER TO ORDERS
 		DBSet.getInstance().getOrderMap().addObserver(o);
 
@@ -1414,7 +1421,7 @@ public class Controller extends Observable {
 			case ItemCls.NOTE_TYPE:
 				return DBSet.getInstance().getItemNoteMap();
 			case ItemCls.PERSON_TYPE:
-				return DBSet.getInstance().getPersonMap();
+				return DBSet.getInstance().getItemPersonMap();
 		}
 		return null;
 	}
@@ -1580,22 +1587,27 @@ public class Controller extends Observable {
 	}
 
 	// IMPRINTS
-	public ImprintCls getImprint(long key) {
+	public ImprintCls getItemImprint(long key) {
 		return (ImprintCls)DBSet.getInstance().getItemImprintMap().get(key);
 	}
 
 	// NOTES
-	public NoteCls getNote(long key) {
+	public NoteCls getItemNote(long key) {
 		return (NoteCls)DBSet.getInstance().getItemNoteMap().get(key);
 	}
 
 	// PERSONS
-	public PersonCls getPerson(long key) {
-		return (PersonCls)DBSet.getInstance().getPersonMap().get(key);
+	public PersonCls getItemPerson(long key) {
+		return (PersonCls)DBSet.getInstance().getItemPersonMap().get(key);
+	}
+
+	// STATUSES
+	public StatusCls getItemStatus(long key) {
+		return (StatusCls)DBSet.getInstance().getItemStatusMap().get(key);
 	}
 
 	// ALL ITEMS
-	public ItemCls getItem(int type, long key) {
+	public ItemCls getItemItem(int type, long key) {
 		
 		switch(type)
 			{
@@ -1609,7 +1621,7 @@ public class Controller extends Observable {
 				return DBSet.getInstance().getItemNoteMap().get(key);
 			}
 			case ItemCls.PERSON_TYPE: {
-				return DBSet.getInstance().getPersonMap().get(key);	
+				return DBSet.getInstance().getItemPersonMap().get(key);	
 			}
 		}
 		return null;
@@ -1787,6 +1799,15 @@ public class Controller extends Observable {
 			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday,
 					gender, race, birthLatitude, birthLongitude,
 					skinColor, eyeColor, hairСolor, height, description);
+		}
+	}
+
+	public Pair<Transaction, Integer> issueStatus(PrivateKeyAccount creator,
+			String name, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueStatusTransaction(creator,
+					name, description, feePow);
 		}
 	}
 

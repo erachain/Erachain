@@ -21,6 +21,8 @@ import core.item.notes.Note;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonHuman;
 import core.item.persons.PersonCls;
+import core.item.statuses.Status;
+import core.item.statuses.StatusCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
@@ -36,6 +38,7 @@ import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
+import core.transaction.IssueStatusRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
@@ -343,6 +346,24 @@ public class TransactionCreator
 										
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issuePersonRecord, false);
+	}
+
+	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+								
+		StatusCls status = new Status(creator, name, description);
+							
+		//CREATE ISSUE NOTE TRANSACTION
+		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));
+		issueStatusRecord.sign(creator, false);
+										
+		//VALIDATE AND PROCESS
+		return this.afterCreate(issueStatusRecord, false);
 	}
 
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price, int feePow)

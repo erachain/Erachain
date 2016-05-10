@@ -232,12 +232,12 @@ public class TestRecGenesisPerson2 {
 		keyPerson = person.getKey();
 
 		//CHECK PERSON EXISTS SENDER
-		assertEquals(true, db.getPersonMap().contains(keyPerson));
+		assertEquals(true, db.getItemPersonMap().contains(keyPerson));
 		assertEquals(genesisIssuePersonTransaction.getItem().getKey(), keyPerson);
 		assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 		
 		//CHECK PERSON IS CORRECT
-		assertEquals(true, Arrays.equals(db.getPersonMap().get(keyPerson).toBytes(true), person.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(true), person.toBytes(true)));
 
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
@@ -263,7 +263,7 @@ public class TestRecGenesisPerson2 {
 		///// ORPHAN ////
 		genesisIssuePersonTransaction.orphan(db, false);
 		
-		assertEquals(false, db.getPersonMap().contains(keyPerson));
+		assertEquals(false, db.getItemPersonMap().contains(keyPerson));
 
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));

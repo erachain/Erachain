@@ -48,6 +48,7 @@ import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MyPersonsPanel;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
+import gui.items.statuses.AllStatusesFrame;
 import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
 import gui.transaction.TransactionDetailsFactory;
@@ -359,7 +360,24 @@ public class Menu extends JMenuBar
         		selectOrAdd( new RecordsFrame(parent), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        recordsMenu.add(recordsMenuList);  
+        recordsMenu.add(recordsMenuList);
+        
+        ///// STATUSES
+        JMenuItem allStatusesMenu = new JMenuItem(Lang.getInstance().translate("List"));
+        allStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Statuses"));
+   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        allStatusesMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        statusesMenu.add(allStatusesMenu);  
+
+        
 	}
 	
 	
@@ -381,12 +399,11 @@ public class Menu extends JMenuBar
 		}
 			
 		if (k==-1){
-		MainFrame.desktopPane.add(item);
-		 try {
-			 item.setSelected(true);
-	        } catch (java.beans.PropertyVetoException e1) {}
-		}
-		else {
+			MainFrame.desktopPane.add(item);
+			try {
+				 item.setSelected(true);
+		        } catch (java.beans.PropertyVetoException e1) {}
+		} else {
 			try {
 				openedFrames[k].setSelected(true);
 			} catch (PropertyVetoException e1) {

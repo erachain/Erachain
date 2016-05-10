@@ -135,7 +135,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 			return INVALID_ADDRESS;
 		}
 
-		if ( !db.getPersonMap().contains(this.key) )
+		if ( !db.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}

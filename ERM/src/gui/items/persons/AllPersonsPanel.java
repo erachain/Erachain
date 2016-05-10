@@ -60,7 +60,7 @@ import database.ItemPersonMap;
 
 
 @SuppressWarnings("serial")
-public class AllPersonsPanel extends JPanel {//JInternalFrame {
+public class AllPersonsPanel extends JPanel {
 	
 	private TableModelPersons tableModelPersons;
 	private JButton ConfirmButton;
@@ -68,25 +68,10 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 
 	public AllPersonsPanel() {
 		
-//		super(Lang.getInstance().translate("All Persons"));
 		GridBagConstraints gridBagConstraints;
-		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		
-		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
-		this.setLocation(50, 20);
-	//	this.setIconImages(icons);
-		
-		
+				
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
-		
 			
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
@@ -316,18 +301,10 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
 					PersonCls person = tableModelPersons.getPerson(row);
 		//			new PersonFrame(person);
 					
-					
-					
 				}
 			}
 		});
-	
-
 		
-		
-		
-		
-	
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -359,14 +336,6 @@ public class AllPersonsPanel extends JPanel {//JInternalFrame {
         this.add(PersJSpline, gridBagConstraints);
 
         
-//		setPreferredSize(new Dimension(1000, 600));
-		//PACK
-//		this.pack();
-		//this.setSize(500, this.getHeight());
-//		this.setResizable(true);
-	//	this.setLocationRelativeTo(null);
-		this.setVisible(true);
-		
 	}
 	
 	

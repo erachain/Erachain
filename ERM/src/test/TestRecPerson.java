@@ -344,10 +344,10 @@ public class TestRecPerson {
 		//CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssuePersonMap().get(issuePersonTransaction);
 		assertEquals(true, key >= 0);
-		assertEquals(true, db.getPersonMap().contains(key));
+		assertEquals(true, db.getItemPersonMap().contains(key));
 		
 		//CHECK PERSON IS CORRECT
-		assertEquals(true, Arrays.equals(db.getPersonMap().get(key).toBytes(true), person.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(key).toBytes(true), person.toBytes(true)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issuePersonTransaction.getSignature(), certifier.getLastReference(db)));
@@ -360,7 +360,7 @@ public class TestRecPerson {
 		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getConfirmedBalance(FEE_KEY, db));
 		
 		//CHECK PERSON EXISTS ISSUER
-		assertEquals(false, db.getPersonMap().contains(personKey));
+		assertEquals(false, db.getItemPersonMap().contains(personKey));
 						
 		//CHECK REFERENCE ISSUER
 		assertEquals(true, Arrays.equals(issuePersonTransaction.getReference(), certifier.getLastReference(db)));

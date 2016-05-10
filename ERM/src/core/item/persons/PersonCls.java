@@ -129,7 +129,7 @@ public abstract class PersonCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{
-		return db.getPersonMap();
+		return db.getItemPersonMap();
 	}
 	public Issue_ItemMap getDBIssueMap(DBSet db)
 	{

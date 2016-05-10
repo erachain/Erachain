@@ -32,6 +32,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Issue Status";
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
 
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference) 
 	{
@@ -80,7 +81,10 @@ public class IssueStatusRecord extends Issue_ItemRecord
 
 		if ( !this.creator.isPerson(db) )
 		{
-			return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+			{
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			}
 		}
 
 		return Transaction.VALIDATE_OK;
@@ -147,9 +151,6 @@ public class IssueStatusRecord extends Issue_ItemRecord
 			return new IssueStatusRecord(typeBytes, creator, status, signatureBytes);
 		}
 	}	
-	
-	//VALIDATE
-		
 	
 	//PROCESS/ORPHAN
 

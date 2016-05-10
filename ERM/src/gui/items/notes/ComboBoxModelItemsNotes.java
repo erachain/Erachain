@@ -64,7 +64,7 @@ public class ComboBoxModelItemsNotes extends DefaultComboBoxModel<NoteCls> imple
 			for(Long key: keys)
 			{				
 				//GET NOTE
-				NoteCls note = Controller.getInstance().getNote(key);
+				NoteCls note = Controller.getInstance().getItemNote(key);
 				notes.add(note);
 				
 				//ADD

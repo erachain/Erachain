@@ -40,7 +40,7 @@ public class NotesFavorites implements Observer{
 		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY));		
 		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
-			notes.add(Controller.getInstance().getNote(key));
+			notes.add(Controller.getInstance().getItemNote(key));
 		}
 		return notes;
 	}

@@ -69,7 +69,7 @@ public class ComboBoxModelItems extends DefaultComboBoxModel<ItemCls> implements
 			for(Long key: keys)
 			{				
 				//GET ITEM
-				ItemCls item = Controller.getInstance().getItem(itemType, key);
+				ItemCls item = Controller.getInstance().getItemItem(itemType, key);
 				items.add(item);
 				
 				//ADD

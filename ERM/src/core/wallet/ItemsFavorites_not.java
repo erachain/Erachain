@@ -46,7 +46,7 @@ public class ItemsFavorites_not implements Observer{
 	{
 		List<ItemCls> assets = new ArrayList<ItemCls>();
 		for (Long key : this.favorites) {
-			assets.add(Controller.getInstance().getItem(this.type, key));
+			assets.add(Controller.getInstance().getItemItem(this.type, key));
 		}
 		return assets;
 	}

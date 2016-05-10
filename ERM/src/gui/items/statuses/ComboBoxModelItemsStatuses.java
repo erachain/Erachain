@@ -1,4 +1,4 @@
-package gui.items.imprints;
+package gui.items.statuses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,13 @@ import javax.swing.DefaultComboBoxModel;
 
 import utils.ObserverMessage;
 import controller.Controller;
-import core.item.imprints.ImprintCls;
+import core.item.statuses.StatusCls;
 
 @SuppressWarnings("serial")
-public class ComboBoxModelItemsImprints_NONE extends DefaultComboBoxModel<ImprintCls> implements Observer {
+public class ComboBoxModelItemsStatuses extends DefaultComboBoxModel<StatusCls> implements Observer {
 	Lock lock = new ReentrantLock();
 	
-	public ComboBoxModelItemsImprints_NONE()
+	public ComboBoxModelItemsStatuses()
 	{
 		Controller.getInstance().addWalletListener(this);
 	}
@@ -50,35 +50,35 @@ public class ComboBoxModelItemsImprints_NONE extends DefaultComboBoxModel<Imprin
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF LIST UPDATED
-		if(false) //message.getType() == ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE)
+		if(message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE)
 		{
 			//GET SELECTED ITEM
-			ImprintCls selected = (ImprintCls) this.getSelectedItem();
+			StatusCls selected = (StatusCls) this.getSelectedItem();
 						
 			//EMPTY LIST
 			this.removeAllElements();
 				
 			//INSERT ALL ACCOUNTS
 			Set<Long> keys = (Set<Long>) message.getValue();
-			List<ImprintCls> imprints = new ArrayList<ImprintCls>();
+			List<StatusCls> statuses = new ArrayList<StatusCls>();
 			for(Long key: keys)
 			{				
-				//GET IMPRINT
-				ImprintCls imprint = Controller.getInstance().getItemImprint(key);
-				imprints.add(imprint);
+				//GET STATUS
+				StatusCls status = Controller.getInstance().getItemStatus(key);
+				statuses.add(status);
 				
 				//ADD
-				this.addElement(imprint);
+				this.addElement(status);
 			}
 				
 			//RESET SELECTED ITEM
 			if(this.getIndexOf(selected) != -1)
 			{
-				for(ImprintCls imprint: imprints)
+				for(StatusCls status: statuses)
 				{
-					if(imprint.getKey() == selected.getKey())
+					if(status.getKey() == selected.getKey())
 					{
-						this.setSelectedItem(imprint);
+						this.setSelectedItem(status);
 						return;
 					}
 				}

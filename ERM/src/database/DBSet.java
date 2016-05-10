@@ -438,7 +438,7 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.issueNoteMap;
 	}
-	public ItemPersonMap getPersonMap()
+	public ItemPersonMap getItemPersonMap()
 	{
 		return this.itemPersonMap;
 	}

@@ -440,7 +440,7 @@ public class R_SertifyPerson extends Transaction {
 		}
 
 		
-		if ( !db.getPersonMap().contains(this.key) )
+		if ( !db.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 			//return Transaction.ITEM_DOES_NOT_EXIST;
