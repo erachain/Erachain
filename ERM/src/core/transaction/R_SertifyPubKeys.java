@@ -39,6 +39,7 @@ import ntp.NTP;
 import database.DBSet;
 import utils.Converter;
 
+// if person has not ALIVE status - add it
 // this.end_date = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
 // typeBytes[1] - version =0 - not need sign by person;
 // 		 =1 - need sign by person
@@ -474,6 +475,12 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
 		
+		if (db.getPersonStatusMap().getItem(key) == null) {
+			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
+			db.getPersonStatusMap().addItem(key, new Tuple3<Integer, Integer, byte[]>(0,
+					Controller.getInstance().getHeight(), this.signature));
+		}
+
 		// SET PERSON ADDRESS
 		String address;
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)

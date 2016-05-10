@@ -362,6 +362,7 @@ public class Account {
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		days = personDuration.a;
 		if (days < 0 ) return false;
+		if (days == 0 ) return true; // permanent active
 		if (days * (long)86400 < current_time ) return false;
 		
 		return true;

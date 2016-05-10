@@ -624,7 +624,7 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
-		assertEquals( to_date, (int)dbPS.getItem(personKey).a);
+		assertEquals( 0, (int)dbPS.getItem(personKey).a);
 		assertEquals( -1, (int)dbPS.getItem(personKey).b);
 		assertEquals( true, Arrays.equals(dbPS.getItem(personKey).c, r_SertifyPubKeys.getSignature()));
 		// ADDRESSES
@@ -683,8 +683,8 @@ public class TestRecPerson {
 		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
-		// PERSON STATUS ALIVE
-		assertEquals( null, dbPS.getItem(personKey));
+		// PERSON STATUS ALIVE - must not modified!
+		assertEquals( (int)0, (int)dbPS.getItem(personKey).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
