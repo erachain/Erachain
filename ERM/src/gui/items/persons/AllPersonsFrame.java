@@ -65,8 +65,8 @@ public class AllPersonsFrame extends JInternalFrame{
  
 		MyPersonsPanel my_person_panel = new MyPersonsPanel();
 	 
-        main_jTabbedPane.addTab(Lang.getInstance().translate("Search Person"), null, allPersonsFrame, "");
         main_jTabbedPane.addTab(Lang.getInstance().translate("My Persons"), null, my_person_panel, "");
+        main_jTabbedPane.addTab(Lang.getInstance().translate("Search Person"), null, allPersonsFrame, "");
         
         getContentPane().add(main_jTabbedPane, BorderLayout.CENTER);
         main_jTabbedPane.getAccessibleContext().setAccessibleName("");
@@ -84,6 +84,7 @@ public class AllPersonsFrame extends JInternalFrame{
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         this.setResizable(true);
 //        splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+        //my_person_panel.requestFocusInWindow();
         this.setVisible(true);
 	
 	}

@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -44,6 +45,7 @@ import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.MainFrame;
+import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
@@ -51,11 +53,15 @@ import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
 
-public class PersonConfirm extends JDialog { // InternalFrame  {
+//public class PersonConfirm extends JDialog { // InternalFrame  {
+public class PersonConfirm extends JFrame  {
+
+	private JComboBox<Account> accountLBox;
 
 	public PersonConfirm(JComponent  apers, PersonCls person) {
 		super();
 	
+
 		final JTextField pubKey1Txt = new JTextField();
 		final JTextField pubKey2Txt = new JTextField();
 		final JTextField pubKey3Txt = new JTextField();
@@ -64,15 +70,16 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		final JLabel pubKey3Details = new JLabel();
 
 		final JTextField toDate = new JTextField();
+		final JTextField feePow = new JTextField();
 		
 		
 	//	this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		//	MainFrame mainFram = new MainFrame();
 	
 		setSize(400,300);
-        setLocationRelativeTo(apers);
-        setModalityType(ModalityType.TOOLKIT_MODAL);
-        setDefaultCloseOperation(HIDE_ON_CLOSE);    	
+        //setLocationRelativeTo(apers);
+        //setModalityType(ModalityType.TOOLKIT_MODAL);
+        //setDefaultCloseOperation(HIDE_ON_CLOSE);    	
 		
 	//		this.setMaximizable(true);
 	//		this.setTitle(Lang.getInstance().translate("Person confirm"));
@@ -125,12 +132,15 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    detail.weightx = -1;
 	    detail.weighty = -1;
 
-	    // Create and add a bunch of buttons, specifying different grid
-	    // position, and size for each.
-	    // Give the first button a resize weight of 1.0 and all others
-	    // a weight of 0.0. The first button will get all extra space.
+		//LABEL FROM
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
+		this.add(fromLabel, label);
+		
+		//COMBOBOX FROM
+		this.accountLBox = new JComboBox<Account>(new AccountsComboBoxModel());
+        this.add(this.accountLBox, input);
+
 	    input.gridx = 0;
-	    //c.weightx = c.weighty = 0;
 	    this.add(new JLabel(Lang.getInstance().translate("Public Keys of") + " " + person.getName() +":"), input);
 	    
 	    input.gridy = ++gridy;
@@ -241,6 +251,21 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    input.gridheight = 1;
 	    this.add(toDate, input);
 
+	    // FEE POWER
+        input.gridx = 0;
+	    input.gridy = ++gridy;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    this.add(new JLabel(Lang.getInstance().translate("Fee Power") +":"), input);
+
+	    input.gridx = 2;
+	    input.gridy = gridy;
+	    input.gridwidth = 3;
+	    input.gridheight = 1;
+      	feePow.setText("0");
+	    this.add(feePow, input);
+
+	    // BUTTONS
 	    input.gridx = 2;
 	    input.gridy = ++gridy;
 	    input.gridwidth = 1;
@@ -265,7 +290,7 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(person, Button_Confirm, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate);
+		    	onGoClick(person, Button_Confirm, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate, feePow);
 		    }
 		});
 	    
@@ -289,14 +314,13 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 	    this.add(new JButton("Button #9"), c);
     
 	    */
-	    setPreferredSize(new Dimension(700, 700));
+	    setPreferredSize(new Dimension(500, 600));
 		//PACK
-//		this.pack();
-		//this.setSize(500, this.getHeight());
-//		this.setResizable(true);
-		this.setLocationRelativeTo(null);
-	//	MainFrame.this.add(comp, constraints);//.setFocusable(false);
-		this.setVisible(true);
+		this.pack();
+        this.setResizable(false);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+	    //MainFrame.this.add(comp, constraints).setFocusable(false);
 	}
 	
 	private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails)
@@ -316,8 +340,14 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		}
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		
-		if (!PublicKeyAccount.isValidPublicKey(toValue)) {
+		boolean isValid = false;
+		try {
+			isValid = PublicKeyAccount.isValidPublicKey(toValue);
+		}
+		catch(Exception e) {
+
+		}
+		if (!isValid) {
 			// SHOW error message
 			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_INVALID_ADDRESS));
 		} else {
@@ -353,32 +383,63 @@ public class PersonConfirm extends JDialog { // InternalFrame  {
 		
 	}
 
-	public void onGoClick(PersonCls person, JButton Button_Confirm,
-			JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDate)
+	public void onGoClick(
+			PersonCls person, JButton Button_Confirm,
+			JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDateTxt, JTextField feePowTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
-    	// программа обработки при нажатии confirm
-    	String address = pubKey1Txt.getText();
-    	int toDateVol = Integer.parseInt(toDate.getText());
+		Account creator = (Account) this.accountLBox.getSelectedItem();
+    	//String address = pubKey1Txt.getText();
+    	int toDate = 0;
     	int feePow = 0;
+    	int parse = 0;
+    	String toDateStr = toDateTxt.getText();
+		try {
+
+			//READ FEE POW
+			feePow = Integer.parseInt(feePowTxt.getText());
+			
+			//READ to DAY
+			parse++;
+	    	if (toDateStr.length() > 0)
+    			toDate = Integer.parseInt(toDateStr);
+    		}
+		catch(Exception e)
+		{
+			if(parse == 0)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+		}
     	
 	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
-	    PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
-    	if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
-    	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
-    	if (userAccount2.isValid()) sertifiedPublicKeys.add(userAccount2);
-    	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
-    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
+	    if (pubKey1Txt.getText().length() == 30) {
+	    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
+	    	if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
+	    }
+	    if (pubKey2Txt.getText().length() > 30) {
+	    	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
+	    	if (userAccount2.isValid()) sertifiedPublicKeys.add(userAccount2);
+	    }
+	    if (pubKey3Txt.getText().length() > 30) {
+	    	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
+	    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
+	    }
     	
 		//Account authenticator =  new Account(address);
-		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(address);
+		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
+
 		int version = 0; // without user signs
 		
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
 				feePow, person.getKey(), 
-				sertifiedPublicKeys, toDateVol);
+				sertifiedPublicKeys, toDate);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
