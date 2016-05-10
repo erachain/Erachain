@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -39,8 +40,11 @@ import core.account.PrivateKeyAccount;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class IssueStatusFrame extends JInternalFrame
+public class IssueStatusPanel extends JPanel
 {
+	
+	private JInternalFrame parent;
+
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtScale;
 	private JTextField txtFeePow;
@@ -50,28 +54,12 @@ public class IssueStatusFrame extends JInternalFrame
 	private JCheckBox chkDivisible;
 	private JButton issueButton;
 
-	public IssueStatusFrame()
+	public IssueStatusPanel(JInternalFrame parent)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Status"));
 		
-		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		/*
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		*/
-		
+		this.parent = parent;
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
-		
-		//PADDING
-		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 		
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
@@ -168,11 +156,6 @@ public class IssueStatusFrame extends JInternalFrame
 		});
     	this.add(this.issueButton, buttonGBC);
         
-        //PACK
-		this.pack();
-        this.setResizable(false);
-        //this.setLocationRelativeTo(null);
-        this.setVisible(true);
 	}
 	
 	public void onIssueClick()
@@ -242,7 +225,7 @@ public class IssueStatusFrame extends JInternalFrame
 			case Transaction.VALIDATE_OK:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				this.dispose();
+				parent.dispose();
 				break;	
 				
 			case Transaction.NOT_ENOUGH_FEE:

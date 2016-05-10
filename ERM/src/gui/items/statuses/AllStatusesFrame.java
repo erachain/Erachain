@@ -38,7 +38,9 @@ public class AllStatusesFrame extends JInternalFrame{
 
 	public AllStatusesFrame (JFrame parent)
 	{
+	this.setName("all statuses");
 	
+		/*
 		// tool bar
 		JToolBar tb2 = new JToolBar(Lang.getInstance().translate("Toolbar statuses"));
 	
@@ -48,26 +50,31 @@ public class AllStatusesFrame extends JInternalFrame{
 				{
 				    public void actionPerformed(ActionEvent e)
 				    {
-				    	 Menu.selectOrAdd( new IssueStatusFrame(), MainFrame.desktopPane.getAllFrames());
+				    	 Menu.selectOrAdd( new IssueStatusPanel(), MainFrame.desktopPane.getAllFrames());
 				    }
 	
 					
 				});	
 				
 		getContentPane().add(tb2, BorderLayout.NORTH);
-		
-	    JTabbedPane main_jTabbedPane = new JTabbedPane();
+		*/
 	
-		
-		
+	
 		AllStatusesPanel allStatusesFrame = new AllStatusesPanel();
+        getContentPane().add(allStatusesFrame, BorderLayout.CENTER);
+		
+	    /*
+		JTabbedPane main_jTabbedPane = new JTabbedPane();
+	
 		 
         main_jTabbedPane.addTab(Lang.getInstance().translate("Search Status"), null, allStatusesFrame, "");
         
         getContentPane().add(main_jTabbedPane, BorderLayout.CENTER);
         main_jTabbedPane.getAccessibleContext().setAccessibleName("");
         main_jTabbedPane.getAccessibleContext().setAccessibleDescription("");
-       //SHOW FRAME
+        */
+		
+		//SHOW FRAME
         this.pack();
         this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Statuses"));

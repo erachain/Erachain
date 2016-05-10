@@ -19,7 +19,7 @@ public class StatusFrame extends JInternalFrame
 	
 	public StatusFrame(StatusCls status)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Status Details"));
 		
 		this.status = status;
 		

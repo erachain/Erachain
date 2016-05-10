@@ -29,7 +29,7 @@ import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
 import gui.items.statuses.AllStatusesFrame;
 import gui.items.statuses.StatusFrame;
-import gui.items.statuses.IssueStatusFrame;
+import gui.items.statuses.IssueStatusPanel;
 //import gui.items.statuses.MyOrdersFrame;
 //import gui.items.statuses.PayDividendFrame;
 import gui.models.WalletItemStatusesTableModel;
@@ -196,7 +196,7 @@ public class StatusesPanel extends JPanel
 	
 	public void onIssueClick()
 	{
-		new IssueStatusFrame();
+		//new IssueStatusPanel();
 	}
 	
 	public void onAllClick()

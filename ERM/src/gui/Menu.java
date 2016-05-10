@@ -49,6 +49,8 @@ import gui.items.persons.MyPersonsPanel;
 import gui.items.persons.PersonsPanel;
 import gui.items.persons.SearchPersons;
 import gui.items.statuses.AllStatusesFrame;
+import gui.items.statuses.AllStatusesPanel;
+import gui.items.statuses.IssueStatusPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
 import gui.transaction.TransactionDetailsFactory;
@@ -376,6 +378,28 @@ public class Menu extends JMenuBar
         	}
         });
         statusesMenu.add(allStatusesMenu);  
+        statusesMenu.addSeparator();
+        
+        JMenuItem issueStatusesMenu = new JMenuItem(Lang.getInstance().translate("New"));
+        issueStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("New Status"));
+   //     issueStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueStatusesMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		JInternalFrame frame = new JInternalFrame(Lang.getInstance().translate("Issue new Status"),true, true, true, true);
+        		//frame.getContentPane().add(new AllStatusesPanel());
+        		frame.getContentPane().add(new IssueStatusPanel(frame));
+        		frame.setName("new status");
+        		frame.pack();
+        		frame.setLocation(50, 60);
+        		frame.setVisible(true);
+        		selectOrAdd( frame, MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        statusesMenu.add(issueStatusesMenu);  
 
         
 	}
@@ -387,12 +411,16 @@ public class Menu extends JMenuBar
 	public static void selectOrAdd(JInternalFrame item, JInternalFrame[] openedFrames ){
 		    		
 		//проверка если уже открыто такое окно то передаем только фокус на него
+		String itemName = item.getName();
+		if (itemName == null) itemName  = item.getClass().getName();
+		
 		int k= -1;
 		if (openedFrames != null) 
 		{
 			for (int i=0 ; i < openedFrames.length; i=i+1) {
-				//String s = a[i].getClass().getName();
-				if (openedFrames[i].getClass().getName() == item.getClass().getName()){
+				String name = openedFrames[i].getName();
+				if (name == null) name  = openedFrames[i].getClass().getName();
+				if (name == itemName){
 					k=i;
 				}
 			};
