@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
+import javax.swing.table.TableColumn;
 
 import lang.Lang;
 import javax.swing.JLabel;
@@ -22,6 +23,7 @@ import javax.swing.JScrollPane;
 
 import gui.MainFrame;
 import gui.Menu;
+import gui.items.notes.TableModelNotes;
 import gui.items.persons.PersonFrame;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
@@ -61,7 +63,6 @@ public class AllPersonsFrame extends JInternalFrame{
 		
 		
 		AllPersonsPanel allPersonsFrame = new AllPersonsPanel();
-	
  
 		MyPersonsPanel my_person_panel = new MyPersonsPanel();
 	 

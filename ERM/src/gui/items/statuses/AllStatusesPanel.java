@@ -34,6 +34,7 @@ import javax.swing.table.TableColumn;
 
 import core.item.statuses.StatusCls;
 import gui.items.AllItemsFrame;
+import gui.items.notes.TableModelNotes;
 
 @SuppressWarnings("serial")
 public class AllStatusesPanel extends JPanel {
@@ -92,6 +93,10 @@ public class AllStatusesPanel extends JPanel {
 		divisibleColumn.setCellRenderer(statusesTable.getDefaultRenderer(Boolean.class));
 		*/
 		
+		//CHECKBOX FOR FAVORITE
+		TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelStatuses.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(statusesTable.getDefaultRenderer(Boolean.class));
+
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		CoreRowSorter sorter = new CoreRowSorter(this.tableModelStatuses, indexes);

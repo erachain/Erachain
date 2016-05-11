@@ -90,11 +90,11 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 			
 		case COLUMN_DIVISIBLE:
 			
-			return asset.isFavorite();
+			return asset.isDivisible();
 			
 		case COLUMN_FAVORITE:
 			
-			return asset.isDivisible();
+			return asset.isFavorite();
 
 		}
 		

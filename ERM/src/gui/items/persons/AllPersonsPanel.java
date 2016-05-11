@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import gui.CoreRowSorter;
+import gui.items.notes.TableModelNotes;
 import gui.models.Renderer_Right;
 import lang.Lang;
 
@@ -48,6 +49,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
@@ -94,6 +96,10 @@ public class AllPersonsPanel extends JPanel {
 		divisibleColumn.setCellRenderer(personsTable.getDefaultRenderer(Boolean.class));
 		*/
 		
+		//CHECKBOX FOR FAVORITE
+		TableColumn favoriteColumn = personsTable.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(personsTable.getDefaultRenderer(Boolean.class));
+
 		//BLOCKS SORTER
 	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 	//	indexes.put(TableModelPersons.COLUMN_KEY, ItemPersonMap.DEFAULT_INDEX);// указываем, что первая колонка состоит из чисел

@@ -18,10 +18,11 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_CONFIRMED = 3;
+	public static final int COLUMN_FAVORITE = 4;
 	
 	private SortableList<Tuple2<String, String>, NoteCls> notes;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
 	
 	public WalletItemNotesTableModel()
 	{
@@ -83,6 +84,10 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 		case COLUMN_CONFIRMED:
 			
 			return note.isConfirmed();
+			
+		case COLUMN_FAVORITE:
+			
+			return note.isFavorite();
 			
 		}
 		

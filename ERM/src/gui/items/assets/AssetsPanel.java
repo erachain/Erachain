@@ -72,7 +72,7 @@ public class AssetsPanel extends JPanel
 		TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);
 		confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 		
-		//CHECKBOX FOR CONFIRMED
+		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);
 		favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 

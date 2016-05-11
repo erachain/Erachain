@@ -33,6 +33,10 @@ import javax.swing.table.TableColumn;
 
 import core.item.notes.NoteCls;
 import gui.items.AllItemsFrame;
+//import gui.items.assets.TableModelItemAssets;
+import gui.items.notes.TableModelNotes;
+
+
 
 @SuppressWarnings("serial")
 public class AllNotesFrame extends JFrame {
@@ -101,6 +105,10 @@ public class AllNotesFrame extends JFrame {
 		TableColumn divisibleColumn = notesTable.getColumnModel().getColumn(NotesTableModel.COLUMN_DIVISIBLE);
 		divisibleColumn.setCellRenderer(notesTable.getDefaultRenderer(Boolean.class));
 		*/
+		
+		//CHECKBOX FOR FAVORITE
+		TableColumn favoriteColumn = notesTable.getColumnModel().getColumn(TableModelNotes.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(notesTable.getDefaultRenderer(Boolean.class));
 		
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

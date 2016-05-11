@@ -48,6 +48,7 @@ import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
 import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.PersonFrame;
+import gui.items.statuses.TableModelStatuses;
 import gui.items.persons.IssuePersonFrame;
 import gui.models.Renderer_Right;
 //import gui.items.persons.MyOrdersFrame;
@@ -83,9 +84,15 @@ public class MyPersonsPanel extends JPanel
 		table.setRowSorter(sorter);
 		table.getRowSorter();
 		personsModel.fireTableDataChanged();
+		
 		//CHECKBOX FOR CONFIRMED
 		TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
 		confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+		
+		//CHECKBOX FOR FAVORITE
+		TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+
 		
 		TableColumnModel columnModel = table.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));

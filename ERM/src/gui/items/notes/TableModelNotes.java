@@ -17,12 +17,11 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	//public static final int COLUMN_AMOUNT = 3;
-	//public static final int COLUMN_DIVISIBLE = 4;
+	public static final int COLUMN_FAVORITE = 3;
 
 	private SortableList<Long, NoteCls> notes;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	
 	public TableModelNotes()
 	{
@@ -82,6 +81,10 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 		case COLUMN_ADDRESS:
 			
 			return note.getCreator().getAddress();
+
+		case COLUMN_FAVORITE:
+			
+			return note.isFavorite();
 			
 		}
 		

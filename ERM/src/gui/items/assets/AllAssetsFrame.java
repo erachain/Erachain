@@ -99,7 +99,7 @@ public class AllAssetsFrame extends JFrame{
 		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);
 		divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 		
-		//CHECKBOX FOR CONFIRMED
+		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);
 		favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 

@@ -17,12 +17,11 @@ public class TableModelStatuses extends TableModelCls<Long, StatusCls> implement
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	//public static final int COLUMN_AMOUNT = 3;
-	//public static final int COLUMN_DIVISIBLE = 4;
+	public static final int COLUMN_FAVORITE = 3;
 
 	private SortableList<Long, StatusCls> statuses;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Issuer"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Issuer", "Favorite"});
 	
 	public TableModelStatuses()
 	{
@@ -83,6 +82,10 @@ public class TableModelStatuses extends TableModelCls<Long, StatusCls> implement
 			
 			return status.getCreator().getAddress();
 			
+		case COLUMN_FAVORITE:
+			
+			return status.isFavorite();
+
 		}
 		
 		return null;
