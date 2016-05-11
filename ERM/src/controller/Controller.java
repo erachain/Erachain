@@ -1565,6 +1565,9 @@ public class Controller extends Observable {
 	public AssetCls getAsset(long key) {
 		return (AssetCls) DBSet.getInstance().getItemAssetMap().get(key);
 	}
+	public PersonCls getPerson(long key) {
+		return (PersonCls) DBSet.getInstance().getItemPersonMap().get(key);
+	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
 		return this.getOrders(have, want, false);
@@ -1607,31 +1610,35 @@ public class Controller extends Observable {
 	}
 
 	// ALL ITEMS
-	public ItemCls getItem(int type, long key) {
+	public ItemCls getItem(DBSet db, int type, long key) {
 		
 		switch(type)
 			{
 			case ItemCls.ASSET_TYPE: {
-				return DBSet.getInstance().getItemAssetMap().get(key);
+				return db.getItemAssetMap().get(key);
 			}
 			case ItemCls.IMPRINT_TYPE: {
-				return DBSet.getInstance().getItemImprintMap().get(key);
+				return db.getItemImprintMap().get(key);
 			}
 			case ItemCls.NOTE_TYPE: {
-				return DBSet.getInstance().getItemNoteMap().get(key);
+				return db.getItemNoteMap().get(key);
 			}
 			case ItemCls.PERSON_TYPE: {
-				return DBSet.getInstance().getItemPersonMap().get(key);
+				return db.getItemPersonMap().get(key);
 			}
 			case ItemCls.STATUS_TYPE: {
-				return DBSet.getInstance().getItemStatusMap().get(key);	
+				return db.getItemStatusMap().get(key);	
 			}
 			case ItemCls.UNION_TYPE: {
-				return DBSet.getInstance().getItemUnionMap().get(key);
+				return db.getItemUnionMap().get(key);
 			}
 		}
 		return null;
 	}
+	public ItemCls getItem(int type, long key) {
+		return this.getItem(DBSet.getInstance(), type, key);
+	}
+		
 
 	// ATs
 

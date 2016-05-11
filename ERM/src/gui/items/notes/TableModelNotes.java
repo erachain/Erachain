@@ -80,7 +80,7 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 		
 		case COLUMN_ADDRESS:
 			
-			return note.getCreator().getAddress();
+			return note.getCreator().asPerson();
 
 		case COLUMN_FAVORITE:
 			

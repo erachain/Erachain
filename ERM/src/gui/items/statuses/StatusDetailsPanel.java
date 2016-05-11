@@ -99,12 +99,21 @@ public class StatusDetailsPanel extends JPanel {
 		JTextField owner = new JTextField(status.getCreator().getAddress());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
-								
+
+		String personStr = status.getCreator().viewPerson();
+		if (personStr.length()>0) {
+			//LABEL PERSON
+			++labelGBC.gridy;
+			++detailGBC.gridy;
+			this.add(new JLabel(personStr), detailGBC);
+
+		}
+
 		//IF STATUS CONFIRMED
 		if(this.status.getKey() >= 0)
 		{
 			//ADD ERM PAIR BUTTON
-			labelGBC.gridy++;
+			++labelGBC.gridy;
 			labelGBC.gridwidth = 2;
 			JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
 			openPairButton.setPreferredSize(new Dimension(200, 25));
@@ -122,7 +131,7 @@ public class StatusDetailsPanel extends JPanel {
 		if(this.status.getKey() >= StatusCls.INITIAL_FAVORITES)
 		{
 			//FAVORITES
-			labelGBC.gridy++;
+			++labelGBC.gridy;
 			labelGBC.gridwidth = 2;
 			this.favoritesButton = new JButton();
 			

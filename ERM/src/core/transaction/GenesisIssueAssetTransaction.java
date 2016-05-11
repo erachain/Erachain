@@ -67,5 +67,11 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 						
 		return new GenesisIssueAssetTransaction(asset);
 	}	
-	
+
+	@Override
+	public boolean isInvolved(Account account)
+	{
+		return true; 
+	}
+
 }

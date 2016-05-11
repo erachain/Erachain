@@ -75,7 +75,7 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 		
 		case COLUMN_ADDRESS:
 			
-			return poll.getCreator().getAddress();
+			return poll.getCreator().asPerson();
 			
 		case COLUMN_TOTAL_VOTES:
 			

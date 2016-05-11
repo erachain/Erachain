@@ -1412,7 +1412,7 @@ public class TransactionTests {
 			assertEquals(namePurchaseTransaction.getAmount(maker), parsedNamePurchase.getAmount(maker));	
 			
 			//CHECK OWNER
-			assertEquals(namePurchaseTransaction.getBuyer().getAddress(), parsedNamePurchase.getBuyer().getAddress());	
+			assertEquals(namePurchaseTransaction.getCreator().getAddress(), parsedNamePurchase.getCreator().getAddress());	
 			
 			//CHECK NAME
 			assertEquals(namePurchaseTransaction.getNameSale().getKey(), parsedNamePurchase.getNameSale().getKey());	

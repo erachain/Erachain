@@ -81,7 +81,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		
 		case COLUMN_ADDRESS:
 			
-			return asset.getCreator().getAddress();
+			return asset.getCreator().asPerson();
 			
 		case COLUMN_AMOUNT:
 			

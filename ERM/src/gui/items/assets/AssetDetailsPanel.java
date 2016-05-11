@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import core.account.Account;
 import core.item.assets.AssetCls;
 import lang.Lang;
 
@@ -37,6 +38,7 @@ public class AssetDetailsPanel extends JPanel {
 		//PADDING
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
+		int gridy = 0;
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(0, 5, 5, 0);
@@ -55,34 +57,34 @@ public class AssetDetailsPanel extends JPanel {
 		detailGBC.gridx = 1;		
 		
 		//LABEL KEY
-		labelGBC.gridy = 1;
+		labelGBC.gridy = ++gridy;
 		JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
 		this.add(keyLabel, labelGBC);
 				
 		//KEY
-		detailGBC.gridy = 1;
+		detailGBC.gridy = gridy;
 		JTextField txtKey = new JTextField(Long.toString(asset.getKey()));
 		txtKey.setEditable(false);
 		this.add(txtKey, detailGBC);	
 		
 		//LABEL NAME
-		labelGBC.gridy = 2;
+		labelGBC.gridy = ++gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
-		detailGBC.gridy = 2;
+		detailGBC.gridy = gridy;
 		JTextField txtName = new JTextField(asset.getName());
 		txtName.setEditable(false);
 		this.add(txtName, detailGBC);		
 		
 		//LABEL DESCRIPTION
-		labelGBC.gridy = 3;
+		labelGBC.gridy = ++gridy;
 		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 		           
 		//DESCRIPTION
-		detailGBC.gridy = 3;
+		detailGBC.gridy = gridy;
 		JTextArea txtAreaDescription = new JTextArea(asset.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(txtName.getBorder());
@@ -90,34 +92,43 @@ public class AssetDetailsPanel extends JPanel {
 		this.add(txtAreaDescription, detailGBC);	
 		
 		//LABEL OWNER
-		labelGBC.gridy = 4;
+		labelGBC.gridy = ++gridy;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(ownerLabel, labelGBC);
-				
+		
+		Account creator = asset.getCreator();
 		//OWNER
-		detailGBC.gridy = 4;
-		JTextField owner = new JTextField(asset.getCreator().getAddress());
+		detailGBC.gridy = gridy;
+		JTextField owner = new JTextField(creator.getAddress());
 		owner.setEditable(false);
-		this.add(owner, detailGBC);
+		this.add(owner, detailGBC);		
+		
+		String personStr = creator.viewPerson();
+		if (personStr.length()>0) {
+			//LABEL PERSON
+			detailGBC.gridy = ++gridy;
+			this.add(new JLabel(personStr), detailGBC);
+
+		}
 		
 		//LABEL QUANTITY
-		labelGBC.gridy = 5;
+		labelGBC.gridy = ++gridy;
 		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
 		this.add(quantityLabel, labelGBC);
 		           
 		//QUANTITY
-		detailGBC.gridy = 5;
+		detailGBC.gridy = gridy;
 		JTextField txtQuantity = new JTextField(asset.getQuantity().toString());
 		txtQuantity.setEditable(false);
 		this.add(txtQuantity, detailGBC);		
 		
 		//LABEL DIVISIBLE
-		labelGBC.gridy = 6;
+		labelGBC.gridy = ++gridy;
 		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
 		this.add(divisibleLabel, labelGBC);
 		           
 		//DIVISIBLE
-		detailGBC.gridy = 6;
+		detailGBC.gridy = gridy;
 		JCheckBox chkDivisible = new JCheckBox();
 		chkDivisible.setSelected(asset.isDivisible());
 		chkDivisible.setEnabled(false);

@@ -231,7 +231,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 							PlaySound.getInstance().playSound("receivepayment.wav", ((Transaction) message.getValue()).getSignature());
 						}
 						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + paymentTransaction.getCreator().getAddress() + "\nTo: " + account.getAddress() + "\nAmount: " + paymentTransaction.getAmount().toPlainString(), MessageType.INFO);
+						SysTray.getInstance().sendMessage("Payment received", "From: " + paymentTransaction.getCreator().asPerson() + "\nTo: " + account.asPerson() + "\nAmount: " + paymentTransaction.getAmount().toPlainString(), MessageType.INFO);
 						
 					}
 					else if(Settings.getInstance().isSoundNewTransactionEnabled())
@@ -250,7 +250,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 							PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature()) ;
 						}
 						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + messageTransaction.getCreator().getAddress() + "\nTo: " + account.getAddress()
+						SysTray.getInstance().sendMessage("Payment received", "From: " + messageTransaction.getCreator().asPerson() + "\nTo: " + account.asPerson()
 						+ "\n" + "Asset Key" + ": " + messageTransaction.getKey()
 						+ ", " + "Amount" + ": " + messageTransaction.getAmount().toPlainString(), MessageType.INFO);
 					}

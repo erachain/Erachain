@@ -1,36 +1,21 @@
 package gui.transaction;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
-import core.crypto.Base58;
-import core.transaction.GenesisCertifyPersonRecord;
-import core.item.assets.AssetCls;
+import core.transaction.GenesisIssuePersonRecord;
 import lang.Lang;
-import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class GenesisCertifyPersonRecordFrame extends RecGenesis_DetailsFrame
+public class GenesisPersonalizeDetailsFrame extends RecGenesis_DetailsFrame
 {
-	public GenesisCertifyPersonRecordFrame(GenesisCertifyPersonRecord record)
+	public GenesisPersonalizeDetailsFrame(GenesisIssuePersonRecord record)
 	{
 		super(record);
-				
+		
 		//LABEL RECIPIENT
 		++labelGBC.gridy;
 		JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
@@ -50,11 +35,11 @@ public class GenesisCertifyPersonRecordFrame extends RecGenesis_DetailsFrame
 		
 		//PERSON
 		++detailGBC.gridy;
-		JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getKey()).toString()));
+		JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getItem().getKey()).toString()));
 		asset.setEditable(false);
 		MenuPopupUtil.installContextMenu(asset);
 		this.add(asset, detailGBC);	
-				           
+		           
         //PACK
 		this.pack();
         this.setResizable(false);

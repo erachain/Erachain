@@ -83,7 +83,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().getAddress();
+			return person.getCreator().asPerson();
 						
 		case COLUMN_CONFIRMED:
 			

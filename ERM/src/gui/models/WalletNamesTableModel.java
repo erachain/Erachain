@@ -83,7 +83,7 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
 		
 		case COLUMN_ADDRESS:
 			
-			return name.getOwner().getAddress();
+			return name.getOwner().asPerson();
 			
 		case COLUMN_CONFIRMED:
 			

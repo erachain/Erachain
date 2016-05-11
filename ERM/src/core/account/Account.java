@@ -20,6 +20,7 @@ import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.naming.Name;
@@ -40,6 +41,7 @@ public class Account {
 	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	public static final long DEAD_KEY = StatusCls.DEAD_KEY;
 
 	protected String address;
 	
@@ -312,9 +314,57 @@ public class Account {
 	
 	public String toString(long key)
 	{
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		String personStr;
+		String addressStr;
+		if (personRes == null) {
+			personStr = "";
+			addressStr = this.getAddress();
+		}
+		else {
+			personStr = personRes.b.getShort();
+			addressStr = this.getAddress().substring(0, 8);
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			else if (personRes.a == 0) personStr = "[++]" + personStr;
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+		}
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
 				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
-				+ " - " + this.getAddress();
+				+ " " + addressStr + " " + personStr;
+	}
+	
+	//////////
+	public String viewPerson() {
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		if (personRes == null) {
+			return "";
+		} else {
+			String personStr = personRes.b.toString();
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			return personStr;
+		}
+		
+	}
+	
+	public String asPerson()
+	{
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		if (personRes == null) {
+			return this.getAddress();
+		}
+		else {
+			String personStr = personRes.b.getShort();
+			String addressStr = this.getAddress().substring(0, 8);
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			return addressStr + " " + personStr;
+		}
 	}
 	
 	@Override
@@ -367,6 +417,48 @@ public class Account {
 		
 		return true;
 		
+	}
+	public Tuple2<Integer, PersonCls> hasPerson(DBSet db) {
+		
+		// IF DURATION ADDRESS to PERSON IS ENDED
+		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		if (addressDuration == null) return null;
+		// TEST TIME and EXPIRE TIME
+		long current_time = NTP.getTime();
+		
+		// get person
+		Long personKey = addressDuration.a;
+		PersonCls person = (PersonCls)Controller.getInstance().getItem(ItemCls.PERSON_TYPE, personKey);
+		
+		// TEST ADDRESS is ACTIVE?
+		int days = addressDuration.b;
+		// TODO x 1000 ?
+		if (days < 0 || days * (long)86400 < current_time )
+			return new Tuple2<Integer, PersonCls>(-1, person);
+
+		// IF PERSON is DEAD
+		Tuple3<Integer, Integer, byte[]> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
+		if (personDead != null) {
+			// person is dead
+			return new Tuple2<Integer, PersonCls>(-2, person);
+		}
+
+		// IF PERSON is ALIVE
+		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		// TEST TIME and EXPIRE TIME for ALIVE person
+		days = personDuration.a;
+		if (days == 0 )
+			// permanent active
+			return new Tuple2<Integer, PersonCls>(0, person);
+		if ((days < 0 ) || days * (long)86400 < current_time )
+			// ALIVE expired
+			return new Tuple2<Integer, PersonCls>(-1, person);
+		
+		return new Tuple2<Integer, PersonCls>(1, person);
+		
+	}
+	public Tuple2<Integer, PersonCls> hasPerson() {
+		return hasPerson(DBSet.getInstance());
 	}
 
 }

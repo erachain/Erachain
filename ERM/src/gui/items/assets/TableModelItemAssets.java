@@ -82,7 +82,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		
 		case COLUMN_ADDRESS:
 			
-			return asset.getCreator().getAddress();
+			return asset.getCreator().asPerson();
 			
 		case COLUMN_AMOUNT:
 			

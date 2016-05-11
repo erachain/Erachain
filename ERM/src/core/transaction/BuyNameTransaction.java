@@ -55,10 +55,12 @@ public class BuyNameTransaction extends Transaction
 	//GETTERS/SETTERS
 	//public static String getName() { return "OLD: Buy Name";	}
 
+	/*
 	public PublicKeyAccount getBuyer()
 	{
 		return this.creator;
 	}
+	*/
 	
 	public NameSale getNameSale()
 	{

@@ -96,11 +96,11 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 		
 		case COLUMN_AT_ADDRESS:
 			
-			return new Account(Base58.encode(at.getId())).getAddress();
+			return new Account(Base58.encode(at.getId())).asPerson();
 			
 		case COLUMN_AT_CREATOR:
 			
-			return new Account(Base58.encode(at.getCreator())).getAddress();
+			return new Account(Base58.encode(at.getCreator())).asPerson();
 		
 		case COLUMN_AT_AMOUNT:
 			

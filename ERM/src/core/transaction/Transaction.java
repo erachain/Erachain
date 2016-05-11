@@ -440,7 +440,7 @@ public abstract class Transaction {
 	}
 
 	public String viewCreator() {
-		return creator==null?"GENESIS":creator.getAddress();
+		return creator==null?"GENESIS":creator.asPerson();
 	}
 	public String viewRecipient() {
 		return "";

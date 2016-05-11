@@ -21,137 +21,24 @@ import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class CancelSellNameDetailsFrame extends JFrame
+public class CancelSellNameDetailsFrame extends Rec_DetailsFrame
 {
 	public CancelSellNameDetailsFrame(CancelSellNameTransaction cancelNameSale)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
-		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		
-		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		//LAYOUT
-		this.setLayout(new GridBagLayout());
-		
-		//PADDING
-		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		//LABEL GBC
-		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(0, 5, 5, 0);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
-		labelGBC.gridx = 0;
-		
-		//DETAIL GBC
-		GridBagConstraints detailGBC = new GridBagConstraints();
-		detailGBC.insets = new Insets(0, 5, 5, 0);
-		detailGBC.fill = GridBagConstraints.HORIZONTAL;  
-		detailGBC.anchor = GridBagConstraints.NORTHWEST;
-		detailGBC.weightx = 1;	
-		detailGBC.gridwidth = 2;
-		detailGBC.gridx = 1;		
-		
-		//LABEL TYPE
-		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
-		this.add(typeLabel, labelGBC);
-						
-		//TYPE
-		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Cancel Sell Name Transaction"));
-		this.add(type, detailGBC);
-		
-		//LABEL SIGNATURE
-		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
-		this.add(signatureLabel, labelGBC);
+		super(cancelNameSale);
 				
-		//SIGNATURE
-		detailGBC.gridy = 1;
-		JTextField signature = new JTextField(Base58.encode(cancelNameSale.getSignature()));
-		signature.setEditable(false);
-		MenuPopupUtil.installContextMenu(signature);
-		this.add(signature, detailGBC);
-		
-		//LABEL REFERENCE
-		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
-		this.add(referenceLabel, labelGBC);
-						
-		//REFERENCE
-		detailGBC.gridy = 2;
-		JTextField reference = new JTextField(Base58.encode(cancelNameSale.getReference()));
-		reference.setEditable(false);
-		MenuPopupUtil.installContextMenu(reference);
-		this.add(reference, detailGBC);
-		
-		//LABEL TIMESTAMP
-		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
-		this.add(timestampLabel, labelGBC);
-						
-		//TIMESTAMP
-		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(cancelNameSale.getTimestamp()));
-		MenuPopupUtil.installContextMenu(timestamp);
-		this.add(timestamp, detailGBC);
-		
-		//LABEL REGISTRANT
-		labelGBC.gridy = 4;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Seller") + ":");
-		this.add(registrantLabel, labelGBC);
-		
-		//REGISTRANT
-		detailGBC.gridy = 4;
-		JTextField registrant = new JTextField(cancelNameSale.getCreator().getAddress());
-		registrant.setEditable(false);
-		MenuPopupUtil.installContextMenu(registrant);
-		this.add(registrant, detailGBC);
-		
 		//LABEL NAME
-		labelGBC.gridy = 5;
+		++labelGBC.gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
-		detailGBC.gridy = 5;
+		++detailGBC.gridy;
 		JTextField name = new JTextField(cancelNameSale.getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
 		
-		//LABEL FEE
-		labelGBC.gridy = 6;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
-		this.add(feeLabel, labelGBC);
-						
-		//FEE
-		detailGBC.gridy = 6;
-		JTextField fee = new JTextField(cancelNameSale.getFee().toPlainString());
-		fee.setEditable(false);
-		MenuPopupUtil.installContextMenu(fee);
-		this.add(fee, detailGBC);	
-		
-		//LABEL CONFIRMATIONS
-		labelGBC.gridy = 7;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
-		this.add(confirmationsLabel, labelGBC);
-								
-		//CONFIRMATIONS
-		detailGBC.gridy = 7;
-		JLabel confirmations = new JLabel(String.valueOf(cancelNameSale.getConfirmations()));
-		this.add(confirmations, detailGBC);	
-		           
         //PACK
 		this.pack();
         this.setResizable(false);

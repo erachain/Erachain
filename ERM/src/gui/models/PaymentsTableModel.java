@@ -57,7 +57,7 @@ public class PaymentsTableModel extends AbstractTableModel
 		{
 		case COLUMN_ACCOUNT:
 			
-			return payment.getRecipient().getAddress();
+			return payment.getRecipient().asPerson();
 		
 		case COLUMN_ASSET:
 			

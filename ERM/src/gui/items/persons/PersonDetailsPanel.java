@@ -55,56 +55,64 @@ public class PersonDetailsPanel extends JPanel {
 		detailGBC.gridx = 1;		
 		
 		//LABEL KEY
-		labelGBC.gridy = 1;
+		++labelGBC.gridy;
 		JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
 		this.add(keyLabel, labelGBC);
 				
 		//KEY
-		detailGBC.gridy = 1;
+		++detailGBC.gridy;
 		JTextField txtKey = new JTextField(Long.toString(person.getKey()));
 		txtKey.setEditable(false);
 		this.add(txtKey, detailGBC);	
 		
 		//LABEL NAME
-		labelGBC.gridy = 2;
+		++labelGBC.gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
-		detailGBC.gridy = 2;
+		++detailGBC.gridy;
 		JTextField txtName = new JTextField(person.getName());
 		txtName.setEditable(false);
 		this.add(txtName, detailGBC);		
 		
 		//LABEL DESCRIPTION
-		labelGBC.gridy = 3;
+		++labelGBC.gridy;
 		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 		           
 		//DESCRIPTION
-		detailGBC.gridy = 3;
+		++detailGBC.gridy;
 		JTextArea txtAreaDescription = new JTextArea(person.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(txtName.getBorder());
 		txtAreaDescription.setEditable(false);
 		this.add(txtAreaDescription, detailGBC);	
 		
-		//LABEL OWNER
-		labelGBC.gridy = 4;
-		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
+		//LABEL CREAtoR
+		++labelGBC.gridy;
+		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(ownerLabel, labelGBC);
 				
 		//OWNER
-		detailGBC.gridy = 4;
+		++detailGBC.gridy;
 		JTextField owner = new JTextField(person.getCreator().getAddress());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
-								
+		
+		String personStr = person.getCreator().viewPerson();
+		if (personStr.length()>0) {
+			//LABEL PERSON
+			++labelGBC.gridy;
+			++detailGBC.gridy;
+			this.add(new JLabel(personStr), detailGBC);
+		}
+
 		//IF PERSON CONFIRMED
 		if(this.person.getKey() >= 0)
 		{
 			//ADD ERM PAIR BUTTON
-			labelGBC.gridy++;
+			++labelGBC.gridy;
 			labelGBC.gridwidth = 2;
 			JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
 			openPairButton.setPreferredSize(new Dimension(200, 25));
@@ -122,7 +130,7 @@ public class PersonDetailsPanel extends JPanel {
 		if(this.person.getKey() > 2l)
 		{
 			//FAVORITES
-			labelGBC.gridy++;
+			++labelGBC.gridy;
 			labelGBC.gridwidth = 2;
 			this.favoritesButton = new JButton();
 			

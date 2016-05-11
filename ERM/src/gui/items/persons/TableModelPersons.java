@@ -85,7 +85,7 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().getAddress();
+			return person.getCreator().asPerson();
 			
 		case COLUMN_FAVORITE:
 			

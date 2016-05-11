@@ -1400,7 +1400,7 @@ public class Wallet extends Observable implements Observer
 	private void processNamePurchase(BuyNameTransaction namePurchase)
 	{
 		//CHECK IF WE ARE BUYER
-		if(this.accountExists(namePurchase.getBuyer().getAddress()))
+		if(this.accountExists(namePurchase.getCreator().getAddress()))
 		{
 			//ADD NAME
 			Name name = DBSet.getInstance().getNameMap().get(namePurchase.getNameSale().getKey());
@@ -1424,12 +1424,12 @@ public class Wallet extends Observable implements Observer
 	private void orphanNamePurchase(BuyNameTransaction namePurchase)
 	{
 		//CHECK IF WE WERE BUYER
-		if(this.accountExists(namePurchase.getBuyer().getAddress()))
+		if(this.accountExists(namePurchase.getCreator().getAddress()))
 		{
 			//DELETE NAME
 			Name name = namePurchase.getNameSale().getName();
-			name.setOwner(namePurchase.getBuyer());
-			this.database.getNameMap().delete(namePurchase.getBuyer(), name);
+			name.setOwner(namePurchase.getCreator());
+			this.database.getNameMap().delete(namePurchase.getCreator(), name);
 		}
 		
 		//CHECK IF WE WERE SELLER

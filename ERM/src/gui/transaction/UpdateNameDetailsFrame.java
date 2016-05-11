@@ -26,135 +26,50 @@ import utils.GZIP;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class UpdateNameDetailsFrame extends JFrame
+public class UpdateNameDetailsFrame extends Rec_DetailsFrame
 {
 	public UpdateNameDetailsFrame(UpdateNameTransaction nameUpdate)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Transaction Details"));
-		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		
-		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		//LAYOUT
-		this.setLayout(new GridBagLayout());
-		
-		//PADDING
-		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		//LABEL GBC
-		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(0, 5, 5, 0);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
-		labelGBC.gridx = 0;
-		
-		//DETAIL GBC
-		GridBagConstraints detailGBC = new GridBagConstraints();
-		detailGBC.insets = new Insets(0, 5, 5, 0);
-		detailGBC.fill = GridBagConstraints.HORIZONTAL;  
-		detailGBC.anchor = GridBagConstraints.NORTHWEST;
-		detailGBC.weightx = 1;	
-		detailGBC.gridwidth = 2;
-		detailGBC.gridx = 1;		
-		
-		//LABEL TYPE
-		labelGBC.gridy = 0;
-		JLabel typeLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
-		this.add(typeLabel, labelGBC);
-						
-		//TYPE
-		detailGBC.gridy = 0;
-		JLabel type = new JLabel(Lang.getInstance().translate("Update Name Transaction"));
-		this.add(type, detailGBC);
-		
-		//LABEL SIGNATURE
-		labelGBC.gridy = 1;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
-		this.add(signatureLabel, labelGBC);
+		super(nameUpdate);
 				
-		//SIGNATURE
-		detailGBC.gridy = 1;
-		JTextField signature = new JTextField(Base58.encode(nameUpdate.getSignature()));
-		signature.setEditable(false);
-		MenuPopupUtil.installContextMenu(signature);
-		this.add(signature, detailGBC);
-		
-		//LABEL REFERENCE
-		labelGBC.gridy = 2;
-		JLabel referenceLabel = new JLabel(Lang.getInstance().translate("Reference") + ":");
-		this.add(referenceLabel, labelGBC);
-						
-		//REFERENCE
-		detailGBC.gridy = 2;
-		JTextField reference = new JTextField(Base58.encode(nameUpdate.getReference()));
-		reference.setEditable(false);
-		MenuPopupUtil.installContextMenu(reference);
-		this.add(reference, detailGBC);
-		
-		//LABEL TIMESTAMP
-		labelGBC.gridy = 3;
-		JLabel timestampLabel = new JLabel(Lang.getInstance().translate("Timestamp") + ":");
-		this.add(timestampLabel, labelGBC);
-						
-		//TIMESTAMP
-		detailGBC.gridy = 3;
-		JTextField timestamp = new JTextField(DateTimeFormat.timestamptoString(nameUpdate.getTimestamp()));
-		timestamp.setEditable(false);
-		MenuPopupUtil.installContextMenu(timestamp);
-		this.add(timestamp, detailGBC);
-		
-		//LABEL REGISTRANT
-		labelGBC.gridy = 4;
-		JLabel registrantLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
-		this.add(registrantLabel, labelGBC);
-		
-		//REGISTRANT
-		detailGBC.gridy = 4;
-		JTextField registrant = new JTextField(nameUpdate.getCreator().getAddress());
-		registrant.setEditable(false);
-		MenuPopupUtil.installContextMenu(registrant);
-		this.add(registrant, detailGBC);
-		
 		//LABEL OWNER
-		labelGBC.gridy = 5;
+		++labelGBC.gridy;
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("New Owner") + ":");
 		this.add(ownerLabel, labelGBC);
 				
 		//OWNER
-		detailGBC.gridy = 5;
+		++detailGBC.gridy;
 		JTextField owner = new JTextField(nameUpdate.getName().getOwner().getAddress());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);
 		
+		String personStr = nameUpdate.getName().getOwner().viewPerson();
+		if (personStr.length()>0) {
+			++labelGBC.gridy;
+			++detailGBC.gridy;
+			this.add(new JLabel(personStr), detailGBC);
+		}
+
 		//LABEL NAME
-		labelGBC.gridy = 6;
+		++labelGBC.gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
-		detailGBC.gridy = 6;
+		++detailGBC.gridy;
 		JTextField name = new JTextField(nameUpdate.getName().getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
 		
 		//LABEL VALUE
-		labelGBC.gridy = 7;
+		++labelGBC.gridy;
 		JLabel valueLabel = new JLabel(Lang.getInstance().translate("New Value") + ":");
 		this.add(valueLabel, labelGBC);
 				
 		//VALUE
-		detailGBC.gridy = 7;
+		++detailGBC.gridy;
 
 		JTextArea txtareaValue = new JTextArea(GZIP.webDecompress(nameUpdate.getName().getValue()));
 		txtareaValue.setRows(10);
@@ -168,40 +83,18 @@ public class UpdateNameDetailsFrame extends JFrame
       	this.add(valueScroll, detailGBC);
       	      	
       	//LABEL COMPRESSED
-      	labelGBC.gridy = 8;
+      	++labelGBC.gridy;
       	JLabel compressedLabel = new JLabel(Lang.getInstance().translate("Compressed") + ":");
       	this.add(compressedLabel, labelGBC);
       		
   		//COMPRESSED
-  		detailGBC.gridy = 8;
+  		++detailGBC.gridy;
   		final JCheckBox compressed = new JCheckBox();
   		compressed.setSelected(nameUpdate.getName().getValue().startsWith("?gz!"));
   		compressed.setEnabled(false);
      	
   		this.add(compressed, detailGBC);		
-      	
-		//LABEL FEE
-		labelGBC.gridy = 9;
-		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
-		this.add(feeLabel, labelGBC);
-						
-		//FEE
-		detailGBC.gridy = 9;
-		JTextField fee = new JTextField(nameUpdate.getFee().toPlainString());
-		fee.setEditable(false);
-		MenuPopupUtil.installContextMenu(fee);
-		this.add(fee, detailGBC);	
-		
-		//LABEL CONFIRMATIONS
-		labelGBC.gridy = 10;
-		JLabel confirmationsLabel = new JLabel(Lang.getInstance().translate("Confirmations") + ":");
-		this.add(confirmationsLabel, labelGBC);
-								
-		//CONFIRMATIONS
-		detailGBC.gridy = 10;
-		JLabel confirmations = new JLabel(String.valueOf(nameUpdate.getConfirmations()));
-		this.add(confirmations, detailGBC);	
-		           
+      			           
         //PACK
 		this.pack();
         this.setResizable(false);
