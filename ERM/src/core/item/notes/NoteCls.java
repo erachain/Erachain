@@ -18,7 +18,9 @@ public abstract class NoteCls extends ItemCls {
 	protected static final int NOTE = 1;
 	protected static final int SAMPLE = 2;
 	protected static final int PAPER = 3;
-	
+
+	public static final int INITIAL_FAVORITES = 3;
+
 	public NoteCls(byte[] typeBytes, Account creator, String name, String description)
 	{
 		super(typeBytes, creator, name, description);
@@ -32,7 +34,8 @@ public abstract class NoteCls extends ItemCls {
 
 	//GETTERS/SETTERS
 		
-	public String getItemType() { return "note"; }
+	public int getItemTypeInt() { return ItemCls.NOTE_TYPE; }
+	public String getItemTypeStr() { return "note"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

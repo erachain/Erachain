@@ -18,10 +18,11 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_CONFIRMED = 3;
+	public static final int COLUMN_FAVORITE = 4;
 	
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
 	
 	public WalletItemPersonsTableModel()
 	{
@@ -32,6 +33,10 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
 		return this.persons;
 	}
+	
+	//public Class<? extends Object> getColumnClass(int c) {     // set column type
+    //    return getValueAt(0, c).getClass();
+    //}
 	
 	public PersonCls getItem(int row)
 	{
@@ -78,11 +83,15 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().getAddress();
+			return person.getCreator().asPerson();
 						
 		case COLUMN_CONFIRMED:
 			
 			return person.isConfirmed();
+			
+		case COLUMN_FAVORITE:
+			
+			return person.isFavorite();
 			
 		}
 		

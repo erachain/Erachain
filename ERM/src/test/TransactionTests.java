@@ -89,7 +89,7 @@ public class TransactionTests {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -232,7 +232,7 @@ public class TransactionTests {
 		payment.process(databaseSet, false);
 
 		LOGGER.info("getConfirmedBalance: " + maker.getConfirmedBalance(FEE_KEY, databaseSet));
-		LOGGER.info("getConfirmedBalance OIL_KEY:" + maker.getConfirmedBalance(FEE_KEY, databaseSet));
+		LOGGER.info("getConfirmedBalance FEE_KEY:" + maker.getConfirmedBalance(FEE_KEY, databaseSet));
 
 		//CHECK BALANCE SENDER
 		assertEquals(0, BigDecimal.valueOf(1).subtract(amount).subtract(fee).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
@@ -683,7 +683,7 @@ public class TransactionTests {
 		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
-		// set OIL
+		// set FEE
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 		
 		//CREATE NAME UPDATE
@@ -724,7 +724,7 @@ public class TransactionTests {
 		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
-		// set OIL
+		// set FEE
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 		
 		//CREATE NAME UPDATE
@@ -1412,7 +1412,7 @@ public class TransactionTests {
 			assertEquals(namePurchaseTransaction.getAmount(maker), parsedNamePurchase.getAmount(maker));	
 			
 			//CHECK OWNER
-			assertEquals(namePurchaseTransaction.getBuyer().getAddress(), parsedNamePurchase.getBuyer().getAddress());	
+			assertEquals(namePurchaseTransaction.getCreator().getAddress(), parsedNamePurchase.getCreator().getAddress());	
 			
 			//CHECK NAME
 			assertEquals(namePurchaseTransaction.getNameSale().getKey(), parsedNamePurchase.getNameSale().getKey());	

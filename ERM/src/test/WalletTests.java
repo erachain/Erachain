@@ -24,7 +24,7 @@ public class WalletTests {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = AssetCls.DILE_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	long VOTE_KEY = AssetCls.ERMO_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];

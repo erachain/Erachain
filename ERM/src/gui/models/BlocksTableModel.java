@@ -86,7 +86,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				
 			case COLUMN_GENERATOR:
 				
-				return block.getGenerator().getAddress();
+				return block.getGenerator().asPerson();
 				
 			case COLUMN_BASETARGET:
 				

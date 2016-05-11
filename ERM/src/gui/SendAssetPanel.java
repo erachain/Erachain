@@ -6,6 +6,8 @@ import gui.models.MessagesTableModel;
 import lang.Lang;
 import ntp.NTP;
 
+import java.awt.Container;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -24,6 +26,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -55,7 +58,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SendMessagePanel extends JPanel 
+public class SendAssetPanel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -73,10 +76,13 @@ public class SendMessagePanel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SendMessagePanel()
+	public SendAssetPanel(AssetCls asset, Account account)
 	{
 		
-		
+		if (asset == null)
+		{
+			asset = Controller.getInstance().getAsset(1l);
+		}
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
@@ -97,6 +103,7 @@ public class SendMessagePanel extends JPanel
 		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
+		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		this.accountsModel = new AccountsComboBoxModel();
         
@@ -125,6 +132,7 @@ public class SendMessagePanel extends JPanel
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
 		this.add(this.cbxFrom, cbxFromGBC);
+		if (account != null) cbxFrom.setSelectedItem(account);
 		
 		//ON FAVORITES CHANGE
 
@@ -427,6 +435,30 @@ public class SendMessagePanel extends JPanel
 				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
+		
+ 
+        /*
+        this.pack();
+		this.setLocationRelativeTo(null);
+		this.setMaximizable(true);
+		this.setTitle(Lang.getInstance().translate("Persons"));
+		this.setClosable(true);
+		this.setResizable(true);
+		*/
+		
+	
+		//Container parent = this.getParent();
+		//this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+		//this.setLocation(20, 20);
+	//	this.setIconImages(icons);
+		
+		//CLOSE
+		//setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        //this.setResizable(true);
+        //splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+        //this.setVisible(true);
+
+        
 	}
 
 	private void refreshReceiverDetails()
@@ -728,6 +760,8 @@ public class SendMessagePanel extends JPanel
 		//ENABLE
 		this.sendButton.setEnabled(true);
 	}
+	
+	
 	
 }
 

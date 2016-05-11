@@ -36,6 +36,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -267,7 +268,7 @@ public class CreatePollFrame extends JFrame
 				
 			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 								
 			case Transaction.NO_BALANCE:

@@ -40,7 +40,7 @@ public class GenesisIssueNoteTransaction extends GenesisIssue_ItemRecord
 	{
 		super(TYPE_ID, NAME_ID, note);
 
-		this.generateSignature();
+		//this.generateSignature();
 
 	}
 

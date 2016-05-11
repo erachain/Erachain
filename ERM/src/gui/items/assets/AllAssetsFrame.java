@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gui.CoreRowSorter;
+import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
 
 import javax.swing.JComponent;
@@ -98,6 +99,10 @@ public class AllAssetsFrame extends JFrame{
 		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);
 		divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 		
+		//CHECKBOX FOR FAVORITE
+		TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
+
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		CoreRowSorter sorter = new CoreRowSorter(this.tableModelItemAssets, indexes);

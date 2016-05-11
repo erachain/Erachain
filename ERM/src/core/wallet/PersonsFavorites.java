@@ -40,7 +40,7 @@ public class PersonsFavorites implements Observer{
 		//persons.add(Controller.getInstance().getperson(Transaction.FEE_KEY));		
 		//persons.add(Controller.getInstance().getperson(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
-			persons.add(Controller.getInstance().getPerson(key));
+			persons.add(Controller.getInstance().getItemPerson(key));
 		}
 		return persons;
 	}

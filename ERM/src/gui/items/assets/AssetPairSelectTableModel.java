@@ -90,6 +90,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		}
 		
 		long key = this.assets.get(row).getKey();
+		Object item = this.all.get(key);
 		
 		try	{
 			
@@ -106,11 +107,11 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			
 		case COLUMN_ORDERS_COUNT:
 			
-			return this.all.get(key).a;
+			return item == null?"":this.all.get(key).a;
 			
 		case COLUMN_ORDERS_VOLUME:
 			
-			return "<html>" + NumberAsString.getInstance().numberAsString(this.all.get(key).c) 
+			return item == null?"":"<html>" + NumberAsString.getInstance().numberAsString(this.all.get(key).c) 
 					+ " " + this.assets.get(row).getShort() + "<br>" 
 					+ NumberAsString.getInstance().numberAsString(this.all.get(key).d) 
 					+ " " + Controller.getInstance().getAsset(this.key).getShort()
@@ -118,13 +119,15 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 
 		case COLUMN_TRADES_COUNT:
 			
+			if (item == null) return "";
 			if(this.all.get(key).b > 0)
 				return this.all.get(key).b;
 			else
-				return null;
+				return "";
 			
 		case COLUMN_TRADES_VOLUME:
 			
+			if (item == null) return "";
 			if(this.all.get(key).b > 0)
 				return "<html>" + NumberAsString.getInstance().numberAsString(this.all.get(key).e) 
 					+ " " + this.assets.get(row).getShort() + "<br>" 

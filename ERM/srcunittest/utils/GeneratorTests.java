@@ -19,7 +19,7 @@ import database.DBSet;
 
 public class GeneratorTests {
 
-	byte OIL_KEY = 1;
+	byte FEE_KEY = 1;
 	
 	@Test
 	public void addManyTransactionsWithDifferentFees()

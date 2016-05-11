@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.transaction.Transaction;
 //import settings.Settings;
@@ -271,7 +272,7 @@ public class SellNameFrame extends JFrame
 				
 			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 								
 			case Transaction.NO_BALANCE:

@@ -17,12 +17,11 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	//public static final int COLUMN_AMOUNT = 3;
-	//public static final int COLUMN_DIVISIBLE = 4;
+	public static final int COLUMN_FAVORITE = 3;
 
 	private SortableList<Long, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	
 	public TableModelPersons()
 	{
@@ -34,6 +33,11 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 	{
 		return this.persons;
 	}
+	
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+         return getValueAt(0, c).getClass();
+     }
 	
 	public PersonCls getPerson(int row)
 	{
@@ -81,8 +85,12 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().getAddress();
+			return person.getCreator().asPerson();
 			
+		case COLUMN_FAVORITE:
+			
+			return person.isFavorite();
+
 		}
 		
 		return null;

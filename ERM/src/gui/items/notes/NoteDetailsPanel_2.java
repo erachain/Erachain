@@ -123,7 +123,7 @@ public class NoteDetailsPanel_2 extends ItemDetailsPanel
 		}
 		
 		//IF ASSET CONFIRMED AND NOT ERM
-		if(this.note.getKey() > 2l)
+		if(this.note.getKey() >= NoteCls.INITIAL_FAVORITES)
 		{
 			//FAVORITES
 			labelGBC.gridy++;

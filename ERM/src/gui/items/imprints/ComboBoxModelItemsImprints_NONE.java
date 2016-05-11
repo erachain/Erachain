@@ -64,7 +64,7 @@ public class ComboBoxModelItemsImprints_NONE extends DefaultComboBoxModel<Imprin
 			for(Long key: keys)
 			{				
 				//GET IMPRINT
-				ImprintCls imprint = Controller.getInstance().getImprint(key);
+				ImprintCls imprint = Controller.getInstance().getItemImprint(key);
 				imprints.add(imprint);
 				
 				//ADD

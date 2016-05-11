@@ -38,7 +38,7 @@ public class TestRecAsset {
 
 	byte[] releaserReference = null;
 
-	long FEE_KEY = AssetCls.DILE_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -62,7 +62,7 @@ public class TestRecAsset {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -303,7 +303,7 @@ public class TestRecAsset {
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
 		long key = asset.getKey();
-		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
+		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE SIGNATURE
@@ -548,7 +548,7 @@ public class TestRecAsset {
 		issueMessageTransaction.sign(maker, false);
 		issueMessageTransaction.process(db, false);
 		long key = asset.getKey();
-		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(OIL_KEY, db));
+		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
 		//CREATE SIGNATURE

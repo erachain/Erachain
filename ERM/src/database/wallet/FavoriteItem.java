@@ -37,7 +37,7 @@ public class FavoriteItem extends Observable {
 			}
 		}
 	}
-	
+		
 	public void replace(List<Long> keys)
 	{
 		this.itemsSet.clear();

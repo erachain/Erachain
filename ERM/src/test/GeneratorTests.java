@@ -47,7 +47,7 @@ public class GeneratorTests {
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
-
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -56,6 +56,8 @@ public class GeneratorTests {
 		{	
 			//GENERATE NEXT BLOCK
 			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock);
+			//Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+
 			
 			//ADD TRANSACTION SIGNATURE
 			byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -109,7 +111,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB
@@ -161,7 +163,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(null, generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB

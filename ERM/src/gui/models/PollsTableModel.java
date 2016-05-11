@@ -90,7 +90,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 		
 		case COLUMN_CREATOR:
 			
-			return poll.getCreator().getAddress();
+			return poll.getCreator().asPerson();
 			
 		case COLUMN_VOTES:
 			

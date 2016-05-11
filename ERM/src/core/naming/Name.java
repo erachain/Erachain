@@ -21,7 +21,7 @@ public class Name {
 	private static final int NAME_SIZE_LENGTH = 4;
 	private static final int VALUE_SIZE_LENGTH = 4;
 	
-	private Account owner;
+	private Account owner; // current owner of Name
 	private String name;
 	private String value;
 	
@@ -189,6 +189,6 @@ public class Name {
 	
 	public String getNameBalanceString()
 	{
-		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0, AssetCls.DILE_KEY)) + " - " + this.getName();
+		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(0, AssetCls.FEE_KEY)) + " - " + this.getName();
 	}
 }

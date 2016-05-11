@@ -78,7 +78,7 @@ public abstract class TransactionAmount extends Transaction {
 	// VIEW
 	@Override
 	public String viewRecipient() {
-		return recipient.getAddress();
+		return recipient.asPerson();
 	}
 	
 	@Override
@@ -253,7 +253,7 @@ public abstract class TransactionAmount extends Transaction {
 		
 		if (!asPack) {
 
-			//UPDATE REFERENCE OF RECIPIENT - for first accept OIL need
+			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
 			if(this.key == FEE_KEY)
 			{
 				if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))

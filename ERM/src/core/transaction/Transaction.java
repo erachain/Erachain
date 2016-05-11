@@ -83,31 +83,33 @@ public abstract class Transaction {
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
 	
-	//public static final int FEE_LESS_REQUIRED = 40;
+	public static final int INVALID_PUBLIC_KEY = 40;
 	
 	public static final int INVALID_RAW_DATA = 41;
 	
 	public static final int INVALID_DATE = 42;
 
 	public static final int NOT_ENOUGH_RIGHTS = 50;
-	public static final int ITEM_DOES_NOT_EXIST = 51;
 	public static final int ACCOUNT_NOT_PERSONALIZED = 52;
 	public static final int DUPLICATE_KEY = 53;
 
+	public static final int ITEM_DOES_NOT_EXIST = 54;
 	public static final int ITEM_ASSET_DOES_NOT_EXIST = 55;
 	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 56;
 	public static final int ITEM_NOTE_NOT_EXIST = 57;
 	public static final int ITEM_PERSON_NOT_EXIST = 58;
-	public static final int ITEM_UNION_NOT_EXIST = 59;
+	public static final int ITEM_STATUS_NOT_EXIST = 59;
+	public static final int ITEM_UNION_NOT_EXIST = 60;
+	public static final int ITEM_DOES_NOT_STATUSED = 61;
 
-	public static final int ITEM_PERSON_LATITUDE_ERROR = 60;
-	public static final int ITEM_PERSON_LONGITUDE_ERROR = 61;
-	public static final int ITEM_PERSON_RACE_ERROR = 62;
-	public static final int ITEM_PERSON_GENDER_ERROR = 63;
-	public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 64;
-	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 65;
-	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 66;
-	public static final int ITEM_PERSON_HEIGHT_ERROR = 67;
+	public static final int ITEM_PERSON_LATITUDE_ERROR = 70;
+	public static final int ITEM_PERSON_LONGITUDE_ERROR = 71;
+	public static final int ITEM_PERSON_RACE_ERROR = 72;
+	public static final int ITEM_PERSON_GENDER_ERROR = 73;
+	public static final int ITEM_PERSON_SKIN_COLOR_ERROR = 74;
+	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 75;
+	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 76;
+	public static final int ITEM_PERSON_HEIGHT_ERROR = 77;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	
@@ -135,8 +137,8 @@ public abstract class Transaction {
 	// USE ITEMS
 	public static final int SEND_ASSET_TRANSACTION = 31;
 	public static final int SIGN_NOTE_TRANSACTION = 32;
-	public static final int CERTIFY_PERSON_TRANSACTION = 33;
-	public static final int ASSIGN_STATUS_TRANSACTION = 34;
+	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 33;
+	public static final int SET_STATUS_TRANSACTION = 34;
 	public static final int ADOPT_UNION_TRANSACTION = 35;
 	// confirms other transactions
 	public static final int CONFIRM_TRANSACTION = 40;
@@ -170,7 +172,7 @@ public abstract class Transaction {
 
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 
-	public static final long FEE_KEY = AssetCls.DILE_KEY;
+	public static final long FEE_KEY = AssetCls.FEE_KEY;
 	public static final int FEE_PER_BYTE = 1;
 	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
 	public static final float FEE_POW_BASE = (float)1.5;
@@ -238,7 +240,7 @@ public abstract class Transaction {
 	protected static final int KEY_LENGTH = 8;
 	protected static final int FEE_POWER_LENGTH = 1;
 	//protected static final int HKEY_LENGTH = 20;
-	protected static final int CREATOR_LENGTH = 32;
+	protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	// not need now protected static final int FEE_LENGTH = 8;
 	public static final int SIGNATURE_LENGTH = 64;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
@@ -286,6 +288,14 @@ public abstract class Transaction {
 	public int getType()
 	{
 		return Byte.toUnsignedInt(this.typeBytes[0]);
+	}
+	public int getVersion()
+	{
+		return Byte.toUnsignedInt(this.typeBytes[1]);
+	}
+	public static int getVersion(byte[] typeBytes)
+	{
+		return Byte.toUnsignedInt(typeBytes[1]);
 	}
 	public byte[] getTypeBytes()
 	{
@@ -389,8 +399,10 @@ public abstract class Transaction {
 		return (int) fee;
 	}
 	
-	// get personal fee
-	public abstract int calcBaseFee();
+	// get fee
+	public int calcBaseFee() {
+		return calcCommonFee();
+	}
 	
 	// calc FEE by recommended and feePOW
 	public void calcFee()
@@ -407,7 +419,7 @@ public abstract class Transaction {
 			this.fee = fee;
 		}
 	}
-	
+
 	public Block getParent() {
 		
 		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
@@ -428,7 +440,7 @@ public abstract class Transaction {
 	}
 
 	public String viewCreator() {
-		return creator==null?"GENESIS":creator.getAddress();
+		return creator==null?"GENESIS":creator.asPerson();
 	}
 	public String viewRecipient() {
 		return "";

@@ -119,7 +119,7 @@ public class NoteDetailsPanel extends JPanel {
 		}
 		
 		//IF NOTE CONFIRMED AND NOT ERM
-		if(this.note.getKey() > 2l)
+		if(this.note.getKey() >= NoteCls.INITIAL_FAVORITES)
 		{
 			//FAVORITES
 			labelGBC.gridy++;

@@ -126,11 +126,15 @@ public class TransactionFactory {
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
 			
-		case Transaction.CERTIFY_PERSON_TRANSACTION:
+		case Transaction.SET_STATUS_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION
-			return R_SertifyPerson.Parse(data, releaserReference);
+			return R_SetStatusToItem.Parse(data, releaserReference);
 			
+		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
+			
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_SertifyPubKeys.Parse(data, releaserReference);			
 			
 		case Transaction.ISSUE_ASSET_TRANSACTION:
 			
@@ -162,10 +166,12 @@ public class TransactionFactory {
 			//PARSE ISSUE NOTE TRANSACTION
 			return IssueUnionRecord.Parse(data, releaserReference);
 
+		/*
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
 			
 			//PARSE TRANSFER ASSET TRANSACTION
-			return GenesisCertifyPersonRecord.Parse(data);	
+			return GenesisCertifyPersonRecord.Parse(data);
+			*/	
 
 		/*
 		case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:

@@ -177,7 +177,7 @@ public class AccountMap extends Observable {
 		return null;
 	}
 
-	public BigDecimal getUnconfirmedBalance(String address, Long key) 
+	private BigDecimal getUnconfirmedBalance(String address, Long key) 
 	{
 		
 		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
@@ -186,11 +186,18 @@ public class AccountMap extends Observable {
 			return this.assetsBalanceMap.get(k);
 		}
 		
-		return BigDecimal.ZERO.setScale(8);
+		return null;
 	}
+	// IF account+key not found in wallet - take from common confirmed balance map
 	public BigDecimal getUnconfirmedBalance(Account account, Long key) 
 	{		
-		return getUnconfirmedBalance(account.getAddress(), key);
+		BigDecimal balance = getUnconfirmedBalance(account.getAddress(), key);
+		if (balance == null) {
+			balance = account.getConfirmedBalance(key);
+			this.update(account, key, balance);
+		}
+		
+		return balance;
 	}
 
 	/*
@@ -218,6 +225,7 @@ public class AccountMap extends Observable {
 				this.publickKeys.add(account.getPublicKey());
 				
 				this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+				
 			}
 		}
 	}

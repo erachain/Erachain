@@ -4,6 +4,7 @@ import gui.AccountRenderer;
 import gui.DebugTabPane;
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 
 import java.awt.BorderLayout;
@@ -296,8 +297,8 @@ public class OrderPanel extends JPanel
 			superHintText.setText( "<html><body style='font-size: 100%'>&nbsp;<br>" + Lang.getInstance().translate("Enter correct amount.") + "</body></html>" );
 		else
 			superHintText.setText( "<html><body style='font-size: 100%'>" + 
-					Lang.getInstance().translate("Give <b>%amount%&nbsp;%have%</b>" + 
-					" at the price of <b>%price%&nbsp;%want%</b> per <b>1%&nbsp;%have%</b> that would get " + 
+					Lang.getInstance().translate("Give <b>%amount% %have%</b>" + 
+					" at the price of <b>%price%&nbsp;%want%</b> per <b>1% %have%</b> that would get " + 
 					"<b>%buyingamount%&nbsp;%want%</b>.")
 					.replace("%amount%", this.txtAmount.getText())
 					.replace("%have%", have.getShort())
@@ -384,90 +385,23 @@ public class OrderPanel extends JPanel
 		//READ CREATOR
 		Account sender = (Account) this.cbxAccount.getSelectedItem();
 		
+		int feePow;
+		BigDecimal amount;
+		BigDecimal price;
 		long parse = 0;
 		try
 		{
 			//READ FEE
-			int feePow = Integer.parseInt(this.txtFeePow.getText());
+			feePow = Integer.parseInt(this.txtFeePow.getText());
 			
 			//READ AMOUNT
 			parse = 1;
-			BigDecimal amount = new BigDecimal(this.txtAmount.getText()).setScale(8);
+			amount = new BigDecimal(this.txtAmount.getText()).setScale(8);
 			
 			//READ PRICE
 			parse = 2;
-			BigDecimal price = new BigDecimal(this.txtPrice.getText()).setScale(8);			
+			price = new BigDecimal(this.txtPrice.getText()).setScale(8);			
 
-			//CREATE POLL
-			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amount, price, feePow);
-			
-			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				
-				this.txtFeePow.setText("0");
-				this.txtAmount.setText("");
-				this.txtPrice.setText("");
-				
-				break;	
-
-				/*
-			case Transaction.NOT_YET_RELEASED:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets will be enabled at %time%!").replace("%time%", DateTimeFormat.timestamptoString(Transaction.getASSETS_RELEASE())),  "Error", JOptionPane.ERROR_MESSAGE);
-				break;
-				*/
-			case Transaction.HAVE_EQUALS_WANT:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Have can not equal Want!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.ASSET_DOES_NOT_EXIST:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The asset does not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be positive!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			case Transaction.NEGATIVE_PRICE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Price must be positive!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			case Transaction.INVALID_AMOUNT:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			case Transaction.INVALID_RETURN:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid total price!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough OIL balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.NO_BALANCE:
-			
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-
-				
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			}
 		}
 		catch(Exception e)
 		{
@@ -475,17 +409,36 @@ public class OrderPanel extends JPanel
 			
 			if(parse == 0)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee") + "!", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 			if(parse == 1)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount") + "!", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 			if(parse == 2)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid price!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid price") + "!", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
+			this.sellButton.setEnabled(true);
+			return;
 		}
+
+		//CREATE POLL
+			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+			Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amount, price, feePow);
+			
+			//CHECK VALIDATE MESSAGE
+			if (result.getB() == Transaction.VALIDATE_OK) {
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				
+				this.txtFeePow.setText("0");
+				this.txtAmount.setText("");
+				this.txtPrice.setText("");
+				
+			} else {		
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
 		
 		//ENABLE
 		this.sellButton.setEnabled(true);

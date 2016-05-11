@@ -9,18 +9,29 @@ import core.item.ItemCls;
 import database.DBSet;
 import database.Item_Map;
 import database.Issue_ItemMap;
+import database.wallet.WalletDatabase;
+import database.wallet.FavoriteItem;
+
 
 
 public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
 	public static final long ERMO_KEY = 0l;
+	public static final String ERMO_ABBREV = "ERM"; // ERMO (main rights units)
+	public static final String ERMO_NAME = "ERMO";
+	public static final String ERMO_DESCR = "It is the basic unit of Environment Real Management Objects (" + ERMO_NAME + ")";
 	// FEE KEY
-	public static final long DILE_KEY = 1l;
+	public static final long FEE_KEY = 1l;
+	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
+	public static final String FEE_NAME = "COMPU";
+	public static final String FEE_DESCR = "It is an drops of computation used for deals (" + FEE_NAME + ")";
 
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;
 	public static final int NAME = 3;
+	
+	public static final int INITIAL_FAVORITES = 2;
 		
 	public AssetCls(byte[] typeBytes, Account creator, String name, String description)
 	{
@@ -35,7 +46,8 @@ public abstract class AssetCls extends ItemCls {
 
 	//GETTERS/SETTERS
 
-	public String getItemType() { return "asset"; }
+	public int getItemTypeInt() { return ItemCls.ASSET_TYPE; }
+	public String getItemTypeStr() { return "asset"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

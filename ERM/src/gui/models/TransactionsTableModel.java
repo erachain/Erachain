@@ -9,6 +9,7 @@ import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.SortableList;
 import database.TransactionMap;
@@ -25,7 +26,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "OIL"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());

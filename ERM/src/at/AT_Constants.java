@@ -55,6 +55,8 @@ public class AT_Constants {
 		
 		//version 1
 		AT_VERSION.put( 0 , (short)1 ); //block 0 version 1
+		// icreator version 3 - get ERROR - not start a generating blocks
+		/// error - AT_VERSION.put( 2 , (short)3 ); //block 1 version 3
 		
 		//constants for AT version 1
 		MIN_FEE.put( (short) 1 , 1L );

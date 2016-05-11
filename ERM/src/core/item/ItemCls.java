@@ -18,7 +18,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 //import database.DBMap;
 import database.Item_Map;
-//import database.wallet.FavoriteItem;
+import database.wallet.FavoriteItem;
 import database.Issue_ItemMap;
 
 public abstract class ItemCls {
@@ -67,11 +67,13 @@ public abstract class ItemCls {
 
 	//GETTERS/SETTERS
 
-	public abstract String getItemType();
+	public abstract int getItemTypeInt();
+	public abstract String getItemTypeStr();
 	public abstract String getItemSubType();
 
 	public abstract Item_Map getDBMap(DBSet db);
 	public abstract Issue_ItemMap getDBIssueMap(DBSet db);
+	//public abstract FavoriteItem getDBFavoriteMap();
 
 
 	public byte[] getType()
@@ -127,7 +129,11 @@ public abstract class ItemCls {
 	public boolean isConfirmed(DBSet db) {
 		return this.getDBIssueMap(db).contains(this.reference);
 	}	
-	
+
+	public boolean isFavorite() {
+		return Controller.getInstance().isItemFavorite(this);
+	}
+
 	public byte[] toBytes(boolean includeReference)
 	{
 
@@ -212,7 +218,7 @@ public abstract class ItemCls {
 		JSONObject itemJSON = new JSONObject();
 
 		// ADD DATA
-		itemJSON.put("item_type", this.getItemType());
+		itemJSON.put("item_type", this.getItemTypeStr());
 		itemJSON.put("item_type_sub", this.getItemSubType());
 		itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
 		itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));

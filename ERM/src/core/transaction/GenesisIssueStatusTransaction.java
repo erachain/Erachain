@@ -41,7 +41,7 @@ public class GenesisIssueStatusTransaction extends GenesisIssue_ItemRecord
 	{
 		super(TYPE_ID, NAME_ID, status);
 
-		this.generateSignature();
+		//this.generateSignature();
 
 	}
 

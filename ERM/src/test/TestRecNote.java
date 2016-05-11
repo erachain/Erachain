@@ -37,7 +37,7 @@ public class TestRecNote {
 	byte[] releaserReference = null;
 
 	boolean asPack = false;
-	long FEE_KEY = AssetCls.DILE_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	long VOTE_KEY = AssetCls.ERMO_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
@@ -60,7 +60,7 @@ public class TestRecNote {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 

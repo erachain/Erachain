@@ -41,17 +41,20 @@ public class GeneralTabPane extends JTabbedPane{
 		super();
 		
 		//ACCOUNTS
-		this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel());
+		//this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel(null));
         
 		//STATEMENT
-		this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
+		//this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
 
 		//SEND
-		this.addTab(Lang.getInstance().translate("Send money"), new SendMoneyPanel());
+		this.addTab(Lang.getInstance().translate("Send money"), new SendCompuPanel());
 
 		//MESSAGE
-		this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel());
+		//this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel(null, null, null));
 			   
+		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+		/*
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new JTable(this.transactionsModel);
@@ -85,6 +88,7 @@ public class GeneralTabPane extends JTabbedPane{
 			}
 		});			
 		this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable));       
+		*/
 		
 		//TRANSACTIONS
 		WalletBlocksTableModel blocksModel = new WalletBlocksTableModel();

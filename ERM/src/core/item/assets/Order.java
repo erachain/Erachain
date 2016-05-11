@@ -65,6 +65,10 @@ public class Order implements Comparable<Order> {
 	{
 		return this.id;
 	}
+	public void setId(byte[] id)
+	{
+		this.id = new BigInteger(id);
+	}
 
 	public Account getCreator() 
 	{
@@ -163,6 +167,8 @@ public class Order implements Comparable<Order> {
 		
 		int position = 0;
 		
+		// TODO - ID not need as reference in ASSETS ?? no!
+
 		//READ ID
 		byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
 		BigInteger id = new BigInteger(idBytes);

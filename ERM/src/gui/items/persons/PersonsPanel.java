@@ -22,8 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
@@ -31,6 +33,7 @@ import gui.items.ItemsPanel;
 import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.PersonFrame;
 import gui.items.persons.IssuePersonFrame;
+import gui.models.Renderer_Right;
 //import gui.items.persons.MyOrdersFrame;
 //import gui.items.persons.PayDividendFrame;
 import gui.models.WalletItemPersonsTableModel;
@@ -88,10 +91,21 @@ public class PersonsPanel extends JPanel
 		final WalletItemPersonsTableModel personsModel = new WalletItemPersonsTableModel();
 		final JTable table = new JTable(personsModel);
 		
+		
+		
+	//	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+	//	table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+		
 		//POLLS SORTER
-		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		CoreRowSorter sorter = new CoreRowSorter(personsModel, indexes);
+	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+	//	CoreRowSorter sorter = new CoreRowSorter(personsModel, indexes);
+	//	table.setRowSorter(sorter);
+		
+		RowSorter sorter =   new TableRowSorter(personsModel);
+
 		table.setRowSorter(sorter);
+		table.getRowSorter();
+		personsModel.fireTableDataChanged();
 
 		/*
 		//CHECKBOX FOR DIVISIBLE

@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
- import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import ntp.NTP;
 
@@ -20,6 +20,7 @@ import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.PaymentTransaction;
 import core.transaction.Transaction;
@@ -36,8 +37,8 @@ public class BlockTests
 	long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
-	private GenesisBlock gb;
+	private DBSet db = DBSet.createEmptyDatabaseSet();
+	private GenesisBlock gb = new GenesisBlock();
 
 	static Logger LOGGER = Logger.getLogger(BlockTests.class.getName());
 
@@ -45,109 +46,101 @@ public class BlockTests
 	public void validateSignatureGenesisBlock()
 	{
 		
-		//CREATE EMPTY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+		//CHECK IF SIGNATURE VALID
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature().length
+				+ " : " + gb.getGeneratorSignature());
 
-		Block genesisBlock = new GenesisBlock();
-		//genesisBlock.process(databaseSet);
-		
-		//CHECK IF SIGNATURE VALID  this.transactionsSignature [B@5ecddf8f [B@6c629d6e
-		// [B@5ecddf8f [B@6c629d6e
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
-				+ " : " + genesisBlock.getGeneratorSignature());
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature().length
+				+ " : " + gb.getGeneratorSignature());
 
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature().length
-				+ " : " + genesisBlock.getGeneratorSignature());
-
-		assertEquals(true, genesisBlock.isSignatureValid());
+		assertEquals(true, gb.isSignatureValid());
 		
 		//ADD TRANSACTION SIGNATURE
-		LOGGER.info("getGeneratorSignature " + genesisBlock.getGeneratorSignature());
-		//newBlock.setTransactionsSignature(transactionsSignature);
+		LOGGER.info("getGeneratorSignature " + gb.getGeneratorSignature());
+
+		//ADD a GENESIS TRANSACTION for invalid SIGNATURE
+		gb.addTransaction( new GenesisTransferAssetTransaction(
+				new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 0l, BigDecimal.valueOf(1).setScale(8)));
+
+		assertEquals(false, gb.isSignatureValid());
 
 	}
 	
 	@Test
 	public void validateGenesisBlock()
 	{
-		//CREATE EMPTY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		
-		//CREATE GENESIS BLOCK
-		Block genesisBlock = new GenesisBlock();
-		
+				
 		//CHECK IF VALID
-		assertEquals(true, genesisBlock.isValid(databaseSet));
+		assertEquals(true, gb.isValid(db));
 		
 		//ADD INVALID GENESIS TRANSACTION
-		//Transaction transaction = new GenesisTransaction(new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g"), BigDecimal.valueOf(-1000).setScale(8), NTP.getTime());
-		genesisBlock.addTransaction(new GenesisIssueAssetTransaction(GenesisBlock.makeAssetVenture(Transaction.RIGHTS_KEY)));
+		gb.addTransaction( new GenesisTransferAssetTransaction(
+				new Account("XUi2oga2pnGNcZ9es6pBqxydtRZKWdkL2g"), 0l, BigDecimal.valueOf(-1000).setScale(8)));
 		
 		//CHECK IF INVALID
-		assertEquals(false, genesisBlock.isValid(databaseSet));
+		assertEquals(false, gb.isValid(db));
 		
 		//CREATE NEW BLOCK
-		genesisBlock = new GenesisBlock();
-		//databaseSet = DBSet.createEmptyDatabaseSet();
-		//genesisBlock.process(databaseSet);
+		gb = new GenesisBlock();
 		
 		//CHECK IF VALID
-		assertEquals(true, genesisBlock.isValid(databaseSet));
+		assertEquals(true, gb.isValid(db));
 		
 		//PROCESS
-		genesisBlock.process(databaseSet);
+		gb.process(db);
 		
 		//CHECK IF INVALID
-		assertEquals(false, genesisBlock.isValid(databaseSet));
+		assertEquals(false, gb.isValid(db));
 	}
 	
 	@Test
 	public void parseGenesisBlock()
 	{
-		//CREATE VALID BLOCK
-		Block genesisBlock = new GenesisBlock();
-		//genesisBlock.process();
+		//gb.process();
 				
 		//CONVERT TO BYTES
-		byte[] rawBlock = genesisBlock.toBytes();
-				
+		byte[] rawBlock = gb.toBytes();
+		//CHECK length
+		assertEquals(rawBlock.length, gb.getDataLength());
+			
+		Block parsedBlock = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
+			parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
 					
-			//CHECK length
-			assertEquals(rawBlock.length, parsedBlock.getDataLength());
-
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(genesisBlock.getSignature(), parsedBlock.getSignature()));
-					
-			//CHECK BASE TARGET
-			assertEquals(genesisBlock.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
-			
-			//CHECK FEE
-			assertEquals(genesisBlock.getTotalFee(), parsedBlock.getTotalFee());	
-
-			//CHECK TIMESTAMP
-			assertEquals(genesisBlock.getTimestamp(), parsedBlock.getTimestamp());
-
-			//CHECK TRANSACTION COUNT
-			assertEquals(genesisBlock.getTransactionCount(), parsedBlock.getTransactionCount());
-
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(genesisBlock.getReference(), parsedBlock.getReference()));			
-
-			//CHECK GENERATOR
-			assertEquals(genesisBlock.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
-					
-			//CHECK INSTANCE
-			assertEquals(true, parsedBlock instanceof GenesisBlock);
-
 		}
 		catch (Exception e) 
 		{
 			fail("Exception while parsing transaction." + e);
 		}
+		
+		//CHECK length
+		assertEquals(rawBlock.length, parsedBlock.getDataLength());
+
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(gb.getSignature(), parsedBlock.getSignature()));
+				
+		//CHECK BASE TARGET
+		assertEquals(gb.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
+		
+		//CHECK FEE
+		assertEquals(gb.getTotalFee(), parsedBlock.getTotalFee());	
+
+		//CHECK TIMESTAMP
+		assertEquals(gb.getTimestamp(), parsedBlock.getTimestamp());
+
+		//CHECK TRANSACTION COUNT
+		assertEquals(gb.getTransactionCount(), parsedBlock.getTransactionCount());
+
+		//CHECK REFERENCE
+		assertEquals(true, Arrays.equals(gb.getReference(), parsedBlock.getReference()));			
+
+		//CHECK GENERATOR
+		assertEquals(gb.getGenerator().getAddress(), parsedBlock.getGenerator().getAddress());	
+				
+		//CHECK INSTANCE
+		////assertEquals(true, parsedBlock instanceof GenesisBlock);
 				
 		//PARSE TRANSACTION FROM WRONG BYTES
 		rawBlock = new byte[50];
@@ -169,12 +162,7 @@ public class BlockTests
 	@Test
 	public void validateSignatureBlock()
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-				
-		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
+		gb.process(db);
 				
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -184,13 +172,13 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setLastReference(gb.getGeneratorSignature(), db);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), db); // need for payments
 
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block newBlock = blockGenerator.generateNextBlock(db, generator, gb);
 		
 		//ADD TRANSACTION SIGNATURE
 		byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -215,14 +203,14 @@ public class BlockTests
 		assertEquals(false, newBlock.isSignatureValid());
 		
 		//VALID TRANSACTION SIGNATURE
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
+		newBlock = blockGenerator.generateNextBlock(db, generator, gb);	
 		
 		//ADD TRANSACTION
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(db));
 		payment.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment.isValid(databaseSet, null));
+		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, null));
 		newBlock.addTransaction(payment);
 		
 		//ADD TRANSACTION SIGNATURE
@@ -233,10 +221,10 @@ public class BlockTests
 		assertEquals(true, newBlock.isSignatureValid());	
 		
 		//INVALID TRANSACTION SIGNATURE
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);	
+		newBlock = blockGenerator.generateNextBlock(db, generator, gb);	
 		
 		//ADD TRANSACTION
-		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(databaseSet), payment.getSignature());
+		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(db), payment.getSignature());
 		newBlock.addTransaction(payment);
 				
 		//ADD TRANSACTION SIGNATURE
@@ -548,7 +536,7 @@ public class BlockTests
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 
-		// OIL FUND
+		// FEE FUND
 		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
 								

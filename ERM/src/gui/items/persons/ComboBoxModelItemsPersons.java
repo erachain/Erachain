@@ -64,7 +64,7 @@ public class ComboBoxModelItemsPersons extends DefaultComboBoxModel<PersonCls> i
 			for(Long key: keys)
 			{				
 				//GET PERSON
-				PersonCls person = Controller.getInstance().getPerson(key);
+				PersonCls person = Controller.getInstance().getItemPerson(key);
 				persons.add(person);
 				
 				//ADD

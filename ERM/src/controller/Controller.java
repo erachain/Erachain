@@ -60,6 +60,7 @@ import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
+import core.item.statuses.StatusCls;
 import core.item.persons.PersonCls;
 import core.naming.Name;
 import core.naming.NameSale;
@@ -595,8 +596,14 @@ public class Controller extends Observable {
 		DBSet.getInstance().getItemNoteMap().addObserver(o);
 
 		// ADD OBSERVER TO PERSONS
-		DBSet.getInstance().getPersonMap().addObserver(o);
+		DBSet.getInstance().getItemPersonMap().addObserver(o);
 
+		// ADD OBSERVER TO STATUSES
+		DBSet.getInstance().getItemStatusMap().addObserver(o);
+
+		// ADD OBSERVER TO UNIONS
+		DBSet.getInstance().getItemUnionMap().addObserver(o);
+		
 		// ADD OBSERVER TO ORDERS
 		DBSet.getInstance().getOrderMap().addObserver(o);
 
@@ -1200,8 +1207,11 @@ public class Controller extends Observable {
 		}
 	}
 
-	public BigDecimal getUnconfirmedBalance(String address, long key) {
-		return this.wallet.getUnconfirmedBalance(address, key);
+	//public BigDecimal getUnconfirmedBalance(String address, long key) {
+	//	return this.wallet.getUnconfirmedBalance(address, key);
+	//}
+	public BigDecimal getUnconfirmedBalance(Account account, long key) {
+		return this.wallet.getUnconfirmedBalance(account, key);
 	}
 
 	public void addWalletListener(Observer o) {
@@ -1411,7 +1421,7 @@ public class Controller extends Observable {
 			case ItemCls.NOTE_TYPE:
 				return DBSet.getInstance().getItemNoteMap();
 			case ItemCls.PERSON_TYPE:
-				return DBSet.getInstance().getPersonMap();
+				return DBSet.getInstance().getItemPersonMap();
 		}
 		return null;
 	}
@@ -1555,6 +1565,9 @@ public class Controller extends Observable {
 	public AssetCls getAsset(long key) {
 		return (AssetCls) DBSet.getInstance().getItemAssetMap().get(key);
 	}
+	public PersonCls getPerson(long key) {
+		return (PersonCls) DBSet.getInstance().getItemPersonMap().get(key);
+	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
 		return this.getOrders(have, want, false);
@@ -1577,40 +1590,55 @@ public class Controller extends Observable {
 	}
 
 	// IMPRINTS
-	public ImprintCls getImprint(long key) {
+	public ImprintCls getItemImprint(long key) {
 		return (ImprintCls)DBSet.getInstance().getItemImprintMap().get(key);
 	}
 
 	// NOTES
-	public NoteCls getNote(long key) {
+	public NoteCls getItemNote(long key) {
 		return (NoteCls)DBSet.getInstance().getItemNoteMap().get(key);
 	}
 
 	// PERSONS
-	public PersonCls getPerson(long key) {
-		return (PersonCls)DBSet.getInstance().getPersonMap().get(key);
+	public PersonCls getItemPerson(long key) {
+		return (PersonCls)DBSet.getInstance().getItemPersonMap().get(key);
+	}
+
+	// STATUSES
+	public StatusCls getItemStatus(long key) {
+		return (StatusCls)DBSet.getInstance().getItemStatusMap().get(key);
 	}
 
 	// ALL ITEMS
-	public ItemCls getItem(int type, long key) {
+	public ItemCls getItem(DBSet db, int type, long key) {
 		
 		switch(type)
 			{
 			case ItemCls.ASSET_TYPE: {
-				return DBSet.getInstance().getItemAssetMap().get(key);
+				return db.getItemAssetMap().get(key);
 			}
 			case ItemCls.IMPRINT_TYPE: {
-				return DBSet.getInstance().getItemImprintMap().get(key);
+				return db.getItemImprintMap().get(key);
 			}
 			case ItemCls.NOTE_TYPE: {
-				return DBSet.getInstance().getItemNoteMap().get(key);
+				return db.getItemNoteMap().get(key);
 			}
 			case ItemCls.PERSON_TYPE: {
-				return DBSet.getInstance().getPersonMap().get(key);	
+				return db.getItemPersonMap().get(key);
+			}
+			case ItemCls.STATUS_TYPE: {
+				return db.getItemStatusMap().get(key);	
+			}
+			case ItemCls.UNION_TYPE: {
+				return db.getItemUnionMap().get(key);
 			}
 		}
 		return null;
 	}
+	public ItemCls getItem(int type, long key) {
+		return this.getItem(DBSet.getInstance(), type, key);
+	}
+		
 
 	// ATs
 
@@ -1787,6 +1815,15 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Pair<Transaction, Integer> issueStatus(PrivateKeyAccount creator,
+			String name, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueStatusTransaction(creator,
+					name, description, feePow);
+		}
+	}
+
 	public Pair<Transaction, Integer> createOrder(PrivateKeyAccount creator,
 			AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price,
 			int feePow) {
@@ -1852,10 +1889,11 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
-			PublicKeyAccount userAccount1, PublicKeyAccount userAccount2, PublicKeyAccount userAccount3, int end_date) {
+			List<PublicKeyAccount> userAccounts, int end_date) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_SertifyPerson( version, asPack, creator, feePow, key,
-					userAccount1, userAccount2, userAccount3, end_date);
+			return this.transactionCreator.r_SertifyPerson( version, asPack,
+					creator, feePow, key,
+					userAccounts, end_date);
 		}
 	}
 	

@@ -24,7 +24,7 @@ import database.ItemAssetMap;
 
 public class DatabaseTests {
 
-	long OIL_KEY = 1l;
+	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -119,9 +119,9 @@ public class DatabaseTests {
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 		
-		// OIL FUND
+		// FEE FUND
 		//maker.setLastReference(gb.getGeneratorSignature(), db);
-		//maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		//maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));

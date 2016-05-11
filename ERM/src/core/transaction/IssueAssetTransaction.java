@@ -68,13 +68,33 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Asset"; }
 
-	/*
-	public AssetCls getItem()
+	public long getAssetKey()
 	{
-		return this.asset;
+		return this.getItem().getKey();
 	}
-	*/
+
+	@Override
+	public BigDecimal getAmount() {
+		return new BigDecimal(((AssetCls)this.getItem()).getQuantity());
+	}
+
+	@Override
+	public BigDecimal getAmount(String address) {
+		
+		if(address.equals(this.creator.getAddress()))
+		{
+			return this.getAmount();
+		}
+
+		return BigDecimal.ZERO.setScale(8);
+	}
 	
+	@Override
+	public BigDecimal getAmount(Account account) {
+		String address = account.getAddress();
+		return getAmount(address);
+	}
+
 	/*
 	
 	//@Override
@@ -265,19 +285,6 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		return false;
 	}
 	*/
-
-	//@Override
-	public BigDecimal getAmount(Account account) 
-	{
-		/* 
-		if(account.getAddress().equals(this.creator.getAddress()))
-		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.fee);
-		}
-		*/
-		
-		return BigDecimal.ZERO;
-	}
 
 	//@Override
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 

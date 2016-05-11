@@ -69,17 +69,18 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 		
 		String colorText ="ff0000"; // цвет текста в форме
 		
-		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+		/*
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-	//	this.setIconImages(icons);
+		this.setIconImages(icons);
+		*/
 		
 		this.setVisible(true);
 		this.setMaximizable(true);
@@ -87,7 +88,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 		this.setClosable(true);
 		this.setResizable(true);
 		setPreferredSize(new Dimension(800, 600));
-		this.setLocation(150, 20);
+		this.setLocation(50, 20);
 		
 		
 		//LAYOUT
@@ -435,8 +436,7 @@ public class IssuePersonFrame extends JInternalFrame //JFrame
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
-		} else {
-		
+		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		

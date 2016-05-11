@@ -85,7 +85,7 @@ public class NameSalesTableModel extends TableModelCls<String, BigDecimal> imple
 		
 		case COLUMN_OWNER:
 			
-			return nameSale.getName().getOwner().getAddress();
+			return nameSale.getName().getOwner().asPerson();
 			
 		case COLUMN_PRICE:
 			

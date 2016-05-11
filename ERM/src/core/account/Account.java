@@ -10,19 +10,29 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
+import api.ApiErrorFactory;
+
 //import com.google.common.primitives.Bytes;
 
 import at.AT_Transaction;
+import database.Item_Map;
 import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
 import core.crypto.Base58;
+import core.item.ItemCls;
+import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.naming.Name;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
+import utils.NameUtils;
 import utils.NumberAsString;
+import utils.Pair;
+import utils.NameUtils.NameResult;
 import database.DBSet;
+import database.NameMap;
 import ntp.NTP;
 
 public class Account {
@@ -31,7 +41,7 @@ public class Account {
 	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
-
+	public static final long DEAD_KEY = StatusCls.DEAD_KEY;
 
 	protected String address;
 	
@@ -62,7 +72,7 @@ public class Account {
 	// GET
 	public BigDecimal getUnconfirmedBalance(long key)
 	{
-		return Controller.getInstance().getUnconfirmedBalance(this.getAddress(), key);
+		return Controller.getInstance().getUnconfirmedBalance(this, key);
 	}
 	/*
 	public BigDecimal getConfirmedBalance()
@@ -304,9 +314,57 @@ public class Account {
 	
 	public String toString(long key)
 	{
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		String personStr;
+		String addressStr;
+		if (personRes == null) {
+			personStr = "";
+			addressStr = this.getAddress();
+		}
+		else {
+			personStr = personRes.b.getShort();
+			addressStr = this.getAddress().substring(0, 8);
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			else if (personRes.a == 0) personStr = "[++]" + personStr;
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+		}
 		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
 				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
-				+ " - " + this.getAddress();
+				+ " " + addressStr + " " + personStr;
+	}
+	
+	//////////
+	public String viewPerson() {
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		if (personRes == null) {
+			return "";
+		} else {
+			String personStr = personRes.b.toString();
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			return personStr;
+		}
+		
+	}
+	
+	public String asPerson()
+	{
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		if (personRes == null) {
+			return this.getAddress();
+		}
+		else {
+			String personStr = personRes.b.getShort();
+			String addressStr = this.getAddress().substring(0, 8);
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			return addressStr + " " + personStr;
+		}
 	}
 	
 	@Override
@@ -327,12 +385,12 @@ public class Account {
 		return false;	
 	}
 
+	// personKey, days, block, reference
+	public static Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db, String address) {
+		return db.getAddressPersonMap().getItem(address);				
+	}
 	public Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db) {
-		
-		// IF NOT PERSON HAS THAT ADDRESS
-		Tuple4<Long, Integer, Integer, byte[]> item = db.getAddressPersonMap().getItem(this.address);
-		return item;
-				
+		return getPersonDuration(db, this.address);
 	}
 	
 	public boolean isPerson(DBSet db) {
@@ -343,7 +401,7 @@ public class Account {
 		// TEST TIME and EXPIRE TIME
 		long current_time = NTP.getTime();
 		
-		// TEST TIME and EXPIRE TIME
+		// TEST TIME and EXPIRE TIME for PERSONALIZE address
 		int days = addressDuration.b;		
 		if (days < 0 ) return false;
 		if (days * (long)86400 < current_time ) return false;
@@ -351,14 +409,56 @@ public class Account {
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
 		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
-		
-		// TEST TIME and EXPIRE TIME
+		// TEST TIME and EXPIRE TIME for ALIVE person
 		days = personDuration.a;
 		if (days < 0 ) return false;
+		if (days == 0 ) return true; // permanent active
 		if (days * (long)86400 < current_time ) return false;
-
+		
 		return true;
 		
+	}
+	public Tuple2<Integer, PersonCls> hasPerson(DBSet db) {
+		
+		// IF DURATION ADDRESS to PERSON IS ENDED
+		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		if (addressDuration == null) return null;
+		// TEST TIME and EXPIRE TIME
+		long current_time = NTP.getTime();
+		
+		// get person
+		Long personKey = addressDuration.a;
+		PersonCls person = (PersonCls)Controller.getInstance().getItem(ItemCls.PERSON_TYPE, personKey);
+		
+		// TEST ADDRESS is ACTIVE?
+		int days = addressDuration.b;
+		// TODO x 1000 ?
+		if (days < 0 || days * (long)86400 < current_time )
+			return new Tuple2<Integer, PersonCls>(-1, person);
+
+		// IF PERSON is DEAD
+		Tuple3<Integer, Integer, byte[]> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
+		if (personDead != null) {
+			// person is dead
+			return new Tuple2<Integer, PersonCls>(-2, person);
+		}
+
+		// IF PERSON is ALIVE
+		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		// TEST TIME and EXPIRE TIME for ALIVE person
+		days = personDuration.a;
+		if (days == 0 )
+			// permanent active
+			return new Tuple2<Integer, PersonCls>(0, person);
+		if ((days < 0 ) || days * (long)86400 < current_time )
+			// ALIVE expired
+			return new Tuple2<Integer, PersonCls>(-1, person);
+		
+		return new Tuple2<Integer, PersonCls>(1, person);
+		
+	}
+	public Tuple2<Integer, PersonCls> hasPerson() {
+		return hasPerson(DBSet.getInstance());
 	}
 
 }

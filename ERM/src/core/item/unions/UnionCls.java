@@ -36,7 +36,8 @@ public abstract class UnionCls extends ItemCls{
 	}
 
 	//GETTERS/SETTERS
-	public String getItemType() { return "union"; }
+	public int getItemTypeInt() { return ItemCls.UNION_TYPE; }
+	public String getItemTypeStr() { return "union"; }
 	
 	// DB
 	public Item_Map getDBMap(DBSet db)

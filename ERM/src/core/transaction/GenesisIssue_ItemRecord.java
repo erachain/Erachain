@@ -33,7 +33,9 @@ import database.DBSet;
 public class GenesisIssue_ItemRecord extends Genesis_Record 
 {
 	
+	private Account recipient;
 	private ItemCls item;
+	
 	
 	public GenesisIssue_ItemRecord(byte type, String NAME_ID, ItemCls item) 
 	{
@@ -43,12 +45,26 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		this.generateSignature();
 
 	}
+	// need for GenesisIssuePersonRecord
+	public GenesisIssue_ItemRecord(byte type, String NAME_ID, ItemCls item, Account recipient) 
+	{
+		super(type, NAME_ID);
+
+		this.item = item;
+		this.recipient = recipient;
+		this.generateSignature();
+
+	}
 
 	//GETTERS/SETTERS
 			
 	public ItemCls getItem()
 	{
 		return this.item;
+	}
+	public Account getRecipient()
+	{
+		return this.recipient;
 	}
 
 	public void generateSignature() {
@@ -67,7 +83,8 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		JSONObject transaction = super.toJson();
 				
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put(this.item.getItemType(), this.item.toJson());
+		transaction.put(this.item.getItemTypeStr(), this.item.toJson());
+		if (this.recipient != null) transaction.put("recipient", this.recipient.getAddress());
 				
 		return transaction;	
 	}
@@ -110,7 +127,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		
 		//CHECK DESCRIPTION LENGTH
 		int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000 || descriptionLength < 1)
+		if(descriptionLength > 4000)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}

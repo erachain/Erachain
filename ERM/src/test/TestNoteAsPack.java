@@ -35,7 +35,7 @@ public class TestNoteAsPack {
 
 	boolean asPack = true;
 	boolean includeReference = false;
-	long OIL_KEY = 1l;
+	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -57,9 +57,9 @@ public class TestNoteAsPack {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
-		// OIL FUND
+		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
-		maker.setConfirmedBalance(OIL_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
 	

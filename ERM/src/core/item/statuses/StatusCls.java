@@ -23,6 +23,8 @@ public abstract class StatusCls extends ItemCls {
 	public static final int TITLE = 2;
 	public static final int POSITION = 3;
 	
+	public static final int INITIAL_FAVORITES = 2;
+
 	public StatusCls(byte[] typeBytes, Account creator, String name, String description)
 	{
 		super(typeBytes, creator, name, description);
@@ -34,7 +36,8 @@ public abstract class StatusCls extends ItemCls {
 	}
 
 	//GETTERS/SETTERS
-	public String getItemType() { return "status"; }
+	public int getItemTypeInt() { return ItemCls.STATUS_TYPE; }
+	public String getItemTypeStr() { return "status"; }
 
 	// DB
 	public Item_Map getDBMap(DBSet db)

@@ -102,7 +102,7 @@ public class ExchangeFrame extends JFrame
 		
 		//CREATE SELL LABEL
 		labelGBC.gridx = 1;
-		JLabel lblSell = new JLabel( Lang.getInstance().translate("Sell %have% \u2014 Buy %want%").replace("%have%", this.have.toString()).replace("%sell%", this.want.toString()));
+		JLabel lblSell = new JLabel( Lang.getInstance().translate("Sell %have% \u2014 Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
 		lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblSell, labelGBC);

@@ -22,7 +22,7 @@ import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
 
-import gui.items.persons.PersonConfirm;
+import gui.items.persons.PersonConfirmFrame;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -76,7 +76,7 @@ public static  JDesktopPane desktopPane;
 		
 		
 		//MENU
-        Menu menu = new Menu();
+        Menu menu = new Menu(this);
 
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);
@@ -153,7 +153,7 @@ public static  JDesktopPane desktopPane;
       //  this.pack();
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
-        desktopPane.add(new AllPersonsFrame(this));
+      //  desktopPane.add(new AllPersonsFrame(this));
         
 	}
 }

@@ -32,15 +32,15 @@ public class SynchronizerTests {
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
+	DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+	GenesisBlock genesisBlock = new GenesisBlock();
 
 	@Test
 	public void synchronizeNoCommonBlock()
 	{		
 		//GENERATE 5 BLOCKS FROM ACCOUNT 1
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		
 		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
 		genesisBlock.process(databaseSet);
 		
 		//CREATE KNOWN ACCOUNT
