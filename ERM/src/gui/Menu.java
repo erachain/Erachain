@@ -42,15 +42,18 @@ import gui.AccountsFrame;
 //import gui.SendMoneyFrame;
 import gui.SendAssetFrame;
 import gui.items.imprints.ImprintsPanel;
-import gui.items.persons.AllPersonsPanel;
+//import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
-import gui.items.persons.MyPersonsPanel;
-import gui.items.persons.PersonsPanel;
-import gui.items.persons.SearchPersons;
+//import gui.items.persons.MyPersonsPanel;
+//import gui.items.persons.PersonsPanel;
+//import gui.items.persons.SearchPersons;
 import gui.items.statuses.AllStatusesFrame;
 import gui.items.statuses.AllStatusesPanel;
 import gui.items.statuses.IssueStatusPanel;
+import gui.items.unions.AllUnionsFrame;
+import gui.items.unions.IssueUnionFrame;
+//import gui.items.unions.IssueUnionPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
 import gui.transaction.TransactionDetailsFactory;
@@ -400,6 +403,36 @@ public class Menu extends JMenuBar
         	}
         });
         statusesMenu.add(issueStatusesMenu);  
+
+        ///// UNIONS
+        JMenuItem allUnionsMenu = new JMenuItem(Lang.getInstance().translate("All Unions"));
+        allUnionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Unions"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        allUnionsMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new AllUnionsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        unionsMenu.add(allUnionsMenu);  
+        
+        // issue Person menu
+        JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Set Union"));
+        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Set Union"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueUnionMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        unionsMenu.add(issueUnionMenu);  
 
         
 	}

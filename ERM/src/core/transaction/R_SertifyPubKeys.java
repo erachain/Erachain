@@ -29,6 +29,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
+import core.item.ItemCls;
 import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonCls;
@@ -50,6 +51,7 @@ public class R_SertifyPubKeys extends Transaction {
 	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
+
 	// need RIGHTS for PERSON account
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
@@ -57,21 +59,13 @@ public class R_SertifyPubKeys extends Transaction {
 
 	// how many FEE gift
 	public static final BigDecimal GIFTED_FEE_AMOUNT = BigDecimal.valueOf(0.00005).setScale(8);
-	public static final int DEFAULT_DURATION = 3 * 356;
+	public static final int DEFAULT_DURATION = 2 * 356;
 
 	protected Long key; // PERSON KEY
 	protected Integer end_date; // in days
 	protected List<PublicKeyAccount> sertifiedPublicKeys;
 	protected List<byte[]> sertifiedSignatures;
-	/*
-	protected PublicKeyAccount personAddress1;
-	protected PublicKeyAccount personAddress2;
-	protected PublicKeyAccount personAddress3;
-	protected byte[] userSignature1;
-	protected byte[] userSignature2;
-	protected byte[] userSignature3;
-	*/
-	// 3 * (USER_ADDRESS_LENGTH + SIGNATURE_LENGTH)
+
 	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
@@ -101,8 +95,6 @@ public class R_SertifyPubKeys extends Transaction {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
 				0, timestamp, reference);
-		
-		this.end_date = DEFAULT_DURATION + (int)(NTP.getTime() / 86400);
 	}
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
@@ -148,7 +140,7 @@ public class R_SertifyPubKeys extends Transaction {
 	//GETTERS/SETTERS
 
 	//public static String getName() { return "Send"; }
-	
+
 	public long getKey()
 	{
 		return this.key;
@@ -434,23 +426,18 @@ public class R_SertifyPubKeys extends Transaction {
 			}
 		}
 
-		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		
 		if ( !db.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
-			//return Transaction.ITEM_DOES_NOT_EXIST;
 		}
 
-		if ( !this.creator.isPerson(db) )
+		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
+		if ( this.creator.isPerson(db) )
 		{
+			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+				return Transaction.NOT_ENOUGH_RIGHTS;
+		} else {
 			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-				// if not enough RIGHT BALANCE as GENERAL
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		}
 		
@@ -470,9 +457,16 @@ public class R_SertifyPubKeys extends Transaction {
 		pkAccount.setConfirmedBalance(Transaction.FEE_KEY, 
 				pkAccount.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.end_date,
+		int end_date = this.end_date;
+		if (end_date == 0)
+			// set to_date to default
+			end_date = DEFAULT_DURATION;
+		// set to time stamp of record
+		end_date = (int)(this.timestamp / 86400000.0) + end_date;
+		
+		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(end_date,
 				Controller.getInstance().getHeight(), this.signature);
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, this.end_date,
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, end_date,
 				Controller.getInstance().getHeight(), this.signature);
 		
 		if (db.getPersonStatusMap().getItem(key) == null) {
@@ -560,10 +554,6 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 				
 		return false;
-	}
-
-	public int calcBaseFee() {
-		return calcCommonFee();
 	}
 
 }

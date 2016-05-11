@@ -15,10 +15,15 @@ import core.transaction.GenesisIssueNoteTransaction;
 import core.transaction.GenesisTransferAssetTransaction;
 
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
+import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
+import core.transaction.IssueStatusRecord;
+import core.transaction.IssueUnionRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
@@ -135,6 +140,30 @@ public class TransactionDetailsFactory
 		case Transaction.SEND_ASSET_TRANSACTION:
 			MessageTransaction messageTransaction = (MessageTransaction)transaction;
 			return new MessageTransactionDetailsFrame(messageTransaction);
+
+		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
+			R_SertifyPubKeys sertifyPubKeysRecord = (R_SertifyPubKeys)transaction;
+			return new SertifyPubKeysDetailsFrame(sertifyPubKeysRecord);
+
+		case Transaction.ISSUE_IMPRINT_TRANSACTION:
+			
+			IssueImprintRecord issueImprint = (IssueImprintRecord) transaction;
+			return new IssueImprintDetailsFrame(issueImprint);	
+
+		case Transaction.ISSUE_NOTE_TRANSACTION:
+			
+			IssueNoteRecord issueNote = (IssueNoteRecord) transaction;
+			return new IssueNoteDetailsFrame(issueNote);	
+
+		case Transaction.ISSUE_UNION_TRANSACTION:
+			
+			IssueUnionRecord issueUnion = (IssueUnionRecord) transaction;
+			return new IssueUnionDetailsFrame(issueUnion);	
+
+		case Transaction.ISSUE_STATUS_TRANSACTION:
+			
+			IssueStatusRecord issueStatus = (IssueStatusRecord) transaction;
+			return new IssueStatusDetailsFrame(issueStatus);	
 
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 			

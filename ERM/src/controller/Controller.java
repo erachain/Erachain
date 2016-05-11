@@ -60,8 +60,9 @@ import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
-import core.item.statuses.StatusCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
@@ -98,8 +99,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.12.05";
-	private String buildTime = "2016-04-29 00:00:00 UTC";
+	private String version = "2.13.05";
+	private String buildTime = "2016-05-11 00:00:00 UTC";
 	private long buildTimestamp;
 	
 	public static final String releaseVersion = "2.03.0";
@@ -1608,6 +1609,10 @@ public class Controller extends Observable {
 	public StatusCls getItemStatus(long key) {
 		return (StatusCls)DBSet.getInstance().getItemStatusMap().get(key);
 	}
+	// UNIONS
+	public UnionCls getItemUnion(long key) {
+		return (UnionCls)DBSet.getInstance().getItemUnionMap().get(key);
+	}
 
 	// ALL ITEMS
 	public ItemCls getItem(DBSet db, int type, long key) {
@@ -1821,6 +1826,15 @@ public class Controller extends Observable {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueStatusTransaction(creator,
 					name, description, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> issueUnion(PrivateKeyAccount creator,
+			String name, long birthday, long parent, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueUnionTransaction(creator,
+					name, birthday, parent, description, feePow);
 		}
 	}
 

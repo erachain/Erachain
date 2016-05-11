@@ -2,6 +2,7 @@ package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,6 +31,12 @@ public class IssueUnionRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_UNION_TRANSACTION;
 	private static final String NAME_ID = "Issue Union";
+	
+	// need RIGHTS for PERSON account
+	public static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(100).setScale(8);
+	// need RIGHTS for non PERSON account
+	public static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+
 	
 	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference) 
 	{
@@ -127,7 +134,27 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	}	
 	
 	//VALIDATE
+	public int isValid(DBSet db, byte[] releaserReference) {
 		
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
+
+
+		
+		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
+		if ( this.creator.isPerson(db) )
+		{
+			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+				return Transaction.NOT_ENOUGH_RIGHTS;
+
+		} else {
+			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		}
+		
+		return Transaction.VALIDATE_OK;
+	}
+
 	
 	//PROCESS/ORPHAN
 

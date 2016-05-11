@@ -24,6 +24,8 @@ import core.item.persons.PersonHuman;
 import core.item.persons.PersonCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
+import core.item.unions.Union;
+import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
@@ -40,6 +42,7 @@ import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
+import core.transaction.IssueUnionRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.PaymentTransaction;
@@ -366,6 +369,24 @@ public class TransactionCreator
 										
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueStatusRecord, false);
+	}
+
+	public Pair<Transaction, Integer> createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+								
+		UnionCls union = new Union(creator, name, birthday, parent, description);
+							
+		//CREATE ISSUE NOTE TRANSACTION
+		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastReference(this.fork));
+		issueUnionRecord.sign(creator, false);
+										
+		//VALIDATE AND PROCESS
+		return this.afterCreate(issueUnionRecord, false);
 	}
 
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price, int feePow)

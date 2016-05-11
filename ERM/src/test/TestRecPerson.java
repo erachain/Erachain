@@ -581,10 +581,6 @@ public class TestRecPerson {
 		assertEquals( null, dbAP.getItem(userAddress3));
 		// PERSON -> ADDRESS
 		assertEquals( null, dbPA.getItem(personKey, userAddress3));
-
-		int to_day = (int)(NTP.getTime() / 86400);
-		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + to_day;
-		assertEquals( to_date, r_SertifyPubKeys.getEndDate());
 		
 		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
 		
@@ -594,6 +590,7 @@ public class TestRecPerson {
 		BigDecimal erm_amount_user = userAccount1.getConfirmedBalance(ERM_KEY, db);
 		BigDecimal oil_amount_user = userAccount1.getConfirmedBalance(FEE_KEY, db);
 		
+		//// PROCESS /////
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
 		r_SertifyPubKeys.process(db, false);
@@ -621,12 +618,16 @@ public class TestRecPerson {
 		// byte[0]
 		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));
 		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
-		
+
+		////////// TO DATE ////////
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
-		// PERSON STATUS ALIVE
+		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
+
+		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
 		assertEquals( 0, (int)dbPS.getItem(personKey).a);
 		assertEquals( -1, (int)dbPS.getItem(personKey).b);
 		assertEquals( true, Arrays.equals(dbPS.getItem(personKey).c, r_SertifyPubKeys.getSignature()));
+
 		// ADDRESSES
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress1).a);
 		assertEquals( to_date, (int)dbAP.getItem(userAddress1).b);
@@ -705,7 +706,7 @@ public class TestRecPerson {
 
 		/////////////////////////////////////////////// TEST DURATIONS
 		// TRY DURATIONS
-		int end_date = to_day + 22;
+		int end_date = 222;
 		r_SertifyPubKeys = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				end_date, timestamp, certifier.getLastReference(db));
@@ -713,11 +714,16 @@ public class TestRecPerson {
 		r_SertifyPubKeys.sign(certifier, false);
 		r_SertifyPubKeys.process(db, false);
 
-		assertEquals(end_date, (int)userAccount1.getPersonDuration(db).b);
+		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
+		
+		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
+		assertEquals( 0, (int)dbPS.getItem(personKey).a);
+
+		assertEquals(abs_end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));
 
 		// TEST LIST and STACK
-		int end_date2 = to_day - 12;
+		int end_date2 = -12;
 		r_SertifyPubKeys = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				end_date2, timestamp, certifier.getLastReference(db));
@@ -725,13 +731,16 @@ public class TestRecPerson {
 		r_SertifyPubKeys.sign(certifier, false);
 		r_SertifyPubKeys.process(db, false);
 
-		assertEquals(end_date2, (int)userAccount2.getPersonDuration(db).b);
+		int abs_end_date2 = end_date2 + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
+
+		assertEquals(abs_end_date2, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(false, userAccount2.isPerson(db));
 
 		r_SertifyPubKeys.orphan(db, false);
 
-		assertEquals(end_date, (int)userAccount2.getPersonDuration(db).b);
+		assertEquals(abs_end_date, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));
+		
 	}
 	
 }

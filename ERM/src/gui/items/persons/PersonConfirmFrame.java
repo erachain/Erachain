@@ -69,8 +69,8 @@ public class PersonConfirmFrame extends JFrame  {
 		final JLabel pubKey2Details = new JLabel();
 		final JLabel pubKey3Details = new JLabel();
 
-		final JTextField toDate = new JTextField();
-		final JTextField feePow = new JTextField();
+		final JTextField toDate = new JTextField("0");
+		final JTextField feePow = new JTextField("0");
 		
 		
 	//	this.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -290,7 +290,7 @@ public class PersonConfirmFrame extends JFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(person, Button_Confirm, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate, feePow);
+		    	onGoClick(person, Button_Confirm, pubKey1Txt, pubKey2Txt, pubKey3Txt, toDate, feePow);
 		    }
 		});
 	    
@@ -327,7 +327,7 @@ public class PersonConfirmFrame extends JFrame  {
 	{
 		String toValue = pubKeyTxt.getText();
 		
-		if(toValue.isEmpty())
+		if(toValue.isEmpty() || toValue.length() < 30)
 		{
 			pubKeyDetails.setText("");
 			return;
@@ -363,14 +363,14 @@ public class PersonConfirmFrame extends JFrame  {
 				long current_time = NTP.getTime();
 				
 				// TEST TIME and EXPIRE TIME
-				int daysLeft = addressDuration.b - (int)(current_time / (long)86400);	
+				int daysLeft = addressDuration.b - (int)(current_time / (long)86400000);	
 				if (daysLeft < 0 ) personDetails = Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
 				else personDetails = Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
 
 				// IF PERSON ALIVE
 				Long personKey = addressDuration.a;
 				Tuple3<Integer, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
-				daysLeft = aliveDuration.a - (int)(current_time / (long)86400);
+				daysLeft = aliveDuration.a - (int)(current_time / (long)86400000);
 				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
 				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				
@@ -419,7 +419,7 @@ public class PersonConfirmFrame extends JFrame  {
 		}
     	
 	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
-	    if (pubKey1Txt.getText().length() == 30) {
+	    if (pubKey1Txt.getText().length() > 30) {
 	    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
 	    	if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
 	    }

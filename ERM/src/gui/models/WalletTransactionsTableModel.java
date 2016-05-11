@@ -17,11 +17,13 @@ import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
 import core.item.ItemCls;
+import core.transaction.GenesisIssue_ItemRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.IssueImprintRecord;
 import core.transaction.MessageTransaction;
 import core.transaction.PaymentTransaction;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.TransferAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
@@ -32,6 +34,7 @@ import database.wallet.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
+// in list of records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 	
 	public static final int COLUMN_CONFIRMATIONS = 0;
@@ -127,6 +130,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
 				itemName = item.getShort();
+			} else if ( transaction instanceof GenesisIssue_ItemRecord)
+			{
+				GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)transaction;
+				ItemCls item = transIssue.getItem();
+				itemName = item.getShort();
+			} else if (transaction instanceof R_SertifyPubKeys )
+			{
+				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
+				//recipient = transAmo.getRecipient();
+				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getKey());
+				itemName = item.toString();
 			}
 			
 			switch(column)

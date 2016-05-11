@@ -404,7 +404,7 @@ public class Account {
 		// TEST TIME and EXPIRE TIME for PERSONALIZE address
 		int days = addressDuration.b;		
 		if (days < 0 ) return false;
-		if (days * (long)86400 < current_time ) return false;
+		if (days * (long)86400000 < current_time ) return false;
 
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
@@ -413,7 +413,7 @@ public class Account {
 		days = personDuration.a;
 		if (days < 0 ) return false;
 		if (days == 0 ) return true; // permanent active
-		if (days * (long)86400 < current_time ) return false;
+		if (days * (long)86400000 < current_time ) return false;
 		
 		return true;
 		
@@ -433,7 +433,7 @@ public class Account {
 		// TEST ADDRESS is ACTIVE?
 		int days = addressDuration.b;
 		// TODO x 1000 ?
-		if (days < 0 || days * (long)86400 < current_time )
+		if (days < 0 || days * (long)86400000 < current_time )
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
 		// IF PERSON is DEAD
@@ -450,7 +450,7 @@ public class Account {
 		if (days == 0 )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);
-		if ((days < 0 ) || days * (long)86400 < current_time )
+		if ((days < 0 ) || days * (long)86400000 < current_time )
 			// ALIVE expired
 			return new Tuple2<Integer, PersonCls>(-1, person);
 		

@@ -34,6 +34,7 @@ import database.DBSet;
 public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord 
 {
 	
+	private boolean involvedInWallet;
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_ASSET_TRANSACTION;
 	private static final String NAME_ID = "GENESIS Issue Asset";
 	
@@ -71,7 +72,15 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 	@Override
 	public boolean isInvolved(Account account)
 	{
-		return true; 
+		if (!this.involvedInWallet)
+		{
+			// only one record to wallet for all accounts
+			this.involvedInWallet = true;
+			return true;
+		}
+		
+		return false;
+		
 	}
 
 }

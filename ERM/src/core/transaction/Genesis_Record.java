@@ -121,6 +121,7 @@ public class Genesis_Record extends Transaction
 		return false;	
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return 0;
 	}
