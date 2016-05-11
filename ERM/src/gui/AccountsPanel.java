@@ -156,6 +156,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(sendAsset);
+		menu.addSeparator();
 
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
 		copyAddress.addActionListener(new ActionListener()
@@ -173,25 +174,6 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(copyAddress);
-
-		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public key"));
-		copyPublicKey.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
-				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
-				//		account.getAddress());
-				
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
-			    clipboard.setContents(value, null);
-			}
-		});
-		menu.add(copyPublicKey);
 				
 		JMenuItem copyBalance = new JMenuItem(Lang.getInstance().translate("Copy Balance"));
 		copyBalance.addActionListener(new ActionListener()
@@ -245,7 +227,28 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(copyGeneratingBalance);
-		
+
+		menu.addSeparator();
+		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
+				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
+				//		account.getAddress());
+				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
+			    clipboard.setContents(value, null);
+			}
+		});
+		menu.add(copyPublicKey);
+
+		////////////////////
 		TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 		
 		table.addMouseListener(new MouseAdapter() 
@@ -314,6 +317,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 			AssetCls asset  = cbxFavorites.getItemAt(i);
 			if (asset.getKey() == AssetCls.FEE_KEY)
 			{
+				cbxFavorites.setSelectedIndex(i);
 		    	tableModel.setAsset(asset);
 		    	return;
 			}

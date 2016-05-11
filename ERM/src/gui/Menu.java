@@ -79,6 +79,7 @@ public class Menu extends JMenuBar
 		super();
 		
 		this.parent = parent;
+				
 		//FILE MENU
         JMenu fileMenu = new JMenu(Lang.getInstance().translate("File"));
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));

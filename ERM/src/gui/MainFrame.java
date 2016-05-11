@@ -87,6 +87,17 @@ public static  JDesktopPane desktopPane;
      //   bqColor bq = new bqColor();
         desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
       //  setSelectionBackground(new Color(209, 232, 255, 255))
+
+        /*
+        JInternalFrame item = new AccountsFrame(this);
+        item.setVisible(true);
+		MainFrame.desktopPane.add(item);
+		try {
+			 item.setSelected(true);
+	        } catch (java.beans.PropertyVetoException e1) {}
+	        */
+
+
       //  desktopPane.setSize(500, 300);
         // добавляем его в центр окна
         add(desktopPane);
