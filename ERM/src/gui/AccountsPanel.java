@@ -305,4 +305,18 @@ public class AccountsPanel extends JPanel implements ItemListener
         	tableModel.setAsset(asset);  
 		} 
 	}
+	
+	// set select in Favorites to FEE asset
+	public void setSelectionFavoriteItem() 
+	{		
+		for (int i=0; i < cbxFavorites.getItemCount(); i++)
+		{
+			AssetCls asset  = cbxFavorites.getItemAt(i);
+			if (asset.getKey() == AssetCls.FEE_KEY)
+			{
+		    	tableModel.setAsset(asset);
+		    	return;
+			}
+		}
+	}
 }
