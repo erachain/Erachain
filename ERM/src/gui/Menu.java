@@ -45,6 +45,7 @@ import gui.items.imprints.ImprintsPanel;
 //import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
+import gui.items.persons.RIPPersonFrame;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonsPanel;
 //import gui.items.persons.SearchPersons;
@@ -329,6 +330,22 @@ public class Menu extends JMenuBar
         });
         personsMenu.add(issuePersonMenu);  
 
+        // issue Person menu
+        JMenuItem ripPersonMenu = new JMenuItem(Lang.getInstance().translate("R.I.P. Person"));
+        ripPersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("RIP Person"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        ripPersonMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new RIPPersonFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        personsMenu.addSeparator();  
+        personsMenu.add(ripPersonMenu);  
+
         // DEALS
 
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Asset & Message"));
@@ -369,6 +386,20 @@ public class Menu extends JMenuBar
         recordsMenu.add(recordsMenuList);
         
         ///// STATUSES
+        JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
+        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
+   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        assignStatusMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        statusesMenu.add(assignStatusMenu);  
+
         JMenuItem allStatusesMenu = new JMenuItem(Lang.getInstance().translate("List"));
         allStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Statuses"));
    //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
