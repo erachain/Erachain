@@ -22,7 +22,7 @@ import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
 
-import gui.items.persons.PersonConfirm;
+import gui.items.persons.PersonConfirmFrame;
 import gui.items.persons.SearchPersons;
 import gui.status.StatusPanel;
 import lang.Lang;

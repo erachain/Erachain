@@ -19,10 +19,11 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_AMOUNT = 3;
 	public static final int COLUMN_DIVISIBLE = 4;
+	public static final int COLUMN_FAVORITE = 5;
 
 	private SortableList<Long, AssetCls> assets;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Favorite"});
 	
 	public TableModelItemAssets()
 	{
@@ -89,8 +90,12 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 			
 		case COLUMN_DIVISIBLE:
 			
-			return asset.isDivisible();
+			return asset.isFavorite();
 			
+		case COLUMN_FAVORITE:
+			
+			return asset.isDivisible();
+
 		}
 		
 		return null;

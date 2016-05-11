@@ -64,7 +64,6 @@ import database.ItemPersonMap;
 public class AllPersonsPanel extends JPanel {
 	
 	private TableModelPersons tableModelPersons;
-	private JButton ConfirmButton;
 	
 
 	public AllPersonsPanel() {
@@ -145,24 +144,6 @@ public class AllPersonsPanel extends JPanel {
 			}
 		});
 		
-		
-		// button confirm
-	        ConfirmButton = new JButton(Lang.getInstance().translate("Confirm"));
-	        ConfirmButton.setPreferredSize(new Dimension(100, 25));
-	        ConfirmButton.setEnabled(false);
-	        ConfirmButton.addActionListener(new ActionListener()
-			{
-			    public void actionPerformed(ActionEvent e)
-			    {
-			// открываем диалоговое окно ввода данных для подтверждения персоны 
-		//	    	PersonConfirm fm = new PersonConfirm(AllPersonsFrame.this);	
-			// обрабатываем полученные данные от диалогового окна
-			    	//if(fm.isOK()){
-	                //    JOptionPane.showMessageDialog(Form1.this, "OK");
-	                //}
-			    }
-			});
-	    	
 				
 		// select row table persons
 				
@@ -172,119 +153,95 @@ public class AllPersonsPanel extends JPanel {
 		Address1.setBackground(new Color(255, 255, 255, 0));
 		
 		
-		 JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
-		
-		
-		
+		JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(personsTable),new JScrollPane(Address1)); 
+		 
 		// обработка изменения положения курсора в таблице
-				personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+		personsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 					
-					@SuppressWarnings("deprecation")
-					@Override
-					public void valueChanged(ListSelectionEvent arg0) {
-						String dateAlive;
-						String date_birthday;
-						String message;
+			@SuppressWarnings("deprecation")
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				String dateAlive;
+				String date_birthday;
+				String message;
 				// TODO Auto-generated method stub
 				// устанавливаем формат даты
-						SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 				//создаем объект персоны
-						PersonCls person;
+				PersonCls person;
 						
-						
-						if (personsTable.getSelectedRow() >= 0 ){
-							person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
-						
+			
+				if (personsTable.getSelectedRow() >= 0 ){
+					person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
+				
 
-						if (person.isConfirmed()){
-							date_birthday=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-							message ="<html><div>#" + "<b>" + person.getKey() + " : " + date_birthday + "</b>"
-							+ "<br>" + person.getName().toString() + "</div>";
+				if (person.isConfirmed()){
+					date_birthday=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+					message ="<html><div>#" + "<b>" + person.getKey() + " : " + date_birthday + "</b>"
+					+ "<br>" + person.getName().toString() + "</div>";
 
-							message += "<h2>"+ "Statuses" +"</h2>";
-							// GETT PERSON STATUS for ALIVE
-							Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey());
-					
-							if (t3Alive != null){
-								if (t3Alive.a == 0) dateAlive = "active";
-								else dateAlive = formatDate.format( new Date(t3Alive.a * (long)86400000));
-							} else
-							{
-								dateAlive = Lang.getInstance().translate("unknown");
-							}
-							message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
-
-							// GETT PERSON STATUS for DEAD
-							Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
-					
-							if (t3Dead != null){
-								if (t3Dead.a == 0) dateAlive = "yes";
-								else dateAlive = formatDate.format( new Date(t3Dead.a * (long)86400000));
-							} else
-							{
-								dateAlive = Lang.getInstance().translate("unknown");
-							}
-							message += "<div>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
-
-							// GET CERTIFIED ACCOUNTS
-							message += "<h2>"+ "Accounts" +"</h2>";
-							TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-							if ( !addresses.isEmpty()){
-								// for each account seek active date
-								String active_date_str;
-								for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> e : addresses.entrySet())
-								{
-									Tuple3<Integer, Integer, byte[]> active_date = e.getValue().peek();
-									if (active_date.a == 0) active_date_str = "active";
-									else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
-									
-									message += "<div><input type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
-											+ " -> <b>" + active_date_str +"</b></div>";
-								}
-							}
-							else{
-								message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-							}
-						}else{
-							
-							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	
-						}
-						message = message + "</html>";
-						
-							
-						Address1.setText(message);
-						PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());//.setPreferredSize(new Dimension(100,100));		
-					
+					message += "<h2>"+ "Statuses" +"</h2>";
+					// GETT PERSON STATUS for ALIVE
+					Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey());
+			
+					if (t3Alive != null){
+						if (t3Alive.a == 0) dateAlive = "active";
+						else dateAlive = formatDate.format( new Date(t3Alive.a * (long)86400000));
+					} else
+					{
+						dateAlive = Lang.getInstance().translate("unknown");
 					}
+					message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
+
+					// GETT PERSON STATUS for DEAD
+					Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+			
+					if (t3Dead != null){
+						if (t3Dead.a == 0) dateAlive = "yes";
+						else dateAlive = formatDate.format( new Date(t3Dead.a * (long)86400000));
+					} else
+					{
+						dateAlive = Lang.getInstance().translate("unknown");
+					}
+					message += "<div>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
+
+					// GET CERTIFIED ACCOUNTS
+					message += "<h2>"+ "Accounts" +"</h2>";
+					TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+					if ( !addresses.isEmpty()){
+						// for each account seek active date
+						String active_date_str;
+						for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> e : addresses.entrySet())
+						{
+							Tuple3<Integer, Integer, byte[]> active_date = e.getValue().peek();
+							if (active_date.a == 0) active_date_str = "active";
+							else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
+							
+							message += "<div><input type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
+									+ " -> <b>" + active_date_str +"</b></div>";
+						}
+					}
+					else{
+						message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
+					}					
+				} else {
+					message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	
 				}
+				message = message + "</html>";
 				
-			});
+					
+				Address1.setText(message);
+				PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());//.setPreferredSize(new Dimension(100,100));		
+					
+				}
+			}
+		});
 				
-				
-				
-	/*
-				// tool bar
-				JToolBar tb1 = new JToolBar(" Панель 1"),
-
-						tb2 = new JToolBar(" Панель 2");
-
-						tb1.setRollover(true);
-
-						tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
-
-						tb1.add(new JButton(new ImageIcon("About24.gif")));
-
-						tb2.add(new JButton("Первая")); tb2.add(new JButton("Вторая"));
-
-						tb2.add(new JButton("Третья"));
-
-		*/			
-
 		// MENU
 	
-	JPopupMenu All_Persons_Table_menu = new JPopupMenu();
-		JMenuItem Confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
-		Confirm_Menu.addActionListener(new ActionListener() {
+		JPopupMenu all_Persons_Table_menu = new JPopupMenu();
+		JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
+		confirm_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				/*
 				int row = personsTable.getSelectedRow();
@@ -296,17 +253,33 @@ public class AllPersonsPanel extends JPanel {
 				// открываем диалоговое окно ввода данных для подтверждения персоны 
 				PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
 
-		    	PersonConfirm fm = new PersonConfirm(AllPersonsPanel.this, person);	
-		// обрабатываем полученные данные от диалогового окна
+		    	PersonConfirmFrame fm = new PersonConfirmFrame(AllPersonsPanel.this, person);	
+		    	// обрабатываем полученные данные от диалогового окна
 		    	//if(fm.isOK()){
                 //    JOptionPane.showMessageDialog(Form1.this, "OK");
                 //}
 			
 			}
 		});
-		All_Persons_Table_menu.add(Confirm_Menu);
+		all_Persons_Table_menu.add(confirm_Menu);
 
-		personsTable.setComponentPopupMenu(All_Persons_Table_menu);
+		JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
+		setStatus_Menu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+
+				PersonSetStatusFrame fm = new PersonSetStatusFrame(AllPersonsPanel.this, person);	
+		    	// обрабатываем полученные данные от диалогового окна
+		    	//if(fm.isOK()){
+                //    JOptionPane.showMessageDialog(Form1.this, "OK");
+                //}
+			
+			}
+		});
+		all_Persons_Table_menu.add(setStatus_Menu);
+
+		personsTable.setComponentPopupMenu(all_Persons_Table_menu);
 		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override

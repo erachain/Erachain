@@ -72,6 +72,10 @@ public class AssetsPanel extends JPanel
 		TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);
 		confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 		
+		//CHECKBOX FOR CONFIRMED
+		TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);
+		favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+
 		//MENU
 		JPopupMenu assetsMenu = new JPopupMenu();
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));

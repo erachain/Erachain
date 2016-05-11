@@ -9,6 +9,9 @@ import core.item.ItemCls;
 import database.DBSet;
 import database.Item_Map;
 import database.Issue_ItemMap;
+import database.wallet.WalletDatabase;
+import database.wallet.FavoriteItem;
+
 
 
 public abstract class AssetCls extends ItemCls {

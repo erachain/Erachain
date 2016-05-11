@@ -54,11 +54,11 @@ import utils.Pair;
 import utils.NameUtils.NameResult;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
-public class PersonConfirm extends JFrame  {
+public class PersonConfirmFrame extends JFrame  {
 
 	private JComboBox<Account> accountLBox;
 
-	public PersonConfirm(JComponent  apers, PersonCls person) {
+	public PersonConfirmFrame(JComponent  apers, PersonCls person) {
 		super();
 	
 

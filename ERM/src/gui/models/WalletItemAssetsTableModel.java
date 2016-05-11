@@ -20,10 +20,11 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 	public static final int COLUMN_AMOUNT = 3;
 	public static final int COLUMN_DIVISIBLE = 4;
 	public static final int COLUMN_CONFIRMED = 5;
+	public static final int COLUMN_FAVORITE = 6;
 	
 	private SortableList<Tuple2<String, String>, AssetCls> assets;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Confirmed"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Confirmed", "Favorite"});
 	
 	public WalletItemAssetsTableModel()
 	{
@@ -94,6 +95,9 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 			
 			return asset.isConfirmed();
 			
+		case COLUMN_FAVORITE:
+			
+			return asset.isFavorite();
 		}
 		
 		return null;
