@@ -189,98 +189,19 @@ public class MyPersonsPanel extends JPanel
 				
 				// select row table persons
 				
-				JEditorPane Address1 = new JEditorPane();
-				Address1.setContentType("text/html");
-				Address1.setText("<HTML>" + Lang.getInstance().translate("Select person")); // Document text is provided below.
-				Address1.setBackground(new Color(255, 255, 255, 0));
-				
-				 JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(Address1)); 
-				 
-				 
+				 Person_Info info = new Person_Info();
+				 JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info)); 
 				// обработка изменения положения курсора в таблице
 				table.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-					
 					@SuppressWarnings("deprecation")
 					@Override
 					public void valueChanged(ListSelectionEvent arg0) {
-						String Date_Acti;
-						String Date_birs;
-						String message;
-				// TODO Auto-generated method stub
-				// устанавливаем формат даты
-						SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-				//создаем объект персоны
-						PersonCls person;
-						
-						
-							if (table.getSelectedRow() >= 0 ){
-							person = personsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
-						
-						
-				//читаем таблицу персон.
-						Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
-				// преобразование в дату
-				
-				
-						if (t3 != null){
-							if (t3.a == 0) Date_Acti = "+";
-							else Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
-						} else
-						{
-							Date_Acti =Lang.getInstance().translate("Not found!");
-						};
-						if (person.isConfirmed()){
-							Date_birs=  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-							 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
-							+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + person.getName().toString()		+ "</p>" 
-					        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>"
-					        + "<p>  "  + Lang.getInstance().translate("To Date")  +":"        		  + Date_Acti			+"</p>"
-					        ;
-							 // Читаем адреса клиента
-							 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-							 if ( !Addresses.isEmpty()){
-								 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
-							 }
-							 else{
-								 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-															 }
-						}else{
-							
-							message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
-						}
-						message = message + "</html>";
-						
-							
-				Address1.setText(message);
-				PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());//.setPreferredSize(new Dimension(100,100));		
-			 
-			
-					
+						PersonCls person =null;
+						if (table.getSelectedRow() >= 0 )person = personsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
+						info.show_002(person);
+						PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
 					}
-					}
-					
-					});
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-		
-	
-	
-				
-				
-						
-		
-		
+				});
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
