@@ -40,23 +40,23 @@ import database.DBMap;
 // typeBytes[2] - size of personalized accounts
 public class R_SetStatusToItem extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Status";
-	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
+	private static final int DATE_DAY_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
 	protected Long key; // STATUS KEY
 	protected ItemCls item; // ITEM
-	protected Integer end_date = 0; // in days; 0 - permanent active
+	protected Long end_date; // in days; 0 - permanent active
 	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
+			Long end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
@@ -65,7 +65,7 @@ public class R_SetStatusToItem extends Transaction {
 	}
 
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
+			Long end_date, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
 				end_date, timestamp, reference);
 	}
@@ -73,10 +73,10 @@ public class R_SetStatusToItem extends Transaction {
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
 			long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				0, timestamp, reference);
+				null, timestamp, reference);
 	}
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(typeBytes, creator, feePow, key, item,
 				end_date, timestamp, reference);
 		this.signature = signature;
@@ -84,20 +84,20 @@ public class R_SetStatusToItem extends Transaction {
 	}
 	// as pack
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
+			Long end_date, byte[] signature) {
 		this(typeBytes, creator, (byte)0, key, item,
 				end_date, 0l, null);
 		this.signature = signature;
 	}
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
 				end_date, timestamp, reference);
 	}
 
 	// as pack
 	public R_SetStatusToItem(PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
+			Long end_date, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, item,
 				end_date, 0l, null);
 	}
@@ -120,7 +120,7 @@ public class R_SetStatusToItem extends Transaction {
 		this.item = item;
 	}
 
-	public int getEndDate() 
+	public Long getEndDate() 
 	{
 		return this.end_date;
 	}
@@ -212,8 +212,9 @@ public class R_SetStatusToItem extends Transaction {
 		position += KEY_LENGTH;
 		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);
 		
-		// READ DURATION
-		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
+		// READ END DATE
+		byte[] end_dateBytes = Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH);
+		Long end_date = Longs.fromByteArray(end_dateBytes);	
 		position += DATE_DAY_LENGTH;
 
 		if (!asPack) {
@@ -246,8 +247,8 @@ public class R_SetStatusToItem extends Transaction {
 		keyBytes = Bytes.ensureCapacity(itemKeyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
 		
-		//WRITE DURATION
-		data = Bytes.concat(data, Ints.toByteArray(this.end_date));
+		//WRITE END DATE
+		data = Bytes.concat(data, Longs.toByteArray(this.end_date));
 
 		return data;	
 	}
@@ -266,12 +267,6 @@ public class R_SetStatusToItem extends Transaction {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
-
-		//CHECK END_DAY
-		if(end_date < 0)
-		{
-			return INVALID_DATE;
-		}
 	
 		if ( !db.getItemStatusMap().contains(this.key) )
 		{
@@ -289,18 +284,14 @@ public class R_SetStatusToItem extends Transaction {
 			return ITEM_DOES_NOT_STATUSED;
 
 		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		
-		if ( !this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-				// if not enough RIGHT BALANCE as GENERAL
+		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+			if ( this.creator.isPerson(db) )
+			{
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
+			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		}
+			}
 		
 		return Transaction.VALIDATE_OK;
 	}
@@ -312,7 +303,7 @@ public class R_SetStatusToItem extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.end_date,
+		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
 
 		// SET ALIVE PERSON for DURATION

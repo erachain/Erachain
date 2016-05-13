@@ -402,18 +402,17 @@ public class Account {
 		long current_time = NTP.getTime();
 		
 		// TEST TIME and EXPIRE TIME for PERSONALIZE address
-		int days = addressDuration.b;		
+		int days = addressDuration.b;
 		if (days < 0 ) return false;
 		if (days * (long)86400000 < current_time ) return false;
 
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
-		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple3<Long, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		days = personDuration.a;
-		if (days < 0 ) return false;
-		if (days == 0 ) return true; // permanent active
-		if (days * (long)86400000 < current_time ) return false;
+		Long end_date = personDuration.a;
+		if (end_date == null ) return true; // permanent active
+		if (end_date < current_time + 86400 ) return false; // - 1 day
 		
 		return true;
 		
@@ -437,20 +436,20 @@ public class Account {
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
 		// IF PERSON is DEAD
-		Tuple3<Integer, Integer, byte[]> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
+		Tuple3<Long, Integer, byte[]> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
 		if (personDead != null) {
 			// person is dead
 			return new Tuple2<Integer, PersonCls>(-2, person);
 		}
 
 		// IF PERSON is ALIVE
-		Tuple3<Integer, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple3<Long, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		days = personDuration.a;
-		if (days == 0 )
+		Long end_date = personDuration.a;
+		if (end_date == null )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);
-		if ((days < 0 ) || days * (long)86400000 < current_time )
+		if (end_date < current_time + 86400 )
 			// ALIVE expired
 			return new Tuple2<Integer, PersonCls>(-1, person);
 		

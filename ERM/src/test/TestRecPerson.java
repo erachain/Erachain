@@ -625,7 +625,7 @@ public class TestRecPerson {
 		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( 0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).a);
 		assertEquals( -1, (int)dbPS.getItem(personKey, ALIVE_KEY).b);
 		assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
 
@@ -686,7 +686,7 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE - must not modified!
-		assertEquals( (int)0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -718,7 +718,7 @@ public class TestRecPerson {
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( 0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		assertEquals(abs_end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));

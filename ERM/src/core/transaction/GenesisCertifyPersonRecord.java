@@ -150,14 +150,16 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 
 		//UPDATE RECIPIENT
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
-		// SET ALIVE PERSON for DURATION
+		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(null, 0, this.signature);
+
+		// SET ALIVE PERSON for DURATION permanent
 		db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
 
-		// SET PERSON ADDRESS
+		// SET PERSON ADDRESS - end date as timestamp
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, Integer.MAX_VALUE, 0, this.signature);
+		Tuple3<Integer, Integer, byte[]> itemA1 = new Tuple3<Integer, Integer, byte[]>(0, 0, this.signature);
 		db.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
-		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemP);
+		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.signature, db);

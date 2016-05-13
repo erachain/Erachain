@@ -188,11 +188,11 @@ public class AllUnionsPanel extends JPanel {
 
 					message += "<h2>"+ "Statuses" +"</h2>";
 					// GETT UNION STATUS for ALIVE
-					Tuple3<Integer, Integer, byte[]> t3Alive = null; //DBSet.getInstance().getUnionStatusMap().getItem(union.getKey());
+					Tuple3<Long, Integer, byte[]> t3Alive = null; //DBSet.getInstance().getUnionStatusMap().getItem(union.getKey());
 			
 					if (t3Alive != null){
-						if (t3Alive.a == 0) dateAlive = "active";
-						else dateAlive = formatDate.format( new Date(t3Alive.a * (long)86400000));
+						if (t3Alive.a == null) dateAlive = "active";
+						else dateAlive = formatDate.format( new Date(t3Alive.a));
 					} else
 					{
 						dateAlive = Lang.getInstance().translate("unknown");
@@ -200,11 +200,11 @@ public class AllUnionsPanel extends JPanel {
 					message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
 
 					// GETT UNION STATUS for DEAD
-					Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getUnionStatusMap().getItem(union.getKey(), StatusCls.DEAD_KEY);
+					Tuple3<Long, Integer, byte[]> t3Dead = DBSet.getInstance().getUnionStatusMap().getItem(union.getKey(), StatusCls.DEAD_KEY);
 			
 					if (t3Dead != null){
-						if (t3Dead.a == 0) dateAlive = "yes";
-						else dateAlive = formatDate.format( new Date(t3Dead.a * (long)86400000));
+						if (t3Dead.a == null) dateAlive = "yes";
+						else dateAlive = formatDate.format( new Date(t3Dead.a ));
 					} else
 					{
 						dateAlive = Lang.getInstance().translate("unknown");

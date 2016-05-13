@@ -108,15 +108,16 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		Account recipient = this.getRecipient();
 
 		//UPDATE RECIPIENT
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
+		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(null, 0, this.signature);
 		// SET ALIVE PERSON for DURATION
 		db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, itemP);
 
 		// SET PERSON ADDRESS
 		// Integer.MAX_VALUE = 0 - permanent
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(key, 0, 0, this.signature);
+		Tuple3<Integer, Integer, byte[]> itemA1 = new Tuple3<Integer, Integer, byte[]>(0, 0, this.signature);
 		db.getAddressPersonMap().addItem(recipient.getAddress(), itemA);
-		db.getPersonAddressMap().addItem(key, recipient.getAddress(), itemP);
+		db.getPersonAddressMap().addItem(key, recipient.getAddress(), itemA1);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		recipient.setLastReference(this.signature, db);

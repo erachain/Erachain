@@ -253,7 +253,7 @@ public class TestRecGenesisPerson2 {
 		assertEquals( 0, (int)dbPA.getItem(keyPerson, address).b);
 		assertEquals( true, Arrays.equals(dbPA.getItem(keyPerson, address).c, genesisIssuePersonTransaction.getSignature()));
 		// PERSON STATUS ALIVE
-		assertEquals( Integer.MAX_VALUE, (int)dbPS.getItem(keyPerson, StatusCls.ALIVE_KEY).a);
+		assertEquals( null, dbPS.getItem(keyPerson, StatusCls.ALIVE_KEY).a);
 		assertEquals( 0, (int)dbPS.getItem(keyPerson, StatusCls.ALIVE_KEY).b);
 		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson, StatusCls.ALIVE_KEY).c, genesisIssuePersonTransaction.getSignature()));
 

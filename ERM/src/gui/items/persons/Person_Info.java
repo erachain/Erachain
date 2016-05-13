@@ -51,11 +51,11 @@ public  Person_Info() {
 
 		message += "<h2>"+ "Statuses" +"</h2>";
 		// GETT PERSON STATUS for ALIVE
-		Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+		Tuple3<Long, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 
 		if (t3Alive != null){
-			if (t3Alive.a == 0) dateAlive = "active";
-			else dateAlive = formatDate.format( new Date(t3Alive.a * (long)86400000));
+			if (t3Alive.a == null) dateAlive = "active";
+			else dateAlive = formatDate.format( new Date(t3Alive.a));
 		} else
 		{
 			dateAlive = Lang.getInstance().translate("unknown");
@@ -63,11 +63,11 @@ public  Person_Info() {
 		message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
 
 		// GETT PERSON STATUS for DEAD
-		Tuple3<Integer, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+		Tuple3<Long, Integer, byte[]> t3Dead = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
 
 		if (t3Dead != null){
-			if (t3Dead.a == 0) dateAlive = "yes";
-			else dateAlive = formatDate.format( new Date(t3Dead.a * (long)86400000));
+			if (t3Dead.a == null) dateAlive = "yes";
+			else dateAlive = formatDate.format( new Date(t3Dead.a));
 		} else
 		{
 			dateAlive = Lang.getInstance().translate("unknown");
@@ -114,13 +114,13 @@ public  Person_Info() {
 	
 	
 //читаем таблицу персон.
-	Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
+	Tuple3<Long, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
 // преобразование в дату
 
 
 	
 	if (t3 != null){
-		if (t3.a == 0) Date_Acti = "+";
+		if (t3.a == null) Date_Acti = "+";
 		else Date_Acti = formatDate.format( new Date(Long.valueOf(t3.a.toString())));
 	} else
 	{

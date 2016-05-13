@@ -117,7 +117,7 @@ public class TransactionDetailsFactory
 			IssuePersonRecord issuePerson = (IssuePersonRecord) transaction;
 			return new IssuePersonDetailsFrame(issuePerson);	
 
-		case Transaction.SET_STATUS_TRANSACTION:
+		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			
 			R_SetStatusToItem setStatusToItem = (R_SetStatusToItem) transaction;
 			return new SetStatusToItemDetailsFrame(setStatusToItem);	

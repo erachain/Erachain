@@ -126,11 +126,16 @@ public class TransactionFactory {
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
 			
-		case Transaction.SET_STATUS_TRANSACTION:
+		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION
 			return R_SetStatusToItem.Parse(data, releaserReference);
 			
+		case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
+			
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_SetUnionToItem.Parse(data, releaserReference);
+
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION

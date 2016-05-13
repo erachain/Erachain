@@ -369,8 +369,8 @@ public class UnionConfirmFrame extends JFrame  {
 
 				// IF UNION ALIVE
 				Long unionKey = addressDuration.a;
-				Tuple3<Integer, Integer, byte[]> aliveDuration = DBSet.getInstance().getUnionStatusMap().getItem(unionKey, StatusCls.ALIVE_KEY);
-				daysLeft = aliveDuration.a - (int)(current_time / (long)86400);
+				Tuple3<Long, Integer, byte[]> aliveDuration = DBSet.getInstance().getUnionStatusMap().getItem(unionKey, StatusCls.ALIVE_KEY);
+				daysLeft = (int)((aliveDuration.a - current_time) / 86400000L);
 				if (daysLeft < 0 ) unionDetails = unionDetails + "<br>" + Lang.getInstance().translate("Union died %days% ago days ago").replace("%days%", ""+daysLeft);
 				else unionDetails = unionDetails + "<br>" + Lang.getInstance().translate("Union is still alive %days%").replace("%days%", ""+daysLeft);
 				

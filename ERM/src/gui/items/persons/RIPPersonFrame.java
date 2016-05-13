@@ -190,7 +190,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(person, Button_Confirm, toDate, feePow);
+		    	onGoClick(Button_Confirm, feePow, person, toDate);
 		    }
 		});
 	    
@@ -241,15 +241,32 @@ public class RIPPersonFrame extends JInternalFrame  {
 			personDetails += person.getSkinColor() + ":" + person.getEyeColor() + ":" + person.getHairСolor() + "<br>";
 			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
-			// IF PERSON ALIVE
-			Tuple3<Integer, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
-			if (aliveDuration.a == 0)
-				personDetails += "permanent ALIVE";
-			else {
-				long current_time = NTP.getTime();
-				int daysLeft = aliveDuration.a - (int)(current_time / (long)86400000);
-				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
-				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
+			// IF PERSON DEAD
+			Tuple3<Long, Integer, byte[]> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+			if (deadDay != null)
+			{
+				if (deadDay.a == null)
+					personDetails += "<br>Dead";
+				else {
+					long current_time = NTP.getTime();
+					int daysLeft = (int)((deadDay.a - current_time) / 86400000);
+					//personDetails += "<br>" + Lang.getInstance().translate("Date of death %days%").replace("%days%", ""+daysLeft);
+					personDetails += "<br>" + Lang.getInstance().translate("Died %days% days ago").replace("%days%", ""+daysLeft);
+				}
+			} else {
+				// IF PERSON ALIVE
+				Tuple3<Long, Integer, byte[]> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+				if (aliveDay == null)
+				{} else {
+					if (aliveDay.a == null)
+						personDetails += "<br>Alive";
+					else {
+						long current_time = NTP.getTime();
+						int daysLeft = (int)((aliveDay.a - current_time) / 86400000);
+						if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
+						else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
+					}
+				}
 			}
 			
 			pubKeyDetails.setText("<html>" + personDetails + "</html>");
@@ -259,15 +276,15 @@ public class RIPPersonFrame extends JInternalFrame  {
 		return person;
 	}
 
-	public void onGoClick(
-			PersonCls person, JButton Button_Confirm, JTextField toDateTxt, JTextField feePowTxt)
+	public void onGoClick(JButton Button_Confirm, JTextField feePowTxt,
+			PersonCls person, JTextField toDateTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
 		Account creator = (Account) this.accountLBox.getSelectedItem();
     	//String address = pubKey1Txt.getText();
-    	int toDate = 0;
+    	Long toDate = null;
     	int feePow = 0;
     	int parse = 0;
     	String toDateStr = toDateTxt.getText();
@@ -279,8 +296,12 @@ public class RIPPersonFrame extends JInternalFrame  {
 			//READ to DAY
 			parse++;
 	    	if (toDateStr.length() > 0)
-    			toDate = Integer.parseInt(toDateStr);
-    		}
+	    	{
+    			toDate = Long.parseLong(toDateStr);
+    			if (toDate == 0) toDate = null;
+	    	}
+	    	
+		}
 		catch(Exception e)
 		{
 			if(parse == 0)
@@ -299,15 +320,12 @@ public class RIPPersonFrame extends JInternalFrame  {
 
 		int version = 0; // without user signs
 		
-		Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
-		/*
-		 * Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
-				feePow, person.getKey(), 
-				sertifiedPublicKeys, toDate);
-		*/
+		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
+		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
+				feePow, StatusCls.DEAD_KEY, person, toDate);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		

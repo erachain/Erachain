@@ -363,14 +363,14 @@ public class PersonConfirmFrame extends JFrame  {
 				long current_time = NTP.getTime();
 				
 				// TEST TIME and EXPIRE TIME
-				int daysLeft = addressDuration.b - (int)(current_time / (long)86400000);	
+				int daysLeft = (int)((addressDuration.b - current_time) / (long)86400000);	
 				if (daysLeft < 0 ) personDetails = Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
 				else personDetails = Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
 
 				// IF PERSON ALIVE
 				Long personKey = addressDuration.a;
-				Tuple3<Integer, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
-				daysLeft = aliveDuration.a - (int)(current_time / (long)86400000);
+				Tuple3<Long, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
+				daysLeft = (int)((aliveDuration.a - current_time) / (long)86400000);	
 				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
 				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				

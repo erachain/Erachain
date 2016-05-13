@@ -101,6 +101,7 @@ public abstract class Transaction {
 	public static final int ITEM_STATUS_NOT_EXIST = 59;
 	public static final int ITEM_UNION_NOT_EXIST = 60;
 	public static final int ITEM_DOES_NOT_STATUSED = 61;
+	public static final int ITEM_DOES_NOT_UNITED = 62;
 
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 70;
 	public static final int ITEM_PERSON_LONGITUDE_ERROR = 71;
@@ -138,8 +139,8 @@ public abstract class Transaction {
 	public static final int SEND_ASSET_TRANSACTION = 31;
 	public static final int SIGN_NOTE_TRANSACTION = 32;
 	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 33;
-	public static final int SET_STATUS_TRANSACTION = 34;
-	public static final int ADOPT_UNION_TRANSACTION = 35;
+	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 34;
+	public static final int SET_UNION_TO_ITEM_TRANSACTION = 35;
 	// confirms other transactions
 	public static final int CONFIRM_TRANSACTION = 40;
 	// exchange of assets

@@ -523,9 +523,9 @@ public class TransactionCreator
 		return afterCreate(record, asPack);
 	}
 
-	public Pair<Transaction, Integer> R_SetStatusToItem(boolean asPack,
+	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
-			int end_date) {
+			Long end_date) {
 		
 		this.checkUpdate();
 		

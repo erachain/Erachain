@@ -1910,7 +1910,16 @@ public class Controller extends Observable {
 					userAccounts, end_date);
 		}
 	}
-	
+
+	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
+			int feePow, long key,
+			ItemCls item, Long end_date) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_SetStatusToItem( version, asPack,
+					creator, feePow, key,
+					item, end_date);
+		}
+	}
 	/*
 	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
 			Account recipient, long key, BigDecimal amount,int feePow,

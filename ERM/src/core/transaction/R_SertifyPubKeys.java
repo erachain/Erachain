@@ -432,14 +432,14 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
-		if ( this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-				return Transaction.NOT_ENOUGH_RIGHTS;
-		} else {
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+			if ( this.creator.isPerson(db) )
+			{
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
+			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		}
+			}
 		
 		return Transaction.VALIDATE_OK;
 	}
@@ -471,7 +471,7 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		if (db.getPersonStatusMap().getItem(key, StatusCls.ALIVE_KEY) == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Integer, Integer, byte[]>(0,
+			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Long, Integer, byte[]>(null,
 					Controller.getInstance().getHeight(), this.signature));
 		}
 

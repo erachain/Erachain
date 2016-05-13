@@ -38,25 +38,25 @@ import database.DBMap;
 // typeBytes[1] - version =0 - not need sign by person;
 // 		 =1 - need sign by person
 // typeBytes[2] - size of personalized accounts
-public class R_SetPersonToItem extends Transaction {
+public class R_SetUnionToItem extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TRANSACTION;
-	private static final String NAME_ID = "Set Status";
-	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
+	private static final byte TYPE_ID = (byte)Transaction.SET_UNION_TO_ITEM_TRANSACTION;
+	private static final String NAME_ID = "Set Union to Unit";
+	private static final int DATE_DAY_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
 	protected Long key; // PERSON KEY
 	protected ItemCls item; // ITEM
-	protected Integer end_date = 0; // in days; 0 - permanent active
+	protected Long end_date; // in days; 0 - permanent active
 	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
-	public R_SetPersonToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
+	public R_SetUnionToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
+			Long end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
@@ -64,40 +64,40 @@ public class R_SetPersonToItem extends Transaction {
 		this.end_date = end_date;		
 	}
 
-	public R_SetPersonToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
+	public R_SetUnionToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
+			Long end_date, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
 				end_date, timestamp, reference);
 	}
 	// set default date
-	public R_SetPersonToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
+	public R_SetUnionToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
 			long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				0, timestamp, reference);
+				null, timestamp, reference);
 	}
-	public R_SetPersonToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
+	public R_SetUnionToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
+			Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(typeBytes, creator, feePow, key, item,
 				end_date, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public R_SetPersonToItem(byte[] typeBytes, PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
+	public R_SetUnionToItem(byte[] typeBytes, PublicKeyAccount creator, long key, ItemCls item,
+			Long end_date, byte[] signature) {
 		this(typeBytes, creator, (byte)0, key, item,
 				end_date, 0l, null);
 		this.signature = signature;
 	}
-	public R_SetPersonToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
+	public R_SetUnionToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
+			Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
 				end_date, timestamp, reference);
 	}
 
 	// as pack
-	public R_SetPersonToItem(PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
+	public R_SetUnionToItem(PublicKeyAccount creator, long key, ItemCls item,
+			Long end_date, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, item,
 				end_date, 0l, null);
 	}
@@ -116,7 +116,7 @@ public class R_SetPersonToItem extends Transaction {
 		return this.item;
 	}
 
-	public int getEndDate() 
+	public Long getEndDate() 
 	{
 		return this.end_date;
 	}
@@ -208,15 +208,16 @@ public class R_SetPersonToItem extends Transaction {
 		position += KEY_LENGTH;
 		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);		
 		
-		// READ DURATION
-		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
+		// READ END DATE
+		byte[] end_dateBytes = Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH);
+		Long end_date = Longs.fromByteArray(end_dateBytes);	
 		position += DATE_DAY_LENGTH;
 
 		if (!asPack) {
-			return new R_SetPersonToItem(typeBytes, creator, feePow, key, item,
+			return new R_SetUnionToItem(typeBytes, creator, feePow, key, item,
 					end_date, timestamp, reference, signature);
 		} else {
-			return new R_SetPersonToItem(typeBytes, creator, key, item,
+			return new R_SetUnionToItem(typeBytes, creator, key, item,
 					end_date, signature);
 		}
 
@@ -242,8 +243,8 @@ public class R_SetPersonToItem extends Transaction {
 		keyBytes = Bytes.ensureCapacity(itemKeyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
 		
-		//WRITE DURATION
-		data = Bytes.concat(data, Ints.toByteArray(this.end_date));
+		//WRITE END DATE
+		data = Bytes.concat(data, Longs.toByteArray(this.end_date));
 
 		return data;	
 	}
@@ -281,22 +282,18 @@ public class R_SetPersonToItem extends Transaction {
 		
 		if (item.getItemTypeInt() != ItemCls.PERSON_TYPE
 				&& item.getItemTypeInt() != ItemCls.ASSET_TYPE
-				&& item.getItemTypeInt() != ItemCls.UNION_TYPE)
-			return ITEM_DOES_NOT_STATUSED;
+				&& item.getItemTypeInt() != ItemCls.STATUS_TYPE)
+			return ITEM_DOES_NOT_UNITED;
 
 		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		
-		if ( !this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-				// if not enough RIGHT BALANCE as GENERAL
+		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+			if ( this.creator.isPerson(db) )
+			{
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
+			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		}
+			}
 		
 		return Transaction.VALIDATE_OK;
 	}
@@ -308,12 +305,10 @@ public class R_SetPersonToItem extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.end_date,
+		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(this.end_date,
 				Controller.getInstance().getHeight(), this.signature);
 
-		// SET ALIVE PERSON for DURATION
-		// TODO set STATUSES by reference of it record - not by key!
-		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
+		// SET UNION to ITEM for DURATION
 		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
 			db.getPersonUnionMap().addItem(item.getKey(), this.key, itemP);
 		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
@@ -327,15 +322,14 @@ public class R_SetPersonToItem extends Transaction {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);
-		
 						
 		// UNDO ALIVE PERSON for DURATION
 		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().removeItem(this.item.getKey(), this.key);
+			db.getPersonUnionMap().removeItem(this.item.getKey(), this.key);
 		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().removeItem(this.item.getKey(), this.key);
-		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().removeItem(this.item.getKey(), this.key);
+			db.getAssetUnionMap().removeItem(this.item.getKey(), this.key);
+		else if (item.getItemTypeInt() == ItemCls.STATUS_TYPE)
+			db.getStatusUnionMap().removeItem(this.item.getKey(), this.key);
 
 	}
 

@@ -49,7 +49,7 @@ public class TestRecSetStatusToItem {
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
 	long status_key = StatusCls.ALIVE_KEY;
-	int to_date = 0;
+	Long to_date = null;
 	long personkey;
 	
 	//CREATE EMPTY MEMORY DATABASE
@@ -199,7 +199,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
 		assertEquals(db.getPersonStatusMap().get(person.getKey()).size(),	0);
 
-		Tuple3<Integer, Integer, byte[]> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
+		Tuple3<Long, Integer, byte[]> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		assertEquals( null, statusDuration);
 
@@ -209,26 +209,26 @@ public class TestRecSetStatusToItem {
 				
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		int days = statusDuration.a;
+		Long endDate = statusDuration.a;
 		//days *= (long)86400;
-		assertEquals(days,	0);
+		assertEquals(endDate, null);
 		
-		to_date = 1234;
+		to_date = timestamp + 1234L * 84600000L;
 		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
 
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
-		days = statusDuration.a;
-		assertEquals(days,	1234);
+		endDate = statusDuration.a;
+		assertEquals(endDate,	to_date);
 		
 		
 		////// ORPHAN 2 ///////
 		setStatusTransaction_2.orphan(db, false);
 		
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
-		days = statusDuration.a;
-		assertEquals(days,	0);
+		endDate = statusDuration.a;
+		assertEquals(endDate, null);
 
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), maker.getLastReference(db)));
