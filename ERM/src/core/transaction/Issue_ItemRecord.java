@@ -186,6 +186,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		return false;
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500);
 	}
