@@ -43,7 +43,7 @@ public class GenesisBlock extends Block{
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
 	private static long genesisGeneratingBalance = 12000000L; // starting max volume for generating	
-	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
+	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
 
 	private String testnetInfo; 
 	
@@ -57,7 +57,6 @@ public class GenesisBlock extends Block{
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
-		Long timestamp = genesisTimestamp;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
@@ -288,54 +287,57 @@ public class GenesisBlock extends Block{
 	private void initItems()
 	{
 		
+		///// ASSETS
 		//CREATE ERM ASSET
-		asset0 = makeAssetVenture(Transaction.RIGHTS_KEY);
+		asset0 = makeAsset(AssetCls.ERMO_KEY);
 		this.addTransaction(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
-		asset1 = makeAssetVenture(Transaction.FEE_KEY);
+		asset1 = makeAsset(AssetCls.FEE_KEY);
 		this.addTransaction(new GenesisIssueAssetTransaction(asset1));
+		// ASSET OTHER
+		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.DEAL_KEY; i++) 
+			this.addTransaction(new GenesisIssueAssetTransaction(makeAsset(i)));
 
-		// NOTES
-		//CREATE MY NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(0)));
-		//CREATE PERSONALIZE NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(1)));
-		//CREATE ESTABLISH NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(2)));
+		///// NOTES
+		for (int i = 0; i <= NoteCls.HIRING_KEY; i++) 
+			this.addTransaction(new GenesisIssueNoteTransaction(makeNote(i)));
 
-		// STATUSES
-		// ALIVE
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(0)));
-		// DEAD
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(1)));
-		// CITIZEN
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(2)));
-		// MEMBER
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(3)));
-		
+		///// STATUSES
+		for (int i = 0; i <= StatusCls.EXPIRED_KEY; i++) 
+			this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(i)));		
 	}
 	
 	// make assets
-	public static AssetVenture makeAssetVenture(long key) 
+	public static AssetVenture makeAsset(long key) 
 	{
 		switch((int)key)
 		{
-		case (int)Transaction.FEE_KEY:
+		case (int)AssetCls.FEE_KEY:
 			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
+		case (int)AssetCls.TRUST_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
+		case (int)AssetCls.REAL_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, AssetCls.REAL_DESCR, 0L, (byte)8, true);
+		case (int)AssetCls.DEAL_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
 		}
 		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
-	public static Note makeAssetNote(int key) 
+	public static Note makeNote(int key) 
 	{
 		switch(key)
 		{
 		case (int)NoteCls.PERSONALIZE_KEY:
 			return new Note(genesisGenerator, "Introduce Myself", "I, %First Name% %Middle Name% %Last Name%, date of birth \"%date of Birth%\", place of birth \"%Place of Birth%\", race \"%Race%\", height \"%height%\", color \"%Color%\", eye color \"Eye Color\", hair color \"%Hair Color%\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 		case (int)NoteCls.ESTABLISH_UNION_KEY:
-			return new Note(genesisGenerator, "Establish the Company", "Company name \"%Company Name%\" in country \"%Country%\"");
+			return new Note(genesisGenerator, "Establish the Union", "Union name \"%Company Name%\" in country \"%Country%\"");
+		case (int)NoteCls.MARRIAGE_KEY:
+			return new Note(genesisGenerator, "Marriage", "%person1% marries  %person2%");
+		case (int)NoteCls.HIRING_KEY:
+			return new Note(genesisGenerator, "Hiring", "Hiring to %union%");
 		}
-		return new Note(genesisGenerator, "Introduce Me", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		return new Note(genesisGenerator, "I", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 	// make notes
 	public static Status makeStatus(int key) 
@@ -343,6 +345,24 @@ public class GenesisBlock extends Block{
 		if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
 		else if (key == StatusCls.CITIZEN_KEY) return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
 		else if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "I am member of %union%");
+		else if (key == StatusCls.SPOUSE_KEY) return new Status(genesisGenerator, "Spouse", "I am spouse on %spouse%");
+
+		else if (key == StatusCls.GENERAL_KEY) return new Status(genesisGenerator, "General", "");
+		else if (key == StatusCls.MAJOR_KEY) return new Status(genesisGenerator, "Major", "");
+		else if (key == StatusCls.ADMIN_KEY) return new Status(genesisGenerator, "Admin", "");
+		else if (key == StatusCls.MANAGER_KEY) return new Status(genesisGenerator, "Manager", "");
+		else if (key == StatusCls.WORKER_KEY) return new Status(genesisGenerator, "Worker", "");
+		else if (key == StatusCls.CREATOR_KEY) return new Status(genesisGenerator, "Creator", "");
+		else if (key == StatusCls.PRESIDENT_KEY) return new Status(genesisGenerator, "President", "");
+		else if (key == StatusCls.DIRECTOR_KEY) return new Status(genesisGenerator, "Director", "");
+		else if (key == StatusCls.SENATOR_KEY) return new Status(genesisGenerator, "Senator", "");
+		else if (key == StatusCls.DEPUTATE_KEY) return new Status(genesisGenerator, "Deputy", "");
+		else if (key == StatusCls.OBSERVER_KEY) return new Status(genesisGenerator, "Observer", "");
+
+		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", "");
+		else if (key == StatusCls.CONFIRMED_KEY) return new Status(genesisGenerator, "Confirmed", "");
+		else if (key == StatusCls.EXPIRED_KEY) return new Status(genesisGenerator, "Expired", "");
+
 		else return new Status(genesisGenerator, "Alive", "I am alive.");
 	}
 

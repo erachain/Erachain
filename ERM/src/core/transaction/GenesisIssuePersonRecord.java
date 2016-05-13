@@ -32,6 +32,7 @@ import core.crypto.Crypto;
 //import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
+import core.item.statuses.StatusCls;
 //import database.ItemMap;
 import database.DBSet;
 
@@ -109,7 +110,7 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		//UPDATE RECIPIENT
 		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
 		// SET ALIVE PERSON for DURATION
-		db.getPersonStatusMap().addItem(key, itemP);
+		db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, itemP);
 
 		// SET PERSON ADDRESS
 		// Integer.MAX_VALUE = 0 - permanent
@@ -131,7 +132,7 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		super.orphan(db, asPack);
 
 		// UNDO ALIVE PERSON for DURATION
-		db.getPersonStatusMap().removeItem(key);
+		db.getPersonStatusMap().removeItem(key, StatusCls.ALIVE_KEY);
 
 		//UPDATE RECIPIENT
 		db.getAddressPersonMap().removeItem(recipient.getAddress());

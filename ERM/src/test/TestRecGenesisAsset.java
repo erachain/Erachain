@@ -59,7 +59,7 @@ public class TestRecGenesisAsset {
 		db = DBSet.createEmptyDatabaseSet();
 		
 		//CREATE ASSET
-		asset = GenesisBlock.makeAssetVenture(0);
+		asset = GenesisBlock.makeAsset(0);
 		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
 		//assertEquals(rawAsset.length, asset.getDataLength());
 				

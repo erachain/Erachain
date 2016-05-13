@@ -25,9 +25,12 @@ public class DBSet implements Observer, IDB {
 	
 	private ItemAssetBalanceMap assetBalanceMap;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
-	private AssetStatusMap assetStatusMap;
-	private PersonStatusMap personStatusMap;
-	private UnionStatusMap unionStatusMap;
+	private KKAssetStatusMap kKAssetStatusMap;
+	private KKPersonStatusMap kKPersonStatusMap;
+	private KKUnionStatusMap kKUnionStatusMap;
+	private KKAssetUnionMap kKAssetUnionMap;
+	private KKPersonUnionMap kKPersonUnionMap;
+	private KKStatusUnionMap kKStatusUnionMap;
 	private AddressPersonMap addressPersonMap;
 	private PersonAddressMap personAddressMap;
 	private BlockMap blockMap;
@@ -120,9 +123,12 @@ public class DBSet implements Observer, IDB {
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
-			this.assetStatusMap = new AssetStatusMap(this, database);
-			this.personStatusMap = new PersonStatusMap(this, database);
-			this.unionStatusMap = new UnionStatusMap(this, database);
+			this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
+			this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
+			this.kKUnionStatusMap = new KKUnionStatusMap(this, database);
+			this.kKAssetUnionMap = new KKAssetUnionMap(this, database);
+			this.kKPersonUnionMap = new KKPersonUnionMap(this, database);
+			this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
 			this.addressPersonMap = new AddressPersonMap(this, database);
 			this.personAddressMap = new PersonAddressMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
@@ -177,9 +183,12 @@ public class DBSet implements Observer, IDB {
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
-		this.assetStatusMap = new AssetStatusMap(parent.assetStatusMap);
-		this.personStatusMap = new PersonStatusMap(parent.personStatusMap);
-		this.unionStatusMap = new UnionStatusMap(parent.unionStatusMap);
+		this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
+		this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
+		this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap);
+		this.kKAssetUnionMap = new KKAssetUnionMap(parent.kKAssetUnionMap);
+		this.kKPersonUnionMap = new KKPersonUnionMap(parent.kKPersonUnionMap);
+		this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
 		this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
 		this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
@@ -229,9 +238,12 @@ public class DBSet implements Observer, IDB {
 		
 		this.assetBalanceMap.reset();
 		this.assetBalanceAccountingMap.reset();
-		this.assetStatusMap.reset();
-		this.personStatusMap.reset();
-		this.unionStatusMap.reset();
+		this.kKAssetStatusMap.reset();
+		this.kKPersonStatusMap.reset();
+		this.kKUnionStatusMap.reset();
+		this.kKAssetUnionMap.reset();
+		this.kKPersonUnionMap.reset();
+		this.kKStatusUnionMap.reset();
 		this.addressPersonMap.reset();
 		this.personAddressMap.reset();;
 		this.heightMap.reset();
@@ -293,17 +305,29 @@ public class DBSet implements Observer, IDB {
 		return this.addressPersonMap;
 	}
 
-	public AssetStatusMap getAssetStatusMap()
+	public KKAssetStatusMap getAssetStatusMap()
 	{
-		return this.assetStatusMap;
+		return this.kKAssetStatusMap;
 	}
-	public PersonStatusMap getPersonStatusMap()
+	public KKPersonStatusMap getPersonStatusMap()
 	{
-		return this.personStatusMap;
+		return this.kKPersonStatusMap;
 	}
-	public UnionStatusMap getUnionStatusMap()
+	public KKUnionStatusMap getUnionStatusMap()
 	{
-		return this.unionStatusMap;
+		return this.kKUnionStatusMap;
+	}
+	public KKAssetUnionMap getAssetUnionMap()
+	{
+		return this.kKAssetUnionMap;
+	}
+	public KKPersonUnionMap getPersonUnionMap()
+	{
+		return this.kKPersonUnionMap;
+	}
+	public KKStatusUnionMap getStatusUnionMap()
+	{
+		return this.kKStatusUnionMap;
 	}
 	/*
 	public ItemsStatusesMap getItemsStatusesMap(ItemCls item)

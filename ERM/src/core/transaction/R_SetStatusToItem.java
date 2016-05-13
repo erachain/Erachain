@@ -115,6 +115,10 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.item;
 	}
+	public void setItem(ItemCls item)
+	{
+		this.item = item;
+	}
 
 	public int getEndDate() 
 	{
@@ -206,7 +210,7 @@ public class R_SetStatusToItem extends Transaction {
 		byte[] itemKeyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
 		long itemKey = Longs.fromByteArray(itemKeyBytes);	
 		position += KEY_LENGTH;
-		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);		
+		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);
 		
 		// READ DURATION
 		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));

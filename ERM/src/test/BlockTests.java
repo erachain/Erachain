@@ -315,7 +315,7 @@ public class BlockTests
 		invalidBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), newBlock.getTimestamp());
-		transaction = new GenesisIssueAssetTransaction(GenesisBlock.makeAssetVenture(Transaction.RIGHTS_KEY));
+		transaction = new GenesisIssueAssetTransaction(GenesisBlock.makeAsset(Transaction.RIGHTS_KEY));
 		invalidBlock.addTransaction(transaction);	
 		
 		//CHECK IF INVALID
@@ -492,21 +492,22 @@ public class BlockTests
 		//CHECK LAST REFERENCE GENERATOR
 		assertEquals(true, Arrays.equals(generator.getLastReference(databaseSet), payment2.getSignature()));
 		
-		//CHECK BALANCE RECIPIENT
-		assertEquals(recipient.getConfirmedBalance(ERM_KEY, databaseSet), BigDecimal.valueOf(10).setScale(8));
+		//CHECK BALANCE RECIPIENT 1
+		assertEquals(recipient.getConfirmedBalance(ERM_KEY, databaseSet), BigDecimal.valueOf(0).setScale(8));
 		assertEquals(recipient.getConfirmedBalance(FEE_KEY, databaseSet), BigDecimal.valueOf(100).setScale(8));
 		
-		//CHECK LAST REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
+		//CHECK LAST REFERENCE RECIPIENT 1
+		assertEquals(true, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT2
+		assertEquals(recipient2.getConfirmedBalance(ERM_KEY, databaseSet), BigDecimal.valueOf(10).setScale(8));
 		assertEquals(recipient2.getConfirmedBalance(FEE_KEY, databaseSet), BigDecimal.valueOf(0).setScale(8));
 				
-		//CHECK LAST REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(recipient2.getLastReference(databaseSet), payment2.getSignature()));
+		//CHECK LAST REFERENCE RECIPIENT 2
+		assertEquals(false, Arrays.equals(recipient2.getLastReference(databaseSet), payment2.getSignature()));
 		
 		//CHECK TOTAL FEE
-		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.0000062).setScale(8));
+		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.00000622).setScale(8));
 		
 		//CHECK TOTAL TRANSACTIONS
 		assertEquals(2, block.getTransactionCount());
@@ -518,12 +519,9 @@ public class BlockTests
 	@Test
 	public void orphanBlock()
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 										
 		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
+		gb.process(db);
 										
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -531,40 +529,37 @@ public class BlockTests
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 												
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 
 		// FEE FUND
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+		generator.setLastReference(gb.getGeneratorSignature(), db);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 								
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator();
-		Block block = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block block = blockGenerator.generateNextBlock(db, generator, gb);
 		
 		//FORK
-		DBSet fork = databaseSet.fork();
+		DBSet fork = db.fork();
 		
 		//GENERATE PAYMENT 1
-		Account recipient = new Account("QRqBjBJshFJig97ABKiPJ9ar86KbWEZ7Hc");
+		Account recipient = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
 		long timestamp = block.getTimestamp();
-		recipient.setLastReference(genesisBlock.getGeneratorSignature(), fork);
+		recipient.setLastReference(gb.getGeneratorSignature(), fork);
 		recipient.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(0.1).setScale(8), (byte)0, timestamp, generator.getLastReference(db));
 		payment1.sign(generator, false);
 		
 		payment1.process(fork, false);
 		block.addTransaction(payment1);	
 		
 		//GENERATE PAYMENT 2
-		Account recipient2 = new Account("QQ7YLV7hcmAjcoYyosycsdEuhbN42M6TW1");
-		recipient2.setLastReference(genesisBlock.getGeneratorSignature(), fork);
+		Account recipient2 = new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB");
+		recipient2.setLastReference(gb.getGeneratorSignature(), fork);
 		recipient2.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(0.2).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
 		payment2.sign(generator, false);
 		
 		block.addTransaction(payment2);	
@@ -575,33 +570,33 @@ public class BlockTests
 		
 		//CHECK VALID
 		assertEquals(true, block.isSignatureValid());
-		assertEquals(true, block.isValid(databaseSet));
+		assertEquals(true, block.isValid(db));
 		
 		//PROCESS BLOCK
-		block.process(databaseSet);
+		block.process(db);
 		
 		//ORPHAN BLOCK
-		block.orphan(databaseSet);
+		block.orphan(db);
 		
 		//CHECK BALANCE GENERATOR
-		assertEquals(true, generator.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
+		assertEquals(generator.getConfirmedBalance(FEE_KEY, db), BigDecimal.valueOf(1).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
-		assertEquals(true, Arrays.equals(generator.getLastReference(databaseSet), genesisBlock.getGeneratorSignature()));
+		assertEquals(true, Arrays.equals(generator.getLastReference(db), gb.getGeneratorSignature()));
 		
 		//CHECK BALANCE RECIPIENT
-		assertEquals(true, recipient.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(1000)) == 0);
+		assertEquals(recipient.getConfirmedBalance(FEE_KEY, db), BigDecimal.valueOf(0).setScale(8));
 		
 		//CHECK LAST REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(recipient.getLastReference(databaseSet), payment1.getSignature()));
+		assertEquals(false, Arrays.equals(recipient.getLastReference(db), payment1.getSignature()));
 		
 		//CHECK BALANCE RECIPIENT2
-		assertEquals(true, recipient2.getConfirmedBalance(FEE_KEY, databaseSet).compareTo(BigDecimal.valueOf(0)) == 0);
+		assertEquals(true, recipient2.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.valueOf(0)) == 0);
 				
 		//CHECK LAST REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(recipient2.getLastReference(databaseSet), new byte[0]));
+		assertEquals(true, Arrays.equals(recipient2.getLastReference(db), new byte[0]));
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(genesisBlock.getSignature(), databaseSet.getBlockMap().getLastBlock().getSignature()));
+		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().getLastBlock().getSignature()));
 	}
 }

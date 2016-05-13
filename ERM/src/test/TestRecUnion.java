@@ -38,7 +38,7 @@ import core.wallet.Wallet;
 import database.DBSet;
 //import database.AddressUnionMap;
 //import database.UnionAddressMap;
-import database.UnionStatusMap;
+import database.KKUnionStatusMap;
 
 public class TestRecUnion {
 
@@ -85,7 +85,7 @@ public class TestRecUnion {
 	long unionKey = -1;
 	IssueUnionRecord issueUnionTransaction;
 
-	UnionStatusMap dbPS;
+	KKUnionStatusMap dbPS;
 	//UnionAddressMap dbPA;
 	//AddressUnionMap dbAP;
 

@@ -109,6 +109,10 @@ public abstract class ItemCls {
 		this.key = -1;
 	}
 	
+	static ItemCls resolveItem(DBSet db, int type, long key) {
+		return Controller.getInstance().getItem(db, type, key);
+	}
+	
 	public String getDescription() {
 		return this.description;
 	}

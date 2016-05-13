@@ -82,9 +82,8 @@ public class Genesis_Record extends Transaction
 		
 		//WRITE TYPE in typeBytes[0]
 		byte[] data = new byte[]{this.typeBytes[0]};
-		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		//data = Bytes.concat(data, TYPE_ID);
+		
+		// SIGNATURE not need - its calculated on fly
 						
 		return data;
 	}

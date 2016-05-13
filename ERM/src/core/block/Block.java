@@ -175,16 +175,17 @@ public class Block {
 					//GET TRANSACTION SIZE
 					byte[] transactionLengthBytes = Arrays.copyOfRange(this.rawTransactions, position, position + TRANSACTION_SIZE_LENGTH);
 					int transactionLength = Ints.fromByteArray(transactionLengthBytes);
-
+					position += TRANSACTION_SIZE_LENGTH;
+					
 					//PARSE TRANSACTION
-					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position + TRANSACTION_SIZE_LENGTH, position + TRANSACTION_SIZE_LENGTH + transactionLength);
+					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
 					Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
 
 					//ADD TO TRANSACTIONS
 					this.transactions.add(transaction);
 
 					//ADD TO POSITION
-					position += TRANSACTION_SIZE_LENGTH + transactionLength;
+					position += transactionLength;
 				}
 			}
 			catch(Exception e)
@@ -399,12 +400,12 @@ public class Block {
 
 		//WRITE VERSION
 		byte[] versionBytes = Ints.toByteArray(this.version);
-		versionBytes = Bytes.ensureCapacity(versionBytes, 4, 0);
+		versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
 		data = Bytes.concat(data, versionBytes);
 
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, 8, 0);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 
 		//WRITE REFERENCE
@@ -413,7 +414,7 @@ public class Block {
 
 		//WRITE GENERATING BALANCE
 		byte[] baseTargetBytes = Longs.toByteArray(this.generatingBalance);
-		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, 8, 0);
+		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, GENERATING_BALANCE_LENGTH, 0);
 		data = Bytes.concat(data,baseTargetBytes);
 
 		//WRITE GENERATOR
@@ -450,7 +451,7 @@ public class Block {
 
 		//WRITE TRANSACTION COUNT
 		byte[] transactionCountBytes = Ints.toByteArray(this.getTransactionCount());
-		transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, 4, 0);
+		transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
 		data = Bytes.concat(data, transactionCountBytes);
 
 		for(Transaction transaction: this.getTransactions())
@@ -458,7 +459,7 @@ public class Block {
 			//WRITE TRANSACTION LENGTH
 			int transactionLength = transaction.getDataLength(false);
 			byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-			transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, 4, 0);
+			transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
 			data = Bytes.concat(data, transactionLengthBytes);
 
 			//WRITE TRANSACTION
@@ -484,7 +485,7 @@ public class Block {
 
 		for(Transaction transaction: this.getTransactions())
 		{
-			length += 4 + transaction.getDataLength(false);
+			length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(false);
 		}
 
 		return length;

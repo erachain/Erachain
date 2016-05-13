@@ -469,9 +469,9 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, end_date,
 				Controller.getInstance().getHeight(), this.signature);
 		
-		if (db.getPersonStatusMap().getItem(key) == null) {
+		if (db.getPersonStatusMap().getItem(key, StatusCls.ALIVE_KEY) == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			db.getPersonStatusMap().addItem(key, new Tuple3<Integer, Integer, byte[]>(0,
+			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Integer, Integer, byte[]>(0,
 					Controller.getInstance().getHeight(), this.signature));
 		}
 

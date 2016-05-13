@@ -42,7 +42,7 @@ import database.AddressPersonMap;
 
 import database.DBSet;
 import database.PersonAddressMap;
-import database.PersonStatusMap;
+import database.KKPersonStatusMap;
 
 public class TestRecPerson {
 
@@ -90,7 +90,7 @@ public class TestRecPerson {
 	IssuePersonRecord issuePersonTransaction;
 	R_SertifyPubKeys r_SertifyPubKeys;
 
-	PersonStatusMap dbPS;
+	KKPersonStatusMap dbPS;
 	PersonAddressMap dbPA;
 	AddressPersonMap dbAP;
 
@@ -150,7 +150,7 @@ public class TestRecPerson {
 		personKey = person.getKey();
 
 		assertEquals( 1, personKey);
-		assertEquals( null, dbPS.getItem(personKey));
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 		
 		//CREATE PERSONALIZE REcORD
 		r_SertifyPubKeys = new R_SertifyPubKeys(version, certifier, FEE_POWER, personKey,
@@ -388,7 +388,7 @@ public class TestRecPerson {
 		R_SertifyPubKeys personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastReference(db));
-		assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));	
+		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));	
 
 		//CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
 		personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
@@ -405,7 +405,8 @@ public class TestRecPerson {
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
 		userAccount1.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
-		assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
+		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
 		userAccount1.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
@@ -551,7 +552,7 @@ public class TestRecPerson {
 		
 		init();
 
-		assertEquals( null, dbPS.getItem(personKey));
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		assertEquals(false, userAccount1.isPerson(db));
 		assertEquals(false, userAccount2.isPerson(db));
@@ -567,7 +568,7 @@ public class TestRecPerson {
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		assertEquals(1, personKey);
-		assertEquals( null, dbPS.getItem(personKey));
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -624,9 +625,9 @@ public class TestRecPerson {
 		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( 0, (int)dbPS.getItem(personKey).a);
-		assertEquals( -1, (int)dbPS.getItem(personKey).b);
-		assertEquals( true, Arrays.equals(dbPS.getItem(personKey).c, r_SertifyPubKeys.getSignature()));
+		assertEquals( 0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
+		assertEquals( -1, (int)dbPS.getItem(personKey, ALIVE_KEY).b);
+		assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
 
 		// ADDRESSES
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress1).a);
@@ -685,7 +686,7 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE - must not modified!
-		assertEquals( (int)0, (int)dbPS.getItem(personKey).a);
+		assertEquals( (int)0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -717,7 +718,7 @@ public class TestRecPerson {
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( 0, (int)dbPS.getItem(personKey).a);
+		assertEquals( 0, (int)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		assertEquals(abs_end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));

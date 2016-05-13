@@ -111,6 +111,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 				
+		// READ SIGNATURE
+		// SIGNATURE not need - its calculated on fly
+
 		return new GenesisTransferAssetTransaction(recipient, key, amount);	
 	}	
 	
@@ -160,7 +163,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 						
 		//CHECK IF AMOUNT IS DIVISIBLE
 		// genesis assets not in DB yet and need take it from genesis maker
-		if(!GenesisBlock.makeAssetVenture((int)this.key).isDivisible())
+		if(!GenesisBlock.makeAsset((int)this.key).isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 			if(this.getAmount().stripTrailingZeros().scale() > 0)

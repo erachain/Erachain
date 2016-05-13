@@ -26,7 +26,22 @@ public abstract class AssetCls extends ItemCls {
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
 	public static final String FEE_NAME = "COMPU";
 	public static final String FEE_DESCR = "It is an drops of computation used for deals (" + FEE_NAME + ")";
-
+	// TRUST KEY
+	public static final long TRUST_KEY = 2l;
+	public static final String TRUST_ABBREV = "TRU"; // COMPU (compute units)
+	public static final String TRUST_NAME = "TRUST";
+	public static final String TRUST_DESCR = "It is an drops of the trust (" + TRUST_NAME + ")";
+	// REAL KEY
+	public static final long REAL_KEY = 3l;
+	public static final String REAL_ABBREV = "RIL"; // COMPU (compute units)
+	public static final String REAL_NAME = "REAL";
+	public static final String REAL_DESCR = "It is an drops of the real (" + REAL_NAME + ")";
+	// DEaL KEY
+	public static final long DEAL_KEY = 4l;
+	public static final String DEAL_ABBREV = "DIL"; // COMPU (compute units)
+	public static final String DEAL_NAME = "DEAL";
+	public static final String DEAL_DESCR = "It is an drops of the deal (" + DEAL_NAME + ")";
+	
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;
 	public static final int NAME = 3;

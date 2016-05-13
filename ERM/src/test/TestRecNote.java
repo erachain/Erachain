@@ -52,11 +52,14 @@ public class TestRecNote {
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	
+	ItemNoteMap noteMap;
 
 	// INIT NOTES
 	private void init() {
 		
 		db = DBSet.createEmptyDatabaseSet();
+		noteMap = db.getItemNoteMap();
+		
 		gb = new GenesisBlock();
 		gb.process(db);
 		
@@ -177,12 +180,13 @@ public class TestRecNote {
 		
 		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, false);
+		int mapSize = noteMap.size();
 		
 		LOGGER.info("note KEY: " + note.getKey());
 				
 		//CHECK NOTE EXISTS SENDER
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(true, db.getItemNoteMap().contains(key));
+		assertEquals(true, noteMap.contains(key));
 		
 		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
@@ -190,12 +194,10 @@ public class TestRecNote {
 		issueNoteTransaction_2.process(db, false);
 		LOGGER.info("note_2 KEY: " + note_2.getKey());
 		issueNoteTransaction_2.orphan(db, false);
-		ItemNoteMap noteMap = db.getItemNoteMap();
-		int mapSize = noteMap.size();
-		assertEquals(0, mapSize - 4);
+		assertEquals(mapSize, noteMap.size());
 		
 		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(true), note.toBytes(true)));
+		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true), note.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
@@ -220,7 +222,7 @@ public class TestRecNote {
 		issueNoteRecord.orphan(db, false);
 				
 		//CHECK NOTE EXISTS SENDER
-		assertEquals(false, db.getItemNoteMap().contains(key));
+		assertEquals(false, noteMap.contains(key));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), maker.getLastReference(db)));
