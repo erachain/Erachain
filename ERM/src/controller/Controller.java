@@ -99,8 +99,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.13.05";
-	private String buildTime = "2016-05-11 00:00:00 UTC";
+	private String version = "2.13.07";
+	private String buildTime = "2016-05-13 12:12:12 UTC";
 	private long buildTimestamp;
 	
 	public static final String releaseVersion = "2.03.0";

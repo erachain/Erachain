@@ -51,7 +51,7 @@ public  Person_Info() {
 
 		message += "<h2>"+ "Statuses" +"</h2>";
 		// GETT PERSON STATUS for ALIVE
-		Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey());
+		Tuple3<Integer, Integer, byte[]> t3Alive = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 
 		if (t3Alive != null){
 			if (t3Alive.a == 0) dateAlive = "active";
@@ -114,7 +114,7 @@ public  Person_Info() {
 	
 	
 //читаем таблицу персон.
-	Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey()); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
+	Tuple3<Integer, Integer, byte[]> t3 = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY); //(Long) personsTable.getValueAt(personsTable.getSelectedRow(),0));
 // преобразование в дату
 
 
