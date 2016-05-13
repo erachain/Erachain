@@ -199,7 +199,7 @@ public abstract class ItemCls {
 	public String toString(DBSet db)
 	{		
 		long key = this.getKey(db);
-		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name;
+		return (key<0?"?":key) + "." + this.typeBytes[0] + " " + this.name;
 	}
 	public String toString()
 	{
@@ -209,7 +209,7 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name.substring(0, Math.min(this.name.length(), 4));
+		return (key<0?"?":key) + "." + this.typeBytes[0] + " " + this.name.substring(0, Math.min(this.name.length(), 10));
 	}
 	public String getShort()
 	{
