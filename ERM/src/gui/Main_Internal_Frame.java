@@ -40,7 +40,8 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         layout.columnWidths = new int[] {0};
         layout.rowHeights = new int[] {0, 5, 0};
         getContentPane().setLayout(layout);
-
+        
+        jToolBar.setFloatable(false);
         jToolBar.setRollover(true);
 
         jButton1_jToolBar.setText("jButton1");

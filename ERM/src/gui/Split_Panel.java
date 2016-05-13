@@ -29,69 +29,68 @@ public class Split_Panel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jSplitPanel = new javax.swing.JSplitPane();
-        rightPanel = new javax.swing.JPanel();
-        toolBar_RightPanel = new javax.swing.JToolBar();
-        button1_ToolBar_RightPanel = new javax.swing.JButton();
-        button2_ToolBar_RightPanel = new javax.swing.JButton();
-        searchToolBar_RightPanel = new javax.swing.JToolBar();
-        searthLabel_SearchToolBar_RaghtPanel = new javax.swing.JLabel();
-        searchTextField_SearchToolBar_RaghtPanel = new javax.swing.JTextField();
-        jScrollPanel_RightPanel = new javax.swing.JScrollPane();
-        jTable_jScrollPanel_RightPanel = new javax.swing.JTable();
         leftPanel = new javax.swing.JPanel();
-        jToolBar_LeftPanel = new javax.swing.JToolBar();
-        jButton1_jToolBar_LeftPanel = new javax.swing.JButton();
-        jButton2_jToolBar_LeftPanel = new javax.swing.JButton();
-        jPanel_LeftPanel = new javax.swing.JPanel();
-        jScrollPane_jPanel_LeftPanel = new javax.swing.JScrollPane();
+        toolBar_LeftPanel = new javax.swing.JToolBar();
+        button1_ToolBar_LeftPanel = new javax.swing.JButton();
+        button2_ToolBar_LeftPanel = new javax.swing.JButton();
+        searchToolBar_LeftPanel = new javax.swing.JToolBar();
+        searthLabel_SearchToolBar_LeftPanel = new javax.swing.JLabel();
+        searchTextField_SearchToolBar_LeftPanel = new javax.swing.JTextField();
+        jScrollPanel_LeftPanel = new javax.swing.JScrollPane();
+        jTable_jScrollPanel_LeftPanel = new javax.swing.JTable();
+        rightPanel1 = new javax.swing.JPanel();
+        jToolBar_RightPanel = new javax.swing.JToolBar();
+        jButton1_jToolBar_RightPanel = new javax.swing.JButton();
+        jButton2_jToolBar_RightPanel = new javax.swing.JButton();
+        jPanel_RightPanel = new javax.swing.JPanel();
+        jScrollPane_jPanel_RightPanel = new javax.swing.JScrollPane();
         jLabel2 = new javax.swing.JLabel();
 
         jSplitPanel.setBorder(null);
 
-        rightPanel.setLayout(new java.awt.GridBagLayout());
+        leftPanel.setLayout(new java.awt.GridBagLayout());
 
-        toolBar_RightPanel.setFloatable(false);
-        toolBar_RightPanel.setRollover(true);
+        toolBar_LeftPanel.setFloatable(false);
+        toolBar_LeftPanel.setRollover(true);
 
-        button1_ToolBar_RightPanel.setText("jButton1");
-        button1_ToolBar_RightPanel.setFocusable(false);
-        button1_ToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        button1_ToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        button1_ToolBar_RightPanel.addActionListener(new java.awt.event.ActionListener() {
+        button1_ToolBar_LeftPanel.setText("jButton1");
+        button1_ToolBar_LeftPanel.setFocusable(false);
+        button1_ToolBar_LeftPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        button1_ToolBar_LeftPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        button1_ToolBar_LeftPanel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1_ToolBar_RightPanelActionPerformed(evt);
+                button1_ToolBar_LeftPanelActionPerformed(evt);
             }
         });
-        toolBar_RightPanel.add(button1_ToolBar_RightPanel);
+        toolBar_LeftPanel.add(button1_ToolBar_LeftPanel);
 
-        button2_ToolBar_RightPanel.setText("jButton2");
-        button2_ToolBar_RightPanel.setFocusable(false);
-        button2_ToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        button2_ToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar_RightPanel.add(button2_ToolBar_RightPanel);
-        button2_ToolBar_RightPanel.getAccessibleContext().setAccessibleDescription("");
+        button2_ToolBar_LeftPanel.setText("jButton2");
+        button2_ToolBar_LeftPanel.setFocusable(false);
+        button2_ToolBar_LeftPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        button2_ToolBar_LeftPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar_LeftPanel.add(button2_ToolBar_LeftPanel);
+        button2_ToolBar_LeftPanel.getAccessibleContext().setAccessibleDescription("");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 8, 0, 0);
-        rightPanel.add(toolBar_RightPanel, gridBagConstraints);
+        leftPanel.add(toolBar_LeftPanel, gridBagConstraints);
 
-        searchToolBar_RightPanel.setFloatable(false);
-        searchToolBar_RightPanel.setRollover(true);
+        searchToolBar_LeftPanel.setFloatable(false);
+        searchToolBar_LeftPanel.setRollover(true);
 
-        searthLabel_SearchToolBar_RaghtPanel.setText("  Search:   ");
-        searthLabel_SearchToolBar_RaghtPanel.setToolTipText("");
-        searchToolBar_RightPanel.add(searthLabel_SearchToolBar_RaghtPanel);
+        searthLabel_SearchToolBar_LeftPanel.setText("  Search:   ");
+        searthLabel_SearchToolBar_LeftPanel.setToolTipText("");
+        searchToolBar_LeftPanel.add(searthLabel_SearchToolBar_LeftPanel);
 
-        searchTextField_SearchToolBar_RaghtPanel.setToolTipText("");
-        searchTextField_SearchToolBar_RaghtPanel.setAlignmentX(1.0F);
-        searchTextField_SearchToolBar_RaghtPanel.setMinimumSize(new java.awt.Dimension(200, 20));
-        searchTextField_SearchToolBar_RaghtPanel.setName(""); // NOI18N
-        searchTextField_SearchToolBar_RaghtPanel.setPreferredSize(new java.awt.Dimension(200, 20));
-        searchTextField_SearchToolBar_RaghtPanel.setRequestFocusEnabled(false);
-        searchToolBar_RightPanel.add(searchTextField_SearchToolBar_RaghtPanel);
+        searchTextField_SearchToolBar_LeftPanel.setToolTipText("");
+        searchTextField_SearchToolBar_LeftPanel.setAlignmentX(1.0F);
+        searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new java.awt.Dimension(200, 20));
+        searchTextField_SearchToolBar_LeftPanel.setName(""); // NOI18N
+        searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new java.awt.Dimension(200, 20));
+        searchToolBar_LeftPanel.add(searchTextField_SearchToolBar_LeftPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -100,11 +99,11 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
-        rightPanel.add(searchToolBar_RightPanel, gridBagConstraints);
+        leftPanel.add(searchToolBar_LeftPanel, gridBagConstraints);
 
-        jScrollPanel_RightPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jScrollPanel_LeftPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTable_jScrollPanel_RightPanel.setModel(new javax.swing.table.DefaultTableModel(
+        jTable_jScrollPanel_LeftPanel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -115,7 +114,7 @@ public class Split_Panel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPanel_RightPanel.setViewportView(jTable_jScrollPanel_RightPanel);
+        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -126,29 +125,29 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 8, 8);
-        rightPanel.add(jScrollPanel_RightPanel, gridBagConstraints);
+        leftPanel.add(jScrollPanel_LeftPanel, gridBagConstraints);
 
-        jSplitPanel.setLeftComponent(rightPanel);
+        jSplitPanel.setLeftComponent(leftPanel);
 
-        leftPanel.setMinimumSize(new java.awt.Dimension(150, 0));
-        leftPanel.setName(""); // NOI18N
-        leftPanel.setLayout(new java.awt.GridBagLayout());
+        rightPanel1.setMinimumSize(new java.awt.Dimension(150, 0));
+        rightPanel1.setName(""); // NOI18N
+        rightPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jToolBar_LeftPanel.setFloatable(false);
-        jToolBar_LeftPanel.setRollover(true);
+        jToolBar_RightPanel.setFloatable(false);
+        jToolBar_RightPanel.setRollover(true);
 
-        jButton1_jToolBar_LeftPanel.setText("jButton1");
-        jButton1_jToolBar_LeftPanel.setFocusable(false);
-        jButton1_jToolBar_LeftPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1_jToolBar_LeftPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar_LeftPanel.add(jButton1_jToolBar_LeftPanel);
+        jButton1_jToolBar_RightPanel.setText("jButton1");
+        jButton1_jToolBar_RightPanel.setFocusable(false);
+        jButton1_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar_RightPanel.add(jButton1_jToolBar_RightPanel);
 
-        jButton2_jToolBar_LeftPanel.setText("jButton2");
-        jButton2_jToolBar_LeftPanel.setToolTipText("");
-        jButton2_jToolBar_LeftPanel.setFocusable(false);
-        jButton2_jToolBar_LeftPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2_jToolBar_LeftPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar_LeftPanel.add(jButton2_jToolBar_LeftPanel);
+        jButton2_jToolBar_RightPanel.setText("jButton2");
+        jButton2_jToolBar_RightPanel.setToolTipText("");
+        jButton2_jToolBar_RightPanel.setFocusable(false);
+        jButton2_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar_RightPanel.add(jButton2_jToolBar_RightPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -157,20 +156,20 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 9, 0, 8);
-        leftPanel.add(jToolBar_LeftPanel, gridBagConstraints);
+        rightPanel1.add(jToolBar_RightPanel, gridBagConstraints);
 
-        jPanel_LeftPanel.setAlignmentX(1.0F);
-        jPanel_LeftPanel.setAlignmentY(1.0F);
+        jPanel_RightPanel.setAlignmentX(1.0F);
+        jPanel_RightPanel.setAlignmentY(1.0F);
 
-        jScrollPane_jPanel_LeftPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jScrollPane_jPanel_LeftPanel.setAlignmentX(0.0F);
-        jScrollPane_jPanel_LeftPanel.setAlignmentY(0.0F);
-        jScrollPane_jPanel_LeftPanel.setAutoscrolls(true);
-        jScrollPane_jPanel_LeftPanel.setMinimumSize(new java.awt.Dimension(0, 0));
-        jScrollPane_jPanel_LeftPanel.setName(""); // NOI18N
-        jScrollPane_jPanel_LeftPanel.setPreferredSize(new java.awt.Dimension(0, 0));
-        jScrollPane_jPanel_LeftPanel.setVerifyInputWhenFocusTarget(false);
-        jScrollPane_jPanel_LeftPanel.setWheelScrollingEnabled(false);
+        jScrollPane_jPanel_RightPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jScrollPane_jPanel_RightPanel.setAlignmentX(0.0F);
+        jScrollPane_jPanel_RightPanel.setAlignmentY(0.0F);
+        jScrollPane_jPanel_RightPanel.setAutoscrolls(true);
+        jScrollPane_jPanel_RightPanel.setMinimumSize(new java.awt.Dimension(0, 0));
+        jScrollPane_jPanel_RightPanel.setName(""); // NOI18N
+        jScrollPane_jPanel_RightPanel.setPreferredSize(new java.awt.Dimension(0, 0));
+        jScrollPane_jPanel_RightPanel.setVerifyInputWhenFocusTarget(false);
+        jScrollPane_jPanel_RightPanel.setWheelScrollingEnabled(false);
 
         jLabel2.setText("jLabel");
         jLabel2.setToolTipText("");
@@ -179,17 +178,17 @@ public class Split_Panel extends javax.swing.JPanel {
         jLabel2.setMaximumSize(new java.awt.Dimension(0, 0));
         jLabel2.setMinimumSize(new java.awt.Dimension(0, 0));
         jLabel2.setName(""); // NOI18N
-        jScrollPane_jPanel_LeftPanel.setViewportView(jLabel2);
+        jScrollPane_jPanel_RightPanel.setViewportView(jLabel2);
 
-        javax.swing.GroupLayout jPanel_LeftPanelLayout = new javax.swing.GroupLayout(jPanel_LeftPanel);
-        jPanel_LeftPanel.setLayout(jPanel_LeftPanelLayout);
-        jPanel_LeftPanelLayout.setHorizontalGroup(
-            jPanel_LeftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane_jPanel_LeftPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout jPanel_RightPanelLayout = new javax.swing.GroupLayout(jPanel_RightPanel);
+        jPanel_RightPanel.setLayout(jPanel_RightPanelLayout);
+        jPanel_RightPanelLayout.setHorizontalGroup(
+            jPanel_RightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane_jPanel_RightPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel_LeftPanelLayout.setVerticalGroup(
-            jPanel_LeftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane_jPanel_LeftPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+        jPanel_RightPanelLayout.setVerticalGroup(
+            jPanel_RightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane_jPanel_RightPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -200,9 +199,9 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        leftPanel.add(jPanel_LeftPanel, gridBagConstraints);
+        rightPanel1.add(jPanel_RightPanel, gridBagConstraints);
 
-        jSplitPanel.setRightComponent(leftPanel);
+        jSplitPanel.setRightComponent(rightPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -216,28 +215,29 @@ public class Split_Panel extends javax.swing.JPanel {
         );
     }// </editor-fold>                        
 
-    private void button1_ToolBar_RightPanelActionPerformed(java.awt.event.ActionEvent evt) {                                                           
+    private void button1_ToolBar_LeftPanelActionPerformed(java.awt.event.ActionEvent evt) {                                                          
         // TODO add your handling code here:
-    }                                                          
+    }                                                         
 
 
     // Variables declaration - do not modify                     
-    public javax.swing.JButton button1_ToolBar_RightPanel;
-    public javax.swing.JButton button2_ToolBar_RightPanel;
-    public javax.swing.JButton jButton1_jToolBar_LeftPanel;
-    public javax.swing.JButton jButton2_jToolBar_LeftPanel;
+    public javax.swing.JButton button1_ToolBar_LeftPanel;
+    public javax.swing.JButton button2_ToolBar_LeftPanel;
+    public javax.swing.JButton jButton1_jToolBar_RightPanel;
+    public javax.swing.JButton jButton2_jToolBar_RightPanel;
     public javax.swing.JLabel jLabel2;
-    public javax.swing.JPanel jPanel_LeftPanel;
-    public javax.swing.JScrollPane jScrollPane_jPanel_LeftPanel;
-    public javax.swing.JScrollPane jScrollPanel_RightPanel;
+    public javax.swing.JPanel jPanel_RightPanel;
+    public javax.swing.JScrollPane jScrollPane_jPanel_RightPanel;
+    public javax.swing.JScrollPane jScrollPanel_LeftPanel;
     public javax.swing.JSplitPane jSplitPanel;
-    public javax.swing.JTable jTable_jScrollPanel_RightPanel;
-    public javax.swing.JToolBar jToolBar_LeftPanel;
+    public javax.swing.JTable jTable_jScrollPanel_LeftPanel;
+    public javax.swing.JToolBar jToolBar_RightPanel;
     public javax.swing.JPanel leftPanel;
-    public javax.swing.JPanel rightPanel;
-    public javax.swing.JTextField searchTextField_SearchToolBar_RaghtPanel;
-    public javax.swing.JToolBar searchToolBar_RightPanel;
-    public javax.swing.JLabel searthLabel_SearchToolBar_RaghtPanel;
-    public javax.swing.JToolBar toolBar_RightPanel;
+    public javax.swing.JPanel rightPanel1;
+    public javax.swing.JTextField searchTextField_SearchToolBar_LeftPanel;
+    public javax.swing.JToolBar searchToolBar_LeftPanel;
+    public javax.swing.JLabel searthLabel_SearchToolBar_LeftPanel;
+    public javax.swing.JToolBar toolBar_LeftPanel;
     // End of variables declaration                   
 }
+
