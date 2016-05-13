@@ -85,7 +85,7 @@ public class KK_Map extends DBMap<
 	{
 
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
-		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey.intValue());
+		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		if (stack == null) stack = new Stack<Tuple3<Long, Integer, byte[]>>();
 		
 		stack.add(item);
@@ -97,7 +97,7 @@ public class KK_Map extends DBMap<
 	public Tuple3<Long, Integer, byte[]> getItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
-		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey.intValue());
+		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
 	
@@ -105,7 +105,7 @@ public class KK_Map extends DBMap<
 	public void removeItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
-		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey.intValue());
+		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		if (stack==null) return;
 
 		stack.pop();
