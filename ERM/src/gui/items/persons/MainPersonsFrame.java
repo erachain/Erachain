@@ -2,6 +2,8 @@ package gui.items.persons;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -17,10 +19,12 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
@@ -31,6 +35,8 @@ import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Menu;
 import gui.Split_Panel;
+import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
@@ -44,10 +50,13 @@ private TableModelPersons tableModelPersons;
 
 public MainPersonsFrame(){
 // not show buttons main Toolbar
+	this.setTitle(Lang.getInstance().translate("Persons"));
 	 this.jButton2_jToolBar.setVisible(false);
 	 this.jButton3_jToolBar.setVisible(false);
 // buttun1
 	 this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Person"));
+// status panel
+	 this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with persons"));
 	 
 	 this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
@@ -61,13 +70,15 @@ public MainPersonsFrame(){
 	 
 // all persons 
 	Split_Panel search_Person_SplitPanel = new Split_Panel();
-	search_Person_SplitPanel.setName("Search Persons");
+	search_Person_SplitPanel.setName(Lang.getInstance().translate("Search Persons"));
 	search_Person_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
 	search_Person_SplitPanel.button1_ToolBar_LeftPanel.setVisible(false);
 	search_Person_SplitPanel.button2_ToolBar_LeftPanel.setVisible(false);
 	search_Person_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
 	search_Person_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
+	
+	
 	//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
 		final JTable personsTable = new JTable(this.tableModelPersons);
@@ -75,10 +86,20 @@ public MainPersonsFrame(){
 		columnModel.getColumn(0).setMaxWidth((100));
 	//Custom renderer for the String column;
 		personsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		personsTable.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+		Renderer_Right b = new Renderer_Right();
+		personsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 	//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = personsTable.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);
-		favoriteColumn.setCellRenderer(personsTable.getDefaultRenderer(Boolean.class));
+		
+		TableCellRenderer a = personsTable.getDefaultRenderer(Boolean.class);
+
+		
+		
+		favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+		favoriteColumn.setMinWidth(50);
+		favoriteColumn.setMaxWidth(50);
+		favoriteColumn.setPreferredWidth(50);//.setWidth(30);
+		personsTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
 	//Sorter
 		RowSorter sorter =   new TableRowSorter(this.tableModelPersons);
 		personsTable.setRowSorter(sorter);	
@@ -222,7 +243,7 @@ public MainPersonsFrame(){
 // My persons		
 		
 	Split_Panel my_Person_SplitPanel = new Split_Panel();
-	my_Person_SplitPanel.setName("My Persons");
+	my_Person_SplitPanel.setName(Lang.getInstance().translate("My Persons"));
 	my_Person_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
 	my_Person_SplitPanel.button1_ToolBar_LeftPanel.setVisible(false);
@@ -252,7 +273,7 @@ public MainPersonsFrame(){
 			
 			//Custom renderer for the String column;
 					table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-					table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+					table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 					table.setDefaultRenderer(Boolean.class, new Renderer_Right()); // set renderer
 			
 					//CREATE SEARCH FIELD
@@ -437,8 +458,13 @@ public MainPersonsFrame(){
 	
 	this.jSplitPane2.setDividerLocation(700);
 */	
+	/*
+	Window w = SwingUtilities.getWindowAncestor(this);
+	Dimension d;
+	if (w != null)  d = w.getSize();
+*/	
 	this.pack();
-	this.setSize(800,600);
+//	this.setSize(800,600);
 	this.setMaximizable(true);
 	
 	this.setClosable(true);
@@ -452,7 +478,13 @@ public MainPersonsFrame(){
 //    splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
     //my_person_panel.requestFocusInWindow();
     this.setVisible(true);
-	
+    Rectangle k = this.getNormalBounds();
+ //   this.setBounds(k);
+    Dimension size = MainFrame.desktopPane.getSize();
+    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+ // setDividerLocation(700)
+
+ 	search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 }
 
 }

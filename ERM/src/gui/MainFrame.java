@@ -126,7 +126,7 @@ public static  JDesktopPane desktopPane;
         
         //desktopPane.add(new IssuePersonFrame());
     //    desktopPane.add(new AccountsPanel());
-        desktopPane.add(new MainPersonsFrame());
+       
        
      // new PersonConfirm(); 
         //STATS
@@ -153,11 +153,9 @@ public static  JDesktopPane desktopPane;
 
         w = screens.width;
 
-        h = screens.height;
+        setSize((int) (w/1.3),(int) (w/1.3/1.618));
 
-        setSize((int) (w/1.5),(int) (h/1.5));
-
-        setLocation(w/6, h/6);
+        setLocation(w/12, w/12);
         
         
         //SHOW FRAME
@@ -165,6 +163,7 @@ public static  JDesktopPane desktopPane;
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
+        desktopPane.add(new MainPersonsFrame());
         
 	}
 }

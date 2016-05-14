@@ -3,6 +3,7 @@ package gui.items.persons;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,12 +12,15 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import lang.Lang;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Rectangle;
+
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JScrollPane;
@@ -87,6 +91,13 @@ public class AllPersonsFrame extends JInternalFrame{
 //        splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
         //my_person_panel.requestFocusInWindow();
         this.setVisible(true);
+    /*    
+        Window w = SwingUtilities.getWindowAncestor(this);
+    	Dimension d;
+    	if (w != null)  d = w.getSize();
+    	*/
+    	Rectangle k = this.getNormalBounds();
+        this.setBounds(k);
 	
 	}
 
