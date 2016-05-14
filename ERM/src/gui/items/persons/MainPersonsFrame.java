@@ -86,12 +86,11 @@ public MainPersonsFrame(){
 		columnModel.getColumn(0).setMaxWidth((100));
 	//Custom renderer for the String column;
 		personsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		Renderer_Right b = new Renderer_Right();
 		personsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 	//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = personsTable.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);
 		
-		TableCellRenderer a = personsTable.getDefaultRenderer(Boolean.class);
+	
 
 		
 		
@@ -99,7 +98,7 @@ public MainPersonsFrame(){
 		favoriteColumn.setMinWidth(50);
 		favoriteColumn.setMaxWidth(50);
 		favoriteColumn.setPreferredWidth(50);//.setWidth(30);
-		personsTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
+	//	personsTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
 	//Sorter
 		RowSorter sorter =   new TableRowSorter(this.tableModelPersons);
 		personsTable.setRowSorter(sorter);	
@@ -254,6 +253,15 @@ public MainPersonsFrame(){
 	//TABLE
 			final WalletItemPersonsTableModel personsModel = new WalletItemPersonsTableModel();
 			final JTable table = new JTable(personsModel);
+			
+			columnModel = table.getColumnModel(); // read column model
+				columnModel.getColumn(0).setMaxWidth((100));
+			
+			//Custom renderer for the String column;
+			table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+			table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+			
+			
 			TableRowSorter sorter1 = new TableRowSorter(personsModel);
 			table.setRowSorter(sorter1);
 			table.getRowSorter();
@@ -261,20 +269,33 @@ public MainPersonsFrame(){
 			
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
-			confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+			confirmedColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+			confirmedColumn.setMinWidth(50);
+			confirmedColumn.setMaxWidth(50);
+			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
+			
 			
 			//CHECKBOX FOR FAVORITE
 			favoriteColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
-			favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-
+			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+			favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+			favoriteColumn.setMinWidth(50);
+			favoriteColumn.setMaxWidth(50);
+			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 			
-			 columnModel = table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
+		//	TableColumn keyColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_KEY);
+		//	keyColumn.setCellRenderer(new Renderer_Right());
 			
-			//Custom renderer for the String column;
-					table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-					table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
-					table.setDefaultRenderer(Boolean.class, new Renderer_Right()); // set renderer
+		//	TableColumn nameColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_NAME);
+		//	nameColumn.setCellRenderer(new Renderer_Left());
+			
+		//	TableColumn addrColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_ADDRESS);
+		//	addrColumn.setCellRenderer(new Renderer_Left());
+			
+			
+			
+				
 			
 					//CREATE SEARCH FIELD
 					final JTextField txtSearch = new JTextField();
@@ -485,6 +506,7 @@ public MainPersonsFrame(){
  // setDividerLocation(700)
 
  	search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+ 	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 }
 
 }
