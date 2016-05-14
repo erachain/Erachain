@@ -11,7 +11,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -189,7 +191,7 @@ public MainPersonsFrame(){
 							// открываем диалоговое окно ввода данных для подтверждения персоны 
 							PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
 
-					    	PersonConfirmFrame fm = new PersonConfirmFrame(MainPersonsFrame.this, person);	
+					    	 PersonConfirmDialog fm = new PersonConfirmDialog(MainPersonsFrame.this, person);	
 					    	// обрабатываем полученные данные от диалогового окна
 					    	//if(fm.isOK()){
 			                //    JOptionPane.showMessageDialog(Form1.this, "OK");
@@ -205,7 +207,11 @@ public MainPersonsFrame(){
 
 							PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
 
-							PersonSetStatusFrame fm = new PersonSetStatusFrame(MainPersonsFrame.this, person);	
+						//	PersonSetStatusFrame fm = 
+							PersonSetStatusDialog dd = new  PersonSetStatusDialog(MainPersonsFrame.this, person);
+						//
+						//	JOptionPane dd = new JOptionPane();
+							// dd.showInternalMessageDialog(MainFrame.desktopPane, new PersonSetStatusDialog(MainPersonsFrame.this, person));
 					    	// обрабатываем полученные данные от диалогового окна
 					    	//if(fm.isOK()){
 			                //    JOptionPane.showMessageDialog(Form1.this, "OK");

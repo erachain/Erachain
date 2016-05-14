@@ -163,7 +163,7 @@ public static  JDesktopPane desktopPane;
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
-        desktopPane.add(new MainPersonsFrame());
+  //      desktopPane.add(new MainPersonsFrame());
         
 	}
 }

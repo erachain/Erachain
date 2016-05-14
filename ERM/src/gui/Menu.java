@@ -45,6 +45,7 @@ import gui.items.imprints.ImprintsPanel;
 //import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
+import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.RIPPersonFrame;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonsPanel;
@@ -309,7 +310,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        	//	selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainPersonsFrame(), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
