@@ -170,6 +170,7 @@ public class Split_Panel extends javax.swing.JPanel {
         jScrollPane_jPanel_RightPanel.setPreferredSize(new java.awt.Dimension(0, 0));
         jScrollPane_jPanel_RightPanel.setVerifyInputWhenFocusTarget(false);
         jScrollPane_jPanel_RightPanel.setWheelScrollingEnabled(false);
+        jScrollPane_jPanel_RightPanel.setFocusable(false);
 
         jLabel2.setText("jLabel");
         jLabel2.setToolTipText("");

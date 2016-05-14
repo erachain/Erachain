@@ -149,6 +149,7 @@ public MainPersonsFrame(){
 
 		
 		Person_Info info = new Person_Info(); 
+		info.setFocusable(false);
 		//		
 	// обработка изменения положения курсора в таблице
 				 //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
@@ -348,6 +349,7 @@ public MainPersonsFrame(){
 					// select row table persons
 					
 					 Person_Info info1 = new Person_Info();
+					 info1.setFocusable(false);
 					// JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info1)); 
 					 
 				//	 my_Person_SplitPanel.jTable_jScrollPanel_LeftPanel = table;

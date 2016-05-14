@@ -9,7 +9,11 @@ import java.awt.Insets;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -463,7 +469,7 @@ public class PersonConfirmDialog extends JDialog  {
 	  private void initComponents(PersonCls person) {
 	        java.awt.GridBagConstraints gridBagConstraints;
 
-	        jLabel_PersonInfo = new javax.swing.JLabel();
+	        jLabel_PersonInfo = new javax.swing.JScrollPane();
 	        jLabel_YourAddress = new javax.swing.JLabel();
 	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
 	        jLabel_Address1 = new javax.swing.JLabel();
@@ -502,8 +508,13 @@ public class PersonConfirmDialog extends JDialog  {
 	        getContentPane().setLayout(layout);
 
 	        jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+	        Person_Info info = new Person_Info(); 
+	        info.show_001(person);
+	        info.setFocusable(false);
+	        jLabel_PersonInfo.setViewportView( info);
+	       // jLabel_PersonInfo.set
 	     //   jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys of") + " " + person.getName() +":");
-	        jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
+	   //     jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 4;
@@ -822,7 +833,8 @@ public class PersonConfirmDialog extends JDialog  {
 	    private javax.swing.JLabel jLabel_Adress1_Check;
 	    private javax.swing.JLabel jLabel_Fee;
 	    private javax.swing.JLabel jLabel_Fee_Check;
-	   private javax.swing.JLabel jLabel_PersonInfo;
+	  // private javax.swing.JLabel jLabel_PersonInfo;
+	   private javax.swing.JScrollPane jLabel_PersonInfo;
 	//    private javax.swing.JEditorPane jLabel_PersonInfo;
 	    
 	    private javax.swing.JLabel jLabel_Title;

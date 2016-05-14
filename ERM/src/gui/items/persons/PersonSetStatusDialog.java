@@ -287,7 +287,7 @@ final JTextField pubKey1Txt = new JTextField();
 	    private void initComponents(PersonCls person) {
 	        java.awt.GridBagConstraints gridBagConstraints;
 
-	        jLabel_PersonInfo = new javax.swing.JLabel();
+	        jLabel_PersonInfo = new javax.swing.JScrollPane();
 	        jLabel_YourAddress = new javax.swing.JLabel();
 	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
 	        jLabel_Status = new javax.swing.JLabel();
@@ -319,7 +319,11 @@ final JTextField pubKey1Txt = new JTextField();
 	        getContentPane().setLayout(layout);
 
 	        jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-	        jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
+	        Person_Info info = new Person_Info(); 
+	        info.show_001(person);
+	        info.setFocusable(false);
+	        jLabel_PersonInfo.setViewportView( info);
+	   //     jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 4;
@@ -522,7 +526,7 @@ final JTextField pubKey1Txt = new JTextField();
 	    private javax.swing.JFormattedTextField jFormattedTextField_ToDo;
 	    private javax.swing.JLabel jLabel_Fee;
 	    private javax.swing.JLabel jLabel_Fee_Check;
-	    private javax.swing.JLabel jLabel_PersonInfo;
+	    private javax.swing.JScrollPane jLabel_PersonInfo;
 	    private javax.swing.JLabel jLabel_Status;
 	    private javax.swing.JLabel jLabel_Title;
 	    private javax.swing.JLabel jLabel_ToDo;
