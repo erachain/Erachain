@@ -717,7 +717,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
 	        jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jButton_CanselActionPerformed(evt);
+	            	dispose();	
 	            }
 	        });
 	        
