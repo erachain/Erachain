@@ -62,7 +62,8 @@ public MainPersonsFrame(){
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	 Menu.selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+		    //	 Menu.selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+		    	 new IssuePersonDialog();
 		    }
 
 			

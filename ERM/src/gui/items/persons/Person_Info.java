@@ -72,7 +72,7 @@ public  Person_Info() {
 		{
 			dateAlive = Lang.getInstance().translate("unknown");
 		}
-		message += "<div>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
+		message += "<div style='color:#ffff00'>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
 
 		// GET CERTIFIED ACCOUNTS
 		message += "<h2>"+ "Accounts" +"</h2>";
@@ -86,7 +86,7 @@ public  Person_Info() {
 				if (active_date.a == 0) active_date_str = "active";
 				else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
 				
-				message += "<div><input type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
+				message += "<div><input  style='background: #00ffff'; type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
 						+ " -> <b>" + active_date_str +"</b></div>";
 			}
 		}
@@ -137,7 +137,7 @@ public  Person_Info() {
 		 // Читаем адреса клиента
 		 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 		 if ( !Addresses.isEmpty()){
-			 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
+			 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
 		 }
 		 else{
 			 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
