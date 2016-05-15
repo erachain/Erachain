@@ -505,7 +505,7 @@ public class TransactionCreator
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key,
 			List<PublicKeyAccount> userAccounts,
-			int end_date) {
+			int add_day) {
 		
 		this.checkUpdate();
 		
@@ -517,7 +517,7 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
-				end_date,  timestamp, creator.getLastReference(this.fork));
+				add_day,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);

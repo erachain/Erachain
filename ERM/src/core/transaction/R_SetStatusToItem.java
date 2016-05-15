@@ -49,7 +49,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	protected Long key; // STATUS KEY
 	protected ItemCls item; // ITEM
-	protected Long end_date; // in days; 0 - permanent active
+	protected Long end_date = Long.MAX_VALUE;
 	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
@@ -61,6 +61,7 @@ public class R_SetStatusToItem extends Transaction {
 
 		this.key = key;
 		this.item = item;
+		if (end_date == null || end_date == 0) end_date = Long.MAX_VALUE;
 		this.end_date = end_date;		
 	}
 
@@ -248,6 +249,7 @@ public class R_SetStatusToItem extends Transaction {
 		data = Bytes.concat(data, keyBytes);
 		
 		//WRITE END DATE
+		if (this.end_date == null || this.end_date == 0) this.end_date = Long.MAX_VALUE;
 		data = Bytes.concat(data, Longs.toByteArray(this.end_date));
 
 		return data;	

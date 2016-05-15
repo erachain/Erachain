@@ -1903,11 +1903,11 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
-			List<PublicKeyAccount> userAccounts, int end_date) {
+			List<PublicKeyAccount> userAccounts, int add_day) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_SertifyPerson( version, asPack,
 					creator, feePow, key,
-					userAccounts, end_date);
+					userAccounts, add_day);
 		}
 	}
 

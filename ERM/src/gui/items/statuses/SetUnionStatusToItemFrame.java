@@ -1,4 +1,4 @@
-package gui.items.persons;
+package gui.items.statuses;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -40,9 +40,9 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
-import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.MainFrame;
@@ -54,18 +54,27 @@ import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
 
-//public class PersonConfirm extends JDialog { // JInternalFrame  {
-public class RIPPersonFrame extends JInternalFrame  {
+// set union Status to Item (Unit)
+// for example: set status DIRECTOR of union MY_FIRM to person ERMOLAEV
+public class SetUnionStatusToItemFrame extends JInternalFrame  {
 
 	private JComboBox<Account> accountLBox;
-	static PersonCls person;
+	static StatusCls status;
+	static UnionCls union;
+	static ItemCls item;
 
-	public RIPPersonFrame(JFrame parent) {
-		super(Lang.getInstance().translate("R.I.P Person"));
+	public SetUnionStatusToItemFrame(JFrame parent) {
+		super(Lang.getInstance().translate("Union Status to Item (Unit)"));
 	
 
-		final JTextField personKeyTxt = new JTextField();
-		final JLabel personDetails = new JLabel();
+		final JTextField statusKeyTxt = new JTextField();
+		final JLabel statusDetails = new JLabel();
+
+		final JTextField unionKeyTxt = new JTextField();
+		final JLabel unionDetails = new JLabel();
+
+		final JTextField itemKeyTxt = new JTextField();
+		final JLabel itemDetails = new JLabel();
 
 		final JTextField endDate = new JTextField(".");
 		final JTextField feePow = new JTextField("0");
@@ -93,37 +102,36 @@ public class RIPPersonFrame extends JInternalFrame  {
 		label.gridx = 0;
 		label.gridheight = 1;
 
-		//LABEL FROM
+		//LABEL SIGNER
 		++label.gridy;
 		this.add(new JLabel(Lang.getInstance().translate("Account") + ":"), label);
 		
-		//COMBOBOX FROM
+		//COMBOBOX SIGNER
 		++input.gridy;
 		this.accountLBox = new JComboBox<Account>(new AccountsComboBoxModel());
         this.add(this.accountLBox, input);
 	    
 		++label.gridy;
-		this.add(new JLabel(Lang.getInstance().translate("Person Key") + ":"), label);
+		this.add(new JLabel(Lang.getInstance().translate("Status Key") + ":"), label);
 
 		++input.gridy;
-	    this.add(personKeyTxt, input);
+	    this.add(statusKeyTxt, input);
 	    
-	    
-	    personKeyTxt.getDocument().addDocumentListener(new DocumentListener() {
+	    statusKeyTxt.getDocument().addDocumentListener(new DocumentListener() {
             
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
 			}
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
-				RIPPersonFrame.person = refreshReceiverDetails(personKeyTxt, personDetails);
+				SetUnionStatusToItemFrame.status = (StatusCls)refreshStatusDetails(statusKeyTxt, statusDetails);
 			}
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
-				RIPPersonFrame.person = refreshReceiverDetails(personKeyTxt, personDetails);
+				SetUnionStatusToItemFrame.status = (StatusCls)refreshStatusDetails(statusKeyTxt, statusDetails);
 			}
         });
-	          		
+
 	    ++input.gridy;
 	    ++label.gridy;
 	    JPanel htmlPanel = new JPanel();
@@ -142,8 +150,83 @@ public class RIPPersonFrame extends JInternalFrame  {
 	    detail.gridheight = 3;
 	    detail.weightx = -5;
 	    detail.weighty = -2;
-        personDetails.setText(text);
-        htmlPanel.add(personDetails, detail);      
+        itemDetails.setText(text);
+        htmlPanel.add(itemDetails, detail);      
+
+	    input.gridx = 0;
+	    input.gridwidth = 5;
+	    input.gridheight = 2;
+        this.add(htmlPanel, input); // BorderLayout.SOUTH);
+
+	    ++label.gridy;
+		this.add(new JLabel(Lang.getInstance().translate("Union Key") + ":"), label);
+
+		++input.gridy;
+	    this.add(unionKeyTxt, input);
+	    
+	    
+	    unionKeyTxt.getDocument().addDocumentListener(new DocumentListener() {
+            
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+			}
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				SetUnionStatusToItemFrame.union = refreshUnionDetails(unionKeyTxt, unionDetails);
+			}
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				SetUnionStatusToItemFrame.union = refreshUnionDetails(unionKeyTxt, unionDetails);
+			}
+        });
+	          		
+	    ++input.gridy;
+	    ++label.gridy;
+	    JPanel unionDetailsPanel = new JPanel();
+	    unionDetailsPanel.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+
+        ++label.gridy;
+		this.add(new JLabel(Lang.getInstance().translate("Person Key") + ":"), label);
+
+		++input.gridy;
+	    this.add(itemKeyTxt, input);
+	    
+	    
+	    itemKeyTxt.getDocument().addDocumentListener(new DocumentListener() {
+            
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+			}
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				SetUnionStatusToItemFrame.item = refreshItemDetails(itemKeyTxt, itemDetails);
+			}
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				SetUnionStatusToItemFrame.item = refreshItemDetails(itemKeyTxt, itemDetails);
+			}
+        });
+	          		
+	    ++input.gridy;
+	    ++label.gridy;
+	    JPanel detailsPanel = new JPanel();
+        htmlPanel.setBorder(BorderFactory.createTitledBorder(Lang.getInstance().translate("Details")));
+         
+        //String text = "";         
+        //font = new Font(null, Font.PLAIN, 10);
+        
+	    //GridBagConstraints detail = new GridBagConstraints();
+	    detail.insets = new Insets(0, 5, 5, 0);
+	    detail.fill = GridBagConstraints.BOTH; // components grow in both dimensions
+	    detail.anchor = GridBagConstraints.NORTHWEST;
+	    detail.gridx = 0;
+	    detail.gridy = 0;
+	    detail.gridwidth = 5;
+	    detail.gridheight = 3;
+	    detail.weightx = -5;
+	    detail.weighty = -2;
+        itemDetails.setText(text);
+        htmlPanel.add(itemDetails, detail);      
 
 	    input.gridx = 0;
 	    input.gridwidth = 5;
@@ -191,7 +274,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(Button_Confirm, feePow, person, endDate);
+		    	onGoClick(Button_Confirm, feePow, item, endDate);
 		    }
 		});
 	    
@@ -212,21 +295,89 @@ public class RIPPersonFrame extends JInternalFrame  {
         this.setVisible(true);
 	}
 	
-	private PersonCls refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails)
+	private StatusCls refreshStatusDetails(JTextField fieldTxt, JLabel itemDetails)
 	{
-		String toValue = pubKeyTxt.getText();
+		String toValue = fieldTxt.getText();
 		
 		if(toValue.isEmpty())
 		{
-			pubKeyDetails.setText("");
+			itemDetails.setText("");
 			return null;
 		}
 		
-		long personKey = Long.parseLong(pubKeyTxt.getText());
+		long key = Long.parseLong(fieldTxt.getText());
 		
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
-			pubKeyDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+			itemDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+			return null;
+		}
+		
+		//CHECK IF ITEM IS VALID ADDRESS
+		StatusCls status = Controller.getInstance().getItemStatus(key);
+
+		if (status == null) {
+			// SHOW error message
+			itemDetails.setText(OnDealClick.resultMess(Transaction.ITEM_STATUS_NOT_EXIST));
+		} else {
+			// SHOW account for FEE asset
+			String statusDetails = status.toString() + "<br>";
+			itemDetails.setText("<html>" + statusDetails + "</html>");
+			
+		}
+		
+		return status;
+	}
+
+	private UnionCls refreshUnionDetails(JTextField fieldTxt, JLabel itemDetails)
+	{
+		String toValue = fieldTxt.getText();
+		
+		if(toValue.isEmpty())
+		{
+			itemDetails.setText("");
+			return null;
+		}
+		
+		long key = Long.parseLong(fieldTxt.getText());
+		
+		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		{
+			itemDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+			return null;
+		}
+		
+		//CHECK IF ITEM IS VALID ADDRESS
+		UnionCls union = Controller.getInstance().getItemUnion(key);
+
+		if (union == null) {
+			// SHOW error message
+			itemDetails.setText(OnDealClick.resultMess(Transaction.ITEM_UNION_NOT_EXIST));
+		} else {
+			// SHOW account for FEE asset
+			String statusDetails = union.toString() + "<br>";
+			itemDetails.setText("<html>" + statusDetails + "</html>");
+			
+		}
+		
+		return union;
+	}
+
+	private PersonCls refreshItemDetails(JTextField itemTxt, JLabel itemDetails)
+	{
+		String toValue = itemTxt.getText();
+		
+		if(toValue.isEmpty())
+		{
+			itemDetails.setText("");
+			return null;
+		}
+		
+		long personKey = Long.parseLong(itemTxt.getText());
+		
+		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		{
+			itemDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
 			return null;
 		}
 		
@@ -235,42 +386,12 @@ public class RIPPersonFrame extends JInternalFrame  {
 
 		if (person == null) {
 			// SHOW error message
-			pubKeyDetails.setText(OnDealClick.resultMess(Transaction.ITEM_PERSON_NOT_EXIST));
+			itemDetails.setText(OnDealClick.resultMess(Transaction.ITEM_DOES_NOT_EXIST));
 		} else {
 			// SHOW account for FEE asset
-			String personDetails = person.toString() + "<br>";
-			personDetails += person.getSkinColor() + ":" + person.getEyeColor() + ":" + person.getHairСolor() + "<br>";
-			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
-
-			// IF PERSON DEAD
-			Tuple3<Long, Integer, byte[]> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
-			if (deadDay != null)
-			{
-				if (deadDay.a == null)
-					personDetails += "<br>Dead";
-				else {
-					long current_time = NTP.getTime();
-					int daysLeft = (int)((deadDay.a - current_time) / 86400000);
-					//personDetails += "<br>" + Lang.getInstance().translate("Date of death %days%").replace("%days%", ""+daysLeft);
-					personDetails += "<br>" + Lang.getInstance().translate("Died %days% days ago").replace("%days%", ""+daysLeft);
-				}
-			} else {
-				// IF PERSON ALIVE
-				Tuple3<Long, Integer, byte[]> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
-				if (aliveDay == null)
-				{} else {
-					if (aliveDay.a == null)
-						personDetails += "<br>Alive";
-					else {
-						long current_time = NTP.getTime();
-						int daysLeft = (int)((aliveDay.a - current_time) / 86400000);
-						if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
-						else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
-					}
-				}
-			}
+			String personDetails = item.toString() + "<br>";
 			
-			pubKeyDetails.setText("<html>" + personDetails + "</html>");
+			itemDetails.setText("<html>" + personDetails + "</html>");
 			
 		}
 		
@@ -278,7 +399,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 	}
 
 	public void onGoClick(JButton Button_Confirm, JTextField feePowTxt,
-			PersonCls person, JTextField toDateTxt)
+			ItemCls item, JTextField toDateTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
@@ -320,7 +441,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
-				feePow, StatusCls.DEAD_KEY, person, endDate);
+				feePow, StatusCls.DEAD_KEY, item, endDate);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

@@ -66,7 +66,7 @@ public class SertifyPubKeysDetailsFrame extends Rec_DetailsFrame
 				
 		//ens DAYS
 		++detailGBC.gridy;
-		JTextField amount = new JTextField("" + sertifyPubKeysRecord.getEndDate());
+		JTextField amount = new JTextField("" + sertifyPubKeysRecord.getAddDay());
 		amount.setEditable(false);
 		MenuPopupUtil.installContextMenu(amount);
 		this.add(amount, detailGBC);	

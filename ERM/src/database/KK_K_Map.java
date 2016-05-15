@@ -8,17 +8,18 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import core.item.statuses.StatusCls;
 import utils.ObserverMessage;
 import database.DBSet;
 
-// key to key_Stack for End_Date Map
+// key+key to key_Stack for End_Date Map
 // in days
-public class KK_Map extends DBMap<
-			Long, // item1 Key
-			TreeMap<Long, // item2 Key
+public class KK_K_Map extends DBMap<
+			Tuple2<Long, Long>, // item1 Key + item2 Key
+			TreeMap<Long, // item3 Key
 					Stack<Tuple3<
 						Long, // end_date
 						Integer, // block.getHeight
@@ -29,7 +30,7 @@ public class KK_Map extends DBMap<
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	private String name;
 		
-	public KK_Map(DBSet databaseSet, DB database,
+	public KK_K_Map(DBSet databaseSet, DB database,
 			String name, int observerMessage_add, int observerMessage_remove)
 	{
 		super(databaseSet, database);
@@ -41,7 +42,7 @@ public class KK_Map extends DBMap<
 
 	}
 
-	public KK_Map(KK_Map parent) 
+	public KK_K_Map(KK_K_Map parent) 
 	{
 		super(parent);
 	}
@@ -50,10 +51,10 @@ public class KK_Map extends DBMap<
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Long, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) 
+	protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) 
 	{
 		//OPEN MAP
-		BTreeMap<Long, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map =  database.createTreeMap(name)
+		BTreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map =  database.createTreeMap(name)
 				.keySerializer(BTreeKeySerializer.BASIC)
 				.counterEnable()
 				.makeOrGet();
@@ -63,10 +64,10 @@ public class KK_Map extends DBMap<
 	}
 
 	@Override
-	protected Map<Long, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() 
+	protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() 
 	{
 		// HashMap ?
-		return new TreeMap<Long, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
+		return new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
 	}
 
 	@Override
@@ -81,9 +82,11 @@ public class KK_Map extends DBMap<
 		return this.observableData;
 	}
 
-	public void addItem(Long key, Long itemKey, Tuple3<Long, Integer, byte[]> item)
+	public void addItem(Long key1, Long key2, Long itemKey, Tuple3<Long, Integer, byte[]> item)
 	{
 
+		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
+		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		if (stack == null) stack = new Stack<Tuple3<Long, Integer, byte[]>>();
@@ -94,16 +97,20 @@ public class KK_Map extends DBMap<
 		this.set(key, value);
 	}
 	
-	public Tuple3<Long, Integer, byte[]> getItem(Long key, Long itemKey)
+	public Tuple3<Long, Integer, byte[]> getItem(Long key1, Long key2, Long itemKey)
 	{
+		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
+
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
 	
 	// remove only last item from stack for this key of itemKey
-	public void removeItem(Long key, Long itemKey)
+	public void removeItem(Long key1, Long key2, Long itemKey)
 	{
+		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
+
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		if (stack==null) return;

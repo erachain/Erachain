@@ -1,58 +1,37 @@
 package gui.items.persons;
 
-import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
-import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import core.crypto.Crypto;
-import core.item.assets.AssetCls;
+import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import gui.MainFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.items.statuses.ComboBoxModelItemsStatuses;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
-import utils.NameUtils;
 import utils.Pair;
-import utils.NameUtils.NameResult;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class PersonSetStatusFrame extends JFrame  {
@@ -136,7 +115,7 @@ public class PersonSetStatusFrame extends JFrame  {
 	    input.gridy = ++gridy;
 	    input.gridwidth = 5;
 	    input.gridheight = 1;
-	    this.add(new JLabel(Lang.getInstance().translate("To date (0 - is permanent)") +":"), input);
+	    this.add(new JLabel(Lang.getInstance().translate("Add day ('+'=permanent, '.'=2year, '-'=stop)") +":"), input);
 
 	    input.gridx = 2;
 	    input.gridy = gridy;
@@ -206,7 +185,7 @@ public class PersonSetStatusFrame extends JFrame  {
 
 		Account creator = (Account) this.accountLBox.getSelectedItem();
     	//String address = pubKey1Txt.getText();
-    	int toDate = 0;
+    	int addDay = 0;
     	int feePow = 0;
     	int parse = 0;
     	String toDateStr = toDateTxt.getText();
@@ -215,10 +194,6 @@ public class PersonSetStatusFrame extends JFrame  {
 			//READ FEE POW
 			feePow = Integer.parseInt(feePowTxt.getText());
 			
-			//READ to DAY
-			parse++;
-	    	if (toDateStr.length() > 0)
-    			toDate = Integer.parseInt(toDateStr);
     		}
 		catch(Exception e)
 		{
@@ -226,12 +201,20 @@ public class PersonSetStatusFrame extends JFrame  {
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
-			else
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
+			Button_Confirm.setEnabled(true);
+			return;
 		}
     	
+		Pair<Integer, Integer> toDayRes = ItemCls.resolveEndDayFromStr(toDateStr, 356 * 2);
+		if (toDayRes.getA() == -1)
+		{
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid add Day value"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			Button_Confirm.setEnabled(true);
+			return;
+		}
+		else
+			addDay = (int)toDayRes.getB();
+		
 	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
 	    if (pubKey1Txt.getText().length() == 30) {
 	    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
@@ -253,7 +236,7 @@ public class PersonSetStatusFrame extends JFrame  {
 		
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
 				feePow, person.getKey(), 
-				sertifiedPublicKeys, toDate);
+				sertifiedPublicKeys, addDay);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {

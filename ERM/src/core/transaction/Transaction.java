@@ -141,6 +141,7 @@ public abstract class Transaction {
 	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 33;
 	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 34;
 	public static final int SET_UNION_TO_ITEM_TRANSACTION = 35;
+	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 36;
 	// confirms other transactions
 	public static final int CONFIRM_TRANSACTION = 40;
 	// exchange of assets

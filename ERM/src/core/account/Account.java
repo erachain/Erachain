@@ -412,7 +412,7 @@ public class Account {
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		Long end_date = personDuration.a;
 		if (end_date == null ) return true; // permanent active
-		if (end_date < current_time + 86400 ) return false; // - 1 day
+		if (end_date < current_time + 86400000 ) return false; // - 1 day
 		
 		return true;
 		
@@ -449,7 +449,7 @@ public class Account {
 		if (end_date == null )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);
-		if (end_date < current_time + 86400 )
+		if (end_date < current_time + 86400000 )
 			// ALIVE expired
 			return new Tuple2<Integer, PersonCls>(-1, person);
 		

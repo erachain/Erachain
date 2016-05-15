@@ -21,6 +21,8 @@ import database.Item_Map;
 import database.wallet.FavoriteItem;
 import database.Issue_ItemMap;
 
+import utils.Pair;
+
 public abstract class ItemCls {
 
 	public static final int ASSET_TYPE = 1;
@@ -75,6 +77,53 @@ public abstract class ItemCls {
 	public abstract Issue_ItemMap getDBIssueMap(DBSet db);
 	//public abstract FavoriteItem getDBFavoriteMap();
 
+	public static Pair<Integer, Long> resolveEndDateFromStr(String str, Long defaultVol)
+	{
+		if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
+		else if (str.length() == 1)
+		{
+			if (str == "+")
+				return new Pair<Integer, Long>(0, Long.MAX_VALUE);
+			else if (str == "-")
+				return new Pair<Integer, Long>(0, Long.MIN_VALUE);
+			else
+				return new Pair<Integer, Long>(0, defaultVol);
+		}
+		else {
+			try {
+				Long date = Long.parseLong(str);
+				return new Pair<Integer, Long>(0, date);
+			}
+			catch(Exception e)			
+			{
+				return new Pair<Integer, Long>(-1, 0l);				
+			}
+		}
+	}
+	
+	public static Pair<Integer, Integer> resolveEndDayFromStr(String str, Integer defaultVol)
+	{
+		if (str.length() == 0) return new Pair<Integer, Integer>(0, defaultVol);
+		else if (str.length() == 1)
+		{
+			if (str == "+")
+				return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
+			else if (str == "-")
+				return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
+			else
+				return new Pair<Integer, Integer>(0, defaultVol);
+		}
+		else {
+			try {
+				Integer date = Integer.parseInt(str);
+				return new Pair<Integer, Integer>(0, date);
+			}
+			catch(Exception e)			
+			{
+				return new Pair<Integer, Integer>(-1, 0);				
+			}
+		}
+	}
 
 	public byte[] getType()
 	{

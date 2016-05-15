@@ -41,7 +41,7 @@ import database.DBSet;
 import utils.Converter;
 
 // if person has not ALIVE status - add it
-// this.end_date = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
+// end_day = this.add_day + this.timestanp(days)
 // typeBytes[1] - version =0 - not need sign by person;
 // 		 =1 - need sign by person
 // typeBytes[2] - size of personalized accounts
@@ -62,7 +62,7 @@ public class R_SertifyPubKeys extends Transaction {
 	public static final int DEFAULT_DURATION = 2 * 356;
 
 	protected Long key; // PERSON KEY
-	protected Integer end_date; // in days
+	protected Integer add_day; // in days
 	protected List<PublicKeyAccount> sertifiedPublicKeys;
 	protected List<byte[]> sertifiedSignatures;
 
@@ -73,20 +73,20 @@ public class R_SertifyPubKeys extends Transaction {
 
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, long timestamp, byte[] reference) {
+			int add_day, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
 		this.sertifiedPublicKeys = sertifiedPublicKeys;
-		this.end_date = end_date;		
+		this.add_day = add_day;		
 	}
 
 	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, long timestamp, byte[] reference) {
+			int add_day, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
-				end_date, timestamp, reference);
+				add_day, timestamp, reference);
 	}
 	// set default date
 	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
@@ -98,11 +98,11 @@ public class R_SertifyPubKeys extends Transaction {
 	}
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, long timestamp, byte[] reference, byte[] signature,
+			int add_day, long timestamp, byte[] reference, byte[] signature,
 			List<byte[]> sertifiedSignatures) {
 		this(typeBytes, creator, feePow, key,
 				sertifiedPublicKeys,
-				end_date, timestamp, reference);
+				add_day, timestamp, reference);
 		this.signature = signature;
 		this.sertifiedSignatures = sertifiedSignatures;
 		this.calcFee();
@@ -110,31 +110,31 @@ public class R_SertifyPubKeys extends Transaction {
 	// as pack
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, byte[] signature,
+			int add_day, byte[] signature,
 			List<byte[]> sertifiedSignatures) {
 		this(typeBytes, creator, (byte)0, key,
 				sertifiedPublicKeys,
-				end_date, 0l, null);
+				add_day, 0l, null);
 		this.signature = signature;
 		this.sertifiedSignatures = sertifiedSignatures;
 	}
 	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, long timestamp, byte[] reference, byte[] signature,
+			int add_day, long timestamp, byte[] reference, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, feePow, key,
 				sertifiedPublicKeys,
-				end_date, timestamp, reference);
+				add_day, timestamp, reference);
 	}
 
 	// as pack
 	public R_SertifyPubKeys(int version, PublicKeyAccount creator, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
-			int end_date, byte[] signature,
+			int add_day, byte[] signature,
 			byte[] userSignature1, byte[] userSignature2, byte[] userSignature3) {
 		this(new byte[]{TYPE_ID, (byte)version, (byte)sertifiedPublicKeys.size(), 0}, creator, (byte)0, key,
 				sertifiedPublicKeys,
-				end_date, 0l, null);
+				add_day, 0l, null);
 	}
 	
 	//GETTERS/SETTERS
@@ -174,9 +174,9 @@ public class R_SertifyPubKeys extends Transaction {
 		return items;
 	}
 	
-	public int getEndDate() 
+	public int getAddDay() 
 	{
-		return this.end_date;
+		return this.add_day;
 	}
 	
 	public int getPublicKeysSize()
@@ -200,7 +200,7 @@ public class R_SertifyPubKeys extends Transaction {
 		List<String> pbKeys = new ArrayList<String>();
 		transaction.put("sertified_public_keys", this.getSertifiedPublicKeysB58());
 		transaction.put("sertified_signatures", this.getSertifiedSignaturesB58());
-		transaction.put("end_date", this.end_date);
+		transaction.put("add_day", this.add_day);
 		
 		return transaction;	
 	}
@@ -303,18 +303,18 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		// READ DURATION
-		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
+		int add_day = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
 		position += DATE_DAY_LENGTH;
 
 		if (!asPack) {
 			return new R_SertifyPubKeys(typeBytes, creator, feePow, key,
 					sertifiedPublicKeys,
-					end_date, timestamp, reference, signature,
+					add_day, timestamp, reference, signature,
 					sertifiedSignatures);
 		} else {
 			return new R_SertifyPubKeys(typeBytes, creator, key,
 					sertifiedPublicKeys,
-					end_date, signature,
+					add_day, signature,
 					sertifiedSignatures);
 		}
 
@@ -343,7 +343,7 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 		
 		//WRITE DURATION
-		data = Bytes.concat(data, Ints.toByteArray(this.end_date));
+		data = Bytes.concat(data, Ints.toByteArray(this.add_day));
 
 		return data;	
 	}
@@ -412,7 +412,7 @@ public class R_SertifyPubKeys extends Transaction {
 		if (result != Transaction.VALIDATE_OK) return result; 
 
 		//CHECK END_DAY
-		if(end_date < 0)
+		if(add_day < 0)
 		{
 			return INVALID_DATE;
 		}
@@ -457,21 +457,21 @@ public class R_SertifyPubKeys extends Transaction {
 		pkAccount.setConfirmedBalance(Transaction.FEE_KEY, 
 				pkAccount.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
-		int end_date = this.end_date;
-		if (end_date == 0)
+		int add_day = this.add_day;
+		if (add_day == 0)
 			// set to_date to default
-			end_date = DEFAULT_DURATION;
+			add_day = DEFAULT_DURATION;
 		// set to time stamp of record
-		end_date = (int)(this.timestamp / 86400000.0) + end_date;
+		int  end_day = (int)(this.timestamp / 86400000) + add_day;
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(end_date,
+		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(end_day,
 				Controller.getInstance().getHeight(), this.signature);
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, end_date,
+		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, end_day,
 				Controller.getInstance().getHeight(), this.signature);
 		
 		if (db.getPersonStatusMap().getItem(key, StatusCls.ALIVE_KEY) == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Long, Integer, byte[]>(null,
+			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Long, Integer, byte[]>(Long.MAX_VALUE,
 					Controller.getInstance().getHeight(), this.signature));
 		}
 
