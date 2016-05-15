@@ -24,6 +24,7 @@ import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.PersonConfirmFrame;
 import gui.items.persons.SearchPersons;
+import gui.items.unions.MainUnionsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
@@ -163,7 +164,7 @@ public static  JDesktopPane desktopPane;
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
-  //      desktopPane.add(new MainPersonsFrame());
+      //  desktopPane.add(new MainUnionsFrame());
         
 	}
 }

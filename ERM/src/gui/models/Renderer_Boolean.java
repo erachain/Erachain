@@ -27,6 +27,9 @@ import javax.swing.border.LineBorder;
               setLayout(new GridBagLayout());
               setMargin(new Insets(0, 0, 0, 0));
               setHorizontalAlignment(JLabel.CENTER);
+              setBorder(null);
+
+              setBorderPaintedFlat(true);
           }
 
           @Override

@@ -166,7 +166,7 @@ public MainPersonsFrame(){
 						search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 					}
 				});
-		
+				 
 		
 		
 		
@@ -382,10 +382,10 @@ public MainPersonsFrame(){
 	
 	
 	
-	this.jTabbedPane.add(search_Person_SplitPanel);
+
 	this.jTabbedPane.add(my_Person_SplitPanel);
 	
-	
+	this.jTabbedPane.add(search_Person_SplitPanel);
 	
 	
 	//Frame_All frame = new Frame_All();

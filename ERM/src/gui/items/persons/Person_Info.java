@@ -12,6 +12,7 @@ import org.mapdb.Fun.Tuple3;
 
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 import database.DBSet;
 import lang.Lang;
 
@@ -162,5 +163,7 @@ public void show_002(PersonCls person){
 	setText(new Person_Info().Get_HTML_Person_Info_002(person));
 	return;
 }
+
+
 
 }

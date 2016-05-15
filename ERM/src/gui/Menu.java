@@ -44,6 +44,7 @@ import gui.SendAssetFrame;
 import gui.items.imprints.ImprintsPanel;
 //import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
+import gui.items.persons.IssuePersonDialog;
 import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.RIPPersonFrame;
@@ -54,7 +55,9 @@ import gui.items.statuses.AllStatusesFrame;
 import gui.items.statuses.AllStatusesPanel;
 import gui.items.statuses.IssueStatusPanel;
 import gui.items.unions.AllUnionsFrame;
+import gui.items.unions.IssueUnionDialog;
 import gui.items.unions.IssueUnionFrame;
+import gui.items.unions.MainUnionsFrame;
 //import gui.items.unions.IssueUnionPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
@@ -326,7 +329,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssuePersonDialog();
         		
         	}
         });
@@ -447,7 +451,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllUnionsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AllUnionsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainUnionsFrame(), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
@@ -462,7 +467,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssueUnionDialog();
         		
         	}
         });

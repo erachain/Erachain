@@ -34,6 +34,10 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 		return this.unions;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
 	public UnionCls getItem(int row)
 	{
 		return this.unions.get(row).getB();
