@@ -42,6 +42,7 @@ import gui.AccountsFrame;
 //import gui.SendMoneyFrame;
 import gui.SendAssetFrame;
 import gui.items.imprints.ImprintsPanel;
+import gui.items.imprints.MainImprintsFrame;
 //import gui.items.persons.AllPersonsPanel;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonDialog;
@@ -373,7 +374,8 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd(new MainImprintsFrame(), MainFrame.desktopPane.getAllFrames());
         	}
         });
         imprintsMenu.add(imprintsMenuList);     

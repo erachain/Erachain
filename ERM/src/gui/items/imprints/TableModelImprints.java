@@ -22,7 +22,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 
 	private SortableList<Long, ImprintCls> imprints;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity"});//, "Divisible"});
 	
 	public TableModelImprints()
 	{
@@ -34,6 +34,10 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	{
 		return this.imprints;
 	}
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
 	
 	public ImprintCls getImprint(int row)
 	{

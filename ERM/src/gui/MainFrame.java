@@ -19,6 +19,7 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import gui.items.persons.AllPersonsPanel;
+import gui.items.imprints.MainImprintsFrame;
 import gui.items.persons.AllPersonsFrame;
 import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MainPersonsFrame;
@@ -164,7 +165,7 @@ public static  JDesktopPane desktopPane;
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
-      //  desktopPane.add(new MainUnionsFrame());
+    //    desktopPane.add(new MainImprintsFrame());
         
 	}
 }
