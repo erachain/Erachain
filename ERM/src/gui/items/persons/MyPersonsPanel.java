@@ -198,7 +198,7 @@ public class MyPersonsPanel extends JPanel
 					public void valueChanged(ListSelectionEvent arg0) {
 						PersonCls person =null;
 						if (table.getSelectedRow() >= 0 )person = personsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
-						info.show_002(person);
+						info.show_001(person);
 						PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
 					}
 				});

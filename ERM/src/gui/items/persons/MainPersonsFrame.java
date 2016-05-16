@@ -362,7 +362,7 @@ public MainPersonsFrame(){
 						public void valueChanged(ListSelectionEvent arg0) {
 							PersonCls person =null;
 							if (table.getSelectedRow() >= 0 )person = personsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
-							info1.show_002(person);
+							info1.show_001(person);
 						//	PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
 							my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
 							my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);

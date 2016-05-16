@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
 
 import javax.swing.JEditorPane;
@@ -15,58 +16,52 @@ import org.mapdb.Fun.Tuple4;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
+import database.ItemStatusMap;
 import database.DBSet;
 import gui.MainFrame;
 import lang.Lang;
 
 // Info for person
 public class Person_Info extends JTextPane {
-	private String message = "<HTML>" + Lang.getInstance().translate("Select person");
+	private static final long serialVersionUID = 4763074704570450206L;	
 	
-public  Person_Info() {
-
-	this.setContentType("text/html");
-	this.setText(message); //"<HTML>" + Lang.getInstance().translate("Select person")); // Document text is provided below.
-	//this.setBackground(this.getBackground());
-	//this.setBackground(new Color(211,211,211));
-	this.setBackground(MainFrame.getFrames()[0].getBackground());
+	public  Person_Info() {
 	
+		this.setContentType("text/html");
+		this.setBackground(MainFrame.getFrames()[0].getBackground());
+		
+	}
 	
 	
+	static String Get_HTML_Person_Info_001(PersonCls person)
+	{
+		 
+		String message = "";
+		String dateAlive;
+		String date_birthday;
+		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+		
+		if (person == null) return message += "Empty Person";
+		
+		if (!person.isConfirmed()) {
+			message = Lang.getInstance().translate("Not confirmed");
+		} else {
+			message = "" + person.getKey();
+		}
+		message = "<div><b>" + message + "</b> : " + person.getName().toString() + "</div>";
 	
-}
-	
- public String Get_HTML_Person_Info_001(PersonCls person){
-	
-	String dateAlive;
-	String date_birthday;
-	// TODO Auto-generated method stub
-	// устанавливаем формат даты
-	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-	//создаем объект персоны
-//	PersonCls person;
-			
-
-	if (person != null){// personsTable.getSelectedRow() >= 0 ){
-	//	person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
-	
-
-	if (person.isConfirmed()) {
-		message ="<html><div>#" + "<b>" + person.getKey() + "</b> : " + person.getName().toString() + "</br>";
-
 		date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-		message += date_birthday;
+		message += "<div>" + date_birthday;
 		if ( person.getBirthday() < person.getDeathday())
-			message += "..." + formatDate.format(new Date(Long.valueOf(person.getDeathday())));
-
-		message += "</br>";
-
-		message += "<h2>"+ "Statuses" +"</h2>";
-
+			message += " - " + formatDate.format(new Date(Long.valueOf(person.getDeathday())));
+		message += "</div>";
+						
 		// GET CERTIFIED ACCOUNTS
-		message += "<h2>"+ "Accounts" +"</h2>";
 		TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-		if ( !addresses.isEmpty()){
+		if ( addresses.isEmpty()){
+			message += "<p>" +  Lang.getInstance().translate("Not personalized")+ "</p";
+		} else {
+			message += "<h3>"+ Lang.getInstance().translate("Personalized Accounts") +"</h3>";
 			// for each account seek active date
 			String active_date_str;
 			for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> e : addresses.entrySet())
@@ -78,65 +73,44 @@ public  Person_Info() {
 				message += "<div><input  style='background: #00ffff'; type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
 						+ " -> <b>" + active_date_str +"</b></div>";
 			}
+		}	
+		
+		TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> statuses = DBSet.getInstance().getPersonStatusMap().get(person.getKey());
+		if ( statuses.isEmpty()){
+			message += "<p>" +  Lang.getInstance().translate("Not statuses")+ "</p";
+		} else {
+			message += "<h3>"+ "Statuses" +"</h3>";
+			String from_date_str;
+			String to_date_str;
+			Long dte;
+			ItemStatusMap statusesMap = DBSet.getInstance().getItemStatusMap();
+			for( Map.Entry<Long, java.util.Stack<Tuple4<Long, Long, Integer, Integer>>> status: statuses.entrySet())
+			{
+				message += "<div>" + statusesMap.get(status.getKey()).toString() + " : ";
+				
+				Tuple4<Long, Long, Integer, Integer> dates = status.getValue().peek();
+				
+				dte = dates.a;
+				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
+				else from_date_str = formatDate.format( new Date(dte));
+				
+				dte = dates.b;
+				if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
+				else to_date_str = formatDate.format( new Date(dte));
+				
+				message += from_date_str + " - " + to_date_str + "</div";
+
+			}
+			
 		}
-		else{
-			message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-		}					
-	} else {
-		message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	
+
+		return message;
 	}
-	message = message + "</html>";
-	
-	
+	 	
+	public void show_001(PersonCls person){
+		
+		setText("<html>" + Get_HTML_Person_Info_001(person) + "</html>");
+		return;
 	}	
-	return message;
-}
- 
-  public String Get_HTML_Person_Info_002(PersonCls person)	{
-		
-	
-	  String Date_Acti; 
-		
-	  SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-	  if (person != null){ //if (table.getSelectedRow() >= 0 ){
-		//person = personsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
-	
-		
-	if (person.isConfirmed()){
-		String Date_birs = formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-		 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + person.getKey()        			+ "</p>"
-		+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + person.getName().toString()		+ "</p>" 
-        + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>"
-        ;
-		 // Читаем адреса клиента
-		 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> Addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-		 if ( !Addresses.isEmpty()){
-			 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
-		 }
-		 else{
-			 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-										 }
-	}else{
-		
-		message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
-	}
-	message = message + "</html>";
-  }
-	 
-	return  message;
-  }
-
-public void show_001(PersonCls person){
-	
-	setText(new Person_Info().Get_HTML_Person_Info_001(person));
-	return;
-}
-public void show_002(PersonCls person){
-	
-	setText(new Person_Info().Get_HTML_Person_Info_002(person));
-	return;
-}
-
-
 
 }
