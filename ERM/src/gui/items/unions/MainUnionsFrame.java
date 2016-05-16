@@ -208,6 +208,12 @@ public MainUnionsFrame (){
 	favoriteColumn.setMinWidth(50);
 	favoriteColumn.setMaxWidth(50);
 	favoriteColumn.setPreferredWidth(50);//.setWidth(30);
+	
+//Sorter
+			RowSorter sorter11 =   new TableRowSorter(unionsModel);
+			tableUnion.setRowSorter(sorter11);	
+	
+	
 //CREATE SEARCH FIELD
 // UPDATE FILTER ON TEXT CHANGE
 	my_Union_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -230,9 +236,14 @@ public MainUnionsFrame (){
 // SET FILTER
 				unionsModel.fireTableDataChanged();
 				@SuppressWarnings("rawtypes")
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter<TableModelUnions, ?>) sorter).setRowFilter(filter);
+				RowFilter filter1 = RowFilter.regexFilter(".*" + search + ".*", 1);
+				((DefaultRowSorter<WalletItemUnionsTableModel, ?>) sorter11).setRowFilter(filter1);
 				unionsModel.fireTableDataChanged();
+			
+				
+			
+			
+			
 			}
 		});
 // set show		

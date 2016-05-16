@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import gui.CoreRowSorter;
 import gui.items.notes.TableModelNotes;
+import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import lang.Lang;
 
@@ -85,7 +86,7 @@ public class AllUnionsPanel extends JPanel {
 		//Custom renderer for the String column;
 		unionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 		unionsTable.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-
+		unionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 	
 	//	cellRenderer render = new CellRenderer();
 	//	columnModel.getColumn(0).setCellRenderer(cellRenderer);
@@ -97,8 +98,8 @@ public class AllUnionsPanel extends JPanel {
 		*/
 		
 		//CHECKBOX FOR FAVORITE
-		TableColumn favoriteColumn = unionsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
-		favoriteColumn.setCellRenderer(unionsTable.getDefaultRenderer(Boolean.class));
+	//	TableColumn favoriteColumn = unionsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
+	//	favoriteColumn.setCellRenderer(unionsTable.getDefaultRenderer(Boolean.class));
 
 		//BLOCKS SORTER
 	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

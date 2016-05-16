@@ -5,6 +5,12 @@
  */
 package gui;
 
+import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  *
  * @author Саша
@@ -16,6 +22,43 @@ public class Split_Panel extends javax.swing.JPanel {
      */
     public Split_Panel() {
         initComponents();
+        
+        this.addComponentListener(new ComponentListener(){
+
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			  Dimension size = getSize();
+		//	 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));	
+			 
+			 
+				
+			}
+
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			
+				
+			
+        	
+        });
     }
 
     /**

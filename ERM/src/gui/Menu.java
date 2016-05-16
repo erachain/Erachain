@@ -41,6 +41,8 @@ import database.wallet.TransactionMap;
 import gui.AccountsFrame;
 //import gui.SendMoneyFrame;
 import gui.SendAssetFrame;
+import gui.items.assets.IssueAssetDialog;
+import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.ImprintsPanel;
 import gui.items.imprints.MainImprintsFrame;
 //import gui.items.persons.AllPersonsPanel;
@@ -475,6 +477,44 @@ public class Menu extends JMenuBar
         	}
         });
         unionsMenu.add(issueUnionMenu);  
+        
+
+     // issue asset menu
+        JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
+        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue asset"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueAssetMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssueAssetDialog();
+        		
+        	}
+        });
+        assetsMenu.add(issueAssetMenu);  
+
+        // issue asset menu
+        JMenuItem allAssetsMenu = new JMenuItem(Lang.getInstance().translate("All assets"));
+        allAssetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All assets"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        allAssetsMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainAssetsFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        assetsMenu.add(allAssetsMenu);  
+        
+        
+        
+    
+        
 
         
 	}

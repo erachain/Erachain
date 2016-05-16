@@ -53,7 +53,6 @@ public class IssueImprintDialog extends JDialog
 	private JTextField txtDebitor;
 	private JTextField txtCreditor;
 	private JTextField txtAmount;
-	private JTextArea txtareaDescription;
 	private JButton issueButton;
 
 	public IssueImprintDialog()
