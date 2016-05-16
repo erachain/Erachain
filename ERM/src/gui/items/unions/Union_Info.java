@@ -3,27 +3,25 @@ package gui.items.unions;
 import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
-
 import javax.swing.JEditorPane;
 
 import org.mapdb.Fun.Tuple3;
 
 import core.item.unions.UnionCls;
 import core.item.statuses.StatusCls;
-import core.item.unions.UnionCls;
 import database.DBSet;
 import lang.Lang;
 
 // Info for union
 public class Union_Info extends JEditorPane {
+	
+	private static final long serialVersionUID = 1L;
 	private String message = "<HTML>" + Lang.getInstance().translate("Select union");
 	
 public  Union_Info() {
 
 	this.setContentType("text/html");
-	this.setText(message); //"<HTML>" + Lang.getInstance().translate("Select union")); // Document text is provided below.
+	this.setText(message); 
 	this.setBackground(new Color(255, 255, 255, 0));
 	
 	
@@ -34,18 +32,15 @@ public  Union_Info() {
 	
 	String dateAlive;
 	String date_birthday;
-	// TODO Auto-generated method stub
+
 	// устанавливаем формат даты
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-	//создаем объект персоны
-//	UnionCls union;
+
 			
 
-	if (union != null){// unionsTable.getSelectedRow() >= 0 ){
-	//	union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
-	
 
-	if (union.isConfirmed()){
+
+	if (union != null){
 		date_birthday=  formatDate.format(new Date(Long.valueOf(union.getBirthday())));
 		message ="<html><div>#" + "<b>" + union.getKey() + " : " + date_birthday + "</b>"
 		+ "<br>" + union.getName().toString() + "</div>";
@@ -101,7 +96,7 @@ public  Union_Info() {
 	message = message + "</html>";
 	
 	
-	}	
+		
 	return message;
 }
  
@@ -115,7 +110,7 @@ public  Union_Info() {
 		//union = unionsModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
 	
 	
-//читаем таблицу персон.
+//читаем таблицу .
 	Tuple3<Long, Integer, byte[]> t3 = DBSet.getInstance().getUnionStatusMap().getItem(union.getKey(), StatusCls.ALIVE_KEY); //(Long) unionsTable.getValueAt(unionsTable.getSelectedRow(),0));
 // преобразование в дату
 
@@ -129,27 +124,16 @@ public  Union_Info() {
 		Date_Acti =Lang.getInstance().translate("Not found!");
 	};
 	
-	if (union.isConfirmed()){
+	if (union != null){
 		String Date_birs = formatDate.format(new Date(Long.valueOf(union.getBirthday())));
 		 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + union.getKey()        			+ "</p>"
 		+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + union.getName().toString()		+ "</p>" 
         + "<p> "  + Lang.getInstance().translate("Birthday")  +":"        	      + Date_birs			+"</p>"
         + "<p>  "  + Lang.getInstance().translate("To Date")  +":"        		  + Date_Acti			+"</p>"
         ;
-		 /*
-		 // Читаем адреса клиента
-		 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= DBSet.getInstance().getUnionAddressMap().getItems(union.getKey());
-		 if ( !Addresses.isEmpty()){
-			 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
-		 }
-		 else{
-			 message = message + "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-										 }
-		 */
-	}else{
-		
+		 }else{
 		message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</></>";	
-	}
+		 }
 	message = message + "</html>";
   }
 	 

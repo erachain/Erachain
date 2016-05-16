@@ -56,7 +56,7 @@ import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
 
-//public class UnionConfirm extends JDialog { // InternalFrame  {
+
 public class UnionSetStatusDialog extends JDialog  {
 
 	private JComboBox<Account> accountLBox;
@@ -65,138 +65,19 @@ public class UnionSetStatusDialog extends JDialog  {
 	public UnionSetStatusDialog(JComponent  apers, UnionCls union) {
 		super();
 	
-/*
-		final JTextField pubKey1Txt = new JTextField();
-		final JTextField pubKey2Txt = new JTextField();
-		final JTextField pubKey3Txt = new JTextField();
-		final JLabel pubKey1Details = new JLabel();
-		final JLabel pubKey2Details = new JLabel();
-		final JLabel pubKey3Details = new JLabel();
 
-		final JTextField toDate = new JTextField();
-		final JTextField feePow = new JTextField();
-	*/	
-		
-	//	this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		//	MainFrame mainFram = new MainFrame();
 		initComponents(union);
-//		setSize(400,300);
+
 		this.setModal(true);	
 		this.setTitle(Lang.getInstance().translate("Union set status"));
-		//CLOSE
-		// setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-   /* 
-		//LAYOUT
-		this.setLayout(new GridBagLayout());
-		// Create and specify a layout manager
-	    this.setLayout(new GridBagLayout());
 
-	    int gridy = 0;
-	    // Create a constraints object, and specify some default values
-	    GridBagConstraints input = new GridBagConstraints();
-	    input.insets = new Insets(0, 5, 5, 0); // 5-pixel margins on all sides
-		input.fill = GridBagConstraints.HORIZONTAL;   
-		input.anchor = GridBagConstraints.NORTHWEST;
-	    input.gridwidth = 5;
-	    input.gridheight = 1;
-
-	    GridBagConstraints label = new GridBagConstraints();	    
-	    label.insets = new Insets(0, 5, 5, 0);
-		label.fill = GridBagConstraints.HORIZONTAL;   
-		label.anchor = GridBagConstraints.NORTHWEST;
-		label.gridx = 0;
-		label.gridheight = 1;
-
-	    GridBagConstraints detail = new GridBagConstraints();
-	    detail.insets = new Insets(0, 5, 5, 0);
-	    detail.fill = GridBagConstraints.BOTH; // components grow in both dimensions
-	    detail.anchor = GridBagConstraints.NORTHWEST;
-	    detail.gridx = 0;
-	    detail.gridwidth = 5;
-	    detail.gridheight = 2;
-	    detail.weightx = -1;
-	    detail.weighty = -1;
-
-		//LABEL FROM
-		JLabel accountLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-		this.add(accountLabel, label);
-		
-		//COMBOBOX FROM
-		this.accountLBox = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.accountLBox, input);
-
-		//LABEL STATUS
-        label.gridy = ++gridy;
-		JLabel statusLabel = new JLabel(Lang.getInstance().translate("Status") + ":");
-		this.add(statusLabel, label);
-
-		//COMBOBOX STATUS
-		input.gridy = gridy;
-		this.statusLBox =  new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
-        this.add((JComponent)this.statusLBox, input);
-	          		
-        input.gridx = 0;
-	    input.gridy = ++gridy;
-	    input.gridwidth = 5;
-	    input.gridheight = 1;
-	    this.add(new JLabel(Lang.getInstance().translate("To date (0 - is permanent)") +":"), input);
-
-	    input.gridx = 2;
-	    input.gridy = gridy;
-	    input.gridwidth = 3;
-	    input.gridheight = 1;
-	    this.add(toDate, input);
-
-	    // FEE POWER
-        input.gridx = 0;
-	    input.gridy = ++gridy;
-	    input.gridwidth = 5;
-	    input.gridheight = 1;
-	    this.add(new JLabel(Lang.getInstance().translate("Fee Power") +":"), input);
-
-	    input.gridx = 2;
-	    input.gridy = gridy;
-	    input.gridwidth = 3;
-	    input.gridheight = 1;
-      	feePow.setText("0");
-	    this.add(feePow, input);
-
-	    // BUTTONS
-	    input.gridx = 2;
-	    input.gridy = ++gridy;
-	    input.gridwidth = 1;
-	    input.gridheight = 1;
-	    JButton Button_Cancel = new JButton(Lang.getInstance().translate("Cancel"));
-	    Button_Cancel.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		// программа обработки при нажатии cancel
-		    }
-		});
-	    this.add( Button_Cancel, input);
-
-	    input.gridx = 4;
-	    input.gridy = gridy;
-	    input.gridwidth = 1;
-	    input.gridheight = 1;
-	    JButton Button_Confirm = new JButton(Lang.getInstance().translate("Confirm"));
-	    this.add(Button_Confirm, input);
-	    Button_Confirm.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		    	onGoClick(union, Button_Confirm, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate, feePow);
-		    }
-		});
-	*/    
 	    setPreferredSize(new Dimension(400, 600));
 		//PACK
 		this.pack();
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-	    //MainFrame.this.add(comp, constraints).setFocusable(false);
+	    
 	}
 	
 
@@ -208,20 +89,14 @@ public class UnionSetStatusDialog extends JDialog  {
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
 		Account creator = (Account) this.accountLBox.getSelectedItem();
-    	//String address = pubKey1Txt.getText();
-    	int toDate = 0;
-    	int feePow = 0;
     	int parse = 0;
     	String toDateStr = toDateTxt.getText();
 		try {
 
-			//READ FEE POW
-			feePow = Integer.parseInt(feePowTxt.getText());
-			
 			//READ to DAY
 			parse++;
-	    	if (toDateStr.length() > 0)
-    			toDate = Integer.parseInt(toDateStr);
+	    	if (toDateStr.length() > 0) {
+			}
     		}
 		catch(Exception e)
 		{
@@ -252,8 +127,6 @@ public class UnionSetStatusDialog extends JDialog  {
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
-		int version = 0; // without user signs
-		
 		Pair<Transaction, Integer> result = null;
 		//Controller.getInstance().r_SertifyUnion(version, false, authenticator,
 		//		feePow, union.getKey(), 
@@ -273,14 +146,7 @@ public class UnionSetStatusDialog extends JDialog  {
 		
 	}
 	
-	/*
-	 * To change this license header, choose License Headers in Project Properties.
-	 * To change this template file, choose Tools | Templates
-	 * and open the template in the editor.
-	 */
-
-	    @SuppressWarnings("unchecked")
-	    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+                        
 	    private void initComponents(UnionCls union) {
 	        java.awt.GridBagConstraints gridBagConstraints;
 
