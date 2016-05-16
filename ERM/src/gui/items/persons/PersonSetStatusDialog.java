@@ -227,13 +227,21 @@ final JTextField pubKey1Txt = new JTextField();
 			//READ FROM DATE
 			parse++;
 			String str = fromDateTxt.getText();
-			if (str.length() < 11) str = str + " 00:00:00";
-			fromDate = Timestamp.valueOf(str).getTime();
+			if (str.equals("0000-00-00")) 
+				fromDate = Long.MIN_VALUE;
+			else {
+				if (str.length() < 11) str = str + " 00:00:00";
+				fromDate = Timestamp.valueOf(str).getTime();
+			}
 
 			//READ TO DATE
 			str = toDateTxt.getText();
-			if (str.length() < 11) str = str + " 00:00:00";
-			toDate = Timestamp.valueOf(str).getTime();
+			if (str.equals("0000-00-00")) 
+				toDate = Long.MAX_VALUE;
+			else {
+				if (str.length() < 11) str = str + " 00:00:00";
+				toDate = Timestamp.valueOf(str).getTime();
+			}
 
 		}
 		catch(Exception e)
@@ -378,7 +386,7 @@ final JTextField pubKey1Txt = new JTextField();
 	            ex.printStackTrace();
 	        }
 	        jFormattedTextField_fromDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_fromDate.setToolTipText("");
+	        jFormattedTextField_fromDate.setToolTipText("0000-00-00 - set to MIN");
 	        jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_fromDate.setText("0000-00-00"); // NOI18N
 	        jFormattedTextField_fromDate.setPreferredSize(new java.awt.Dimension(100, 20));
@@ -409,7 +417,7 @@ final JTextField pubKey1Txt = new JTextField();
 	            ex.printStackTrace();
 	        }
 	        jFormattedTextField_toDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_toDate.setToolTipText("");
+	        jFormattedTextField_toDate.setToolTipText("0000-00-00 - set to MAX");
 	        jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_toDate.setText("0000-00-00"); // NOI18N
 	        jFormattedTextField_toDate.setPreferredSize(new java.awt.Dimension(100, 20));
@@ -430,7 +438,7 @@ final JTextField pubKey1Txt = new JTextField();
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee")+":"),
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee Power (0..6)")+":"),
 	        		gridBagConstraints);
 
 	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));

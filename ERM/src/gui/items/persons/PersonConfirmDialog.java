@@ -45,7 +45,8 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.assets.AssetCls;
+import core.item.ItemCls;
+//import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
@@ -411,12 +412,7 @@ public class PersonConfirmDialog extends JDialog  {
 
 			//READ FEE POW
 			feePow = Integer.parseInt(feePowTxt.getText());
-			
-			//READ to DAY
-			parse++;
-	    	if (toDateStr.length() > 0)
-    			toDate = Integer.parseInt(toDateStr);
-    		}
+		}				
 		catch(Exception e)
 		{
 			if(parse == 0)
@@ -425,10 +421,25 @@ public class PersonConfirmDialog extends JDialog  {
 			}
 			else
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
+
+			//ENABLE
+			Button_Confirm.setEnabled(true);
+
+			return;
 		}
     	
+		Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, 356 * 2);
+		if (toDateResult.getA() <0 ) {
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			
+			Button_Confirm.setEnabled(true);
+			return;
+			
+		} else {
+			toDate = toDateResult.getB();
+		}
+
 	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
 	    if (pubKey1Txt.getText().length() > 30) {
 	    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
@@ -442,7 +453,15 @@ public class PersonConfirmDialog extends JDialog  {
 	    	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
 	    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
 	    }
-    	
+
+		if (sertifiedPublicKeys.size() == 0 ) {
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Nothing to personalize"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			
+			Button_Confirm.setEnabled(true);
+			return;
+			
+		}
+
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
@@ -481,13 +500,13 @@ public class PersonConfirmDialog extends JDialog  {
 	        jLabel_Adress1_Check = new javax.swing.JLabel();
 	        jLabel_Address2_Check = new javax.swing.JLabel();
 	        jLabel_Address3_Check = new javax.swing.JLabel();
-	        jLabel_ToDo = new javax.swing.JLabel();
+	        jLabel_addDays = new javax.swing.JLabel();
 	        jTextField_addDays = new javax.swing.JFormattedTextField();
 	        jLabel_Fee = new javax.swing.JLabel();
 	        jFormattedTextField_Fee = new javax.swing.JFormattedTextField();
 	        jButton_Cansel = new javax.swing.JButton();
 	        jButton_Confirm = new javax.swing.JButton();
-	        jLabel_ToDo_Check = new javax.swing.JLabel();
+	        jLabel_addDays_Check = new javax.swing.JLabel();
 	        jLabel_Fee_Check = new javax.swing.JLabel();
 	        jLabel_Title = new javax.swing.JLabel();
 
@@ -667,18 +686,14 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jTextField_Address3, gridBagConstraints);
 
-	        
-	       
 
-	       
-
-	        jLabel_ToDo.setText(Lang.getInstance().translate("To date") +":");
+	        jLabel_addDays.setText(Lang.getInstance().translate("Add Days") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_ToDo, gridBagConstraints);
+	        getContentPane().add(jLabel_addDays, gridBagConstraints);
 
 	        /*
 	        try {
@@ -714,6 +729,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
 	        jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jFormattedTextField_Fee.setText("0");
 	        jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_Fee.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -760,19 +776,20 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
 	        getContentPane().add(jButton_Confirm, gridBagConstraints);
 
-	        jLabel_ToDo_Check.setText("insert date");
+	        jLabel_addDays_Check.setText("'.' =2 year, '+' =MAX days, '-' =unconfirm");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jLabel_ToDo_Check, gridBagConstraints);
+	        getContentPane().add(jLabel_addDays_Check, gridBagConstraints);
 
-	        jLabel_Fee_Check.setText("insert fee");
+	        jLabel_Fee_Check.setText("0..6");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 16;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 	        getContentPane().add(jLabel_Fee_Check, gridBagConstraints);
+
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 2;
@@ -841,8 +858,8 @@ public class PersonConfirmDialog extends JDialog  {
 	//    private javax.swing.JEditorPane jLabel_PersonInfo;
 	    
 	    private javax.swing.JLabel jLabel_Title;
-	    private javax.swing.JLabel jLabel_ToDo;
-	    private javax.swing.JLabel jLabel_ToDo_Check;
+	    private javax.swing.JLabel jLabel_addDays;
+	    private javax.swing.JLabel jLabel_addDays_Check;
 	    private javax.swing.JLabel jLabel_YourAddress;
 	    private javax.swing.JTextField jTextField_Address1;
 	    private javax.swing.JTextField jTextField_Address2;
