@@ -341,7 +341,7 @@ public class PersonConfirmDialog extends JDialog  {
 		
 		if(toValue.isEmpty() || toValue.length() < 30)
 		{
-			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_INVALID_ADDRESS));
+			pubKeyDetails.setText(Lang.getInstance().translate("Invalid public key"));
 			return;
 		}
 		
@@ -568,7 +568,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
 	        getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-	        jLabel_Address1.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address1.setText(Lang.getInstance().translate("Public Key") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 6;
@@ -595,7 +595,7 @@ public class PersonConfirmDialog extends JDialog  {
 				}
 	        });
 	        
-	        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert firsr Address"));
+	        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 6;
@@ -609,13 +609,13 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jTextField_Address1, gridBagConstraints);
 
-	        jLabel_Address2.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address2.setText(Lang.getInstance().translate("Public Key") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_Address2, gridBagConstraints);
+	     //   getContentPane().add(jLabel_Address2, gridBagConstraints);
 
 	        jTextField_Address2.getDocument().addDocumentListener(new DocumentListener() {
 	            
@@ -632,28 +632,28 @@ public class PersonConfirmDialog extends JDialog  {
 				}
 	        });
 	       
-	        jLabel_Address2_Check.setText(Lang.getInstance().translate("insert second Addres"));
+	        jLabel_Address2_Check.setText(Lang.getInstance().translate("insert second Public Key"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jLabel_Address2_Check, gridBagConstraints);
+	   //     getContentPane().add(jLabel_Address2_Check, gridBagConstraints);
 	    
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jTextField_Address2, gridBagConstraints);
+	  //      getContentPane().add(jTextField_Address2, gridBagConstraints);
 
 	
-	        jLabel_Address3.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address3.setText(Lang.getInstance().translate("Public Key") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 10;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_Address3, gridBagConstraints);
+	  //      getContentPane().add(jLabel_Address3, gridBagConstraints);
 
 	        jTextField_Address3.getDocument().addDocumentListener(new DocumentListener() {
 	            
@@ -670,12 +670,12 @@ public class PersonConfirmDialog extends JDialog  {
 				}
 	        });
 	        
-	        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Address"));
+	        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Public Key"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 10;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jLabel_Address3_Check, gridBagConstraints);
+	 //      getContentPane().add(jLabel_Address3_Check, gridBagConstraints);
 	       
 	        
 	        
@@ -684,7 +684,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.gridy = 10;
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jTextField_Address3, gridBagConstraints);
+	  //      getContentPane().add(jTextField_Address3, gridBagConstraints);
 
 
 	        jLabel_addDays.setText(Lang.getInstance().translate("Add Days") +":");
