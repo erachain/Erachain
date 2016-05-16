@@ -372,7 +372,7 @@ public class R_SetUnionToItem extends Transaction {
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.creator))
+		if(address.equals(this.creator.getAddress()))
 		{
 			return true;
 		}

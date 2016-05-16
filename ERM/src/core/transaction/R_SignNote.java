@@ -337,7 +337,7 @@ public class R_SignNote extends Transaction {
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.creator))
+		if(address.equals(this.creator.getAddress()))
 		{
 			return true;
 		}
