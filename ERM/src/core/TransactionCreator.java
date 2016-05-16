@@ -535,7 +535,7 @@ public class TransactionCreator
 		
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
-		record = new R_SetStatusToItem(creator, (byte)feePow, key, item,
+		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
 				beg_date, end_date, timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			

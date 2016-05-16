@@ -93,7 +93,8 @@ public class TestRecSetStatusToItem {
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey();
 
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person,
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db),
 				to_date, birthDay + 1000, timestamp, maker.getLastReference(db));
 
 	}
@@ -114,7 +115,8 @@ public class TestRecSetStatusToItem {
 		assertEquals(true, setStatusTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, null, timestamp, maker.getLastReference(db), new byte[64]);
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, setStatusTransaction.isSignatureValid());
@@ -149,8 +151,6 @@ public class TestRecSetStatusToItem {
 			fail("Exception while parsing transaction. " + e);
 		}
 		
-		parsedSetStatusTransaction.setItem(Controller.getInstance().getItem(db, ItemCls.PERSON_TYPE, 0l));
-
 		//CHECK LEN
 		assertEquals(parsedSetStatusTransaction.getDataLength(false), setStatusTransaction.getDataLength(false));
 
@@ -169,17 +169,16 @@ public class TestRecSetStatusToItem {
 		//CHECK ISSUER
 		assertEquals(setStatusTransaction.getCreator().getAddress(), parsedSetStatusTransaction.getCreator().getAddress());
 		
-		//// RESET item to FORK DB
-		parsedSetStatusTransaction.resetItemToDB(db);
-
+		ItemCls item = ItemCls.getItem(db, setStatusTransaction.getItemType(), setStatusTransaction.getItemKey());
+		ItemCls itemParsed = ItemCls.getItem(db, parsedSetStatusTransaction.getItemType(), parsedSetStatusTransaction.getItemKey());
 		//CHECK NAME
-		assertEquals(setStatusTransaction.getItem().getName(), parsedSetStatusTransaction.getItem().getName());
+		assertEquals(item.getName(), itemParsed.getName());
 			
 		//CHECK OWNER
-		assertEquals(setStatusTransaction.getItem().getCreator().getAddress(), parsedSetStatusTransaction.getItem().getCreator().getAddress());
+		assertEquals(item.getCreator().getAddress(), itemParsed.getCreator().getAddress());
 		
 		//CHECK DESCRIPTION
-		assertEquals(setStatusTransaction.getItem().getDescription(), parsedSetStatusTransaction.getItem().getDescription());
+		assertEquals(item.getDescription(), itemParsed.getDescription());
 						
 		//CHECK FEE
 		assertEquals(setStatusTransaction.getFee(), parsedSetStatusTransaction.getFee());	
@@ -217,7 +216,8 @@ public class TestRecSetStatusToItem {
 		assertEquals(endDate, null);
 		
 		to_date = timestamp + 1234L * 84600000L;
-		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, null, timestamp+10, maker.getLastReference(db));
+		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
 
