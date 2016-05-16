@@ -82,6 +82,7 @@ public class UnionSetStatusDialog extends JDialog  {
 		initComponents(union);
 //		setSize(400,300);
 		this.setModal(true);	
+		this.setTitle(Lang.getInstance().translate("Union set status"));
 		//CLOSE
 		// setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
    /* 

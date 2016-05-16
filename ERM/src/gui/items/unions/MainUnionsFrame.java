@@ -169,7 +169,7 @@ public MainUnionsFrame (){
 			// обработка изменения положения курсора в таблице
 						 //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 						 search_Union_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-							 @SuppressWarnings("deprecation")
+							 @SuppressWarnings({ "deprecation", "null", "unused" })
 								@Override
 								public void valueChanged(ListSelectionEvent arg0) {
 									String dateAlive;
@@ -186,7 +186,7 @@ public MainUnionsFrame (){
 										union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
 									
 
-									if (union.isConfirmed()){
+									if (union != null){ //].isConfirmed()){
 										date_birthday=  formatDate.format(new Date(Long.valueOf(union.getBirthday())));
 										message ="<html><div>#" + "<b>" + union.getKey() + " : " + date_birthday + "</b>"
 										+ "<br>" + union.getName().toString() + "</div>";
@@ -219,7 +219,7 @@ public MainUnionsFrame (){
 										// GET CERTIFIED ACCOUNTS
 										message += "<h2>"+ "Accounts" +"</h2>";
 										TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> addresses= null; //DBSet.getInstance().getUnionAddressMap().getItems(union.getKey());
-										if ( !addresses.isEmpty()){
+										if ( addresses != null){ //!addresses.isEmpty()){
 											// for each account seek active date
 											String active_date_str;
 											for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> e : addresses.entrySet())
@@ -481,7 +481,7 @@ public MainUnionsFrame (){
 														{
 															Date_Acti =Lang.getInstance().translate("Not found!");
 														};
-														if (union.isConfirmed()){
+														if (union != null){//.isConfirmed()){
 															Date_birs=  formatDate.format(new Date(Long.valueOf(union.getBirthday())));
 															 message ="<html><div></div><div> <p><b>" + Lang.getInstance().translate("Key")+":"   + union.getKey()        			+ "</p>"
 															+ "<p> <b> "  + Lang.getInstance().translate("Name")+":"       			  + union.getName().toString()		+ "</p>" 
@@ -490,7 +490,7 @@ public MainUnionsFrame (){
 													        ;
 															 // Читаем адреса клиента
 															 TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> Addresses= null; //DBSet.getInstance().getUnionAddressMap().getItems(union.getKey());
-															 if ( !Addresses.isEmpty()){
+															 if ( Addresses != null){ //!Addresses.isEmpty()){
 																 message =message + "<p>"  + Lang.getInstance().translate("Account")  +":  <input type='text' size='40' value='"+ Addresses.lastKey() +"' id='iiii' name='nnnn' class= 'cccc' onchange =''><p></div>";
 															 }
 															 else{
