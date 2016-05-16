@@ -3,7 +3,6 @@ package gui.items.persons;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -13,27 +12,21 @@ import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import core.item.persons.PersonCls;
-import gui.Frame_All;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
-import gui.Menu;
 import gui.Split_Panel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -153,7 +146,6 @@ public MainPersonsFrame(){
 		
 				 //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 				 search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-					@SuppressWarnings("deprecation")
 					@Override
 					public void valueChanged(ListSelectionEvent arg0) {
 						PersonCls person = null;

@@ -1,70 +1,47 @@
 package gui.items.persons;
 
-import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
-
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import core.crypto.Crypto;
 import core.item.ItemCls;
-//import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.MainFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
-import utils.NameUtils;
 import utils.Pair;
-import utils.NameUtils.NameResult;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class PersonConfirmDialog extends JDialog  {
 
 	//private JComboBox<Account> accountLBox;
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public PersonConfirmDialog(JComponent  apers, PersonCls person) {
 		super();
 	

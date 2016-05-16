@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import gui.items.assets.AssetsPanel;
 import gui.items.imprints.ImprintsPanel;
 import gui.items.notes.NotesPanel;
-import gui.items.persons.PersonsPanel;
 import gui.at.ATPanel;
 import gui.at.ATTransactionsPanel;
 import gui.at.AcctPanel;

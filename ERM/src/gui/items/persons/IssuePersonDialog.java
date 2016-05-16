@@ -7,26 +7,18 @@ import lang.Lang;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -35,9 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
-
-//import settings.Settings;
-import utils.DateTimeFormat;
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
@@ -54,6 +43,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 	private JTextArea txtareaDescription;
 	private JTextField txtBirthday;
 	private JTextField txtDeathday;
+	@SuppressWarnings("rawtypes")
 	private JComboBox txtGender;
 	private JTextField txtRace;
 	private JTextField txtBirthLatitude;
@@ -64,6 +54,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 	private JTextField txtHeight;
 	private JButton issueButton;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssuePersonDialog()
 	{
 		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Person"));

@@ -22,14 +22,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-import gui.items.persons.AllPersonsPanel;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
-import gui.items.persons.AllPersonsFrame;
-import gui.items.persons.IssuePersonFrame;
 import gui.items.persons.MainPersonsFrame;
-import gui.items.persons.PersonConfirmFrame;
-import gui.items.persons.SearchPersons;
 import gui.items.unions.MainUnionsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;

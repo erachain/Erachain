@@ -1,7 +1,6 @@
 package gui;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.AllPersonsFrame;
 import gui.models.AccountsTableModel;
 import lang.Lang;
 

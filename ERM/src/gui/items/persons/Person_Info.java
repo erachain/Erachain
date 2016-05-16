@@ -1,21 +1,17 @@
 package gui.items.persons;
 
-import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import core.item.persons.PersonCls;
-import core.item.statuses.StatusCls;
-import core.item.unions.UnionCls;
 import database.ItemStatusMap;
 import database.DBSet;
 import gui.MainFrame;
@@ -37,7 +33,6 @@ public class Person_Info extends JTextPane {
 	{
 		 
 		String message = "";
-		String dateAlive;
 		String date_birthday;
 		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 		
