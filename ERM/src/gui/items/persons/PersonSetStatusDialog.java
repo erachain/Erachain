@@ -10,6 +10,7 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,14 +207,15 @@ final JTextField pubKey1Txt = new JTextField();
 
 	public void onGoClick(
 			PersonCls person, JButton Button_Confirm,
-			JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDateTxt, JTextField feePowTxt)
+			Account creator, StatusCls status,
+			JTextField fromDateTxt, JTextField toDateTxt, JTextField feePowTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
-		Account creator = (Account) this.accountLBox.getSelectedItem();
     	//String address = pubKey1Txt.getText();
-    	int toDate = 0;
+    	long fromDate = 0;
+    	long toDate = 0;
     	int feePow = 0;
     	int parse = 0;
     	String toDateStr = toDateTxt.getText();
@@ -222,49 +224,52 @@ final JTextField pubKey1Txt = new JTextField();
 			//READ FEE POW
 			feePow = Integer.parseInt(feePowTxt.getText());
 			
-			//READ to DAY
+			//READ FROM DATE
 			parse++;
-	    	if (toDateStr.length() > 0)
-    			toDate = Integer.parseInt(toDateStr);
-    		}
+			String str = fromDateTxt.getText();
+			if (str.length() < 11) str = str + " 00:00:00";
+			fromDate = Timestamp.valueOf(str).getTime();
+
+			//READ TO DATE
+			str = toDateTxt.getText();
+			if (str.length() < 11) str = str + " 00:00:00";
+			toDate = Timestamp.valueOf(str).getTime();
+
+		}
 		catch(Exception e)
 		{
 			if(parse == 0)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"), Lang.getInstance().translate("Error") + e, JOptionPane.ERROR_MESSAGE);
 			}
-			else
+			else if (parse == 1)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid From Date") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
+			else if (parse == 2)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid To Date") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			
+			//ENABLE
+			Button_Confirm.setEnabled(true);
+
+			return;
+			
 		}
-    	
-	    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
-	    if (pubKey1Txt.getText().length() == 30) {
-	    	PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
-	    	if (userAccount1.isValid()) sertifiedPublicKeys.add(userAccount1);
-	    }
-	    if (pubKey2Txt.getText().length() > 30) {
-	    	PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
-	    	if (userAccount2.isValid()) sertifiedPublicKeys.add(userAccount2);
-	    }
-	    if (pubKey3Txt.getText().length() > 30) {
-	    	PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
-	    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
-	    }
-    	
+    	    	
 		//Account authenticator =  new Account(address);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
-		int version = 0; // without user signs
+		int version = 0;
 		
-		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
-				feePow, person.getKey(), 
-				sertifiedPublicKeys, toDate);
+		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
+				feePow, status.getKey(), 
+				person, fromDate, toDate);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status assigned!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		
@@ -288,18 +293,12 @@ final JTextField pubKey1Txt = new JTextField();
 	        java.awt.GridBagConstraints gridBagConstraints;
 
 	        jLabel_PersonInfo = new javax.swing.JScrollPane();
-	        jLabel_YourAddress = new javax.swing.JLabel();
 	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
-	        jLabel_Status = new javax.swing.JLabel();
-	        jLabel_ToDo = new javax.swing.JLabel();
-	        jFormattedTextField_ToDo = new javax.swing.JFormattedTextField();
-	        jLabel_Fee = new javax.swing.JLabel();
-	        jFormattedTextField_Fee = new javax.swing.JFormattedTextField();
+	        jFormattedTextField_fromDate = new javax.swing.JFormattedTextField();
+	        jFormattedTextField_toDate = new javax.swing.JFormattedTextField();
+	        jFeeTxt = new javax.swing.JFormattedTextField();
 	        jButton_Cansel = new javax.swing.JButton();
 	        jButton_SetStatus = new javax.swing.JButton();
-	        jLabel_ToDo_Check = new javax.swing.JLabel();
-	        jLabel_Fee_Check = new javax.swing.JLabel();
-	        jLabel_Title = new javax.swing.JLabel();
 	        jComboBox_Status = new javax.swing.JComboBox<>();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -335,15 +334,14 @@ final JTextField pubKey1Txt = new JTextField();
 	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
 	        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
 
-	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Address:")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
 	        gridBagConstraints.insets = new java.awt.Insets(21, 27, 0, 0);
-	        getContentPane().add(jLabel_YourAddress, gridBagConstraints);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Your Address")+":"),
+	        		gridBagConstraints);
 
-	       // jComboBox_YourAddress.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
 	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
 	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
@@ -357,66 +355,100 @@ final JTextField pubKey1Txt = new JTextField();
 	        gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
 	        getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-	        jLabel_Status.setText(Lang.getInstance().translate("Status") + ":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 10;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_Status, gridBagConstraints);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Status")+":"),
+	        		gridBagConstraints);
 
-	        jLabel_ToDo.setText(Lang.getInstance().translate("To Do:"));
+	        /// FROM DATE
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_ToDo, gridBagConstraints);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("From Date")+":"),
+	        		gridBagConstraints);
 
 	        try {
-	            jFormattedTextField_ToDo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.##.####")));
+	            jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-##-##")));
 	        } catch (java.text.ParseException ex) {
 	            ex.printStackTrace();
 	        }
-	        jFormattedTextField_ToDo.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_ToDo.setToolTipText("");
-	        jFormattedTextField_ToDo.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_ToDo.setName(""); // NOI18N
-	        jFormattedTextField_ToDo.setPreferredSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_ToDo.addActionListener(new java.awt.event.ActionListener() {
+	        jFormattedTextField_fromDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jFormattedTextField_fromDate.setToolTipText("");
+	        jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jFormattedTextField_fromDate.setText("0000-00-00"); // NOI18N
+	        jFormattedTextField_fromDate.setPreferredSize(new java.awt.Dimension(100, 20));
+	        jFormattedTextField_fromDate.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jFormattedTextField_ToDoActionPerformed(evt);
+	                jFormattedTextField_fromDateActionPerformed(evt);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jFormattedTextField_ToDo, gridBagConstraints);
+	        getContentPane().add(jFormattedTextField_fromDate, gridBagConstraints);
 
-	        jLabel_Fee.setText(Lang.getInstance().translate("fee :"));
+	        /// TO DATE
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("To Date")+":"),
+	        		gridBagConstraints);
+
+	        try {
+	        	jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+	        			new javax.swing.text.MaskFormatter("####-##-##")));
+	        } catch (java.text.ParseException ex) {
+	            ex.printStackTrace();
+	        }
+	        jFormattedTextField_toDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jFormattedTextField_toDate.setToolTipText("");
+	        jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jFormattedTextField_toDate.setText("0000-00-00"); // NOI18N
+	        jFormattedTextField_toDate.setPreferredSize(new java.awt.Dimension(100, 20));
+	        jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jFormattedTextField_toDateActionPerformed(evt);
+	            }
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 4;
+	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        getContentPane().add(jFormattedTextField_toDate, gridBagConstraints);
+
+	        //////////////// FEE
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 6;
+	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(jLabel_Fee, gridBagConstraints);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee")+":"),
+	        		gridBagConstraints);
 
-	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
-	        jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_Fee.addActionListener(new java.awt.event.ActionListener() {
+	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+	        jFeeTxt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jFeeTxt.setText("0");
+	        jFeeTxt.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jFeeTxt.setPreferredSize(new java.awt.Dimension(100, 20));
+	        jFeeTxt.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_FeeActionPerformed(evt);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 2;
-	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.gridx = 7;
+	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
-	        getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
+	        getContentPane().add(jFeeTxt, gridBagConstraints);
 
 	        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
 	        jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
@@ -435,7 +467,9 @@ final JTextField pubKey1Txt = new JTextField();
 	        jButton_SetStatus.setToolTipText("");
 	        jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	         //   	onGoClick(person,  jButton_SetStatus, pubKey1Txt, pubKey1Txt, pubKey1Txt, toDate, feePow);
+	            	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
+	            			(StatusCls)jComboBox_Status.getSelectedItem(),
+	            			jFormattedTextField_fromDate, jFormattedTextField_toDate, jFeeTxt);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -444,21 +478,6 @@ final JTextField pubKey1Txt = new JTextField();
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
 	        getContentPane().add(jButton_SetStatus, gridBagConstraints);
 
-	        jLabel_ToDo_Check.setText(Lang.getInstance().translate("insert date"));
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 4;
-	        gridBagConstraints.gridy = 14;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jLabel_ToDo_Check, gridBagConstraints);
-
-	        jLabel_Fee_Check.setText(Lang.getInstance().translate("insert fee"));
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 4;
-	        gridBagConstraints.gridy = 16;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-	        getContentPane().add(jLabel_Fee_Check, gridBagConstraints);
-
-	        jLabel_Title.setText(Lang.getInstance().translate("Information about the person"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 2;
@@ -466,7 +485,8 @@ final JTextField pubKey1Txt = new JTextField();
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.weightx = 1.0;
 	        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-	        getContentPane().add(jLabel_Title, gridBagConstraints);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Information about the person")+":"),
+	        		gridBagConstraints);
 
 	        //jComboBox_Status.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 	        jComboBox_Status =new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
@@ -488,7 +508,11 @@ final JTextField pubKey1Txt = new JTextField();
 	        pack();
 	    }// </editor-fold>                        
 
-	    private void jFormattedTextField_ToDoActionPerformed(java.awt.event.ActionEvent evt) {                                                         
+	    private void jFormattedTextField_fromDateActionPerformed(java.awt.event.ActionEvent evt) {                                                         
+	        // TODO add your handling code here:
+	    }                                                        
+
+	    private void jFormattedTextField_toDateActionPerformed(java.awt.event.ActionEvent evt) {                                                         
 	        // TODO add your handling code here:
 	    }                                                        
 
@@ -522,20 +546,10 @@ final JTextField pubKey1Txt = new JTextField();
 	    private javax.swing.JButton jButton_SetStatus;
 	    private JComboBox<StatusCls> jComboBox_Status;
 	    private JComboBox<Account> jComboBox_YourAddress;
-	    private javax.swing.JFormattedTextField jFormattedTextField_Fee;
-	    private javax.swing.JFormattedTextField jFormattedTextField_ToDo;
-	    private javax.swing.JLabel jLabel_Fee;
-	    private javax.swing.JLabel jLabel_Fee_Check;
+	    private javax.swing.JTextField jFeeTxt;
+	    private javax.swing.JFormattedTextField jFormattedTextField_fromDate;
+	    private javax.swing.JFormattedTextField jFormattedTextField_toDate;
 	    private javax.swing.JScrollPane jLabel_PersonInfo;
-	    private javax.swing.JLabel jLabel_Status;
-	    private javax.swing.JLabel jLabel_Title;
-	    private javax.swing.JLabel jLabel_ToDo;
-	    private javax.swing.JLabel jLabel_ToDo_Check;
-	    private javax.swing.JLabel jLabel_YourAddress;
 	    // End of variables declaration                   
-	
-
-	
-	
 	
 }

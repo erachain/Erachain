@@ -62,7 +62,7 @@ import utils.NameUtils.NameResult;
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class PersonConfirmDialog extends JDialog  {
 
-	private JComboBox<Account> accountLBox;
+	//private JComboBox<Account> accountLBox;
 
 	public PersonConfirmDialog(JComponent  apers, PersonCls person) {
 		super();
@@ -396,12 +396,12 @@ public class PersonConfirmDialog extends JDialog  {
 
 	public void onGoClick(
 			PersonCls person, JButton Button_Confirm,
-			JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDateTxt, JTextField feePowTxt)
+			JComboBox<Account> jComboBox_YourAddress, JTextField pubKey1Txt, JTextField pubKey2Txt, JTextField pubKey3Txt, JTextField toDateTxt, JTextField feePowTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
-		Account creator = (Account) this.accountLBox.getSelectedItem();
+		Account creator = (Account) jComboBox_YourAddress.getSelectedItem();
     	//String address = pubKey1Txt.getText();
     	int toDate = 0;
     	int feePow = 0;
@@ -482,7 +482,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        jLabel_Address2_Check = new javax.swing.JLabel();
 	        jLabel_Address3_Check = new javax.swing.JLabel();
 	        jLabel_ToDo = new javax.swing.JLabel();
-	        jFormattedTextField_ToDo = new javax.swing.JFormattedTextField();
+	        jTextField_addDays = new javax.swing.JFormattedTextField();
 	        jLabel_Fee = new javax.swing.JLabel();
 	        jFormattedTextField_Fee = new javax.swing.JFormattedTextField();
 	        jButton_Cansel = new javax.swing.JButton();
@@ -680,17 +680,19 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_ToDo, gridBagConstraints);
 
+	        /*
 	        try {
 	            jFormattedTextField_ToDo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.##.####")));
 	        } catch (java.text.ParseException ex) {
 	            ex.printStackTrace();
 	        }
-	        jFormattedTextField_ToDo.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_ToDo.setToolTipText("");
-	        jFormattedTextField_ToDo.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_ToDo.setName(""); // NOI18N
-	        jFormattedTextField_ToDo.setPreferredSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_ToDo.addActionListener(new java.awt.event.ActionListener() {
+	        */
+	        jTextField_addDays.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jTextField_addDays.setToolTipText("");
+	        jTextField_addDays.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jTextField_addDays.setText("0"); // NOI18N
+	        jTextField_addDays.setPreferredSize(new java.awt.Dimension(100, 20));
+	        jTextField_addDays.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_ToDoActionPerformed(evt);
 	            }
@@ -699,7 +701,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        getContentPane().add(jFormattedTextField_ToDo, gridBagConstraints);
+	        getContentPane().add(jTextField_addDays, gridBagConstraints);
 
 	        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -709,7 +711,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_Fee, gridBagConstraints);
 
-	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
 	        jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
@@ -745,7 +747,8 @@ public class PersonConfirmDialog extends JDialog  {
 			{
 			    public void actionPerformed(ActionEvent e)
 			    {
-			    	onGoClick(person, jButton_Confirm, jTextField_Address1, jTextField_Address2, jTextField_Address3, jFormattedTextField_ToDo, jFormattedTextField_Fee);
+			    	onGoClick(person, jButton_Confirm,
+			    			jComboBox_YourAddress, jTextField_Address1, jTextField_Address2, jTextField_Address3, jTextField_addDays, jFormattedTextField_Fee);
 			    }
 			});
 	        
@@ -824,7 +827,7 @@ public class PersonConfirmDialog extends JDialog  {
 	    private javax.swing.JButton jButton_Confirm;
 	    private JComboBox<Account> jComboBox_YourAddress;
 	    private javax.swing.JFormattedTextField jFormattedTextField_Fee;
-	    private javax.swing.JFormattedTextField jFormattedTextField_ToDo;
+	    private javax.swing.JTextField jTextField_addDays;
 	    private javax.swing.JLabel jLabel_Address1;
 	    private javax.swing.JLabel jLabel_Address2;
 	    private javax.swing.JLabel jLabel_Address2_Check;
