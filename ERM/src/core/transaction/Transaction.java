@@ -440,6 +440,12 @@ public abstract class Transaction {
 	public String viewSubTypeName() {
 		return "";
 	}
+	public String viewAmount(Account account) {
+		return "";
+	}
+	public String viewAmount(String address) {
+		return "";
+	}
 
 	public String viewCreator() {
 		return creator==null?"GENESIS":creator.asPerson();
@@ -459,6 +465,10 @@ public abstract class Transaction {
 	public String viewFee() {
 		return fee.multiply(new BigDecimal(1000)).setScale(5)
 				.toPlainString() + "[" + feePow + "]";
+	}
+
+	public String viewItemName() {
+		return "";
 	}
 
 	//PARSE/CONVERT

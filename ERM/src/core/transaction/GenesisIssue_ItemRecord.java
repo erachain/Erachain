@@ -27,6 +27,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.ItemFactory;
 import database.Item_Map;
+import utils.NumberAsString;
 //import database.BalanceMap;
 import database.DBSet;
 
@@ -58,6 +59,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		this.item.setReference(this.signature);
 
 	}
+
 
 	@SuppressWarnings("unchecked")
 	//@Override

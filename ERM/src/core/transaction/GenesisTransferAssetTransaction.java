@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import ntp.NTP;
+import utils.NumberAsString;
 
 import org.json.simple.JSONObject;
 
@@ -21,6 +22,7 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.ItemCls;
 import database.ItemAssetBalanceMap;
 import database.DBSet;
 
@@ -65,6 +67,39 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	public long getAssetKey()
 	{
 		return this.key;
+	}
+	
+	@Override
+	public BigDecimal getAmount(String address) {
+		BigDecimal amount = BigDecimal.ZERO.setScale(8);
+		
+		if(address.equals(this.recipient.getAddress()))
+		{
+			//IF RECIPIENT
+			amount = amount.add(this.amount);
+		}
+
+		return amount;
+	}
+	@Override
+	public BigDecimal getAmount(Account account) {
+		String address = account.getAddress();
+		return getAmount(address);
+	}
+
+	@Override
+	public String viewAmount(Account account) {
+		String address = account.getAddress();
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+	@Override
+	public String viewAmount(String address) {
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+
+	@Override
+	public String viewRecipient() {
+		return recipient.asPerson();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -228,21 +263,6 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		}
 		
 		return false;
-	}
-
-	@Override
-	public BigDecimal getAmount(Account account) 
-	{
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
-					
-		//IF RECIPIENT
-		if(address.equals(this.recipient.getAddress()))
-		{
-			amount = amount.add(this.amount);
-		}
-		
-		return amount;
 	}
 
 	//@Override

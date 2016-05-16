@@ -18,6 +18,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 //import database.BalanceMap;
 import database.DBSet;
+import utils.NumberAsString;
 
 public abstract class TransactionAmount extends Transaction {
 
@@ -102,6 +103,17 @@ public abstract class TransactionAmount extends Transaction {
 		String address = account.getAddress();
 		return getAmount(address);
 	}
+	
+	@Override
+	public String viewAmount(Account account) {
+		String address = account.getAddress();
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+	@Override
+	public String viewAmount(String address) {
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+
 	
 	//PARSE/CONVERT
 	//@Override

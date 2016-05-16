@@ -133,6 +133,18 @@ public class R_SetStatusToItem extends Transaction {
 		return this.end_date;
 	}
 
+	@Override
+	public String viewItemName() {
+		ItemCls status = DBSet.getInstance().getItemStatusMap().get(this.key);
+		return status==null?"null" : status.toString();
+	}
+	
+	@Override
+	public String viewRecipient() {
+		ItemCls item = ItemCls.getItem(DBSet.getInstance(), this.itemType, this.itemKey);
+		return item==null?"null" : item.toString();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

@@ -21,6 +21,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.item.ItemCls;
 //import database.BalanceMap;
 import database.DBSet;
 
@@ -138,7 +139,7 @@ public class R_SignNote extends Transaction {
 	{
 		return (Arrays.equals(this.isText,new byte[1]))?false:true;
 	}
-		
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

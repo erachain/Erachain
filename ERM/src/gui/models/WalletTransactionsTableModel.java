@@ -129,6 +129,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				//recipient = transGen.getRecipient();				
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
 				itemName = item.toString();
+				creator_address = transGen.getRecipient().getAddress();
 			} else if ( transaction instanceof Issue_ItemRecord)
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
@@ -145,6 +146,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				//recipient = transAmo.getRecipient();
 				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getKey());
 				itemName = item.toString();
+			} else {
+				itemName = transaction.viewItemName();
 			}
 			
 			switch(column)
@@ -170,10 +173,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_AMOUNT:
 								
+				/*
 				if (creator_address==null) return "";
 				
 				return NumberAsString.getInstance().numberAsString(
-						transaction.getAmount(creator_address));			
+						transaction.getAmount(creator_address));
+						*/
+				return transaction.viewAmount(creator_address);
 
 			case COLUMN_RECIPIENT:
 				

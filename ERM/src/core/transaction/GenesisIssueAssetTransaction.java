@@ -27,6 +27,7 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
 import database.ItemAssetMap;
+import utils.NumberAsString;
 //import database.BalanceMap;
 import database.DBSet;
 
@@ -48,6 +49,18 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 
 	//GETTERS/SETTERS
 	//public static String getName() { return "Genesis Issue Asset"; }
+	
+	@Override
+	public String viewAmount(Account account) {
+		AssetCls asset = (AssetCls)this.getItem();
+		return NumberAsString.getInstance().numberAsString(asset.getQuantity());
+	}
+	@Override
+	public String viewAmount(String address) {
+		AssetCls asset = (AssetCls)this.getItem();
+		return NumberAsString.getInstance().numberAsString(asset.getQuantity());
+	}
+
 	
 	//PARSE CONVERT
 	public static Transaction Parse(byte[] data) throws Exception
