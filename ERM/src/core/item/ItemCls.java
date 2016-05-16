@@ -77,7 +77,7 @@ public abstract class ItemCls {
 	public abstract Issue_ItemMap getDBIssueMap(DBSet db);
 	//public abstract FavoriteItem getDBFavoriteMap();
 
-	public static Pair<Integer, Long> resolveEndDateFromStr(String str, Long defaultVol)
+	public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol)
 	{
 		if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
 		else if (str.length() == 1)
@@ -300,7 +300,7 @@ public abstract class ItemCls {
 		long key = 0l;
 		if (mapSize == 0) {
 			// initial map set
-			dbMap.set(0l, this);
+			dbMap.set(0L, this);
 		} else {
 			key = dbMap.add(this);
 		}

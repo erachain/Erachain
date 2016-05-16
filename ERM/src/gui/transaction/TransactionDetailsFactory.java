@@ -11,7 +11,7 @@ import core.transaction.CreatePollTransaction;
 
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueNoteRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 
 import core.transaction.IssueAssetTransaction;
@@ -172,8 +172,8 @@ public class TransactionDetailsFactory
 			
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 			
-			GenesisIssueNoteTransaction genesisIssueNoteTransaction = (GenesisIssueNoteTransaction) transaction;
-			return new GenesisIssueNoteDetailsFrame(genesisIssueNoteTransaction);	
+			GenesisIssueNoteRecord genesisIssueNoteRecord = (GenesisIssueNoteRecord) transaction;
+			return new GenesisIssueNoteDetailsFrame(genesisIssueNoteRecord);	
 
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			

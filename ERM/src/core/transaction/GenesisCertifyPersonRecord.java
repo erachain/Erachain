@@ -21,6 +21,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -149,15 +150,20 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	public void process(DBSet db, boolean asPack) 
 	{
 
+		Block block = new GenesisBlock();
+		int blockIndex = block.getHeight();
+		int transactionIndex = block.getTransactionIndex(signature);
 		//UPDATE RECIPIENT
-		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(null, 0, this.signature);
+		Tuple4<Long, Long, Integer, Integer> itemP = 
+				new Tuple4<Long, Long, Integer, Integer>
+					(timestamp, Long.MAX_VALUE, blockIndex, transactionIndex);
 
 		// SET ALIVE PERSON for DURATION permanent
 		db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
 
 		// SET PERSON ADDRESS - end date as timestamp
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, Integer.MAX_VALUE, 0, this.signature);
-		Tuple3<Integer, Integer, byte[]> itemA1 = new Tuple3<Integer, Integer, byte[]>(0, 0, this.signature);
+		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
+		Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
 		db.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
 		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 		

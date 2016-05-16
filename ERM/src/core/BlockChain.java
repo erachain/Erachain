@@ -9,12 +9,9 @@ import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
-//import core.item.assets.AssetCls;
 import core.transaction.ArbitraryTransaction;
-//import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
-//import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
 

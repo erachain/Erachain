@@ -13,6 +13,7 @@ import ntp.NTP;
 
 import org.junit.Test;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import controller.Controller;
 import core.account.PrivateKeyAccount;
@@ -81,7 +82,8 @@ public class TestRecSetStatusToItem {
 		//statusMap = db.getItemStatusMap();
 		//mapSize = statusMap.size();
 
-		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", timestamp - 12345678,
+		long birthDay =  timestamp - 12345678;
+		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
 				(byte)1, "Slav", (float)128.12345, (float)33.7777,
 				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
 
@@ -91,7 +93,8 @@ public class TestRecSetStatusToItem {
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey();
 
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, timestamp, maker.getLastReference(db));
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person,
+				to_date, birthDay + 1000, timestamp, maker.getLastReference(db));
 
 	}
 	
@@ -111,7 +114,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(true, setStatusTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, timestamp, maker.getLastReference(db), new byte[64]);
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, null, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, setStatusTransaction.isSignatureValid());
@@ -199,7 +202,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
 		assertEquals(db.getPersonStatusMap().get(person.getKey()).size(),	0);
 
-		Tuple3<Long, Integer, byte[]> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
+		Tuple4<Long, Long, Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		assertEquals( null, statusDuration);
 
@@ -214,7 +217,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(endDate, null);
 		
 		to_date = timestamp + 1234L * 84600000L;
-		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, timestamp+10, maker.getLastReference(db));
+		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key, person, to_date, null, timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
 

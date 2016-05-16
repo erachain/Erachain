@@ -243,10 +243,10 @@ public class RIPPersonFrame extends JInternalFrame  {
 			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
 			// IF PERSON DEAD
-			Tuple3<Long, Integer, byte[]> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+			Tuple4<Long, Long, Integer, Integer> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
 			if (deadDay != null)
 			{
-				if (deadDay.a == null)
+				if (false & deadDay.b == Long.MIN_VALUE)
 					personDetails += "<br>Dead";
 				else {
 					long current_time = NTP.getTime();
@@ -256,10 +256,10 @@ public class RIPPersonFrame extends JInternalFrame  {
 				}
 			} else {
 				// IF PERSON ALIVE
-				Tuple3<Long, Integer, byte[]> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+				Tuple4<Long, Long, Integer, Integer> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 				if (aliveDay == null)
 				{} else {
-					if (aliveDay.a == null)
+					if (aliveDay.b == null || aliveDay.b == Long.MAX_VALUE)
 						personDetails += "<br>Alive";
 					else {
 						long current_time = NTP.getTime();
@@ -285,6 +285,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 
 		Account creator = (Account) this.accountLBox.getSelectedItem();
     	//String address = pubKey1Txt.getText();
+    	//Long begDate = null;
     	Long endDate = null;
     	int feePow = 0;
     	int parse = 0;
@@ -303,7 +304,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 			}
 		}
     	
-		Pair<Integer, Long> endDateRes = ItemCls.resolveEndDateFromStr(toDateStr, NTP.getTime());
+		Pair<Integer, Long> endDateRes = ItemCls.resolveDateFromStr(toDateStr, NTP.getTime());
 		if (endDateRes.getA() == -1)
 		{
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Date value"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -320,7 +321,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
-				feePow, StatusCls.DEAD_KEY, person, endDate);
+				feePow, StatusCls.DEAD_KEY, person, endDate, Long.MAX_VALUE);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

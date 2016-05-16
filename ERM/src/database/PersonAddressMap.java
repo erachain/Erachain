@@ -21,7 +21,7 @@ public class PersonAddressMap extends DBMap<
 					String, // address
 					Stack<Tuple3<Integer, // end_date
 						Integer, // block.getHeight
-						byte[] // transaction.getReference
+						Integer // transaction index
 		>>>>
 {
 	private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // hashMap ?
@@ -39,7 +39,7 @@ public class PersonAddressMap extends DBMap<
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>> getMap(DB database) 
+	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("person_address")
@@ -49,15 +49,15 @@ public class PersonAddressMap extends DBMap<
 	}
 
 	@Override
-	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>> getMemoryMap() 
+	protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMemoryMap() 
 	{
-		return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>>();
+		return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>>();
 	}
 
 	@Override
-	protected TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> getDefaultValue() 
+	protected TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue() 
 	{
-		return new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>();
+		return new TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>();
 	}
 	
 	@Override
@@ -67,11 +67,11 @@ public class PersonAddressMap extends DBMap<
 	}
 		
 	///////////////////////////////
-	public void addItem(Long person, String address, Tuple3<Integer, Integer, byte[]> item)
+	public void addItem(Long person, String address, Tuple3<Integer, Integer, Integer> item)
 	{
-		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
-		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
-		if (stack == null) stack = new Stack<Tuple3<Integer, Integer, byte[]>>();
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, Integer>> stack = tree.get(address);
+		if (stack == null) stack = new Stack<Tuple3<Integer, Integer, Integer>>();
 		
 		stack.push(item);
 		
@@ -81,24 +81,24 @@ public class PersonAddressMap extends DBMap<
 	}
 	
 	// GET ALL ITEMS
-	public TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> getItems(Long person)
+	public TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getItems(Long person)
 	{
-		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
 		return tree;
 	}
 
-	public Tuple3<Integer, Integer, byte[]> getItem(Long person, String address)
+	public Tuple3<Integer, Integer, Integer> getItem(Long person, String address)
 	{
-		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
-		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, Integer>> stack = tree.get(address);
 		if (stack == null) return null;
 		return stack.size()> 0? stack.peek(): null;
 	}
 	
 	public void removeItem(Long person, String address)
 	{
-		TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>> tree = this.get(person);
-		Stack<Tuple3<Integer, Integer, byte[]>> stack = tree.get(address);
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
+		Stack<Tuple3<Integer, Integer, Integer>> stack = tree.get(address);
 		if (stack==null || stack.size() == 0) return;
 
 		stack.pop();

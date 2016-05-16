@@ -31,13 +31,13 @@ import database.ItemStatusMap;
 import database.DBSet;
 import database.ItemStatusMap;
 
-public class GenesisIssueStatusTransaction extends GenesisIssue_ItemRecord 
+public class GenesisIssueStatusRecord extends GenesisIssue_ItemRecord 
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "GENESIS Issue Status";
 	
-	public GenesisIssueStatusTransaction(StatusCls status) 
+	public GenesisIssueStatusRecord(StatusCls status) 
 	{
 		super(TYPE_ID, NAME_ID, status);
 
@@ -67,7 +67,7 @@ public class GenesisIssueStatusTransaction extends GenesisIssue_ItemRecord
 		StatusCls status = StatusFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += status.getDataLength(false);
 						
-		return new GenesisIssueStatusTransaction(status);
+		return new GenesisIssueStatusRecord(status);
 	}	
 	
 }

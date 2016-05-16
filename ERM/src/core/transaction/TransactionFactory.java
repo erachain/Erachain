@@ -192,18 +192,18 @@ public class TransactionFactory {
 		
 		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
+			//PARSE ISSUE PERSON TRANSACTION
 			return GenesisIssuePersonRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
-			return GenesisIssueNoteTransaction.Parse(data);
+			//PARSE ISSUE NOTE TRANSACTION
+			return GenesisIssueNoteRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
 			
 			//PARSE ISSUE STATUS TRANSACTION
-			return GenesisIssueStatusTransaction.Parse(data);
+			return GenesisIssueStatusRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			

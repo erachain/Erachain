@@ -103,6 +103,8 @@ public class KK_K_Map extends DBMap<
 
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
+
+		//stack.elementAt()
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
 	

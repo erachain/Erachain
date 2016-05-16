@@ -16,27 +16,27 @@ public class PersonHuman extends PersonCls {
 	
 	private static final int TYPE_ID = PersonCls.HUMAN;
 
-	public PersonHuman(Account creator, String fullName, long birthday,
+	public PersonHuman(Account creator, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
-		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday,
+		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
-	public PersonHuman(Account creator, String fullName, String birthday,
+	public PersonHuman(Account creator, String fullName, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
-		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday,
+		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
-	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday,
+	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description)
 	{
-		super(typeBytes, creator, fullName, birthday,
+		super(typeBytes, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
 	}
@@ -98,6 +98,11 @@ public class PersonHuman extends PersonCls {
 		byte[] birthdayBytes = Arrays.copyOfRange(data, position, position + BIRTHDAY_LENGTH);
 		long birthday = Longs.fromByteArray(birthdayBytes);	
 		position += BIRTHDAY_LENGTH;
+
+		//READ DEATHDAY
+		byte[] deathdayBytes = Arrays.copyOfRange(data, position, position + DEATHDAY_LENGTH);
+		long deathday = Longs.fromByteArray(deathdayBytes);	
+		position += DEATHDAY_LENGTH;
 
 		//READ GENDER
 		byte gender = data[position];
@@ -168,7 +173,7 @@ public class PersonHuman extends PersonCls {
 		position ++;
 
 		//RETURN
-		PersonHuman personHuman = new PersonHuman(typeBytes, creator, fullName, birthday,
+		PersonHuman personHuman = new PersonHuman(typeBytes, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, description);
 		if (includeReference)

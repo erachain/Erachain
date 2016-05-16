@@ -188,49 +188,6 @@ public class AllUnionsPanel extends JPanel {
 					+ "<br>" + union.getName().toString() + "</div>";
 
 					message += "<h2>"+ "Statuses" +"</h2>";
-					// GETT UNION STATUS for ALIVE
-					Tuple3<Long, Integer, byte[]> t3Alive = null; //DBSet.getInstance().getUnionStatusMap().getItem(union.getKey());
-			
-					if (t3Alive != null){
-						if (t3Alive.a == null) dateAlive = "active";
-						else dateAlive = formatDate.format( new Date(t3Alive.a));
-					} else
-					{
-						dateAlive = Lang.getInstance().translate("unknown");
-					}
-					message += "<div>" + Lang.getInstance().translate("ALIVE")+": <b>" + dateAlive +"</b></div>";
-
-					// GETT UNION STATUS for DEAD
-					Tuple3<Long, Integer, byte[]> t3Dead = DBSet.getInstance().getUnionStatusMap().getItem(union.getKey(), StatusCls.DEAD_KEY);
-			
-					if (t3Dead != null){
-						if (t3Dead.a == null) dateAlive = "yes";
-						else dateAlive = formatDate.format( new Date(t3Dead.a ));
-					} else
-					{
-						dateAlive = Lang.getInstance().translate("unknown");
-					}
-					message += "<div>" + Lang.getInstance().translate("DEAD")+": <b>" + dateAlive +"</b></div>";
-
-					// GET CERTIFIED ACCOUNTS
-					message += "<h2>"+ "Accounts" +"</h2>";
-					TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> addresses= null; //DBSet.getInstance().getUnionAddressMap().getItems(union.getKey());
-					if ( !addresses.isEmpty()){
-						// for each account seek active date
-						String active_date_str;
-						for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, byte[]>>> e : addresses.entrySet())
-						{
-							Tuple3<Integer, Integer, byte[]> active_date = e.getValue().peek();
-							if (active_date.a == 0) active_date_str = "active";
-							else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
-							
-							message += "<div><input type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
-									+ " -> <b>" + active_date_str +"</b></div>";
-						}
-					}
-					else{
-						message += "<p> " +  Lang.getInstance().translate("Account not found!")+ "</p";
-					}					
 				} else {
 					message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	
 				}

@@ -49,11 +49,11 @@ import gui.transaction.OnDealClick;
 public class IssuePersonDialog extends JDialog //JFrame
 {
 	private JComboBox<Account> cbxFrom;
-	private JTextField txtScale;
 	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
 	private JTextField txtBirthday;
+	private JTextField txtDeathday;
 	private JComboBox txtGender;
 	private JTextField txtRace;
 	private JTextField txtBirthLatitude;
@@ -178,14 +178,14 @@ public class IssuePersonDialog extends JDialog //JFrame
       	
       	
       	String[] items = {
-      			Lang.getInstance().translate("Man"),
-      			Lang.getInstance().translate("Woman"),
+      			Lang.getInstance().translate("Male"),
+      			Lang.getInstance().translate("Female"),
       			Lang.getInstance().translate("-")
         	};	
       	//TXT GENDER
       	txtGBC.gridy = gridy++;
       	//this.txtGender = new JTextField();
-      	 txtGender = new JComboBox(items);
+      	txtGender = new JComboBox(items);
       	//this.txtGender.setText("1");
         this.add(this.txtGender, txtGBC);
         
@@ -211,7 +211,17 @@ public class IssuePersonDialog extends JDialog //JFrame
       	this.txtBirthday.setText("1970-12-08");
         this.add(this.txtBirthday, txtGBC);
         
-
+        //LABEL DEATHDAY
+      	labelGBC.gridy = gridy;
+      	this.add(new JLabel(Lang.getInstance().translate("Deathday") + ":"), labelGBC);
+      		
+      	//TXT DEATHDAY
+      	txtGBC.gridy = gridy++;
+      	this.txtDeathday = new JTextField();
+      	this.txtDeathday = new JFormattedTextField(mf1); 
+      	this.txtDeathday.setText("0000-00-00");
+        this.add(this.txtDeathday, txtGBC);
+        
         //LABEL RACE
       	labelGBC.gridy = gridy;
       	JLabel raceLabel = new JLabel(Lang.getInstance().translate("Race") + ":");
@@ -361,6 +371,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 		int feePow = 0;
 		byte gender = 0;
 		long birthday = 0;
+		long deathday = 0;
 		float birthLatitude = 0;
 		float birthLongitude = 0;
 		int height = 0;
@@ -377,11 +388,15 @@ public class IssuePersonDialog extends JDialog //JFrame
 			parse++;
 			//birthday = Long.parseLong(this.txtBirthday.getText());
 			// 1970-08-12 03:05:07
-			String bd = this.txtBirthday.getText();
-			if (bd.length() < 11) bd = bd + " 00:00:00";
-			Timestamp ts = Timestamp.valueOf(bd);
-			birthday = ts.getTime();
-			
+			String str = this.txtBirthday.getText();
+			if (str.length() < 11) str = str + " 00:00:00";
+			birthday = Timestamp.valueOf(str).getTime();
+
+			parse++;
+			str = this.txtDeathday.getText();
+			if (str.length() < 11) str = str + " 00:00:00";
+			deathday = Timestamp.valueOf(str).getTime();
+
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			
@@ -404,15 +419,18 @@ public class IssuePersonDialog extends JDialog //JFrame
 				mess = "Invalid gender";
 				break;
 			case 2:
-				mess = "Invalid birthday [YYYY-MM-DD]";
+				mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
 				break;
 			case 3:
-				mess = "Invalid birth Latitude -180..180";
+				mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
 				break;
 			case 4:
-				mess = "Invalid birth Longitude -90..90";
+				mess = "Invalid birth Latitude -180..180";
 				break;
 			case 5:
+				mess = "Invalid birth Longitude -90..90";
+				break;
+			case 6:
 				mess = "Invalid height 10..255 ";
 				break;
 			}
@@ -428,7 +446,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
-				creator, this.txtName.getText(), feePow, birthday,
+				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height, this.txtareaDescription.getText()

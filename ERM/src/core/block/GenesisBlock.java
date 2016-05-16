@@ -30,13 +30,16 @@ import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueNoteRecord;
 import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.GenesisIssueStatusTransaction;
+import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import database.DBSet;
+import gui.Gui;
+import lang.Lang;
 import settings.Settings;
 import utils.Pair;
+import utils.SysTray;
 
 public class GenesisBlock extends Block{
 	
@@ -87,7 +90,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account(address);
 
 				user = new PersonHuman(recipient,
-						"UNKNOWN", "1966-08-21 10:10:10.0", (byte)1, "-", (float)0.1330, (float)1.9224,
+						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.1330, (float)1.9224,
 						"-", "-", "-", (int) 188, "-");
 				
 				// SEND GENESIS ASSETS
@@ -95,7 +98,7 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
+				this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
 				this.addTransaction(new GenesisCertifyPersonRecord(recipient, nonce++));
@@ -113,32 +116,45 @@ public class GenesisBlock extends Block{
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
-							"Ермолаев Дмитрий Сергеевич", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев Дмитрий Сергеевич", "1966-08-21 10:10:10.0", null, 
+							(byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
-							"Ермолаев Александр Сергеевич", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев Александр Сергеевич", "1966-08-21 10:10:10.0", null,
+							(byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
-							"Скорняков Александр Викторович", "1963-08-21 10:10:10.0", (byte)1, "Slav", (float)1.1330, (float)13.9224,
+							"Скорняков Александр Викторович", "1963-08-21 10:10:10.0", null,
+							(byte)1, "Slav", (float)1.1330, (float)13.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
 				);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
 					Arrays.asList(1000, new PersonHuman(new Account("7FoC1wAtbR9Z5iwtcw4Ju1u2DnLBQ1TNS7"),
-							"Симанков Дмитрий", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Симанков Дмитрий", "1966-08-21 10:10:10.0", null,
+							(byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("78A24nTM2PPdpjLF2JWbghPDUhPK1zQ51Y"),
-							"Добрышкин Сергей", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Добрышкин Сергей", "1966-08-21 10:10:10.0", null,
+							(byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
-							"Бородин Олег", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Бородин Олег", "1966-08-21 10:10:10.0", null,
+							(byte)1, "Slav", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, ""))					
 				);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					Arrays.asList(100, new PersonHuman(new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo"),
-							"неизвестный участник", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"неизвестный участник", "1966-08-21 10:10:10.0",  null,
+							(byte)1, "Slav", (float)0.0, (float)0.0,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
+					);
+			List<PersonCls> personGenesisUsers = Arrays.asList(
+					new PersonHuman(genesisGenerator,
+							"Менделеев, Дмитрий Иванович", "1834-02-08 00:00:00.0", "1907-02-02 00:00:00.0",
+							(byte)1, "Slav", (float)58.195278, (float)68.258056,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 180, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
 					);
 
 			////////// INVESTORS
@@ -278,6 +294,20 @@ public class GenesisBlock extends Block{
 
 			}
 
+			// PERSONALIZED USERS
+			for(PersonCls person: personGenesisUsers)
+			{				
+				//CREATE ISSUE PERSON TRANSACTION
+				GenesisIssuePersonRecord tr = new GenesisIssuePersonRecord(person);
+				if (Transaction.VALIDATE_OK != tr.isValid(null))
+				{
+					//throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
+					LOGGER.error(Lang.getInstance().translate("Genesis person error"));
+				}
+
+				//this.addTransaction(new GenesisIssuePersonRecord(person));
+			}
+
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(this.generateHash());
 			
@@ -300,11 +330,11 @@ public class GenesisBlock extends Block{
 
 		///// NOTES
 		for (int i = 0; i <= NoteCls.HIRING_KEY; i++) 
-			this.addTransaction(new GenesisIssueNoteTransaction(makeNote(i)));
+			this.addTransaction(new GenesisIssueNoteRecord(makeNote(i)));
 
 		///// STATUSES
 		for (int i = 0; i <= StatusCls.EXPIRED_KEY; i++) 
-			this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(i)));		
+			this.addTransaction(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
 	// make assets

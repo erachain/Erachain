@@ -1809,12 +1809,12 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, String fullName, int feePow,
-			long birthday,
+			long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday,
+			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday, deathday,
 					gender, race, birthLatitude, birthLongitude,
 					skinColor, eyeColor, hairСolor, height, description);
 		}
@@ -1913,11 +1913,11 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
-			ItemCls item, Long end_date) {
+			ItemCls item, Long beg_date, Long end_date) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_SetStatusToItem( version, asPack,
 					creator, feePow, key,
-					item, end_date);
+					item, beg_date, end_date);
 		}
 	}
 	/*

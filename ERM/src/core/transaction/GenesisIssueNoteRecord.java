@@ -30,22 +30,17 @@ import database.ItemNoteMap;
 //import database.BalanceMap;
 import database.DBSet;
 
-public class GenesisIssueNoteTransaction extends GenesisIssue_ItemRecord 
+public class GenesisIssueNoteRecord extends GenesisIssue_ItemRecord 
 {
 	
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_NOTE_TRANSACTION;
 	private static final String NAME_ID = "GENESIS Issue Note";
 	
-	public GenesisIssueNoteTransaction(NoteCls note) 
+	public GenesisIssueNoteRecord(NoteCls note) 
 	{
 		super(TYPE_ID, NAME_ID, note);
-
-		//this.generateSignature();
-
 	}
 
-	//GETTERS/SETTERS
-	
 	//PARSE CONVERT
 	public static Transaction Parse(byte[] data) throws Exception
 	{	
@@ -63,7 +58,7 @@ public class GenesisIssueNoteTransaction extends GenesisIssue_ItemRecord
 		NoteCls note = NoteFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += note.getDataLength(false);
 						
-		return new GenesisIssueNoteTransaction(note);
+		return new GenesisIssueNoteRecord(note);
 	}	
 	
 }

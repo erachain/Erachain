@@ -269,7 +269,7 @@ public MainPersonsFrame(){
 			TableRowSorter sorter1 = new TableRowSorter(personsModel);
 			table.setRowSorter(sorter1);
 			table.getRowSorter();
-			personsModel.fireTableDataChanged();
+			if (personsModel.getRowCount() > 0) personsModel.fireTableDataChanged();
 			
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);

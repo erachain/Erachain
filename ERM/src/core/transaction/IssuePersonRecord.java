@@ -75,6 +75,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (res != Transaction.VALIDATE_OK) return res;
 		
 		PersonCls person = (PersonCls) this.getItem();
+		// birthLatitude -90..90; birthLongitude -180..180
 		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
 		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
 		if (person.getRace().length() <1 || person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;

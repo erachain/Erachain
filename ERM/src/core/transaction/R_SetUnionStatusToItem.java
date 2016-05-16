@@ -26,6 +26,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
@@ -39,7 +40,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Union Status to Unit";
-	private static final int DATE_DAY_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
+	private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
@@ -47,58 +48,61 @@ public class R_SetUnionStatusToItem extends Transaction {
 	protected Long key; // UNION KEY
 	protected Long statusKey; // STATUS KEY
 	protected ItemCls item; // ITEM
-	protected Long end_date = Long.MAX_VALUE;
-	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
+	protected long beg_date;
+	protected long end_date = Long.MAX_VALUE;
+	private static final int SELF_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			Long end_date, long timestamp, byte[] reference) {
+			Long beg_date, Long end_date, long timestamp, byte[] reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
 		this.item = item;
+		if (beg_date == null || beg_date == 0) beg_date = Long.MIN_VALUE;
+		this.beg_date = beg_date;		
 		if (end_date == null) end_date = Long.MAX_VALUE;
 		this.end_date = end_date;		
 	}
 
 	public R_SetUnionStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			Long end_date, long timestamp, byte[] reference) {
+			Long beg_date, Long end_date, long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				end_date, timestamp, reference);
+				beg_date, end_date, timestamp, reference);
 	}
 	// set default date
 	public R_SetUnionStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
 			long timestamp, byte[] reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				null, timestamp, reference);
+				 Long.MIN_VALUE, Long.MAX_VALUE, timestamp, reference);
 	}
 	public R_SetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			Long end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long beg_date, Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(typeBytes, creator, feePow, key, item,
-				end_date, timestamp, reference);
+				beg_date, end_date, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
 	public R_SetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, ItemCls item,
-			Long end_date, byte[] signature) {
+			Long beg_date, Long end_date, byte[] signature) {
 		this(typeBytes, creator, (byte)0, key, item,
-				end_date, 0l, null);
+				beg_date, end_date, 0l, null);
 		this.signature = signature;
 	}
 	public R_SetUnionStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			Long end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long beg_date, Long end_date, long timestamp, byte[] reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				end_date, timestamp, reference);
+				beg_date, end_date, timestamp, reference);
 	}
 
 	// as pack
 	public R_SetUnionStatusToItem(PublicKeyAccount creator, long key, ItemCls item,
-			Long end_date, byte[] signature) {
+			Long beg_date, Long end_date, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, item,
-				end_date, 0l, null);
+				beg_date, end_date, 0l, null);
 	}
 	
 	//GETTERS/SETTERS
@@ -115,6 +119,10 @@ public class R_SetUnionStatusToItem extends Transaction {
 		return this.item;
 	}
 
+	public Long getBeginDate() 
+	{
+		return this.beg_date;
+	}
 	public Long getEndDate() 
 	{
 		return this.end_date;
@@ -136,6 +144,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("key", this.key);
 		transaction.put("item", this.item.toJson());
+		transaction.put("begin_date", this.beg_date);
 		transaction.put("end_date", this.end_date);
 		
 		return transaction;	
@@ -207,17 +216,22 @@ public class R_SetUnionStatusToItem extends Transaction {
 		position += KEY_LENGTH;
 		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);		
 		
+		// READ BEGIN DATE
+		byte[] beg_dateBytes = Arrays.copyOfRange(data, position, position + DATE_LENGTH);
+		Long beg_date = Longs.fromByteArray(beg_dateBytes);	
+		position += DATE_LENGTH;
+
 		// READ END DATE
-		byte[] end_dateBytes = Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH);
+		byte[] end_dateBytes = Arrays.copyOfRange(data, position, position + DATE_LENGTH);
 		Long end_date = Longs.fromByteArray(end_dateBytes);	
-		position += DATE_DAY_LENGTH;
+		position += DATE_LENGTH;
 
 		if (!asPack) {
 			return new R_SetUnionStatusToItem(typeBytes, creator, feePow, key, item,
-					end_date, timestamp, reference, signature);
+					beg_date, end_date, timestamp, reference, signature);
 		} else {
 			return new R_SetUnionStatusToItem(typeBytes, creator, key, item,
-					end_date, signature);
+					beg_date, end_date, signature);
 		}
 
 	}
@@ -242,8 +256,10 @@ public class R_SetUnionStatusToItem extends Transaction {
 		keyBytes = Bytes.ensureCapacity(itemKeyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
 		
+		//WRITE BEGIN DATE
+		data = Bytes.concat(data, Longs.toByteArray(this.beg_date));
+
 		//WRITE END DATE
-		if (this.end_date == null || this.end_date == 0) this.end_date = Long.MAX_VALUE;
 		data = Bytes.concat(data, Longs.toByteArray(this.end_date));
 
 		return data;	
@@ -305,8 +321,14 @@ public class R_SetUnionStatusToItem extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		Tuple3<Long, Integer, byte[]> itemP = new Tuple3<Long, Integer, byte[]>(this.end_date,
-				Controller.getInstance().getHeight(), this.signature);
+		Block block = db.getBlockMap().getLastBlock();
+		int blockIndex = block.getHeight();
+		int transactionIndex = block.getTransactionIndex(signature);
+
+		Tuple4<Long, Long, Integer, Integer> itemP = new Tuple4<Long, Long, Integer, Integer>
+				(beg_date, end_date,
+				//Controller.getInstance().getHeight(), this.signature);
+				blockIndex, transactionIndex);
 
 		// SET UNION to ITEM for DURATION
 		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)

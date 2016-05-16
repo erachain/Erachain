@@ -386,17 +386,17 @@ public class Account {
 	}
 
 	// personKey, days, block, reference
-	public static Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db, String address) {
+	public static Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DBSet db, String address) {
 		return db.getAddressPersonMap().getItem(address);				
 	}
-	public Tuple4<Long, Integer, Integer, byte[]> getPersonDuration(DBSet db) {
+	public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DBSet db) {
 		return getPersonDuration(db, this.address);
 	}
 	
 	public boolean isPerson(DBSet db) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
-		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
 		if (addressDuration == null) return false;
 		// TEST TIME and EXPIRE TIME
 		long current_time = NTP.getTime();
@@ -408,9 +408,9 @@ public class Account {
 
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
-		Tuple3<Long, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple4<Long, Long, Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		Long end_date = personDuration.a;
+		Long end_date = personDuration.b;
 		if (end_date == null ) return true; // permanent active
 		if (end_date < current_time + 86400000 ) return false; // - 1 day
 		
@@ -420,7 +420,7 @@ public class Account {
 	public Tuple2<Integer, PersonCls> hasPerson(DBSet db) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
-		Tuple4<Long, Integer, Integer, byte[]> addressDuration = this.getPersonDuration(db);
+		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
 		if (addressDuration == null) return null;
 		// TEST TIME and EXPIRE TIME
 		long current_time = NTP.getTime();
@@ -436,16 +436,16 @@ public class Account {
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
 		// IF PERSON is DEAD
-		Tuple3<Long, Integer, byte[]> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
+		Tuple4<Long, Long, Integer, Integer> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
 		if (personDead != null) {
 			// person is dead
 			return new Tuple2<Integer, PersonCls>(-2, person);
 		}
 
 		// IF PERSON is ALIVE
-		Tuple3<Long, Integer, byte[]> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple4<Long, Long, Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		Long end_date = personDuration.a;
+		Long end_date = personDuration.b;
 		if (end_date == null )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);

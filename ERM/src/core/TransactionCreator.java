@@ -331,7 +331,7 @@ public class TransactionCreator
 		return this.afterCreate(issueNoteRecord, false);
 	}
 
-	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
 					byte gender, String race, float birthLatitude, float birthLongitude,
 					String skinColor, String eyeColor, String hairСolor, int height, String description) 
 	{
@@ -341,7 +341,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 
-		PersonCls person = new PersonHuman(creator, fullName, birthday,
+		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, description);
 							
@@ -525,7 +525,7 @@ public class TransactionCreator
 
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
-			Long end_date) {
+			Long beg_date, Long end_date) {
 		
 		this.checkUpdate();
 		
@@ -536,7 +536,7 @@ public class TransactionCreator
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
 		record = new R_SetStatusToItem(creator, (byte)feePow, key, item,
-				end_date, timestamp, creator.getLastReference(this.fork));
+				beg_date, end_date, timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);

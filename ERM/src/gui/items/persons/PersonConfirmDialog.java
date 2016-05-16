@@ -365,7 +365,7 @@ public class PersonConfirmDialog extends JDialog  {
 			PublicKeyAccount account = new PublicKeyAccount(toValue); 
 			// SHOW account for FEE asset
 			String personDetails;
-			Tuple4<Long, Integer, Integer, byte[]> addressDuration = account.getPersonDuration(DBSet.getInstance());
+			Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DBSet.getInstance());
 			
 			if (addressDuration == null) personDetails = Lang.getInstance().translate("Not personalized yet");
 			else
@@ -380,8 +380,8 @@ public class PersonConfirmDialog extends JDialog  {
 
 				// IF PERSON ALIVE
 				Long personKey = addressDuration.a;
-				Tuple3<Long, Integer, byte[]> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
-				daysLeft = (int)((aliveDuration.a - current_time) / (long)86400000);	
+				Tuple4<Long, Long, Integer, Integer> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
+				daysLeft = (int)((aliveDuration.b - current_time) / (long)86400000);	
 				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
 				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				

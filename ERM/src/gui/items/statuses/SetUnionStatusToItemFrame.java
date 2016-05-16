@@ -76,7 +76,8 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
 		final JTextField itemKeyTxt = new JTextField();
 		final JLabel itemDetails = new JLabel();
 
-		final JTextField endDate = new JTextField(".");
+		final JTextField beginDate = new JTextField(".");
+		final JTextField endDate = new JTextField("+");
 		final JTextField feePow = new JTextField("0");
 		
 		//CLOSE
@@ -234,7 +235,16 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
         this.add(htmlPanel, input); // BorderLayout.SOUTH);
  
 	    ++label.gridy;
-	    this.add(new JLabel(Lang.getInstance().translate("Date ('.'=today)") +":"), label);
+	    this.add(new JLabel(Lang.getInstance().translate("From Date ('.'=today, '-', '+' )") +":"), label);
+
+	    input.gridy = label.gridy;
+	    input.gridx = 1;
+	    input.gridwidth = 5;
+	    input.gridheight = 1;
+	    this.add(beginDate, input);
+
+	    ++label.gridy;
+	    this.add(new JLabel(Lang.getInstance().translate("To Date ('.'=today, '-', '+')") +":"), label);
 
 	    input.gridy = label.gridy;
 	    input.gridx = 1;
@@ -274,7 +284,7 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	onGoClick(Button_Confirm, feePow, item, endDate);
+		    	onGoClick(Button_Confirm, feePow, item, beginDate, endDate);
 		    }
 		});
 	    
@@ -399,16 +409,18 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
 	}
 
 	public void onGoClick(JButton Button_Confirm, JTextField feePowTxt,
-			ItemCls item, JTextField toDateTxt)
+			ItemCls item, JTextField fromDateTxt, JTextField toDateTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
 
 		Account creator = (Account) this.accountLBox.getSelectedItem();
     	//String address = pubKey1Txt.getText();
-    	Long endDate = null;
+    	Long beginDate = Long.MIN_VALUE;
+    	Long endDate = Long.MAX_VALUE;
     	int feePow = 0;
     	int parse = 0;
+    	String fromDateStr = fromDateTxt.getText();
     	String toDateStr = toDateTxt.getText();
 		try {
 
@@ -424,7 +436,17 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
 			}
 		}
     	
-		Pair<Integer, Long> endDateRes = ItemCls.resolveEndDateFromStr(toDateStr, NTP.getTime());
+		Pair<Integer, Long> beginDateRes = ItemCls.resolveDateFromStr(fromDateStr, NTP.getTime());
+		if (beginDateRes.getA() == -1)
+		{
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Date value"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			Button_Confirm.setEnabled(true);
+			return;
+		}
+		else
+			beginDate = beginDateRes.getB();
+
+		Pair<Integer, Long> endDateRes = ItemCls.resolveDateFromStr(toDateStr, NTP.getTime());
 		if (endDateRes.getA() == -1)
 		{
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Date value"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -441,7 +463,7 @@ public class SetUnionStatusToItemFrame extends JInternalFrame  {
 		
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
-				feePow, StatusCls.DEAD_KEY, item, endDate);
+				feePow, StatusCls.DEAD_KEY, item, beginDate, endDate);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

@@ -361,20 +361,8 @@ public class UnionConfirmFrame extends JFrame  {
 			{
 				// TEST TIME and EXPIRE TIME
 				long current_time = NTP.getTime();
+				unionDetails = "";
 				
-				// TEST TIME and EXPIRE TIME
-				int daysLeft = addressDuration.b - (int)(current_time / (long)86400);	
-				if (daysLeft < 0 ) unionDetails = Lang.getInstance().translate("Unionalize ended %days% ago").replace("%days%", ""+daysLeft);
-				else unionDetails = Lang.getInstance().translate("Unionalize is valid for %days% days").replace("%days%", ""+daysLeft);
-
-				// IF UNION ALIVE
-				Long unionKey = addressDuration.a;
-				Tuple3<Long, Integer, byte[]> aliveDuration = DBSet.getInstance().getUnionStatusMap().getItem(unionKey, StatusCls.ALIVE_KEY);
-				daysLeft = (int)((aliveDuration.a - current_time) / 86400000L);
-				if (daysLeft < 0 ) unionDetails = unionDetails + "<br>" + Lang.getInstance().translate("Union died %days% ago days ago").replace("%days%", ""+daysLeft);
-				else unionDetails = unionDetails + "<br>" + Lang.getInstance().translate("Union is still alive %days%").replace("%days%", ""+daysLeft);
-				
-				//unionDetails = unionDetails; 
 			}
 
 			pubKeyDetails.setText("<html><h3>" + unionDetails + "</h3>" + account.toString(Transaction.FEE_KEY) + "</html>");

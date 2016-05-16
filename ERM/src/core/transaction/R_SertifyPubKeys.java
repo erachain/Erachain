@@ -26,6 +26,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
@@ -34,7 +35,7 @@ import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
-import core.item.statuses.StatusCls;
+//import core.item.statuses.StatusCls;
 import database.ItemAssetBalanceMap;
 import ntp.NTP;
 import database.DBSet;
@@ -451,6 +452,11 @@ public class R_SertifyPubKeys extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 
+		// ?? Controller.getInstance().getHeight()
+		Block block = db.getBlockMap().getLastBlock();
+		int blockIndex = block.getHeight();
+		int transactionIndex = block.getTransactionIndex(signature);
+
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 		// send GIFT FEE_KEY
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
@@ -464,15 +470,19 @@ public class R_SertifyPubKeys extends Transaction {
 		// set to time stamp of record
 		int  end_day = (int)(this.timestamp / 86400000) + add_day;
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(end_day,
-				Controller.getInstance().getHeight(), this.signature);
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, end_day,
-				Controller.getInstance().getHeight(), this.signature);
+		Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
+				//Controller.getInstance().getHeight(), this.signature);
+				blockIndex, transactionIndex);
+		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
+				blockIndex, transactionIndex);
 		
 		if (db.getPersonStatusMap().getItem(key, StatusCls.ALIVE_KEY) == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY, new Tuple3<Long, Integer, byte[]>(Long.MAX_VALUE,
-					Controller.getInstance().getHeight(), this.signature));
+			PersonCls person = (PersonCls)db.getItemPersonMap().get(key);
+			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY,
+					new Tuple4<Long, Long, Integer, Integer>(
+							person.getBirthday(), Long.MAX_VALUE,
+							blockIndex, transactionIndex));
 		}
 
 		// SET PERSON ADDRESS

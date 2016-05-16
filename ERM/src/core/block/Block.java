@@ -204,6 +204,23 @@ public class Block {
 		this.transactionCount++;
 	}
 
+	public int getTransactionIndex(byte[] signature)
+	{
+
+		int i = 0;
+		
+		for(Transaction transaction: this.getTransactions())
+		{
+			if(Arrays.equals(transaction.getSignature(), signature))
+			{
+				return i;
+			}
+			i++;
+		}
+
+		return -1;
+	}
+
 	public Transaction getTransaction(byte[] signature)
 	{
 
@@ -216,6 +233,13 @@ public class Block {
 		}
 
 		return null;
+	}
+
+	public Transaction getTransaction(int index)
+	{
+		if (index < this.transactions.size())
+			return getTransactions().get(index);
+		else return null;
 	}
 
 
@@ -590,7 +614,8 @@ public class Block {
 		}
 
 		//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-		if(true & (this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp))
+		if(true & (this.timestamp - 500 > NTP.getTime()
+				|| this.timestamp < this.getParent(db).timestamp))
 		{
 			return false;
 		}
