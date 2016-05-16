@@ -67,6 +67,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		return this.transactions;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
 	public Transaction getTransaction(int row)
 	{
 		return transactions.get(row).getB();
