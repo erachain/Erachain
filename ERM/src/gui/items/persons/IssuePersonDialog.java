@@ -394,8 +394,12 @@ public class IssuePersonDialog extends JDialog //JFrame
 
 			parse++;
 			str = this.txtDeathday.getText();
-			if (str.length() < 11) str = str + " 00:00:00";
-			deathday = Timestamp.valueOf(str).getTime();
+			if (str.equals("0000-00-00")) {
+				deathday = birthday -1;
+			} else {
+				if (str.length() < 11) str = str + " 00:00:00";
+				deathday = Timestamp.valueOf(str).getTime();
+			}
 
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());

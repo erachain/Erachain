@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JEditorPane;
+import javax.swing.JTextPane;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -15,17 +16,21 @@ import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
 import database.DBSet;
+import gui.MainFrame;
 import lang.Lang;
 
 // Info for person
-public class Person_Info extends JEditorPane {
+public class Person_Info extends JTextPane {
 	private String message = "<HTML>" + Lang.getInstance().translate("Select person");
 	
 public  Person_Info() {
 
 	this.setContentType("text/html");
 	this.setText(message); //"<HTML>" + Lang.getInstance().translate("Select person")); // Document text is provided below.
-	this.setBackground(new Color(255, 255, 255, 0));
+	//this.setBackground(this.getBackground());
+	//this.setBackground(new Color(211,211,211));
+	this.setBackground(MainFrame.getFrames()[0].getBackground());
+	
 	
 	
 	

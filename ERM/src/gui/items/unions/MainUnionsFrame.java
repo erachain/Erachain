@@ -194,7 +194,7 @@ public MainUnionsFrame (){
 	TableRowSorter<WalletItemUnionsTableModel> sorter1 = new TableRowSorter<WalletItemUnionsTableModel>(unionsModel);
 	tableUnion.setRowSorter(sorter1);
 	tableUnion.getRowSorter();
-	unionsModel.fireTableDataChanged();
+	//unionsModel.fireTableDataChanged();
 //CHECKBOX FOR CONFIRMED
 	TableColumn confirmedColumn = tableUnion.getColumnModel().getColumn(WalletItemUnionsTableModel.COLUMN_CONFIRMED);
 	confirmedColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));
