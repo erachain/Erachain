@@ -48,7 +48,7 @@ import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
 import gui.items.unions.AllUnionsPanel;
 import gui.items.unions.UnionFrame;
-import gui.items.statuses.TableModelStatuses;
+import gui.items.statuses.TableModelItemStatuses;
 import gui.items.unions.IssueUnionFrame;
 import gui.models.Renderer_Right;
 //import gui.items.unions.MyOrdersFrame;

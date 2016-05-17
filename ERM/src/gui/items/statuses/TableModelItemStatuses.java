@@ -12,7 +12,7 @@ import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelStatuses extends TableModelCls<Long, StatusCls> implements Observer
+public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -23,7 +23,7 @@ public class TableModelStatuses extends TableModelCls<Long, StatusCls> implement
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Issuer", "Favorite"});
 	
-	public TableModelStatuses()
+	public TableModelItemStatuses()
 	{
 		Controller.getInstance().addObserver(this);
 	}

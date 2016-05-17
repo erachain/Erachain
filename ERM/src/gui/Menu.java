@@ -51,9 +51,9 @@ import gui.items.persons.RIPPersonFrame;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonsPanel;
 //import gui.items.persons.SearchPersons;
-import gui.items.statuses.AllStatusesFrame;
-import gui.items.statuses.AllStatusesPanel;
-import gui.items.statuses.IssueStatusPanel;
+import gui.items.statuses.MainStatusesFrame;
+//import gui.items.statuses.AllStatusesPanel;
+import gui.items.statuses.IssueStatusDialog;
 import gui.items.unions.AllUnionsFrame;
 import gui.items.unions.IssueUnionDialog;
 import gui.items.unions.IssueUnionFrame;
@@ -354,7 +354,7 @@ public class Menu extends JMenuBar
 
         // DEALS
 
-        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Asset & Message"));
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener()
         {
@@ -401,7 +401,7 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
@@ -415,7 +415,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
@@ -432,7 +433,7 @@ public class Menu extends JMenuBar
              
         		JInternalFrame frame = new JInternalFrame(Lang.getInstance().translate("Issue new Status"),true, true, true, true);
         		//frame.getContentPane().add(new AllStatusesPanel());
-        		frame.getContentPane().add(new IssueStatusPanel(frame));
+        		frame.getContentPane().add(new IssueStatusDialog());
         		frame.setName("new status");
         		frame.pack();
         		frame.setLocation(50, 60);
