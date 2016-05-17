@@ -441,7 +441,7 @@ public abstract class Transaction {
 		return "";
 	}
 	public String viewAmount(Account account) {
-		return "";
+		return account==null?"": viewAmount(account.getAddress());
 	}
 	public String viewAmount(String address) {
 		return "";

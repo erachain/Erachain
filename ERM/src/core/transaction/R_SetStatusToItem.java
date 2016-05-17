@@ -32,6 +32,7 @@ import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
 import core.item.ItemCls;
 import ntp.NTP;
+import utils.DateTimeFormat;
 import database.DBSet;
 import database.DBMap;
 
@@ -137,6 +138,11 @@ public class R_SetStatusToItem extends Transaction {
 	public String viewItemName() {
 		ItemCls status = DBSet.getInstance().getItemStatusMap().get(this.key);
 		return status==null?"null" : status.toString();
+	}
+	
+	@Override
+	public String viewAmount(String address) {
+		return DateTimeFormat.timestamptoString(end_date);
 	}
 	
 	@Override

@@ -24,217 +24,240 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import controller.Controller;
+import core.item.ItemCls;
 import core.item.statuses.StatusCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
+import gui.items.assets.AssetFrame;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemStatusesTableModel;
 import lang.Lang;
 
-public class MainStatusesFrame extends Main_Internal_Frame{ //Frame_All{ //JInternalFrame {
-/**
-	 * 
-	 */
+public class MainStatusesFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 1L;
-private TableModelItemStatuses tableModelItemStatuses;
+	private TableModelItemStatuses tableModelItemStatuses;
 
-public MainStatusesFrame(){
-// not show buttons main Toolbar
-	this.setTitle(Lang.getInstance().translate("Statuses"));
-	 this.jButton2_jToolBar.setVisible(false);
-	 this.jButton3_jToolBar.setVisible(false);
-// buttun1
-	 this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Status"));
-// status panel
-	 this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with statuses"));
+	
+	public MainStatusesFrame(){
+
+		this.setTitle(Lang.getInstance().translate("Statuses"));
+		this.jButton2_jToolBar.setVisible(false);
+		this.jButton3_jToolBar.setVisible(false);
+		// buttun1
+		this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Status"));
+		// status panel
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with statuses"));
 	 
-	 this.jButton1_jToolBar.addActionListener(new ActionListener()
+		this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		    //	 Menu.selectOrAdd( new IssueStatusFrame(), MainFrame.desktopPane.getAllFrames());
+			public void actionPerformed(ActionEvent e)
+			{
 		    	 new IssueStatusDialog();
-		    }
-
-			
+			}
 		});	
-	 
-// all statuses 
-	Split_Panel search_Status_SplitPanel = new Split_Panel();
-	search_Status_SplitPanel.setName(Lang.getInstance().translate("Search Statuses"));
-	search_Status_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
-	// not show buttons
-	search_Status_SplitPanel.button1_ToolBar_LeftPanel.setVisible(false);
-	search_Status_SplitPanel.button2_ToolBar_LeftPanel.setVisible(false);
-	search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
-	search_Status_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
-	
-	
-	//CREATE TABLE
+		 
+		// all statuses 
+		Split_Panel search_Status_SplitPanel = new Split_Panel();
+		search_Status_SplitPanel.setName(Lang.getInstance().translate("Search Statuses"));
+		search_Status_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+		// not show buttons
+		search_Status_SplitPanel.button1_ToolBar_LeftPanel.setVisible(false);
+		search_Status_SplitPanel.button2_ToolBar_LeftPanel.setVisible(false);
+		search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
+		search_Status_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
+		
+		search_Status_SplitPanel.jButton1_jToolBar_RightPanel.addActionListener(new ActionListener()
+			{
+			    public void actionPerformed(ActionEvent e)
+			    {
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(MainStatusesFrame.itemAll))
+					{
+						search_Status_SplitPanel.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add Favorite"));
+						Controller.getInstance().removeItemFavorite(MainStatusesFrame.itemAll);
+					}
+					else
+					{
+						search_Status_SplitPanel.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Remove Favorite"));
+						Controller.getInstance().addItemFavorite(MainStatusesFrame.itemAll);
+					}
+			    }
+			});
+
+		
+		//CREATE TABLE
 		this.tableModelItemStatuses = new TableModelItemStatuses();
 		final JTable statusesTable = new JTable(this.tableModelItemStatuses);
 		TableColumnModel columnModel = statusesTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
-	//Custom renderer for the String column;
+		//Custom renderer for the String column;
 		statusesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 		statusesTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
-	//CHECKBOX FOR FAVORITE
+		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelItemStatuses.COLUMN_FAVORITE);
-		
-
+			
+	
 		favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 		favoriteColumn.setMinWidth(50);
 		favoriteColumn.setMaxWidth(50);
 		favoriteColumn.setPreferredWidth(50);//.setWidth(30);
-	//	statusesTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
-	//Sorter
+		//	statusesTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
+		//Sorter
 		RowSorter sorter =   new TableRowSorter(this.tableModelItemStatuses);
 		statusesTable.setRowSorter(sorter);	
 		// UPDATE FILTER ON TEXT CHANGE
-		
-		search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
-					public void changedUpdate(DocumentEvent e) {
-						onChange();
-					}
+			
+		search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener()
+		{
+			
+			public void changedUpdate(DocumentEvent e) {
+				onChange();
+			}
 
-					public void removeUpdate(DocumentEvent e) {
-						onChange();
-					}
+			public void removeUpdate(DocumentEvent e) {
+				onChange();
+			}
 
-					public void insertUpdate(DocumentEvent e) {
-						onChange();
-					}
+			public void insertUpdate(DocumentEvent e) {
+				onChange();
+			}
 
-					public void onChange() {
+			public void onChange() {
 
-						// GET VALUE
-						String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
+				// GET VALUE
+				String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
 
-					 	// SET FILTER
+			 	// SET FILTER
 				//		tableModelStatuses.getSortableList().setFilter(search);
-						tableModelItemStatuses.fireTableDataChanged();
-						
-						RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-						((DefaultRowSorter) sorter).setRowFilter(filter);
-						
-						tableModelItemStatuses.fireTableDataChanged();
-						
-					}
-				});
+				tableModelItemStatuses.fireTableDataChanged();
+				
+				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+				((DefaultRowSorter) sorter).setRowFilter(filter);
+				
+				tableModelItemStatuses.fireTableDataChanged();
+				
+			}
+		});
 		
-		
-		
-		
-
-	// set video			
-				//jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setModel(this.tableModelStatuses);
+		// set video			
+		//jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setModel(this.tableModelStatuses);
 		search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel.setModel(this.tableModelItemStatuses);
-				//jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel = statusesTable;
+		//jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel = statusesTable;
 		search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel = statusesTable;
-				//jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setViewportView(jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel); // statusesTable; 
+		//jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setViewportView(jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel); // statusesTable; 
 		search_Status_SplitPanel.jScrollPanel_LeftPanel.setViewportView(search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel);
-	// select row table statuses
-
-		
+		// select row table statuses
+	
+			
 		Status_Info info = new Status_Info(); 
 		info.setFocusable(false);
 		//		
-	// обработка изменения положения курсора в таблице
-		
-				 //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-				 search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-					@Override
-					public void valueChanged(ListSelectionEvent arg0) {
-						StatusCls status = null;
-						if (statusesTable.getSelectedRow() >= 0 ) status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
-						info.show_001(status);
+		// обработка изменения положения курсора в таблице
+			
+		 //jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+		 search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				StatusCls status = null;
+				if (statusesTable.getSelectedRow() >= 0 ) status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
+				info.show_001(status);
+				MainStatusesFrame.itemAll = status;
+				
+				search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setText(status.isFavorite()?Lang.getInstance().translate("Remove Favorite"):Lang.getInstance().translate("Add Favorite"));
+				search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(true);
 						
-						search_Status_SplitPanel.jSplitPanel.setDividerLocation(search_Status_SplitPanel.jSplitPanel.getDividerLocation());	
-						search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-					}
-				});
-				 
+				search_Status_SplitPanel.jSplitPanel.setDividerLocation(search_Status_SplitPanel.jSplitPanel.getDividerLocation());	
+				search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+			}
+		});
+					 
+			
+			
+			
+		search_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
+		// MENU
+						
+		JPopupMenu all_Statuses_Table_menu = new JPopupMenu();
 		
+		/*
+		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+		details.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
+				//new StatusDetailsFrame(status);
+			}
+		});
+		all_Statuses_Table_menu.add(details);
+		*/
+
+		JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
+		confirm_Menu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				/*
+				int row = statusesTable.getSelectedRow();
+				row = statusesTable.convertRowIndexToModel(row);
+
+				StatusCls status = tableModelStatuses.getStatus(row);
+				new StatusFrame(status);
+				*/
+				// открываем диалоговое окно ввода данных для подтверждения персоны 
+				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
+
+		    	//StatusConfirmDialog fm = new StatusConfirmDialog(MainStatusesFrame.this, status);	
+		    	// обрабатываем полученные данные от диалогового окна
+		    	//if(fm.isOK()){
+                //    JOptionPane.showMessageDialog(Form1.this, "OK");
+                //}
+			
+			}
+		});
+
+		all_Statuses_Table_menu.add(confirm_Menu);
+
+		JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
+		setStatus_Menu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
+
+				SetStatusToItemDialog fm = new SetStatusToItemDialog(MainStatusesFrame.this, status);	
+				
+				
+		    	// обрабатываем полученные данные от диалогового окна
+		    	//if(fm.isOK()){
+                //    JOptionPane.showMessageDialog(Form1.this, "OK");
+                //}
+			
+			}
+		});
+		all_Statuses_Table_menu.add(setStatus_Menu);
+
+		statusesTable.setComponentPopupMenu(all_Statuses_Table_menu);
 		
-		
-//		Status_Info info = new Status_Info();
-//		info.show_001(null);
-		//this.Panel_Right_Panel.add(info);
-		 //this.jScrollPane_Panel_Right_Panel.setViewportView(info);
-				 search_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
-				// MENU
+		statusesTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				Point p = e.getPoint();
+				int row = statusesTable.rowAtPoint(p);
+				statusesTable.setRowSelectionInterval(row, row);
+				
+				if(e.getClickCount() == 2)
+				{
+					row = statusesTable.convertRowIndexToModel(row);
+					StatusCls status = tableModelItemStatuses.getStatus(row);
+		//			new StatusFrame(status);
 					
-					JPopupMenu all_Statuses_Table_menu = new JPopupMenu();
-					JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
-					confirm_Menu.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							/*
-							int row = statusesTable.getSelectedRow();
-							row = statusesTable.convertRowIndexToModel(row);
-
-							StatusCls status = tableModelStatuses.getStatus(row);
-							new StatusFrame(status);
-							*/
-							// открываем диалоговое окно ввода данных для подтверждения персоны 
-							StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
-
-					    	//StatusConfirmDialog fm = new StatusConfirmDialog(MainStatusesFrame.this, status);	
-					    	// обрабатываем полученные данные от диалогового окна
-					    	//if(fm.isOK()){
-			                //    JOptionPane.showMessageDialog(Form1.this, "OK");
-			                //}
-						
-						}
-					});
-					all_Statuses_Table_menu.add(confirm_Menu);
-
-					JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
-					setStatus_Menu.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-
-							StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
-
-							SetStatusToItemDialog fm = new SetStatusToItemDialog(MainStatusesFrame.this, status);	
-							
-							
-					    	// обрабатываем полученные данные от диалогового окна
-					    	//if(fm.isOK()){
-			                //    JOptionPane.showMessageDialog(Form1.this, "OK");
-			                //}
-						
-						}
-					});
-					all_Statuses_Table_menu.add(setStatus_Menu);
-
-					statusesTable.setComponentPopupMenu(all_Statuses_Table_menu);
-					
-					statusesTable.addMouseListener(new MouseAdapter() {
-						@Override
-						public void mousePressed(MouseEvent e) {
-							Point p = e.getPoint();
-							int row = statusesTable.rowAtPoint(p);
-							statusesTable.setRowSelectionInterval(row, row);
-							
-							if(e.getClickCount() == 2)
-							{
-								row = statusesTable.convertRowIndexToModel(row);
-								StatusCls status = tableModelItemStatuses.getStatus(row);
-					//			new StatusFrame(status);
-								
-							}
-						}
-					});
-				 
-				 
-				 
-				 
-				 
-		
-// My statuses		
-		
+				}
+			}
+		});
+	 
+			
+	// My statuses		
+			
 	Split_Panel my_Status_SplitPanel = new Split_Panel();
 	my_Status_SplitPanel.setName(Lang.getInstance().translate("My Statuses"));
 	my_Status_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
@@ -291,41 +314,41 @@ public MainStatusesFrame(){
 			
 				
 			
-					//CREATE SEARCH FIELD
-					final JTextField txtSearch = new JTextField();
-
-					// UPDATE FILTER ON TEXT CHANGE
-					txtSearch.getDocument().addDocumentListener(new DocumentListener() {
-						public void changedUpdate(DocumentEvent e) {
-							onChange();
-						}
-
-						public void removeUpdate(DocumentEvent e) {
-							onChange();
-						}
-
-						public void insertUpdate(DocumentEvent e) {
-							onChange();
-						}
-
-						public void onChange() {
-
-							// GET VALUE
-							String search = txtSearch.getText();
-
-						 	// SET FILTER
-					//		tableModelStatuses.getSortableList().setFilter(search);
-							statusesModel.fireTableDataChanged();
-							
-							RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-							((DefaultRowSorter) sorter1).setRowFilter(filter);
-							
-							statusesModel.fireTableDataChanged();
-							
-						}
-					});
-	
-	
+			//CREATE SEARCH FIELD
+			final JTextField txtSearch = new JTextField();
+			
+			// UPDATE FILTER ON TEXT CHANGE
+			txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+				public void changedUpdate(DocumentEvent e) {
+					onChange();
+				}
+			
+				public void removeUpdate(DocumentEvent e) {
+					onChange();
+				}
+			
+				public void insertUpdate(DocumentEvent e) {
+					onChange();
+				}
+			
+				public void onChange() {
+			
+					// GET VALUE
+					String search = txtSearch.getText();
+			
+				 	// SET FILTER
+			//		tableModelStatuses.getSortableList().setFilter(search);
+					statusesModel.fireTableDataChanged();
+					
+					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+					((DefaultRowSorter) sorter1).setRowFilter(filter);
+					
+					statusesModel.fireTableDataChanged();
+					
+				}
+			});
+			
+			
 
 					// set video			
 					//jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setModel(this.tableModelStatuses);
@@ -336,172 +359,70 @@ public MainStatusesFrame(){
 			my_Status_SplitPanel.jScrollPanel_LeftPanel.setViewportView(my_Status_SplitPanel.jTable_jScrollPanel_LeftPanel);		
 					
 					
-					
-					// select row table statuses
-					
-					 Status_Info info1 = new Status_Info();
-					 info1.setFocusable(false);
-					// JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info1)); 
-					 
-				//	 my_Status_SplitPanel.jTable_jScrollPanel_LeftPanel = table;
-					
-					 
-					 
-					// обработка изменения положения курсора в таблице
-					table.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-						@SuppressWarnings("deprecation")
-						@Override
-						public void valueChanged(ListSelectionEvent arg0) {
-							StatusCls status =null;
-							if (table.getSelectedRow() >= 0 )status = statusesModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
-							info1.show_001(status);
-						//	PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-							my_Status_SplitPanel.jSplitPanel.setDividerLocation(my_Status_SplitPanel.jSplitPanel.getDividerLocation());	
-							my_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-						}
-					});
-	
-	
-	
-					 my_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
-	
-	
-	
-	
-	
-	
-	
-	
-
-	this.jTabbedPane.add(my_Status_SplitPanel);
-	
-	this.jTabbedPane.add(search_Status_SplitPanel);
-	
-	
-	//Frame_All frame = new Frame_All();
-/*	
-	this.setTitle(Lang.getInstance().translate("Statuses"));
-	this.search_Label_Panel1_Tabbed_Panel_Left_Panel.setText(Lang.getInstance().translate("Search") +":"); 
-	this.search_Label_Panel2_Tabbed_Panel_Left_Panel.setText(Lang.getInstance().translate("Search") +":");
-	this.Search_jLabel.setText(Lang.getInstance().translate("Search") +":");
-	
-
-	
-	
-	
-	//CREATE TABLE
-	this.tableModelStatuses = new TableModelStatuses();
-	final JTable statusesTable = new JTable(this.tableModelStatuses);
-	TableColumnModel columnModel = statusesTable.getColumnModel(); // read column model
-	columnModel.getColumn(0).setMaxWidth((100));
-//Custom renderer for the String column;
-	statusesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	statusesTable.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-//CHECKBOX FOR FAVORITE
-	TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelStatuses.COLUMN_FAVORITE);
-	favoriteColumn.setCellRenderer(statusesTable.getDefaultRenderer(Boolean.class));
-//Sorter
-	RowSorter sorter =   new TableRowSorter(this.tableModelStatuses);
-	statusesTable.setRowSorter(sorter);	
-	// UPDATE FILTER ON TEXT CHANGE
-			this.search_TextField_Panel2_Tabbed_Panel_Left_Panel.getDocument().addDocumentListener(new DocumentListener() {
-				public void changedUpdate(DocumentEvent e) {
-					onChange();
-				}
-
-				public void removeUpdate(DocumentEvent e) {
-					onChange();
-				}
-
-				public void insertUpdate(DocumentEvent e) {
-					onChange();
-				}
-
-				public void onChange() {
-
-					// GET VALUE
-					String search = search_TextField_Panel2_Tabbed_Panel_Left_Panel.getText();
-
-				 	// SET FILTER
-			//		tableModelStatuses.getSortableList().setFilter(search);
-					tableModelStatuses.fireTableDataChanged();
-					
-					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-					((DefaultRowSorter) sorter).setRowFilter(filter);
-					
-					tableModelStatuses.fireTableDataChanged();
-					
-				}
-			});
-	
-	
-	
-	
-
-// set video			
-			jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setModel(this.tableModelStatuses);
-			jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel = statusesTable;
-			jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setViewportView(jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel); // statusesTable; 
-// select row table statuses
-			 Status_Info info = new Status_Info(); 
-	//		
-// обработка изменения положения курсора в таблице
-			 jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+			
+			// select row table statuses
+			
+			 Status_Info info1 = new Status_Info();
+			 info1.setFocusable(false);
+			// JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info1)); 
+			 
+		//	 my_Status_SplitPanel.jTable_jScrollPanel_LeftPanel = table;
+			
+			 
+			 
+			// обработка изменения положения курсора в таблице
+			table.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 				@SuppressWarnings("deprecation")
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
-					StatusCls status = null;
-					if (statusesTable.getSelectedRow() >= 0 ) status = tableModelStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
-					info.show_001(status);
-					
-					jSplitPane2.setDividerLocation(jSplitPane2.getDividerLocation());	
+					StatusCls status =null;
+					if (table.getSelectedRow() >= 0 )status = statusesModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
+					info1.show_001(status);
+					MainStatusesFrame.itemMy = status;
+
+				//	PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
+					my_Status_SplitPanel.jSplitPanel.setDividerLocation(my_Status_SplitPanel.jSplitPanel.getDividerLocation());	
+					my_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 				}
 			});
-	
-	
-	
-	
-//	Status_Info info = new Status_Info();
-//	info.show_001(null);
-	//this.Panel_Right_Panel.add(info);
-	 this.jScrollPane_Panel_Right_Panel.setViewportView(info);
-	
-	
-	
-	
-	
-	
-	
-	this.jSplitPane2.setDividerLocation(700);
-*/	
-	/*
-	Window w = SwingUtilities.getWindowAncestor(this);
-	Dimension d;
-	if (w != null)  d = w.getSize();
-*/	
-	this.pack();
-//	this.setSize(800,600);
-	this.setMaximizable(true);
-	
-	this.setClosable(true);
-	this.setResizable(true);
-//	this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
-	this.setLocation(20, 20);
-//	this.setIconImages(icons);
-	//CLOSE
-	setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-    this.setResizable(true);
-//    splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
-    //my_status_panel.requestFocusInWindow();
-    this.setVisible(true);
-    Rectangle k = this.getNormalBounds();
- //   this.setBounds(k);
-    Dimension size = MainFrame.desktopPane.getSize();
-    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
- // setDividerLocation(700)
 
- 	search_Status_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
- 	my_Status_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-}
+
+
+			my_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
+	
+		
+	
+		this.jTabbedPane.add(my_Status_SplitPanel);
+		
+		this.jTabbedPane.add(search_Status_SplitPanel);
+		
+		this.pack();
+	//	this.setSize(800,600);
+		this.setMaximizable(true);
+		
+		this.setClosable(true);
+		this.setResizable(true);
+	//	this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+		this.setLocation(20, 20);
+	//	this.setIconImages(icons);
+		//CLOSE
+		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+	    this.setResizable(true);
+	//    splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+	    //my_status_panel.requestFocusInWindow();
+	    this.setVisible(true);
+	    Rectangle k = this.getNormalBounds();
+	 //   this.setBounds(k);
+	    Dimension size = MainFrame.desktopPane.getSize();
+	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	 // setDividerLocation(700)
+	
+	 	search_Status_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	 	my_Status_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+
+	}
+	
+	static private ItemCls itemAll;
+	static private ItemCls itemMy;
 
 }

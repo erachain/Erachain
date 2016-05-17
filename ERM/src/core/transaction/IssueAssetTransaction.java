@@ -88,11 +88,17 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		return BigDecimal.ZERO.setScale(8);
 	}
-	
+
+	/*
 	@Override
 	public BigDecimal getAmount(Account account) {
 		String address = account.getAddress();
 		return getAmount(address);
+	}
+	*/
+
+	public String viewAmount(String address) {
+		return this.getAmount().toString();
 	}
 
 	/*

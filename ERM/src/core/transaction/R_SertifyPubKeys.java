@@ -40,6 +40,7 @@ import database.ItemAssetBalanceMap;
 import ntp.NTP;
 import database.DBSet;
 import utils.Converter;
+import utils.DateTimeFormat;
 
 // if person has not ALIVE status - add it
 // end_day = this.add_day + this.timestanp(days)
@@ -79,7 +80,10 @@ public class R_SertifyPubKeys extends Transaction {
 
 		this.key = key;
 		this.sertifiedPublicKeys = sertifiedPublicKeys;
-		this.add_day = add_day;		
+		if (add_day == 0)
+			// set to_date to default
+			add_day = DEFAULT_DURATION;
+		this.add_day = add_day;
 	}
 
 	public R_SertifyPubKeys(int version, PublicKeyAccount creator, byte feePow, long key,
@@ -189,6 +193,18 @@ public class R_SertifyPubKeys extends Transaction {
 		return typeBytes[2];
 	}
 			
+	//////// VIEWS
+	@Override
+	public String viewAmount(String address) {
+		return add_day>0?"+" + add_day: "" + add_day;
+	}
+
+	@Override
+	public String viewRecipient() {
+		return Base58.encode( this.sertifiedPublicKeys.get(0).getPublicKey());
+	}
+
+	//////////////
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 
@@ -411,12 +427,6 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
-
-		//CHECK END_DAY
-		if(add_day < 0)
-		{
-			return INVALID_DATE;
-		}
 	
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
@@ -464,11 +474,8 @@ public class R_SertifyPubKeys extends Transaction {
 				pkAccount.getConfirmedBalance(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
 		int add_day = this.add_day;
-		if (add_day == 0)
-			// set to_date to default
-			add_day = DEFAULT_DURATION;
 		// set to time stamp of record
-		int  end_day = (int)(this.timestamp / 86400000) + add_day;
+		int end_day = (int)(this.timestamp / 86400000) + add_day;
 		
 		Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
 				//Controller.getInstance().getHeight(), this.signature);

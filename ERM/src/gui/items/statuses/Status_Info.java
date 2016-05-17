@@ -51,6 +51,7 @@ public class Status_Info extends JTextPane {
 	public void show_001(StatusCls status){
 		
 		setText("<html>" + Get_HTML_Status_Info_001(status) + "</html>");
+		
 		return;
 	}	
 
