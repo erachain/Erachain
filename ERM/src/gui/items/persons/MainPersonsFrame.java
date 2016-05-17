@@ -179,7 +179,7 @@ public MainPersonsFrame(){
 							new PersonFrame(person);
 							*/
 							// открываем диалоговое окно ввода данных для подтверждения персоны 
-							PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+							PersonCls person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
 
 					    	PersonConfirmDialog fm = new PersonConfirmDialog(MainPersonsFrame.this, person);	
 					    	// обрабатываем полученные данные от диалогового окна
@@ -195,7 +195,7 @@ public MainPersonsFrame(){
 					setStatus_Menu.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 
-							PersonCls person = tableModelPersons.getPerson(personsTable.getSelectedRow());
+							PersonCls person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
 
 							PersonSetStatusDialog fm = new PersonSetStatusDialog(MainPersonsFrame.this, person);	
 							
@@ -292,10 +292,11 @@ public MainPersonsFrame(){
 				
 			
 					//CREATE SEARCH FIELD
-					final JTextField txtSearch = new JTextField();
+				//	final JTextField txtSearch = new JTextField();
 
 					// UPDATE FILTER ON TEXT CHANGE
-					txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+				//	txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+					my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
 						public void changedUpdate(DocumentEvent e) {
 							onChange();
 						}
@@ -311,8 +312,8 @@ public MainPersonsFrame(){
 						public void onChange() {
 
 							// GET VALUE
-							String search = txtSearch.getText();
-
+						//	String search = txtSearch.getText();
+							String search = my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
 						 	// SET FILTER
 					//		tableModelPersons.getSortableList().setFilter(search);
 							personsModel.fireTableDataChanged();
