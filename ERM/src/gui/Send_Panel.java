@@ -2,7 +2,7 @@ package gui;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
-import gui.models.MessagesTableModel;
+import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
@@ -59,7 +59,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SendAssetPanel extends JPanel
+public class Send_Panel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -79,7 +79,7 @@ public class SendAssetPanel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SendAssetPanel(AssetCls asset, Account account)
+	public Send_Panel(AssetCls asset, Account account)
 	{
 		
 		if (asset == null)
@@ -390,7 +390,7 @@ public class SendAssetPanel extends JPanel
 		
 		//MESSAGES HISTORY TABLE
 
-    	table = new MessagesTableModel();
+    	table = new Send_TableModel();
     	
     	table.setTableHeader(null);
     	table.setSelectionBackground(new Color(209, 232, 255, 255));
@@ -420,7 +420,7 @@ public class SendAssetPanel extends JPanel
     	{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	((MessagesTableModel) table).CryptoOpenBoxAll();
+		    	((Send_TableModel) table).CryptoOpenBoxAll();
 		    }
 		});	
 

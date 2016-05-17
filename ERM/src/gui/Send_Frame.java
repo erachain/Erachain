@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JScrollPane;
 
-import gui.SendAssetPanel;
+import gui.Send_Panel;
 //import gui.items.persons.IssuePersonFrame;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonFrame;
@@ -49,7 +49,7 @@ public class Send_Frame extends JInternalFrame{
 	public Send_Frame (AssetCls asset, Account account)
 	{
 	
-		SendAssetPanel panel = new SendAssetPanel(asset, account);
+		Send_Panel panel = new Send_Panel(asset, account);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         
        //SHOW FRAME

@@ -36,7 +36,7 @@ import gui.ConsolePanel;
 import gui.Gui;
 import gui.PasswordPane;
 import gui.CoreRowSorter;
-import gui.SendAssetPanel;
+import gui.Send_Panel;
 import gui.items.assets.AssetsPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.naming.NamingServicePanel;
@@ -248,7 +248,7 @@ public class SysTray implements Observer{
 				    frame.setSize(800, 600);
 				    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				    frame.setVisible(true);
-					SendAssetPanel ap = new SendAssetPanel(null, null);
+					Send_Panel ap = new Send_Panel(null, null);
 					frame.getContentPane().add(ap);
 					
 			}

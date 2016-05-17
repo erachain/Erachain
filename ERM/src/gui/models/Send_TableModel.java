@@ -53,11 +53,11 @@ import utils.ObserverMessage;
 import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class MessagesTableModel extends JTable implements Observer{
+public class Send_TableModel extends JTable implements Observer{
 	
 	
 	private static final Logger LOGGER = Logger
-			.getLogger(MessagesTableModel.class);
+			.getLogger(Send_TableModel.class);
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
@@ -70,7 +70,7 @@ public class MessagesTableModel extends JTable implements Observer{
 	int width;
 	int fontHeight;
 	
-	public MessagesTableModel()
+	public Send_TableModel()
 	{
 		this.setShowGrid(false);
 
@@ -133,7 +133,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
-		        MessagesTableModel invokerAsJComponent = (MessagesTableModel) invoker;
+		        Send_TableModel invokerAsJComponent = (Send_TableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -172,7 +172,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        MessagesTableModel invokerAsJComponent = (MessagesTableModel) invoker;
+		        Send_TableModel invokerAsJComponent = (Send_TableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -192,7 +192,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        MessagesTableModel invokerAsJComponent = (MessagesTableModel) invoker;
+		        Send_TableModel invokerAsJComponent = (Send_TableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -213,7 +213,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        MessagesTableModel invokerAsJComponent = (MessagesTableModel) invoker;
+		        Send_TableModel invokerAsJComponent = (Send_TableModel) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -235,7 +235,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				{
 					if(e.getClickCount() == 2) 
 					{
-						MessagesTableModel tableModelparent = (MessagesTableModel) e.getSource();
+						Send_TableModel tableModelparent = (Send_TableModel) e.getSource();
 						
 				        Point p = e.getPoint();
 					    int row = tableModelparent.rowAtPoint(p);
@@ -404,8 +404,8 @@ public class MessagesTableModel extends JTable implements Observer{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
-				transaction.getCreator().getAddress(),
-				transaction.getRecipient().getAddress(),
+				transaction.getCreator().asPerson(),
+				transaction.getRecipient().asPerson(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),
 				transaction.getKey(),
