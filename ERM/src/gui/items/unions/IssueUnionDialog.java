@@ -85,7 +85,7 @@ public class IssueUnionDialog extends JDialog //JFrame
 		
 	
 //		this.setMaximizable(true);
-		this.setTitle(Lang.getInstance().translate("Issue Union"));
+		this.setTitle(Lang.getInstance().translate("Establish a new Union"));
 //		this.setClosable(true);
 		this.setResizable(true);
 		setPreferredSize(new Dimension(800, 600));

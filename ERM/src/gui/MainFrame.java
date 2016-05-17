@@ -25,6 +25,7 @@ import javax.swing.event.AncestorListener;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
 import gui.items.persons.MainPersonsFrame;
+import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -134,16 +135,38 @@ private JFrame parent;
 		});
 		Toolbar_Main.add(button5_MainToolBar);
 		        	
+		JButton button6_MainToolBar = new JButton();
+		button6_MainToolBar.setText(Lang.getInstance().translate("Statuses"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button6_MainToolBar.setFocusable(false);
+		button6_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button6_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button6_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button6_MainToolBar);
+		        	
+		JButton button7_MainToolBar = new JButton();
+		button7_MainToolBar.setText(Lang.getInstance().translate("Records"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button7_MainToolBar.setFocusable(false);
+		button7_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button7_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button7_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new RecordsFrame(parent), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button7_MainToolBar);
 		        	
 		        
 				//add(tb1, BorderLayout.NORTH); 
 				add(Toolbar_Main, BorderLayout.NORTH);
 
-			
+		
 
-	
-		
-		
 		//MENU
         Menu menu = new Menu(this);
 
@@ -153,9 +176,8 @@ private JFrame parent;
         
         // создаем рабочий стол Swing
         desktopPane = new JDesktopPane();
-     //   bqColor bq = new bqColor();
-        desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
-      //  setSelectionBackground(new Color(209, 232, 255, 255))
+        //desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
+        desktopPane.setBackground(MainFrame.getFrames()[0].getBackground());
 
         /*
         JInternalFrame item = new AccountsFrame(this);
@@ -186,21 +208,15 @@ private JFrame parent;
         frame1.setVisible(true);
         frame1.setMaximizable(true);
         frame1.setTitle(Lang.getInstance().translate("Old Panels"));
-    //    frame1.setClosable(true);
+        //frame1.setClosable(true);
         frame1.setResizable(true);
+        
+        
         //ADD GENERAL TABPANE TO FRAME
         desktopPane.add(frame1);
         
-       // JInternalFrame Jfacc = new AccountsPanel();
-        
-        //desktopPane.add(new IssuePersonFrame());
-    //    desktopPane.add(new AccountsPanel());
-       
-       
-     // new PersonConfirm(); 
-        //STATS
+        // WALLET STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
-   //     this.add(new Person1());
         
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter()

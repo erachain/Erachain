@@ -19,7 +19,7 @@ import lang.Lang;
 
 // Info for status
 public class Status_Info extends JTextPane {
-	private static final long serialVersionUID = 4763074704570450206L;	
+	private static final long serialVersionUID = 476307470457045006L;	
 	
 	public  Status_Info() {
 	

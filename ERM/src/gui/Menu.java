@@ -1,67 +1,42 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import core.transaction.Transaction;
-import database.wallet.TransactionMap;
 import gui.AccountsFrame;
-//import gui.SendMoneyFrame;
 import gui.SendAssetFrame;
 import gui.items.assets.IssueAssetDialog;
 import gui.items.assets.MainAssetsFrame;
-import gui.items.imprints.ImprintsPanel;
 import gui.items.imprints.MainImprintsFrame;
 import gui.items.persons.IssuePersonDialog;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.RIPPersonFrame;
-//import gui.items.persons.MyPersonsPanel;
-//import gui.items.persons.PersonsPanel;
-//import gui.items.persons.SearchPersons;
 import gui.items.statuses.MainStatusesFrame;
-//import gui.items.statuses.AllStatusesPanel;
 import gui.items.statuses.IssueStatusDialog;
-import gui.items.unions.AllUnionsFrame;
 import gui.items.unions.IssueUnionDialog;
-import gui.items.unions.IssueUnionFrame;
 import gui.items.unions.MainUnionsFrame;
-//import gui.items.unions.IssueUnionPanel;
-import gui.models.WalletTransactionsTableModel;
 import gui.settings.SettingsFrame;
-import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import settings.Settings;
 import utils.URLViewer;
@@ -75,7 +50,6 @@ public class Menu extends JMenuBar
 	public static JMenuItem lockItem;
 	private ImageIcon lockedIcon;
 	private ImageIcon unlockedIcon;
-	private JFrame parent;
 
 	private static final Logger LOGGER = Logger.getLogger(Menu.class);
 
@@ -83,7 +57,7 @@ public class Menu extends JMenuBar
 	{
 		super();
 		
-		this.parent = parent;
+		//this.parent = parent;
 				
 		//FILE MENU
         JMenu fileMenu = new JMenu(Lang.getInstance().translate("File"));
@@ -111,14 +85,6 @@ public class Menu extends JMenuBar
         personsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons menu"));
         this.add(personsMenu);
 
-        JMenu statusesMenu = new JMenu(Lang.getInstance().translate("Statuses"));
-        statusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statuses menu"));
-        this.add(statusesMenu);
-
-        JMenu unionsMenu = new JMenu(Lang.getInstance().translate("Unions"));
-        unionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Unions menu"));
-        this.add(unionsMenu);
-
         JMenu assetsMenu = new JMenu(Lang.getInstance().translate("Assets"));
         assetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assets menu"));
         this.add(assetsMenu);
@@ -126,6 +92,14 @@ public class Menu extends JMenuBar
         JMenu imprintsMenu = new JMenu(Lang.getInstance().translate("Imprints"));
         imprintsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints menu"));
         this.add(imprintsMenu);
+
+        JMenu unionsMenu = new JMenu(Lang.getInstance().translate("Unions"));
+        unionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Unions menu"));
+        this.add(unionsMenu);
+
+        JMenu statusesMenu = new JMenu(Lang.getInstance().translate("Statuses"));
+        statusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statuses menu"));
+        this.add(statusesMenu);
 
         JMenu recordsMenu = new JMenu(Lang.getInstance().translate("Records"));
         recordsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records menu"));
@@ -393,20 +367,6 @@ public class Menu extends JMenuBar
         recordsMenu.add(recordsMenuList);
         
         ///// STATUSES
-        JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
-        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
-   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        assignStatusMenu.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-             
-        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
-        		
-        	}
-        });
-        statusesMenu.add(assignStatusMenu);  
-
         JMenuItem allStatusesMenu = new JMenuItem(Lang.getInstance().translate("List"));
         allStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Statuses"));
    //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
@@ -422,6 +382,22 @@ public class Menu extends JMenuBar
         });
         statusesMenu.add(allStatusesMenu);  
         statusesMenu.addSeparator();
+        
+        JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
+        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
+   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        assignStatusMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        statusesMenu.add(assignStatusMenu);  
+        statusesMenu.addSeparator();
+
         
         JMenuItem issueStatusesMenu = new JMenuItem(Lang.getInstance().translate("New"));
         issueStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("New Status"));
@@ -458,11 +434,12 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        unionsMenu.add(allUnionsMenu);  
+        unionsMenu.add(allUnionsMenu);
+        statusesMenu.addSeparator();
         
         // issue Person menu
-        JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Set Union"));
-        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Set Union"));
+        JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Establish"));
+        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Establish a new Union"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
         issueUnionMenu.addActionListener(new ActionListener()
         {
@@ -475,25 +452,9 @@ public class Menu extends JMenuBar
         	}
         });
         unionsMenu.add(issueUnionMenu);  
-        
 
-     // issue asset menu
-        JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
-        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue asset"));
-   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        issueAssetMenu.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-             
-        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
-        		new IssueAssetDialog();
-        		
-        	}
-        });
-        assetsMenu.add(issueAssetMenu);  
-
-        // issue asset menu
+        // ASSETS
+        // ALL ASSETS
         JMenuItem allAssetsMenu = new JMenuItem(Lang.getInstance().translate("All assets"));
         allAssetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All assets"));
    //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
@@ -508,15 +469,26 @@ public class Menu extends JMenuBar
         	}
         });
         assetsMenu.add(allAssetsMenu);  
-        
-        
-        
-    
-        
+        statusesMenu.addSeparator();
+
+        // issue asset menu
+        JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
+        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue asset"));
+        // searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueAssetMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssueAssetDialog();
+        		
+        	}
+        });
+        assetsMenu.add(issueAssetMenu);  
 
         
 	}
-	
 	
 	// подпрограмма выводит в панели окно или передает фокус если окно уже открыто
 	// item открываемое окно
@@ -552,8 +524,6 @@ public class Menu extends JMenuBar
 				e1.printStackTrace();
 			}
 		}	
-		
-		
 	
 	}
 }

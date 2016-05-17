@@ -46,10 +46,10 @@ import core.item.unions.UnionCls;
 import database.DBSet;
 import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
-import gui.items.unions.AllUnionsPanel;
+//import gui.items.unions.AllUnionsPanel;
 import gui.items.unions.UnionFrame;
 import gui.items.statuses.TableModelItemStatuses;
-import gui.items.unions.IssueUnionFrame;
+//import gui.items.unions.IssueUnionFrame;
 import gui.models.Renderer_Right;
 //import gui.items.unions.MyOrdersFrame;
 //import gui.items.unions.PayDividendFrame;
@@ -319,12 +319,12 @@ public class MyUnionsPanel extends JPanel
 	
 	public void onIssueClick()
 	{
-		new IssueUnionFrame();
+		new IssueUnionDialog();
 	}
 	
 	public void onAllClick()
 	{
-		new AllUnionsPanel();
+		//new AllUnionsPanel();
 	}
 	
 	public void onMyOrdersClick()

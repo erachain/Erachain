@@ -10,14 +10,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-//import java.math.BigDecimal;
-import java.sql.*;
-import java.text.ParseException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,7 +22,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.MaskFormatter;
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
@@ -41,20 +36,9 @@ public class IssueStatusDialog extends JDialog //JFrame
 	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
-	private JTextField txtBirthday;
-	private JTextField txtDeathday;
-	@SuppressWarnings("rawtypes")
-	private JComboBox txtGender;
-	private JTextField txtRace;
-	private JTextField txtBirthLatitude;
-	private JTextField txtBirthLongitude;
-	private JTextField txtSkinColor;
-	private JTextField txtEyeColor;
-	private JTextField txtHairСolor;
-	private JTextField txtHeight;
 	private JButton issueButton;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	//@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssueStatusDialog()
 	{
 		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Status"));
@@ -162,140 +146,12 @@ public class IssueStatusDialog extends JDialog //JFrame
       	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(scrollDescription, txtGBC);
       	      	
-      	//LABEL GENDER
-      	labelGBC.gridy = gridy;
-      	JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");
-      	this.add(genderLabel, labelGBC);
-      	
-      	
-      	String[] items = {
-      			Lang.getInstance().translate("Male"),
-      			Lang.getInstance().translate("Female"),
-      			Lang.getInstance().translate("-")
-        	};	
-      	//TXT GENDER
-      	txtGBC.gridy = gridy++;
-      	//this.txtGender = new JTextField();
-      	txtGender = new JComboBox(items);
-      	//this.txtGender.setText("1");
-        this.add(this.txtGender, txtGBC);
-        
-        
-        
-        //LABEL Birthday
-      	labelGBC.gridy = gridy;
-      	JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
-      	this.add(birthdayLabel, labelGBC);
-      		
-      	//TXT Birthday
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthday = new JTextField();
-      	// Маска ввода
-      	MaskFormatter mf1 = null;
-      	try {
-			 mf1 = new MaskFormatter("####-##-##");
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-      	this.txtBirthday = new JFormattedTextField(mf1); 
-      	this.txtBirthday.setText("1970-12-08");
-        this.add(this.txtBirthday, txtGBC);
-        
-        //LABEL DEATHDAY
-      	labelGBC.gridy = gridy;
-      	this.add(new JLabel(Lang.getInstance().translate("Deathday") + ":"), labelGBC);
-      		
-      	//TXT DEATHDAY
-      	txtGBC.gridy = gridy++;
-      	this.txtDeathday = new JTextField();
-      	this.txtDeathday = new JFormattedTextField(mf1); 
-      	this.txtDeathday.setText("0000-00-00");
-        this.add(this.txtDeathday, txtGBC);
-        
-        //LABEL RACE
-      	labelGBC.gridy = gridy;
-      	JLabel raceLabel = new JLabel(Lang.getInstance().translate("Race") + ":");
-      	this.add(raceLabel, labelGBC);
-      		
-      	//TXT RACE
-      	txtGBC.gridy = gridy++;
-      	this.txtRace = new JTextField();
-      	this.txtRace.setText("-");
-        this.add(this.txtRace, txtGBC);
-      	
-        //LABEL birthLatitude
-      	labelGBC.gridy = gridy;
-      	JLabel birthLatitudeLabel = new JLabel(Lang.getInstance().translate("Birth Latitude") + ":");
-      	this.add(birthLatitudeLabel, labelGBC);
-      		
-      	//TXT birthLatitude
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthLatitude = new JTextField();
-      	this.txtBirthLatitude.setText("45.123");
-        this.add(this.txtBirthLatitude, txtGBC);
-      	
-        //LABEL birthLongitude
-      	labelGBC.gridy = gridy;
-      	JLabel birthLongitudeLabel = new JLabel(Lang.getInstance().translate("Birth Longitude") + ":");
-      	this.add(birthLongitudeLabel, labelGBC);
-      		
-      	//TXT birthLongitude
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthLongitude = new JTextField();
-      	this.txtBirthLongitude.setText("12.123");
-        this.add(this.txtBirthLongitude, txtGBC);
-
-        //LABEL skinColor
-      	labelGBC.gridy = gridy;
-      	JLabel skinColorLabel = new JLabel(Lang.getInstance().translate("Skin Color") + ":");
-      	this.add(skinColorLabel, labelGBC);
-      		
-      	//TXT skinColor
-      	txtGBC.gridy = gridy++;
-      	this.txtSkinColor = new JTextField();
-      	this.txtSkinColor.setText("");
-        this.add(this.txtSkinColor, txtGBC);
-
-        //LABEL eyeColor
-      	labelGBC.gridy = gridy;
-      	JLabel eyeColorLabel = new JLabel(Lang.getInstance().translate("Eye Color") + ":");
-      	this.add(eyeColorLabel, labelGBC);
-      		
-      	//TXT eyeColor
-      	txtGBC.gridy = gridy++;
-      	this.txtEyeColor = new JTextField();
-      	this.txtEyeColor.setText("");
-        this.add(this.txtEyeColor, txtGBC);
-
-        //LABEL hairСolor
-      	labelGBC.gridy = gridy;
-      	JLabel hairСolorLabel = new JLabel(Lang.getInstance().translate("Hair Сolor") + ":");
-      	this.add(hairСolorLabel, labelGBC);
-      		
-      	//TXT hairСolor
-      	txtGBC.gridy = gridy++;
-      	this.txtHairСolor = new JTextField();
-      	this.txtHairСolor.setText("");
-        this.add(this.txtHairСolor, txtGBC);
-
-        //LABEL height
-      	labelGBC.gridy = gridy;
-      	JLabel heightLabel = new JLabel(Lang.getInstance().translate("Height") + ":");
-      	this.add(heightLabel, labelGBC);
-      		
-      	//TXT height
-      	txtGBC.gridy = gridy++;
-      	this.txtHeight = new JTextField();
-      	this.txtHeight.setText("170");
-        this.add(this.txtHeight, txtGBC);
-
         //LABEL FEE POW
       	labelGBC.gridy = gridy;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power (0..6)") + ":");
       	this.add(feeLabel, labelGBC);
       		
-      	//TXT FEE
+      	//TXT FEE POW
       	txtGBC.gridy = gridy++;
       	this.txtFeePow = new JTextField();
       	this.txtFeePow.setText("0");
@@ -360,46 +216,11 @@ public class IssueStatusDialog extends JDialog //JFrame
 
 		int parse = 0;
 		int feePow = 0;
-		byte gender = 0;
-		long birthday = 0;
-		long deathday = 0;
-		float birthLatitude = 0;
-		float birthLongitude = 0;
-		int height = 0;
 		try
 		{
 			
 			//READ FEE POW
 			feePow = Integer.parseInt(this.txtFeePow.getText());
-
-			//READ GENDER
-			parse++;
-			gender = (byte) (this.txtGender.getSelectedIndex());
-			
-			parse++;
-			//birthday = Long.parseLong(this.txtBirthday.getText());
-			// 1970-08-12 03:05:07
-			String str = this.txtBirthday.getText();
-			if (str.length() < 11) str = str + " 00:00:00";
-			birthday = Timestamp.valueOf(str).getTime();
-
-			parse++;
-			str = this.txtDeathday.getText();
-			if (str.equals("0000-00-00")) {
-				deathday = birthday -1;
-			} else {
-				if (str.length() < 11) str = str + " 00:00:00";
-				deathday = Timestamp.valueOf(str).getTime();
-			}
-
-			parse++;
-			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
-			
-			parse++;
-			birthLongitude = Float.parseFloat(this.txtBirthLongitude.getText());
-
-			parse++;
-			height = Integer.parseInt(this.txtHeight.getText());
 			
 		}
 		catch(Exception e)
@@ -409,24 +230,6 @@ public class IssueStatusDialog extends JDialog //JFrame
 			{
 			case 0:
 				mess = "Invalid fee power 0..6";
-				break;
-			case 1:
-				mess = "Invalid gender";
-				break;
-			case 2:
-				mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-				break;
-			case 3:
-				mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-				break;
-			case 4:
-				mess = "Invalid birth Latitude -180..180";
-				break;
-			case 5:
-				mess = "Invalid birth Longitude -90..90";
-				break;
-			case 6:
-				mess = "Invalid height 10..255 ";
 				break;
 			}
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
