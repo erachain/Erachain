@@ -205,7 +205,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 				new StatusFrame(status);
 				*/
 				// открываем диалоговое окно ввода данных для подтверждения персоны 
-				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
+				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
 
 		    	//StatusConfirmDialog fm = new StatusConfirmDialog(MainStatusesFrame.this, status);	
 		    	// обрабатываем полученные данные от диалогового окна
@@ -222,7 +222,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		setStatus_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
+				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
 
 				SetStatusToItemDialog fm = new SetStatusToItemDialog(MainStatusesFrame.this, status);	
 				

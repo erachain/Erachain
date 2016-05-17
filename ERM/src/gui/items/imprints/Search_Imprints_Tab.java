@@ -53,11 +53,11 @@ public Search_Imprints_Tab(){
 	imprintsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 	imprintsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 //CHECKBOX FOR FAVORITE
-	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
+//	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
 //	favoriteColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));
-	favoriteColumn.setMinWidth(50);
-	favoriteColumn.setMaxWidth(50);
-	favoriteColumn.setPreferredWidth(50);//.setWidth(30);
+//	favoriteColumn.setMinWidth(50);
+//	favoriteColumn.setMaxWidth(50);
+//	favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 // column #1
 	TableColumn column1 = imprintsTable.getColumnModel().getColumn(WalletItemImprintsTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
 	column1.setMinWidth(1);

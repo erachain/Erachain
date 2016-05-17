@@ -144,7 +144,7 @@ public MainUnionsFrame (){
 		confirm_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 // открываем диалоговое окно ввода данных для подтверждения персоны 
-				UnionCls union = tableModelUnions.getUnion(unionsTable.getSelectedRow());
+				UnionCls union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
 				new UnionConfirmDialog(MainUnionsFrame.this, union);
 			}
 		});
@@ -153,7 +153,7 @@ public MainUnionsFrame (){
 		JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
 		setStatus_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UnionCls union = tableModelUnions.getUnion(unionsTable.getSelectedRow());
+				UnionCls union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
 				new UnionSetStatusDialog(MainUnionsFrame.this, union);		
 			}
 		});
