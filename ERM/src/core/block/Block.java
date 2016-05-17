@@ -38,6 +38,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import database.DBSet;
+import lang.Lang;
 
 
 public class Block {
@@ -610,6 +611,7 @@ public class Block {
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].refence invalid");
 			return false;
 		}
 
@@ -617,28 +619,33 @@ public class Block {
 		if(true & (this.timestamp - 500 > NTP.getTime()
 				|| this.timestamp < this.getParent(db).timestamp))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].timestamp invalid");
 			return false;
 		}
 
 		//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
 		if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].timestamp % 1000 invalid");
 			return false;
 		}
 
 		//CHECK IF GENERATING BALANCE IS CORRECT
 		if(this.generatingBalance != BlockGenerator.getNextBlockGeneratingBalance(db, this.getParent(db)))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].generatingBalance invalid");
 			return false;
 		}
 
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].version invalid");
 			return false;
 		}
 		if(this.version < 2 && (this.atBytes.length > 0 || this.atFees != 0))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].version AT invalid");
 			return false;
 		}
 
@@ -665,12 +672,14 @@ public class Block {
 		//CHECK IF HASH LOWER THEN TARGET
 		if(hashValue.compareTo(target) >= 0)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].target invalid");
 			return false;
 		}
 
 		//CHECK IF FIRST BLOCK OF USER	
 		if(hashValue.compareTo(lowerTarget) < 0)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].lowerTarget invalid");
 			return false;
 		}
 
@@ -708,17 +717,20 @@ public class Block {
 				DeployATTransaction atTx = (DeployATTransaction)transaction;
 				if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 				{
+					LOGGER.error("Block[" + this.getHeight(db) + "].atTx invalid");
 					return false;
 				}
 			}
 			else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 			{
+				LOGGER.error("Block[" + this.getHeight(db) + "].Tx invalid");
 				return false;
 			}
 
 			//CHECK TIMESTAMP AND DEADLINE
 			if(transaction.getTimestamp() > this.timestamp || transaction.getDeadline() <= this.timestamp)
 			{
+				LOGGER.error("Block[" + this.getHeight(db) + "].TX.timestamp invalid");
 				return false;
 			}
 

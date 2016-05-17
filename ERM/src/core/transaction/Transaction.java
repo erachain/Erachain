@@ -143,7 +143,7 @@ public abstract class Transaction {
 	public static final int SET_UNION_TO_ITEM_TRANSACTION = 35;
 	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 36;
 	// confirms other transactions
-	public static final int CONFIRM_TRANSACTION = 40;
+	public static final int VOUCH_TRANSACTION = 40;
 	// exchange of assets
 	public static final int CREATE_ORDER_TRANSACTION = 50;
 	public static final int CANCEL_ORDER_TRANSACTION = 51;
