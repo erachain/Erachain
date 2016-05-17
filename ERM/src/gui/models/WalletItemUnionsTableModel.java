@@ -22,7 +22,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 	
 	private SortableList<Tuple2<String, String>, UnionCls> unions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
 	
 	public WalletItemUnionsTableModel()
 	{
