@@ -12,7 +12,7 @@ import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
-import core.transaction.PaymentTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 //import ntp.NTP;
@@ -20,6 +20,7 @@ import database.DBSet;
 public class GeneratorTests {
 
 	byte FEE_KEY = 1;
+	byte FEE_POWER = (byte)0;
 	
 	@Test
 	public void addManyTransactionsWithDifferentFees()
@@ -54,7 +55,7 @@ public class GeneratorTests {
 			long timestamp = newBlock.getTimestamp() + i - 10000;
 						 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB

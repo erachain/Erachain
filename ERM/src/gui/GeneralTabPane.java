@@ -39,55 +39,9 @@ public class GeneralTabPane extends JTabbedPane{
 	{
 		super();
 		
-		//ACCOUNTS
-		//this.addTab(Lang.getInstance().translate("Accounts"), new AccountsPanel(null));
-        
-		//STATEMENT
-		//this.addTab(Lang.getInstance().translate("Statement"), new RecordNotePanel());
-
-		//SEND
-		this.addTab(Lang.getInstance().translate("Send money"), new SendCompuPanel());
-
-		//MESSAGE
-		//this.addTab(Lang.getInstance().translate("Messages"), new SendMessagePanel(null, null, null));
 			   
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
-		/*
-		//TRANSACTIONS
-		this.transactionsModel = new WalletTransactionsTableModel();
-		this.transactionsTable = new JTable(this.transactionsModel);
-		
-		//TRANSACTIONS SORTER
-		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
-		transactionsTable.setRowSorter(sorter);
-		
-		//TRANSACTION DETAILS
-		this.transactionsTable.addMouseListener(new MouseAdapter() 
-		{
-			public void mouseClicked(MouseEvent e) 
-			{
-				if(e.getClickCount() == 2) 
-				{
-					//GET ROW
-			        int row = transactionsTable.getSelectedRow();
-			        row = transactionsTable.convertRowIndexToModel(row);
-			        
-			        //GET TRANSACTION
-			        Transaction transaction = transactionsModel.getTransaction(row);
-			         
-			        //SHOW DETAIL SCREEN OF TRANSACTION
-			        TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-			    }
-			}
-		});			
-		this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable));       
-		*/
 		
 		//TRANSACTIONS
 		WalletBlocksTableModel blocksModel = new WalletBlocksTableModel();

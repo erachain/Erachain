@@ -43,9 +43,8 @@ import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.PaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
@@ -53,7 +52,6 @@ import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import core.transaction.TransferAssetTransaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
@@ -123,24 +121,7 @@ public class TransactionCreator
 			}
 		}
 	}
-	
-	public Pair<Transaction, Integer> createPayment(PrivateKeyAccount sender, Account recipient, BigDecimal amount, int feePow)
-	{
-		//CHECK FOR UPDATES
-		this.checkUpdate();
 		
-		//TIME
-		long time = NTP.getTime();
-		
-		//CREATE PAYMENT
-		//PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, feePow, time, sender.getLastReference(this.fork));
-		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, (byte)feePow, time, sender.getLastReference(this.fork));
-		payment.sign(sender, false);
-		
-		//VALIDATE AND PROCESS
-		return this.afterCreate(payment, false);
-	}
-	
 	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow)
 	{
 		//CHECK FOR UPDATES
@@ -421,22 +402,6 @@ public class TransactionCreator
 		return this.afterCreate(cancelOrderTransaction, false);
 	}
 		
-	public Pair<Transaction, Integer> createAssetTransfer(PrivateKeyAccount creator, Account recipient, AssetCls asset, BigDecimal amount, int feePow)
-	{
-		//CHECK FOR UPDATES
-		this.checkUpdate();
-		
-		//TIME
-		long time = NTP.getTime();
-				
-		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(creator, recipient, asset.getKey(), amount, (byte)feePow, time, creator.getLastReference(this.fork));
-		assetTransfer.sign(creator, false);
-		
-		//VALIDATE AND PROCESS
-		return this.afterCreate(assetTransfer, false);
-	}
-		
 	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow)
 	{
 		//CHECK FOR UPDATES
@@ -469,7 +434,7 @@ public class TransactionCreator
 		
 	}
 	
-	public Pair<Transaction, Integer> createMessage(PrivateKeyAccount creator,
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
@@ -480,7 +445,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new MessageTransaction(creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
 		return afterCreate(messageTx, false);

@@ -15,7 +15,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 //import core.transaction.GenesisTransaction;
-import core.transaction.PaymentTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 
@@ -111,7 +111,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB
@@ -163,7 +163,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB

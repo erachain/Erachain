@@ -3,6 +3,7 @@ package gui;
 import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
 import gui.models.MessagesTableModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
 
@@ -62,6 +63,8 @@ public class SendAssetPanel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
+    // TODO - "A" - &
+    final static String wrongFirstCharOfAddress = "A";
     
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtTo;
@@ -494,19 +497,19 @@ public class SendAssetPanel extends JPanel
 			{
 				txtRecDetails.setText(nameToAdress.getB().getShortStatusMessage());
 			}
-		}else
+		} else
 		{
 			account = new Account(toValue);
 			
 			txtRecDetails.setText(account.toString(asset.getKey()));
 			
-			if(account.toString(asset.getKey()).equals("0.00000000"))
+			if(account.getConfirmedBalance(asset.getKey()).compareTo(BigDecimal.ZERO) == 0)
 			{
-				txtRecDetails.setText(txtRecDetails.getText()+ " - " + Lang.getInstance().translate("Warning!"));
+				txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
 			}
 		}
 		
-		if(account!=null && account.getAddress().startsWith("A"))
+		if(false && account!=null && account.getAddress().startsWith(wrongFirstCharOfAddress))
 		{
 			encrypted.setEnabled(false);
 			encrypted.setSelected(false);
@@ -553,14 +556,12 @@ public class SendAssetPanel extends JPanel
 				
 				//ENABLE
 				this.sendButton.setEnabled(true);
-				
 				return;
 			}
 		}
 		
 		//READ SENDER
 		Account sender = (Account) cbxFrom.getSelectedItem();
-		
 		
 		//READ RECIPIENT
 		String recipientAddress = txtTo.getText();
@@ -571,9 +572,10 @@ public class SendAssetPanel extends JPanel
 		if(Crypto.getInstance().isValidAddress(recipientAddress))
 		{
 			recipient = new Account(recipientAddress);
-		//NAME RECIPIENT
-		}else
+		}
+		else
 		{
+			//IS IS NAME of RECIPIENT - resolve ADDRESS
 			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
 			
 			if(result.getB() == NameResult.OK)
@@ -586,159 +588,22 @@ public class SendAssetPanel extends JPanel
 		
 				//ENABLE
 				this.sendButton.setEnabled(true);
-			
 				return;
 			}
 		}
 		
 		int parsing = 0;
+		int feePow = 0;
+		BigDecimal amount = null; 
 		try
 		{
 			//READ AMOUNT
 			parsing = 1;
-			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
+			amount = new BigDecimal(txtAmount.getText()).setScale(8);
 			
 			//READ FEE
 			parsing = 2;
-			int feePow = Integer.parseInt(txtFeePow.getText());			
-			
-			String message = txtMessage.getText();
-			
-			boolean isTextB = isText.isSelected();
-			
-			byte[] messageBytes;
-			
-			if ( isTextB )
-			{
-				messageBytes = message.getBytes( Charset.forName("UTF-8") );
-			}
-			else
-			{
-				try
-				{
-					messageBytes = Converter.parseHexString( message );
-				}
-				catch (Exception g)
-				{
-					try
-					{
-						messageBytes = Base58.decode(message);
-					}
-					catch (Exception e)
-					{
-						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-						
-						//ENABLE
-						this.sendButton.setEnabled(true);
-					}
-					return;
-				}
-			}
-			if ( messageBytes.length < 1 || messageBytes.length > 4000 )
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				
-				return;
-			}
-
-			boolean encryptMessage = encrypted.isSelected();
-		
-			byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
-			byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
-			
-			//CHECK IF PAYMENT OR ASSET TRANSFER
-			AssetCls asset = (AssetCls) this.cbxFavorites.getSelectedItem();
-			long key = asset.getKey(); 
-			
-			Pair<Transaction, Integer> result;
-			
-			if(encryptMessage)
-			{
-				//sender
-				PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
-				byte[] privateKey = account.getPrivateKey();		
-
-				//recipient
-				byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
-				if(publicKey == null)
-				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					
-					return;
-				}
-				
-				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
-			}
-
-
-			/*
-			if(key != 0l && NTP.getTime() < Transaction.getPOWFIX_RELEASE())
-			{	
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Assets transactions will be enabled at %ss%!").replace("%ss%", DateTimeFormat.timestamptoString(Transaction.getPOWFIX_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			*/
-			
-			//CREATE TX MESSAGE
-			result = Controller.getInstance().sendMessage(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), recipient, key, amount, feePow, messageBytes, isTextByte, encrypted);
-			
-			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
-				//RESET FIELDS
-				
-				if(amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
-				{
-					this.txtAmount.setText("0.00000000");
-				}
-				
-				if(this.txtTo.getText().startsWith("A"))
-				{
-					this.txtTo.setText("");
-				}
-				
-				this.txtMessage.setText("");
-				
-				if(this.txtTo.getText().startsWith("A"))
-				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message with payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				}
-				break;	
-			
-			case Transaction.INVALID_ADDRESS:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid address!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be positive!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.NO_BALANCE:
-			
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			}
+			feePow = Integer.parseInt(txtFeePow.getText());	
 		}
 		catch(Exception e)
 		{
@@ -755,13 +620,131 @@ public class SendAssetPanel extends JPanel
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 			}
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;
+		}
+
+		String message = txtMessage.getText();
+		
+		boolean isTextB = isText.isSelected();
+		
+		byte[] messageBytes;
+		
+		if ( isTextB )
+		{
+			messageBytes = message.getBytes( Charset.forName("UTF-8") );
+		}
+		else
+		{
+			try
+			{
+				messageBytes = Converter.parseHexString( message );
+			}
+			catch (Exception g)
+			{
+				try
+				{
+					messageBytes = Base58.decode(message);
+				}
+				catch (Exception e)
+				{
+					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+					
+					//ENABLE
+					this.sendButton.setEnabled(true);
+					return;
+				}
+			}
+		}
+
+		// if no TEXT - set null
+		if (messageBytes.length == 0) messageBytes = null;
+		// if amount = 0 - set null
+		if (amount.compareTo(BigDecimal.ZERO) == 0) amount = null;
+		
+		boolean encryptMessage = encrypted.isSelected();
+	
+		byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
+		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
+		
+		AssetCls asset;
+		long key = -1;
+		if (amount != null) {
+			//CHECK IF PAYMENT OR ASSET TRANSFER
+			asset = (AssetCls) this.cbxFavorites.getSelectedItem();
+			key = asset.getKey();
+		}
+		
+		Pair<Transaction, Integer> result;
+		
+		if(messageBytes != null)
+		{
+			if ( messageBytes.length > 4000 )
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= 4000", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				
+				//ENABLE
+				this.sendButton.setEnabled(true);
+				return;
+			}
+			
+			if(encryptMessage)
+			{
+				//sender
+				PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
+				byte[] privateKey = account.getPrivateKey();		
+	
+				//recipient
+				byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+				if(publicKey == null)
+				{
+					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+	
+					//ENABLE
+					this.sendButton.setEnabled(true);
+					
+					return;
+				}
+				
+				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
+			}
+		}
+
+		//CREATE TX MESSAGE
+		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key, amount, messageBytes, isTextByte, encrypted);
+		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
+		
+		//CHECK VALIDATE MESSAGE
+		if (result.getB() ==  Transaction.VALIDATE_OK)
+		{
+			//RESET FIELDS
+			
+			if(amount != null && amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
+			{
+				this.txtAmount.setText("0");
+			}
+			
+			// TODO "A" ??
+			if(false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress))
+			{
+				this.txtTo.setText("");
+			}
+			
+			this.txtMessage.setText("");
+			
+			// TODO "A" ??
+			if(true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress))
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			}
+		} else {		
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE
 		this.sendButton.setEnabled(true);
 	}
-	
-	
 	
 }
 

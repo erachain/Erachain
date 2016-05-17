@@ -1671,15 +1671,6 @@ public class Controller extends Observable {
 		this.broadcastTransaction(transaction);
 	}
 
-	public Pair<Transaction, Integer> sendPayment(PrivateKeyAccount sender,
-			Account recipient, BigDecimal amount,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createPayment(sender, recipient,
-					amount, feePow);
-		}
-	}
-
 	public Pair<Transaction, Integer> registerName(
 			PrivateKeyAccount registrant, Account owner, String name,
 			String value,int feePow) {
@@ -1857,15 +1848,6 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> transferAsset(PrivateKeyAccount sender,
-			Account recipient, AssetCls asset, BigDecimal amount,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createAssetTransfer(sender,
-					recipient, asset, amount, feePow);
-		}
-	}
-
 	public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator,
 			String name, String description, String type, String tags,
 			byte[] creationBytes, BigDecimal quantity,int feePow) {
@@ -1885,11 +1867,18 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> sendMessage(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount,int feePow,
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+			int feePow, Account recipient, long key, BigDecimal amount) {
+		synchronized (this.transactionCreator) {
+			return this.r_Send(sender, feePow, recipient,
+					key, amount, null, null, null);
+		}
+	}
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+			int feePow, Account recipient, long key,BigDecimal amount,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createMessage(sender, recipient,
+			return this.transactionCreator.r_Send(sender, recipient,
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}

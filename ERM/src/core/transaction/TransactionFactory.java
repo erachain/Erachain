@@ -38,11 +38,6 @@ public class TransactionFactory {
 			
 			//PARSE PAYMENT TRANSACTION
 			return R_SignNote.Parse(data, releaserReference);
-
-		case Transaction.PAYMENT_TRANSACTION:
-			
-			//PARSE PAYMENT TRANSACTION
-			return PaymentTransaction.Parse(data, releaserReference);
 		
 		case Transaction.REGISTER_NAME_TRANSACTION:
 			
@@ -83,12 +78,7 @@ public class TransactionFactory {
 			
 			//PARSE ARBITRARY TRANSACTION
 			return ArbitraryTransaction.Parse(data);			
-			
-		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
-			
-			//PARSE TRANSFER ASSET TRANSACTION
-			return TransferAssetTransaction.Parse(data, releaserReference);	
-		
+					
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			
 			//PARSE ORDER CREATION TRANSACTION
@@ -110,7 +100,7 @@ public class TransactionFactory {
 		case Transaction.SEND_ASSET_TRANSACTION:
 
 			// PARSE MESSAGE TRANSACTION
-			return MessageTransaction.Parse(data, releaserReference);
+			return R_Send.Parse(data, releaserReference);
 			
 			/*
 		case Transaction.ACCOUNTING_TRANSACTION:

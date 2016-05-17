@@ -40,7 +40,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
 import database.DBSet;
@@ -109,7 +109,7 @@ public class MessagesTableModel extends JTable implements Observer{
 			}
 			if(!is)
 			{
-				addMessage(messageBufs.size(),(MessageTransaction)messagetx);
+				addMessage(messageBufs.size(),(R_Send)messagetx);
 			}
 		}
 				
@@ -370,7 +370,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
 				for (MessageBuf messageBuf : messageBufs) {
-					if(Arrays.equals(((MessageTransaction) message.getValue()).getSignature(), messageBuf.getSignature()))
+					if(Arrays.equals(((R_Send) message.getValue()).getSignature(), messageBuf.getSignature()))
 					{
 						is = true;
 						break;
@@ -378,7 +378,7 @@ public class MessagesTableModel extends JTable implements Observer{
 				}
 				if(!is)
 				{
-					addMessage(0, (MessageTransaction) message.getValue());
+					addMessage(0, (R_Send) message.getValue());
 					
 					messagesModel.setRowCount( messageBufs.size() );
 					
@@ -399,7 +399,7 @@ public class MessagesTableModel extends JTable implements Observer{
 		}
 	}
 
-	private void addMessage(int pos, MessageTransaction transaction)
+	private void addMessage(int pos, R_Send transaction)
 	{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
@@ -541,6 +541,8 @@ public class MessagesTableModel extends JTable implements Observer{
 	
 	int lineCount( String text ) 
 	{
+		
+		if (text == null) return 0;
 		int lineCount = 1;
 		
 		for(int k = 0; k < text.length(); k++) 
@@ -598,6 +600,8 @@ public class MessagesTableModel extends JTable implements Observer{
 		}
 		public String getDecrMessage()
 		{
+			if (this.rawMessage == null) return "";
+			
 			if( decryptedMessage.equals("") )
 			{
 				if( this.encrypted && !this.opened )
@@ -759,17 +763,22 @@ public class MessagesTableModel extends JTable implements Observer{
 			decrMessage = decrMessage.replace( ">" , "&gt;" );
 			decrMessage = decrMessage.replace( "\n" , "<br>" );
 			
-			String fontSize = "";
+			String amountStr = "";
 			
-			if(this.amount.compareTo(new BigDecimal(10)) >= 0)
-			{
-				fontSize = " size='2'";
-			} else {
-				fontSize = " size='2'";
+			if (this.amount != null) {
+				String fontSize = "";
+				if(this.amount.compareTo(new BigDecimal(10)) >= 0)
+				{
+					fontSize = " size='3'";
+				} else {
+					fontSize = " size='2'";
+				}
+				amountStr = "<font" + fontSize + ">"
+						+ Lang.getInstance().translate("Amount") + ": "
+						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>"
+						+ Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance()) + ". ";
 			}
 			
-
-			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance());
 		
 			return	  "<html>\n"
 					+ "<body width='" + width + "'>\n"
@@ -779,11 +788,11 @@ public class MessagesTableModel extends JTable implements Observer{
 					+ this.recipient + "\n</font></td>\n"
 					+ "<td bgcolor='" + colorHeader + "' align='right' width='" + (width/2-1) + "'>\n"
 					+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
-					+ DateTimeFormat.timestamptoString(this.timestamp) + "\n<br></font>\n"
-					+ "<font" + fontSize + " color='" + colorTextHeader + "'>"+Lang.getInstance().translate("Amount") + ": "
-					+ NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "
-					+ Lang.getInstance().translate("Fee") + ": "
-					+ NumberAsString.getInstance().numberAsString(fee)+"</font>"
+					+ DateTimeFormat.timestamptoString(this.timestamp)
+					+ " " + Lang.getInstance().translate("Fee") + ": "
+					+ NumberAsString.getInstance().numberAsString(fee)
+					+ "<br></font>\n"
+					+ amountStr
 					+ "</td></tr></table>"
 					+ "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='"+colorTextBackground+"'><td width='25'>"+imginout
 					+ "<td width='" + width + "'>\n"

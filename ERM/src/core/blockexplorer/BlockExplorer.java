@@ -47,13 +47,12 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
-import core.transaction.TransferAssetTransaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
@@ -1593,18 +1592,10 @@ public class BlockExplorer
 			{
 				if (assetNames != null) 
 				{
-					assetNames.setKey(((TransferAssetTransaction)unit).getKey());
-				}
-			}
-
-			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 
-			{
-				if (assetNames != null) 
-				{
-					assetNames.setKey(((MessageTransaction)unit).getKey());
+					assetNames.setKey(((R_Send)unit).getKey());
 				}
 				
-				if(((MessageTransaction)unit).isEncrypted()){
+				if(((R_Send)unit).isEncrypted()){
 					transactionDataJSON.put("data", "encrypted");
 				}
 			}

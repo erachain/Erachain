@@ -34,8 +34,8 @@ import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.IssueAssetTransaction;
-import core.transaction.MultiPaymentTransaction;
-import core.transaction.PaymentTransaction;
+//import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Send;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -105,33 +105,33 @@ public class TransactionTests {
 	//PAYMENT
 	
 	@Test
-	public void validateSignaturePaymentTransaction() 
+	public void validateSignatureR_Send() 
 	{
 		
 		init();
 		
 		//CREATE PAYMENT
-		Transaction payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
 		payment.sign(maker, false);		
 		//CHECK IF PAYMENT SIGNATURE IS VALID
 		assertEquals(true, payment.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp+1, maker.getLastReference(databaseSet), new byte[64]);
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp+1, maker.getLastReference(databaseSet), new byte[64]);
 		
 		//CHECK IF PAYMENT SIGNATURE IS INVALID
 		assertEquals(false, payment.isSignatureValid());
 	}
 	
 	@Test
-	public void validatePaymentTransaction() 
+	public void validateR_Send() 
 	{
 		
 		init();
 		
 
 		//CREATE VALID PAYMENT
-		Transaction payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(0.5).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(8), timestamp, maker.getLastReference(db));
 		payment.sign(maker, false);
 
 		//CHECK IF PAYMENT IS VALID
@@ -140,31 +140,31 @@ public class TransactionTests {
 		payment.process(db, false);
 
 		//CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
-		payment = new PaymentTransaction(maker, new Account("test"), BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		payment = new R_Send(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 	
 		//CHECK IF PAYMENT IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));
 		
 		//CREATE INVALID PAYMENT NEGATIVE AMOUNT
-		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(-100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, maker.getLastReference(db));
 		payment.sign(maker, false);
 		//CHECK IF PAYMENT IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));	
 		
 		
 		//CREATE INVALID PAYMENT WRONG REFERENCE
-		payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, new byte[64], new byte[64]);
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, new byte[64], new byte[64]);
 		//CHECK IF PAYMENT IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));	
 	}
 	
 	@Test
-	public void parsePaymentTransaction() 
+	public void parseR_Send() 
 	{
 		init();
 												
 		//CREATE VALID PAYMENT
-		Transaction payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(db));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 		payment.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -173,10 +173,10 @@ public class TransactionTests {
 		try 
 		{	
 			//PARSE FROM BYTES
-			PaymentTransaction parsedPayment = (PaymentTransaction) TransactionFactory.getInstance().parse(rawPayment, releaserReference);
+			R_Send parsedPayment = (R_Send) TransactionFactory.getInstance().parse(rawPayment, releaserReference);
 			
 			//CHECK INSTANCE
-			assertEquals(true, parsedPayment instanceof PaymentTransaction);
+			assertEquals(true, parsedPayment instanceof R_Send);
 			
 			//CHECK SIGNATURE
 			assertEquals(true, Arrays.equals(payment.getSignature(), parsedPayment.getSignature()));
@@ -219,14 +219,14 @@ public class TransactionTests {
 	}
 	
 	@Test
-	public void processPaymentTransaction()
+	public void processR_Send()
 	{
 		
 		init();
 
 		//CREATE PAYMENT
 		BigDecimal amount = BigDecimal.valueOf(0.5).setScale(8);
-		Transaction payment = new PaymentTransaction(maker, recipient, amount.setScale(8), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(8), timestamp, maker.getLastReference(databaseSet));
 		payment.sign(maker, false);
 		BigDecimal fee = payment.getFee();
 		payment.process(databaseSet, false);
@@ -248,13 +248,13 @@ public class TransactionTests {
 	}
 	
 	@Test
-	public void orphanPaymentTransaction()
+	public void orphanR_Send()
 	{
 		
 		init();
 			
 		//CREATE PAYMENT
-		Transaction payment = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
 		payment.sign(maker, false);
 		payment.process(databaseSet, false);
 		
@@ -262,7 +262,7 @@ public class TransactionTests {
 		BigDecimal amount2 = recipient.getConfirmedBalance(FEE_KEY, databaseSet);
 
 		//CREATE PAYMENT2
-		Transaction payment2  = new PaymentTransaction(maker, recipient, BigDecimal.valueOf(100).setScale(8), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction payment2  = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
 		payment2.sign(maker, false);
 		payment.process(databaseSet, false);
 		

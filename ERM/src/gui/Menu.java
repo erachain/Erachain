@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import gui.AccountsFrame;
-import gui.SendAssetFrame;
+import gui.Send_Frame;
 import gui.items.assets.IssueAssetDialog;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
@@ -335,7 +335,7 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
         		// 
-        		selectOrAdd(new SendAssetFrame(null, null), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd(new Send_Frame(null, null), MainFrame.desktopPane.getAllFrames());
         	}
         });
         dealsMenu.add(dealsMenuSendMessage);     

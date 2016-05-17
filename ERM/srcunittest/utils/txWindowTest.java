@@ -13,10 +13,10 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransactionV3;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import gui.transaction.ArbitraryTransactionDetailsFrame;
-import gui.transaction.MessageTransactionDetailsFrame;
+import gui.transaction.Send_RecordDetailsFrame;
 import ntp.NTP;
 
 public class txWindowTest {
@@ -26,8 +26,8 @@ public class txWindowTest {
 	@Test
 	public void windowTest() {
 		
-		new MessageTransactionDetailsFrame(
-				(MessageTransaction) Controller.getInstance().getTransaction(Base58.decode("2kGG3Nmu2VNatZ8MAL1PF5r3VUZyY5FsbPve9G2zJ1UL1x3NHDU96VFWn2cXvqHnvdjvY2jt3kuGTkgabr2JQXAx"))
+		new Send_RecordDetailsFrame(
+				(R_Send) Controller.getInstance().getTransaction(Base58.decode("2kGG3Nmu2VNatZ8MAL1PF5r3VUZyY5FsbPve9G2zJ1UL1x3NHDU96VFWn2cXvqHnvdjvY2jt3kuGTkgabr2JQXAx"))
 			);
 		
 		

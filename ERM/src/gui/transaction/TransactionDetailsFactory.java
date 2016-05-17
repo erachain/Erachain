@@ -20,16 +20,14 @@ import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.PaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
-import core.transaction.TransferAssetTransaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 
@@ -56,11 +54,6 @@ public class TransactionDetailsFactory
 			
 			R_SignNote statement = (R_SignNote) transaction;
 			return new RecStatementDetailsFrame(statement);
-
-		case Transaction.PAYMENT_TRANSACTION:
-		
-			PaymentTransaction payment = (PaymentTransaction) transaction;
-			return new PaymentDetailsFrame(payment);
 			
 		case Transaction.REGISTER_NAME_TRANSACTION:
 			
@@ -106,12 +99,7 @@ public class TransactionDetailsFactory
 			
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) transaction;
 			return new IssueAssetDetailsFrame(issueAssetTransaction);	
-			
-		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
-			
-			TransferAssetTransaction transferAssetTransaction = (TransferAssetTransaction) transaction;
-			return new TransferAssetDetailsFrame(transferAssetTransaction);		
-			
+						
 		case Transaction.ISSUE_PERSON_TRANSACTION:
 			
 			IssuePersonRecord issuePerson = (IssuePersonRecord) transaction;
@@ -138,8 +126,8 @@ public class TransactionDetailsFactory
 			return new MultiPaymentDetailsFrame(MultiPaymentTransaction);
 
 		case Transaction.SEND_ASSET_TRANSACTION:
-			MessageTransaction messageTransaction = (MessageTransaction)transaction;
-			return new MessageTransactionDetailsFrame(messageTransaction);
+			R_Send r_Send = (R_Send)transaction;
+			return new Send_RecordDetailsFrame(r_Send);
 
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 			R_SertifyPubKeys sertifyPubKeysRecord = (R_SertifyPubKeys)transaction;

@@ -154,14 +154,11 @@ public abstract class Transaction {
 	public static final int RELEASE_PACK = 70;
 
 	// old
-	// public static final int GENESIS_TRANSACTION = 4 + 130;
-	public static final int PAYMENT_TRANSACTION = 5 + 130;
 	public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
 	public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
 	public static final int SELL_NAME_TRANSACTION = 8 + 130;
 	public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
 	public static final int BUY_NAME_TRANSACTION = 10 + 130;
-	public static final int TRANSFER_ASSET_TRANSACTION_OLD = 11 + 130;	
 	public static final int ARBITRARY_TRANSACTION = 12 + 130;
 	public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
 	public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
@@ -340,6 +337,10 @@ public abstract class Transaction {
 		return this.viewTime(account);
 	}
 	*/
+	public long getKey() {
+		return -1;
+	}
+
 	public BigDecimal getAmount() {
 		return BigDecimal.ZERO;
 	}

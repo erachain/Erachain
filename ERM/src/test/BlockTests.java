@@ -22,9 +22,8 @@ import core.item.assets.AssetCls;
 import core.transaction.GenesisIssueAssetTransaction;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisTransferAssetTransaction;
-import core.transaction.PaymentTransaction;
 import core.transaction.Transaction;
-import core.transaction.TransferAssetTransaction;
+import core.transaction.R_Send;
 import core.web.blog.BlogEntry;
 import database.DBSet;
 
@@ -208,7 +207,7 @@ public class BlockTests
 		//ADD TRANSACTION
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(db));
+		Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(db));
 		payment.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, null));
 		newBlock.addTransaction(payment);
@@ -224,7 +223,7 @@ public class BlockTests
 		newBlock = blockGenerator.generateNextBlock(db, generator, gb);	
 		
 		//ADD TRANSACTION
-		payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(200).setScale(8), (byte)0, NTP.getTime(), generator.getLastReference(db), payment.getSignature());
+		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200).setScale(8), NTP.getTime(), generator.getLastReference(db), payment.getSignature());
 		newBlock.addTransaction(payment);
 				
 		//ADD TRANSACTION SIGNATURE
@@ -304,7 +303,7 @@ public class BlockTests
 		invalidBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp();
-		Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(-100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, generator.getLastReference(databaseSet));
 		payment.sign(generator, false);
 		invalidBlock.addTransaction(payment);		
 		
@@ -355,7 +354,7 @@ public class BlockTests
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = block.getTimestamp();
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
 		
@@ -364,7 +363,7 @@ public class BlockTests
 				
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(fork));
 		payment2.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
 		
@@ -460,7 +459,7 @@ public class BlockTests
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
 		long timestamp = block.getTimestamp();
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(100).setScale(8), (byte)0, timestamp, generator.getLastReference(databaseSet));
+		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(databaseSet));
 		payment1.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
 
@@ -469,7 +468,7 @@ public class BlockTests
 		
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB");
-		Transaction payment2 = new TransferAssetTransaction(generator, recipient2, ERM_KEY, BigDecimal.valueOf(10).setScale(8), (byte)0, timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, ERM_KEY, BigDecimal.valueOf(10).setScale(8),  timestamp, generator.getLastReference(fork));
 		payment2.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
 		block.addTransaction(payment2);	
@@ -548,7 +547,7 @@ public class BlockTests
 		recipient.setLastReference(gb.getGeneratorSignature(), fork);
 		recipient.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment1 = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(0.1).setScale(8), (byte)0, blockTimestamp, generator.getLastReference(db));
+		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.1).setScale(8), blockTimestamp, generator.getLastReference(db));
 		payment1.sign(generator, false);
 		
 		payment1.process(fork, false);
@@ -559,7 +558,7 @@ public class BlockTests
 		recipient2.setLastReference(gb.getGeneratorSignature(), fork);
 		recipient2.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), fork);
 		
-		Transaction payment2 = new PaymentTransaction(generator, recipient2, BigDecimal.valueOf(0.2).setScale(8), (byte)0, blockTimestamp, generator.getLastReference(fork));
+		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(0.2).setScale(8), blockTimestamp, generator.getLastReference(fork));
 		payment2.sign(generator, false);
 		
 		block.addTransaction(payment2);	

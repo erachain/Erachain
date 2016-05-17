@@ -20,7 +20,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransactionV3;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 
@@ -32,6 +32,7 @@ public class TransactionV3Tests {
 
 	byte[] releaserReference = null;
 
+	long ERMO_KEY = 0l;
 	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
@@ -47,7 +48,11 @@ public class TransactionV3Tests {
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 
 	Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");		
+	BigDecimal amount = BigDecimal.valueOf(10).setScale(8); 
 
+	byte[] data = "test123!".getBytes();
+	byte[] isText = new byte[] { 1 };
+	byte[] encrypted = new byte[] { 0 };
 
 	// INIT ASSETS
 	private void init() {
@@ -58,6 +63,7 @@ public class TransactionV3Tests {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
@@ -67,47 +73,36 @@ public class TransactionV3Tests {
 	{
 		
 		init();
-		
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		
-		byte[] data = "test123!".getBytes();
-		
-		PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-
-		long timestamp = NTP.getTime();
-		long key = 2l;
-		
-		creator.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
 				
-		MessageTransaction messageTransactionV3 = new MessageTransaction(
-				creator, FEE_POWER, //	ATFunding 
+				
+		R_Send messageTransactionV3 = new R_Send(
+				maker, FEE_POWER, //	ATFunding 
 				recipient, 
-				key, 
-				BigDecimal.valueOf(10).setScale(8), 
+				ERMO_KEY, 
+				amount,
 				data,
-				new byte[] { 1 },
-				new byte[] { 0 },
-				timestamp, creator.getLastReference(db)
+				isText,
+				encrypted,
+				timestamp, maker.getLastReference(db)
 				);
-		messageTransactionV3.sign(creator, false);
+		messageTransactionV3.sign(maker, false);
 		
 		assertEquals(messageTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
 		messageTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), creator.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getConfirmedBalance(key, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(key, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getConfirmedBalance(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(ERMO_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
+		int dd = messageTransactionV3.getDataLength(false);
 		assertEquals(rawMessageTransactionV3.length, messageTransactionV3.getDataLength(false));
 
 		
-		MessageTransaction messageTransactionV3_2 = null;
+		R_Send messageTransactionV3_2 = null;
 		try {
-			messageTransactionV3_2 = (MessageTransaction) MessageTransaction.Parse(rawMessageTransactionV3, releaserReference);
+			messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, releaserReference);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 		}
@@ -142,7 +137,6 @@ public class TransactionV3Tests {
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		
-		byte[] data = "test123!".getBytes();
 		
 		Account recipient1 = new Account("79MXwfzHPDGWoQUgyPXRf2fxKuzY1osNsg");		
 		Account recipient2 = new Account("76abzpJK61F4TAZFkqev2EY5duHVUvycZX");		
