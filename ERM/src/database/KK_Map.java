@@ -141,7 +141,8 @@ public Block getBlockByHeight(int parseInt) {
 		Stack<Tuple4<Long, Long, Integer, Integer>> stack = value.get(itemKey);
 		if (stack==null) return;
 
-		stack.pop();
+		if (stack != null && stack.size() > 0 )
+			stack.pop();
 		value.put(itemKey, stack);
 		this.set(key, value);
 	}

@@ -117,7 +117,8 @@ public class KK_K_Map extends DBMap<
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 		if (stack==null) return;
 
-		stack.pop();
+		if (stack != null && stack.size() > 0 )
+			stack.pop();
 		value.put(itemKey, stack);
 		this.set(key, value);
 		

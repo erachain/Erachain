@@ -109,7 +109,8 @@ public class KKN_Map extends DBMap<
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(nameKey);
 		if (stack==null) return;
 
-		stack.pop();
+		if (stack != null && stack.size() > 0 )
+			stack.pop();
 		value.put(nameKey, stack);
 		this.set(key, value);
 		

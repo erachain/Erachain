@@ -393,8 +393,7 @@ public class Send_TableModel extends JTable implements Observer{
 					}
 					
 					this.repaint();
-				}
-				
+				}			
 			}
 		}
 	}
