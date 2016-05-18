@@ -48,7 +48,7 @@ import javax.swing.JLabel;
 
         setHorizontalAlignment(JLabel.LEFT);//.RIGHT);
          setHorizontalTextPosition(JLabel.LEFT);//.RIGHT);
-         setAlignmentX(10);
+   //      setAlignmentX(10);
           setText((value == null) ? "" :  value + "</></>  ");
           return this;
         }

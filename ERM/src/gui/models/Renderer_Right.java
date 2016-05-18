@@ -21,7 +21,7 @@ import javax.swing.JLabel;
         public Component getTableCellRendererComponent(JTable table,
                Object value, boolean isSelected, boolean hasFocus, int row, int column)
         {
-          setFont(table.getFont());
+     //     setFont(table.getFont());
           setBackground(new Color(255, 255, 220));
           setOpaque(true);
           
@@ -48,7 +48,7 @@ import javax.swing.JLabel;
 
         setHorizontalAlignment(JLabel.RIGHT);
          setHorizontalTextPosition(JLabel.RIGHT);
-         setAlignmentX(10);
+       //  setAlignmentX(10);
           setText((value == null) ? "" : value +"&nbsp;&nbsp;&nbsp;</></>  ");
           return this;
         }
