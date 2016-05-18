@@ -83,7 +83,7 @@ public MainPersonsFrame(){
 		personsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 	//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = personsTable.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);
-		
+	
 
 		favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
 		favoriteColumn.setMinWidth(50);
@@ -136,8 +136,7 @@ public MainPersonsFrame(){
 		search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel = personsTable;
 				//jScrollPanel_Panel2_Tabbed_Panel_Left_Panel.setViewportView(jTable_jScrollPanel_Panel2_Tabbed_Panel_Left_Panel); // personsTable; 
 		search_Person_SplitPanel.jScrollPanel_LeftPanel.setViewportView(search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel);
-	// select row table persons
-
+	// select row table personshtml
 		
 		Person_Info info = new Person_Info(); 
 		info.setFocusable(false);
