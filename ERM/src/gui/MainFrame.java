@@ -27,6 +27,7 @@ import gui.items.imprints.MainImprintsFrame;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
+import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;

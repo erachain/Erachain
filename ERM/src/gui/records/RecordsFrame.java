@@ -1,4 +1,4 @@
-package gui;
+package gui.records;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -33,8 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.BoxLayout;
-
-import gui.RecordsPanel;
 
 public class RecordsFrame extends JInternalFrame{
 

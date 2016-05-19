@@ -1,5 +1,6 @@
-package gui;
+package gui.records;
 
+import gui.CoreRowSorter;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;

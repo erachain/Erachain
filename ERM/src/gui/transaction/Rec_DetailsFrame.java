@@ -98,6 +98,18 @@ public class Rec_DetailsFrame extends JFrame
 		componentLevel ++;
 		*/
 		
+		//LABEL Height + Seq
+		labelGBC.gridy = componentLevel;
+		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Height / Seq.") + ":");
+		this.add(heSeqLabel, labelGBC);
+				
+		//Height + Seq
+		detailGBC.gridy = componentLevel++;
+		JTextField heSeq = new JTextField(record.viewHeightSeq());
+		heSeq.setEditable(false);
+		MenuPopupUtil.installContextMenu(heSeq);
+		this.add(heSeq, detailGBC);
+
 		//LABEL SIGNATURE
 		labelGBC.gridy = componentLevel;
 		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");

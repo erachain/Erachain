@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
-//import com.google.common.primitives.Ints;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -30,8 +30,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import database.DBSet;
-import lang.Lang;
-import settings.Settings;
+//import lang.Lang;
+//import settings.Settings;
 import utils.DateTimeFormat;
 
 public abstract class Transaction {
@@ -257,7 +257,7 @@ public abstract class Transaction {
 	protected byte[] signature;
 	protected long timestamp;
 	protected PublicKeyAccount creator;
-	
+
 	// need for genesis
 	protected Transaction(byte type, String type_name)
 	{
@@ -284,6 +284,7 @@ public abstract class Transaction {
 
 	//GETTERS/SETTERS
 	
+	
 	public int getType()
 	{
 		return Byte.toUnsignedInt(this.typeBytes[0]);
@@ -300,6 +301,7 @@ public abstract class Transaction {
 	{
 		return this.typeBytes;
 	}
+		
 	public PublicKeyAccount getCreator() 
 	{
 		return this.creator;
@@ -393,10 +395,11 @@ public abstract class Transaction {
 	
 	public int calcCommonFee()
 	{		
-		int fee =  this.getDataLength(false) + 100 * FEE_PER_BYTE;
-		if (this.getDataLength(false) > 1000) {
+		int len = this.getDataLength(false);
+		int fee = len + 100 * FEE_PER_BYTE;
+		if (len > 1000) {
 			// add overheat
-			fee += (this.getDataLength(false) - 1000) * FEE_PER_BYTE;
+			fee += (len - 1000) * FEE_PER_BYTE;
 		}
 		
 		return (int) fee;
@@ -441,6 +444,13 @@ public abstract class Transaction {
 	public String viewSubTypeName() {
 		return "";
 	}
+	public String viewFullTypeName() {
+		String sub = viewSubTypeName();
+		return sub.length() > 0? viewTypeName() + ":" + sub: viewTypeName();
+	}
+	public String viewHeightSeq() {
+		return this.getHeight() + "-" + this.getSeq();
+	}
 	public String viewAmount(Account account) {
 		return account==null?"": viewAmount(account.getAddress());
 	}
@@ -457,6 +467,9 @@ public abstract class Transaction {
 	public String viewReference() {
 		return reference==null?"GENESIS":Base58.encode(reference);
 	}
+	public String viewSignature() {
+		return signature==null?"GENESIS":Base58.encode(signature);
+	}
 	public String viewTimestamp() {
 		return timestamp<1000?"GENESIS":DateTimeFormat.timestamptoString(timestamp);
 	}
@@ -469,6 +482,9 @@ public abstract class Transaction {
 	}
 
 	public String viewItemName() {
+		return "";
+	}
+	public String viewAmount() {
 		return "";
 	}
 
@@ -553,8 +569,9 @@ public abstract class Transaction {
 		return data;
 		
 	}
-	
+
 	public abstract int getDataLength(boolean asPack);
+
 	
 	//VALIDATE
 	
@@ -661,6 +678,14 @@ public abstract class Transaction {
 		
 	public abstract boolean isInvolved(Account account);
  
+	public int getHeight()
+	{
+		if(this.isConfirmed())
+		{
+			return this.getParent().getHeight();
+		}
+		return -1;
+	}
 	public int getSeq()
 	{
 		if(this.isConfirmed())
@@ -718,7 +743,7 @@ public abstract class Transaction {
 		}
 	}
 
-	public int getBlockVersion1()
+	public int getBlockVersion()
 	{
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
 		if(this.isConfirmed())

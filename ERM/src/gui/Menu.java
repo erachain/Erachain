@@ -36,6 +36,8 @@ import gui.items.statuses.MainStatusesFrame;
 import gui.items.statuses.IssueStatusDialog;
 import gui.items.unions.IssueUnionDialog;
 import gui.items.unions.MainUnionsFrame;
+import gui.records.RecordsFrame;
+import gui.records.VouchRecordDialog;
 import gui.settings.SettingsFrame;
 import lang.Lang;
 import settings.Settings;
@@ -338,7 +340,21 @@ public class Menu extends JMenuBar
         		selectOrAdd(new Send_Frame(null, null), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        dealsMenu.add(dealsMenuSendMessage);     
+        dealsMenu.add(dealsMenuSendMessage);
+        
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        dealsMenuVouchRecord.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		new VouchRecordDialog();
+        	}
+        });
+        dealsMenu.add(dealsMenuVouchRecord);
+        
 
         // Imprints menu
         JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
