@@ -9,10 +9,12 @@ import lang.Lang;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
 //import java.awt.ScrollPaneLayout;
 //import java.awt.la
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.AWTEvent;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -21,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import core.transaction.Transaction;
@@ -75,8 +78,9 @@ public class RecordsPanel extends  JPanel // JPanel
 		transactionsTable.setRowSorter(sorter);
 		
 		//Custom renderer for the String column;
+		//RenderingHints.
 		this.transactionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+		//this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer

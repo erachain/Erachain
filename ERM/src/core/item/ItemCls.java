@@ -139,7 +139,7 @@ public abstract class ItemCls {
 	}
 	public long getKey(DBSet db) {
 		// resolve key in that DB
-		resolveKey(DBSet.getInstance());
+		resolveKey(db);
 		return this.key;
 	}
 	public long getKey() {

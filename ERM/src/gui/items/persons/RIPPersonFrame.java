@@ -40,7 +40,9 @@ public class RIPPersonFrame extends JInternalFrame  {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2717571093561259483L;
+
 	private JComboBox<Account> accountLBox;
 	static PersonCls person;
 

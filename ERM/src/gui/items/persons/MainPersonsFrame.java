@@ -38,7 +38,9 @@ public class MainPersonsFrame extends Main_Internal_Frame{ //Frame_All{ //JInter
 /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2717571093561259483L;
+
 private TableModelPersons tableModelPersons;
 
 public MainPersonsFrame(){

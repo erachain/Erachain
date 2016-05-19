@@ -11,6 +11,7 @@ import javax.swing.JTextPane;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
+import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import database.ItemStatusMap;
 import database.DBSet;
@@ -19,7 +20,10 @@ import lang.Lang;
 
 // Info for person
 public class Person_Info extends JTextPane {
-	private static final long serialVersionUID = 4763074704570450206L;	
+	
+	//private static final long serialVersionUID = 4763074704570450206L;
+	private static final long serialVersionUID = 2717571093561259483L;
+
 	
 	public  Person_Info() {
 	
@@ -98,6 +102,9 @@ public class Person_Info extends JTextPane {
 			}
 			
 		}
+		
+		//message += "<div><font size='2'>" + Base58.encode(person.getReference()).substring(0, 25) + "..</font></div>";
+		message += "<div>" + Base58.encode(person.getReference()).substring(0, 25) + "..</div>";
 
 		return message;
 	}
