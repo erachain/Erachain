@@ -60,7 +60,11 @@ public abstract class Issue_ItemRecord extends Transaction
 	{
 		return this.item;
 	}
-	
+	public String viewItemName()
+	{
+		return item.toString();
+	}
+
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{

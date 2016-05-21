@@ -45,7 +45,6 @@ public class R_Send extends TransactionAmount {
 			this.data = data;
 			this.encrypted = encrypted;
 			this.isText = isText;
-			this.feePow = feePow;
 		}
 	}
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {

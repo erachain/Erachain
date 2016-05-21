@@ -115,7 +115,12 @@ public class TransactionFactory {
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
+
+		case Transaction.VOUCH_TRANSACTION:
 			
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_Vouch.Parse(data, releaserReference);
+
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION

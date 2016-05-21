@@ -1449,8 +1449,11 @@ public class BlockExplorer
 		return output;
 	}	
 
+	// DBSet.getInstance()
 	public Map jsonUnitPrint(Object unit, AssetNames assetNames)
 	{
+		
+		DBSet db = DBSet.getInstance();
 		Map transactionDataJSON = new LinkedHashMap();
 		Map transactionJSON = new LinkedHashMap();
 
@@ -1458,7 +1461,7 @@ public class BlockExplorer
 		{
 			Trade trade = (Trade)unit;
 
-			Order orderInitiator = trade.getInitiatorOrder(DBSet.getInstance());
+			Order orderInitiator = trade.getInitiatorOrder(db);
 
 			/*
 			if(DBSet.getInstance().getOrderMap().contains(trade.getInitiator()))
@@ -1471,7 +1474,7 @@ public class BlockExplorer
 			}
 			 */
 
-			Order orderTarget = trade.getTargetOrder(DBSet.getInstance());
+			Order orderTarget = trade.getTargetOrder(db);
 
 			/*
 			if(DBSet.getInstance().getOrderMap().contains(trade.getTarget()))
@@ -1676,7 +1679,7 @@ public class BlockExplorer
 				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount().getAddress());
 			}
 
-			if(transaction.isConfirmed())
+			if(transaction.isConfirmed(db))
 			{
 				Block parent = transaction.getParent();
 				transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
@@ -1907,6 +1910,8 @@ public class BlockExplorer
 	@SuppressWarnings("serial")
 	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
+		DBSet db = DBSet.getInstance();
+
 		TreeSet<BlExpUnit> all = new TreeSet<>();
 	
 		addresses = new ArrayList<>(new LinkedHashSet<String>(addresses));
@@ -2028,7 +2033,7 @@ public class BlockExplorer
 				
 				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 				
-				all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeq(), txTarget.getSeq(), trade.getValue() ) );
+				all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 			}
 			
 			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
@@ -2611,6 +2616,8 @@ public class BlockExplorer
 
 	public Map jsonQueryTX(String query)
 	{
+		DBSet db = DBSet.getInstance();
+
 		Map output=new LinkedHashMap();
 		AssetNames assetNames = new AssetNames();
 
@@ -2626,7 +2633,7 @@ public class BlockExplorer
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
-			all.add( new BlExpUnit( transaction.getParent().getHeight(), transaction.getSeq(), transaction));
+			all.add( new BlExpUnit( transaction.getParent(db).getHeight(db), transaction.getSeqNo(db), transaction));
 
 			if(transaction instanceof CreateOrderTransaction)
 			{
@@ -2645,7 +2652,7 @@ public class BlockExplorer
 			
 			Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 			
-			all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeq(), txTarget.getSeq(), trade.getValue() ) );
+			all.add( new BlExpUnit(txInitiator.getParent(db).getHeight(db), txTarget.getParent(db).getHeight(db), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 		}
 
 		int size = all.size();
@@ -2666,6 +2673,8 @@ public class BlockExplorer
 
 	public Map jsonQueryBlock(String query)
 	{
+		DBSet db = DBSet.getInstance();
+
 		Map output=new LinkedHashMap();
 		List<Object> all = new ArrayList<Object>();
 		int[] txsTypeCount = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -2675,7 +2684,7 @@ public class BlockExplorer
 
 		if(query.matches("\\d+"))
 		{
-			block = Controller.getInstance().getBlockByHeight(Integer.valueOf(query));
+			block = Controller.getInstance().getBlockByHeight(db, Integer.valueOf(query));
 		}
 		else if (query.equals("last"))
 		{

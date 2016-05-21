@@ -348,8 +348,4 @@ public abstract class TransactionAmount extends Transaction {
 
 	//public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
 	
-	public int calcBaseFee() {
-		return calcCommonFee();
-	}
-
 }

@@ -112,6 +112,9 @@ public abstract class Transaction {
 	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 76;
 	public static final int ITEM_PERSON_HEIGHT_ERROR = 77;
 
+	public static final int INVALID_BLOCK_HEIGHT_ERROR = 80;
+	public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 81;
+
 	public static final int NOT_YET_RELEASED = 1000;
 	
 	//TYPES *******
@@ -230,6 +233,8 @@ public abstract class Transaction {
 	//PROPERTIES LENGTH
 	protected static final int SIMPLE_TYPE_LENGTH = 1;
 	protected static final int TYPE_LENGTH = 4;
+	protected static final int HEIGHT_LENGTH = 4;
+	protected static final int SEQ_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
 	public static final int REFERENCE_LENGTH = 64;
@@ -426,9 +431,13 @@ public abstract class Transaction {
 		}
 	}
 
+	public Block getParent(DBSet db) {
+		
+		return db.getTransactionParentMap().getParent(this.signature);
+	}
 	public Block getParent() {
 		
-		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
+		return this.getParent(DBSet.getInstance());
 	}
 
 	// VIEW
@@ -448,8 +457,8 @@ public abstract class Transaction {
 		String sub = viewSubTypeName();
 		return sub.length() > 0? viewTypeName() + ":" + sub: viewTypeName();
 	}
-	public String viewHeightSeq() {
-		return this.getHeight() + "-" + this.getSeq();
+	public String viewHeightSeq(DBSet db) {
+		return this.getBlockHeight(db) + "-" + this.getSeqNo(db);
 	}
 	public String viewAmount(Account account) {
 		return account==null?"": viewAmount(account.getAddress());
@@ -678,17 +687,23 @@ public abstract class Transaction {
 		
 	public abstract boolean isInvolved(Account account);
  
-	public int getHeight()
+	public int getBlockHeight(DBSet db)
 	{
-		if(this.isConfirmed())
+		if(this.isConfirmed(db))
 		{
 			return this.getParent().getHeight();
 		}
 		return -1;
 	}
-	public int getSeq()
+	/*
+	public int getBlockHeight()
 	{
-		if(this.isConfirmed())
+		return getBlockHeight(db);
+	}
+	*/
+	public int getSeqNo(DBSet db)
+	{
+		if(this.isConfirmed(db))
 		{
 			return this.getParent().getTransactionSeq(this.signature);
 		}
@@ -708,14 +723,16 @@ public abstract class Transaction {
 		return false;
 	}
 
+	/*
 	public boolean isConfirmed()
 	{
 		return this.isConfirmed(DBSet.getInstance());
 	}
+	*/
 	
 	public boolean isConfirmed(DBSet db)
 	{
-		return DBSet.getInstance().getTransactionParentMap().contains(this.getSignature());
+		return db.getTransactionParentMap().contains(this.getSignature());
 	}
 	
 	public int getConfirmations()
@@ -743,10 +760,10 @@ public abstract class Transaction {
 		}
 	}
 
-	public int getBlockVersion()
+	public int getBlockVersion(DBSet db)
 	{
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
-		if(this.isConfirmed())
+		if(this.isConfirmed(db))
 		{
 			return DBSet.getInstance().getTransactionParentMap().getParent(this.getSignature()).getVersion();
 		}

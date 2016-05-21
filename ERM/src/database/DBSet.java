@@ -34,6 +34,8 @@ public class DBSet implements Observer, IDB {
 	private AddressPersonMap addressPersonMap;
 	private PersonAddressMap personAddressMap;
 	private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
+	private VouchRecordMap vouchRecordMap;
+
 	private BlockMap blockMap;
 	private ChildMap childMap;
 	private HeightMap heightMap;
@@ -134,6 +136,8 @@ public class DBSet implements Observer, IDB {
 			this.personAddressMap = new PersonAddressMap(this, database);
 			this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
+			this.vouchRecordMap = new VouchRecordMap(this, database);
+			
 			this.blockMap = new BlockMap(this, database);
 			this.childMap = new ChildMap(this, database);
 			this.heightMap = new HeightMap(this, database);
@@ -195,6 +199,8 @@ public class DBSet implements Observer, IDB {
 		this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
 		this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
+		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
+
 		this.blockMap = new BlockMap(parent.blockMap);
 		this.childMap = new ChildMap(this.blockMap, parent.childMap);
 		this.heightMap = new HeightMap(parent.heightMap);
@@ -250,6 +256,8 @@ public class DBSet implements Observer, IDB {
 		this.addressPersonMap.reset();
 		this.personAddressMap.reset();;
 		this.kK_KPersonStatusUnionMap.reset();
+		this.vouchRecordMap.reset();
+
 		this.heightMap.reset();
 		this.referenceMap.reset();
 		this.peerMap.reset();
@@ -348,6 +356,11 @@ public class DBSet implements Observer, IDB {
 	public KK_KPersonStatusUnionMap getPersonStatusUnionMap()
 	{
 		return this.kK_KPersonStatusUnionMap;
+	}
+
+	public VouchRecordMap getVouchRecordMap() 
+	{
+		return this.vouchRecordMap;
 	}
 
 	public BlockMap getBlockMap() 

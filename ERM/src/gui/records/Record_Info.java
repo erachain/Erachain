@@ -34,16 +34,18 @@ public class Record_Info extends JTextPane {
 	
 	static String Get_HTML_Record_Info_001(Transaction record)
 	{
-		 
+		
+		DBSet db = DBSet.getInstance();
+
 		String message = "";
 		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 		
 		if (record == null) return message += "Empty Record";
 		
-		if (!record.isConfirmed()) {
+		if (!record.isConfirmed(db)) {
 			message = Lang.getInstance().translate("Not confirmed");
 		} else {
-			message = "Block Height - SeqNo.: " + record.viewHeightSeq() + ", Confs.: " + record.getConfirmations() + ", Block Ver.: " + record.getBlockVersion();
+			message = "Block Height - SeqNo.: " + record.viewHeightSeq(db) + ", Confs.: " + record.getConfirmations() + ", Block Ver.: " + record.getBlockVersion(db);
 		}
 		message = "<div><b>" + message + "</b>"
 			+ ", time: " + record.viewTimestamp() + "</div>";

@@ -1929,9 +1929,12 @@ public class Controller extends Observable {
 	}
 	*/
 	
+	public Block getBlockByHeight(DBSet db, int parseInt) {
+		byte[] b = db.getHeightMap().getBlockByHeight(parseInt);
+		return db.getBlockMap().get(b);
+	}
 	public Block getBlockByHeight(int parseInt) {
-		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);
-		return DBSet.getInstance().getBlockMap().get(b);
+		return getBlockByHeight(DBSet.getInstance(), parseInt);
 	}
 
 	public PublicKeyAccount getPublicKeyByAddress1(String address) {
