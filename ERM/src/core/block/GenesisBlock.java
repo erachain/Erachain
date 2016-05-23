@@ -116,44 +116,68 @@ public class GenesisBlock extends Block{
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
-							"Ермолаев Дмитрий Сергеевич", "1966-08-21 10:10:10.0", null, 
-							(byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
-							"Ермолаев Александр Сергеевич", "1966-08-21 10:10:10.0", null,
-							(byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев, Александр Сергеевич", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
-							"Скорняков Александр Викторович", "1963-08-21 10:10:10.0", null,
-							(byte)1, "Slav", (float)1.1330, (float)13.9224,
+							"Скорняков, Александр Викторович", "1963-08-21", null,
+							(byte)1, "европеец-славянин", (float)1.1330, (float)13.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
 				);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
 					Arrays.asList(1000, new PersonHuman(new Account("7FoC1wAtbR9Z5iwtcw4Ju1u2DnLBQ1TNS7"),
-							"Симанков Дмитрий", "1966-08-21 10:10:10.0", null,
-							(byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Симанков, Дмитрий", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("78A24nTM2PPdpjLF2JWbghPDUhPK1zQ51Y"),
-							"Добрышкин Сергей", "1966-08-21 10:10:10.0", null,
-							(byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Добрышкин, Сергей", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
-							"Бородин Олег", "1966-08-21 10:10:10.0", null,
-							(byte)1, "Slav", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, ""))					
+							"Бородин, Олег", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "")),
+					Arrays.asList(1000, new PersonHuman(new Account("7RhYgcBSLNLKURXzv85BRuzp4DBb2bpCag"),
+							"Попилин, Максим Александрович", "1984-08-10", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
+							"Кузьмин, Павел Иванович", "1970-12-08", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7JWNnyeiti3X7MYo83kDJVw15PLR7VqUjb"),
+							"Рабчевский, Павел Александрович", "1979-09-08", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7EDf4NPP6wRTmTtZcszo7ivNYhWrP2X44P"),
+							"Стриженок, Арсений Сергеевич", "1991-02-05", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7McpCLj5a27mnSpo9UGHCcDr2CysC382VJ"),
+							"Скорняков, Александр Викторович", "1956-02-01", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7L4erwEVLbGfY6hw4o3GKMjdi8KsJjPdCt"),
+							"Симонов, Олег Вадимович", "1967-02-11", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
 				);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					Arrays.asList(100, new PersonHuman(new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo"),
-							"неизвестный участник", "1966-08-21 10:10:10.0",  null,
-							(byte)1, "Slav", (float)0.0, (float)0.0,
+							"неизвестный участник", "1966-08-21",  null,
+							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
 					);
 			List<PersonCls> personGenesisUsers = Arrays.asList(
 					new PersonHuman(genesisGenerator,
-							"Менделеев, Дмитрий Иванович", "1834-02-08 00:00:00.0", "1907-02-02 00:00:00.0",
-							(byte)1, "Slav", (float)58.195278, (float)68.258056,
+							"Менделеев, Дмитрий Иванович", "1834-02-08", "1907-02-02",
+							(byte)1, "европеец-славянин", (float)58.195278, (float)68.258056,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 180, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
 					);
 
@@ -358,8 +382,8 @@ public class GenesisBlock extends Block{
 	{
 		switch(key)
 		{
-		case (int)NoteCls.PERSONALIZE_KEY:
-			return new Note(genesisGenerator, "Introduce Myself", "I, %First Name% %Middle Name% %Last Name%, date of birth \"%date of Birth%\", place of birth \"%Place of Birth%\", race \"%Race%\", height \"%height%\", color \"%Color%\", eye color \"Eye Color\", hair color \"%Hair Color%\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		case (int)NoteCls.EMPTY_KEY:
+			return new Note(genesisGenerator, "empty", "empty");
 		case (int)NoteCls.ESTABLISH_UNION_KEY:
 			return new Note(genesisGenerator, "Establish the Union", "Union name \"%Company Name%\" in country \"%Country%\"");
 		case (int)NoteCls.MARRIAGE_KEY:

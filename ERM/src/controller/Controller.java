@@ -1900,6 +1900,16 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow,
+			int height, int seq) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Vouch( version, asPack,
+					creator, feePow,
+					height, seq);
+		}
+	}
+
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
 			ItemCls item, Long beg_date, Long end_date) {

@@ -24,6 +24,7 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import database.ItemAssetBalanceMap;
+import lang.Lang;
 import database.DBSet;
 import utils.Converter;
 
@@ -80,6 +81,19 @@ public class R_Vouch extends Transaction {
 	{
 		return this.seq;
 	}
+	
+	public static Transaction getVouchingRecord(DBSet db, String refStr) { 
+		try {
+			String[] strA = refStr.split("\\-");
+			int height = Integer.parseInt(strA[0]);
+			int seq = Integer.parseInt(strA[1]);
+	
+			return db.getTransactionFinalMap().getTransaction(height, seq);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

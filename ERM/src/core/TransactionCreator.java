@@ -48,6 +48,7 @@ import core.transaction.MultiPaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -483,6 +484,26 @@ public class TransactionCreator
 		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
 				add_day,  timestamp, creator.getLastReference(this.fork));
+		record.sign(creator, asPack);
+			
+		return afterCreate(record, asPack);
+	}
+
+	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow,
+			int height, int seq) {
+		
+		this.checkUpdate();
+		
+		Transaction record;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE SERTIFY PERSON TRANSACTION
+		//int version = 5; // without user sign
+		record = new R_Vouch(creator, (byte)feePow,
+				height, seq,
+				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);

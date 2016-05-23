@@ -26,6 +26,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.statuses.StatusCls;
+import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.persons.RIPPersonFrame;
@@ -68,22 +69,21 @@ public class VouchRecordDialog extends JDialog  {
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			infoPanel.show_mess(Lang.getInstance().translate("Status must be OK to show public key details."));
+	        jLabel_RecordInfo.setViewportView(infoPanel);
 			return null;
 		}
 
 		Transaction record = null;
-		String recordStr = jTextField_recordID.getText();
-		try {
-			String[] strA = recordStr.split("\\-");
-			int height = Integer.parseInt(strA[0]);
-			int seq = Integer.parseInt(strA[1]);
-
-			record = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
-		} catch (Exception e) {
+		record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jTextField_recordID.getText());
+		if (record == null) {
 			infoPanel.show_mess(Lang.getInstance().translate("Error - use 1233-321."));
-			return null;
+	        jLabel_RecordInfo.setViewportView(infoPanel);
+			return record;
 		}
 		
+		//ENABLE
+		jButton_Confirm.setEnabled(true);
+
 		infoPanel.show_001(record);
 		//infoPanel.setFocusable(false);
         jLabel_RecordInfo.setViewportView(infoPanel);
@@ -91,22 +91,20 @@ public class VouchRecordDialog extends JDialog  {
         return record;
 	}
 
-	public void onGoClick(
-			Transaction record, JButton Button_Confirm,
-			JComboBox<Account> jComboBox_YourAddress, JTextField feePowTxt)
+	public void onGoClick()
+			//JComboBox<Account> jComboBox_YourAddress, JTextField feePowTxt)
 	{
 
-    	if (!OnDealClick.proccess1(Button_Confirm)) return;
+    	if (!OnDealClick.proccess1(jButton_Confirm)) return;
 
 		Account creator = (Account) jComboBox_YourAddress.getSelectedItem();
     	//String address = pubKey1Txt.getText();
-    	int toDate = 0;
     	int feePow = 0;
     	int parse = 0;
 		try {
 
 			//READ FEE POW
-			feePow = Integer.parseInt(feePowTxt.getText());
+			feePow = Integer.parseInt(jFormattedTextField_Fee.getText());
 		}				
 		catch(Exception e)
 		{
@@ -119,7 +117,7 @@ public class VouchRecordDialog extends JDialog  {
 			}
 
 			//ENABLE
-			Button_Confirm.setEnabled(true);
+			jButton_Confirm.setEnabled(true);
 
 			return;
 		}
@@ -129,10 +127,10 @@ public class VouchRecordDialog extends JDialog  {
 
 		int version = 0; // without user signs
 		
-		//Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyRecord(version, false, authenticator,
-		//		feePow, record.getKey(), 
-		//		sertifiedPublicKeys, toDate);
-		Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
+		Pair<Transaction, Integer> result = Controller.getInstance().r_Vouch(0, false,
+				authenticator, feePow,
+				record.getBlockHeight(DBSet.getInstance()), record.getSeqNo(DBSet.getInstance()));
+		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
@@ -144,7 +142,7 @@ public class VouchRecordDialog extends JDialog  {
 		}
 		
 		//ENABLE
-		Button_Confirm.setEnabled(true);
+		jButton_Confirm.setEnabled(true);
 		
 	}
 	
@@ -182,7 +180,7 @@ public class VouchRecordDialog extends JDialog  {
 	        layout.rowHeights = new int[] {0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
 	        getContentPane().setLayout(layout);
 
-	        jLabel_recordID.setText(Lang.getInstance().translate("Add Days") +":");
+	        jLabel_recordID.setText(Lang.getInstance().translate("Heigh/SeqNo.") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 14;
@@ -306,8 +304,7 @@ public class VouchRecordDialog extends JDialog  {
 			{
 			    public void actionPerformed(ActionEvent e)
 			    {
-			    	onGoClick(VouchRecordDialog.record, jButton_Confirm,
-			    			jComboBox_YourAddress, jFormattedTextField_Fee);
+			    	onGoClick();
 			    }
 			});
 	        

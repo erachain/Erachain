@@ -7,7 +7,8 @@
 *.iml
 
 /log.txt
+/log.txt.*
 peers.json
 settings.json
+/*.jar
 *.zip
-/log.txt.1

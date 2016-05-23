@@ -87,8 +87,12 @@ public abstract class PersonCls extends ItemCls {
 		this(typeBytes, creator, name, 0, 0,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
+		
+		if (birthday.length() < 11) birthday += " 00:01:01";
 		this.birthday = Timestamp.valueOf(birthday).getTime();
-		this.deathday = deathday==null?Long.MIN_VALUE:Timestamp.valueOf(deathday).getTime();
+		
+		if (deathday != null && deathday.length() < 11) deathday += " 00:01:01";
+		this.deathday = deathday==null? Long.MIN_VALUE: Timestamp.valueOf(deathday).getTime();
 	}
 	
 	public PersonCls(int type, Account creator, String name, long birthday, long deathday,

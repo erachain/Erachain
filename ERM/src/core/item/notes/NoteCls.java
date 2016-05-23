@@ -13,7 +13,7 @@ public abstract class NoteCls extends ItemCls {
 	
 	// PERS KEY
 	public static final long MYSELF_KEY = 0l;
-	public static final long PERSONALIZE_KEY = 1l;
+	public static final long EMPTY_KEY = 1l;
 	public static final long ESTABLISH_UNION_KEY = 2l;
 	public static final long MARRIAGE_KEY = 3l;
 	public static final long HIRING_KEY = 4l;
