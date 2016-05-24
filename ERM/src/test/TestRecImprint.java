@@ -90,7 +90,7 @@ public class TestRecImprint {
 		assertEquals(name_total, Base58.encode(reference));
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
 		issueImprintTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE IMPRINT TRANSACTION IS VALID
@@ -101,7 +101,7 @@ public class TestRecImprint {
 		assertEquals(name_total, Base58.encode(impr_1.getCuttedReference()));
 		
 		//INVALID SIGNATURE
-		issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
+		issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, new byte[64]);
 		
 		//CHECK IF ISSUE IMPRINT IS INVALID
 		assertEquals(false, issueImprintTransaction.isSignatureValid());
@@ -119,9 +119,9 @@ public class TestRecImprint {
 		assertEquals(raw.length, imprint.getDataLength(false));
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
 		issueImprintRecord.sign(maker, false);
-		issueImprintRecord.process(db, false);
+		//issueImprintRecord.process(db, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueImprintTransaction = issueImprintRecord.toBytes(true, null);
@@ -177,7 +177,7 @@ public class TestRecImprint {
 		init();				
 						
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
 		assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
 		issueImprintRecord.sign(maker, false);
 		
@@ -194,7 +194,7 @@ public class TestRecImprint {
 		assertEquals(true, db.getItemImprintMap().contains(key));
 		
 		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), "e");				
-		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
+		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10);
 		issueImprintTransaction_2.sign(maker, false);
 		issueImprintTransaction_2.process(db, false);
 		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey());
@@ -207,7 +207,7 @@ public class TestRecImprint {
 		assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true), imprint.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference(db)));
+		//assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 	}
 	
 	
@@ -218,11 +218,11 @@ public class TestRecImprint {
 		init();				
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
 		issueImprintRecord.sign(maker, false);
 		issueImprintRecord.process(db, false);
 		long key = db.getIssueImprintMap().get(issueImprintRecord);
-		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference(db)));
+//		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 		
 		issueImprintRecord.orphan(db, false);
 				
@@ -230,7 +230,7 @@ public class TestRecImprint {
 		assertEquals(false, db.getItemImprintMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueImprintRecord.getReference(), maker.getLastReference(db)));
+		//assertEquals(true, Arrays.equals(issueImprintRecord.getReference(), maker.getLastReference()));
 	}
 	
 	// TODO - in statement - valid on key = 999

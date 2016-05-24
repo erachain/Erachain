@@ -109,7 +109,7 @@ public My_Imprints_Tab(){
 		
 		public void onIssueClick()
 		{
-			new IssueImprintFrame();
+			new IssueImprintDialog();
 		}
 		
 		public void onAllClick()

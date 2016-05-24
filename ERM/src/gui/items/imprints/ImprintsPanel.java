@@ -31,7 +31,7 @@ import gui.CoreRowSorter;
 import gui.items.ItemsPanel;
 import gui.items.imprints.AllImprintsFrame;
 import gui.items.imprints.ImprintFrame;
-import gui.items.imprints.IssueImprintFrame;
+import gui.items.imprints.IssueImprintDialog;
 //import gui.items.imprints.MyOrdersFrame;
 //import gui.items.imprints.PayDividendFrame;
 import gui.models.WalletItemImprintsTableModel;
@@ -198,7 +198,7 @@ public class ImprintsPanel extends JInternalFrame
 	
 	public void onIssueClick()
 	{
-		new IssueImprintFrame();
+		new IssueImprintDialog();
 	}
 	
 	public void onAllClick()

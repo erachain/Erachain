@@ -474,13 +474,13 @@ public abstract class Transaction {
 		return "";
 	}
 	public String viewReference() {
-		return reference==null?"GENESIS":Base58.encode(reference);
+		return reference==null?"null":Base58.encode(reference);
 	}
 	public String viewSignature() {
-		return signature==null?"GENESIS":Base58.encode(signature);
+		return signature==null?"null":Base58.encode(signature);
 	}
 	public String viewTimestamp() {
-		return timestamp<1000?"GENESIS":DateTimeFormat.timestamptoString(timestamp);
+		return timestamp<1000?"null":DateTimeFormat.timestamptoString(timestamp);
 	}
 	public int viewSize(boolean asPack) {
 		return getDataLength(asPack);
@@ -506,15 +506,17 @@ public abstract class Transaction {
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
-		transaction.put("reference", Base58.encode(this.reference));
-		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
 		if (this.creator == null )
 		{
-			transaction.put("creator", "genesis");			
+			transaction.put("creator", "genesis");
+			transaction.put("reference", "genesis");
+			transaction.put("signature", "genesis");
 		} else {
+			transaction.put("reference", this.reference==null?"null":Base58.encode(this.reference));
+			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
 			transaction.put("fee", this.fee.toPlainString());
-			transaction.put("timestamp", this.timestamp);
+			transaction.put("timestamp", this.timestamp<1000?"null":this.timestamp);
 			transaction.put("creator", this.creator.getAddress());
 			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
 			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
@@ -560,7 +562,10 @@ public abstract class Transaction {
 		}
 		
 		//WRITE REFERENCE - in any case as Pack or not
-		data = Bytes.concat(data, this.reference);
+		if (this.reference != null) {
+			// NULL in imprints
+			data = Bytes.concat(data, this.reference);
+		}
 
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -615,7 +620,8 @@ public abstract class Transaction {
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
+		if(this.reference != null 
+				&& !Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
 		{
 			return INVALID_REFERENCE;
 		}
