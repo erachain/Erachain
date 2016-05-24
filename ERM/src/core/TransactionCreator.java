@@ -288,7 +288,7 @@ public class TransactionCreator
 		ImprintCls imprint = new Imprint(creator, name, description);
 							
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time, creator.getLastReference(this.fork));
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
 		issueImprintRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
