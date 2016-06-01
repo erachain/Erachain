@@ -101,16 +101,6 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		return this.getAmount().toString();
 	}
 
-	/*
-	
-	//@Override
-	public void sign(PrivateKeyAccount creator, boolean asPack)
-	{
-		super.sign(creator, asPack);
-		this.asset.setReference(this.signature);
-	}
-	*/
-
 	//PARSE CONVERT
 	
 	@SuppressWarnings("unchecked")

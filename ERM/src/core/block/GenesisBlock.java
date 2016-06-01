@@ -45,7 +45,7 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
-	private static long genesisGeneratingBalance = 12000000L; // starting max volume for generating	
+	private static long genesisGeneratingBalance = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
 	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
 
 	private String testnetInfo; 
@@ -396,13 +396,26 @@ public class GenesisBlock extends Block{
 	// make notes
 	public static Status makeStatus(int key) 
 	{
-		if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		// if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		if  (key == StatusCls.AA_KEY) return new Status(genesisGenerator, "AA", "Rights level AA");
+		else if  (key == StatusCls.BB_KEY) return new Status(genesisGenerator, "BB", "Rights level AA");
+		else if  (key == StatusCls.CC_KEY) return new Status(genesisGenerator, "CC", "Rights level AA");
+		else if  (key == StatusCls.DD_KEY) return new Status(genesisGenerator, "DD", "Rights level AA");
+		else if  (key == StatusCls.EE_KEY) return new Status(genesisGenerator, "EE", "Rights level AA");
+		else if  (key == StatusCls.FF_KEY) return new Status(genesisGenerator, "FF", "Rights level AA");
+		else if  (key == StatusCls.GG_KEY) return new Status(genesisGenerator, "GG", "Rights level AA");
+		else if  (key == StatusCls.HH_KEY) return new Status(genesisGenerator, "HH", "Rights level AA");
+		
+		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "alive", "Person is alive");
+		else if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+
 		else if (key == StatusCls.CITIZEN_KEY) return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
 		else if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "I am member of %union%");
 		else if (key == StatusCls.SPOUSE_KEY) return new Status(genesisGenerator, "Spouse", "I am spouse on %spouse%");
 
 		else if (key == StatusCls.GENERAL_KEY) return new Status(genesisGenerator, "General", "");
 		else if (key == StatusCls.MAJOR_KEY) return new Status(genesisGenerator, "Major", "");
+		else if (key == StatusCls.MINOR_KEY) return new Status(genesisGenerator, "Minor", "");
 		else if (key == StatusCls.ADMIN_KEY) return new Status(genesisGenerator, "Admin", "");
 		else if (key == StatusCls.MANAGER_KEY) return new Status(genesisGenerator, "Manager", "");
 		else if (key == StatusCls.WORKER_KEY) return new Status(genesisGenerator, "Worker", "");
@@ -417,7 +430,7 @@ public class GenesisBlock extends Block{
 		else if (key == StatusCls.CONFIRMED_KEY) return new Status(genesisGenerator, "Confirmed", "");
 		else if (key == StatusCls.EXPIRED_KEY) return new Status(genesisGenerator, "Expired", "");
 
-		else return new Status(genesisGenerator, "Alive", "I am alive.");
+		else return new Status(genesisGenerator, "AA", "Rights level AA");
 	}
 
 	public String getTestNetInfo() 

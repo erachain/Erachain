@@ -29,7 +29,9 @@ import database.DBSet;
 import utils.Converter;
 
 
-
+// TODO
+// ver =1 - vouching incommed transfers - assets etc.
+//   ++ FEE = 0, no TIMESTAMP??, max importance for including in block 
 public class R_Vouch extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.VOUCH_TRANSACTION;

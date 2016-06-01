@@ -76,6 +76,12 @@ public class Settings {
 	private static final String DEFAULT_DATA_DIR = "data";
 	private static final String DEFAULT_WALLET_DIR = "wallet";
 	
+	// RIGHTs 
+	public static final int GENERAL_ERMO_BALANCE = 1000000;
+	public static final int MAJOR_ERMO_BALANCE = 33000;
+	public static final int MINOR_ERMO_BALANCE = 100;
+	
+	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = false;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
 

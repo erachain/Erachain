@@ -30,6 +30,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import database.DBSet;
+import settings.Settings;
 //import lang.Lang;
 //import settings.Settings;
 import utils.DateTimeFormat;
@@ -255,6 +256,7 @@ public abstract class Transaction {
 	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
+	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected byte[] reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
@@ -534,6 +536,12 @@ public abstract class Transaction {
 		boolean withSign = false;
 		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;
+		
+		
+		// all test a not valid for main test
+		// all other network must be invalid here!
+		int port = Controller.getInstance().getNetworkPort();
+		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		this.signature = Crypto.getInstance().sign(creator, data);
 		if (!asPack)

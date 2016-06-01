@@ -284,7 +284,7 @@ public class TransactionCreator
 								
 		//TIME
 		long time = NTP.getTime();
-								
+			
 		ImprintCls imprint = new Imprint(creator, name, description);
 							
 		//CREATE ISSUE IMPRINT TRANSACTION
