@@ -543,9 +543,9 @@ public abstract class AT_Controller {
 				if ( tx.getRecipientId() != null && !Arrays.equals(tx.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]))
 				{
 					Account recipient = new Account( Base58.encode( tx.getRecipientId() ) );
-					if ( Arrays.equals( recipient.getLastReference(dbSet),new byte[0]))
+					if ( recipient.getLastReference(dbSet) == null)
 					{
-						recipient.setLastReference(new byte[64], dbSet);
+						recipient.setLastReference(-1L, dbSet);
 					}
 					recipient.setConfirmedBalance( Transaction.FEE_KEY, recipient.getConfirmedBalance( Transaction.FEE_KEY, dbSet ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
 				}

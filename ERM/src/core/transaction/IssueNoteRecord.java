@@ -31,11 +31,11 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_NOTE_TRANSACTION;
 	private static final String NAME_ID = "Issue Note";
 	
-	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference) 
+	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, note, feePow, timestamp, reference);		
 	}
-	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, note, feePow, timestamp, reference, signature);		
 	}
@@ -43,7 +43,7 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, note, (byte)0, 0l, null, signature);		
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, note, feePow, timestamp, reference, signature);
 	}
@@ -51,7 +51,7 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, note, (byte)0, 0l, null, signature);
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, byte[] reference) 
+	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, note, feePow, timestamp, reference);
 	}
@@ -66,7 +66,7 @@ public class IssueNoteRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -90,10 +90,11 @@ public class IssueNoteRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		

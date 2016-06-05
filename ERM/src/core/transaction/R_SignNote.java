@@ -48,30 +48,30 @@ public class R_SignNote extends Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + IS_TEXT_LENGTH + DATA_SIZE_LENGTH ; 
 
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.data = data;
 		this.isText = isText;
 	}
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, Note, data, isText, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// asPack
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data, byte[] isText, byte[] reference, byte[] signature) {
+	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data, byte[] isText, Long reference, byte[] signature) {
 		this(typeBytes, creator, (byte)0, Note, data, isText, 0l, reference);
 		this.signature = signature;
 		// not need this.calcFee();
 	}
-	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference, byte[] signature) {
+	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, Note, data, isText, timestamp, reference, signature);
 	}
-	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference) {
+	public R_SignNote(PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, Note, data, isText, timestamp, reference);
 	}
 	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long Note, byte[] data,
-			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, byte[] reference, byte[] signature)
+			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, feePow, Note, data, isText, timestamp, reference, signature);
 		this.signers = signers;
@@ -80,14 +80,14 @@ public class R_SignNote extends Transaction {
 	}
 	// as Pack
 	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long Note, byte[] data,
-			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, byte[] reference, byte[] signature)
+			byte[] isText, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, Note, data, isText, reference, signature);
 		this.signers = signers;
 		this.signatures = signatures;
 		this.setTypeBytes();
 	}
-	public R_SignNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, byte[] reference)
+	public R_SignNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long Note, byte[] data, byte[] isText, long timestamp, Long reference)
 	{
 		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, Note, data, isText, timestamp, reference);
 	}
@@ -163,7 +163,7 @@ public class R_SignNote extends Transaction {
 	
 	// releaserReference = null - not a pack
 	// releaserReference = reference for releaser account - it is as pack
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
 		
@@ -186,10 +186,11 @@ public class R_SignNote extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -272,7 +273,7 @@ public class R_SignNote extends Transaction {
 	}
 
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -299,7 +300,7 @@ public class R_SignNote extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
 		if(data.length > 4000 || data.length < 1)

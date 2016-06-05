@@ -45,7 +45,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 		
@@ -95,7 +95,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 
@@ -146,7 +146,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 

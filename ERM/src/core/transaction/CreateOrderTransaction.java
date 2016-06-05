@@ -39,7 +39,7 @@ public class CreateOrderTransaction extends Transaction
 	//private BigDecimal amount;
 	//private BigDecimal price;
 	
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
@@ -50,7 +50,7 @@ public class CreateOrderTransaction extends Transaction
 		this.order = new Order(null, creator, have, want, amount, price, timestamp);
 
 	}
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.signature = signature;
@@ -58,11 +58,11 @@ public class CreateOrderTransaction extends Transaction
 		this.calcFee();
 		
 	}
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference, signature);
 	}
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference);
 	}
@@ -112,7 +112,8 @@ public class CreateOrderTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -173,7 +174,7 @@ public class CreateOrderTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = new byte[0];
 		
@@ -188,7 +189,9 @@ public class CreateOrderTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 		
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		byte[] referenceBytes = Longs.toByteArray(this.reference);
+		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -235,7 +238,7 @@ public class CreateOrderTransaction extends Transaction
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK IF ASSETS NOT THE SAME
 		if(this.order.getHave() == this.order.getWant())
@@ -299,14 +302,8 @@ public class CreateOrderTransaction extends Transaction
 				return INVALID_RETURN;
 			}
 		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+						
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN

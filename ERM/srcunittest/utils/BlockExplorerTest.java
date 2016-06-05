@@ -344,7 +344,7 @@ public class BlockExplorerTest {
 	public Transaction getTransaction(byte[] signature, DBSet database) {
 		
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionParentMap()
+		Block block = database.getTransactionRef_BlockRef_Map()
 				.getParent(signature);
 		if (block != null) {
 			return block.getTransaction(signature);

@@ -38,11 +38,11 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	public static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
 
 	
-	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference) 
+	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);		
 	}
-	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);		
 	}
@@ -50,7 +50,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, union, (byte)0, 0l, null, signature);		
 	}
-	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, feePow, timestamp, reference, signature);
 	}
@@ -58,7 +58,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, (byte)0, 0l, null, signature);
 	}
-	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference) 
+	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, feePow, timestamp, reference);
 	}
@@ -73,7 +73,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -97,10 +97,11 @@ public class IssueUnionRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		
@@ -134,7 +135,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	}	
 	
 	//VALIDATE
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 

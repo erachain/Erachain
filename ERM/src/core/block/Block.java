@@ -758,7 +758,7 @@ public class Block {
 			transaction.process(db, false);
 
 			//SET PARENT
-			db.getTransactionParentMap().set(transaction, this);
+			db.getTransactionRef_BlockRef_Map().set(transaction, this);
 
 			//REMOVE FROM UNCONFIRMED DATABASE
 			db.getTransactionMap().delete(transaction);
@@ -768,7 +768,7 @@ public class Block {
 		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
 		for(Transaction transaction: unconfirmedTransactions)
 		{
-			if(db.getTransactionParentMap().contains(transaction.getSignature()))
+			if(db.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
 			{
 				db.getTransactionMap().delete(transaction);
 			}
@@ -839,7 +839,7 @@ public class Block {
 			{
 				Account recipient = new Account( key.getRecipient() );
 				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  db ).subtract( BigDecimal.valueOf( amount, 8 ) ) , db );
-				if ( Arrays.equals(recipient.getLastReference(db),new byte[64]))
+				if ( recipient.getLastReference(db) != null)
 				{
 					recipient.removeReference(db);
 				}
@@ -878,7 +878,7 @@ public class Block {
 			db.getTransactionMap().add(transaction);
 
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
-			db.getTransactionParentMap().delete(transaction.getSignature());
+			db.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
 	}
 

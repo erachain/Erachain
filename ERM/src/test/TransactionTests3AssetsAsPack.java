@@ -35,7 +35,7 @@ public class TransactionTests3AssetsAsPack {
 
 	static Logger LOGGER = Logger.getLogger(TransactionTests3AssetsAsPack.class.getName());
 
-	byte[] releaserReference;
+	Long releaserReference;
 	static boolean asPack = false;
 	
 	long FEE_KEY = 1l;
@@ -63,7 +63,7 @@ public class TransactionTests3AssetsAsPack {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		asset = new AssetVenture(maker, "a", "a", 50000l, (byte) 2, true);
@@ -164,7 +164,7 @@ public class TransactionTests3AssetsAsPack {
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueAssetTransaction.getReference(), parsedIssueAssetTransaction.getReference()));	
+			assertEquals(issueAssetTransaction.getReference(), parsedIssueAssetTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueAssetTransaction.getTimestamp(), parsedIssueAssetTransaction.getTimestamp());				
@@ -224,7 +224,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), releaserReference));
+		assertEquals(issueAssetTransaction.getSignature(), releaserReference);
 	}
 	
 	
@@ -242,7 +242,7 @@ public class TransactionTests3AssetsAsPack {
 		issueAssetTransaction.process(db, asPack);
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
 		assertEquals(new BigDecimal(1).setScale(8), maker.getConfirmedBalance(key,db));
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), releaserReference));
+		assertEquals(issueAssetTransaction.getSignature(), releaserReference);
 		
 		issueAssetTransaction.orphan(db, asPack);
 		
@@ -256,7 +256,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).longValue());
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getReference(), releaserReference));
+		assertEquals(issueAssetTransaction.getReference(), releaserReference);
 	}
 	
 
@@ -277,7 +277,7 @@ public class TransactionTests3AssetsAsPack {
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
@@ -289,7 +289,7 @@ public class TransactionTests3AssetsAsPack {
 		//INVALID SIGNATURE
 		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
 		assetTransfer.sign(maker, asPack);
-		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(101).setScale(8),assetTransfer.getSignature());
+		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(101).setScale(8), -123L);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
 		assertEquals(false, assetTransfer.isSignatureValid());
@@ -359,7 +359,7 @@ public class TransactionTests3AssetsAsPack {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 					
 		//CREATE VALID ASSET TRANSFER
 		R_Send assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
@@ -427,9 +427,9 @@ public class TransactionTests3AssetsAsPack {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		byte[] maker_LastReference = releaserReference;
-		byte[] recipient_LastReference = recipient.getLastReference(db);
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+		Long maker_LastReference = releaserReference;
+		Long recipient_LastReference = recipient.getLastReference(db);
 			
 		//CREATE ASSET TRANSFER
 		long key = 221;
@@ -447,10 +447,10 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(maker_LastReference, releaserReference));
+		assertEquals(maker_LastReference, releaserReference);
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(recipient_LastReference, recipient.getLastReference(db)));
+		assertEquals(recipient_LastReference, recipient.getLastReference(db));
 	}
 	
 	@Test
@@ -460,9 +460,9 @@ public class TransactionTests3AssetsAsPack {
 		init();
 		
 		//CREATE SIGNATURE
-		Account recipient = new Account("QUGKmr4JJjJRoHo9wNYKZa1Lvem7FHRXfU");
-		byte[] maker_LastReference = releaserReference;
-		byte[] recipient_LastReference = recipient.getLastReference(db);
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+		Long maker_LastReference = releaserReference;
+		Long recipient_LastReference = recipient.getLastReference(db);
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
@@ -481,10 +481,10 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(maker_LastReference, releaserReference));
+		assertEquals(maker_LastReference, releaserReference);
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(recipient_LastReference, recipient.getLastReference(db)));
+		assertEquals(recipient_LastReference, recipient.getLastReference(db));
 	}
 
 	
@@ -563,7 +563,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
 				
 		//CREATE CANCEL ORDER INVALID REFERENCE
-		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), new byte[64], new byte[]{1,2});		
+		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), -123L, new byte[]{1,2});		
 				
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(db, releaserReference));
@@ -611,7 +611,7 @@ public class TransactionTests3AssetsAsPack {
 			assertEquals(cancelOrderTransaction.getFee(), parsedCancelOrder.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(cancelOrderTransaction.getReference(), parsedCancelOrder.getReference()));	
+			assertEquals(cancelOrderTransaction.getReference(), parsedCancelOrder.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(cancelOrderTransaction.getTimestamp(), parsedCancelOrder.getTimestamp());				
@@ -666,7 +666,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(cancelOrderTransaction.getSignature(), releaserReference));
+		assertEquals(cancelOrderTransaction.getSignature(), releaserReference);
 				
 		//CHECK ORDER EXISTS
 		assertEquals(false, db.getOrderMap().contains(new BigInteger(new byte[]{5,6})));
@@ -710,7 +710,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(BigDecimal.valueOf(49000).setScale(8), maker.getConfirmedBalance( key, db));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(createOrderTransaction.getSignature(), releaserReference));
+		assertEquals(createOrderTransaction.getSignature(), releaserReference);
 				
 		//CHECK ORDER EXISTS
 		assertEquals(true, db.getOrderMap().contains(new BigInteger(new byte[]{5,6})));

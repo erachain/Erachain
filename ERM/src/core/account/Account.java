@@ -268,24 +268,24 @@ public class Account {
 	
 	//REFERENCE
 	
-	public byte[] getLastReference()
+	public Long getLastReference()
 	{
 		return this.getLastReference(DBSet.getInstance());
 	}
 	
-	public byte[] getLastReference(DBSet db)
+	public Long getLastReference(DBSet db)
 	{
-		return db.getReferenceMap().get(this);
+		return db.getReferenceMap().get(this.getAddress());
 	}
 	
-	public void setLastReference(byte[] reference)
+	public void setLastReference(Long timestamp)
 	{
-		this.setLastReference(reference, DBSet.getInstance());
+		this.setLastReference(timestamp, DBSet.getInstance());
 	}
 	
-	public void setLastReference(byte[] reference, DBSet db)
+	public void setLastReference(Long timestamp, DBSet db)
 	{
-		db.getReferenceMap().set(this, reference);
+		db.getReferenceMap().set(this.getAddress(), timestamp);
 	}
 	
 	public void removeReference() 
@@ -295,7 +295,7 @@ public class Account {
 	
 	public void removeReference(DBSet db) 
 	{
-		db.getReferenceMap().delete(this);
+		db.getReferenceMap().delete(this.getAddress());
 	}
 	
 	//TOSTRING

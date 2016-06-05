@@ -34,7 +34,7 @@ public class TestRecNote {
 
 	static Logger LOGGER = Logger.getLogger(TestRecNote.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = false;
 	long FEE_KEY = AssetCls.FEE_KEY;
@@ -64,7 +64,7 @@ public class TestRecNote {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
@@ -152,7 +152,7 @@ public class TestRecNote {
 			assertEquals(issueNoteRecord.getFee(), parsedIssueNoteTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference()));	
+			assertEquals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueNoteRecord.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
@@ -200,7 +200,7 @@ public class TestRecNote {
 		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true), note.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
+		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));
 	}
 	
 	
@@ -208,7 +208,7 @@ public class TestRecNote {
 	public void orphanIssueNoteTransaction()
 	{
 		
-		init();				
+		init();
 				
 		Note note = new Note(maker, "test", "strontje");
 				
@@ -217,7 +217,7 @@ public class TestRecNote {
 		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, false);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), maker.getLastReference(db)));
+		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));
 		
 		issueNoteRecord.orphan(db, false);
 				
@@ -225,7 +225,7 @@ public class TestRecNote {
 		assertEquals(false, noteMap.contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueNoteRecord.getReference(), maker.getLastReference(db)));
+		assertEquals(issueNoteRecord.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999

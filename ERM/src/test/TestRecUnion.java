@@ -44,7 +44,7 @@ public class TestRecUnion {
 
 	static Logger LOGGER = Logger.getLogger(TestRecUnion.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -112,7 +112,7 @@ public class TestRecUnion {
 		//GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
 		//genesis_certify.process(db, false);
 		
-		certifier.setLastReference(gb.getGeneratorSignature(), db);
+		certifier.setLastReference(gb.getTimestamp(), db);
 		certifier.setConfirmedBalance(ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE, db);
 		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -273,7 +273,7 @@ public class TestRecUnion {
 		assertEquals(union.getName(), parsedUnion.getName());
 			
 		//CHECK REFERENCE
-		assertEquals(true, Arrays.equals(issueUnionTransaction.getReference(), parsedIssueUnionRecord.getReference()));	
+		assertEquals(issueUnionTransaction.getReference(), parsedIssueUnionRecord.getReference());	
 		
 		//CHECK TIMESTAMP
 		assertEquals(issueUnionTransaction.getTimestamp(), parsedIssueUnionRecord.getTimestamp());				
@@ -330,7 +330,7 @@ public class TestRecUnion {
 		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true), union.toBytes(true)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueUnionTransaction.getSignature(), certifier.getLastReference(db)));
+		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastReference(db));
 
 		//////// ORPHAN /////////
 		issueUnionTransaction.orphan(db, false);
@@ -343,7 +343,7 @@ public class TestRecUnion {
 		assertEquals(false, db.getItemUnionMap().contains(unionKey));
 						
 		//CHECK REFERENCE ISSUER
-		assertEquals(true, Arrays.equals(issueUnionTransaction.getReference(), certifier.getLastReference(db)));
+		assertEquals(issueUnionTransaction.getReference(), certifier.getLastReference(db));
 	}
 	
 	

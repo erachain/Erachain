@@ -32,24 +32,24 @@ public class RegisterNameTransaction extends Transaction
 	private PublicKeyAccount creator;
 	private Name name;
 	
-	public RegisterNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	public RegisterNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
 	}
-	public RegisterNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public RegisterNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, name, feePow, timestamp, reference);
 		this.signature = signature;		
 		this.calcFee();
 	}
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference, signature);
 	}
-	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	public RegisterNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);
 	}
@@ -84,7 +84,8 @@ public class RegisterNameTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		Long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -124,7 +125,7 @@ public class RegisterNameTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -136,8 +137,12 @@ public class RegisterNameTransaction extends Transaction
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		//WRITE REFERENCE - in any case as Pack or not
+		if (this.reference != null) {
+			byte[] referenceBytes = Longs.toByteArray(this.reference);
+			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+			data = Bytes.concat(data, referenceBytes);
+		}
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -164,8 +169,8 @@ public class RegisterNameTransaction extends Transaction
 	
 	//VALIDATE
 	
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -198,21 +203,10 @@ public class RegisterNameTransaction extends Transaction
 		{
 			return NAME_ALREADY_REGISTRED;
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		
+						
 
-		return VALIDATE_OK;
+		return super.isValid(db, releaserReference);
+
 	}
 	
 	//PROCESS/ORPHAN
@@ -224,7 +218,7 @@ public class RegisterNameTransaction extends Transaction
 		super.process(db, asPack);
 								
 		//UPDATE REFERENCE OF OWNER
-		this.creator.setLastReference(this.signature, db);
+		//this.creator.setLastReference(this.timestamp, db);
 		
 		//INSERT INTO DATABASE
 		db.getNameMap().add(this.name);
@@ -238,7 +232,7 @@ public class RegisterNameTransaction extends Transaction
 		super.orphan(db, asPack);
 										
 		//UPDATE REFERENCE OF OWNER
-		this.creator.setLastReference(this.reference, db);
+		//this.creator.setLastReference(this.reference, db);
 				
 		//INSERT INTO DATABASE
 		db.getNameMap().delete(this.name);		

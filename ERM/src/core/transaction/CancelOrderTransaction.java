@@ -32,19 +32,19 @@ public class CancelOrderTransaction extends Transaction
 	
 	private BigInteger order;
 	
-	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.order = order;
 	}
-	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, order, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference, signature);
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference);
 	}
 	
@@ -77,7 +77,8 @@ public class CancelOrderTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -116,7 +117,7 @@ public class CancelOrderTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -131,7 +132,9 @@ public class CancelOrderTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 		
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		byte[] referenceBytes = Longs.toByteArray(this.reference);
+		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -161,8 +164,8 @@ public class CancelOrderTransaction extends Transaction
 	
 	//VALIDATE
 
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK IF ORDER EXISTS
 		Order order = db.getOrderMap().get(this.order);
@@ -170,32 +173,14 @@ public class CancelOrderTransaction extends Transaction
 		{
 			return ORDER_DOES_NOT_EXIST;
 		}
-		
-		//CHECK CREATOR
-		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-				
+						
 		//CHECK IF CREATOR IS CREATOR
 		if(!order.getCreator().getAddress().equals(this.creator.getAddress()))
 		{
 			return INVALID_ORDER_CREATOR;
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+								
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN

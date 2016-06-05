@@ -959,7 +959,7 @@ public class Controller extends Observable {
 				// AND UNCONFIRMED
 				// TODO fee
 				// transaction.calcFee();
-				if (!DBSet.getInstance().getTransactionParentMap()
+				if (!DBSet.getInstance().getTransactionRef_BlockRef_Map()
 								.contains(transaction.getSignature())) {
 					// ADD TO UNCONFIRMED TRANSACTIONS
 					this.blockGenerator.addUnconfirmedTransaction(transaction);
@@ -1317,10 +1317,17 @@ public class Controller extends Observable {
 		return getTransaction(signature, DBSet.getInstance());
 	}
 	
+	// by account addres + timestamp get signature
+	public byte[] getSignatureByAddrTime(DBSet database, String address, Long timestamp) {
+
+		//return database.getTransactionRef_BlockRef_Map().getParent(signature);
+		return null;
+	}
+	
 	public Transaction getTransaction(byte[] signature, DBSet database) {
 		
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionParentMap()
+		Block block = database.getTransactionRef_BlockRef_Map()
 				.getParent(signature);
 		if (block != null) {
 			return block.getTransaction(signature);
@@ -1963,20 +1970,21 @@ public class Controller extends Observable {
 		}
 
 		// CHECK ACCOUNT IN OWN WALLET
-		Account account = Controller.getInstance().getAccountByAddress(address);
+		Controller cntr = Controller.getInstance();
+		Account account = cntr.getAccountByAddress(address);
 		if (account != null) {
-			if (Controller.getInstance().isWalletUnlocked()) {
-				return Controller.getInstance()
-						.getPrivateKeyAccountByAddress(address).getPublicKey();
+			if (cntr.isWalletUnlocked()) {
+				return cntr.getPrivateKeyAccountByAddress(address).getPublicKey();
 			}
 		}
 
-		if (!DBSet.getInstance().getReferenceMap().contains(address)) {
+		DBSet db = DBSet.getInstance();
+		if (!db.getReferenceMap().contains(address)) {
 			return null;
 		}
 
-		Transaction transaction = Controller.getInstance().getTransaction(
-				DBSet.getInstance().getReferenceMap().get(address));
+		Transaction transaction = cntr.getTransaction(
+				getSignatureByAddrTime(db, address, db.getReferenceMap().get(address)));
 
 		if (transaction == null) {
 			return null;

@@ -30,7 +30,7 @@ public class TransactionV3Tests {
 
 	static Logger LOGGER = Logger.getLogger(TransactionV3Tests.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long ERMO_KEY = 0l;
 	long FEE_KEY = 1l;
@@ -62,7 +62,7 @@ public class TransactionV3Tests {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
@@ -157,7 +157,7 @@ public class TransactionV3Tests {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, maker.getLastReference(db)
+				timestamp + 100, maker.getLastReference(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		

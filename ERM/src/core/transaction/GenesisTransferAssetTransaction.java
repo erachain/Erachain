@@ -153,7 +153,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	}	
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		//byte[] data = new byte[0];
 		
@@ -187,7 +187,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -227,7 +227,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.signature, db);
+		this.recipient.setLastReference(this.timestamp, db);
 	}
 
 	@Override

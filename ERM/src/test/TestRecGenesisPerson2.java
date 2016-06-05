@@ -37,7 +37,7 @@ public class TestRecGenesisPerson2 {
 
 	static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson2.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long FEE_KEY = Transaction.FEE_KEY;
 	long ALIVE_KEY = StatusCls.ALIVE_KEY;
@@ -223,7 +223,7 @@ public class TestRecGenesisPerson2 {
 		LOGGER.info("person KEY: " + keyPerson);
 
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
+		assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
 
 		genesisIssuePersonTransaction.process(db, false);
 		keyPerson = person.getKey();

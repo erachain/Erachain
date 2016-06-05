@@ -48,7 +48,7 @@ public class TestRecPerson {
 
 	static Logger LOGGER = Logger.getLogger(TestRecPerson.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -61,6 +61,7 @@ public class TestRecPerson {
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
+	Long last_ref;
 	
 	//CREATE KNOWN ACCOUNT
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -108,6 +109,7 @@ public class TestRecPerson {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
+		last_ref = gb.getTimestamp();
 		
 		// GET RIGHTS TO CERTIFIER
 		byte gender = 1;
@@ -121,7 +123,7 @@ public class TestRecPerson {
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L);
 		genesis_certify.process(db, false);
 		
-		certifier.setLastReference(gb.getGeneratorSignature(), db);
+		certifier.setLastReference(last_ref, db);
 		certifier.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -153,10 +155,11 @@ public class TestRecPerson {
 		personKey = person.getKey();
 
 		// issue 1 genesis person in init() here
-		assertEquals( 2, personKey);
+		assertEquals( 1, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 		
 		//CREATE PERSONALIZE REcORD
+		timestamp += 100;
 		r_SertifyPubKeys = new R_SertifyPubKeys(version, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				timestamp, certifier.getLastReference(db));
@@ -291,7 +294,7 @@ public class TestRecPerson {
 		assertEquals(person.getName(), parsedPerson.getName());
 			
 		//CHECK REFERENCE
-		assertEquals(true, Arrays.equals(issuePersonTransaction.getReference(), parsedIssuePersonRecord.getReference()));	
+		assertEquals(issuePersonTransaction.getReference(), parsedIssuePersonRecord.getReference());	
 		
 		//CHECK TIMESTAMP
 		assertEquals(issuePersonTransaction.getTimestamp(), parsedIssuePersonRecord.getTimestamp());				
@@ -355,7 +358,7 @@ public class TestRecPerson {
 		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(key).toBytes(true), person.toBytes(true)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issuePersonTransaction.getSignature(), certifier.getLastReference(db)));
+		assertEquals(issuePersonTransaction.getTimestamp(), certifier.getLastReference(db));
 
 		//////// ORPHAN /////////
 		issuePersonTransaction.orphan(db, false);
@@ -368,7 +371,7 @@ public class TestRecPerson {
 		assertEquals(false, db.getItemPersonMap().contains(personKey));
 						
 		//CHECK REFERENCE ISSUER
-		assertEquals(true, Arrays.equals(issuePersonTransaction.getReference(), certifier.getLastReference(db)));
+		assertEquals(issuePersonTransaction.getReference(), certifier.getLastReference(db));
 	}
 	
 
@@ -507,7 +510,7 @@ public class TestRecPerson {
 			assertEquals(r_SertifyPubKeys.getTimestamp(), parsedPersonTransfer.getTimestamp());				
 
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(r_SertifyPubKeys.getReference(), parsedPersonTransfer.getReference()));	
+			assertEquals(r_SertifyPubKeys.getReference(), parsedPersonTransfer.getReference());	
 
 			//CHECK CREATOR
 			assertEquals(r_SertifyPubKeys.getCreator().getAddress(), parsedPersonTransfer.getCreator().getAddress());				
@@ -572,7 +575,7 @@ public class TestRecPerson {
 
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
-		assertEquals(2, personKey);
+		assertEquals(1, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES
@@ -617,51 +620,52 @@ public class TestRecPerson {
 		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(r_SertifyPubKeys.getSignature(), certifier.getLastReference(db)));
+		assertEquals(r_SertifyPubKeys.getTimestamp(), certifier.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		// TRUE - new reference for first send FEE
-		assertEquals(true, Arrays.equals(r_SertifyPubKeys.getSignature(), userAccount1.getLastReference(db)));
+		assertEquals(r_SertifyPubKeys.getTimestamp(), userAccount1.getLastReference(db));
 		// byte[0]
-		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));
-		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
+		assertEquals(null, userAccount2.getLastReference(db));
+		assertEquals(null, userAccount3.getLastReference(db));
 
 		////////// TO DATE ////////
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
+		// PERSON STATUS ALIVE - beg_date = person birthDay
+		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( (long)Long.MAX_VALUE, (long)dbPS.getItem(personKey, ALIVE_KEY).a);
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).b);
+		assertEquals( (long)Long.MAX_VALUE, (long)dbPS.getItem(personKey, ALIVE_KEY).b);
 		//assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
 		assertEquals( (int)dbPS.getItem(personKey, ALIVE_KEY).d, transactionIndex);
 
 		// ADDRESSES
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress1).a);
 		assertEquals( to_date, (int)dbAP.getItem(userAddress1).b);
-		assertEquals( -1, (int)dbAP.getItem(userAddress1).c);
+		assertEquals( 1, (int)dbAP.getItem(userAddress1).c);
 //		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress1).d, r_SertifyPubKeys.getSignature()));
 		// PERSON -> ADDRESS
 		assertEquals( to_date, (int)dbPA.getItem(personKey, userAddress1).a);
-		assertEquals( -1, (int)dbPA.getItem(personKey, userAddress1).b);
+		assertEquals( 1, (int)dbPA.getItem(personKey, userAddress1).b);
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress1).c, r_SertifyPubKeys.getSignature()));
 
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress2).a);
 		assertEquals( to_date, (int)dbAP.getItem(userAddress2).b);
-		assertEquals( -1, (int)dbAP.getItem(userAddress2).c);
+		assertEquals( 1, (int)dbAP.getItem(userAddress2).c);
 //		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress2).d, r_SertifyPubKeys.getSignature()));
 		// PERSON -> ADDRESS
 		assertEquals( to_date, (int)dbPA.getItem(personKey, userAddress2).a);
-		assertEquals( -1, (int)dbPA.getItem(personKey, userAddress2).b);
+		assertEquals( 1, (int)dbPA.getItem(personKey, userAddress2).b);
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress2).c, r_SertifyPubKeys.getSignature()));
 
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress3).a);
 		assertEquals( to_date, (int)dbAP.getItem(userAddress3).b);
-		assertEquals( -1, (int)dbAP.getItem(userAddress3).c);
+		assertEquals( 1, (int)dbAP.getItem(userAddress3).c);
 //		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress3).d, r_SertifyPubKeys.getSignature()));
 		// PERSON -> ADDRESS
 		assertEquals( to_date, (int)dbPA.getItem(personKey, userAddress3).a);
-		assertEquals( -1, (int)dbPA.getItem(personKey, userAddress3).b);
+		assertEquals( 1, (int)dbPA.getItem(personKey, userAddress3).b);
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress3).c, r_SertifyPubKeys.getSignature()));
 
 		assertEquals(true, userAccount1.isPerson(db));
@@ -684,16 +688,16 @@ public class TestRecPerson {
 		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(r_SertifyPubKeys.getReference(), certifier.getLastReference(db)));
+		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(new byte[0], userAccount1.getLastReference(db)));
-		assertEquals(true, Arrays.equals(new byte[0], userAccount2.getLastReference(db)));
-		assertEquals(true, Arrays.equals(new byte[0], userAccount3.getLastReference(db)));
+		assertEquals(null, userAccount1.getLastReference(db));
+		assertEquals(null, userAccount2.getLastReference(db));
+		assertEquals(null, userAccount3.getLastReference(db));
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
-		// PERSON STATUS ALIVE - must not modified!
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).a);
+		// PERSON STATUS ALIVE - must not be modified!
+		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -724,8 +728,8 @@ public class TestRecPerson {
 
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
-		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY).a);
+		// PERSON STATUS ALIVE - date_begin
+		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		assertEquals(abs_end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));

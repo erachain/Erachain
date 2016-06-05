@@ -54,7 +54,7 @@ public class txWindowTest {
 				FEE_POWER, 
 				//Transaction.getPOWFIX_RELEASE(),
 				NTP.getTime(),
-				new byte[]{0}
+				null
 				);
 		
 		new ArbitraryTransactionDetailsFrame(

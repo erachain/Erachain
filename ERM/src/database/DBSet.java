@@ -36,6 +36,7 @@ public class DBSet implements Observer, IDB {
 	private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
 	private VouchRecordMap vouchRecordMap;
 
+	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
 	private ChildMap childMap;
 	private HeightMap heightMap;
@@ -52,7 +53,7 @@ public class DBSet implements Observer, IDB {
 	private LocalDataMap localDataMap;
 	private BlogPostMap blogPostMap;
 	private HashtagPostMap hashtagPostMap;
-	private TransactionParentMap transactionParentMap;
+	private TransactionRef_BlockRef_Map transactionRef_BlockRef_Map;
 	private NameExchangeMap nameExchangeMap;
 	private UpdateNameMap updateNameMap;
 	private CancelSellNameMap cancelSellNameMap;
@@ -138,6 +139,7 @@ public class DBSet implements Observer, IDB {
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
 			this.vouchRecordMap = new VouchRecordMap(this, database);
 			
+			this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
 			this.blockMap = new BlockMap(this, database);
 			this.childMap = new ChildMap(this, database);
 			this.heightMap = new HeightMap(this, database);
@@ -154,7 +156,7 @@ public class DBSet implements Observer, IDB {
 			this.localDataMap = new LocalDataMap(this, database);
 			this.blogPostMap = new BlogPostMap(this, database);
 			this.hashtagPostMap = new HashtagPostMap(this, database);
-			this.transactionParentMap = new TransactionParentMap(this, database);
+			this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this, database);
 			this.nameExchangeMap = new NameExchangeMap(this, database);
 			this.updateNameMap = new UpdateNameMap(this, database);
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
@@ -201,6 +203,7 @@ public class DBSet implements Observer, IDB {
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
 		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
 
+		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap);
 		this.childMap = new ChildMap(this.blockMap, parent.childMap);
 		this.heightMap = new HeightMap(parent.heightMap);
@@ -217,7 +220,7 @@ public class DBSet implements Observer, IDB {
 		this.localDataMap = new LocalDataMap(parent.localDataMap);
 		this.blogPostMap = new BlogPostMap(parent.blogPostMap);
 		this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-		this.transactionParentMap = new TransactionParentMap(this.blockMap, parent.transactionParentMap);
+		this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this.blockMap, parent.transactionRef_BlockRef_Map);
 		this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
 		this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
@@ -273,7 +276,7 @@ public class DBSet implements Observer, IDB {
 		this.localDataMap.reset();
 		this.blogPostMap.reset();
 		this.hashtagPostMap.reset();
-		this.transactionParentMap.reset();
+		this.transactionRef_BlockRef_Map.reset();
 		this.nameExchangeMap.reset();
 		this.updateNameMap.reset();
 		this.cancelSellNameMap.reset();
@@ -382,6 +385,10 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.referenceMap;
 	}
+	public AddressTime_SignatureMap getAddressTime_SignatureMap() 
+	{
+		return this.addressTime_SignatureMap;
+	}
 	
 	public PeerMap getPeerMap() 
 	{
@@ -443,9 +450,9 @@ public class DBSet implements Observer, IDB {
 		return this.hashtagPostMap;
 	}
 	
-	public TransactionParentMap getTransactionParentMap()
+	public TransactionRef_BlockRef_Map getTransactionRef_BlockRef_Map()
 	{
-		return this.transactionParentMap;
+		return this.transactionRef_BlockRef_Map;
 	}
 	
 	public NameExchangeMap getNameExchangeMap()

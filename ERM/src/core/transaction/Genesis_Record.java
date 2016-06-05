@@ -77,7 +77,7 @@ public class Genesis_Record extends Transaction
 	//public abstract Transaction Parse(byte[] data);
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		
 		//WRITE TYPE in typeBytes[0]

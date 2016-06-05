@@ -1,6 +1,7 @@
 package database.wallet;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,8 @@ import utils.ObserverMessage;
 import utils.Pair;
 import database.DBMap;
 import database.serializer.ItemSerializer;
+
+// TODO reference as TIMESTAMP of transaction
 public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
 {
 

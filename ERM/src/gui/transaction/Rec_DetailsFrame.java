@@ -133,7 +133,7 @@ public class Rec_DetailsFrame extends JFrame
 						
 		//REFERENCE
 		detailGBC.gridy = componentLevel;
-		JTextField reference = new JTextField(Base58.encode(record.getReference()));
+		JTextField reference = new JTextField(""+record.getReference());
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);

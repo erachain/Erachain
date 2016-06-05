@@ -533,7 +533,7 @@ public class BlockExplorer
 		}
 		else
 		{
-			if(!(signatureBytes == null) && (DBSet.getInstance().getTransactionParentMap().contains(signatureBytes)))
+			if(!(signatureBytes == null) && (DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(signatureBytes)))
 			{
 				i++;
 				foundList.put(i, "transactionSignature");
@@ -564,8 +564,8 @@ public class BlockExplorer
 
 			try
 			{
-				if(DBSet.getInstance().getTransactionParentMap().contains(Base58.decode(signatures[0])) || 
-						DBSet.getInstance().getTransactionParentMap().contains(Base58.decode(signatures[1])))
+				if(DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[0])) || 
+						DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[1])))
 				{
 					i++;
 					foundList.put(i, "trade");
@@ -611,15 +611,23 @@ public class BlockExplorer
 			if (Crypto.getInstance().isValidAddress(addr)) {
 				Account account = new Account(addr);
 
-				byte[] signatureBytes = DBSet.getInstance().getReferenceMap().get(account);
+				DBSet db = DBSet.getInstance();
+				String address = account.getAddress();
+				// get reference to parent record for this account
+				Long timestampRef = db.getReferenceMap().get(address);
+				// get signature for account + time
+				byte[] signatureBytes = db.getAddressTime_SignatureMap().get(address, timestampRef);
 
+				Controller cntr = Controller.getInstance();
 				do{
-					Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+					//Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+					Transaction transaction = cntr.getTransaction(signatureBytes);
 					if(transaction == null)
 					{
 						break;
 					}
-					if(!transaction.getCreator().getAddress().equals(account.getAddress()))
+					if(transaction.getCreator() == null
+							&& !transaction.getCreator().getAddress().equals(addr))
 					{
 						break;
 					}
@@ -630,7 +638,10 @@ public class BlockExplorer
 					{
 						transactions.add(transaction);
 					}
-					signatureBytes = transaction.getReference();
+					// get reference to parent record for this account
+					timestampRef = transaction.getReference();
+					// get signature for account + time
+					signatureBytes = db.getAddressTime_SignatureMap().get(address, timestampRef);
 
 				}while(true);
 

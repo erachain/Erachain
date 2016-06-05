@@ -31,7 +31,7 @@ public class TestNoteAsPack {
 
 	static Logger LOGGER = Logger.getLogger(TestNoteAsPack.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = true;
 	boolean includeReference = false;
@@ -58,7 +58,7 @@ public class TestNoteAsPack {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
@@ -158,7 +158,7 @@ public class TestNoteAsPack {
 		issueNoteRecord.sign(maker, asPack);
 		
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
-		byte[] makerReference = maker.getLastReference(db);
+		Long makerReference = maker.getLastReference(db);
 		issueNoteRecord.process(db, asPack);
 		
 		LOGGER.info("note KEY: " + note.getKey());
@@ -181,7 +181,7 @@ public class TestNoteAsPack {
 		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(includeReference), note.toBytes(includeReference)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(makerReference, maker.getLastReference(db)));
+		assertEquals((long)makerReference, (long)maker.getLastReference(db));
 	}
 	
 	
@@ -192,14 +192,14 @@ public class TestNoteAsPack {
 		init();				
 				
 		Note note = new Note(maker, "test", "strontje");
-		byte[] makerReference = maker.getLastReference(db);
+		Long makerReference = maker.getLastReference(db);
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note);
 		issueNoteRecord.sign(maker, asPack);
 		issueNoteRecord.process(db, asPack);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(true, Arrays.equals(makerReference, maker.getLastReference(db)));
+		assertEquals((long)makerReference, (long)maker.getLastReference(db));
 		
 		issueNoteRecord.orphan(db, asPack);
 				
@@ -207,7 +207,7 @@ public class TestNoteAsPack {
 		assertEquals(false, db.getItemNoteMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(makerReference, maker.getLastReference(db)));
+		assertEquals((long)makerReference, (long)maker.getLastReference(db));
 	}
 	
 	

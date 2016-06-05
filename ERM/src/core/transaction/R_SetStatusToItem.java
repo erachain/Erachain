@@ -56,7 +56,7 @@ public class R_SetStatusToItem extends Transaction {
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-			Long beg_date, Long end_date, long timestamp, byte[] reference) {
+			Long beg_date, Long end_date, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
@@ -69,18 +69,18 @@ public class R_SetStatusToItem extends Transaction {
 	}
 
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-			Long beg_date, Long end_date, long timestamp, byte[] reference) {
+			Long beg_date, Long end_date, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date, timestamp, reference);
 	}
 	// set default date
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-			long timestamp, byte[] reference) {
+			long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
 				Long.MIN_VALUE, Long.MAX_VALUE, timestamp, reference);
 	}
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-			Long beg_date, Long end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date, timestamp, reference);
 		this.signature = signature;
@@ -94,7 +94,7 @@ public class R_SetStatusToItem extends Transaction {
 		this.signature = signature;
 	}
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
-			Long beg_date, Long end_date, long timestamp, byte[] reference, byte[] signature) {
+			Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date, timestamp, reference);
 	}
@@ -170,7 +170,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	// releaserReference = null - not a pack
 	// releaserReference = reference for releaser account - it is as pack
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
 		
@@ -193,10 +193,11 @@ public class R_SetStatusToItem extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -254,7 +255,7 @@ public class R_SetStatusToItem extends Transaction {
 	}
 
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -292,7 +293,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	//VALIDATE
 
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 

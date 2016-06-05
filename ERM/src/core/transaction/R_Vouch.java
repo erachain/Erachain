@@ -42,30 +42,30 @@ public class R_Vouch extends Transaction {
 	
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + HEIGHT_LENGTH + SEQ_LENGTH;
 
-	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, byte[] reference) {
+	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
 		this.height = height;
 		this.seq = seq;
 	}
-	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, byte[] reference, byte[] signature) {
+	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, height, seq, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, byte[] reference, byte[] signature) {
+	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, Long reference, byte[] signature) {
 		this(typeBytes, creator, (byte)0, height, seq, 0l, reference);
 		this.signature = signature;
 	}
-	public R_Vouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, byte[] reference) {
+	public R_Vouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference);
 	}
-	public R_Vouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, byte[] reference, byte[] signature) {
+	public R_Vouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference, signature);
 	}
 	// as pack
-	public R_Vouch(PublicKeyAccount creator, int height, int seq, byte[] reference) {
+	public R_Vouch(PublicKeyAccount creator, int height, int seq, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, height, seq, 0l, reference);
 	}
 
@@ -111,7 +111,7 @@ public class R_Vouch extends Transaction {
 
 	//PARSE/CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception{
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception{
 
 		boolean asPack = releaserReference != null;
 
@@ -134,10 +134,11 @@ public class R_Vouch extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -179,7 +180,7 @@ public class R_Vouch extends Transaction {
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -207,7 +208,7 @@ public class R_Vouch extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS

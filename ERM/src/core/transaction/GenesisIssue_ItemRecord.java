@@ -78,7 +78,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//public abstract Transaction Parse(byte[] data);
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -100,7 +100,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH

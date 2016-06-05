@@ -35,7 +35,7 @@ public class R_Send extends TransactionAmount {
 	
 	protected static final int BASE_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
-	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
 		if (data == null || data.length == 0) {
@@ -47,33 +47,33 @@ public class R_Send extends TransactionAmount {
 			this.isText = isText;
 		}
 	}
-	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, byte[] reference, byte[] signature) {
+	public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
 		this(typeBytes, creator, (byte)0, recipient, key, amount, data, isText, encrypted, 0l, reference);
 		this.signature = signature;
 	}
-	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference) {
+	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 	}
-	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, byte[] reference, byte[] signature) {
+	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference, signature);
 	}
 	// as pack
-	public R_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, byte[] reference) {
+	public R_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, recipient, key, amount, data, isText, encrypted, 0l, reference);
 	}
 
 	////////////////////////// SHOR -text DATA
-	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference) {
+	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 		typeBytes[2] = (byte)(typeBytes[2] & (byte)128);
 	}
-	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference, byte[] signature) {
+	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
@@ -82,14 +82,14 @@ public class R_Send extends TransactionAmount {
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount) {
 		this(typeBytes, creator, (byte)0, recipient, key, amount, 0l, null);
 	}
-	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference) {
+	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, -128, 0}, creator, feePow, recipient, key, amount, timestamp, reference);
 	}
-	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, byte[] reference, byte[] signature) {
+	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, -128, 0}, creator, feePow, recipient, key, amount, timestamp, reference, signature);
 	}
 	// as pack
-	public R_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, byte[] reference) {
+	public R_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, Long reference) {
 		this(new byte[]{TYPE_ID, 0, -128, 0}, creator, (byte)0, recipient, key, amount, 0l, reference);
 	}
 
@@ -150,7 +150,7 @@ public class R_Send extends TransactionAmount {
 
 	//PARSE/CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception{
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception{
 
 		boolean asPack = releaserReference != null;
 
@@ -173,10 +173,11 @@ public class R_Send extends TransactionAmount {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -251,7 +252,7 @@ public class R_Send extends TransactionAmount {
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -282,7 +283,7 @@ public class R_Send extends TransactionAmount {
 	}
 
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		if (this.data != null ) {
 			//CHECK DATA SIZE

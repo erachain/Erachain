@@ -73,7 +73,7 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 	}
 	
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 						
 		int res = super.isValid(db, releaserReference);

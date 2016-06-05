@@ -27,7 +27,7 @@ import database.DBSet;
 
 public class OrderTests 
 {
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	byte FEE_POWER = (byte)0;
@@ -123,7 +123,7 @@ public class OrderTests
 		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(dbSet, releaserReference));
 		
 		//CREATE ORDER CREATION INVALID REFERENCE
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, new byte[]{1,2}, new byte[64]);		
+		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		
 			
 		//CHECK IF  ORDER CREATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(dbSet, releaserReference));
@@ -183,7 +183,7 @@ public class OrderTests
 			assertEquals(orderCreation.getFee(), parsedOrderCreation.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(orderCreation.getReference(), parsedOrderCreation.getReference()));	
+			assertEquals((long)orderCreation.getReference(), (long)parsedOrderCreation.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(orderCreation.getTimestamp(), parsedOrderCreation.getTimestamp());				

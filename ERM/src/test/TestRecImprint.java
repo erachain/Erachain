@@ -36,7 +36,7 @@ public class TestRecImprint {
 
 	static Logger LOGGER = Logger.getLogger(TestRecImprint.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = false;
 	long FEE_KEY = AssetCls.FEE_KEY;
@@ -69,7 +69,7 @@ public class TestRecImprint {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		imprint = new Imprint(maker, name_total, "");
@@ -157,7 +157,7 @@ public class TestRecImprint {
 			assertEquals(issueImprintRecord.getFee(), parsedIssueImprintTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueImprintRecord.getReference(), parsedIssueImprintTransaction.getReference()));	
+			assertEquals(issueImprintRecord.getReference(), parsedIssueImprintTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueImprintRecord.getTimestamp(), parsedIssueImprintTransaction.getTimestamp());				

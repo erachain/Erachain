@@ -32,7 +32,7 @@ public abstract class TransactionAmount extends Transaction {
 	protected long key = Transaction.FEE_KEY;
 
 	// need for calculate fee
-	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
 		super(typeBytes, name, creator, feePow, timestamp, reference, signature);
 		this.recipient = recipient;
@@ -48,7 +48,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	// need for calculate fee by feePow into GUI
-	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference)
 	{
 		super(typeBytes, name, creator, feePow, timestamp, reference);
 		this.recipient = recipient;
@@ -136,7 +136,7 @@ public abstract class TransactionAmount extends Transaction {
 	
 	//PARSE/CONVERT
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -210,7 +210,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override // - fee + balance - calculate here
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
@@ -219,10 +219,11 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
-		{
+		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		if (reference.compareTo(this.reference) != 0)
 			return INVALID_REFERENCE;
-		}
+		if (reference.compareTo(this.timestamp) >= 0)
+			return INVALID_TIMESTAMP;
 
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount != null && this.amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -297,9 +298,9 @@ public abstract class TransactionAmount extends Transaction {
 				//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
 				if(this.key == FEE_KEY)
 				{
-					if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
+					if(this.recipient.getLastReference(db) == null)
 					{
-						this.recipient.setLastReference(this.signature, db);
+						this.recipient.setLastReference(this.timestamp, db);
 					}
 				}
 			}
@@ -322,7 +323,7 @@ public abstract class TransactionAmount extends Transaction {
 				//UPDATE REFERENCE OF RECIPIENT
 				if(this.key == FEE_KEY)
 				{
-					if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
+					if( this.recipient.getLastReference(db).equals(this.timestamp) )
 					{
 						this.recipient.removeReference(db);
 					}	

@@ -78,14 +78,14 @@ public class AddressesResource {
 		// GET ACCOUNT
 		Account account = new Account(address);
 
-		byte[] lastReference = account.getLastReference();
+		Long lastTimestamp = account.getLastReference();
 		
 		// RETURN
 		
-		if(lastReference == null || lastReference.length == 0) {
+		if(lastTimestamp == null) {
 			return "false"; 
 		} else {
-			return Base58.encode(lastReference);
+			return ""+lastTimestamp;
 		}
 	}
 	
@@ -104,12 +104,17 @@ public class AddressesResource {
 
 		HashSet<byte[]> isSomeoneReference = new HashSet<byte[]>();
 		
+		Controller cntrl = Controller.getInstance();
+
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
-		byte[] lastReference = account.getLastReference();
-		if(!(lastReference == null || lastReference.length == 0)) 
+		DBSet db = DBSet.getInstance();
+		Long lastTimestamp = account.getLastReference();
+		byte[] signature;
+		if(!(lastTimestamp == null)) 
 		{
-			transactions.add(Controller.getInstance().getTransaction(lastReference));
+			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
+			transactions.add(cntrl.getTransaction(signature));
 		}	
 		
 		for (Transaction tx : transactions)
@@ -118,7 +123,9 @@ public class AddressesResource {
 			{
 				for (Transaction tx2 : transactions)
 				{
-					if (Arrays.equals(tx.getSignature(), tx2.getReference())){
+					if (tx.getTimestamp() == tx2.getReference()
+							& tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())){
+						// if same address and parent timestamp
 						isSomeoneReference.add(tx.getSignature());
 						break;
 					}
@@ -131,13 +138,14 @@ public class AddressesResource {
 			return getLastReference(address);
 		}
 		
-		for (Transaction tx : Controller.getInstance().getUnconfirmedTransactions())
+		for (Transaction tx : cntrl.getUnconfirmedTransactions())
 		{
 			if (tx.getCreator().equals(account))
 			{
 				if(!isSomeoneReference.contains(tx.getSignature()))
 				{
-					return Base58.encode(tx.getSignature());
+					//return Base58.encode(tx.getSignature());
+					return ""+tx.getTimestamp();
 				}
 			}
 		}

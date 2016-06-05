@@ -73,7 +73,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -140,7 +140,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//VALIDATE
 	//
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH

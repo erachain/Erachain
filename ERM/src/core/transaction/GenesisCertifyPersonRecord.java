@@ -102,7 +102,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	}	
 	
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
 				
@@ -127,7 +127,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -168,7 +168,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.signature, db);
+		this.recipient.setLastReference(this.timestamp, db);
 	}
 
 	@Override

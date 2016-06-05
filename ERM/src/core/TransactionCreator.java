@@ -108,10 +108,11 @@ public class TransactionCreator
 		//SORT THEM BY TIMESTAMP
 		Collections.sort(accountTransactions, new TransactionTimestampComparator());
 			
-		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK
+		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
 		for(Transaction transaction: accountTransactions)
 		{
-			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK && transaction.isSignatureValid())
+			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK
+					&& transaction.isSignatureValid())
 			{
 				transaction.process(this.fork, false);
 			}
@@ -256,6 +257,7 @@ public class TransactionCreator
 	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
+		// all unconfirmed records insert in FORK for calc last account REFERENCE 
 		this.checkUpdate();
 								
 		//TIME
@@ -266,13 +268,7 @@ public class TransactionCreator
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueAssetTransaction.sign(creator, false);
-		
-//		byte[] signature = issueAssetTransaction.getSignature();
-//		asset.se
-		//asset = new Asset(creator, name, description, quantity, scale, divisible, signature);
-		//issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
-		//issueAssetTransaction.sign(creator);
-								
+										
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueAssetTransaction, false);
 	}

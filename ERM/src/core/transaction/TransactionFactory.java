@@ -25,7 +25,7 @@ public class TransactionFactory {
 		
 	}
 	
-	public Transaction parse(byte[] data, byte[] releaserReference) throws Exception
+	public Transaction parse(byte[] data, Long releaserReference) throws Exception
 	{
 		//READ TYPE
 		int type = Byte.toUnsignedInt(data[0]);

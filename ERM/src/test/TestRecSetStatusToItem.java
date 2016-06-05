@@ -41,7 +41,7 @@ public class TestRecSetStatusToItem {
 
 	static Logger LOGGER = Logger.getLogger(TestRecSetStatusToItem.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = false;
 	long ERM_KEY = AssetCls.ERMO_KEY;
@@ -76,7 +76,7 @@ public class TestRecSetStatusToItem {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		//statusMap = db.getItemStatusMap();
@@ -93,9 +93,11 @@ public class TestRecSetStatusToItem {
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey();
 
+		timestamp += 100;
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db),
 				to_date, birthDay + 1000, timestamp, maker.getLastReference(db));
+		timestamp += 100;
 
 	}
 	
@@ -184,7 +186,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(setStatusTransaction.getFee(), parsedSetStatusTransaction.getFee());	
 		
 		//CHECK REFERENCE
-		assertEquals(true, Arrays.equals(setStatusTransaction.getReference(), parsedSetStatusTransaction.getReference()));	
+		assertEquals(setStatusTransaction.getReference(), parsedSetStatusTransaction.getReference());	
 		
 		//CHECK TIMESTAMP
 		assertEquals(setStatusTransaction.getTimestamp(), parsedSetStatusTransaction.getTimestamp());				
@@ -213,7 +215,7 @@ public class TestRecSetStatusToItem {
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		Long endDate = statusDuration.a;
 		//days *= (long)86400;
-		assertEquals(endDate, null);
+		assertEquals((long)endDate, (long)Long.MIN_VALUE);
 		
 		to_date = timestamp + 1234L * 84600000L;
 		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
@@ -231,10 +233,10 @@ public class TestRecSetStatusToItem {
 		
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		endDate = statusDuration.a;
-		assertEquals(endDate, null);
+		assertEquals((long)endDate, (long)Long.MIN_VALUE);
 
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), maker.getLastReference(db)));
+		assertEquals(setStatusTransaction.getTimestamp(), maker.getLastReference(db));
 
 		////// ORPHAN ///////
 		setStatusTransaction.orphan(db, false);
@@ -243,7 +245,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(statusDuration, null);
 
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(setStatusTransaction.getReference(), maker.getLastReference(db)));
+		assertEquals(setStatusTransaction.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999

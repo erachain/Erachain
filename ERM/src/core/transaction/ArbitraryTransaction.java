@@ -41,10 +41,10 @@ public abstract class ArbitraryTransaction extends Transaction {
 	
 	static Logger LOGGER = Logger.getLogger(ArbitraryTransaction.class.getName());
 	
-	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);	
 	}
-	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference, signature);
 	}
 	/*
@@ -226,9 +226,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.process(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (Arrays.equals(payment.getRecipient().getLastReference(db),
-					new byte[0])) {
-				payment.getRecipient().setLastReference(this.signature, db);
+			if (payment.getRecipient().getLastReference(db) == null) {
+				payment.getRecipient().setLastReference(this.timestamp, db);
 			}
 		}
 	}
@@ -252,8 +251,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.orphan(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (Arrays.equals(payment.getRecipient().getLastReference(db),
-					this.signature)) {
+			if (payment.getRecipient().getLastReference(db).equals(this.timestamp)) {
 				payment.getRecipient().removeReference(db);
 			}
 		}

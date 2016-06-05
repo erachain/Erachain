@@ -1482,7 +1482,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(creator.getAddress()))
 		{
 			//DELETE ASSET
-			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getReference());
+			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getSignature());
 		}
 	}
 

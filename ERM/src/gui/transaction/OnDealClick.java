@@ -80,6 +80,10 @@ public class OnDealClick
 		case Transaction.INVALID_REFERENCE:
 			mess = "Invalid reference";
 			break;
+		case Transaction.INVALID_TIMESTAMP:
+			mess = "Invalid timestamp";
+			break;
+			
 
 		case Transaction.INVALID_NAME_LENGTH:
 			mess = "Invalid  name length";

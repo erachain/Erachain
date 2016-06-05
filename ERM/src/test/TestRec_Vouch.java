@@ -40,7 +40,7 @@ public class TestRec_Vouch {
 
 	static Logger LOGGER = Logger.getLogger(TestRec_Vouch.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long ERMO_KEY = AssetCls.ERMO_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
@@ -67,7 +67,7 @@ public class TestRec_Vouch {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -161,7 +161,7 @@ public class TestRec_Vouch {
 			assertEquals(vouchRecord.getFee(), parsedR_Vouch.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(vouchRecord.getReference(), parsedR_Vouch.getReference()));	
+			assertEquals((long)vouchRecord.getReference(), (long)parsedR_Vouch.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(vouchRecord.getTimestamp(), parsedR_Vouch.getTimestamp());				
@@ -234,7 +234,7 @@ public class TestRec_Vouch {
 						)));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(vouchRecord.getReference(), maker.getLastReference(db)));
+		assertEquals(vouchRecord.getReference(), maker.getLastReference(db));
 	}
 	
 }

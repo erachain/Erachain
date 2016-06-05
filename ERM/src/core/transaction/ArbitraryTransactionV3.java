@@ -26,7 +26,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	public ArbitraryTransactionV3(byte[] typeBytes,
 			PublicKeyAccount creator, List<Payment> payments, int service,
-			byte[] data, byte feePow, long timestamp, byte[] reference) {
+			byte[] data, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, creator, feePow, timestamp, reference);
 
 		this.creator = creator;
@@ -41,7 +41,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 	public ArbitraryTransactionV3(byte[] typeBytes,
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-			byte feePow, long timestamp, byte[] reference, byte[] signature)
+			byte feePow, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, payments, service, data, feePow, timestamp, reference);
 		this.signature = signature;
@@ -49,13 +49,13 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 	public ArbitraryTransactionV3(
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-			byte feePow, long timestamp, byte[] reference, byte[] signature)
+			byte feePow, long timestamp, Long reference, byte[] signature)
 	{
 		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference, signature);
 	}
 	public ArbitraryTransactionV3(
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-			byte feePow, long timestamp, byte[] reference)
+			byte feePow, long timestamp, Long reference)
 	{
 		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference);
 	}
@@ -79,8 +79,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		position += TIMESTAMP_LENGTH;
 
 		// READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position
 				+ REFERENCE_LENGTH);
+		long reference = Longs.fromByteArray(referenceBytes);
 		position += REFERENCE_LENGTH;
 
 		// READ CREATOR
@@ -140,7 +141,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 		byte[] data = new byte[0];
 
 		// WRITE TYPE
@@ -148,12 +149,13 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		// WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH,
-				0);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 
 		// WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		byte[] referenceBytes = Longs.toByteArray(this.reference);
+		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
 
 		// WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -216,8 +218,8 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 	*/
 
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) {
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) {
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -232,12 +234,6 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		// REMOVE FEE
 		DBSet fork = db.fork();
 		super.process(fork, false);
-
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.ZERO) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
 		
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
@@ -272,12 +268,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			payment.process(this.creator, fork);
 		}
 
-		// CHECK IF REFERENCE IS OKE
-		if (!Arrays.equals(this.creator.getLastReference(db), this.reference)) {
-			return INVALID_REFERENCE;
-		}
-
-		return VALIDATE_OK;
+		return super.isValid(fork, releaserReference);
 	}
 
 	public int calcBaseFee() {

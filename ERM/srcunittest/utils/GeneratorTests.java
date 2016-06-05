@@ -40,7 +40,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(10000000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(Transaction.FEE_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
 				
 		//GENERATE NEXT BLOCK

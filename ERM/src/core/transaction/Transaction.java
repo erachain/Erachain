@@ -83,6 +83,7 @@ public abstract class Transaction {
 	public static final int AT_ERROR = 10000;
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
+	public static final int INVALID_TIMESTAMP = 39;
 	
 	public static final int INVALID_PUBLIC_KEY = 40;
 	
@@ -238,7 +239,8 @@ public abstract class Transaction {
 	protected static final int SEQ_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
-	public static final int REFERENCE_LENGTH = 64;
+	//public static final int REFERENCE_LENGTH = 64;
+	public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
@@ -257,7 +259,7 @@ public abstract class Transaction {
 	//protected int type;
 	protected byte[] typeBytes;
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
-	protected byte[] reference;
+	protected Long reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
@@ -271,7 +273,7 @@ public abstract class Transaction {
 		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
 		this.TYPE_NAME = type_name;
 	}
-	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference)
 	{
 		this.typeBytes = typeBytes;
 		this.TYPE_NAME = type_name;
@@ -283,7 +285,7 @@ public abstract class Transaction {
 		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
 		this.feePow = feePow;
 	}
-	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, type_name, creator, feePow, timestamp, reference);
 		this.signature = signature;
@@ -314,7 +316,7 @@ public abstract class Transaction {
 		return this.creator;
 	}
 
-	public long getTimestamp()
+	public Long getTimestamp()
 	{
 		return this.timestamp;
 	}
@@ -394,7 +396,7 @@ public abstract class Transaction {
 		return this.signature;
 	}
 	
-	public byte[] getReference()
+	public Long getReference()
 	{
 		return this.reference;
 	}			
@@ -435,7 +437,7 @@ public abstract class Transaction {
 
 	public Block getParent(DBSet db) {
 		
-		return db.getTransactionParentMap().getParent(this.signature);
+		return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
 	}
 	public Block getParent() {
 		
@@ -476,7 +478,8 @@ public abstract class Transaction {
 		return "";
 	}
 	public String viewReference() {
-		return reference==null?"null":Base58.encode(reference);
+		//return reference==null?"null":Base58.encode(reference);
+		return reference==null?"null":"" + reference;
 	}
 	public String viewSignature() {
 		return signature==null?"null":Base58.encode(signature);
@@ -515,7 +518,7 @@ public abstract class Transaction {
 			transaction.put("reference", "genesis");
 			transaction.put("signature", "genesis");
 		} else {
-			transaction.put("reference", this.reference==null?"null":Base58.encode(this.reference));
+			transaction.put("reference", this.reference==null?"null":"" + this.reference);
 			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
 			transaction.put("fee", this.fee.toPlainString());
 			transaction.put("timestamp", this.timestamp<1000?"null":this.timestamp);
@@ -536,8 +539,7 @@ public abstract class Transaction {
 		boolean withSign = false;
 		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;
-		
-		
+				
 		// all test a not valid for main test
 		// all other network must be invalid here!
 		int port = Controller.getInstance().getNetworkPort();
@@ -553,7 +555,7 @@ public abstract class Transaction {
 	
 	// releaserReference == null - not as pack
 	// releaserReference = reference of releaser - as pack
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		boolean asPack = releaserReference != null;
 
@@ -572,7 +574,9 @@ public abstract class Transaction {
 		//WRITE REFERENCE - in any case as Pack or not
 		if (this.reference != null) {
 			// NULL in imprints
-			data = Bytes.concat(data, this.reference);
+			byte[] referenceBytes = Longs.toByteArray(this.reference);
+			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+			data = Bytes.concat(data, referenceBytes);
 		}
 
 		//WRITE CREATOR
@@ -614,25 +618,34 @@ public abstract class Transaction {
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
+		
+		// all test a not valid for main test
+		// all other network must be invalid here!
+		int port = Controller.getInstance().getNetworkPort();
+		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
 
-	public int isValid(byte[] releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		return isValid(DBSet.getInstance(), releaserReference);
 	}
 	
-	public int isValid(DBSet db, byte[] releaserReference)
+	public int isValid(DBSet db, Long releaserReference)
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		if(this.reference != null 
-				&& !Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
+		if(this.reference != null)
 		{
-			return INVALID_REFERENCE;
+			Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+			if (reference.compareTo(this.reference) != 0)
+				return INVALID_REFERENCE;
+			if (reference.compareTo(this.timestamp) >= 0)
+				return INVALID_TIMESTAMP;
 		}
+		
 
 		//CHECK CREATOR
 		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
@@ -668,7 +681,7 @@ public abstract class Transaction {
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				this.creator.setLastReference(this.signature, db);
+				this.creator.setLastReference(this.timestamp, db);
 			}
 		}
 
@@ -746,7 +759,7 @@ public abstract class Transaction {
 	
 	public boolean isConfirmed(DBSet db)
 	{
-		return db.getTransactionParentMap().contains(this.getSignature());
+		return db.getTransactionRef_BlockRef_Map().contains(this.getSignature());
 	}
 	
 	public int getConfirmations()
@@ -762,7 +775,7 @@ public abstract class Transaction {
 		
 		//CALCULATE CONFIRMATIONS
 		int lastBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getBlockMap().getLastBlockSignature());
-		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getTransactionParentMap().getParent(this.signature));
+		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature));
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;
@@ -779,7 +792,7 @@ public abstract class Transaction {
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
 		if(this.isConfirmed(db))
 		{
-			return DBSet.getInstance().getTransactionParentMap().getParent(this.getSignature()).getVersion();
+			return DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
 		}
 		
 		// IF UNCONFIRMED

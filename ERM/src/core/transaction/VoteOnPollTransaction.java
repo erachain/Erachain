@@ -36,7 +36,7 @@ public class VoteOnPollTransaction extends Transaction
 	private String poll;
 	public int option;
 	
-	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
+	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
@@ -44,27 +44,27 @@ public class VoteOnPollTransaction extends Transaction
 		this.poll = poll;
 		this.option = option;
 	}
-	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, poll, option, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte[] reference, byte[] signature) 
+	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, poll, option, (byte)0, 0l, reference);
 		this.signature = signature;
 	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, option, feePow, timestamp, reference, signature);
 	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, byte[] reference) 
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, option, feePow, timestamp, reference);
 	}
-	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, byte[] reference)
+	public VoteOnPollTransaction(PublicKeyAccount creator, String poll, int option, Long reference)
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, option, (byte)0, 0l, reference);
 	}
@@ -100,7 +100,7 @@ public class VoteOnPollTransaction extends Transaction
 		return transaction;	
 	}
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
 		
@@ -123,10 +123,11 @@ public class VoteOnPollTransaction extends Transaction
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -178,7 +179,7 @@ public class VoteOnPollTransaction extends Transaction
 	}	
 		
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -213,7 +214,7 @@ public class VoteOnPollTransaction extends Transaction
 	//VALIDATE
 	
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 
 		//CHECK POLL LENGTH

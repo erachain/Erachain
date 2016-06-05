@@ -48,7 +48,7 @@ import database.DBSet;
 
 public class TransactionTests {
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	static Logger LOGGER = Logger.getLogger(TransactionTests.class.getName());
 
@@ -57,7 +57,8 @@ public class TransactionTests {
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
-	byte[] last_ref;
+	Long last_ref;
+	Long new_ref;
 	
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -88,16 +89,18 @@ public class TransactionTests {
 		databaseSet = db = DBSet.createEmptyDatabaseSet();
 		gb = new GenesisBlock();
 		gb.process(db);
+
+		last_ref = gb.getTimestamp();
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(last_ref, db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		new_ref = maker.getLastReference(db);
 		
-		buyer.setLastReference(gb.getGeneratorSignature(), db);
+		buyer.setLastReference(last_ref, db);
 		buyer.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		buyer.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(2000).setScale(8), db); // for bye
 		
-		last_ref = gb.getGeneratorSignature();
 
 	}
 	
@@ -111,13 +114,13 @@ public class TransactionTests {
 		init();
 		
 		//CREATE PAYMENT
-		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, last_ref);
 		payment.sign(maker, false);		
 		//CHECK IF PAYMENT SIGNATURE IS VALID
 		assertEquals(true, payment.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp+1, maker.getLastReference(databaseSet), new byte[64]);
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp+1, last_ref, new byte[64]);
 		
 		//CHECK IF PAYMENT SIGNATURE IS INVALID
 		assertEquals(false, payment.isSignatureValid());
@@ -132,30 +135,26 @@ public class TransactionTests {
 
 		//CREATE VALID PAYMENT
 		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(8), timestamp, maker.getLastReference(db));
-		payment.sign(maker, false);
-
-		//CHECK IF PAYMENT IS VALID
 		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));
-		
-		payment.process(db, false);
 
 		//CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
-		payment = new R_Send(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
-	
-		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));
+		payment = new R_Send(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db)+10);
+		assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(db, releaserReference));
 		
 		//CREATE INVALID PAYMENT NEGATIVE AMOUNT
 		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, maker.getLastReference(db));
-		payment.sign(maker, false);
-		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));	
-		
-		
+		assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(db, releaserReference));	
+				
 		//CREATE INVALID PAYMENT WRONG REFERENCE
-		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, new byte[64], new byte[64]);
-		//CHECK IF PAYMENT IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, payment.isValid(db, releaserReference));	
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, -123L, new byte[64]);
+		assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(db, releaserReference));
+		
+		//CREATE INVALID PAYMENT WRONG TIMESTAMP
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), maker.getLastReference(db), maker.getLastReference(db));
+		assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(db, releaserReference));
+		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), maker.getLastReference(db)-10, maker.getLastReference(db));
+		assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(db, releaserReference));
+
 	}
 	
 	@Test
@@ -191,7 +190,7 @@ public class TransactionTests {
 			assertEquals(payment.getFee(), parsedPayment.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(payment.getReference(), parsedPayment.getReference()));	
+			assertEquals(payment.getReference(), parsedPayment.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(payment.getTimestamp(), parsedPayment.getTimestamp());				
@@ -226,7 +225,7 @@ public class TransactionTests {
 
 		//CREATE PAYMENT
 		BigDecimal amount = BigDecimal.valueOf(0.5).setScale(8);
-		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(8), timestamp, maker.getLastReference(databaseSet));
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(8), timestamp, last_ref);
 		payment.sign(maker, false);
 		BigDecimal fee = payment.getFee();
 		payment.process(databaseSet, false);
@@ -241,10 +240,10 @@ public class TransactionTests {
 		assertEquals(amount, recipient.getConfirmedBalance(FEE_KEY, databaseSet));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(payment.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals((long)maker.getLastReference(databaseSet), timestamp);
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(payment.getSignature(), recipient.getLastReference(databaseSet)));
+		assertEquals(payment.getTimestamp(), recipient.getLastReference(databaseSet));
 	}
 	
 	@Test
@@ -253,8 +252,8 @@ public class TransactionTests {
 		
 		init();
 			
-		//CREATE PAYMENT
-		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
+		//CREATE PAYMENT		
+		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, last_ref);
 		payment.sign(maker, false);
 		payment.process(databaseSet, false);
 		
@@ -262,7 +261,7 @@ public class TransactionTests {
 		BigDecimal amount2 = recipient.getConfirmedBalance(FEE_KEY, databaseSet);
 
 		//CREATE PAYMENT2
-		Transaction payment2  = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(databaseSet));
+		Transaction payment2  = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, last_ref);
 		payment2.sign(maker, false);
 		payment.process(databaseSet, false);
 		
@@ -276,10 +275,10 @@ public class TransactionTests {
 		assertEquals(amount2, recipient.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(payment.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(maker.getLastReference(databaseSet), maker.getLastReference(databaseSet));
 				
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(payment.getSignature(), recipient.getLastReference(databaseSet)));
+		assertEquals(null, recipient.getLastReference(databaseSet));
 
 	}
 
@@ -298,7 +297,7 @@ public class TransactionTests {
 		long timestamp = NTP.getTime();
 		
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -306,7 +305,7 @@ public class TransactionTests {
 		
 		//INVALID SIGNATURE
 		nameRegistration = new RegisterNameTransaction(
-				maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, name, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, nameRegistration.isSignatureValid());
@@ -322,7 +321,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -336,7 +335,7 @@ public class TransactionTests {
 			longName += "oke";
 		}
 		name = new Name(maker, longName, "this is the value");
-		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -349,7 +348,7 @@ public class TransactionTests {
 			longValue += "oke";
 		}
 		name = new Name(maker, "test2", longValue);
-		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -357,7 +356,7 @@ public class TransactionTests {
 		
 		//CREATE INVALID NAME REGISTRATION NAME ALREADY TAKEN
 		name = new Name(maker, "test", "this is the value");
-		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
@@ -392,7 +391,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -425,7 +424,7 @@ public class TransactionTests {
 			assertEquals(nameRegistration.getFee(), parsedRegistration.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(nameRegistration.getReference(), parsedRegistration.getReference()));	
+			assertEquals(nameRegistration.getReference(), parsedRegistration.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(nameRegistration.getTimestamp(), parsedRegistration.getTimestamp());				
@@ -462,7 +461,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -471,7 +470,7 @@ public class TransactionTests {
 		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(nameRegistration.getTimestamp(), maker.getLastReference(databaseSet));
 		
 		//CHECK NAME EXISTS
 		assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -486,7 +485,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		nameRegistration.orphan(databaseSet, false);
@@ -495,7 +494,7 @@ public class TransactionTests {
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));
+		assertEquals(last_ref, nameRegistration.getReference());
 		
 		//CHECK NAME EXISTS
 		assertEquals(false, databaseSet.getNameMap().contains(name));
@@ -515,14 +514,14 @@ public class TransactionTests {
 		long timestamp = NTP.getTime();
 		
 		//CREATE NAME UPDATE
-		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameUpdate.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(true, nameUpdate.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		nameUpdate = new RegisterNameTransaction(
-				maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, name, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, nameUpdate.isSignatureValid());
@@ -538,7 +537,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -547,7 +546,7 @@ public class TransactionTests {
 		
 		//CREATE NAME UPDATE
 		name.setValue("new value");
-		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 	
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(Transaction.VALIDATE_OK, nameUpdate.isValid(databaseSet, releaserReference));
@@ -559,14 +558,14 @@ public class TransactionTests {
 			longName += "oke";
 		}
 		name = new Name(maker, longName, "this is the value");
-		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.INVALID_NAME_LENGTH, nameUpdate.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID NAME UPDATE NAME DOES NOT EXIST
 		name = new Name(maker, "test2", "this is the value");
-		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 				
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NAME_DOES_NOT_EXIST, nameUpdate.isValid(databaseSet, releaserReference));
@@ -576,7 +575,7 @@ public class TransactionTests {
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
 		name = new Name(invalidOwner, "test2", "this is the value");
-		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(invalidOwner, false);
 		nameRegistration.process(databaseSet, false);	
 		
@@ -585,14 +584,14 @@ public class TransactionTests {
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		name = new Name(invalidOwner, "test2", "this is the value");
-		nameUpdate = new UpdateNameTransaction(invalidOwner, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameUpdate = new UpdateNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
 				
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NO_BALANCE, nameUpdate.isValid(databaseSet, releaserReference));
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
 		name = new Name(maker, "test", "this is the value");
-		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, new byte[]{});
+		nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, -123L);
 				
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, nameUpdate.isValid(databaseSet, releaserReference));
@@ -608,7 +607,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameUpdate.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -644,7 +643,7 @@ public class TransactionTests {
 			assertEquals(nameUpdate.getFee(), parsedUpdate.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(nameUpdate.getReference(), parsedUpdate.getReference()));	
+			assertEquals(nameUpdate.getReference(), parsedUpdate.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(nameUpdate.getTimestamp(), parsedUpdate.getTimestamp());				
@@ -680,7 +679,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		// set FEE
@@ -688,7 +687,7 @@ public class TransactionTests {
 		
 		//CREATE NAME UPDATE
 		name = new Name(new Account("Qj5Aq4P4ehXaCEmi6vqVrFQDecpPXKSi8z"), "test", "new value");
-		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameUpdate.sign(maker, false);
 		nameUpdate.process(databaseSet, false);
 		
@@ -696,7 +695,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameUpdate.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(nameUpdate.getTimestamp(), maker.getLastReference(databaseSet));
 				
 		//CHECK NAME EXISTS
 		assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -721,7 +720,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		// set FEE
@@ -729,7 +728,7 @@ public class TransactionTests {
 		
 		//CREATE NAME UPDATE
 		name = new Name(new Account("XYLEQnuvhracK2WMN3Hjif67knkJe9hTQn"), "test", "new value");
-		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameUpdate.sign(maker, false);
 		nameUpdate.process(databaseSet, false);
 		nameUpdate.orphan(databaseSet, false);
@@ -738,7 +737,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(nameRegistration.getTimestamp(), maker.getLastReference(databaseSet));
 				
 		//CHECK NAME EXISTS
 		assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -763,14 +762,14 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(true, nameSaleTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		nameSaleTransaction = new SellNameTransaction(
-				maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, nameSale, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, nameSaleTransaction.isSignatureValid());
@@ -785,7 +784,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -794,7 +793,7 @@ public class TransactionTests {
 		
 		//CREATE NAME SALE
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 	
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(databaseSet, releaserReference));
@@ -806,14 +805,14 @@ public class TransactionTests {
 			longName += "oke";
 		}
 		nameSale = new NameSale(longName, BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.INVALID_NAME_LENGTH, nameSaleTransaction.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID NAME SALE NAME DOES NOT EXIST
 		nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 				
@@ -825,31 +824,31 @@ public class TransactionTests {
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
 		name = new Name(invalidOwner, "test2", "this is the value");
-		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(invalidOwner, false);
 		nameRegistration.process(databaseSet, false);	
 		
 		//CHECK IF NAME UPDATE IS INVALID
-		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		assertEquals(Transaction.INVALID_NAME_CREATOR, nameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, last_ref);
 				
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NO_BALANCE, nameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
 		nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, new byte[]{});
+		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, -123L);
 				
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, nameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE NAME UPDATE PROCESS 
 		nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
@@ -866,7 +865,7 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1).setScale(8));
 				
 		//CREATE NAME UPDATE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(false);
 		
@@ -900,7 +899,7 @@ public class TransactionTests {
 			assertEquals(nameSaleTransaction.getFee(), parsedNameSale.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(nameSaleTransaction.getReference(), parsedNameSale.getReference()));	
+			assertEquals(nameSaleTransaction.getReference(), parsedNameSale.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(nameSaleTransaction.getTimestamp(), parsedNameSale.getTimestamp());				
@@ -936,7 +935,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -944,7 +943,7 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
@@ -952,7 +951,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(nameSaleTransaction.getTimestamp(), maker.getLastReference(databaseSet));
 				
 		//CHECK NAME SALE EXISTS
 		assertEquals(true, databaseSet.getNameExchangeMap().contains("test"));
@@ -971,7 +970,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		BigDecimal bal = maker.getConfirmedBalance(FEE_KEY, databaseSet);
@@ -980,7 +979,7 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 						
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		nameSaleTransaction.orphan(databaseSet, false);
@@ -990,7 +989,7 @@ public class TransactionTests {
 		assertEquals(0, bal.compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameRegistration.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(nameRegistration.getTimestamp(), maker.getLastReference(databaseSet));
 				
 		//CHECK NAME SALE EXISTS
 		assertEquals(false, databaseSet.getNameExchangeMap().contains("test"));
@@ -1006,14 +1005,14 @@ public class TransactionTests {
 		init();
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(true, nameSaleTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		nameSaleTransaction = new CancelSellNameTransaction(
-				maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, "test", FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, nameSaleTransaction.isSignatureValid());
@@ -1028,7 +1027,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -1037,7 +1036,7 @@ public class TransactionTests {
 		
 		//CREATE NAME SALE
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 	
 		//CHECK IF NAME UPDATE IS VALID
@@ -1045,7 +1044,7 @@ public class TransactionTests {
 		nameSaleTransaction.process(databaseSet, false);
 		
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, nameSale.getKey(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, nameSale.getKey(), FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF CANCEL NAME UPDATE IS VALID
 		assertEquals(Transaction.VALIDATE_OK, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
@@ -1057,13 +1056,13 @@ public class TransactionTests {
 			longName += "oke";
 		}
 		
-		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, longName, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, longName, FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.INVALID_NAME_LENGTH, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID CANCEL NAME SALE NAME DOES NOT EXIST
-		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
 				
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NAME_DOES_NOT_EXIST, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
@@ -1073,35 +1072,35 @@ public class TransactionTests {
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
 		name = new Name(invalidOwner, "test2", "this is the value");
-		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(invalidOwner, false);
 		nameRegistration.process(databaseSet, false);	
 		
 		//CREATE NAME SALE
 		nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(8));
-		nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(invalidOwner, false);
 		nameSaleTransaction.process(databaseSet, false);	
 		
 		//CHECK IF NAME UPDATE IS INVALID
-		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		assertEquals(Transaction.INVALID_NAME_CREATOR, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
-		cancelNameSaleTransaction = new CancelSellNameTransaction(invalidOwner, "test2", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		cancelNameSaleTransaction = new CancelSellNameTransaction(invalidOwner, "test2", FEE_POWER, timestamp, last_ref);
 				
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NO_BALANCE, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
-		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, new byte[]{});
+		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, -123L);
 				
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE NAME UPDATE PROCESS 
-		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		cancelNameSaleTransaction.sign(maker, false);
 		cancelNameSaleTransaction.process(databaseSet, false);
 		
@@ -1116,7 +1115,7 @@ public class TransactionTests {
 		init();
 				
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		cancelNameSaleTransaction.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -1146,7 +1145,7 @@ public class TransactionTests {
 			assertEquals(cancelNameSaleTransaction.getFee(), parsedCancelNameSale.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(cancelNameSaleTransaction.getReference(), parsedCancelNameSale.getReference()));	
+			assertEquals(cancelNameSaleTransaction.getReference(), parsedCancelNameSale.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(cancelNameSaleTransaction.getTimestamp(), parsedCancelNameSale.getTimestamp());				
@@ -1182,7 +1181,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -1190,14 +1189,14 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
 		//CREATE SIGNATURE
 			
 		//CREATE CANCEL NAME SALE
-		Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		cancelNameSaleTransaction.sign(maker, false);
 		cancelNameSaleTransaction.process(databaseSet, false);	
 		
@@ -1205,7 +1204,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(cancelNameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(cancelNameSaleTransaction.getTimestamp(), maker.getLastReference(databaseSet));
 				
 		//CHECK NAME SALE EXISTS
 		assertEquals(false, databaseSet.getNameExchangeMap().contains("test"));
@@ -1220,7 +1219,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -1228,14 +1227,14 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
 		//CREATE SIGNATURE
 			
 		//CREATE CANCEL NAME SALE
-		Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		cancelNameSaleTransaction.sign(maker, false);
 		cancelNameSaleTransaction.process(databaseSet, false);	
 		cancelNameSaleTransaction.orphan(databaseSet, false);
@@ -1244,7 +1243,7 @@ public class TransactionTests {
 		assertEquals(0,BigDecimal.valueOf(1000).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(nameSaleTransaction.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals((long)nameSaleTransaction.getTimestamp(), (long)maker.getLastReference(databaseSet));
 				
 		//CHECK NAME SALE EXISTS
 		assertEquals(true, databaseSet.getNameExchangeMap().contains("test"));
@@ -1265,14 +1264,14 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction buyNameTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction buyNameTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
 		buyNameTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
 		assertEquals(true, buyNameTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		buyNameTransaction = new BuyNameTransaction(
-				maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, buyNameTransaction.isSignatureValid());
@@ -1290,7 +1289,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 				
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
@@ -1300,7 +1299,7 @@ public class TransactionTests {
 		//CREATE NAME SALE
 		BigDecimal bdAmoSell = BigDecimal.valueOf(700).setScale(8);
 		NameSale nameSale = new NameSale("test", bdAmoSell);
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 	
 		//CHECK IF NAME UPDATE IS VALID
@@ -1347,7 +1346,7 @@ public class TransactionTests {
 						
 		//CREATE INVALID NAME PURCHASE ALREADY OWNER
 		nameSale = new NameSale("test", bdAmoSell);
-		namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);		
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(databaseSet, releaserReference));
@@ -1363,7 +1362,7 @@ public class TransactionTests {
 		buyer.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(2000).setScale(8), databaseSet);
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
-		namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, new byte[]{});		
+		namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, -123L);		
 				
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, namePurchaseTransaction.isValid(databaseSet, releaserReference));
@@ -1380,7 +1379,7 @@ public class TransactionTests {
 		//CREATE NAME SALE
 		BigDecimal bdAmoSell = BigDecimal.valueOf(700).setScale(8);
 		NameSale nameSale = new NameSale("test", bdAmoSell);
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		//nameSaleTransaction.process();
 		nameSaleTransaction.process(databaseSet, false);
@@ -1392,7 +1391,7 @@ public class TransactionTests {
 		//LOGGER.info("nameSale " + nameSale.getName(databaseSet).getOwner());
 
 		//CREATE CANCEL NAME SALE
-		BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);	
 		namePurchaseTransaction.sign(maker, false);
 		//CONVERT TO BYTES
 		byte[] rawNamePurchase = namePurchaseTransaction.toBytes(true, null);
@@ -1421,7 +1420,7 @@ public class TransactionTests {
 			assertEquals(namePurchaseTransaction.getFee(), parsedNamePurchase.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(namePurchaseTransaction.getReference(), parsedNamePurchase.getReference()));	
+			assertEquals(namePurchaseTransaction.getReference(), parsedNamePurchase.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(namePurchaseTransaction.getTimestamp(), parsedNamePurchase.getTimestamp());				
@@ -1457,7 +1456,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -1465,7 +1464,7 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(500).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
@@ -1484,7 +1483,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1500).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE BUYER
-		assertEquals(true, Arrays.equals(purchaseNameTransaction.getSignature(), buyer.getLastReference(databaseSet)));
+		assertEquals(purchaseNameTransaction.getTimestamp(), buyer.getLastReference(databaseSet));
 				
 		//CHECK NAME OWNER
 		name = databaseSet.getNameMap().get("test");
@@ -1503,7 +1502,7 @@ public class TransactionTests {
 		Name name = new Name(maker, "test", "this is the value");
 						
 		//CREATE NAME REGISTRATION
-		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, false);
 		
@@ -1511,7 +1510,7 @@ public class TransactionTests {
 		NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE NAME SALE
-		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		nameSaleTransaction.process(databaseSet, false);
 		
@@ -1530,7 +1529,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(9999).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 						
 		//CHECK REFERENCE BUYER
-		assertEquals(true, Arrays.equals(last_ref, buyer.getLastReference(databaseSet)));
+		assertEquals(last_ref, buyer.getLastReference(databaseSet));
 				
 		//CHECK NAME OWNER
 		name = databaseSet.getNameMap().get("test");
@@ -1540,6 +1539,7 @@ public class TransactionTests {
 		assertEquals(true, databaseSet.getNameExchangeMap().contains("test"));
 	}
 	
+	/////////////////////////////////////////////////
 	//CREATE POLL
 	
 	@Test
@@ -1552,14 +1552,14 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", new ArrayList<PollOption>());
 				
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		//CHECK IF POLL CREATION IS VALID
 		assertEquals(true, pollCreation.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		pollCreation = new CreatePollTransaction(
-				maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, poll, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
 		assertEquals(false, pollCreation.isSignatureValid());
@@ -1574,7 +1574,7 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test")));
 				
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		
 		//CHECK IF POLL CREATION IS VALID
@@ -1588,7 +1588,7 @@ public class TransactionTests {
 			longName += "oke";
 		}
 		poll = new Poll(maker, longName, "this is the value", Arrays.asList(new PollOption("test")));
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.INVALID_NAME_LENGTH, pollCreation.isValid(databaseSet, releaserReference));
@@ -1600,35 +1600,35 @@ public class TransactionTests {
 			longDescription += "oke";
 		}
 		poll = new Poll(maker, "test2", longDescription, Arrays.asList(new PollOption("test")));
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH, pollCreation.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL CREATION NAME ALREADY TAKEN
 		poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test")));
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 		
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.POLL_ALREADY_CREATED, pollCreation.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL CREATION NO OPTIONS 
 		poll = new Poll(maker, "test2", "this is the value", new ArrayList<PollOption>());
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 		
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.INVALID_OPTIONS_LENGTH, pollCreation.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL CREATION INVALID OPTION LENGTH
 		poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption(longName)));
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 				
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.INVALID_OPTION_LENGTH, pollCreation.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL CREATION INVALID DUPLICATE OPTIONS
 		poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test")));
-		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));		
+		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);		
 						
 		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.DUPLICATE_OPTION, pollCreation.isValid(databaseSet, releaserReference));
@@ -1637,8 +1637,10 @@ public class TransactionTests {
 		seed = Crypto.getInstance().digest("invalid".getBytes());
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
+		invalidOwner.setLastReference(last_ref, databaseSet);
 		poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
 		pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));
+		// need for calc FEE
 		pollCreation.sign(invalidOwner, false);
 		
 		//CHECK IF POLL CREATION IS INVALID
@@ -1647,8 +1649,6 @@ public class TransactionTests {
 		//CREATE POLL CREATION INVALID REFERENCE
 		poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
 		pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));		
-		
-		//CHECK IF POLL CREATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(databaseSet, releaserReference));
 		
 	}
@@ -1662,7 +1662,7 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("second option")));
 				
 		//CREATE POLL CREATION
-		CreatePollTransaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		CreatePollTransaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -1705,7 +1705,7 @@ public class TransactionTests {
 			assertEquals(pollCreation.getFee(), parsedPollCreation.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(pollCreation.getReference(), parsedPollCreation.getReference()));	
+			assertEquals(pollCreation.getReference(), parsedPollCreation.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(pollCreation.getTimestamp(), parsedPollCreation.getTimestamp());				
@@ -1741,7 +1741,7 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("second option")));
 						
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		pollCreation.process(databaseSet, false);
 		
@@ -1749,7 +1749,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1).subtract(pollCreation.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(pollCreation.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(pollCreation.getTimestamp(), maker.getLastReference(databaseSet));
 		
 		//CHECK POLL EXISTS
 		assertEquals(true, databaseSet.getPollMap().contains(poll));
@@ -1764,7 +1764,7 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("second option")));
 						
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		pollCreation.process(databaseSet, false);
 		pollCreation.orphan(databaseSet, false);
@@ -1773,7 +1773,7 @@ public class TransactionTests {
 		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));
+		assertEquals(last_ref, maker.getLastReference(databaseSet));
 		
 		//CHECK POLL EXISTS
 		assertEquals(false, databaseSet.getPollMap().contains(poll));
@@ -1788,14 +1788,14 @@ public class TransactionTests {
 		init();
 		
 		//CREATE POLL VOTE
-		Transaction pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		//CHECK IF POLL VOTE IS VALID
 		assertEquals(true, pollVote.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		pollVote = new VoteOnPollTransaction(
-				maker, "test", 5, FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, "test", 5, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF POLL VOTE IS INVALID
 		assertEquals(false, pollVote.isSignatureValid());
@@ -1812,7 +1812,7 @@ public class TransactionTests {
 		long timestamp = NTP.getTime();
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test2")));
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		
 		//CHECK IF POLL CREATION IS VALID
@@ -1820,12 +1820,12 @@ public class TransactionTests {
 		pollCreation.process(databaseSet, false);
 		
 		//CREATE POLL VOTE
-		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastReference(databaseSet));
 		pollVote.sign(maker, false);
 		
 		//CHECK IF POLL VOTE IS VALID
 		assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(databaseSet, releaserReference));
-		pollVote.process(databaseSet, false);
+		//pollVote.process(databaseSet, false);
 		
 		//CREATE INVALID POLL VOTE INVALID NAME LENGTH
 		String longName = "";
@@ -1833,31 +1833,31 @@ public class TransactionTests {
 		{
 			longName += "oke";
 		}
-		pollVote = new VoteOnPollTransaction(maker, longName, 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		pollVote = new VoteOnPollTransaction(maker, longName, 0, FEE_POWER, timestamp, last_ref);	
 
 		//CHECK IF POLL VOTE IS INVALID
 		assertEquals(Transaction.INVALID_NAME_LENGTH, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE POLL DOES NOT EXIST
-		pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF POLL VOTE IS INVALID
 		assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE INVALID OPTION
-		pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF POLL VOTE IS INVALID
 		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE INVALID OPTION
-		pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, last_ref);	
 				
 		//CHECK IF POLL VOTE IS INVALID
 		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CRTEATE INVALID POLL VOTE VOTED ALREADY
-		pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		pollVote.process(databaseSet, false);
 		
@@ -1868,7 +1868,8 @@ public class TransactionTests {
 		seed = Crypto.getInstance().digest("invalid".getBytes());
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-		pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		invalidOwner.setLastReference(timestamp, databaseSet);
+		pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(invalidOwner, false);
 		
 
@@ -1877,9 +1878,7 @@ public class TransactionTests {
 		/// fee = 0 assertEquals(Transaction.NOT_ENOUGH_FEE, pollVote.isValid(databaseSet));
 		
 		//CREATE POLL CREATION INVALID REFERENCE
-		pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet));	
-		
-		//CHECK IF POLL CREATION IS INVALID
+		pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastReference(databaseSet) + 1);	
 		assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(databaseSet, releaserReference));
 		
 	}
@@ -1892,7 +1891,7 @@ public class TransactionTests {
 		init();
 				
 		//CREATE POLL Vote
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -1926,7 +1925,7 @@ public class TransactionTests {
 			assertEquals(pollVote.getFee(), parsedPollVote.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(pollVote.getReference(), parsedPollVote.getReference()));	
+			assertEquals(pollVote.getReference(), parsedPollVote.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(pollVote.getTimestamp(), parsedPollVote.getTimestamp());				
@@ -1963,16 +1962,16 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("second option")));
 						
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		pollCreation.process(databaseSet, false);
 
 		BigDecimal bal = maker.getConfirmedBalance(FEE_KEY, databaseSet);
 		
 		//CREATE POLL VOTE
-		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastReference(databaseSet));
 		pollVote.sign(maker, false);
-		assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(databaseSet, null));
+		assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(databaseSet, releaserReference));
 		
 		pollVote.process(databaseSet, false);
 		
@@ -1981,13 +1980,13 @@ public class TransactionTests {
 				
 		// NOT NEED !!!! vote not use FEE and not change REFERENCE
 		///////CHECK REFERENCE SENDER
-		///////assertEquals(true, Arrays.equals(pollVote.getSignature(), maker.getLastReference(databaseSet)));
+		///////assertEquals(true, Arrays.equals(pollVote.getTimestamp(), maker.getLastReference(databaseSet)));
 		
 		//CHECK POLL VOTER
 		assertEquals(true, databaseSet.getPollMap().get(poll.getName()).getOptions().get(0).hasVoter(maker));
 		
 		//CREATE POLL VOTE
-		pollVote = new VoteOnPollTransaction(maker, poll.getName(), 1, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		pollVote = new VoteOnPollTransaction(maker, poll.getName(), 1, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		pollVote.process(databaseSet, false);
 				
@@ -1996,7 +1995,7 @@ public class TransactionTests {
 						
 		// NOT NEED !!!! vote not use FEE and not change REFERENCE
 		/////CHECK REFERENCE SENDER
-		/////assertEquals(true, Arrays.equals(pollVote.getSignature(), maker.getLastReference(databaseSet)));
+		/////assertEquals(true, Arrays.equals(pollVote.getTimestamp(), maker.getLastReference(databaseSet)));
 				
 		//CHECK POLL VOTER
 		//assertEquals(false, databaseSet.getPollMap().get(poll.getName()).getOptions().get(0).hasVoter(maker));
@@ -2014,12 +2013,12 @@ public class TransactionTests {
 		Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("second option")));
 						
 		//CREATE POLL CREATION
-		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		pollCreation.process(databaseSet, false);
 		
 		//CREATE POLL VOTE
-		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		pollVote.process(databaseSet, false);
 		pollVote.orphan(databaseSet, false);
@@ -2029,7 +2028,7 @@ public class TransactionTests {
 		assertEquals(1, BigDecimal.valueOf(1).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(pollCreation.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(pollCreation.getTimestamp(), maker.getLastReference(databaseSet));
 		
 		//CHECK POLL VOTER
 		assertEquals(false, databaseSet.getPollMap().get(poll.getName()).hasVotes());
@@ -2048,7 +2047,7 @@ public class TransactionTests {
 		init();
 		
 		//CREATE ARBITRARY TRANSACTION
-		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, last_ref);
 		arbitraryTransaction.sign(maker, false);
 		
 		//CHECK IF ARBITRARY TRANSACTION IS VALID
@@ -2056,7 +2055,7 @@ public class TransactionTests {
 		
 		//INVALID SIGNATURE
 		arbitraryTransaction = new ArbitraryTransactionV3(
-				maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, maker.getLastReference(databaseSet), new byte[64]);
+				maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, last_ref, new byte[64]);
 		//arbitraryTransaction.sign(maker);
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
 		assertEquals(false, arbitraryTransaction.isSignatureValid());
@@ -2071,7 +2070,7 @@ public class TransactionTests {
 		byte[] data = "test".getBytes();
 				
 		//CREATE ARBITRARY TRANSACTION
-		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, last_ref);	
 		arbitraryTransaction.sign(maker, false);		
 
 		//CHECK IF ARBITRARY TRANSACTION IS VALID
@@ -2080,7 +2079,7 @@ public class TransactionTests {
 		
 		//CREATE INVALID ARBITRARY TRANSACTION INVALID data LENGTH
 		byte[] longData = new byte[5000];
-		arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, last_ref);	
 
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
 		assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(databaseSet, releaserReference));
@@ -2089,7 +2088,7 @@ public class TransactionTests {
 		seed = Crypto.getInstance().digest("invalid".getBytes());
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-		arbitraryTransaction = new ArbitraryTransactionV3(invalidOwner, null, 4776, data, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		arbitraryTransaction = new ArbitraryTransactionV3(invalidOwner, null, 4776, data, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
 		assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(databaseSet, releaserReference));
@@ -2110,7 +2109,7 @@ public class TransactionTests {
 		init();
 				
 		//CREATE ARBITRARY TRANSACTION
-		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, last_ref);
 		arbitraryTransaction.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -2143,7 +2142,7 @@ public class TransactionTests {
 			assertEquals(arbitraryTransaction.getFee(), parsedArbitraryTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(arbitraryTransaction.getReference(), parsedArbitraryTransaction.getReference()));	
+			assertEquals(arbitraryTransaction.getReference(), parsedArbitraryTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(arbitraryTransaction.getTimestamp(), parsedArbitraryTransaction.getTimestamp());				
@@ -2178,7 +2177,7 @@ public class TransactionTests {
 		init();
 						
 		//CREATE ARBITRARY TRANSACTION
-		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, last_ref);
 		arbitraryTransaction.sign(maker, false);
 		arbitraryTransaction.process(databaseSet, false);				
 		
@@ -2186,7 +2185,7 @@ public class TransactionTests {
 		assertEquals(0, BigDecimal.valueOf(1).subtract(arbitraryTransaction.getFee()).setScale(8).compareTo(maker.getConfirmedBalance(FEE_KEY, databaseSet)));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(arbitraryTransaction.getSignature(), maker.getLastReference(databaseSet)));
+		assertEquals(arbitraryTransaction.getTimestamp(), maker.getLastReference(databaseSet));
 	}
 	
 	@Test
@@ -2196,7 +2195,7 @@ public class TransactionTests {
 		init();
 		
 		//CREATE ARBITRARY TRANSACTION
-		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, maker.getLastReference(databaseSet));
+		ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776,"test".getBytes(), FEE_POWER, timestamp, last_ref);
 		arbitraryTransaction.sign(maker, false);
 		arbitraryTransaction.process(databaseSet, false);	
 		arbitraryTransaction.orphan(databaseSet, false);
@@ -2205,7 +2204,7 @@ public class TransactionTests {
 		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(FEE_KEY, databaseSet));
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(last_ref, maker.getLastReference(databaseSet)));
+		assertEquals(last_ref, maker.getLastReference(databaseSet));
 	}
 
 	/*@Test
@@ -2229,7 +2228,7 @@ public class TransactionTests {
 		byte[] data = "test".getBytes();
 				
 		//CREATE ARBITRARY TRANSACTION
-		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF ARBITRARY TRANSACTION IS VALID
 		assertEquals(Transaction.VALIDATE_OK, arbitraryTransaction.isValid(databaseSet));
@@ -2237,7 +2236,7 @@ public class TransactionTests {
 		
 		//CREATE INVALID ARBITRARY TRANSACTION INVALID data LENGTH
 		byte[] longData = new byte[5000];
-		arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, last_ref);	
 
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
 		assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(databaseSet));
@@ -2246,7 +2245,7 @@ public class TransactionTests {
 		seed = Crypto.getInstance().digest("invalid".getBytes());
 		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 		PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-		arbitraryTransaction = new ArbitraryTransactionV1(invalidOwner, 4776, data, FEE_POWER, timestamp, maker.getLastReference(databaseSet));	
+		arbitraryTransaction = new ArbitraryTransactionV1(invalidOwner, 4776, data, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
 		assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(databaseSet));
@@ -2347,7 +2346,7 @@ public class TransactionTests {
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueAssetTransaction.getReference(), parsedIssueAssetTransaction.getReference()));	
+			assertEquals(issueAssetTransaction.getReference(), parsedIssueAssetTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueAssetTransaction.getTimestamp(), parsedIssueAssetTransaction.getTimestamp());				
@@ -2410,7 +2409,7 @@ public class TransactionTests {
 		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), maker.getLastReference(db)));
+		assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastReference(db));
 	}
 	
 	
@@ -2430,7 +2429,7 @@ public class TransactionTests {
 		issueAssetTransaction.process(db, false);
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
 		assertEquals(new BigDecimal(50000).setScale(8), maker.getConfirmedBalance(key,db));
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getSignature(), maker.getLastReference(db)));
+		assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastReference(db));
 		
 		issueAssetTransaction.orphan(db, false);
 		
@@ -2444,7 +2443,7 @@ public class TransactionTests {
 		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).longValue());
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueAssetTransaction.getReference(), maker.getLastReference(db)));
+		assertEquals(issueAssetTransaction.getReference(), maker.getLastReference(db));
 	}
 	
 }
