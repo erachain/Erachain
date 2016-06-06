@@ -42,9 +42,9 @@ public class Order implements Comparable<Order> {
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave.setScale(8);
-		this.fulfilled = BigDecimal.ZERO.setScale(8);
-		this.amountWant = amountWant.setScale(8);
+		this.amountHave = amountHave; //.setScale(8);
+		this.fulfilled = BigDecimal.ZERO; //.setScale(8);
+		this.amountWant = amountWant; //.setScale(8);
 		this.timestamp = timestamp;
 	}
 	
@@ -54,9 +54,9 @@ public class Order implements Comparable<Order> {
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave.setScale(8);
-		this.fulfilled = fulfilled.setScale(8);
-		this.amountWant = amountWant.setScale(8);
+		this.amountHave = amountHave;//.setScale(8);
+		this.fulfilled = fulfilled;//.setScale(8);
+		this.amountWant = amountWant;//.setScale(8);
 		this.timestamp = timestamp;
 	}
 	
@@ -122,7 +122,7 @@ public class Order implements Comparable<Order> {
 	}
 	public BigDecimal getPriceCalc() 
 	{
-		return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_UP);
+		return this.amountWant.divide(amountHave, 12, RoundingMode.DOWN);
 	}	
 	
 	public BigDecimal getFulfilled()
@@ -340,7 +340,8 @@ public class Order implements Comparable<Order> {
 			//CHECK IF OWNERS OF BOTH ORDER ARE NOT THE SAME
 	
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-				if(buyingPrice.compareTo(this.amountWant) >= 0)
+			BigDecimal thisPrice = this.getPriceCalc();
+				if(buyingPrice.compareTo(this.getPriceCalc()) >= 0)
 				{
 					//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
 					BigDecimal amount = order.getAmountLeft();
@@ -356,15 +357,15 @@ public class Order implements Comparable<Order> {
 						amount = amount.subtract(amount.remainder(increment));
 						
 						//CALCULATE THE PRICE WE HAVE TO PAY
-						BigDecimal price = amount.multiply(order.getPriceCalc()).setScale(8);
+						BigDecimal amountGet = amount.multiply(order.getPriceCalc()).setScale(8);
 						
 						//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
 						if(amount.compareTo(BigDecimal.ZERO) > 0)
 						{
 							//CREATE TRADE
-							Trade trade = new Trade(this.getId(), order.getId(), amount, price, transaction.getTimestamp());
+							Trade trade = new Trade(this.getId(), order.getId(), amount, amountGet, transaction.getTimestamp());
 							trade.process(db);
-							this.fulfilled = this.fulfilled.add(price);
+							this.fulfilled = this.fulfilled.add(amountGet);
 						}
 						
 						//COMPLETED ORDER

@@ -181,7 +181,7 @@ public class CreateOrderTransaction extends Transaction
 		return transaction;	
 	}
 	
-	@Override
+	//@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
