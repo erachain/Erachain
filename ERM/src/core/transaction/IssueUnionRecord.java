@@ -2,6 +2,7 @@ package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,11 +32,17 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_UNION_TRANSACTION;
 	private static final String NAME_ID = "Issue Union";
 	
-	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference) 
+	// need RIGHTS for PERSON account
+	public static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(100).setScale(8);
+	// need RIGHTS for non PERSON account
+	public static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+
+	
+	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);		
 	}
-	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference, signature);		
 	}
@@ -43,7 +50,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, union, (byte)0, 0l, null, signature);		
 	}
-	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, feePow, timestamp, reference, signature);
 	}
@@ -51,7 +58,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, (byte)0, 0l, null, signature);
 	}
-	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, byte[] reference) 
+	public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, union, feePow, timestamp, reference);
 	}
@@ -66,7 +73,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -90,10 +97,11 @@ public class IssueUnionRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		
@@ -127,7 +135,27 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	}	
 	
 	//VALIDATE
+	public int isValid(DBSet db, Long releaserReference) {
 		
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
+
+
+		
+		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
+		if ( this.creator.isPerson(db) )
+		{
+			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+				return Transaction.NOT_ENOUGH_RIGHTS;
+
+		} else {
+			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		}
+		
+		return Transaction.VALIDATE_OK;
+	}
+
 	
 	//PROCESS/ORPHAN
 

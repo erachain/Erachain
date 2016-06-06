@@ -35,29 +35,29 @@ public class RecordReleasePack extends Transaction {
 
 	private List<Transaction> transactions;
 	
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, byte[] reference) 
+	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 		this.transactions = transactions;
 	}
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, transactions, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack - calcFee not needed
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte[] reference, byte[] signature)
+	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, transactions, (byte)0, 0l, reference);
 		this.signature = signature;		
 	}
-	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, byte[] reference) 
+	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, transactions, feePow, timestamp, reference);
 	}
 	// as Pack
-	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, byte[] reference)
+	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, Long reference)
 	{
 		this(creator, transactions, (byte)0, 0l, reference);
 	}
@@ -93,7 +93,7 @@ public class RecordReleasePack extends Transaction {
 		return json;	
 	}
 
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception{
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception{
 		
 		boolean asPack = releaserReference != null;
 		int data_length = data.length;
@@ -117,10 +117,11 @@ public class RecordReleasePack extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -173,7 +174,7 @@ public class RecordReleasePack extends Transaction {
 	}	
 	
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 
 		byte[] data = super.toBytes(withSign, null);
@@ -207,7 +208,7 @@ public class RecordReleasePack extends Transaction {
 	//VALIDATE
 
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK PAYMENTS SIZE

@@ -77,14 +77,13 @@ public class Genesis_Record extends Transaction
 	//public abstract Transaction Parse(byte[] data);
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		
 		//WRITE TYPE in typeBytes[0]
 		byte[] data = new byte[]{this.typeBytes[0]};
-		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		//data = Bytes.concat(data, TYPE_ID);
+		
+		// SIGNATURE not need - its calculated on fly
 						
 		return data;
 	}
@@ -121,6 +120,7 @@ public class Genesis_Record extends Transaction
 		return false;	
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return 0;
 	}

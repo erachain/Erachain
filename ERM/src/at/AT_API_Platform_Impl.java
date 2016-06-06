@@ -16,7 +16,7 @@ import core.account.Account;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
 import database.ATTransactionMap;
@@ -231,9 +231,9 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 		if ( tx != null)
 		{
-			if ( tx instanceof MessageTransaction )
+			if ( tx instanceof R_Send )
 			{
-				MessageTransaction txMessage = (MessageTransaction) tx;
+				R_Send txMessage = (R_Send) tx;
 				if ( txMessage != null)
 				{
 					byte[] message = txMessage.getData();

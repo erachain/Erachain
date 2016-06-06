@@ -22,13 +22,13 @@ public class Imprint extends ImprintCls {
 	public Imprint(Account creator, String name, String description)
 	{
 		super(TYPE_ID, creator, name, description);
-		this.reference = Bytes.ensureCapacity(Base58.decode(name), Transaction.REFERENCE_LENGTH, 0);
+		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 
 	}
 	public Imprint(byte[] typeBytes, Account creator, String name, String description)
 	{
 		super(typeBytes, creator, name, description);
-		this.reference = Bytes.ensureCapacity(Base58.decode(name), Transaction.REFERENCE_LENGTH, 0);
+		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 	}
 
 	//GETTERS/SETTERS
@@ -80,7 +80,7 @@ public class Imprint extends ImprintCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 0 || descriptionLength > 4000)
+		if(descriptionLength > 4000)
 		{
 			throw new Exception("Invalid description length");
 		}

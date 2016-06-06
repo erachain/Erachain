@@ -35,25 +35,25 @@ public class CreatePollTransaction extends Transaction
 	private PublicKeyAccount creator;
 	private Poll poll;
 	
-	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference) 
+	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.poll = poll;
 	}
-	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, poll, feePow, timestamp, reference);
 		
 		this.signature = signature;
 		this.calcFee();
 	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference, signature);
 	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, byte[] reference) 
+	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference);
 	}
@@ -87,7 +87,8 @@ public class CreatePollTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -134,7 +135,7 @@ public class CreatePollTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -147,7 +148,9 @@ public class CreatePollTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 		
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		byte[] referenceBytes = Longs.toByteArray(this.reference);
+		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -174,6 +177,7 @@ public class CreatePollTransaction extends Transaction
 	
 	//VALIDATE
 	
+	/*
 	public boolean isSignatureValid()
 	{
 		byte[] data = this.toBytes( false, null );
@@ -181,9 +185,10 @@ public class CreatePollTransaction extends Transaction
 				
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
+	*/
 	
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		/*
 		//CHECK IF RELEASED
@@ -257,21 +262,8 @@ public class CreatePollTransaction extends Transaction
 			
 			options.add(option.getName());
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-		
-		
-		return VALIDATE_OK;
+				
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN

@@ -26,80 +26,84 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
 import core.item.ItemCls;
 import ntp.NTP;
+import utils.DateTimeFormat;
 import database.DBSet;
 import database.DBMap;
 
-// this.end_date = 0 (ALIVE PERMANENT), = -1 (ENDED), = Integer - different
-// typeBytes[1] - version =0 - not need sign by person;
-// 		 =1 - need sign by person
-// typeBytes[2] - size of personalized accounts
 public class R_SetStatusToItem extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TRANSACTION;
+	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Status";
-	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
+	private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
 	protected Long key; // STATUS KEY
-	protected ItemCls item; // ITEM
-	protected Integer end_date = 0; // in days; 0 - permanent active
-	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
+	protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
+	protected Long itemKey; // ITEM KEY
+	protected long beg_date;
+	protected long end_date = Long.MAX_VALUE;
+	private static final int SELF_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
-	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
+	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
 		this.key = key;
-		this.item = item;
+		this.itemType = itemType;
+		this.itemKey = itemKey;
+		if (beg_date == null || beg_date == 0) beg_date = Long.MIN_VALUE;
+		this.beg_date = beg_date;		
+		if (end_date == null || end_date == 0) end_date = Long.MAX_VALUE;
 		this.end_date = end_date;		
 	}
 
-	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				end_date, timestamp, reference);
+	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
+				beg_date, end_date, timestamp, reference);
 	}
 	// set default date
-	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				0, timestamp, reference);
+	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+			long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
+				Long.MIN_VALUE, Long.MAX_VALUE, timestamp, reference);
 	}
-	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
-		this(typeBytes, creator, feePow, key, item,
-				end_date, timestamp, reference);
+	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature) {
+		this(typeBytes, creator, feePow, key, itemType, itemKey,
+				beg_date, end_date, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
-		this(typeBytes, creator, (byte)0, key, item,
-				end_date, 0l, null);
+	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, byte[] signature) {
+		this(typeBytes, creator, (byte)0, key, itemType, itemKey,
+				beg_date, end_date, 0l, null);
 		this.signature = signature;
 	}
-	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, ItemCls item,
-			int end_date, long timestamp, byte[] reference, byte[] signature) {
-		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, item,
-				end_date, timestamp, reference);
+	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature) {
+		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
+				beg_date, end_date, timestamp, reference);
 	}
 
 	// as pack
-	public R_SetStatusToItem(PublicKeyAccount creator, long key, ItemCls item,
-			int end_date, byte[] signature) {
-		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, item,
-				end_date, 0l, null);
+	public R_SetStatusToItem(PublicKeyAccount creator, long key, int itemType, long itemKey,
+			Long beg_date, Long end_date, byte[] signature) {
+		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, itemType, itemKey,
+				beg_date, end_date, 0l, null);
 	}
 	
 	//GETTERS/SETTERS
@@ -111,22 +115,42 @@ public class R_SetStatusToItem extends Transaction {
 		return this.key;
 	}
 
-	public ItemCls getItem()
+	public int getItemType()
 	{
-		return this.item;
+		return this.itemType;
+	}
+	public long getItemKey()
+	{
+		return this.itemKey;
 	}
 
-	public int getEndDate() 
+	public Long getBeginDate()
+	{
+		return this.beg_date;
+	}
+
+	public Long getEndDate()
 	{
 		return this.end_date;
 	}
 
-	public void resetItemToDB(DBSet db) 
-	{
-		this.item = db.getItem_Map(this.item.getItemTypeInt())
-				.get(this.item.getKey());		
+	@Override
+	public String viewItemName() {
+		ItemCls status = DBSet.getInstance().getItemStatusMap().get(this.key);
+		return status==null?"null" : status.toString();
 	}
-
+	
+	@Override
+	public String viewAmount(String address) {
+		return DateTimeFormat.timestamptoString(end_date);
+	}
+	
+	@Override
+	public String viewRecipient() {
+		ItemCls item = ItemCls.getItem(DBSet.getInstance(), this.itemType, this.itemKey);
+		return item==null?"null" : item.toString();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 
@@ -136,7 +160,9 @@ public class R_SetStatusToItem extends Transaction {
 
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("key", this.key);
-		transaction.put("item", this.item.toJson());
+		transaction.put("itemType", this.itemType);
+		transaction.put("itemKey", this.itemKey);
+		transaction.put("begin_date", this.beg_date);
 		transaction.put("end_date", this.end_date);
 		
 		return transaction;	
@@ -144,7 +170,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	// releaserReference = null - not a pack
 	// releaserReference = reference for releaser account - it is as pack
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
 		
@@ -167,10 +193,11 @@ public class R_SetStatusToItem extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -206,24 +233,29 @@ public class R_SetStatusToItem extends Transaction {
 		byte[] itemKeyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
 		long itemKey = Longs.fromByteArray(itemKeyBytes);	
 		position += KEY_LENGTH;
-		ItemCls item = Controller.getInstance().getItem(itemType.intValue(), itemKey);		
 		
-		// READ DURATION
-		int end_date = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
-		position += DATE_DAY_LENGTH;
+		// READ BEGIN DATE
+		byte[] beg_dateBytes = Arrays.copyOfRange(data, position, position + DATE_LENGTH);
+		Long beg_date = Longs.fromByteArray(beg_dateBytes);	
+		position += DATE_LENGTH;
+
+		// READ END DATE
+		byte[] end_dateBytes = Arrays.copyOfRange(data, position, position + DATE_LENGTH);
+		Long end_date = Longs.fromByteArray(end_dateBytes);	
+		position += DATE_LENGTH;
 
 		if (!asPack) {
-			return new R_SetStatusToItem(typeBytes, creator, feePow, key, item,
-					end_date, timestamp, reference, signature);
+			return new R_SetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
+					beg_date, end_date, timestamp, reference, signature);
 		} else {
-			return new R_SetStatusToItem(typeBytes, creator, key, item,
-					end_date, signature);
+			return new R_SetStatusToItem(typeBytes, creator, key, itemType, itemKey,
+					beg_date, end_date, signature);
 		}
 
 	}
 
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -235,15 +267,18 @@ public class R_SetStatusToItem extends Transaction {
 		//WRITE ITEM KEYS
 		// TYPE
 		byte[] itemTypeKeyBytes = new byte[1];
-		itemTypeKeyBytes[0] = (byte)this.item.getItemTypeInt();
+		itemTypeKeyBytes[0] = (byte)this.itemType;
 		data = Bytes.concat(data, itemTypeKeyBytes);
 		// KEY
-		byte[] itemKeyBytes = Longs.toByteArray(this.item.getKey());
+		byte[] itemKeyBytes = Longs.toByteArray(this.itemKey);
 		keyBytes = Bytes.ensureCapacity(itemKeyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
 		
-		//WRITE DURATION
-		data = Bytes.concat(data, Ints.toByteArray(this.end_date));
+		//WRITE BEGIN DATE
+		data = Bytes.concat(data, Longs.toByteArray(this.beg_date));
+
+		//WRITE END DATE
+		data = Bytes.concat(data, Longs.toByteArray(this.end_date));
 
 		return data;	
 	}
@@ -258,45 +293,36 @@ public class R_SetStatusToItem extends Transaction {
 
 	//VALIDATE
 
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
-
-		//CHECK END_DAY
-		if(end_date < 0)
-		{
-			return INVALID_DATE;
-		}
 	
 		if ( !db.getItemStatusMap().contains(this.key) )
 		{
 			return Transaction.ITEM_STATUS_NOT_EXIST;
 		}
 
-		if ( this.item == null )
+		if (this.itemType != ItemCls.PERSON_TYPE
+				&& this.itemType != ItemCls.ASSET_TYPE
+				&& this.itemType != ItemCls.UNION_TYPE)
+			return ITEM_DOES_NOT_STATUSED;
+
+		ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
+		if ( item == null )
 		{
 			return Transaction.ITEM_DOES_NOT_EXIST;
 		}
 		
-		if (item.getItemTypeInt() != ItemCls.PERSON_TYPE
-				&& item.getItemTypeInt() != ItemCls.ASSET_TYPE
-				&& item.getItemTypeInt() != ItemCls.UNION_TYPE)
-			return ITEM_DOES_NOT_STATUSED;
-
 		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		
-		if ( !this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-				// if not enough RIGHT BALANCE as GENERAL
+		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+			if ( this.creator.isPerson(db) )
+			{
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
+			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		}
+			}
 		
 		return Transaction.VALIDATE_OK;
 	}
@@ -308,18 +334,24 @@ public class R_SetStatusToItem extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(this.end_date,
-				Controller.getInstance().getHeight(), this.signature);
+		Block block = db.getBlockMap().getLastBlock();
+		int blockIndex = block.getHeight();
+		int transactionIndex = block.getTransactionIndex(signature);
+
+		Tuple4<Long, Long, Integer, Integer> itemP = new Tuple4<Long, Long, Integer, Integer>
+				(beg_date, end_date,
+				//Controller.getInstance().getHeight(), this.signature);
+				blockIndex, transactionIndex);
 
 		// SET ALIVE PERSON for DURATION
 		// TODO set STATUSES by reference of it record - not by key!
 		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
-		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().addItem(item.getKey(), this.key, itemP);
-		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().addItem(item.getKey(), this.key, itemP);
-		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().addItem(item.getKey(), this.key, itemP);
+		if (this.itemType == ItemCls.PERSON_TYPE)
+			db.getPersonStatusMap().addItem(this.itemKey, this.key, itemP);
+		else if (this.itemType == ItemCls.ASSET_TYPE)
+			db.getAssetStatusMap().addItem(this.itemKey, this.key, itemP);
+		else if (this.itemType == ItemCls.UNION_TYPE)
+			db.getUnionStatusMap().addItem(this.itemKey, this.key, itemP);
 
 	}
 
@@ -330,12 +362,12 @@ public class R_SetStatusToItem extends Transaction {
 		
 						
 		// UNDO ALIVE PERSON for DURATION
-		if (item.getItemTypeInt() == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().removeItem(this.item.getKey(), this.key);
-		else if (item.getItemTypeInt() == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().removeItem(this.item.getKey(), this.key);
-		else if (item.getItemTypeInt() == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().removeItem(this.item.getKey(), this.key);
+		if (this.itemType == ItemCls.PERSON_TYPE)
+			db.getPersonStatusMap().removeItem(this.itemKey, this.key);
+		else if (this.itemType == ItemCls.ASSET_TYPE)
+			db.getAssetStatusMap().removeItem(this.itemKey, this.key);
+		else if (this.itemType == ItemCls.UNION_TYPE)
+			db.getUnionStatusMap().removeItem(this.itemKey, this.key);
 
 	}
 
@@ -358,7 +390,7 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(this.creator))
+		if(address.equals(this.creator.getAddress()))
 		{
 			return true;
 		}

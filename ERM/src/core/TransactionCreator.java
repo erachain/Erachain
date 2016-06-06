@@ -24,6 +24,8 @@ import core.item.persons.PersonHuman;
 import core.item.persons.PersonCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
+import core.item.unions.Union;
+import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
@@ -40,17 +42,17 @@ import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
-import core.transaction.MessageTransaction;
+import core.transaction.IssueUnionRecord;
+import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.PaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import core.transaction.TransferAssetTransaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
@@ -106,10 +108,11 @@ public class TransactionCreator
 		//SORT THEM BY TIMESTAMP
 		Collections.sort(accountTransactions, new TransactionTimestampComparator());
 			
-		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK
+		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
 		for(Transaction transaction: accountTransactions)
 		{
-			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK && transaction.isSignatureValid())
+			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK
+					&& transaction.isSignatureValid())
 			{
 				transaction.process(this.fork, false);
 			}
@@ -120,24 +123,7 @@ public class TransactionCreator
 			}
 		}
 	}
-	
-	public Pair<Transaction, Integer> createPayment(PrivateKeyAccount sender, Account recipient, BigDecimal amount, int feePow)
-	{
-		//CHECK FOR UPDATES
-		this.checkUpdate();
 		
-		//TIME
-		long time = NTP.getTime();
-		
-		//CREATE PAYMENT
-		//PaymentTransaction payment = new PaymentTransaction(new PublicKeyAccount(sender.getPublicKey()), recipient, amount, feePow, time, sender.getLastReference(this.fork));
-		PaymentTransaction payment = new PaymentTransaction(sender, recipient, amount, (byte)feePow, time, sender.getLastReference(this.fork));
-		payment.sign(sender, false);
-		
-		//VALIDATE AND PROCESS
-		return this.afterCreate(payment, false);
-	}
-	
 	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow)
 	{
 		//CHECK FOR UPDATES
@@ -271,6 +257,7 @@ public class TransactionCreator
 	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
+		// all unconfirmed records insert in FORK for calc last account REFERENCE 
 		this.checkUpdate();
 								
 		//TIME
@@ -281,13 +268,7 @@ public class TransactionCreator
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueAssetTransaction.sign(creator, false);
-		
-//		byte[] signature = issueAssetTransaction.getSignature();
-//		asset.se
-		//asset = new Asset(creator, name, description, quantity, scale, divisible, signature);
-		//issueAssetTransaction = new IssueAssetTransaction(creator, asset, feePow, time, creator.getLastReference(this.fork));
-		//issueAssetTransaction.sign(creator);
-								
+										
 		//VALIDATE AND PROCESS
 		return this.afterCreate(issueAssetTransaction, false);
 	}
@@ -299,11 +280,11 @@ public class TransactionCreator
 								
 		//TIME
 		long time = NTP.getTime();
-								
+			
 		ImprintCls imprint = new Imprint(creator, name, description);
 							
 		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time, creator.getLastReference(this.fork));
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
 		issueImprintRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
@@ -328,7 +309,7 @@ public class TransactionCreator
 		return this.afterCreate(issueNoteRecord, false);
 	}
 
-	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
 					byte gender, String race, float birthLatitude, float birthLongitude,
 					String skinColor, String eyeColor, String hairСolor, int height, String description) 
 	{
@@ -338,7 +319,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 
-		PersonCls person = new PersonHuman(creator, fullName, birthday,
+		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, description);
 							
@@ -368,7 +349,25 @@ public class TransactionCreator
 		return this.afterCreate(issueStatusRecord, false);
 	}
 
-	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price, int feePow)
+	public Pair<Transaction, Integer> createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+								
+		UnionCls union = new Union(creator, name, birthday, parent, description);
+							
+		//CREATE ISSUE NOTE TRANSACTION
+		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastReference(this.fork));
+		issueUnionRecord.sign(creator, false);
+										
+		//VALIDATE AND PROCESS
+		return this.afterCreate(issueUnionRecord, false);
+	}
+
+	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -377,7 +376,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, (byte)feePow, time, creator.getLastReference(this.fork));
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte)feePow, time, creator.getLastReference(this.fork));
 		createOrderTransaction.sign(creator, false);
 								
 		//VALIDATE AND PROCESS
@@ -398,22 +397,6 @@ public class TransactionCreator
 								
 		//VALIDATE AND PROCESS
 		return this.afterCreate(cancelOrderTransaction, false);
-	}
-		
-	public Pair<Transaction, Integer> createAssetTransfer(PrivateKeyAccount creator, Account recipient, AssetCls asset, BigDecimal amount, int feePow)
-	{
-		//CHECK FOR UPDATES
-		this.checkUpdate();
-		
-		//TIME
-		long time = NTP.getTime();
-				
-		//CREATE ASSET TRANSFER
-		TransferAssetTransaction assetTransfer = new TransferAssetTransaction(creator, recipient, asset.getKey(), amount, (byte)feePow, time, creator.getLastReference(this.fork));
-		assetTransfer.sign(creator, false);
-		
-		//VALIDATE AND PROCESS
-		return this.afterCreate(assetTransfer, false);
 	}
 		
 	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow)
@@ -448,7 +431,7 @@ public class TransactionCreator
 		
 	}
 	
-	public Pair<Transaction, Integer> createMessage(PrivateKeyAccount creator,
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
@@ -459,7 +442,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new MessageTransaction(creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
 		return afterCreate(messageTx, false);
@@ -484,7 +467,7 @@ public class TransactionCreator
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key,
 			List<PublicKeyAccount> userAccounts,
-			int end_date) {
+			int add_day) {
 		
 		this.checkUpdate();
 		
@@ -496,15 +479,15 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
-				end_date,  timestamp, creator.getLastReference(this.fork));
+				add_day,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);
 	}
 
-	public Pair<Transaction, Integer> R_SetStatusToItem(boolean asPack,
-			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
-			int end_date) {
+	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow,
+			int height, int seq) {
 		
 		this.checkUpdate();
 		
@@ -514,8 +497,28 @@ public class TransactionCreator
 		
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
-		record = new R_SetStatusToItem(creator, (byte)feePow, key, item,
-				end_date, timestamp, creator.getLastReference(this.fork));
+		record = new R_Vouch(creator, (byte)feePow,
+				height, seq,
+				timestamp, creator.getLastReference(this.fork));
+		record.sign(creator, asPack);
+			
+		return afterCreate(record, asPack);
+	}
+
+	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
+			Long beg_date, Long end_date) {
+		
+		this.checkUpdate();
+		
+		Transaction record;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE SERTIFY PERSON TRANSACTION
+		//int version = 5; // without user sign
+		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
+				beg_date, end_date, timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);

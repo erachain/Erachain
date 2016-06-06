@@ -27,35 +27,40 @@ import core.item.imprints.Imprint;
 import database.DBSet;
 
 // reference - as item.name
+// TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
 public class IssueImprintRecord extends Issue_ItemRecord 
 {
 	private static final byte TYPE_ID = (byte)ISSUE_IMPRINT_TRANSACTION;
 	private static final String NAME_ID = "Issue Imprint";
 	
-	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference) 
+	//protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
+	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - REFERENCE_LENGTH;
+
+	
+	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) 
 	{
-		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, reference);	
+		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null);	
 	}
-	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) 
 	{
-		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, reference, signature);		
+		super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
 	}
 	// asPack
 	public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, imprint, (byte)0, 0l, null, signature);		
 	}
-	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference, byte[] signature) 
-	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, feePow, timestamp, reference, signature);
-	}
 	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte[] signature) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, (byte)0, 0l, null, signature);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, (byte)0, 0l, signature);
 	}
-	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] reference) 
+	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, feePow, timestamp, reference);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, feePow, timestamp, signature);
+	}
+	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) 
+	{
+		this(new byte[]{TYPE_ID,0,0,0}, creator, imprint, feePow, timestamp, null);
 	}
 	public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint) 
 	{
@@ -68,14 +73,15 @@ public class IssueImprintRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
 
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if (data.length < BASE_LENGTH_AS_PACK
-				| !asPack & data.length < BASE_LENGTH)
+				| !asPack & data.length < BASE_LENGTH
+)
 		{
 			throw new Exception("Data does not match block length " + data.length);
 		}
@@ -92,12 +98,15 @@ public class IssueImprintRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
+		/*
 		byte[] reference = null;
-		if (!asPack) {
+		if (!asPack && typeBytes[1] == 0) {
+			// in not PACKED and it is VERSION - 0
 			//READ REFERENCE
 			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 			position += REFERENCE_LENGTH;
 		}
+		*/
 		
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -122,7 +131,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 		position += imprint.getDataLength(false);
 				
 		if (!asPack) {
-			return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, reference, signatureBytes);
+			return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes);
 		} else {
 			return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
 		}
@@ -131,7 +140,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//VALIDATE
 	//
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH
@@ -151,8 +160,19 @@ public class IssueImprintRecord extends Issue_ItemRecord
 		return Transaction.VALIDATE_OK; 		
 	
 	}
-
 	
+	@Override
+	public int getDataLength(boolean asPack)
+	{
+		// not include item reference
+		if (asPack) {
+			return BASE_LENGTH_AS_PACK + this.getItem().getDataLength(false);
+		} else {
+			return BASE_LENGTH + this.getItem().getDataLength(false);
+		}
+	}
+
+
 	//PROCESS/ORPHAN
 
 	@Override

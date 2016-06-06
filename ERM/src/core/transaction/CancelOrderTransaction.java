@@ -32,19 +32,19 @@ public class CancelOrderTransaction extends Transaction
 	
 	private BigInteger order;
 	
-	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.order = order;
 	}
-	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, order, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference, byte[] signature) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference, signature);
 	}
-	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, byte[] reference) {
+	public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference);
 	}
 	
@@ -58,46 +58,61 @@ public class CancelOrderTransaction extends Transaction
 	
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
+		boolean asPack = releaserReference != null;
+
 		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
+		if (data.length < BASE_LENGTH_AS_PACK
+				| !asPack & data.length < BASE_LENGTH)
 		{
-			throw new Exception("Data does not match block length");
+			throw new Exception("Data does not match block length " + data.length);
 		}
-		
 		
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-		
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
+		long timestamp = 0;
+		if (!asPack) {
+			//READ TIMESTAMP
+			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+			timestamp = Longs.fromByteArray(timestampBytes);	
+			position += TIMESTAMP_LENGTH;
+		}
+
+		Long reference = null;
+		if (!asPack) {
+			//READ REFERENCE
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
+			position += REFERENCE_LENGTH;
+		} else {
+			reference = releaserReference;
+		}
 		
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
 		
+		byte feePow = 0;
+		if (!asPack) {
+			//READ FEE POWER
+			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+			feePow = feePowBytes[0];
+			position += 1;
+		}
+		
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+		position += SIGNATURE_LENGTH;
+				
 		//READ ORDER
 		byte[] orderBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
 		BigInteger order = new BigInteger(orderBytes);
 		position += ORDER_LENGTH;
-		
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-		
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-		
+				
 		return new CancelOrderTransaction(typeBytes, creator, order, feePow, timestamp, reference, signatureBytes);
 	}	
 
@@ -115,41 +130,17 @@ public class CancelOrderTransaction extends Transaction
 		return transaction;	
 	}
 
-	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	//@Override
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, this.typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		
+		byte[] data = super.toBytes(withSign, releaserReference);
+
 		//WRITE ORDER
 		byte[] orderBytes = this.order.toByteArray();
 		byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
 		orderBytes = Bytes.concat(fill, orderBytes);
 		data = Bytes.concat(data, orderBytes);
 				
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
-		
 		return data;	
 	}
 
@@ -161,8 +152,8 @@ public class CancelOrderTransaction extends Transaction
 	
 	//VALIDATE
 
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK IF ORDER EXISTS
 		Order order = db.getOrderMap().get(this.order);
@@ -170,32 +161,14 @@ public class CancelOrderTransaction extends Transaction
 		{
 			return ORDER_DOES_NOT_EXIST;
 		}
-		
-		//CHECK CREATOR
-		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
-				
+						
 		//CHECK IF CREATOR IS CREATOR
 		if(!order.getCreator().getAddress().equals(this.creator.getAddress()))
 		{
 			return INVALID_ORDER_CREATOR;
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+								
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN

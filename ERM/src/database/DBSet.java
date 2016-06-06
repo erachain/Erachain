@@ -25,11 +25,18 @@ public class DBSet implements Observer, IDB {
 	
 	private ItemAssetBalanceMap assetBalanceMap;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
-	private AssetStatusMap assetStatusMap;
-	private PersonStatusMap personStatusMap;
-	private UnionStatusMap unionStatusMap;
+	private KKAssetStatusMap kKAssetStatusMap;
+	private KKPersonStatusMap kKPersonStatusMap;
+	private KKUnionStatusMap kKUnionStatusMap;
+	private KKAssetUnionMap kKAssetUnionMap;
+	private KKPersonUnionMap kKPersonUnionMap;
+	private KKStatusUnionMap kKStatusUnionMap;
 	private AddressPersonMap addressPersonMap;
 	private PersonAddressMap personAddressMap;
+	private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
+	private VouchRecordMap vouchRecordMap;
+
+	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
 	private ChildMap childMap;
 	private HeightMap heightMap;
@@ -46,7 +53,7 @@ public class DBSet implements Observer, IDB {
 	private LocalDataMap localDataMap;
 	private BlogPostMap blogPostMap;
 	private HashtagPostMap hashtagPostMap;
-	private TransactionParentMap transactionParentMap;
+	private TransactionRef_BlockRef_Map transactionRef_BlockRef_Map;
 	private NameExchangeMap nameExchangeMap;
 	private UpdateNameMap updateNameMap;
 	private CancelSellNameMap cancelSellNameMap;
@@ -120,12 +127,19 @@ public class DBSet implements Observer, IDB {
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
-			this.assetStatusMap = new AssetStatusMap(this, database);
-			this.personStatusMap = new PersonStatusMap(this, database);
-			this.unionStatusMap = new UnionStatusMap(this, database);
+			this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
+			this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
+			this.kKUnionStatusMap = new KKUnionStatusMap(this, database);
+			this.kKAssetUnionMap = new KKAssetUnionMap(this, database);
+			this.kKPersonUnionMap = new KKPersonUnionMap(this, database);
+			this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
 			this.addressPersonMap = new AddressPersonMap(this, database);
 			this.personAddressMap = new PersonAddressMap(this, database);
+			this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
+			this.vouchRecordMap = new VouchRecordMap(this, database);
+			
+			this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
 			this.blockMap = new BlockMap(this, database);
 			this.childMap = new ChildMap(this, database);
 			this.heightMap = new HeightMap(this, database);
@@ -142,7 +156,7 @@ public class DBSet implements Observer, IDB {
 			this.localDataMap = new LocalDataMap(this, database);
 			this.blogPostMap = new BlogPostMap(this, database);
 			this.hashtagPostMap = new HashtagPostMap(this, database);
-			this.transactionParentMap = new TransactionParentMap(this, database);
+			this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this, database);
 			this.nameExchangeMap = new NameExchangeMap(this, database);
 			this.updateNameMap = new UpdateNameMap(this, database);
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
@@ -177,12 +191,19 @@ public class DBSet implements Observer, IDB {
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
-		this.assetStatusMap = new AssetStatusMap(parent.assetStatusMap);
-		this.personStatusMap = new PersonStatusMap(parent.personStatusMap);
-		this.unionStatusMap = new UnionStatusMap(parent.unionStatusMap);
+		this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
+		this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
+		this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap);
+		this.kKAssetUnionMap = new KKAssetUnionMap(parent.kKAssetUnionMap);
+		this.kKPersonUnionMap = new KKPersonUnionMap(parent.kKPersonUnionMap);
+		this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
 		this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
 		this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
+		this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap);
+		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
+
+		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap);
 		this.childMap = new ChildMap(this.blockMap, parent.childMap);
 		this.heightMap = new HeightMap(parent.heightMap);
@@ -199,7 +220,7 @@ public class DBSet implements Observer, IDB {
 		this.localDataMap = new LocalDataMap(parent.localDataMap);
 		this.blogPostMap = new BlogPostMap(parent.blogPostMap);
 		this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-		this.transactionParentMap = new TransactionParentMap(this.blockMap, parent.transactionParentMap);
+		this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this.blockMap, parent.transactionRef_BlockRef_Map);
 		this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
 		this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
@@ -229,11 +250,17 @@ public class DBSet implements Observer, IDB {
 		
 		this.assetBalanceMap.reset();
 		this.assetBalanceAccountingMap.reset();
-		this.assetStatusMap.reset();
-		this.personStatusMap.reset();
-		this.unionStatusMap.reset();
+		this.kKAssetStatusMap.reset();
+		this.kKPersonStatusMap.reset();
+		this.kKUnionStatusMap.reset();
+		this.kKAssetUnionMap.reset();
+		this.kKPersonUnionMap.reset();
+		this.kKStatusUnionMap.reset();
 		this.addressPersonMap.reset();
 		this.personAddressMap.reset();;
+		this.kK_KPersonStatusUnionMap.reset();
+		this.vouchRecordMap.reset();
+
 		this.heightMap.reset();
 		this.referenceMap.reset();
 		this.peerMap.reset();
@@ -249,7 +276,7 @@ public class DBSet implements Observer, IDB {
 		this.localDataMap.reset();
 		this.blogPostMap.reset();
 		this.hashtagPostMap.reset();
-		this.transactionParentMap.reset();
+		this.transactionRef_BlockRef_Map.reset();
 		this.nameExchangeMap.reset();
 		this.updateNameMap.reset();
 		this.cancelSellNameMap.reset();
@@ -293,17 +320,29 @@ public class DBSet implements Observer, IDB {
 		return this.addressPersonMap;
 	}
 
-	public AssetStatusMap getAssetStatusMap()
+	public KKAssetStatusMap getAssetStatusMap()
 	{
-		return this.assetStatusMap;
+		return this.kKAssetStatusMap;
 	}
-	public PersonStatusMap getPersonStatusMap()
+	public KKPersonStatusMap getPersonStatusMap()
 	{
-		return this.personStatusMap;
+		return this.kKPersonStatusMap;
 	}
-	public UnionStatusMap getUnionStatusMap()
+	public KKUnionStatusMap getUnionStatusMap()
 	{
-		return this.unionStatusMap;
+		return this.kKUnionStatusMap;
+	}
+	public KKAssetUnionMap getAssetUnionMap()
+	{
+		return this.kKAssetUnionMap;
+	}
+	public KKPersonUnionMap getPersonUnionMap()
+	{
+		return this.kKPersonUnionMap;
+	}
+	public KKStatusUnionMap getStatusUnionMap()
+	{
+		return this.kKStatusUnionMap;
 	}
 	/*
 	public ItemsStatusesMap getItemsStatusesMap(ItemCls item)
@@ -316,6 +355,16 @@ public class DBSet implements Observer, IDB {
 			return this.unionStatusMap;
 	}
 	*/
+
+	public KK_KPersonStatusUnionMap getPersonStatusUnionMap()
+	{
+		return this.kK_KPersonStatusUnionMap;
+	}
+
+	public VouchRecordMap getVouchRecordMap() 
+	{
+		return this.vouchRecordMap;
+	}
 
 	public BlockMap getBlockMap() 
 	{
@@ -335,6 +384,10 @@ public class DBSet implements Observer, IDB {
 	public ReferenceMap getReferenceMap() 
 	{
 		return this.referenceMap;
+	}
+	public AddressTime_SignatureMap getAddressTime_SignatureMap() 
+	{
+		return this.addressTime_SignatureMap;
 	}
 	
 	public PeerMap getPeerMap() 
@@ -397,9 +450,9 @@ public class DBSet implements Observer, IDB {
 		return this.hashtagPostMap;
 	}
 	
-	public TransactionParentMap getTransactionParentMap()
+	public TransactionRef_BlockRef_Map getTransactionRef_BlockRef_Map()
 	{
-		return this.transactionParentMap;
+		return this.transactionRef_BlockRef_Map;
 	}
 	
 	public NameExchangeMap getNameExchangeMap()

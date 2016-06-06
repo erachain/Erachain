@@ -17,7 +17,7 @@ import at.AT_API_Helper;
 import at.AT_Transaction;
 import core.account.Account;
 import core.crypto.Base58;
-import core.transaction.MessageTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 
 import com.google.common.collect.Lists;
@@ -194,11 +194,11 @@ public class ATWebResource {
 		return acc.getConfirmedBalance(Transaction.FEE_KEY).toPlainString();
 	}
 	
-	public String getMessage(MessageTransaction tx)
+	public String getMessage(R_Send tx)
 	{
-		if ( tx instanceof MessageTransaction )
+		if ( tx instanceof R_Send )
 		{
-			MessageTransaction message = (MessageTransaction)tx;
+			R_Send message = (R_Send)tx;
 			if ((!message.isEncrypted()) )
 			{
 				return (message.isText())? 

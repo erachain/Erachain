@@ -5,7 +5,6 @@ import java.util.Observer;
 
 import controller.Controller;
 import core.item.persons.PersonCls;
-import utils.NumberAsString;
 import utils.ObserverMessage;
 import database.SortableList;
 import gui.models.TableModelCls;

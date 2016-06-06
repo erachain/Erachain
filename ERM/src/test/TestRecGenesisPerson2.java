@@ -19,6 +19,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.persons.PersonCls;
@@ -30,15 +31,16 @@ import core.transaction.TransactionFactory;
 import database.DBSet;
 import database.AddressPersonMap;
 import database.PersonAddressMap;
-import database.PersonStatusMap;
+import database.KKPersonStatusMap;
 
 public class TestRecGenesisPerson2 {
 
 	static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson2.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long FEE_KEY = Transaction.FEE_KEY;
+	long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] packedReference = new byte[64];
 	
@@ -54,7 +56,7 @@ public class TestRecGenesisPerson2 {
 	long keyPerson = -1l;
 	GenesisIssuePersonRecord genesisIssuePersonTransaction;
 
-	PersonStatusMap dbPS;
+	KKPersonStatusMap dbPS;
 	PersonAddressMap dbPA;
 	AddressPersonMap dbAP;
 	
@@ -68,14 +70,15 @@ public class TestRecGenesisPerson2 {
 		
 		//CREATE PERSON
 		//person = GenesisBlock.makePerson(0);
-		person = new PersonHuman(maker, "ERMOLAEV DMITRII SERGEEVICH", -106185600,
+		long bd = -106185600;
+		person = new PersonHuman(maker, "ERMOLAEV DMITRII SERGEEVICH", bd, bd -1, 
 				(byte)1, "Slav", (float)1.1, (float)1.1,
 				"white", "gray", "dark", (int) 188, "icreator");
 		//byte[] rawPerson = person.toBytes(true); // reference is new byte[64]
 		//assertEquals(rawPerson.length, person.getDataLength());
 				
 		//CREATE ISSUE PERSON TRANSACTION
-		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person, maker);
+		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
 		if (toProcess)
 		{ 
 			genesisIssuePersonTransaction.process(db, false);
@@ -144,9 +147,11 @@ public class TestRecGenesisPerson2 {
 		}
 		
 		//CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person, new Account("test"));	
-		//CHECK IF PERSON TRANSFER IS INVALID
-		assertEquals(Transaction.INVALID_ADDRESS, genesisIssuePersonTransaction.isValid(db, releaserReference));
+		person = new PersonHuman(maker, "ERMOLAEV DMITRII SERGEEVICH", 0L, -1L, 
+				(byte)1, "Slav", (float)111.1, (float)1.1,
+				"white", "gray", "dark", (int) 188, "icreator");
+		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);	
+		assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(db, releaserReference));
 
 	}
 
@@ -217,16 +222,8 @@ public class TestRecGenesisPerson2 {
 		initIssue(false);		
 		LOGGER.info("person KEY: " + keyPerson);
 
-		String address = genesisIssuePersonTransaction.getRecipient().getAddress();
-
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
-		// ADDRESS -> PERSON
-		assertEquals( null, dbAP.getItem(address));
-		// PERSON -> ADDRESS
-		assertEquals( null, dbPA.getItem(keyPerson, address));
-		// PERSON STATUS ALIVE
-		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
+		assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
 
 		genesisIssuePersonTransaction.process(db, false);
 		keyPerson = person.getKey();
@@ -238,45 +235,12 @@ public class TestRecGenesisPerson2 {
 		
 		//CHECK PERSON IS CORRECT
 		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(true), person.toBytes(true)));
-
-		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 		
-		// .a - personKey, .b - end_date, .c - block height, .d - reference
-		assertEquals( (long)keyPerson, (long)dbAP.getItem(address).a);
-		assertEquals( Integer.MAX_VALUE, (int)dbAP.getItem(address).b);
-		assertEquals( 0, (int)dbAP.getItem(address).c);
-		assertEquals( true, Arrays.equals(dbAP.getItem(address).d, genesisIssuePersonTransaction.getSignature()));
-		// PERSON -> ADDRESS
-		assertEquals( Integer.MAX_VALUE, (int)dbPA.getItem(keyPerson, address).a);
-		assertEquals( 0, (int)dbPA.getItem(keyPerson, address).b);
-		assertEquals( true, Arrays.equals(dbPA.getItem(keyPerson, address).c, genesisIssuePersonTransaction.getSignature()));
-		// PERSON STATUS ALIVE
-		assertEquals( Integer.MAX_VALUE, (int)dbPS.getItem(keyPerson).a);
-		assertEquals( 0, (int)dbPS.getItem(keyPerson).b);
-		assertEquals( true, Arrays.equals(dbPS.getItem(keyPerson).c, genesisIssuePersonTransaction.getSignature()));
-
-		assertEquals(true, genesisIssuePersonTransaction.getRecipient().isPerson(db));
-		assertEquals(true, maker.isPerson(db));
-
 		/////////////////
 		///// ORPHAN ////
 		genesisIssuePersonTransaction.orphan(db, false);
 		
 		assertEquals(false, db.getItemPersonMap().contains(keyPerson));
-
-		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(genesisIssuePersonTransaction.getSignature(), maker.getLastReference(db)));
 	
-		// ADDRESS -> PERSON
-		assertEquals( null, dbAP.getItem(address));
-		// PERSON -> ADDRESS
-		assertEquals( null, dbPA.getItem(keyPerson, address));
-		// PERSON STATUS ALIVE
-		assertEquals( null, dbPS.getItem(keyPerson)); // , StatusCls.ALIVE_KEY
-		
-		assertEquals(false, genesisIssuePersonTransaction.getRecipient().isPerson(db));
-		assertEquals(false, maker.isPerson(db));
-
 	}
 }

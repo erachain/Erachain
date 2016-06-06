@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
 import core.item.notes.NoteCls;
-import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueNoteRecord;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -26,7 +26,7 @@ import utils.MenuPopupUtil;
 @SuppressWarnings("serial")
 public class GenesisIssueNoteDetailsFrame extends RecGenesis_DetailsFrame
 {
-	public GenesisIssueNoteDetailsFrame(GenesisIssueNoteTransaction noteIssue)
+	public GenesisIssueNoteDetailsFrame(GenesisIssueNoteRecord noteIssue)
 	{
 		super(noteIssue);
 		

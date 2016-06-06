@@ -71,7 +71,7 @@ public class AssetUnique extends AssetCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 1 || descriptionLength > 4000)
+		if(descriptionLength > 4000)
 		{
 			throw new Exception("Invalid description length");
 		}

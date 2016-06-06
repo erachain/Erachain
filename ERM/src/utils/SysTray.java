@@ -36,8 +36,7 @@ import gui.ConsolePanel;
 import gui.Gui;
 import gui.PasswordPane;
 import gui.CoreRowSorter;
-import gui.SendAssetPanel;
-import gui.SendCompuPanel;
+import gui.Send_Panel;
 import gui.items.assets.AssetsPanel;
 import gui.models.WalletTransactionsTableModel;
 import gui.naming.NamingServicePanel;
@@ -240,31 +239,16 @@ public class SysTray implements Observer{
 			}
 		});
 		menu.add(transactions);
-		
-		MenuItem payment = new MenuItem("Send Payment");
-		payment.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-					JFrame frame = new JFrame("Send Payment");
-
-				    frame.setSize(800, 600);
-				    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				    frame.setVisible(true);
-					SendCompuPanel ap = new SendCompuPanel();
-					frame.getContentPane().add(ap);
-					
-			}
-		});
-		menu.add(payment);
-		
-		MenuItem messages = new MenuItem("Messages");
+				
+		MenuItem messages = new MenuItem("Sends");
 		messages.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-					JFrame frame = new JFrame("Messages");
+					JFrame frame = new JFrame("Sends");
 
 				    frame.setSize(800, 600);
 				    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				    frame.setVisible(true);
-					SendAssetPanel ap = new SendAssetPanel(null, null);
+					Send_Panel ap = new Send_Panel(null, null);
 					frame.getContentPane().add(ap);
 					
 			}

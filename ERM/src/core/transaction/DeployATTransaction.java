@@ -56,7 +56,7 @@ public class DeployATTransaction extends Transaction
 	private BigDecimal amount;
 	private byte[] creationBytes;
 
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, byte[] reference) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference);
 
@@ -67,19 +67,19 @@ public class DeployATTransaction extends Transaction
 		this.tags = tags;
 		this.amount = quantity;
 	}
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.signature = signature;
 		this.feePow = feePow;
 		this.calcFee();
 	}
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference) 
 	{
 		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.feePow = feePow;
 	}
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, byte[] reference) 
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 	}
@@ -106,7 +106,8 @@ public class DeployATTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 
 		//READ CREATOR
@@ -217,7 +218,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 
@@ -230,7 +231,9 @@ public class DeployATTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		byte[] referenceBytes = Longs.toByteArray(this.reference);
+		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
 
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -310,11 +313,12 @@ public class DeployATTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference)
+	public int isValid(DBSet db, Long releaserReference)
 	{
 		return isValid(db, 0);
 	}
 
+	//
 	public int isValid(DBSet db, Integer forkHeight) 
 	{
 		/*
@@ -351,24 +355,12 @@ public class DeployATTransaction extends Transaction
 			return INVALID_TAGS_LENGTH;
 		}
 		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
+				
 		//CHECK IF CREATIONBYTES VALID
 		try 
 		{
@@ -397,7 +389,7 @@ public class DeployATTransaction extends Transaction
 			return INVALID_CREATION_BYTES;
 		}
 
-		return VALIDATE_OK;
+		return super.isValid(db, null);
 
 	}
 
@@ -418,9 +410,9 @@ public class DeployATTransaction extends Transaction
 		atAccount.setConfirmedBalance(Transaction.FEE_KEY, this.amount , db );
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		if(Arrays.equals(atAccount.getLastReference(db), new byte[0]))
+		if( atAccount.getLastReference(db) == null)
 		{
-			atAccount.setLastReference(this.signature, db);
+			atAccount.setLastReference(this.timestamp, db);
 		}
 		
 		//CREATE AT - public key or address? Is that the correct height?
@@ -483,7 +475,7 @@ public class DeployATTransaction extends Transaction
 		this.creator.setLastReference(this.reference, db);
 				
 		///UPDATE REFERENCE OF RECIPIENT
-		if(Arrays.equals(atAccount.getLastReference(db), this.signature))
+		if( atAccount.getLastReference(db).equals(this.timestamp))
 		{
 			atAccount.removeReference(db);
 		}	

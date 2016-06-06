@@ -30,20 +30,20 @@ public class UpdateNameTransaction extends Transaction
 
 	private Name name;
 	
-	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		
 		this.creator = creator;
 		this.name = name;
 	}
-	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, name, feePow, timestamp, reference);		
 		this.signature = signature;
 		this.calcFee();
 	}
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, byte[] reference) 
+	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);		
 	}
@@ -78,7 +78,8 @@ public class UpdateNameTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		Long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -118,7 +119,7 @@ public class UpdateNameTransaction extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -131,7 +132,13 @@ public class UpdateNameTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 		
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		//WRITE REFERENCE - in any case as Pack or not
+		if (this.reference != null) {
+			// NULL in imprints
+			byte[] referenceBytes = Longs.toByteArray(this.reference);
+			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+			data = Bytes.concat(data, referenceBytes);
+		}
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -158,8 +165,8 @@ public class UpdateNameTransaction extends Transaction
 	
 	//VALIDATE
 		
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -198,20 +205,8 @@ public class UpdateNameTransaction extends Transaction
 		{
 			return INVALID_NAME_CREATOR;
 		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
-		{
-			return INVALID_REFERENCE;
-		}		
-		
-		return VALIDATE_OK;
+						
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN

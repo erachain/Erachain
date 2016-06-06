@@ -20,7 +20,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		Long, // person key
 		Integer, // end_date day
 		Integer, // block height 
-		byte[]>>> // transaction reference
+		Integer>>> // transaction index
 {
 	private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
 	
@@ -37,7 +37,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<String, Stack<Tuple4<Long, Integer, Integer, byte[]>>> getMap(DB database) 
+	protected Map<String, Stack<Tuple4<Long, Integer, Integer, Integer>>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("address_person")
@@ -47,16 +47,16 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 	}
 
 	@Override
-	protected Map<String, Stack<Tuple4<Long, Integer, Integer, byte[]>>> getMemoryMap() 
+	protected Map<String, Stack<Tuple4<Long, Integer, Integer, Integer>>> getMemoryMap() 
 	{
 		// HashMap ?
-		return new TreeMap<String, Stack<Tuple4<Long, Integer, Integer, byte[]>>>();
+		return new TreeMap<String, Stack<Tuple4<Long, Integer, Integer, Integer>>>();
 	}
 
 	@Override
-	protected Stack<Tuple4<Long, Integer, Integer, byte[]>> getDefaultValue() 
+	protected Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() 
 	{
-		return new Stack<Tuple4<Long, Integer, Integer, byte[]>>();
+		return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
 	}
 	
 	@Override
@@ -66,23 +66,23 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 	}
 	
 	///////////////////////////////
-	public void addItem(String address, Tuple4<Long, Integer, Integer, byte[]> item)
+	public void addItem(String address, Tuple4<Long, Integer, Integer, Integer> item)
 	{
-		Stack<Tuple4<Long, Integer, Integer, byte[]>> value = this.get(address);
+		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		
 		value.add(item);
 		
 		this.set(address, value);
 	}
 	
-	public Tuple4<Long, Integer, Integer, byte[]> getItem(String address)
+	public Tuple4<Long, Integer, Integer, Integer> getItem(String address)
 	{
-		Stack<Tuple4<Long, Integer, Integer, byte[]>> value = this.get(address);
+		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		return value.size()>0? value.peek(): null;
 	}
 	public void removeItem(String address)
 	{
-		Stack<Tuple4<Long, Integer, Integer, byte[]>> value = this.get(address);
+		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		if (value==null || value.size() == 0) return;
 
 		value.pop();

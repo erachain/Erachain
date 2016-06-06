@@ -34,6 +34,7 @@ import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import database.DBSet;
 
 @SuppressWarnings("serial")
 public class Rec_DetailsFrame extends JFrame
@@ -98,6 +99,20 @@ public class Rec_DetailsFrame extends JFrame
 		componentLevel ++;
 		*/
 		
+		//LABEL Height + Seq
+		labelGBC.gridy = componentLevel;
+		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Height / Seq.") + ":");
+		this.add(heSeqLabel, labelGBC);
+				
+		//Height + Seq
+		DBSet db = DBSet.getInstance();
+
+		detailGBC.gridy = componentLevel++;
+		JTextField heSeq = new JTextField(record.viewHeightSeq(db));
+		heSeq.setEditable(false);
+		MenuPopupUtil.installContextMenu(heSeq);
+		this.add(heSeq, detailGBC);
+
 		//LABEL SIGNATURE
 		labelGBC.gridy = componentLevel;
 		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
@@ -118,7 +133,7 @@ public class Rec_DetailsFrame extends JFrame
 						
 		//REFERENCE
 		detailGBC.gridy = componentLevel;
-		JTextField reference = new JTextField(Base58.encode(record.getReference()));
+		JTextField reference = new JTextField(""+record.getReference());
 		reference.setEditable(false);
 		MenuPopupUtil.installContextMenu(reference);
 		this.add(reference, detailGBC);

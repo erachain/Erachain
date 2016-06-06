@@ -25,7 +25,7 @@ public class TransactionFactory {
 		
 	}
 	
-	public Transaction parse(byte[] data, byte[] releaserReference) throws Exception
+	public Transaction parse(byte[] data, Long releaserReference) throws Exception
 	{
 		//READ TYPE
 		int type = Byte.toUnsignedInt(data[0]);
@@ -38,11 +38,6 @@ public class TransactionFactory {
 			
 			//PARSE PAYMENT TRANSACTION
 			return R_SignNote.Parse(data, releaserReference);
-
-		case Transaction.PAYMENT_TRANSACTION:
-			
-			//PARSE PAYMENT TRANSACTION
-			return PaymentTransaction.Parse(data, releaserReference);
 		
 		case Transaction.REGISTER_NAME_TRANSACTION:
 			
@@ -83,21 +78,16 @@ public class TransactionFactory {
 			
 			//PARSE ARBITRARY TRANSACTION
 			return ArbitraryTransaction.Parse(data);			
-			
-		case Transaction.TRANSFER_ASSET_TRANSACTION_OLD:
-			
-			//PARSE TRANSFER ASSET TRANSACTION
-			return TransferAssetTransaction.Parse(data, releaserReference);	
-		
+					
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			
 			//PARSE ORDER CREATION TRANSACTION
-			return CreateOrderTransaction.Parse(data);	
+			return CreateOrderTransaction.Parse(data, releaserReference);	
 			
 		case Transaction.CANCEL_ORDER_TRANSACTION:
 			
 			//PARSE ORDER CANCEL
-			return CancelOrderTransaction.Parse(data);	
+			return CancelOrderTransaction.Parse(data, releaserReference);	
 			
 		case Transaction.MULTI_PAYMENT_TRANSACTION:
 			
@@ -110,7 +100,7 @@ public class TransactionFactory {
 		case Transaction.SEND_ASSET_TRANSACTION:
 
 			// PARSE MESSAGE TRANSACTION
-			return MessageTransaction.Parse(data, releaserReference);
+			return R_Send.Parse(data, releaserReference);
 			
 			/*
 		case Transaction.ACCOUNTING_TRANSACTION:
@@ -125,12 +115,22 @@ public class TransactionFactory {
 			// PARSE JSON1 TRANSACTION
 			return JsonTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
 			*/
+
+		case Transaction.VOUCH_TRANSACTION:
 			
-		case Transaction.SET_STATUS_TRANSACTION:
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_Vouch.Parse(data, releaserReference);
+
+		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION
 			return R_SetStatusToItem.Parse(data, releaserReference);
 			
+		case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
+			
+			//PARSE CERTIFY PERSON TRANSACTION
+			return R_SetUnionToItem.Parse(data, releaserReference);
+
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 			
 			//PARSE CERTIFY PERSON TRANSACTION
@@ -187,18 +187,18 @@ public class TransactionFactory {
 		
 		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
+			//PARSE ISSUE PERSON TRANSACTION
 			return GenesisIssuePersonRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 			
-			//PARSE ISSUE ASSET TRANSACTION
-			return GenesisIssueNoteTransaction.Parse(data);
+			//PARSE ISSUE NOTE TRANSACTION
+			return GenesisIssueNoteRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
 			
 			//PARSE ISSUE STATUS TRANSACTION
-			return GenesisIssueStatusTransaction.Parse(data);
+			return GenesisIssueStatusRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			

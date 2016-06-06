@@ -84,7 +84,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		Bind.secondaryKey(map, this.haveWantKeyMap, new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
 			@Override
 			public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key, Order value) {
-				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getHave(), value.getWant(), value.getPrice(), key);
+				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getHave(), value.getWant(), value.getPriceCalc(), key);
 			}	
 		});
 		
@@ -97,7 +97,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		Bind.secondaryKey(map, this.wantHaveKeyMap, new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
 			@Override
 			public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key, Order value) {
-				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getWant(), value.getHave(), value.getPrice(), key);
+				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getWant(), value.getHave(), value.getPriceCalc(), key);
 			}	
 		});
 		

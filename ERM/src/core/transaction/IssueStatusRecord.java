@@ -34,11 +34,11 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
 	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
 
-	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference) 
+	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference);		
 	}
-	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, status, feePow, timestamp, reference, signature);		
 	}
@@ -46,7 +46,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, status, (byte)0, 0l, null, signature);		
 	}
-	public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, status, feePow, timestamp, reference, signature);
 	}
@@ -54,7 +54,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, status, (byte)0, 0l, null, signature);
 	}
-	public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, byte[] reference) 
+	public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, status, feePow, timestamp, reference);
 	}
@@ -68,7 +68,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	
 
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) {	
+	public int isValid(DBSet db, Long releaserReference) {	
 
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
@@ -92,7 +92,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -116,10 +116,11 @@ public class IssueStatusRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		

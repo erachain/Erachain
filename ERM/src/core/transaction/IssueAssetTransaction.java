@@ -37,12 +37,12 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 	//private AssetCls asset;
 	
-	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference) 
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);		
 		//this.asset = asset;
 	}
-	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference, signature);		
 	}
@@ -51,16 +51,16 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, asset, (byte)0, 0l, null, signature);		
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference, signature);
 	}
 	// as pack
-	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte[] reference, byte[] signature) 
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, (byte)0, 0l, reference, signature);
 	}
-	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, byte[] reference) 
+	public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, asset, feePow, timestamp, reference);
 	}
@@ -88,22 +88,18 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		return BigDecimal.ZERO.setScale(8);
 	}
-	
+
+	/*
 	@Override
 	public BigDecimal getAmount(Account account) {
 		String address = account.getAddress();
 		return getAmount(address);
 	}
-
-	/*
-	
-	//@Override
-	public void sign(PrivateKeyAccount creator, boolean asPack)
-	{
-		super.sign(creator, asPack);
-		this.asset.setReference(this.signature);
-	}
 	*/
+
+	public String viewAmount(String address) {
+		return this.getAmount().toString();
+	}
 
 	//PARSE CONVERT
 	
@@ -122,7 +118,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		return transaction;	
 	}
 
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 		boolean asPack = releaserReference != null;
 		
@@ -145,10 +141,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		
@@ -215,7 +212,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//VALIDATE
 		
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		int result = super.isValid(db, releaserReference);

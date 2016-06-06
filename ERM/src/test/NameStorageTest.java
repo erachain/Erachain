@@ -30,7 +30,7 @@ public class NameStorageTest {
 
 	private DBSet databaseSet;
 	private PrivateKeyAccount sender;
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;

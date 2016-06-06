@@ -356,7 +356,7 @@ public class BlockGenerator extends Thread implements Observer
 		return newBlock;
 	}
 	
-	private byte[] calculateSignature(DBSet db, Block solvingBlock, PrivateKeyAccount account) 
+	public byte[] calculateSignature(DBSet db, Block solvingBlock, PrivateKeyAccount account) 
 	{	
 		byte[] data = new byte[0];
 		

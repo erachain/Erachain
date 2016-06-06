@@ -26,6 +26,7 @@ import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
 
+//birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
 	public static final int HUMAN = 1;
@@ -33,6 +34,7 @@ public abstract class PersonCls extends ItemCls {
 	public static final int CAT = 3;
 
 	protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
+	protected static final int DEATHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
 	public static final int GENDER_LENGTH = 1;
 	protected static final int RACE_SIZE_LENGTH = 1;
 	public static final int MAX_RACE_LENGTH = 256 * RACE_SIZE_LENGTH;
@@ -45,12 +47,13 @@ public abstract class PersonCls extends ItemCls {
 	public static final int MAX_HAIR_COLOR_LENGTH = 256 * HAIR_COLOR_SIZE_LENGTH;
 	public static final int HEIGHT_LENGTH = 1;
 	protected static final int BASE_LENGTH = ItemCls.BASE_LENGTH
-			+ BIRTHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
+			+ BIRTHDAY_LENGTH + DEATHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
 			+ SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH
 			+ HEIGHT_LENGTH;
 	
 	// already exist in super - protected String name; // First Name|Middle Name|Last Name
 	protected long birthday; // timestamp
+	protected long deathday; // timestamp
 	protected byte gender; // 
 	protected String race; 
 	protected float birthLatitude;
@@ -60,12 +63,13 @@ public abstract class PersonCls extends ItemCls {
 	protected String hairСolor; // First Name|Middle Name|Last Name	
 	protected byte height;
 	
-	public PersonCls(byte[] typeBytes, Account creator, String name, long birthday,
+	public PersonCls(byte[] typeBytes, Account creator, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, String description)
 	{
 		super(typeBytes, creator, name, description);
 		this.birthday = birthday;
+		this.deathday = deathday;
 		this.gender = gender;
 		this.race = race;
 		this.birthLatitude = birthLatitude;
@@ -75,21 +79,27 @@ public abstract class PersonCls extends ItemCls {
 		this.hairСolor = hairСolor;
 		this.height = height;
 	}
-	public PersonCls(byte[] typeBytes, Account creator, String name, String birthday,
+	
+	public PersonCls(byte[] typeBytes, Account creator, String name, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, String description)
 	{
-		this(typeBytes, creator, name, 0,
+		this(typeBytes, creator, name, 0, 0,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, description);
+		
+		if (birthday.length() < 11) birthday += " 00:01:01";
 		this.birthday = Timestamp.valueOf(birthday).getTime();
+		
+		if (deathday != null && deathday.length() < 11) deathday += " 00:01:01";
+		this.deathday = deathday==null? Long.MIN_VALUE: Timestamp.valueOf(deathday).getTime();
 	}
 	
-	public PersonCls(int type, Account creator, String name, long birthday,
+	public PersonCls(int type, Account creator, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, String description)
 	{
-		this(new byte[]{(byte)type}, creator, name, birthday,
+		this(new byte[]{(byte)type}, creator, name, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, description);
 	}
@@ -102,6 +112,10 @@ public abstract class PersonCls extends ItemCls {
 	public long getBirthday() {
 		return this.birthday;
 	}
+	public long getDeathday() {
+		return this.deathday;
+	}
+	
 	public byte getGender() {
 		return this.gender;
 	}
@@ -147,6 +161,11 @@ public abstract class PersonCls extends ItemCls {
 		byte[] birthdayBytes = Longs.toByteArray(this.birthday);
 		birthdayBytes = Bytes.ensureCapacity(birthdayBytes, BIRTHDAY_LENGTH, 0);
 		data = Bytes.concat(data, birthdayBytes);
+
+		// WRITE DEATHDAY
+		byte[] deathdayBytes = Longs.toByteArray(this.deathday);
+		deathdayBytes = Bytes.ensureCapacity(deathdayBytes, DEATHDAY_LENGTH, 0);
+		data = Bytes.concat(data, deathdayBytes);
 
 		// WRITE GENDER
 		data = Bytes.concat(data, new byte[]{gender});
@@ -214,7 +233,7 @@ public abstract class PersonCls extends ItemCls {
 	public String toString(DBSet db)
 	{
 		long key = this.getKey(db);
-		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") " + this.name + " "
+		return (key<0?"?":key) + "." + this.typeBytes[0] + " " + this.name + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
@@ -222,7 +241,7 @@ public abstract class PersonCls extends ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		return "(" + (key<0?"? ":key) + ":" + this.typeBytes[0] + ") "
+		return (key<0?"?":key) + "." + this.typeBytes[0] + " "
 				+ this.name.substring(0, Math.min(this.name.length(), 20)) + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
@@ -234,6 +253,7 @@ public abstract class PersonCls extends ItemCls {
 
 		// ADD DATA
 		personJSON.put("birthday", this.birthday);
+		personJSON.put("deathday", this.deathday);
 		personJSON.put("gender",this.gender);
 		personJSON.put("race", this.race);
 		personJSON.put("birthLatitude", this.birthLatitude);

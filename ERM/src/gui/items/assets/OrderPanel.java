@@ -15,6 +15,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import javax.swing.JButton;
@@ -75,6 +76,7 @@ public class OrderPanel extends JPanel
 		superhintGBC.gridwidth = 3;
 		superhintGBC.weightx = superhintGBC.weighty = 1.0;
 		superhintGBC.weighty = 1.0;
+		
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(0, 5, 5, 0);
@@ -124,10 +126,10 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel priceHintLabel = new JLabel( want.getShort() );
+		JLabel priceHintLabel = new JLabel( buying?have.getShort():want.getShort() );
 		this.add(priceHintLabel, assetHintGBC);
 				
-		if(buying)
+		if(false & buying)
 		{
 			//LABEL BUYING PRICE
 			labelGBC.gridy++;
@@ -171,17 +173,17 @@ public class OrderPanel extends JPanel
 			{
 				public void changedUpdate(DocumentEvent e) 
 				{
-					calculateBuyingAmount(txtBuyingAmount);
+					calculateBuyingAmount(txtBuyingAmount, buying);
 				}
 				
 				public void removeUpdate(DocumentEvent e) 
 				{
-					calculateBuyingAmount(txtBuyingAmount);
+					calculateBuyingAmount(txtBuyingAmount, buying);
 				}
 				  
 				public void insertUpdate(DocumentEvent e) 
 				{
-					calculateBuyingAmount(txtBuyingAmount);
+					calculateBuyingAmount(txtBuyingAmount, buying);
 				}
 			});
 		}
@@ -198,12 +200,13 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel amountHintLabel = new JLabel( have.getShort() );
+		JLabel amountHintLabel = new JLabel( buying?want.getShort():have.getShort() );
+
 		this.add(amountHintLabel, assetHintGBC);
 		
 		//LABEL AMOUNT
 		labelGBC.gridy++;
-		JLabel buyingAmountLabel = new JLabel(Lang.getInstance().translate("Buying amount") + ":");
+		JLabel buyingAmountLabel = new JLabel(Lang.getInstance().translate("Total") + ":");
 		this.add(buyingAmountLabel, labelGBC);
 					
 		//AMOUNT
@@ -214,7 +217,7 @@ public class OrderPanel extends JPanel
 			
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel buyingAmountHintLabel = new JLabel( want.getShort() );
+		JLabel buyingAmountHintLabel = new JLabel( buying?have.getShort():want.getShort() );
 		this.add(buyingAmountHintLabel, assetHintGBC);
 		
 		//ON PRICE CHANGE
@@ -222,17 +225,17 @@ public class OrderPanel extends JPanel
 		{
 			public void changedUpdate(DocumentEvent e) 
 			{
-				calculateBuyingAmount(txtBuyingAmount);
+				calculateBuyingAmount(txtBuyingAmount, buying);
 			}
 			
 			public void removeUpdate(DocumentEvent e) 
 			{
-				calculateBuyingAmount(txtBuyingAmount);
+				calculateBuyingAmount(txtBuyingAmount, buying);
 			}
 				  
 			public void insertUpdate(DocumentEvent e) 
 			{
-				calculateBuyingAmount(txtBuyingAmount);
+				calculateBuyingAmount(txtBuyingAmount, buying);
 			}
 		});	
 		
@@ -283,7 +286,7 @@ public class OrderPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				onSellClick();
+				onSellClick(buying);
 			}
 		});	
 		this.add(this.sellButton, labelGBC);
@@ -329,10 +332,10 @@ public class OrderPanel extends JPanel
 	    	target.setText("0");
 	    }
 	    
-	    calculateBuyingAmount(txtBuyingAmount);
+	    calculateBuyingAmount(txtBuyingAmount, false);
 	}
 	
-	public void calculateBuyingAmount(JTextField target) 
+	public void calculateBuyingAmount(JTextField target, boolean buying) 
 	{
 	    try
 	    {
@@ -345,10 +348,10 @@ public class OrderPanel extends JPanel
 	    	target.setText("0");
 	    }
 	    
-	    calculateHint();
+	    //calculateHint();
 	}
 	
-	public void onSellClick()
+	public void onSellClick(boolean buying)
 	{
 		//DISABLE
 		this.sellButton.setEnabled(false);
@@ -386,7 +389,7 @@ public class OrderPanel extends JPanel
 		Account sender = (Account) this.cbxAccount.getSelectedItem();
 		
 		int feePow;
-		BigDecimal amount;
+		BigDecimal amountHave;
 		BigDecimal price;
 		long parse = 0;
 		try
@@ -396,7 +399,7 @@ public class OrderPanel extends JPanel
 			
 			//READ AMOUNT
 			parse = 1;
-			amount = new BigDecimal(this.txtAmount.getText()).setScale(8);
+			amountHave = new BigDecimal(this.txtAmount.getText()).setScale(8);
 			
 			//READ PRICE
 			parse = 2;
@@ -423,27 +426,41 @@ public class OrderPanel extends JPanel
 			return;
 		}
 
-		//CREATE POLL
-			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amount, price, feePow);
+		//CREATE ORDER
+		
+		BigDecimal amountWant = amountHave.multiply(price);
+		if (buying) {
+			price = amountWant;
+			amountWant = amountHave;
+			amountHave = price;
+		}
+		
+		if (true) {
+			JOptionPane.showMessageDialog(new JFrame(),
+					amountHave.toPlainString() + " - " + amountWant.toPlainString(),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			this.sellButton.setEnabled(true);
+			return;
+		}
+
+		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave, amountWant, feePow);
+		
+		//CHECK VALIDATE MESSAGE
+		if (result.getB() == Transaction.VALIDATE_OK) {
 			
-			//CHECK VALIDATE MESSAGE
-			if (result.getB() == Transaction.VALIDATE_OK) {
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				
-				this.txtFeePow.setText("0");
-				this.txtAmount.setText("");
-				this.txtPrice.setText("");
-				
-			} else {		
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			
+			this.txtFeePow.setText("0");
+			this.txtAmount.setText("");
+			this.txtPrice.setText("");
+			
+		} else {		
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		}
 		
 		//ENABLE
 		this.sellButton.setEnabled(true);
 	}
-	
-	
 	
 }

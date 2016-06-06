@@ -26,8 +26,8 @@ public class APIUtils {
 
 	static Logger LOGGER = Logger.getLogger(APIUtils.class.getName());
 
-	public static String processPayment(String assetKeyString, String amount, String feePowStr,
-			String sender, String recipient, String x,
+	public static String processPayment(String sender, String feePowStr,
+			String recipient, String assetKeyString, String amount, String x,
 			HttpServletRequest request) {
 		
 		// PARSE AMOUNT		
@@ -35,7 +35,7 @@ public class APIUtils {
 		
 		if(assetKeyString == null)
 		{
-			asset = Controller.getInstance().getAsset(0l);
+			asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
 		}
 		else
 		{
@@ -94,19 +94,11 @@ public class APIUtils {
 					ApiErrorFactory.ERROR_INVALID_SENDER);
 		}
 
+		// TODO R_Send insert!
 		Pair<Transaction, Integer> result;
-		if(asset.getKey() == 0l)
-		{
-			// SEND ERM PAYMENT
-			result = Controller.getInstance()
-				.sendPayment(account, new Account(recipient), bdAmount, feePow);
-		}
-		else
-		{
-			// SEND ASSET PAYMENT
-			result = Controller.getInstance()
-				.transferAsset(account, new Account(recipient), asset, bdAmount, feePow);
-		}
+		// SEND ASSET PAYMENT
+		result = Controller.getInstance()
+			.r_Send(account, feePow, new Account(recipient), asset.getKey(), bdAmount);
 			
 		switch (result.getB()) {
 		case Transaction.VALIDATE_OK:

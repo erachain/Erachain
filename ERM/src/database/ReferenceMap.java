@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mapdb.DB;
+import org.mapdb.Fun.Tuple2;
 
 import core.account.Account;
 import database.DBSet;
 
-// used for seek transactions by creator address
-public class ReferenceMap extends DBMap<String, byte[]> 
+// seek reference to tx_Parent by address
+// account.addres -> <tx2.parentTimestamp>
+public class ReferenceMap extends DBMap<String, Long> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -26,22 +28,23 @@ public class ReferenceMap extends DBMap<String, byte[]>
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<String, byte[]> getMap(DB database) 
+	
+	protected Map<String, Long> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.getTreeMap("references");
 	}
 
 	@Override
-	protected Map<String, byte[]> getMemoryMap() 
+	protected Map<String, Long> getMemoryMap() 
 	{
-		return new HashMap<String, byte[]>();
+		return new HashMap<String, Long>();
 	}
 
 	@Override
-	protected byte[] getDefaultValue() 
+	protected Long getDefaultValue() 
 	{
-		return new byte[0];
+		return null;
 	}
 	
 	@Override
@@ -49,19 +52,5 @@ public class ReferenceMap extends DBMap<String, byte[]>
 	{
 		return this.observableData;
 	}
-
-	public byte[] get(Account account) 
-	{
-		return this.get(account.getAddress());
-	}
-	
-	public void set(Account account, byte[] reference)
-	{
-		this.set(account.getAddress(), reference);
-	}
-	
-	public void delete(Account account)
-	{
-		this.delete(account.getAddress());
-	}
+			
 }

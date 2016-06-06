@@ -34,7 +34,7 @@ public class TestRecStatus {
 
 	static Logger LOGGER = Logger.getLogger(TestRecStatus.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = false;
 	long ERM_KEY = AssetCls.ERMO_KEY;
@@ -62,7 +62,7 @@ public class TestRecStatus {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		statusMap = db.getItemStatusMap();
@@ -153,7 +153,7 @@ public class TestRecStatus {
 			assertEquals(issueStatusRecord.getFee(), parsedIssueStatusTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(issueStatusRecord.getReference(), parsedIssueStatusTransaction.getReference()));	
+			assertEquals(issueStatusRecord.getReference(), parsedIssueStatusTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueStatusRecord.getTimestamp(), parsedIssueStatusTransaction.getTimestamp());				
@@ -200,7 +200,7 @@ public class TestRecStatus {
 		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true), status.toBytes(true)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueStatusRecord.getSignature(), maker.getLastReference(db)));
+		assertEquals(issueStatusRecord.getTimestamp(), maker.getLastReference(db));
 
 		////// ORPHAN ///////
 		
@@ -212,7 +212,7 @@ public class TestRecStatus {
 		assertEquals(false, db.getItemStatusMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(issueStatusRecord.getReference(), maker.getLastReference(db)));
+		assertEquals(issueStatusRecord.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999

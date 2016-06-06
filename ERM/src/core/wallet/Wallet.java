@@ -45,7 +45,7 @@ import core.transaction.Issue_ItemRecord;
 //import core.transaction.IssueNoteRecord;
 //import core.transaction.IssuePersonRecord;
 //import core.transaction.IssueUnionRecord;
-import core.transaction.PaymentTransaction;
+import core.transaction.R_Send;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -1459,8 +1459,6 @@ public class Wallet extends Observable implements Observer
 		Account creator = item.getCreator();
 		if (creator == null) return;
 		
-		//issueItem
-		
 		if(this.accountExists(creator.getAddress()))
 		{
 			//ADD ASSET
@@ -1484,7 +1482,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(creator.getAddress()))
 		{
 			//DELETE ASSET
-			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getReference());
+			this.database.getItemMap(item).delete(creator.getAddress(), issueItem.getSignature());
 		}
 	}
 
@@ -1579,7 +1577,7 @@ public class Wallet extends Observable implements Observer
 				this.processTransaction(transaction);
 				
 				//SKIP PAYMENT TRANSACTIONS
-				if (transaction instanceof PaymentTransaction)
+				if (transaction instanceof R_Send)
 				{
 					continue;
 				}
@@ -1653,7 +1651,7 @@ public class Wallet extends Observable implements Observer
 			this.processTransaction(transaction);
 			
 			//CHECK IF PAYMENT
-			if (transaction instanceof PaymentTransaction)
+			if (transaction instanceof R_Send)
 			{
 				
 			}
@@ -1763,7 +1761,7 @@ public class Wallet extends Observable implements Observer
 			this.orphanTransaction(transaction);
 				
 			//CHECK IF PAYMENT
-			if (transaction instanceof PaymentTransaction)
+			if (transaction instanceof R_Send)
 			{
 				
 			}

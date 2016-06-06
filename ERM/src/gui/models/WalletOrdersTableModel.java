@@ -88,11 +88,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		
 		case COLUMN_AMOUNT:
 			
-			return order.getAmount().toPlainString();
+			return order.getAmountHave().toPlainString();
 			
 		case COLUMN_PRICE:
 			
-			return order.getPrice().toPlainString();
+			return order.getPriceCalc().toPlainString();
 			
 		case COLUMN_FULFILLED:
 			

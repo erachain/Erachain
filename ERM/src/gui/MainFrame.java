@@ -5,11 +5,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -17,13 +19,15 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
-import gui.items.persons.AllPersonsPanel;
-import gui.items.persons.AllPersonsFrame;
-import gui.items.persons.IssuePersonFrame;
-
-import gui.items.persons.PersonConfirmFrame;
-import gui.items.persons.SearchPersons;
+import gui.items.assets.MainAssetsFrame;
+import gui.items.imprints.MainImprintsFrame;
+import gui.items.persons.MainPersonsFrame;
+import gui.items.statuses.MainStatusesFrame;
+import gui.items.unions.MainUnionsFrame;
+import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
@@ -33,12 +37,13 @@ public class MainFrame extends JFrame{
 	
 private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
+private JFrame parent;
 
+	@SuppressWarnings("null")
 	public MainFrame()
 	{
 		//CREATE FRAME
 		super(Lang.getInstance().translate("DATACHAINS.world"));
-		
 		if(Settings.getInstance().isTestnet()) {
 			setTitle(Lang.getInstance().translate("DATACHAINS.world TestNet ") + Settings.getInstance().getGenesisStamp());
 		}
@@ -52,29 +57,117 @@ public static  JDesktopPane desktopPane;
 		this.setIconImages(icons);
 		
        
+		parent = MainFrame.this;
+		
 		// tool bar
-		JToolBar tb1 = new JToolBar(" Панель 1"),
+	//	JToolBar tb1 = new JToolBar(" Панель 1");
 
-				tb2 = new JToolBar(" Панель 2");
+			JToolBar	 Toolbar_Main = new JToolBar(" Панель 2");
 
-				tb1.setRollover(true);
+			//	tb1.setRollover(true);
 
-				tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
+			//	tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
 
-				tb1.add(new JButton(new ImageIcon("About24.gif")));
-
-				tb2.add(new JButton("Первая")); tb2.add(new JButton("Вторая"));
-
-				tb2.add(new JButton("Третья"));
-
-				//add(tb1, BorderLayout.NORTH); 
-				add(tb2, BorderLayout.NORTH);
-
+			//	tb1.add(new JButton(new ImageIcon("About24.gif")));
+				
+		JButton button1_MainToolBar = new JButton();
+		button1_MainToolBar.setText(Lang.getInstance().translate("Accounts"));
+			//     button1_MainToolBar.setActionCommand("button1_Main_Panel");
+		button1_MainToolBar.setFocusable(false);
+		button1_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button1_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+		button1_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
+		    }
+		});
+		Toolbar_Main.add(button1_MainToolBar);
 			
+			
+		JButton button2_MainToolBar = new JButton();
+		button2_MainToolBar.setText(Lang.getInstance().translate("Persons"));
+		    //    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button2_MainToolBar.setFocusable(false);
+		button2_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button2_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+       	button2_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+       		public void actionPerformed(java.awt.event.ActionEvent evt) {
+       			gui.Menu.selectOrAdd( new MainPersonsFrame(), MainFrame.desktopPane.getAllFrames());
+       		}
+       	});
+       	Toolbar_Main.add(button2_MainToolBar);
+			
+		JButton button3_MainToolBar = new JButton();
+		button3_MainToolBar.setText(Lang.getInstance().translate("Assets"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button3_MainToolBar.setFocusable(false);
+		button3_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button3_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button3_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainAssetsFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button3_MainToolBar);	
 
-	
+		JButton button4_MainToolBar = new JButton();
+		button4_MainToolBar.setText(Lang.getInstance().translate("Imprints"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button4_MainToolBar.setFocusable(false);
+		button4_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button4_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button4_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainImprintsFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button4_MainToolBar);
+		        	
+		JButton button5_MainToolBar = new JButton();
+		button5_MainToolBar.setText(Lang.getInstance().translate("Unions"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button5_MainToolBar.setFocusable(false);
+		button5_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button5_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button5_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainUnionsFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button5_MainToolBar);
+		        	
+		JButton button6_MainToolBar = new JButton();
+		button6_MainToolBar.setText(Lang.getInstance().translate("Statuses"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button6_MainToolBar.setFocusable(false);
+		button6_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button6_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button6_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button6_MainToolBar);
+		        	
+		JButton button7_MainToolBar = new JButton();
+		button7_MainToolBar.setText(Lang.getInstance().translate("Records"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button7_MainToolBar.setFocusable(false);
+		button7_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button7_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button7_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new RecordsFrame(parent), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button7_MainToolBar);
+		        	
+		        
+				//add(tb1, BorderLayout.NORTH); 
+				add(Toolbar_Main, BorderLayout.NORTH);
+
 		
-		
+
 		//MENU
         Menu menu = new Menu(this);
 
@@ -84,9 +177,19 @@ public static  JDesktopPane desktopPane;
         
         // создаем рабочий стол Swing
         desktopPane = new JDesktopPane();
-     //   bqColor bq = new bqColor();
-        desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
-      //  setSelectionBackground(new Color(209, 232, 255, 255))
+        //desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
+        desktopPane.setBackground(MainFrame.getFrames()[0].getBackground());
+
+        /*
+        JInternalFrame item = new AccountsFrame(this);
+        item.setVisible(true);
+		MainFrame.desktopPane.add(item);
+		try {
+			 item.setSelected(true);
+	        } catch (java.beans.PropertyVetoException e1) {}
+	        */
+
+
       //  desktopPane.setSize(500, 300);
         // добавляем его в центр окна
         add(desktopPane);
@@ -106,21 +209,15 @@ public static  JDesktopPane desktopPane;
         frame1.setVisible(true);
         frame1.setMaximizable(true);
         frame1.setTitle(Lang.getInstance().translate("Old Panels"));
-    //    frame1.setClosable(true);
+        //frame1.setClosable(true);
         frame1.setResizable(true);
+        
+        
         //ADD GENERAL TABPANE TO FRAME
         desktopPane.add(frame1);
         
-       // JInternalFrame Jfacc = new AccountsPanel();
-        
-        //desktopPane.add(new IssuePersonFrame());
-    //    desktopPane.add(new AccountsPanel());
-    //    desktopPane.add(new AllPersonsFrame());
-       
-     // new PersonConfirm(); 
-        //STATS
+        // WALLET STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
-   //     this.add(new Person1());
         
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter()
@@ -142,11 +239,9 @@ public static  JDesktopPane desktopPane;
 
         w = screens.width;
 
-        h = screens.height;
+        setSize((int) (w/1.3),(int) (w/1.3/1.618));
 
-        setSize((int) (w/1.5),(int) (h/1.5));
-
-        setLocation(w/6, h/6);
+        setLocation(w/12, w/12);
         
         
         //SHOW FRAME
@@ -154,6 +249,7 @@ public static  JDesktopPane desktopPane;
      //   this.setLocationRelativeTo(null);
         this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
+    //    desktopPane.add(new MainImprintsFrame());
         
 	}
 }

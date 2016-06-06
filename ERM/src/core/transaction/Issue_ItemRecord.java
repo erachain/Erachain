@@ -32,12 +32,12 @@ public abstract class Issue_ItemRecord extends Transaction
 
 	private ItemCls item;
 	
-	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference) 
+	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.item = item;
 	}
-	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);		
 		this.signature = signature;
@@ -60,7 +60,11 @@ public abstract class Issue_ItemRecord extends Transaction
 	{
 		return this.item;
 	}
-	
+	public String viewItemName()
+	{
+		return item.toString();
+	}
+
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
@@ -86,7 +90,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	}
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
 		
@@ -110,7 +114,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	//VALIDATE
 		
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH
@@ -186,6 +190,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		return false;
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500);
 	}

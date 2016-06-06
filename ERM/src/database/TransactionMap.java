@@ -25,6 +25,9 @@ import utils.ReverseComparator;
 import database.DBSet;
 import database.serializer.TransactionSerializer;
 
+// memory pool for unconfirmed transaction
+// tx.signature -> transaction
+// ++ seek by TIMESTAMP
 public class TransactionMap extends DBMap<byte[], Transaction> implements Observer
 {
 	public static final int TIMESTAMP_INDEX = 1;

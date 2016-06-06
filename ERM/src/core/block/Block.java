@@ -38,6 +38,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import database.DBSet;
+import lang.Lang;
 
 
 public class Block {
@@ -175,16 +176,17 @@ public class Block {
 					//GET TRANSACTION SIZE
 					byte[] transactionLengthBytes = Arrays.copyOfRange(this.rawTransactions, position, position + TRANSACTION_SIZE_LENGTH);
 					int transactionLength = Ints.fromByteArray(transactionLengthBytes);
-
+					position += TRANSACTION_SIZE_LENGTH;
+					
 					//PARSE TRANSACTION
-					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position + TRANSACTION_SIZE_LENGTH, position + TRANSACTION_SIZE_LENGTH + transactionLength);
+					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
 					Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
 
 					//ADD TO TRANSACTIONS
 					this.transactions.add(transaction);
 
 					//ADD TO POSITION
-					position += TRANSACTION_SIZE_LENGTH + transactionLength;
+					position += transactionLength;
 				}
 			}
 			catch(Exception e)
@@ -203,6 +205,23 @@ public class Block {
 		this.transactionCount++;
 	}
 
+	public int getTransactionIndex(byte[] signature)
+	{
+
+		int i = 0;
+		
+		for(Transaction transaction: this.getTransactions())
+		{
+			if(Arrays.equals(transaction.getSignature(), signature))
+			{
+				return i;
+			}
+			i++;
+		}
+
+		return -1;
+	}
+
 	public Transaction getTransaction(byte[] signature)
 	{
 
@@ -215,6 +234,13 @@ public class Block {
 		}
 
 		return null;
+	}
+
+	public Transaction getTransaction(int index)
+	{
+		if (index < this.transactions.size())
+			return getTransactions().get(index);
+		else return null;
 	}
 
 
@@ -399,12 +425,12 @@ public class Block {
 
 		//WRITE VERSION
 		byte[] versionBytes = Ints.toByteArray(this.version);
-		versionBytes = Bytes.ensureCapacity(versionBytes, 4, 0);
+		versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
 		data = Bytes.concat(data, versionBytes);
 
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, 8, 0);
+		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 
 		//WRITE REFERENCE
@@ -413,7 +439,7 @@ public class Block {
 
 		//WRITE GENERATING BALANCE
 		byte[] baseTargetBytes = Longs.toByteArray(this.generatingBalance);
-		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, 8, 0);
+		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, GENERATING_BALANCE_LENGTH, 0);
 		data = Bytes.concat(data,baseTargetBytes);
 
 		//WRITE GENERATOR
@@ -450,7 +476,7 @@ public class Block {
 
 		//WRITE TRANSACTION COUNT
 		byte[] transactionCountBytes = Ints.toByteArray(this.getTransactionCount());
-		transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, 4, 0);
+		transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
 		data = Bytes.concat(data, transactionCountBytes);
 
 		for(Transaction transaction: this.getTransactions())
@@ -458,7 +484,7 @@ public class Block {
 			//WRITE TRANSACTION LENGTH
 			int transactionLength = transaction.getDataLength(false);
 			byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-			transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, 4, 0);
+			transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
 			data = Bytes.concat(data, transactionLengthBytes);
 
 			//WRITE TRANSACTION
@@ -484,7 +510,7 @@ public class Block {
 
 		for(Transaction transaction: this.getTransactions())
 		{
-			length += 4 + transaction.getDataLength(false);
+			length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(false);
 		}
 
 		return length;
@@ -585,34 +611,41 @@ public class Block {
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].refence invalid");
 			return false;
 		}
 
 		//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-		if(true & (this.timestamp - 500 > NTP.getTime() || this.timestamp < this.getParent(db).timestamp))
+		if(true & (this.timestamp - 500 > NTP.getTime()
+				|| this.timestamp < this.getParent(db).timestamp))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].timestamp invalid");
 			return false;
 		}
 
 		//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
 		if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].timestamp % 1000 invalid");
 			return false;
 		}
 
 		//CHECK IF GENERATING BALANCE IS CORRECT
 		if(this.generatingBalance != BlockGenerator.getNextBlockGeneratingBalance(db, this.getParent(db)))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].generatingBalance invalid");
 			return false;
 		}
 
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].version invalid");
 			return false;
 		}
 		if(this.version < 2 && (this.atBytes.length > 0 || this.atFees != 0))
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].version AT invalid");
 			return false;
 		}
 
@@ -639,12 +672,14 @@ public class Block {
 		//CHECK IF HASH LOWER THEN TARGET
 		if(hashValue.compareTo(target) >= 0)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].target invalid");
 			return false;
 		}
 
 		//CHECK IF FIRST BLOCK OF USER	
 		if(hashValue.compareTo(lowerTarget) < 0)
 		{
+			LOGGER.error("Block[" + this.getHeight(db) + "].lowerTarget invalid");
 			return false;
 		}
 
@@ -682,17 +717,20 @@ public class Block {
 				DeployATTransaction atTx = (DeployATTransaction)transaction;
 				if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 				{
+					LOGGER.error("Block[" + this.getHeight(db) + "].atTx invalid");
 					return false;
 				}
 			}
 			else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 			{
+				LOGGER.error("Block[" + this.getHeight(db) + "].Tx invalid");
 				return false;
 			}
 
 			//CHECK TIMESTAMP AND DEADLINE
 			if(transaction.getTimestamp() > this.timestamp || transaction.getDeadline() <= this.timestamp)
 			{
+				LOGGER.error("Block[" + this.getHeight(db) + "].TX.timestamp invalid");
 				return false;
 			}
 
@@ -720,7 +758,7 @@ public class Block {
 			transaction.process(db, false);
 
 			//SET PARENT
-			db.getTransactionParentMap().set(transaction, this);
+			db.getTransactionRef_BlockRef_Map().set(transaction, this);
 
 			//REMOVE FROM UNCONFIRMED DATABASE
 			db.getTransactionMap().delete(transaction);
@@ -730,7 +768,7 @@ public class Block {
 		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
 		for(Transaction transaction: unconfirmedTransactions)
 		{
-			if(db.getTransactionParentMap().contains(transaction.getSignature()))
+			if(db.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
 			{
 				db.getTransactionMap().delete(transaction);
 			}
@@ -801,7 +839,7 @@ public class Block {
 			{
 				Account recipient = new Account( key.getRecipient() );
 				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  db ).subtract( BigDecimal.valueOf( amount, 8 ) ) , db );
-				if ( Arrays.equals(recipient.getLastReference(db),new byte[64]))
+				if ( recipient.getLastReference(db) != null)
 				{
 					recipient.removeReference(db);
 				}
@@ -840,7 +878,7 @@ public class Block {
 			db.getTransactionMap().add(transaction);
 
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
-			db.getTransactionParentMap().delete(transaction.getSignature());
+			db.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
 	}
 

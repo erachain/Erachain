@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import settings.Settings;
-import utils.DateTimeFormat;
-import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.PlaySound;
@@ -17,21 +15,20 @@ import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
 import core.item.ItemCls;
+import core.transaction.GenesisIssue_ItemRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Issue_ItemRecord;
-import core.transaction.IssueImprintRecord;
-import core.transaction.MessageTransaction;
-import core.transaction.PaymentTransaction;
-import core.transaction.TransferAssetTransaction;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
 import database.DBSet;
-import database.ItemAssetMap;
 import database.SortableList;
 import database.wallet.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
+// in list of records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
 	
 	public static final int COLUMN_CONFIRMATIONS = 0;
@@ -63,6 +60,12 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
 		return this.transactions;
 	}
+	
+	public Class<? extends Object> getColumnClass(int c)
+	{     // set column type
+		Object o = getValueAt(0, c);
+		return o == null? null: o.getClass();
+    }
 	
 	public Transaction getTransaction(int row)
 	{
@@ -110,7 +113,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			Transaction transaction = data.getB();
 			//creator = transaction.getCreator();
 			String itemName = "";
-			if (transaction instanceof TransactionAmount)
+			if (transaction instanceof TransactionAmount && transaction.getKey() >=0)
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
@@ -122,11 +125,25 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				//recipient = transGen.getRecipient();				
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
 				itemName = item.toString();
+				creator_address = transGen.getRecipient().getAddress();
 			} else if ( transaction instanceof Issue_ItemRecord)
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
 				itemName = item.getShort();
+			} else if ( transaction instanceof GenesisIssue_ItemRecord)
+			{
+				GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)transaction;
+				ItemCls item = transIssue.getItem();
+				itemName = item.getShort();
+			} else if (transaction instanceof R_SertifyPubKeys )
+			{
+				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
+				//recipient = transAmo.getRecipient();
+				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getKey());
+				itemName = item.toString();
+			} else {
+				itemName = transaction.viewItemName();
 			}
 			
 			switch(column)
@@ -152,10 +169,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_AMOUNT:
 								
+				/*
 				if (creator_address==null) return "";
 				
 				return NumberAsString.getInstance().numberAsString(
-						transaction.getAmount(creator_address));			
+						transaction.getAmount(creator_address));
+						*/
+				return transaction.viewAmount(creator_address);
 
 			case COLUMN_RECIPIENT:
 				
@@ -220,29 +240,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			if(DBSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
 			{
 				int type = ((Transaction) message.getValue()).getType(); 
-				if( type == Transaction.PAYMENT_TRANSACTION)
+				if( type == Transaction.SEND_ASSET_TRANSACTION)
 				{
-					PaymentTransaction paymentTransaction = (PaymentTransaction) message.getValue();
-					Account account = Controller.getInstance().getAccountByAddress(paymentTransaction.getRecipient().getAddress());	
-					if(account != null)
-					{
-						if(Settings.getInstance().isSoundReceivePaymentEnabled())
-						{
-							PlaySound.getInstance().playSound("receivepayment.wav", ((Transaction) message.getValue()).getSignature());
-						}
-						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + paymentTransaction.getCreator().asPerson() + "\nTo: " + account.asPerson() + "\nAmount: " + paymentTransaction.getAmount().toPlainString(), MessageType.INFO);
-						
-					}
-					else if(Settings.getInstance().isSoundNewTransactionEnabled())
-					{
-						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-					}
-				}
-				else if( type == Transaction.SEND_ASSET_TRANSACTION)
-				{
-					MessageTransaction messageTransaction = (MessageTransaction) message.getValue();
-					Account account = Controller.getInstance().getAccountByAddress(((MessageTransaction) message.getValue()).getRecipient().getAddress());	
+					R_Send r_Send = (R_Send) message.getValue();
+					Account account = Controller.getInstance().getAccountByAddress(((R_Send) message.getValue()).getRecipient().getAddress());	
 					if(account != null)
 					{
 						if(Settings.getInstance().isSoundReceiveMessageEnabled())
@@ -250,9 +251,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 							PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature()) ;
 						}
 						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + messageTransaction.getCreator().asPerson() + "\nTo: " + account.asPerson()
-						+ "\n" + "Asset Key" + ": " + messageTransaction.getKey()
-						+ ", " + "Amount" + ": " + messageTransaction.getAmount().toPlainString(), MessageType.INFO);
+						SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().asPerson() + "\nTo: " + account.asPerson()
+						+ "\n" + "Asset Key" + ": " + r_Send.getKey()
+						+ ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
 					}
 					
 					else if(Settings.getInstance().isSoundNewTransactionEnabled())

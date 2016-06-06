@@ -1,7 +1,6 @@
 package gui;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.AllPersonsFrame;
 import gui.models.AccountsTableModel;
 import lang.Lang;
 
@@ -47,7 +46,7 @@ import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
-import gui.SendAssetFrame;
+import gui.Send_Frame;
 @SuppressWarnings("serial")
 public class AccountsPanel extends JPanel implements ItemListener
 
@@ -131,7 +130,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				AssetCls asset = getAsset();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				Menu.selectOrAdd( new SendAssetFrame(asset, account), null);
+				Menu.selectOrAdd( new Send_Frame(asset, account), null);
 
 				/*
 				JInternalFrame frame = new JInternalFrame();
@@ -156,6 +155,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(sendAsset);
+		menu.addSeparator();
 
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
 		copyAddress.addActionListener(new ActionListener()
@@ -173,25 +173,6 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(copyAddress);
-
-		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public key"));
-		copyPublicKey.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
-				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
-				//		account.getAddress());
-				
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
-			    clipboard.setContents(value, null);
-			}
-		});
-		menu.add(copyPublicKey);
 				
 		JMenuItem copyBalance = new JMenuItem(Lang.getInstance().translate("Copy Balance"));
 		copyBalance.addActionListener(new ActionListener()
@@ -245,7 +226,28 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(copyGeneratingBalance);
-		
+
+		menu.addSeparator();
+		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
+				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
+				//		account.getAddress());
+				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
+			    clipboard.setContents(value, null);
+			}
+		});
+		menu.add(copyPublicKey);
+
+		////////////////////
 		TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 		
 		table.addMouseListener(new MouseAdapter() 
@@ -304,5 +306,20 @@ public class AccountsPanel extends JPanel implements ItemListener
 			AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
         	tableModel.setAsset(asset);  
 		} 
+	}
+	
+	// set select in Favorites to FEE asset
+	public void setSelectionFavoriteItem() 
+	{		
+		for (int i=0; i < cbxFavorites.getItemCount(); i++)
+		{
+			AssetCls asset  = cbxFavorites.getItemAt(i);
+			if (asset.getKey() == AssetCls.FEE_KEY)
+			{
+				cbxFavorites.setSelectedIndex(i);
+		    	tableModel.setAsset(asset);
+		    	return;
+			}
+		}
 	}
 }

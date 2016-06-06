@@ -21,6 +21,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -101,7 +102,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	}	
 	
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
 				
@@ -126,7 +127,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -149,18 +150,25 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	public void process(DBSet db, boolean asPack) 
 	{
 
+		Block block = new GenesisBlock();
+		int blockIndex = block.getHeight();
+		int transactionIndex = block.getTransactionIndex(signature);
 		//UPDATE RECIPIENT
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
-		// SET ALIVE PERSON for DURATION
-		db.getPersonStatusMap().addItem(this.key, itemP);
+		Tuple4<Long, Long, Integer, Integer> itemP = 
+				new Tuple4<Long, Long, Integer, Integer>
+					(timestamp, Long.MAX_VALUE, blockIndex, transactionIndex);
 
-		// SET PERSON ADDRESS
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(this.key, Integer.MAX_VALUE, 0, this.signature);
+		// SET ALIVE PERSON for DURATION permanent
+		db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
+
+		// SET PERSON ADDRESS - end date as timestamp
+		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
+		Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
 		db.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
-		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemP);
+		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.signature, db);
+		this.recipient.setLastReference(this.timestamp, db);
 	}
 
 	@Override
@@ -168,7 +176,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 								
 		// UNDO ALIVE PERSON for DURATION
-		db.getPersonStatusMap().removeItem(this.key);
+		db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
 		//UPDATE RECIPIENT
 		db.getAddressPersonMap().removeItem(this.recipient.getAddress());

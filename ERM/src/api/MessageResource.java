@@ -200,10 +200,10 @@ public class MessageResource {
 					: new byte[] { 0 };
 
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.sendMessage(
+					.r_Send(
 							Controller.getInstance()
 									.getPrivateKeyAccountByAddress(sender),
-							recipientAccount, assetKey, bdAmount, 0, messageBytes,
+							0, recipientAccount, assetKey, bdAmount, messageBytes,
 							isTextByte, encrypted);
 
 			switch (result.getB()) {

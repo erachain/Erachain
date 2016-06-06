@@ -15,6 +15,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
 import lang.Lang;
 import utils.NumberAsString;
 
@@ -42,7 +43,9 @@ public class AccountsFrame extends JInternalFrame{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2717571093561259483L;
+
 
 	public AccountsFrame (JFrame parent)
 	{
@@ -66,6 +69,8 @@ public class AccountsFrame extends JInternalFrame{
 		
 	    AccountsPanel accountsPanel = new AccountsPanel(parent);
         getContentPane().add(accountsPanel, BorderLayout.CENTER);
+		accountsPanel.setSelectionFavoriteItem();  
+
 	 
 	    //JTabbedPane main_jTabbedPane = new JTabbedPane();
         //main_jTabbedPane.addTab(Lang.getInstance().translate("Search account"), null, allPersonsFrame, "");

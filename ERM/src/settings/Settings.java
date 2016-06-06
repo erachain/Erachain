@@ -47,11 +47,11 @@ public class Settings {
 	//private static final String[] DEFAULT_PEERS = { };
 	
 	// BLOCK
-	public static final int BLOCK_MAX_SIGNATURES = 500;
+	public static final int BLOCK_MAX_SIGNATURES = 500; // blocks load onetime
 	public static final BigDecimal BLOCK_GENERATING_BALANCE_NEED = new BigDecimal(100);
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1462871270336L; // CORE RELEASE
+	public static final long DEFAULT_MAINNET_STAMP = 1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -75,6 +75,12 @@ public class Settings {
 	//DATA
 	private static final String DEFAULT_DATA_DIR = "data";
 	private static final String DEFAULT_WALLET_DIR = "wallet";
+	
+	// RIGHTs 
+	public static final int GENERAL_ERMO_BALANCE = 1000000;
+	public static final int MAJOR_ERMO_BALANCE = 33000;
+	public static final int MINOR_ERMO_BALANCE = 100;
+	
 	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = false;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
@@ -718,6 +724,7 @@ public class Settings {
 		return DEFAULT_SOUND_NEW_TRANSACTION;
 	}
 	
+	/*
 	public int getMaxBytePerFee() 
 	{
 		if(this.settingsJSON.containsKey("maxbyteperfee"))
@@ -727,6 +734,7 @@ public class Settings {
 		
 		return DEFAULT_MAX_BYTE_PER_FEE;
 	}
+	*/
 	
 	public boolean isAllowFeeLessRequired() 
 	{

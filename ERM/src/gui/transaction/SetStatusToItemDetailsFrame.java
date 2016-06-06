@@ -33,7 +33,10 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 	{
 		super(setStatusToItem);
 		
-		ItemCls item = setStatusToItem.getItem();
+		//ItemCls item = ItemCls.setStatusToItem.getItemType();
+		//ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
+		ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
+
 		//NAME
 		long status_key = setStatusToItem.getKey();
 		StatusCls status = Controller.getInstance().getItemStatus(status_key);
@@ -64,6 +67,19 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 		txtAreaDescription.setEditable(false);
 		MenuPopupUtil.installContextMenu(txtAreaDescription);
 		this.add(txtAreaDescription, detailGBC);		
+
+		// FROM - TO DATE
+		++labelGBC.gridy;
+		this.add(new JLabel(Lang.getInstance().translate("From - To") + ":"), labelGBC);						
+		++detailGBC.gridy;
+		long beginDate = setStatusToItem.getBeginDate();
+		long endDate = setStatusToItem.getEndDate();
+		
+		JTextField fromToDate = new JTextField((beginDate == Long.MIN_VALUE?"?":DateTimeFormat.timestamptoString(beginDate))
+				+ " - " + (endDate == Long.MAX_VALUE? "?":DateTimeFormat.timestamptoString(endDate)));
+		fromToDate.setEditable(false);
+		MenuPopupUtil.installContextMenu(fromToDate);
+		this.add(fromToDate, detailGBC);
 
 		// //// ITEM
 		//LABEL NAME

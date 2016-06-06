@@ -36,6 +36,10 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		return this.assets;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
 	public AssetCls getAsset(int row)
 	{
 		return this.assets.get(row).getB();

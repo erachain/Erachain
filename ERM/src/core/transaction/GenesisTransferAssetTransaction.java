@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import ntp.NTP;
+import utils.NumberAsString;
 
 import org.json.simple.JSONObject;
 
@@ -21,6 +22,7 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.ItemCls;
 import database.ItemAssetBalanceMap;
 import database.DBSet;
 
@@ -65,6 +67,39 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	public long getAssetKey()
 	{
 		return this.key;
+	}
+	
+	@Override
+	public BigDecimal getAmount(String address) {
+		BigDecimal amount = BigDecimal.ZERO.setScale(8);
+		
+		if(address.equals(this.recipient.getAddress()))
+		{
+			//IF RECIPIENT
+			amount = amount.add(this.amount);
+		}
+
+		return amount;
+	}
+	@Override
+	public BigDecimal getAmount(Account account) {
+		String address = account.getAddress();
+		return getAmount(address);
+	}
+
+	@Override
+	public String viewAmount(Account account) {
+		String address = account.getAddress();
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+	@Override
+	public String viewAmount(String address) {
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+
+	@Override
+	public String viewRecipient() {
+		return recipient.asPerson();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -111,11 +146,14 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
 				
+		// READ SIGNATURE
+		// SIGNATURE not need - its calculated on fly
+
 		return new GenesisTransferAssetTransaction(recipient, key, amount);	
 	}	
 	
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		//byte[] data = new byte[0];
 		
@@ -149,7 +187,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -160,7 +198,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 						
 		//CHECK IF AMOUNT IS DIVISIBLE
 		// genesis assets not in DB yet and need take it from genesis maker
-		if(!GenesisBlock.makeAssetVenture((int)this.key).isDivisible())
+		if(!GenesisBlock.makeAsset((int)this.key).isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
 			if(this.getAmount().stripTrailingZeros().scale() > 0)
@@ -189,7 +227,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.signature, db);
+		this.recipient.setLastReference(this.timestamp, db);
 	}
 
 	@Override
@@ -225,21 +263,6 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		}
 		
 		return false;
-	}
-
-	@Override
-	public BigDecimal getAmount(Account account) 
-	{
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		String address = account.getAddress();
-					
-		//IF RECIPIENT
-		if(address.equals(this.recipient.getAddress()))
-		{
-			amount = amount.add(this.amount);
-		}
-		
-		return amount;
 	}
 
 	//@Override

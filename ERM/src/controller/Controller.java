@@ -60,8 +60,9 @@ import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
-import core.item.statuses.StatusCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
@@ -98,11 +99,11 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.12.05";
-	private String buildTime = "2016-04-29 00:00:00 UTC";
+	private String version = "2.14.01";
+	private String buildTime = "2016-05-18 12:12:12 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "2.03.0";
+	public static final String releaseVersion = "2.05.0";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -958,7 +959,7 @@ public class Controller extends Observable {
 				// AND UNCONFIRMED
 				// TODO fee
 				// transaction.calcFee();
-				if (!DBSet.getInstance().getTransactionParentMap()
+				if (!DBSet.getInstance().getTransactionRef_BlockRef_Map()
 								.contains(transaction.getSignature())) {
 					// ADD TO UNCONFIRMED TRANSACTIONS
 					this.blockGenerator.addUnconfirmedTransaction(transaction);
@@ -1316,10 +1317,17 @@ public class Controller extends Observable {
 		return getTransaction(signature, DBSet.getInstance());
 	}
 	
+	// by account addres + timestamp get signature
+	public byte[] getSignatureByAddrTime(DBSet database, String address, Long timestamp) {
+
+		//return database.getTransactionRef_BlockRef_Map().getParent(signature);
+		return null;
+	}
+	
 	public Transaction getTransaction(byte[] signature, DBSet database) {
 		
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionParentMap()
+		Block block = database.getTransactionRef_BlockRef_Map()
 				.getParent(signature);
 		if (block != null) {
 			return block.getTransaction(signature);
@@ -1608,6 +1616,10 @@ public class Controller extends Observable {
 	public StatusCls getItemStatus(long key) {
 		return (StatusCls)DBSet.getInstance().getItemStatusMap().get(key);
 	}
+	// UNIONS
+	public UnionCls getItemUnion(long key) {
+		return (UnionCls)DBSet.getInstance().getItemUnionMap().get(key);
+	}
 
 	// ALL ITEMS
 	public ItemCls getItem(DBSet db, int type, long key) {
@@ -1664,15 +1676,6 @@ public class Controller extends Observable {
 
 		// BROADCAST
 		this.broadcastTransaction(transaction);
-	}
-
-	public Pair<Transaction, Integer> sendPayment(PrivateKeyAccount sender,
-			Account recipient, BigDecimal amount,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createPayment(sender, recipient,
-					amount, feePow);
-		}
 	}
 
 	public Pair<Transaction, Integer> registerName(
@@ -1804,12 +1807,12 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, String fullName, int feePow,
-			long birthday,
+			long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height, String description) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday,
+			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday, deathday,
 					gender, race, birthLatitude, birthLongitude,
 					skinColor, eyeColor, hairСolor, height, description);
 		}
@@ -1824,13 +1827,22 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Pair<Transaction, Integer> issueUnion(PrivateKeyAccount creator,
+			String name, long birthday, long parent, String description, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueUnionTransaction(creator,
+					name, birthday, parent, description, feePow);
+		}
+	}
+
 	public Pair<Transaction, Integer> createOrder(PrivateKeyAccount creator,
-			AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price,
+			AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amountWant,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createOrderTransaction(creator,
-					have, want, amount, price, feePow);
+					have, want, amountHave, amountWant, feePow);
 		}
 	}
 
@@ -1840,15 +1852,6 @@ public class Controller extends Observable {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createCancelOrderTransaction(
 					creator, order, feePow);
-		}
-	}
-
-	public Pair<Transaction, Integer> transferAsset(PrivateKeyAccount sender,
-			Account recipient, AssetCls asset, BigDecimal amount,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createAssetTransfer(sender,
-					recipient, asset, amount, feePow);
 		}
 	}
 
@@ -1871,11 +1874,18 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> sendMessage(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount,int feePow,
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+			int feePow, Account recipient, long key, BigDecimal amount) {
+		synchronized (this.transactionCreator) {
+			return this.r_Send(sender, feePow, recipient,
+					key, amount, null, null, null);
+		}
+	}
+	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+			int feePow, Account recipient, long key,BigDecimal amount,
 			byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createMessage(sender, recipient,
+			return this.transactionCreator.r_Send(sender, recipient,
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}
@@ -1889,14 +1899,33 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
-			List<PublicKeyAccount> userAccounts, int end_date) {
+			List<PublicKeyAccount> userAccounts, int add_day) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_SertifyPerson( version, asPack,
 					creator, feePow, key,
-					userAccounts, end_date);
+					userAccounts, add_day);
 		}
 	}
-	
+
+	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow,
+			int height, int seq) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Vouch( version, asPack,
+					creator, feePow,
+					height, seq);
+		}
+	}
+
+	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
+			int feePow, long key,
+			ItemCls item, Long beg_date, Long end_date) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_SetStatusToItem( version, asPack,
+					creator, feePow, key,
+					item, beg_date, end_date);
+		}
+	}
 	/*
 	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
 			Account recipient, long key, BigDecimal amount,int feePow,
@@ -1917,9 +1946,12 @@ public class Controller extends Observable {
 	}
 	*/
 	
+	public Block getBlockByHeight(DBSet db, int parseInt) {
+		byte[] b = db.getHeightMap().getBlockByHeight(parseInt);
+		return db.getBlockMap().get(b);
+	}
 	public Block getBlockByHeight(int parseInt) {
-		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);
-		return DBSet.getInstance().getBlockMap().get(b);
+		return getBlockByHeight(DBSet.getInstance(), parseInt);
 	}
 
 	public PublicKeyAccount getPublicKeyByAddress1(String address) {
@@ -1938,20 +1970,21 @@ public class Controller extends Observable {
 		}
 
 		// CHECK ACCOUNT IN OWN WALLET
-		Account account = Controller.getInstance().getAccountByAddress(address);
+		Controller cntr = Controller.getInstance();
+		Account account = cntr.getAccountByAddress(address);
 		if (account != null) {
-			if (Controller.getInstance().isWalletUnlocked()) {
-				return Controller.getInstance()
-						.getPrivateKeyAccountByAddress(address).getPublicKey();
+			if (cntr.isWalletUnlocked()) {
+				return cntr.getPrivateKeyAccountByAddress(address).getPublicKey();
 			}
 		}
 
-		if (!DBSet.getInstance().getReferenceMap().contains(address)) {
+		DBSet db = DBSet.getInstance();
+		if (!db.getReferenceMap().contains(address)) {
 			return null;
 		}
 
-		Transaction transaction = Controller.getInstance().getTransaction(
-				DBSet.getInstance().getReferenceMap().get(address));
+		Transaction transaction = cntr.getTransaction(
+				getSignatureByAddrTime(db, address, db.getReferenceMap().get(address)));
 
 		if (transaction == null) {
 			return null;

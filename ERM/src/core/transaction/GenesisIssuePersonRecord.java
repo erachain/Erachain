@@ -2,6 +2,7 @@ package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 //import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 //import java.util.HashSet;
@@ -24,6 +25,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
 import core.account.Account;
+import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 //import core.account.Account;
@@ -32,6 +35,7 @@ import core.crypto.Crypto;
 //import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
+import core.item.statuses.StatusCls;
 //import database.ItemMap;
 import database.DBSet;
 
@@ -39,17 +43,11 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "GENESIS Issue Person";
-	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
-	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH;
 
-	public GenesisIssuePersonRecord(PersonCls item, Account recipient) 
+	public GenesisIssuePersonRecord(PersonCls person) 
 	{
-		super(TYPE_ID, NAME_ID, item, recipient);
+		super(TYPE_ID, NAME_ID, person);
 	}
-	
-	//GETTERS/SETTERS
-	
-	//public String getName() { return "Issue Person"; }
 	
 	//PARSE CONVERT
 	
@@ -70,100 +68,31 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 		//position += note.getDataLength(false);
 
-		//READ RECIPIENT
-		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-		Account recipient = new Account(Base58.encode(recipientBytes));
-		position += RECIPIENT_LENGTH;
-
-		return new GenesisIssuePersonRecord(person, recipient);
+		return new GenesisIssuePersonRecord(person);
 		
-	}	
-
-	//VALIDATE
-
+	}
+	
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
+						
+		int res = super.isValid(db, releaserReference);
+		if (res != Transaction.VALIDATE_OK) return res;
 		
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(this.getRecipient() == null || !Crypto.getInstance().isValidAddress(this.getRecipient().getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
+		PersonCls person = (PersonCls) this.getItem();
+		// birthLatitude -90..90; birthLongitude -180..180
+		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
+		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
+		if (person.getRace().length() <1 || person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
+		if (person.getGender() < 0 || person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
+		if (person.getSkinColor().length() <1 || person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
+		if (person.getEyeColor().length() <1 || person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
+		if (person.getHairСolor().length() <1 || person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
+		//int ii = Math.abs(person.getHeight());
+		if (Math.abs(person.getHeight()) < 40) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 				
-		return super.isValid(db, releaserReference);
-	}
-
-
-	//PROCESS/ORPHAN
+		return VALIDATE_OK;
 	
-	//@Override
-	public void process(DBSet db, boolean asPack) 
-	{
-
-		super.process(db, asPack);
-
-		long key = this.getItem().getKey();
-		Account recipient = this.getRecipient();
-
-		//UPDATE RECIPIENT
-		Tuple3<Integer, Integer, byte[]> itemP = new Tuple3<Integer, Integer, byte[]>(Integer.MAX_VALUE, 0, this.signature);
-		// SET ALIVE PERSON for DURATION
-		db.getPersonStatusMap().addItem(key, itemP);
-
-		// SET PERSON ADDRESS
-		// Integer.MAX_VALUE = 0 - permanent
-		Tuple4<Long, Integer, Integer, byte[]> itemA = new Tuple4<Long, Integer, Integer, byte[]>(key, 0, 0, this.signature);
-		db.getAddressPersonMap().addItem(recipient.getAddress(), itemA);
-		db.getPersonAddressMap().addItem(key, recipient.getAddress(), itemP);
-		
-		//UPDATE REFERENCE OF RECIPIENT
-		recipient.setLastReference(this.signature, db);
-	}
-
-	//@Override
-	public void orphan(DBSet db, boolean asPack) 
-	{
-		
-		long key = this.getItem().getKey();
-		Account recipient = this.getRecipient();
-
-		super.orphan(db, asPack);
-
-		// UNDO ALIVE PERSON for DURATION
-		db.getPersonStatusMap().removeItem(key);
-
-		//UPDATE RECIPIENT
-		db.getAddressPersonMap().removeItem(recipient.getAddress());
-		db.getPersonAddressMap().removeItem(key, recipient.getAddress());
-
-		//UPDATE REFERENCE OF CREATOR
-		// not needthis.creator.setLastReference(this.reference, db);		
-		//UPDATE REFERENCE OF RECIPIENT
-		recipient.removeReference(db);
-	}
-
-	//REST
-	
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.getRecipient());
-		return accounts;
-	}
-	
-	@Override
-	public boolean isInvolved(Account account) 
-	{
-		String address = account.getAddress();
-		
-		if(address.equals(getRecipient().getAddress()))
-		{
-			return true;
-		}
-		
-		return false;
 	}
 
 

@@ -6,6 +6,7 @@ import java.util.Arrays;
  import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.crypto.Base58;
@@ -14,13 +15,13 @@ public class Union extends UnionCls {
 	
 	private static final int TYPE_ID = UnionCls.UNION;
 
-	public Union(Account creator, String name, String description)
+	public Union(Account creator, String name, long birthday, long parent, String description)
 	{
-		super(TYPE_ID, creator, name, description);
+		super(TYPE_ID, creator, name, birthday, parent, description);
 	}
-	public Union(byte[] typeBytes, Account creator, String name, String description)
+	public Union(byte[] typeBytes, Account creator, String name, long birthday, long parent, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, birthday, parent, description);
 	}
 
 	//GETTERS/SETTERS
@@ -70,6 +71,16 @@ public class Union extends UnionCls {
 		String description = new String(descriptionBytes, StandardCharsets.UTF_8);
 		position += descriptionLength;
 		
+		//READ BIRTDAY
+		byte[] birthdayBytes = Arrays.copyOfRange(data, position, position + BIRTHDAY_LENGTH);
+		long birthday = Longs.fromByteArray(birthdayBytes);	
+		position += BIRTHDAY_LENGTH;
+
+		//READ BIRTDAY
+		byte[] parentBytes = Arrays.copyOfRange(data, position, position + BIRTHDAY_LENGTH);
+		long parent = Longs.fromByteArray(parentBytes);	
+		position += PARENT_LENGTH;
+
 		byte[] reference = null;
 		if (includeReference)
 		{
@@ -79,7 +90,7 @@ public class Union extends UnionCls {
 		}
 		
 		//RETURN
-		Union note = new Union(typeBytes, creator, name, description);
+		Union note = new Union(typeBytes, creator, name, birthday, parent, description);
 		if (includeReference)
 		{
 			note.setReference(reference);

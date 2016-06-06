@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
-//import com.google.common.primitives.Ints;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
@@ -30,8 +30,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import database.DBSet;
-import lang.Lang;
 import settings.Settings;
+//import lang.Lang;
+//import settings.Settings;
 import utils.DateTimeFormat;
 
 public abstract class Transaction {
@@ -82,6 +83,7 @@ public abstract class Transaction {
 	public static final int AT_ERROR = 10000;
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
+	public static final int INVALID_TIMESTAMP = 39;
 	
 	public static final int INVALID_PUBLIC_KEY = 40;
 	
@@ -101,6 +103,7 @@ public abstract class Transaction {
 	public static final int ITEM_STATUS_NOT_EXIST = 59;
 	public static final int ITEM_UNION_NOT_EXIST = 60;
 	public static final int ITEM_DOES_NOT_STATUSED = 61;
+	public static final int ITEM_DOES_NOT_UNITED = 62;
 
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 70;
 	public static final int ITEM_PERSON_LONGITUDE_ERROR = 71;
@@ -110,6 +113,9 @@ public abstract class Transaction {
 	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 75;
 	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 76;
 	public static final int ITEM_PERSON_HEIGHT_ERROR = 77;
+
+	public static final int INVALID_BLOCK_HEIGHT_ERROR = 80;
+	public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 81;
 
 	public static final int NOT_YET_RELEASED = 1000;
 	
@@ -138,10 +144,11 @@ public abstract class Transaction {
 	public static final int SEND_ASSET_TRANSACTION = 31;
 	public static final int SIGN_NOTE_TRANSACTION = 32;
 	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 33;
-	public static final int SET_STATUS_TRANSACTION = 34;
-	public static final int ADOPT_UNION_TRANSACTION = 35;
+	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 34;
+	public static final int SET_UNION_TO_ITEM_TRANSACTION = 35;
+	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 36;
 	// confirms other transactions
-	public static final int CONFIRM_TRANSACTION = 40;
+	public static final int VOUCH_TRANSACTION = 40;
 	// exchange of assets
 	public static final int CREATE_ORDER_TRANSACTION = 50;
 	public static final int CANCEL_ORDER_TRANSACTION = 51;
@@ -152,14 +159,11 @@ public abstract class Transaction {
 	public static final int RELEASE_PACK = 70;
 
 	// old
-	// public static final int GENESIS_TRANSACTION = 4 + 130;
-	public static final int PAYMENT_TRANSACTION = 5 + 130;
 	public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
 	public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
 	public static final int SELL_NAME_TRANSACTION = 8 + 130;
 	public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
 	public static final int BUY_NAME_TRANSACTION = 10 + 130;
-	public static final int TRANSFER_ASSET_TRANSACTION_OLD = 11 + 130;	
 	public static final int ARBITRARY_TRANSACTION = 12 + 130;
 	public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
 	public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
@@ -231,13 +235,16 @@ public abstract class Transaction {
 	//PROPERTIES LENGTH
 	protected static final int SIMPLE_TYPE_LENGTH = 1;
 	protected static final int TYPE_LENGTH = 4;
+	protected static final int HEIGHT_LENGTH = 4;
+	protected static final int SEQ_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
-	public static final int REFERENCE_LENGTH = 64;
+	//public static final int REFERENCE_LENGTH = 64;
+	public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
 	protected static final int IS_TEXT_LENGTH = 1;
-	protected static final int KEY_LENGTH = 8;
+	public static final int KEY_LENGTH = 8;
 	protected static final int FEE_POWER_LENGTH = 1;
 	//protected static final int HKEY_LENGTH = 20;
 	protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
@@ -251,21 +258,22 @@ public abstract class Transaction {
 	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
-	protected byte[] reference;
+	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
+	protected Long reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
 	protected byte[] signature;
 	protected long timestamp;
 	protected PublicKeyAccount creator;
-	
+
 	// need for genesis
 	protected Transaction(byte type, String type_name)
 	{
 		this.typeBytes = new byte[]{type,0,0,0}; // for GENESIS
 		this.TYPE_NAME = type_name;
 	}
-	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference)
 	{
 		this.typeBytes = typeBytes;
 		this.TYPE_NAME = type_name;
@@ -277,13 +285,14 @@ public abstract class Transaction {
 		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
 		this.feePow = feePow;
 	}
-	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference, byte[] signature)
+	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, type_name, creator, feePow, timestamp, reference);
 		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
+	
 	
 	public int getType()
 	{
@@ -301,12 +310,13 @@ public abstract class Transaction {
 	{
 		return this.typeBytes;
 	}
+		
 	public PublicKeyAccount getCreator() 
 	{
 		return this.creator;
 	}
 
-	public long getTimestamp()
+	public Long getTimestamp()
 	{
 		return this.timestamp;
 	}
@@ -338,6 +348,10 @@ public abstract class Transaction {
 		return this.viewTime(account);
 	}
 	*/
+	public long getKey() {
+		return -1;
+	}
+
 	public BigDecimal getAmount() {
 		return BigDecimal.ZERO;
 	}
@@ -382,7 +396,7 @@ public abstract class Transaction {
 		return this.signature;
 	}
 	
-	public byte[] getReference()
+	public Long getReference()
 	{
 		return this.reference;
 	}			
@@ -390,10 +404,11 @@ public abstract class Transaction {
 	
 	public int calcCommonFee()
 	{		
-		int fee =  this.getDataLength(false) + 100 * FEE_PER_BYTE;
-		if (this.getDataLength(false) > 1000) {
+		int len = this.getDataLength(false);
+		int fee = len + 100 * FEE_PER_BYTE;
+		if (len > 1000) {
 			// add overheat
-			fee += (this.getDataLength(false) - 1000) * FEE_PER_BYTE;
+			fee += (len - 1000) * FEE_PER_BYTE;
 		}
 		
 		return (int) fee;
@@ -420,9 +435,13 @@ public abstract class Transaction {
 		}
 	}
 
+	public Block getParent(DBSet db) {
+		
+		return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+	}
 	public Block getParent() {
 		
-		return DBSet.getInstance().getTransactionParentMap().getParent(this.signature);
+		return this.getParent(DBSet.getInstance());
 	}
 
 	// VIEW
@@ -438,6 +457,19 @@ public abstract class Transaction {
 	public String viewSubTypeName() {
 		return "";
 	}
+	public String viewFullTypeName() {
+		String sub = viewSubTypeName();
+		return sub.length() > 0? viewTypeName() + ":" + sub: viewTypeName();
+	}
+	public String viewHeightSeq(DBSet db) {
+		return this.getBlockHeight(db) + "-" + this.getSeqNo(db);
+	}
+	public String viewAmount(Account account) {
+		return account==null?"": viewAmount(account.getAddress());
+	}
+	public String viewAmount(String address) {
+		return "";
+	}
 
 	public String viewCreator() {
 		return creator==null?"GENESIS":creator.asPerson();
@@ -446,10 +478,14 @@ public abstract class Transaction {
 		return "";
 	}
 	public String viewReference() {
-		return reference==null?"GENESIS":Base58.encode(reference);
+		//return reference==null?"null":Base58.encode(reference);
+		return reference==null?"null":"" + reference;
+	}
+	public String viewSignature() {
+		return signature==null?"null":Base58.encode(signature);
 	}
 	public String viewTimestamp() {
-		return timestamp<1000?"GENESIS":DateTimeFormat.timestamptoString(timestamp);
+		return timestamp<1000?"null":DateTimeFormat.timestamptoString(timestamp);
 	}
 	public int viewSize(boolean asPack) {
 		return getDataLength(asPack);
@@ -457,6 +493,13 @@ public abstract class Transaction {
 	public String viewFee() {
 		return fee.multiply(new BigDecimal(1000)).setScale(5)
 				.toPlainString() + "[" + feePow + "]";
+	}
+
+	public String viewItemName() {
+		return "";
+	}
+	public String viewAmount() {
+		return "";
 	}
 
 	//PARSE/CONVERT
@@ -468,15 +511,17 @@ public abstract class Transaction {
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
-		transaction.put("reference", Base58.encode(this.reference));
-		transaction.put("signature", Base58.encode(this.signature));
 		transaction.put("confirmations", this.getConfirmations());
 		if (this.creator == null )
 		{
-			transaction.put("creator", "genesis");			
+			transaction.put("creator", "genesis");
+			transaction.put("reference", "genesis");
+			transaction.put("signature", "genesis");
 		} else {
+			transaction.put("reference", this.reference==null?"null":"" + this.reference);
+			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
 			transaction.put("fee", this.fee.toPlainString());
-			transaction.put("timestamp", this.timestamp);
+			transaction.put("timestamp", this.timestamp<1000?"null":this.timestamp);
 			transaction.put("creator", this.creator.getAddress());
 			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
 			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
@@ -494,6 +539,11 @@ public abstract class Transaction {
 		boolean withSign = false;
 		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;
+				
+		// all test a not valid for main test
+		// all other network must be invalid here!
+		int port = Controller.getInstance().getNetworkPort();
+		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		this.signature = Crypto.getInstance().sign(creator, data);
 		if (!asPack)
@@ -505,7 +555,7 @@ public abstract class Transaction {
 	
 	// releaserReference == null - not as pack
 	// releaserReference = reference of releaser - as pack
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) {
+	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		boolean asPack = releaserReference != null;
 
@@ -522,7 +572,12 @@ public abstract class Transaction {
 		}
 		
 		//WRITE REFERENCE - in any case as Pack or not
-		data = Bytes.concat(data, this.reference);
+		if (this.reference != null) {
+			// NULL in imprints
+			byte[] referenceBytes = Longs.toByteArray(this.reference);
+			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+			data = Bytes.concat(data, referenceBytes);
+		}
 
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -540,8 +595,9 @@ public abstract class Transaction {
 		return data;
 		
 	}
-	
+
 	public abstract int getDataLength(boolean asPack);
+
 	
 	//VALIDATE
 	
@@ -562,24 +618,34 @@ public abstract class Transaction {
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
+		
+		// all test a not valid for main test
+		// all other network must be invalid here!
+		int port = Controller.getInstance().getNetworkPort();
+		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
 
-	public int isValid(byte[] releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		return isValid(DBSet.getInstance(), releaserReference);
 	}
 	
-	public int isValid(DBSet db, byte[] releaserReference)
+	public int isValid(DBSet db, Long releaserReference)
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
+		if(this.reference != null)
 		{
-			return INVALID_REFERENCE;
+			Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+			if (reference.compareTo(this.reference) != 0)
+				return INVALID_REFERENCE;
+			if (reference.compareTo(this.timestamp) >= 0)
+				return INVALID_TIMESTAMP;
 		}
+		
 
 		//CHECK CREATOR
 		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
@@ -615,7 +681,7 @@ public abstract class Transaction {
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				this.creator.setLastReference(this.signature, db);
+				this.creator.setLastReference(this.timestamp, db);
 			}
 		}
 
@@ -648,9 +714,23 @@ public abstract class Transaction {
 		
 	public abstract boolean isInvolved(Account account);
  
-	public int getSeq()
+	public int getBlockHeight(DBSet db)
 	{
-		if(this.isConfirmed())
+		if(this.isConfirmed(db))
+		{
+			return this.getParent().getHeight();
+		}
+		return -1;
+	}
+	/*
+	public int getBlockHeight()
+	{
+		return getBlockHeight(db);
+	}
+	*/
+	public int getSeqNo(DBSet db)
+	{
+		if(this.isConfirmed(db))
 		{
 			return this.getParent().getTransactionSeq(this.signature);
 		}
@@ -670,14 +750,16 @@ public abstract class Transaction {
 		return false;
 	}
 
+	/*
 	public boolean isConfirmed()
 	{
 		return this.isConfirmed(DBSet.getInstance());
 	}
+	*/
 	
 	public boolean isConfirmed(DBSet db)
 	{
-		return DBSet.getInstance().getTransactionParentMap().contains(this.getSignature());
+		return db.getTransactionRef_BlockRef_Map().contains(this.getSignature());
 	}
 	
 	public int getConfirmations()
@@ -693,7 +775,7 @@ public abstract class Transaction {
 		
 		//CALCULATE CONFIRMATIONS
 		int lastBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getBlockMap().getLastBlockSignature());
-		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getTransactionParentMap().getParent(this.signature));
+		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature));
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;
@@ -705,12 +787,12 @@ public abstract class Transaction {
 		}
 	}
 
-	public int getBlockVersion1()
+	public int getBlockVersion(DBSet db)
 	{
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
-		if(this.isConfirmed())
+		if(this.isConfirmed(db))
 		{
-			return DBSet.getInstance().getTransactionParentMap().getParent(this.getSignature()).getVersion();
+			return DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
 		}
 		
 		// IF UNCONFIRMED

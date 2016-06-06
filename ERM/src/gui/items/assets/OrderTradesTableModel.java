@@ -23,9 +23,9 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 {
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
-	public static final int COLUMN_PRICE = 2;
-	public static final int COLUMN_AMOUNT = 3;
-	public static final int COLUMN_TOTAL = 4;
+	public static final int COLUMN_AMOUNT = 2;
+	public static final int COLUMN_PRICE = 3;
+	public static final int COLUMN_AMOUNT_WANT = 4;
 
 	private SortableList<Tuple2<BigInteger, BigInteger>, Trade> trades;
 	private Order order;
@@ -88,19 +88,19 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 		case COLUMN_TYPE:
 			
 			return trade.getInitiatorOrder(DBSet.getInstance()).getHave() == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
-		
-		case COLUMN_PRICE:
-			
-			return NumberAsString.getInstance().numberAsString(trade.getPrice().divide(trade.getAmount(), RoundingMode.FLOOR).setScale(8));
-		
+				
 		case COLUMN_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(trade.getAmount());
+			return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 			
-		case COLUMN_TOTAL:
+		case COLUMN_PRICE:
 			
-			return NumberAsString.getInstance().numberAsString(trade.getPrice());
+			return NumberAsString.getInstance().numberAsString(trade.getPriceCalc());
+
+		case COLUMN_AMOUNT_WANT:
 			
+			return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+	
 		}
 		
 		return null;

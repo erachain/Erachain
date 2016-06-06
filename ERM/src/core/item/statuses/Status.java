@@ -1,9 +1,7 @@
 package core.item.statuses;
 
-//import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-// import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Ints;
 
@@ -62,7 +60,7 @@ public class Status extends StatusCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 1 || descriptionLength > 4000)
+		if(descriptionLength > 4000)
 		{
 			throw new Exception("Invalid description length");
 		}

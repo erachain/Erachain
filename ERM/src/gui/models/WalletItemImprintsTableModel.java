@@ -33,6 +33,10 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		return this.imprints;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
 	public ImprintCls getItem(int row)
 	{
 		return this.imprints.get(row).getB();

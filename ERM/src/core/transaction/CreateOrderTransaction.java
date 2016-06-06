@@ -2,6 +2,7 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,41 +31,32 @@ public class CreateOrderTransaction extends Transaction
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;
-	private static final int PRICE_LENGTH = 12;
-	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH;
+	//private static final int PRICE_LENGTH = 12;
+	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2*AMOUNT_LENGTH;
 
 	private Order order;
-	//private long have;
-	//private long want;
-	//private BigDecimal amount;
-	//private BigDecimal price;
 	
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
-		
-		//this.have = have;
-		//this.want = want;
-		//this.amount = amount;
-		//this.price = price;
-		this.order = new Order(null, creator, have, want, amount, price, timestamp);
+		this.order = new Order(null, creator, have, want, amountHave, amountWant, timestamp);
 
 	}
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.signature = signature;
-		this.order = new Order(new BigInteger(signature), creator, have, want, amount, price, timestamp);
+		this.order = new Order(new BigInteger(signature), creator, have, want, amountHave, amountWant, timestamp);
 		this.calcFee();
 		
 	}
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference, signature);
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp, reference, signature);
 	}
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amount, BigDecimal price, byte feePow, long timestamp, byte[] reference) 
+	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) 
 	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amount, price, feePow, timestamp, reference);
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp, reference);
 	}
 	
 
@@ -94,31 +86,55 @@ public class CreateOrderTransaction extends Transaction
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
+		boolean asPack = releaserReference != null;
+
 		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
+		if (data.length < BASE_LENGTH_AS_PACK
+				| !asPack & data.length < BASE_LENGTH)
 		{
-			throw new Exception("Data does not match block length");
+			throw new Exception("Data does not match block length " + data.length);
 		}
-				
+		
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
-		position += TIMESTAMP_LENGTH;
-		
-		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		position += REFERENCE_LENGTH;
+		long timestamp = 0;
+		if (!asPack) {
+			//READ TIMESTAMP
+			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+			timestamp = Longs.fromByteArray(timestampBytes);	
+			position += TIMESTAMP_LENGTH;
+		}
+
+		Long reference = null;
+		if (!asPack) {
+			//READ REFERENCE
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
+			position += REFERENCE_LENGTH;
+		} else {
+			reference = releaserReference;
+		}
 		
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
+		
+		byte feePow = 0;
+		if (!asPack) {
+			//READ FEE POWER
+			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+			feePow = feePowBytes[0];
+			position += 1;
+		}
+		
+		//READ SIGNATURE
+		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+		position += SIGNATURE_LENGTH;
 		
 		//READ HAVE
 		byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
@@ -130,25 +146,17 @@ public class CreateOrderTransaction extends Transaction
 		long want = Longs.fromByteArray(wantBytes);	
 		position += WANT_LENGTH;
 		
-		//READ AMOUNT
-		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
+		//READ AMOUNT HAVE
+		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), 8);
 		position += AMOUNT_LENGTH;
-		
-		//READ PRICE
-		byte[] priceBytes = Arrays.copyOfRange(data, position, position + PRICE_LENGTH);
-		BigDecimal price = new BigDecimal(new BigInteger(priceBytes), 8);
-		position += PRICE_LENGTH;
-		
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
-		
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-		
-		return new CreateOrderTransaction(typeBytes, creator, have, want, amount, price, feePow, timestamp, reference, signatureBytes);
+				
+		//READ AMOUNT WANT
+		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), 8);
+		position += AMOUNT_LENGTH;
+
+		return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp, reference, signatureBytes);
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -164,35 +172,20 @@ public class CreateOrderTransaction extends Transaction
 		JSONObject order = new JSONObject();
 		order.put("have", this.order.getHave());
 		order.put("want", this.order.getWant());
-		order.put("amount", this.order.getAmount().toPlainString());
-		order.put("price", this.order.getPrice().toPlainString());
+		order.put("amountHave", this.order.getAmountHave().toPlainString());
+		order.put("amountWant", this.order.getAmountWant().toPlainString());
+		order.put("price", this.order.getPriceCalc().toPlainString());
 		
 		transaction.put("order", order);
 				
 		return transaction;	
 	}
 	
-	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	//@Override
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
-		byte[] data = new byte[0];
-		
-		//WRITE TYPE
-		//byte[] typeBytes = Ints.toByteArray(TYPE_ID);
-		//typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
-		data = Bytes.concat(data, this.typeBytes);
-		
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		
-		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
-		
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
-		
+		byte[] data = super.toBytes(withSign, releaserReference);
+				
 		//WRITE HAVE
 		byte[] haveBytes = Longs.toByteArray(this.order.getHave());
 		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
@@ -203,25 +196,17 @@ public class CreateOrderTransaction extends Transaction
 		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
 		data = Bytes.concat(data, wantBytes);
 		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.order.getAmount().unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		//WRITE AMOUNT HAVE
+		byte[] amountHaveBytes = this.order.getAmountHave().unscaledValue().toByteArray();
+		byte[] fill_H = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
+		amountHaveBytes = Bytes.concat(fill_H, amountHaveBytes);
+		data = Bytes.concat(data, amountHaveBytes);
 		
-		//WRITE PRICE
-		byte[] priceBytes = this.order.getPrice().unscaledValue().toByteArray();
-		fill = new byte[PRICE_LENGTH - priceBytes.length];
-		priceBytes = Bytes.concat(fill, priceBytes);
-		data = Bytes.concat(data, priceBytes);
-		
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
-
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
+		//WRITE AMOUNT WANT
+		byte[] amountWantBytes = this.order.getAmountWant().unscaledValue().toByteArray();
+		byte[] fill_W = new byte[AMOUNT_LENGTH - amountWantBytes.length];
+		amountWantBytes = Bytes.concat(fill_W, amountWantBytes);
+		data = Bytes.concat(data, amountWantBytes);
 		
 		return data;
 	}
@@ -235,47 +220,55 @@ public class CreateOrderTransaction extends Transaction
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK IF ASSETS NOT THE SAME
-		if(this.order.getHave() == this.order.getWant())
+		long have = this.order.getHave();
+		if(have == this.order.getWant())
 		{
 			return HAVE_EQUALS_WANT;
 		}
 		
 		//CHECK IF AMOUNT POSITIVE
-		if(this.order.getAmount().compareTo(BigDecimal.ZERO) <= 0)
+		if(this.order.getAmountHave().compareTo(BigDecimal.ZERO) <= 0
+				|| this.order.getAmountWant().compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
-		
-		//CHECCK IF PRICE POSITIVE
-		if(this.order.getPrice().compareTo(BigDecimal.ZERO) <= 0)
+				
+		//CHECK IF WANT EXISTS
+		AssetCls haveAsset = this.order.getHaveAsset(db);
+		if(haveAsset == null)
 		{
-			return NEGATIVE_PRICE;
+			//WANT DOES NOT EXIST
+			return ASSET_DOES_NOT_EXIST;
 		}
-		
-		//REMOVE FEE
-		DBSet fork = db.fork();
-		super.process(fork, false);
-		
+
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-		if(this.creator.getConfirmedBalance(this.order.getHave(), fork).compareTo(this.order.getAmount()) == -1)
-		{
-			return NO_BALANCE;
-		}
-		
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, fork).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
+		if (FEE_KEY == have) {
+			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(
+					this.order.getAmountHave().add(this.fee)) == -1)
+			{
+				return NO_BALANCE;
+			}
+		} else {			
+			//CHECK IF SENDER HAS ENOUGH FEE BALANCE
+			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+			{
+				return NOT_ENOUGH_FEE;
+			}
+			if(this.creator.getConfirmedBalance(have, db).compareTo(
+					this.order.getAmountHave()) == -1)
+			{
+				return NO_BALANCE;
+			}
 		}
 		
 		//CHECK IF HAVE IS NOT DIVISBLE
-		if(!this.order.getHaveAsset(db).isDivisible())
+		if(!haveAsset.isDivisible())
 		{
 			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if(this.order.getAmount().stripTrailingZeros().scale() > 0)
+			if(this.order.getAmountHave().stripTrailingZeros().scale() > 0)
 			{
 				//AMOUNT HAS DECIMALS
 				return INVALID_AMOUNT;
@@ -289,24 +282,18 @@ public class CreateOrderTransaction extends Transaction
 			//WANT DOES NOT EXIST
 			return ASSET_DOES_NOT_EXIST;
 		}
-		
 		//CHECK IF WANT IS NOT DIVISIBLE
 		if(!wantAsset.isDivisible())
 		{
-			//CHECK IF TOTAL RETURN DOES NOT HAVE ANY DECIMALS
-			if(this.order.getAmount().multiply(this.order.getPrice()).stripTrailingZeros().scale() > 0)
+			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
+			if(this.order.getAmountWant().stripTrailingZeros().scale() > 0)
 			{
+				//AMOUNT HAS DECIMALS
 				return INVALID_RETURN;
 			}
 		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+								
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN
@@ -369,7 +356,7 @@ public class CreateOrderTransaction extends Transaction
 			return BigDecimal.ZERO.setScale(8);
 		}
 		
-		return BigDecimal.ZERO;
+		return BigDecimal.ZERO.setScale(8);
 	}
 
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
@@ -377,7 +364,7 @@ public class CreateOrderTransaction extends Transaction
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(), this.order.getAmount());
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(), this.order.getAmountHave());
 		
 		return assetAmount;
 	}

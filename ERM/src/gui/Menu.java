@@ -1,59 +1,44 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import core.transaction.Transaction;
-import database.wallet.TransactionMap;
 import gui.AccountsFrame;
-//import gui.SendMoneyFrame;
-import gui.SendAssetFrame;
-import gui.items.imprints.ImprintsPanel;
-import gui.items.persons.AllPersonsPanel;
-import gui.items.persons.AllPersonsFrame;
-import gui.items.persons.IssuePersonFrame;
-import gui.items.persons.MyPersonsPanel;
-import gui.items.persons.PersonsPanel;
-import gui.items.persons.SearchPersons;
-import gui.items.statuses.AllStatusesFrame;
-import gui.items.statuses.AllStatusesPanel;
-import gui.items.statuses.IssueStatusPanel;
-import gui.models.WalletTransactionsTableModel;
+import gui.Send_Frame;
+import gui.items.assets.IssueAssetDialog;
+import gui.items.assets.MainAssetsFrame;
+import gui.items.imprints.MainImprintsFrame;
+import gui.items.persons.IssuePersonDialog;
+import gui.items.persons.MainPersonsFrame;
+import gui.items.persons.RIPPersonFrame;
+import gui.items.statuses.MainStatusesFrame;
+import gui.items.statuses.IssueStatusDialog;
+import gui.items.unions.IssueUnionDialog;
+import gui.items.unions.MainUnionsFrame;
+import gui.records.RecordsFrame;
+import gui.records.VouchRecordDialog;
 import gui.settings.SettingsFrame;
-import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import settings.Settings;
 import utils.URLViewer;
@@ -67,7 +52,6 @@ public class Menu extends JMenuBar
 	public static JMenuItem lockItem;
 	private ImageIcon lockedIcon;
 	private ImageIcon unlockedIcon;
-	private JFrame parent;
 
 	private static final Logger LOGGER = Logger.getLogger(Menu.class);
 
@@ -75,7 +59,8 @@ public class Menu extends JMenuBar
 	{
 		super();
 		
-		this.parent = parent;
+		//this.parent = parent;
+				
 		//FILE MENU
         JMenu fileMenu = new JMenu(Lang.getInstance().translate("File"));
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));
@@ -102,14 +87,6 @@ public class Menu extends JMenuBar
         personsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons menu"));
         this.add(personsMenu);
 
-        JMenu statusesMenu = new JMenu(Lang.getInstance().translate("Statuses"));
-        statusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statuses menu"));
-        this.add(statusesMenu);
-
-        JMenu unionsMenu = new JMenu(Lang.getInstance().translate("Unions"));
-        unionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Unions menu"));
-        this.add(unionsMenu);
-
         JMenu assetsMenu = new JMenu(Lang.getInstance().translate("Assets"));
         assetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assets menu"));
         this.add(assetsMenu);
@@ -117,6 +94,14 @@ public class Menu extends JMenuBar
         JMenu imprintsMenu = new JMenu(Lang.getInstance().translate("Imprints"));
         imprintsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Imprints menu"));
         this.add(imprintsMenu);
+
+        JMenu unionsMenu = new JMenu(Lang.getInstance().translate("Unions"));
+        unionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Unions menu"));
+        this.add(unionsMenu);
+
+        JMenu statusesMenu = new JMenu(Lang.getInstance().translate("Statuses"));
+        statusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statuses menu"));
+        this.add(statusesMenu);
 
         JMenu recordsMenu = new JMenu(Lang.getInstance().translate("Records"));
         recordsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records menu"));
@@ -304,7 +289,8 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        	//	selectOrAdd( new AllPersonsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainPersonsFrame(), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
@@ -319,25 +305,56 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssuePersonDialog();
         		
         	}
         });
         personsMenu.add(issuePersonMenu);  
 
+        // issue Person menu
+        JMenuItem ripPersonMenu = new JMenuItem(Lang.getInstance().translate("R.I.P. Person"));
+        ripPersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("RIP Person"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        ripPersonMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		selectOrAdd( new RIPPersonFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        personsMenu.addSeparator();  
+        personsMenu.add(ripPersonMenu);  
+
         // DEALS
 
-        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Asset & Message"));
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)
         	{
         		// 
-        		selectOrAdd(new SendAssetFrame(null, null), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd(new Send_Frame(null, null), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        dealsMenu.add(dealsMenuSendMessage);     
+        dealsMenu.add(dealsMenuSendMessage);
+        
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        dealsMenuVouchRecord.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		new VouchRecordDialog();
+        	}
+        });
+        dealsMenu.add(dealsMenuVouchRecord);
+        
 
         // Imprints menu
         JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
@@ -346,7 +363,8 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd(new ImprintsPanel(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd(new MainImprintsFrame(), MainFrame.desktopPane.getAllFrames());
         	}
         });
         imprintsMenu.add(imprintsMenuList);     
@@ -373,12 +391,29 @@ public class Menu extends JMenuBar
         	public void actionPerformed(ActionEvent e)
         	{
              
-        		selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
         		
         	}
         });
         statusesMenu.add(allStatusesMenu);  
         statusesMenu.addSeparator();
+        
+        JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
+        assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
+   //     allStatusesMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        assignStatusMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new AllStatusesFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        statusesMenu.add(assignStatusMenu);  
+        statusesMenu.addSeparator();
+
         
         JMenuItem issueStatusesMenu = new JMenuItem(Lang.getInstance().translate("New"));
         issueStatusesMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("New Status"));
@@ -390,7 +425,7 @@ public class Menu extends JMenuBar
              
         		JInternalFrame frame = new JInternalFrame(Lang.getInstance().translate("Issue new Status"),true, true, true, true);
         		//frame.getContentPane().add(new AllStatusesPanel());
-        		frame.getContentPane().add(new IssueStatusPanel(frame));
+        		frame.getContentPane().add(new IssueStatusDialog());
         		frame.setName("new status");
         		frame.pack();
         		frame.setLocation(50, 60);
@@ -401,9 +436,75 @@ public class Menu extends JMenuBar
         });
         statusesMenu.add(issueStatusesMenu);  
 
+        ///// UNIONS
+        JMenuItem allUnionsMenu = new JMenuItem(Lang.getInstance().translate("All Unions"));
+        allUnionsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Unions"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        allUnionsMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new AllUnionsFrame(parent), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainUnionsFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        unionsMenu.add(allUnionsMenu);
+        statusesMenu.addSeparator();
+        
+        // issue Person menu
+        JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Establish"));
+        issueUnionMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Establish a new Union"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueUnionMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssueUnionDialog();
+        		
+        	}
+        });
+        unionsMenu.add(issueUnionMenu);  
+
+        // ASSETS
+        // ALL ASSETS
+        JMenuItem allAssetsMenu = new JMenuItem(Lang.getInstance().translate("All assets"));
+        allAssetsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All assets"));
+   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        allAssetsMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd( new MainAssetsFrame(), MainFrame.desktopPane.getAllFrames());
+        		
+        	}
+        });
+        assetsMenu.add(allAssetsMenu);  
+        statusesMenu.addSeparator();
+
+        // issue asset menu
+        JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
+        issueAssetMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue asset"));
+        // searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        issueAssetMenu.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+             
+        		//selectOrAdd( new IssueUnionFrame(), MainFrame.desktopPane.getAllFrames());
+        		new IssueAssetDialog();
+        		
+        	}
+        });
+        assetsMenu.add(issueAssetMenu);  
+
         
 	}
-	
 	
 	// подпрограмма выводит в панели окно или передает фокус если окно уже открыто
 	// item открываемое окно
@@ -439,8 +540,6 @@ public class Menu extends JMenuBar
 				e1.printStackTrace();
 			}
 		}	
-		
-		
 	
 	}
 }

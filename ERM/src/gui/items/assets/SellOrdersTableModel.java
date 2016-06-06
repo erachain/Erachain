@@ -52,7 +52,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		for (Pair<BigInteger, Order> orderPair : this.orders) 	
 		{
 			sumAmount = sumAmount.add(orderPair.getB().getAmountLeft());
-			sumTotal = sumTotal.add(orderPair.getB().getPrice().multiply(orderPair.getB().getAmountLeft()).setScale(8, RoundingMode.DOWN));
+			sumTotal = sumTotal.add(orderPair.getB().getPriceCalc().multiply(orderPair.getB().getAmountLeft()).setScale(8, RoundingMode.DOWN));
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				if(row == this.orders.size())
 					return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 				
-				return NumberAsString.getInstance().numberAsString(order.getPrice());
+				return NumberAsString.getInstance().numberAsString(order.getPriceCalc());
 			
 			case COLUMN_AMOUNT:
 				
@@ -131,7 +131,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				if(row == this.orders.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 	
-				return NumberAsString.getInstance().numberAsString(order.getPrice().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN));
+				return NumberAsString.getInstance().numberAsString(order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN));
 					
 		}
 		

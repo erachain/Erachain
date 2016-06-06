@@ -15,7 +15,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 //import core.transaction.GenesisTransaction;
-import core.transaction.PaymentTransaction;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 
@@ -45,7 +45,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 		
@@ -95,7 +95,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 
@@ -111,7 +111,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB
@@ -146,7 +146,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
+		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), databaseSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 
@@ -163,7 +163,7 @@ public class GeneratorTests {
 			long timestamp = NTP.getTime();
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new PaymentTransaction(generator, recipient, BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB

@@ -35,28 +35,28 @@ public class MultiPaymentTransaction extends Transaction {
 
 	private List<Payment> payments;
 	
-	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 		this.payments = payments;
 	}
-	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, payments, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// as pack
-	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte[] reference, byte[] signature) 
+	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, payments, (byte)0, 0l, reference);
 		this.signature = signature;
 	}
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, byte[] reference) 
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, payments, feePow, timestamp, reference);
 	}
-	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, byte[] reference)
+	public MultiPaymentTransaction(PublicKeyAccount creator, List<Payment> payments, Long reference)
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, payments, (byte)0, 0l, reference);		
 	}
@@ -92,7 +92,7 @@ public class MultiPaymentTransaction extends Transaction {
 		return transaction;	
 	}
 		
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
 		
@@ -116,10 +116,11 @@ public class MultiPaymentTransaction extends Transaction {
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
@@ -173,7 +174,7 @@ public class MultiPaymentTransaction extends Transaction {
 	
 
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -211,7 +212,7 @@ public class MultiPaymentTransaction extends Transaction {
 	//VALIDATE
 	
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
 		//CHECK PAYMENTS SIZE
@@ -284,9 +285,9 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, db);
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(Arrays.equals(payment.getRecipient().getLastReference(db), new byte[0]))
+			if(payment.getRecipient().getLastReference(db) == null)
 			{
-				payment.getRecipient().setLastReference(this.signature, db);
+				payment.getRecipient().setLastReference(this.timestamp, db);
 			}		
 		}
 	}
@@ -303,7 +304,7 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.orphan(this.creator, db);
 								
 			//UPDATE REFERENCE OF RECIPIENT
-			if(Arrays.equals(payment.getRecipient().getLastReference(db), this.signature))
+			if(payment.getRecipient().getLastReference(db).equals(this.timestamp))
 			{
 				payment.getRecipient().removeReference(db);
 			}

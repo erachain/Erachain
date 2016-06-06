@@ -18,6 +18,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 //import database.BalanceMap;
 import database.DBSet;
+import utils.NumberAsString;
 
 public abstract class TransactionAmount extends Transaction {
 
@@ -31,20 +32,34 @@ public abstract class TransactionAmount extends Transaction {
 	protected long key = Transaction.FEE_KEY;
 
 	// need for calculate fee
-	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference, byte[] signature)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
 		super(typeBytes, name, creator, feePow, timestamp, reference, signature);
 		this.recipient = recipient;
-		this.amount = amount;
+
+		if (amount == null || amount.equals(BigDecimal.ZERO)) {
+			// set version to 1
+			typeBytes[1] = (byte)(typeBytes[1] | (byte)-128);
+		} else {
+			this.amount = amount;
+		}
+		
 		this.key = key;
 	}
 
 	// need for calculate fee by feePow into GUI
-	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, byte[] reference)
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference)
 	{
 		super(typeBytes, name, creator, feePow, timestamp, reference);
 		this.recipient = recipient;
-		this.amount = amount;
+
+		if (amount == null || amount.equals(BigDecimal.ZERO)) {
+			// set version to 1
+			typeBytes[1] = (byte)(typeBytes[1] | (byte)-128);
+		} else {
+			this.amount = amount;
+		}
+
 		this.key = key;
 	}
 
@@ -68,6 +83,7 @@ public abstract class TransactionAmount extends Transaction {
 
 	@Override
 	public BigDecimal getAmount() {
+		//return this.amount == null? BigDecimal.ZERO: this.amount;
 		return this.amount;
 	}
 	public String getStr()
@@ -85,14 +101,18 @@ public abstract class TransactionAmount extends Transaction {
 	public BigDecimal getAmount(String address) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
 		
-		if(address.equals(this.creator.getAddress()))
+		if (this.amount != null)
 		{
-			//IF SENDER
-			amount = amount.subtract(this.amount);
-		} else if(address.equals(this.recipient.getAddress()))
-		{
-			//IF RECIPIENT
-			amount = amount.add(this.amount);
+
+			if(address.equals(this.creator.getAddress()))
+			{
+				//IF SENDER
+				amount = amount.subtract(this.amount);
+			} else if(address.equals(this.recipient.getAddress()))
+			{
+				//IF RECIPIENT
+				amount = amount.add(this.amount);
+			}
 		}
 
 		return amount;
@@ -103,9 +123,20 @@ public abstract class TransactionAmount extends Transaction {
 		return getAmount(address);
 	}
 	
+	@Override
+	public String viewAmount(Account account) {
+		String address = account.getAddress();
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+	@Override
+	public String viewAmount(String address) {
+		return NumberAsString.getInstance().numberAsString(getAmount(address));
+	}
+
+	
 	//PARSE/CONVERT
 	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -113,16 +144,18 @@ public abstract class TransactionAmount extends Transaction {
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 		
-		//WRITE KEY
-		byte[] keyBytes = Longs.toByteArray(this.key);
-		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
-		data = Bytes.concat(data, keyBytes);
-		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		if ( this.amount != null ) {
+			//WRITE KEY
+			byte[] keyBytes = Longs.toByteArray(this.key);
+			keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+			data = Bytes.concat(data, keyBytes);
+			
+			//WRITE AMOUNT
+			byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+			byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+			amountBytes = Bytes.concat(fill, amountBytes);
+			data = Bytes.concat(data, amountBytes);
+		}
 				
 		return data;
 	}
@@ -133,8 +166,10 @@ public abstract class TransactionAmount extends Transaction {
 		JSONObject transaction = super.getJsonBase();
 		
 		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("asset", this.key);
-		transaction.put("amount", this.amount.toPlainString());
+		if (this.amount != null) {
+			transaction.put("asset", this.key);
+			transaction.put("amount", this.amount.toPlainString());
+		}
 		
 		return transaction;
 	}
@@ -168,8 +203,14 @@ public abstract class TransactionAmount extends Transaction {
 		return false;
 	}
 
+	public int getDataLength(boolean asPack) {
+		// IF VERSION 1 (amount = null)
+		return (asPack?BASE_LENGTH_AS_PACK:BASE_LENGTH) 
+				- (this.typeBytes[1]<0?(KEY_LENGTH + AMOUNT_LENGTH):0);
+	}
+
 	@Override // - fee + balance - calculate here
-	public int isValid(DBSet db, byte[] releaserReference) {
+	public int isValid(DBSet db, Long releaserReference) {
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
@@ -178,13 +219,14 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(releaserReference==null ? this.creator.getLastReference(db) : releaserReference, this.reference))
-		{
+		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		if (reference.compareTo(this.reference) != 0)
 			return INVALID_REFERENCE;
-		}
+		if (reference.compareTo(this.timestamp) >= 0)
+			return INVALID_TIMESTAMP;
 
 		//CHECK IF AMOUNT IS POSITIVE
-		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
+		if(this.amount != null && this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
@@ -219,14 +261,14 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		*/
 
-		if (this.key != FEE_KEY) {
+		if (this.key != FEE_KEY || this.amount == null) {
 			// CHECK FEE
 			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-			if(this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
+			if(this.amount != null && this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
 			{
 				return NO_BALANCE;
 			}
@@ -243,46 +285,49 @@ public abstract class TransactionAmount extends Transaction {
 
 	public void process(DBSet db, boolean asPack) {
 
-		//UPDATE SENDER
 		super.process(db, asPack);
-
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
 						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
-		
-		if (!asPack) {
-
-			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
-			if(this.key == FEE_KEY)
-			{
-				if(Arrays.equals(this.recipient.getLastReference(db), new byte[0]))
+		if (this.amount != null) {
+			//UPDATE SENDER
+			this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
+			//UPDATE RECIPIENT
+			this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
+			
+			if (!asPack) {
+	
+				//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
+				if(this.key == FEE_KEY)
 				{
-					this.recipient.setLastReference(this.signature, db);
+					if(this.recipient.getLastReference(db) == null)
+					{
+						this.recipient.setLastReference(this.timestamp, db);
+					}
 				}
 			}
 		}
-
 	}
 
 	public void orphan(DBSet db, boolean asPack) {
-		//UPDATE SENDER
+
 		super.orphan(db, asPack);
 		
-		this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
-						
-		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
-		
-		if (!asPack) {
+		if (this.amount != null) {
+			//UPDATE SENDER
+			this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
 			
-			//UPDATE REFERENCE OF RECIPIENT
-			if(this.key == FEE_KEY)
-			{
-				if(Arrays.equals(this.recipient.getLastReference(db), this.signature))
+			//UPDATE RECIPIENT
+			this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
+			
+			if (!asPack) {
+				
+				//UPDATE REFERENCE OF RECIPIENT
+				if(this.key == FEE_KEY)
 				{
-					this.recipient.removeReference(db);
-				}	
+					if( this.recipient.getLastReference(db).equals(this.timestamp) )
+					{
+						this.recipient.removeReference(db);
+					}	
+				}
 			}
 		}
 	}
@@ -291,18 +336,17 @@ public abstract class TransactionAmount extends Transaction {
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		if (this.amount != null) {
+
+			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+			
+			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
+			assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		}
 		
 		return assetAmount;
 	}
 
 	//public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
 	
-	public int calcBaseFee() {
-		return calcCommonFee();
-	}
-
 }

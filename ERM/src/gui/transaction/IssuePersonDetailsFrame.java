@@ -45,6 +45,17 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 		txtAreaDescription.setEditable(false);
 		MenuPopupUtil.installContextMenu(txtAreaDescription);
 		this.add(txtAreaDescription, detailGBC);		
+				
+		//LABEL Birthday
+		++labelGBC.gridy;
+		JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
+		this.add(birthdayLabel, labelGBC);
+				
+		//Birthday
+		++detailGBC.gridy;
+		JTextField birtday = new JTextField(new Date(person.getBirthday()).toString());
+		birtday.setEditable(false);
+		this.add(birtday, detailGBC);	
 		
 		//LABEL GENDER
 		++labelGBC.gridy;
@@ -55,20 +66,8 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 		++detailGBC.gridy;
 		JTextField gender = new JTextField(person.getGender());
 		gender.setEditable(false);
-		//MenuPopupUtil.installContextMenu(gender);
 		this.add(gender, detailGBC);	
-		
-		//LABEL Birthday
-		++labelGBC.gridy;
-		JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
-		this.add(birthdayLabel, labelGBC);
-				
-		//Birthday
-		++detailGBC.gridy;
-		JTextField birtday = new JTextField(new Date(person.getBirthday()).toString());
-		gender.setEditable(false);
-		this.add(birtday, detailGBC);	
-				           
+
         //PACK
 		this.pack();
         this.setResizable(false);

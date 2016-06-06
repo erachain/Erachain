@@ -30,6 +30,10 @@ import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
 import utils.BlExpUnit;
 
+// block.id + tx.ID in this block -> transaction
+// ++ sender_txs
+// ++ recipient_txs
+// ++ address_type_txs
 public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transaction>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -97,8 +101,6 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 				return ret;
 			}
 		});
-		
-
 		
 		this.typeKey = database.createTreeSet("address_type_txs")
 				.comparator(Fun.COMPARATOR)

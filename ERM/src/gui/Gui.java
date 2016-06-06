@@ -21,7 +21,9 @@ import utils.SysTray;
 
 public class Gui extends JFrame{
 
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2717571093561259483L;
+
 
 	private static Gui maingui;
 	private MainFrame mainframe;

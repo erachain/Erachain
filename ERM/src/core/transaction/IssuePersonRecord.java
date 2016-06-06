@@ -34,11 +34,11 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	private static final String NAME_ID = "Issue Person";
 	
 	
-	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference) 
+	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference);		
 	}
-	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);		
 	}
@@ -46,7 +46,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	{
 		super(typeBytes, NAME_ID, creator, person, (byte)0, 0l, null, signature);		
 	}
-	public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, person, feePow, timestamp, reference, signature);
 	}
@@ -54,7 +54,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, person, (byte)0, 0l, null, signature);
 	}
-	public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, byte[] reference) 
+	public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID,0,0,0}, creator, person, feePow, timestamp, reference);
 	}
@@ -68,15 +68,16 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	//public String getName() { return "Issue Person"; }
 	
 	//@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 						
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) return res;
 		
 		PersonCls person = (PersonCls) this.getItem();
-		if (person.getBirthLatitude() > 180 || person.getBirthLatitude() < -180) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
-		if (person.getBirthLongitude() > 90 || person.getBirthLongitude() < -90) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
+		// birthLatitude -90..90; birthLongitude -180..180
+		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
+		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
 		if (person.getRace().length() <1 || person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
 		if (person.getGender() < 0 || person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
 		if (person.getSkinColor().length() <1 || person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
@@ -99,7 +100,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 	//PARSE CONVERT
 	
-	public static Transaction Parse(byte[] data, byte[] releaserReference) throws Exception
+	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{	
 
 		boolean asPack = releaserReference != null;
@@ -123,10 +124,11 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			position += TIMESTAMP_LENGTH;
 		}
 
-		byte[] reference = null;
+		Long reference = null;
 		if (!asPack) {
 			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+			reference = Longs.fromByteArray(referenceBytes);	
 			position += REFERENCE_LENGTH;
 		}
 		

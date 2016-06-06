@@ -3,7 +3,7 @@ package gui;
 import gui.items.assets.AssetsComboBoxModel;
 import gui.items.ComboBoxModelItems;
 import gui.models.AccountsComboBoxModel;
-import gui.models.MessagesTableModel;
+import gui.models.Send_TableModel;
 import lang.Lang;
 import ntp.NTP;
 
@@ -289,7 +289,7 @@ public class RecordNotePanel extends JPanel
 				
 		//MESSAGES HISTORY TABLE
 
-    	table = new MessagesTableModel();
+    	table = new Send_TableModel();
     	
     	table.setTableHeader(null);
     	table.setSelectionBackground(new Color(209, 232, 255, 255));

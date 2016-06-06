@@ -35,7 +35,7 @@ public class TestRecGenesisAsset {
 
 	static Logger LOGGER = Logger.getLogger(TestRecGenesisAsset.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	long FEE_KEY = 1l;
 	byte FEE_POWER = (byte)1;
@@ -59,7 +59,7 @@ public class TestRecGenesisAsset {
 		db = DBSet.createEmptyDatabaseSet();
 		
 		//CREATE ASSET
-		asset = GenesisBlock.makeAssetVenture(0);
+		asset = GenesisBlock.makeAsset(0);
 		//byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
 		//assertEquals(rawAsset.length, asset.getDataLength());
 				
@@ -254,7 +254,7 @@ public class TestRecGenesisAsset {
 				
 		//CHECK REFERENCE SENDER
 		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
-		assertEquals(true, Arrays.equals(new byte[0], maker.getLastReference(db)));
+		assertEquals(null, maker.getLastReference(db));
 
 	}
 
@@ -419,7 +419,7 @@ public class TestRecGenesisAsset {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(true, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(db)));
+		assertEquals(assetTransfer.getTimestamp(), recipient.getLastReference(db));
 	}
 	
 	@Test
@@ -452,7 +452,7 @@ public class TestRecGenesisAsset {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(false, Arrays.equals(assetTransfer.getSignature(), recipient.getLastReference(db)));
+		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));
 	}
 	
 }

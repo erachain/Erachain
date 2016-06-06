@@ -31,24 +31,24 @@ public class SellNameTransaction extends Transaction
 	private PublicKeyAccount creator;
 	private NameSale nameSale;
 	
-	public SellNameTransaction(byte[] typeBytes, PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
+	public SellNameTransaction(byte[] typeBytes, PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
 		this.creator = creator;
 		this.nameSale = nameSale;
 	}
-	public SellNameTransaction(byte[] typeBytes, PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public SellNameTransaction(byte[] typeBytes, PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(typeBytes, creator, nameSale, feePow, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference, byte[] signature) 
+	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, nameSale, feePow, timestamp, reference, signature);
 	}
-	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, byte[] reference) 
+	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, Long reference) 
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, nameSale, feePow, timestamp, reference);
 	}
@@ -83,7 +83,8 @@ public class SellNameTransaction extends Transaction
 		position += TIMESTAMP_LENGTH;
 		
 		//READ REFERENCE
-		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+		Long reference = Longs.fromByteArray(referenceBytes);	
 		position += REFERENCE_LENGTH;
 		
 		//READ CREATOR
@@ -122,7 +123,7 @@ public class SellNameTransaction extends Transaction
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference) 
 	{
 		byte[] data = new byte[0];
 		
@@ -135,7 +136,13 @@ public class SellNameTransaction extends Transaction
 		data = Bytes.concat(data, timestampBytes);
 		
 		//WRITE REFERENCE
-		data = Bytes.concat(data, this.reference);
+		//WRITE REFERENCE - in any case as Pack or not
+		if (this.reference != null) {
+			// NULL in imprints
+			byte[] referenceBytes = Longs.toByteArray(this.reference);
+			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+			data = Bytes.concat(data, referenceBytes);
+		}
 		
 		//WRITE CREATOR
 		data = Bytes.concat(data, this.creator.getPublicKey());
@@ -162,8 +169,8 @@ public class SellNameTransaction extends Transaction
 	
 	//VALIDATE
 
-	@Override
-	public int isValid(DBSet db, byte[] releaserReference) 
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -207,20 +214,8 @@ public class SellNameTransaction extends Transaction
 		{
 			return INVALID_AMOUNT;
 		}
-				
-		//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
-		//CHECK IF REFERENCE IS OK
-		if(!Arrays.equals(this.creator.getLastReference(db), this.reference))
-		{
-			return INVALID_REFERENCE;
-		}
-				
-		return VALIDATE_OK;
+
+		return super.isValid(db, releaserReference);
 	}
 	
 	//PROCESS/ORPHAN
@@ -232,7 +227,7 @@ public class SellNameTransaction extends Transaction
 		super.process(db, asPack);
 										
 		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.signature, db);
+		//this.creator.setLastReference(this.signature, db);
 				
 		//INSERT INTO DATABASE
 		db.getNameExchangeMap().add(this.nameSale);
@@ -245,7 +240,7 @@ public class SellNameTransaction extends Transaction
 		super.orphan(db, asPack);
 										
 		//UPDATE REFERENCE OF CREATOR
-		this.creator.setLastReference(this.reference, db);
+		//this.creator.setLastReference(this.reference, db);
 		
 		//DELETE FORM DATABASE
 		db.getNameExchangeMap().delete(this.nameSale);

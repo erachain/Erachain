@@ -15,7 +15,6 @@ import database.Issue_ItemMap;
 
 public class IssueNoteMap extends Issue_ItemMap 
 {
-	//private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	public IssueNoteMap(DBSet databaseSet, DB database)
 	{
@@ -26,51 +25,4 @@ public class IssueNoteMap extends Issue_ItemMap
 	{
 		super(parent);
 	}
-	/*
-	
-	protected void createIndexes(DB database){}
-
-	@Override
-	protected Map<byte[], Long> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap("IssueNoteOrphanData")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
-				.makeOrGet();
-	}
-
-	@Override
-	protected Map<byte[], Long> getMemoryMap() 
-	{
-		return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
-	}
-
-	@Override
-	protected Long getDefaultValue() 
-	{
-		return -1l;
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	
-	public Long get(Transaction transaction)
-	{
-		return this.get(transaction.getSignature());
-	}
-	
-	public void set(Transaction transaction, Long key)
-	{
-		this.set(transaction.getSignature(), key);
-	}
-	
-	public void delete(Transaction transaction)
-	{
-		this.delete(transaction.getSignature());
-	}
-	*/
 }

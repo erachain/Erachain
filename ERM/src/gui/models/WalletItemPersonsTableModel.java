@@ -34,9 +34,10 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		return this.persons;
 	}
 	
-	//public Class<? extends Object> getColumnClass(int c) {     // set column type
-    //    return getValueAt(0, c).getClass();
-    //}
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? null : item.getClass();
+    }
 	
 	public PersonCls getItem(int row)
 	{

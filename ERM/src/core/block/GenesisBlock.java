@@ -30,20 +30,23 @@ import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteTransaction;
+import core.transaction.GenesisIssueNoteRecord;
 import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.GenesisIssueStatusTransaction;
+import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import database.DBSet;
+import gui.Gui;
+import lang.Lang;
 import settings.Settings;
 import utils.Pair;
+import utils.SysTray;
 
 public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
-	private static long genesisGeneratingBalance = 12000000L; // starting max volume for generating	
-	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
+	private static long genesisGeneratingBalance = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
+	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
 
 	private String testnetInfo; 
 	
@@ -57,7 +60,6 @@ public class GenesisBlock extends Block{
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
-		Long timestamp = genesisTimestamp;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
@@ -88,7 +90,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account(address);
 
 				user = new PersonHuman(recipient,
-						"UNKNOWN", "1966-08-21 10:10:10.0", (byte)1, "-", (float)0.1330, (float)1.9224,
+						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.1330, (float)1.9224,
 						"-", "-", "-", (int) 188, "-");
 				
 				// SEND GENESIS ASSETS
@@ -96,7 +98,7 @@ public class GenesisBlock extends Block{
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
+				this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
 				this.addTransaction(new GenesisCertifyPersonRecord(recipient, nonce++));
@@ -114,32 +116,69 @@ public class GenesisBlock extends Block{
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
-							"Ермолаев Дмитрий Сергеевич", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
-							"Ермолаев Александр Сергеевич", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Ермолаев, Александр Сергеевич", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
-							"Скорняков Александр Викторович", "1963-08-21 10:10:10.0", (byte)1, "Slav", (float)1.1330, (float)13.9224,
+							"Скорняков, Александр Викторович", "1963-08-21", null,
+							(byte)1, "европеец-славянин", (float)1.1330, (float)13.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
 				);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
 					Arrays.asList(1000, new PersonHuman(new Account("7FoC1wAtbR9Z5iwtcw4Ju1u2DnLBQ1TNS7"),
-							"Симанков Дмитрий", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Симанков, Дмитрий", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("78A24nTM2PPdpjLF2JWbghPDUhPK1zQ51Y"),
-							"Добрышкин Сергей", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"Добрышкин, Сергей", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
-							"Бородин Олег", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, ""))					
+							"Бородин, Олег", "1966-08-21", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "")),
+					Arrays.asList(1000, new PersonHuman(new Account("7RhYgcBSLNLKURXzv85BRuzp4DBb2bpCag"),
+							"Попилин, Максим Александрович", "1984-08-10", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
+							"Кузьмин, Павел Иванович", "1970-12-08", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7JWNnyeiti3X7MYo83kDJVw15PLR7VqUjb"),
+							"Рабчевский, Павел Александрович", "1979-09-08", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7EDf4NPP6wRTmTtZcszo7ivNYhWrP2X44P"),
+							"Стриженок, Арсений Сергеевич", "1991-02-05", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7McpCLj5a27mnSpo9UGHCcDr2CysC382VJ"),
+							"Скорняков, Александр Викторович", "1956-02-01", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+					Arrays.asList(1000, new PersonHuman(new Account("7L4erwEVLbGfY6hw4o3GKMjdi8KsJjPdCt"),
+							"Симонов, Олег Вадимович", "1967-02-11", null,
+							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
 				);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					Arrays.asList(100, new PersonHuman(new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo"),
-							"неизвестный участник", "1966-08-21 10:10:10.0", (byte)1, "Slav", (float)43.1330, (float)131.9224,
+							"неизвестный участник", "1966-08-21",  null,
+							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
+					);
+			List<PersonCls> personGenesisUsers = Arrays.asList(
+					new PersonHuman(genesisGenerator,
+							"Менделеев, Дмитрий Иванович", "1834-02-08", "1907-02-02",
+							(byte)1, "европеец-славянин", (float)58.195278, (float)68.258056,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 180, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
 					);
 
 			////////// INVESTORS
@@ -279,6 +318,20 @@ public class GenesisBlock extends Block{
 
 			}
 
+			// PERSONALIZED USERS
+			for(PersonCls person: personGenesisUsers)
+			{				
+				//CREATE ISSUE PERSON TRANSACTION
+				GenesisIssuePersonRecord tr = new GenesisIssuePersonRecord(person);
+				if (Transaction.VALIDATE_OK != tr.isValid(null))
+				{
+					//throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
+					LOGGER.error(Lang.getInstance().translate("Genesis person error"));
+				}
+
+				//this.addTransaction(new GenesisIssuePersonRecord(person));
+			}
+
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(this.generateHash());
 			
@@ -288,62 +341,96 @@ public class GenesisBlock extends Block{
 	private void initItems()
 	{
 		
+		///// ASSETS
 		//CREATE ERM ASSET
-		asset0 = makeAssetVenture(Transaction.RIGHTS_KEY);
+		asset0 = makeAsset(AssetCls.ERMO_KEY);
 		this.addTransaction(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
-		asset1 = makeAssetVenture(Transaction.FEE_KEY);
+		asset1 = makeAsset(AssetCls.FEE_KEY);
 		this.addTransaction(new GenesisIssueAssetTransaction(asset1));
+		// ASSET OTHER
+		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.DEAL_KEY; i++) 
+			this.addTransaction(new GenesisIssueAssetTransaction(makeAsset(i)));
 
-		// NOTES
-		//CREATE MY NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(0)));
-		//CREATE PERSONALIZE NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(1)));
-		//CREATE ESTABLISH NOTE
-		this.addTransaction(new GenesisIssueNoteTransaction(makeAssetNote(2)));
+		///// NOTES
+		for (int i = 0; i <= NoteCls.HIRING_KEY; i++) 
+			this.addTransaction(new GenesisIssueNoteRecord(makeNote(i)));
 
-		// STATUSES
-		// ALIVE
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(0)));
-		// DEAD
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(1)));
-		// CITIZEN
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(2)));
-		// MEMBER
-		this.addTransaction(new GenesisIssueStatusTransaction(makeStatus(3)));
-		
+		///// STATUSES
+		for (int i = 0; i <= StatusCls.EXPIRED_KEY; i++) 
+			this.addTransaction(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
 	// make assets
-	public static AssetVenture makeAssetVenture(long key) 
+	public static AssetVenture makeAsset(long key) 
 	{
 		switch((int)key)
 		{
-		case (int)Transaction.FEE_KEY:
+		case (int)AssetCls.FEE_KEY:
 			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
+		case (int)AssetCls.TRUST_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
+		case (int)AssetCls.REAL_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, AssetCls.REAL_DESCR, 0L, (byte)8, true);
+		case (int)AssetCls.DEAL_KEY:
+			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
 		}
 		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, genesisGeneratingBalance, (byte)0, true);
 	}
 	// make notes
-	public static Note makeAssetNote(int key) 
+	public static Note makeNote(int key) 
 	{
 		switch(key)
 		{
-		case (int)NoteCls.PERSONALIZE_KEY:
-			return new Note(genesisGenerator, "Introduce Myself", "I, %First Name% %Middle Name% %Last Name%, date of birth \"%date of Birth%\", place of birth \"%Place of Birth%\", race \"%Race%\", height \"%height%\", color \"%Color%\", eye color \"Eye Color\", hair color \"%Hair Color%\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		case (int)NoteCls.EMPTY_KEY:
+			return new Note(genesisGenerator, "empty", "empty");
 		case (int)NoteCls.ESTABLISH_UNION_KEY:
-			return new Note(genesisGenerator, "Establish the Company", "Company name \"%Company Name%\" in country \"%Country%\"");
+			return new Note(genesisGenerator, "Establish the Union", "Union name \"%Company Name%\" in country \"%Country%\"");
+		case (int)NoteCls.MARRIAGE_KEY:
+			return new Note(genesisGenerator, "Marriage", "%person1% marries  %person2%");
+		case (int)NoteCls.HIRING_KEY:
+			return new Note(genesisGenerator, "Hiring", "Hiring to %union%");
 		}
-		return new Note(genesisGenerator, "Introduce Me", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		return new Note(genesisGenerator, "I", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 	// make notes
 	public static Status makeStatus(int key) 
 	{
-		if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		// if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		if  (key == StatusCls.AA_KEY) return new Status(genesisGenerator, "AA", "Rights level AA");
+		else if  (key == StatusCls.BB_KEY) return new Status(genesisGenerator, "BB", "Rights level AA");
+		else if  (key == StatusCls.CC_KEY) return new Status(genesisGenerator, "CC", "Rights level AA");
+		else if  (key == StatusCls.DD_KEY) return new Status(genesisGenerator, "DD", "Rights level AA");
+		else if  (key == StatusCls.EE_KEY) return new Status(genesisGenerator, "EE", "Rights level AA");
+		else if  (key == StatusCls.FF_KEY) return new Status(genesisGenerator, "FF", "Rights level AA");
+		else if  (key == StatusCls.GG_KEY) return new Status(genesisGenerator, "GG", "Rights level AA");
+		else if  (key == StatusCls.HH_KEY) return new Status(genesisGenerator, "HH", "Rights level AA");
+		
+		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "alive", "Person is alive");
+		else if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+
 		else if (key == StatusCls.CITIZEN_KEY) return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
 		else if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "I am member of %union%");
-		else return new Status(genesisGenerator, "Alive", "I am alive.");
+		else if (key == StatusCls.SPOUSE_KEY) return new Status(genesisGenerator, "Spouse", "I am spouse on %spouse%");
+
+		else if (key == StatusCls.GENERAL_KEY) return new Status(genesisGenerator, "General", "");
+		else if (key == StatusCls.MAJOR_KEY) return new Status(genesisGenerator, "Major", "");
+		else if (key == StatusCls.MINOR_KEY) return new Status(genesisGenerator, "Minor", "");
+		else if (key == StatusCls.ADMIN_KEY) return new Status(genesisGenerator, "Admin", "");
+		else if (key == StatusCls.MANAGER_KEY) return new Status(genesisGenerator, "Manager", "");
+		else if (key == StatusCls.WORKER_KEY) return new Status(genesisGenerator, "Worker", "");
+		else if (key == StatusCls.CREATOR_KEY) return new Status(genesisGenerator, "Creator", "");
+		else if (key == StatusCls.PRESIDENT_KEY) return new Status(genesisGenerator, "President", "");
+		else if (key == StatusCls.DIRECTOR_KEY) return new Status(genesisGenerator, "Director", "");
+		else if (key == StatusCls.SENATOR_KEY) return new Status(genesisGenerator, "Senator", "");
+		else if (key == StatusCls.DEPUTATE_KEY) return new Status(genesisGenerator, "Deputy", "");
+		else if (key == StatusCls.OBSERVER_KEY) return new Status(genesisGenerator, "Observer", "");
+
+		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", "");
+		else if (key == StatusCls.CONFIRMED_KEY) return new Status(genesisGenerator, "Confirmed", "");
+		else if (key == StatusCls.EXPIRED_KEY) return new Status(genesisGenerator, "Expired", "");
+
+		else return new Status(genesisGenerator, "AA", "Rights level AA");
 	}
 
 	public String getTestNetInfo() 

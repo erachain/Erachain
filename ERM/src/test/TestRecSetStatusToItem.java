@@ -13,7 +13,9 @@ import ntp.NTP;
 
 import org.junit.Test;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
+import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
@@ -39,7 +41,7 @@ public class TestRecSetStatusToItem {
 
 	static Logger LOGGER = Logger.getLogger(TestRecSetStatusToItem.class.getName());
 
-	byte[] releaserReference = null;
+	Long releaserReference = null;
 
 	boolean asPack = false;
 	long ERM_KEY = AssetCls.ERMO_KEY;
@@ -48,8 +50,8 @@ public class TestRecSetStatusToItem {
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
 	long status_key = StatusCls.ALIVE_KEY;
-	int to_date = 0;
-	long item_key;
+	Long to_date = null;
+	long personkey;
 	
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -63,7 +65,6 @@ public class TestRecSetStatusToItem {
 
 	PersonCls personGeneral;
 	PersonCls person;
-	ItemCls item;
 	IssuePersonRecord issuePersonTransaction;
 	R_SetStatusToItem setStatusTransaction;
 
@@ -75,23 +76,28 @@ public class TestRecSetStatusToItem {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getGeneratorSignature(), db);
+		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		//statusMap = db.getItemStatusMap();
 		//mapSize = statusMap.size();
 
-		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", timestamp - 12345678,
+		long birthDay =  timestamp - 12345678;
+		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
 				(byte)1, "Slav", (float)128.12345, (float)33.7777,
 				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
 		issuePersonTransaction.process(db, false);
-		item = issuePersonTransaction.getItem();
-		item_key = item.getKey();
+		person = (PersonCls)issuePersonTransaction.getItem();
+		personkey = person.getKey();
 
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, item, to_date, timestamp, maker.getLastReference(db));
+		timestamp += 100;
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db),
+				to_date, birthDay + 1000, timestamp, maker.getLastReference(db));
+		timestamp += 100;
 
 	}
 	
@@ -111,7 +117,8 @@ public class TestRecSetStatusToItem {
 		assertEquals(true, setStatusTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key, item, to_date, timestamp, maker.getLastReference(db), new byte[64]);
+		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, setStatusTransaction.isSignatureValid());
@@ -133,52 +140,56 @@ public class TestRecSetStatusToItem {
 		//CHECK DATA LENGTH
 		assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(false));
 		
+		R_SetStatusToItem parsedSetStatusTransaction = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			R_SetStatusToItem parsedSetStatusTransaction = (R_SetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, releaserReference);
+			parsedSetStatusTransaction = (R_SetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, releaserReference);
 			LOGGER.info("parsedSetStatusTransaction: " + parsedSetStatusTransaction);
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedSetStatusTransaction instanceof R_SetStatusToItem);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), parsedSetStatusTransaction.getSignature()));
-			
-			//CHECK STATUS KEY
-			assertEquals(setStatusTransaction.getKey(), parsedSetStatusTransaction.getKey());
-
-			//CHECK TO DATE
-			assertEquals(setStatusTransaction.getEndDate(), parsedSetStatusTransaction.getEndDate());
-
-			//CHECK ISSUER
-			assertEquals(setStatusTransaction.getCreator().getAddress(), parsedSetStatusTransaction.getCreator().getAddress());
-			
-			//// RESET item to FORK DB
-			parsedSetStatusTransaction.resetItemToDB(db);
-
-			//CHECK NAME
-			assertEquals(setStatusTransaction.getItem().getName(), parsedSetStatusTransaction.getItem().getName());
-				
-			//CHECK OWNER
-			assertEquals(setStatusTransaction.getItem().getCreator().getAddress(), parsedSetStatusTransaction.getItem().getCreator().getAddress());
-			
-			//CHECK DESCRIPTION
-			assertEquals(setStatusTransaction.getItem().getDescription(), parsedSetStatusTransaction.getItem().getDescription());
-							
-			//CHECK FEE
-			assertEquals(setStatusTransaction.getFee(), parsedSetStatusTransaction.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(setStatusTransaction.getReference(), parsedSetStatusTransaction.getReference()));	
-			
-			//CHECK TIMESTAMP
-			assertEquals(setStatusTransaction.getTimestamp(), parsedSetStatusTransaction.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
 			fail("Exception while parsing transaction. " + e);
 		}
+		
+		//CHECK LEN
+		assertEquals(parsedSetStatusTransaction.getDataLength(false), setStatusTransaction.getDataLength(false));
+
+		//CHECK INSTANCE
+		assertEquals(true, parsedSetStatusTransaction instanceof R_SetStatusToItem);
+		
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), parsedSetStatusTransaction.getSignature()));
+		
+		//CHECK STATUS KEY
+		assertEquals(setStatusTransaction.getKey(), parsedSetStatusTransaction.getKey());
+
+		//CHECK TO DATE
+		assertEquals(setStatusTransaction.getEndDate(), parsedSetStatusTransaction.getEndDate());
+
+		//CHECK ISSUER
+		assertEquals(setStatusTransaction.getCreator().getAddress(), parsedSetStatusTransaction.getCreator().getAddress());
+		
+		ItemCls item = ItemCls.getItem(db, setStatusTransaction.getItemType(), setStatusTransaction.getItemKey());
+		ItemCls itemParsed = ItemCls.getItem(db, parsedSetStatusTransaction.getItemType(), parsedSetStatusTransaction.getItemKey());
+		//CHECK NAME
+		assertEquals(item.getName(), itemParsed.getName());
+			
+		//CHECK OWNER
+		assertEquals(item.getCreator().getAddress(), itemParsed.getCreator().getAddress());
+		
+		//CHECK DESCRIPTION
+		assertEquals(item.getDescription(), itemParsed.getDescription());
+						
+		//CHECK FEE
+		assertEquals(setStatusTransaction.getFee(), parsedSetStatusTransaction.getFee());	
+		
+		//CHECK REFERENCE
+		assertEquals(setStatusTransaction.getReference(), parsedSetStatusTransaction.getReference());	
+		
+		//CHECK TIMESTAMP
+		assertEquals(setStatusTransaction.getTimestamp(), parsedSetStatusTransaction.getTimestamp());				
 		
 	}
 
@@ -190,9 +201,9 @@ public class TestRecSetStatusToItem {
 		init();				
 		
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
-		assertEquals(db.getPersonStatusMap().get(item.getKey()).size(),	0);
+		assertEquals(db.getPersonStatusMap().get(person.getKey()).size(),	0);
 
-		Tuple3<Integer, Integer, byte[]> statusDuration = db.getPersonStatusMap().getItem(item_key, status_key);
+		Tuple4<Long, Long, Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		assertEquals( null, statusDuration);
 
@@ -200,40 +211,41 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction.sign(maker, false);
 		setStatusTransaction.process(db, false);
 				
-		statusDuration = db.getPersonStatusMap().getItem(item_key, status_key);
+		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
-		int days = statusDuration.a;
+		Long endDate = statusDuration.a;
 		//days *= (long)86400;
-		assertEquals(days,	0);
+		assertEquals((long)endDate, (long)Long.MIN_VALUE);
 		
-		to_date = 1234;
-		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key, item, to_date, timestamp+10, maker.getLastReference(db));
+		to_date = timestamp + 1234L * 84600000L;
+		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
+				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
 
-		statusDuration = db.getPersonStatusMap().getItem(item_key, status_key);
-		days = statusDuration.a;
-		assertEquals(days,	1234);
+		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
+		endDate = statusDuration.a;
+		assertEquals(endDate,	to_date);
 		
 		
 		////// ORPHAN 2 ///////
 		setStatusTransaction_2.orphan(db, false);
 		
-		statusDuration = db.getPersonStatusMap().getItem(item_key, status_key);
-		days = statusDuration.a;
-		assertEquals(days,	0);
+		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
+		endDate = statusDuration.a;
+		assertEquals((long)endDate, (long)Long.MIN_VALUE);
 
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(setStatusTransaction.getSignature(), maker.getLastReference(db)));
+		assertEquals(setStatusTransaction.getTimestamp(), maker.getLastReference(db));
 
 		////// ORPHAN ///////
 		setStatusTransaction.orphan(db, false);
 										
-		statusDuration = db.getPersonStatusMap().getItem(item_key, status_key);
+		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		assertEquals(statusDuration, null);
 
 		//CHECK REFERENCE SENDER
-		assertEquals(true, Arrays.equals(setStatusTransaction.getReference(), maker.getLastReference(db)));
+		assertEquals(setStatusTransaction.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999
