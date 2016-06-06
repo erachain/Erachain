@@ -367,7 +367,7 @@ public class TransactionCreator
 		return this.afterCreate(issueUnionRecord, false);
 	}
 
-	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price, int feePow)
+	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -376,7 +376,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amount, price, (byte)feePow, time, creator.getLastReference(this.fork));
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte)feePow, time, creator.getLastReference(this.fork));
 		createOrderTransaction.sign(creator, false);
 								
 		//VALIDATE AND PROCESS

@@ -82,7 +82,7 @@ public class TransactionFactory {
 		case Transaction.CREATE_ORDER_TRANSACTION:
 			
 			//PARSE ORDER CREATION TRANSACTION
-			return CreateOrderTransaction.Parse(data);	
+			return CreateOrderTransaction.Parse(data, null);	
 			
 		case Transaction.CANCEL_ORDER_TRANSACTION:
 			

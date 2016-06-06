@@ -34,7 +34,9 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		
 		//HAVE
 		++detailGBC.gridy;
-		JTextField have = new JTextField(String.valueOf(orderCreation.getOrder().getHave()));
+		JTextField have = new JTextField(
+				orderCreation.getOrder().getAmountHave().toPlainString() + " x "
+				+ String.valueOf(orderCreation.getOrder().getHaveAsset().toString()));
 		have.setEditable(false);
 		MenuPopupUtil.installContextMenu(have);
 		this.add(have, detailGBC);
@@ -46,22 +48,12 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		
 		//HAVE
 		++detailGBC.gridy;
-		JTextField want = new JTextField(String.valueOf(orderCreation.getOrder().getWant()));
+		JTextField want = new JTextField(
+				orderCreation.getOrder().getAmountWant().toPlainString() + " x "
+				+ String.valueOf(orderCreation.getOrder().getWantAsset().toString()));
 		want.setEditable(false);
 		MenuPopupUtil.installContextMenu(want);
 		this.add(want, detailGBC);
-		
-		//LABEL AMOUNT
-		++labelGBC.gridy;
-		JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
-		this.add(amountLabel, labelGBC);
-				
-		//AMOUNT
-		++detailGBC.gridy;
-		JTextField amount = new JTextField(orderCreation.getOrder().getAmount().toPlainString());
-		amount.setEditable(false);
-		MenuPopupUtil.installContextMenu(amount);
-		this.add(amount, detailGBC);	
 		
 		//LABEL PRICE
 		++labelGBC.gridy;
@@ -70,7 +62,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 				
 		//PRICE
 		++detailGBC.gridy;
-		JTextField price = new JTextField(orderCreation.getOrder().getPrice().toPlainString());
+		JTextField price = new JTextField(orderCreation.getOrder().getPriceCalc().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);	

@@ -2,6 +2,7 @@ package core.item.assets;
 // 16/03
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 
 import com.google.common.primitives.Bytes;
@@ -13,23 +14,26 @@ public class Trade {
 	
 	private static final int ORDER_LENGTH = 64;
 	private static final int AMOUNT_LENGTH = 12;
-	private static final int PRICE_LENGTH = 12;
+	//private static final int PRICE_LENGTH = 12;
 	private static final int TIMESTAMP_LENGTH = 8;
-	private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + AMOUNT_LENGTH + PRICE_LENGTH + TIMESTAMP_LENGTH;
+	private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
 	
 	private BigInteger initiator;
 	private BigInteger target;
-	private BigDecimal amount;
-	private BigDecimal price;
+	private BigDecimal amountHave;
+	//private BigDecimal priceCalc;
+	private BigDecimal amountWant;
 	private long timestamp;
 	
-	public Trade(BigInteger initiator, BigInteger target, BigDecimal amount, BigDecimal price, long timestamp)
+	// make trading if two orders is seeked  
+	public Trade(BigInteger initiator, BigInteger target, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
 	{
 		this.initiator = initiator;
 		this.target = target;
-		this.amount = amount;
-		this.price = price;
+		this.amountHave = amountHave;
+		this.amountWant = amountWant;
 		this.timestamp = timestamp;
+		//this.priceCalc = this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
 	}
 
 	public BigInteger getInitiator() 
@@ -62,14 +66,18 @@ public class Trade {
 		return db.getCompletedOrderMap().get(key);
 	}
 
-	public BigDecimal getAmount() 
+	public BigDecimal getAmountHave() 
 	{
-		return this.amount;
+		return this.amountHave;
+	}
+	public BigDecimal getAmountWant() 
+	{
+		return this.amountWant;
 	}
 
-	public BigDecimal getPrice() 
+	public BigDecimal getPriceCalc() 
 	{
-		return this.price;
+		return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_UP);
 	}
 	
 	public long getTimestamp()
@@ -99,22 +107,22 @@ public class Trade {
 		BigInteger target = new BigInteger(targetBytes);
 		position += ORDER_LENGTH;
 		
-		//READ AMOUNT
-		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
+		//READ AMOUNT HAVE
+		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), 8);
 		position += AMOUNT_LENGTH;		
 		
-		//READ PRICE
-		byte[] priceBytes = Arrays.copyOfRange(data, position, position + PRICE_LENGTH);
-		BigDecimal price = new BigDecimal(new BigInteger(priceBytes), 8);
-		position += PRICE_LENGTH;		
+		//READ AMOUNT WANT
+		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), 8);
+		position += AMOUNT_LENGTH;		
 		
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);
 		position += TIMESTAMP_LENGTH;	
 		
-		return new Trade(initiator, target, amount, price, timestamp);
+		return new Trade(initiator, target, amountHave, amountWant, timestamp);
 	}	
 	
 	public byte[] toBytes()
@@ -133,17 +141,17 @@ public class Trade {
 		targetBytes = Bytes.concat(fill, targetBytes);
 		data = Bytes.concat(data, targetBytes);
 		
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+		//WRITE AMOUNT HAVE
+		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
+		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
+		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
+		data = Bytes.concat(data, amountHaveBytes);
 		
-		//WRITE PRICE
-		byte[] priceBytes = this.price.unscaledValue().toByteArray();
-		fill = new byte[PRICE_LENGTH - priceBytes.length];
-		priceBytes = Bytes.concat(fill, priceBytes);
-		data = Bytes.concat(data, priceBytes);
+		//WRITE AMOUNT WANT
+		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
+		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
+		amountWantBytes = Bytes.concat(fill, amountWantBytes);
+		data = Bytes.concat(data, amountWantBytes);
 		
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
@@ -168,8 +176,8 @@ public class Trade {
 		db.getTradeMap().add(this);
 		
 		//UPDATE FULFILLED
-		initiator.setFulfilled(initiator.getFulfilled().add(this.price));
-		target.setFulfilled(target.getFulfilled().add(this.amount));
+		initiator.setFulfilled(initiator.getFulfilled().add(this.amountWant));
+		target.setFulfilled(target.getFulfilled().add(this.amountHave));
 		
 		//CHECK IF FULFILLED
 		if(initiator.isFulfilled())
@@ -201,8 +209,8 @@ public class Trade {
 		}
 		
 		//TRANSFER FUNDS
-		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).add(this.amount), db);
-		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).add(this.price), db);	
+		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).add(this.amountHave), db);
+		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).add(this.amountWant), db);
 	}
 
 	public void orphan(DBSet db) 
@@ -211,8 +219,8 @@ public class Trade {
 		Order target = this.getTargetOrder(db).copy();
 		
 		//REVERSE FUNDS
-		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).subtract(this.amount), db);
-		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).subtract(this.price), db);	
+		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).subtract(this.amountHave), db);
+		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).subtract(this.amountWant), db);	
 		
 		//CHECK IF ORDER IS FULFILLED
 		if(initiator.isFulfilled())
@@ -227,8 +235,8 @@ public class Trade {
 		}
 		
 		//REVERSE FULFILLED
-		initiator.setFulfilled(initiator.getFulfilled().subtract(this.price));
-		target.setFulfilled(target.getFulfilled().subtract(this.amount));
+		initiator.setFulfilled(initiator.getFulfilled().subtract(this.amountWant));
+		target.setFulfilled(target.getFulfilled().subtract(this.amountHave));
 		
 		//UPDATE ORDERS
 		db.getOrderMap().add(initiator);

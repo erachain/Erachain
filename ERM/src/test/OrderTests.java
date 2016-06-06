@@ -19,6 +19,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.assets.Order;
 import core.item.assets.Trade;
+import core.transaction.CancelOrderTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
@@ -28,170 +29,177 @@ import database.DBSet;
 public class OrderTests 
 {
 	Long releaserReference = null;
-	long ERM_KEY = Transaction.RIGHTS_KEY;
+	long ERMO_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	DBSet db = DBSet.createEmptyDatabaseSet();
+	private GenesisBlock gb;
+
+	//CREATE KNOWN ACCOUNT
+	byte[] seed = Crypto.getInstance().digest("test".getBytes());
+	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
+
+	CreateOrderTransaction orderCreation;
+	AssetCls ermAsset;
+	long ermAssetKey;
+	
+	private void init() {
+						
+		gb = new GenesisBlock();
+		gb.process(db);
+		
+		// FEE FUND
+		maker.setLastReference(gb.getTimestamp(), db);
+		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+				
+		//CREATE ORDER TRANSACTION
+		orderCreation = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, maker.getLastReference(db));
+
+		//ADD ERM ASSET
+    	ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte)2, true);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, ermAsset, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
+    	ermAssetKey = issueAssetTransaction.getAssetKey();
+
+	}
 	@Test
 	public void validateSignatureOrderTransaction() 
 	{
 		
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-				
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-		
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(databaseSet, false);
-		sender.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
-		
-		//CREATE SIGNATURE
-		long timestamp = NTP.getTime();		
-		//CREATE ORDER TRANSACTION
-		Transaction orderTransaction = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
-		orderTransaction.sign(sender, false);
+		init();
+		orderCreation.sign(maker, false);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS VALID
-		assertEquals(true, orderTransaction.isSignatureValid());
+		assertEquals(true, orderCreation.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		orderTransaction = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet), new byte[64]);
+		orderCreation = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS INVALID
-		assertEquals(false, orderTransaction.isSignatureValid());
+		assertEquals(false, orderCreation.isSignatureValid());
 	}
 	
 	@Test
 	public void validateCreateOrderTransaction() 
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
-		//ADD ERM ASSET
-    	AssetCls ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 10000000000L, (byte)2, true);
-    	dbSet.getItemAssetMap().set(0l, ermAsset);
-		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount account = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(account, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		account.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
-
-		
-		//CREATE ASSET
-		AssetCls asset = new AssetVenture(account, "a", "a", 50000l, (byte)2, false);
-		
-		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, account,asset, (byte)0, System.currentTimeMillis(), account.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
-		
+		init();
+						
 		//CHECK VALID
 		long timeStamp = System.currentTimeMillis();
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
-		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(dbSet, releaserReference));
+		CreateOrderTransaction orderCreation = new CreateOrderTransaction(maker, ermAssetKey, 0l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
+		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION HAVE EQUALS WANT
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 1l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(maker, 1l, 1l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
 			
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(dbSet, releaserReference));
+		assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION NOT ENOUGH BALANCE
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(maker, 1l, 0l, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(dbSet, releaserReference));
+		assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(maker, ermAssetKey, 0l, BigDecimal.valueOf(-50.0).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.INVALID_AMOUNT, orderCreation.isValid(dbSet, releaserReference));
+		assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(db, releaserReference));
 		
-		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 4l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, account.getLastReference(dbSet), new byte[64]);		
+    	ermAsset = new AssetVenture(new GenesisBlock().getGenerator(), "DATACHAINS.world", "This is the simulated ERM asset.", 100000L, (byte)0, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, ermAsset, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
+    	ermAssetKey = issueAssetTransaction.getAssetKey();
+
+		//CREATE INVALID ORDER CREATION INVALID AMOUNT
+		orderCreation = new CreateOrderTransaction(maker, ermAssetKey, 0l, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(dbSet, releaserReference));
+		assertEquals(Transaction.INVALID_AMOUNT, orderCreation.isValid(db, releaserReference));
+
+		//CREATE INVALID ORDER CREATION INVALID AMOUNT
+		orderCreation = new CreateOrderTransaction(maker, 1l, ermAssetKey, 
+				BigDecimal.valueOf(0.01).setScale(8), BigDecimal.valueOf(1.1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
+					
+		//CHECK IF ORDER CREATION INVALID
+		assertEquals(Transaction.INVALID_RETURN, orderCreation.isValid(db, releaserReference));
+
+		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
+		orderCreation = new CreateOrderTransaction(maker, 111l, 0l, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
+					
+		//CHECK IF ORDER CREATION INVALID
+		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
+
+		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
+		orderCreation = new CreateOrderTransaction(maker, 1l, 114l, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, maker.getLastReference(db), new byte[64]);		
+					
+		//CHECK IF ORDER CREATION INVALID
+		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE ORDER CREATION INVALID REFERENCE
-		orderCreation = new CreateOrderTransaction(null, account, 1l, 0l, BigDecimal.valueOf(50).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		
+		orderCreation = new CreateOrderTransaction(maker, 1l, 0l, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		
 			
 		//CHECK IF  ORDER CREATION IS INVALID
-		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(dbSet, releaserReference));
+		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(db, releaserReference));
 										
 	}
 	
 	@Test
 	public void parseCreateOrderTransaction() 
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-								
-		//CREATE KNOWN ACCOUNT
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount sender = new PrivateKeyAccount(privateKey);
-						
-		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(sender, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(databaseSet, false);
-		sender.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
-
-				
-		//CREATE SIGNATURE
-		long timestamp = NTP.getTime();
-		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(null, sender, 1l, 2l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, sender.getLastReference(databaseSet));
-		orderCreation.sign(sender, false);
+		
+		init();
+		
+		orderCreation.sign(maker, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawOrderCreation = orderCreation.toBytes(true, null);
+		assertEquals(rawOrderCreation.length, orderCreation.getDataLength(false));
 		
+		CreateOrderTransaction parsedOrderCreation = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			CreateOrderTransaction parsedOrderCreation = (CreateOrderTransaction) TransactionFactory.getInstance().parse(rawOrderCreation, releaserReference);
-			
-			//CHECK INSTANCE
-			assertEquals(true, parsedOrderCreation instanceof CreateOrderTransaction);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(orderCreation.getSignature(), parsedOrderCreation.getSignature()));
-			
-			//CHECK HAVE
-			assertEquals(orderCreation.getOrder().getHave(), parsedOrderCreation.getOrder().getHave());	
-			
-			//CHECK WANT
-			assertEquals(orderCreation.getOrder().getWant(), parsedOrderCreation.getOrder().getWant());	
-				
-			//CHECK AMOUNT
-			assertEquals(0, orderCreation.getOrder().getAmount().compareTo(parsedOrderCreation.getOrder().getAmount()));	
-			
-			//CHECK PRICE
-			assertEquals(0, orderCreation.getOrder().getPrice().compareTo(parsedOrderCreation.getOrder().getPrice()));
-			
-			//CHECK FEE
-			assertEquals(orderCreation.getFee(), parsedOrderCreation.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals((long)orderCreation.getReference(), (long)parsedOrderCreation.getReference());	
-			
-			//CHECK TIMESTAMP
-			assertEquals(orderCreation.getTimestamp(), parsedOrderCreation.getTimestamp());				
+			parsedOrderCreation = (CreateOrderTransaction) TransactionFactory.getInstance().parse(rawOrderCreation, releaserReference);
 		}
 		catch (Exception e) 
 		{
-			fail("Exception while parsing transaction.");
+			fail("Exception while parsing transaction. " + e);
 		}
+			
+		//CHECK INSTANCE
+		assertEquals(true, parsedOrderCreation instanceof CreateOrderTransaction);
+		
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(orderCreation.getSignature(), parsedOrderCreation.getSignature()));
+		
+		//CHECK HAVE
+		assertEquals(orderCreation.getOrder().getHave(), parsedOrderCreation.getOrder().getHave());	
+		
+		//CHECK WANT
+		assertEquals(orderCreation.getOrder().getWant(), parsedOrderCreation.getOrder().getWant());	
+			
+		//CHECK AMOUNT
+		assertEquals(0, orderCreation.getOrder().getAmountHave().compareTo(parsedOrderCreation.getOrder().getAmountHave()));	
+		
+		//CHECK PRICE
+		assertEquals(0, orderCreation.getOrder().getAmountWant().compareTo(parsedOrderCreation.getOrder().getAmountWant()));
+		
+		//CHECK FEE
+		assertEquals(orderCreation.getFee(), parsedOrderCreation.getFee());	
+		
+		//CHECK REFERENCE
+		assertEquals((long)orderCreation.getReference(), (long)parsedOrderCreation.getReference());	
+		
+		//CHECK TIMESTAMP
+		assertEquals(orderCreation.getTimestamp(), parsedOrderCreation.getTimestamp());				
 		
 		//PARSE TRANSACTION FROM WRONG BYTES
 		rawOrderCreation = new byte[orderCreation.getDataLength(false)];
@@ -208,29 +216,36 @@ public class OrderTests
 		{
 			//EXCEPTION IS THROWN OK
 		}	
+		
+		//////////////////////////////////
+		/////////// TRADE PARSE //////////
+		Trade tradeParse = new Trade(BigInteger.TEN, BigInteger.ONE,
+				BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(10).setScale(8), timestamp);
+		byte[] tradeRaw = tradeParse.toBytes();
+		Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
+		Trade tradeParse_1 = null;
+		try {
+			tradeParse_1 = Trade.parse(tradeRaw);
+		} catch (Exception e) {
+			
+		}
+		Assert.assertEquals(tradeParse_1.getTimestamp(), tradeParse.getTimestamp());
+
+
 	}
 	
 	@Test
 	public void testOrderProcessingNonDivisible()
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
-
+		init();
 		
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte)2, false);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte)2, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -239,109 +254,112 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte)8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
+		long keyA = assetA.getKey(db);
+		long keyB = assetB.getKey(db);
+		
+
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		createOrderTransaction.process(dbSet, false);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, keyA, keyB, 
+				BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		createOrderTransaction.sign(maker, false); // need for Order.getID()
+		createOrderTransaction.process(db, false);
+
 		
 		//CREATE ORDER TWO (SELLING 1000 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 100 B FOR 1000 A
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, 
+				BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(500).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5, 6});
+		createOrderTransaction.sign(accountB, false); // need for Order.getID()
+		createOrderTransaction.process(db, false);
+		
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(100))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1000))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(maker.getConfirmedBalance(keyA, db), BigDecimal.valueOf(49000).setScale(8)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountB.getConfirmedBalance(keyB, db), BigDecimal.valueOf(49900).setScale(8).setScale(8)); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(maker.getConfirmedBalance(keyB, db), BigDecimal.valueOf(0).setScale(8)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getConfirmedBalance(keyA, db), BigDecimal.valueOf(0).setScale(8)); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		Order orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		//Order orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		//Assert.assertEquals(BigInteger.valueOf(1286), createOrderTransaction.getOrder().getId());
+		Order orderA = db.getCompletedOrderMap().get(createOrderTransaction.getOrder().getId());
+		Assert.assertEquals(BigInteger.valueOf(1286), orderA.getId());
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		Order orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		Order orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(100)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		Trade trade = orderB.getInitiatedTrades(dbSet).get(0);
+		Trade trade = orderB.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{5, 6})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[64])));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(1000)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(100)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
 			
 		//CREATE ORDER THREE (SELLING 24 A FOR B AT A PRICE OF 0.2)
 		//GENERATES TRADE 20 A FOR 4 B
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(24).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(24).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1, 2});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(48976))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(104))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1020))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(48976))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49000))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(104))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(1020))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(104)));
 		Assert.assertEquals(false, orderB.isFulfilled());
 		
-		Order orderC = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderC.getId()));
+		Order orderC = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
 		Assert.assertEquals(0, orderC.getFulfilled().compareTo(BigDecimal.valueOf(20)));
 		Assert.assertEquals(false, orderC.isFulfilled());
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderC.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderC.getInitiatedTrades(db).size());
 		
-		trade = orderC.getInitiatedTrades(dbSet).get(0);
+		trade = orderC.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{1, 2})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[]{5, 6})));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(4)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(20)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(4)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(20)));
 	}
 	
 	@Test
 	public void testOrderProcessingWantDivisible()
-	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
+	{		
 		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
-		
-		
+		init();
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, false);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker,assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -350,102 +368,91 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		createOrderTransaction.process(dbSet, false);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		createOrderTransaction.process(db, false);
 		
 		//CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 99,9 B FOR 999 A		
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(99.9).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(99.9).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5, 6});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49900.1))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(99.9))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(999))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49900.1))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(99.9))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(999))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		Order orderA = dbSet.getOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderA.getId()));
+		Order orderA = db.getOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(999)));
 		Assert.assertEquals(false, orderA.isFulfilled());
 		
-		Order orderB = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderB.getId()));
+		Order orderB = db.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(99.9)));
 		Assert.assertEquals(true, orderB.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		Trade trade = orderB.getInitiatedTrades(dbSet).get(0);
+		Trade trade = orderB.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{5, 6})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[64])));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(999)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(99.9)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(999)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(99.9)));
 		
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2)
 		//GENERATED TRADE 99 A FOR 9.9 B
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1, 2});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(48901))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49900.1))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(99.9))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(999))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(48901))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49900.1))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(99.9))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(999))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		orderA = dbSet.getOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderA.getId()));
+		orderA = db.getOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(999)));
 		Assert.assertEquals(false, orderA.isFulfilled());
 		
-		orderB = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderB.getId()));
+		orderB = db.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(99.9)));
 		Assert.assertEquals(true, orderB.isFulfilled());
 		
-		Order orderC = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderC.getId()));
+		Order orderC = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
 		Assert.assertEquals(0, orderC.getFulfilled().compareTo(BigDecimal.valueOf(0)));
 		Assert.assertEquals(false, orderC.isFulfilled());
 		
 		//CHECK TRADES
-		Assert.assertEquals(0, orderC.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(0, orderC.getInitiatedTrades(db).size());
 	}
 	
 	@Test
 	public void testOrderProcessingHaveDivisible()
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
-		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
-
 		
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -454,108 +461,100 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		createOrderTransaction.process(dbSet, false);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		createOrderTransaction.process(db, false);
 		
 		//CREATE ORDER TWO (SELLING 200 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 100 B FOR 1000 A
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(200).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, 
+				BigDecimal.valueOf(200).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5, 6});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49800))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(100))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1000))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49800))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(100))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(1000))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		Order orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		Order orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		Order orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		Order orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(100)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		Trade trade = orderB.getInitiatedTrades(dbSet).get(0);
+		Trade trade = orderB.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{5, 6})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[64])));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(1000)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(100)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
 		
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2) (I CAN BUY AT INCREMENTS OF 1)
 		//GENERATED TRADE 95 A for 19 B
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1, 2});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(48901))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49800))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(119))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1095))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(48901))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49800))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(119))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(1095))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(119)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
-		Order orderC = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderC.getId()));
+		Order orderC = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
 		Assert.assertEquals(0, orderC.getFulfilled().compareTo(BigDecimal.valueOf(95)));
 		Assert.assertEquals(false, orderC.isFulfilled());
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		trade = orderC.getInitiatedTrades(dbSet).get(0);
+		trade = orderC.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{1, 2})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[]{5, 6})));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(19)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(95)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(19)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(95)));
 	}
 	
 	@Test
 	public void testOrderProcessingDivisible()
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
 		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
-		
+		init();
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -564,107 +563,101 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		createOrderTransaction.process(dbSet, false);
+		// amountHAVE 1000 - amountWant 100
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l,
+				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		createOrderTransaction.process(db, false);
 		
 		//CREATE ORDER TWO (SELLING 999 B FOR A AT A PRICE OF 5) (I CAN BUY AT INCREMENTS OF 0,00000010)
 		//GENERATES TRADE 100 B FOR 1000 A			
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(999).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5, 6});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, 
+				BigDecimal.valueOf(999).setScale(8),BigDecimal.valueOf(5555).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5, 6});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49001))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(100))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1000))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(maker.getConfirmedBalance(1l, db), BigDecimal.valueOf(49000)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49001))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(100))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(1000))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		Order orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		Order orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		Order orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		Order orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(100)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		Trade trade = orderB.getInitiatedTrades(dbSet).get(0);
+		Trade trade = orderB.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{5, 6})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[64])));
-		Assert.assertEquals(0, trade.getAmount().compareTo(BigDecimal.valueOf(1000)));
-		Assert.assertEquals(0, trade.getPrice().compareTo(BigDecimal.valueOf(100)));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
 		
 		//CREATE ORDER THREE (SELLING 99.99999999 A FOR B AT A PRICE OF 0.2) (I CAN BUY AT INCREMENTS OF 0,00000001)
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, new BigDecimal(BigInteger.valueOf(9999999999L), 8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, new BigDecimal(BigInteger.valueOf(9999999999L), 8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1, 2});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(new BigDecimal("48900.00000001"))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49001))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(new BigDecimal("119.99999999"))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(new BigDecimal("1099.99999995"))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(new BigDecimal("48900.00000001"))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49001))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(new BigDecimal("119.99999999"))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(new BigDecimal("1099.99999995"))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[64]));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[64]));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		orderB = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(new BigDecimal("119.99999999")));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
-		Order orderC = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderC.getId()));
+		Order orderC = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
 		Assert.assertEquals(0, orderC.getFulfilled().compareTo(new BigDecimal("99.99999995")));
 		Assert.assertEquals(false, orderC.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(1, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(1, orderB.getInitiatedTrades(db).size());
 		
-		trade = orderC.getInitiatedTrades(dbSet).get(0);
+		trade = orderC.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{1, 2})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[]{5, 6})));
-		Assert.assertEquals(0, trade.getAmount().compareTo(new BigDecimal("19.99999999")));
-		Assert.assertEquals(0, trade.getPrice().compareTo(new BigDecimal("99.99999995")));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(new BigDecimal("19.99999999")));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(new BigDecimal("99.99999995")));
 	}
 	
 	@Test
 	public void testOrderProcessingMultipleOrders()
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
-		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 
+		init();
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker,assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -673,107 +666,99 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{5,6});
-		createOrderTransaction.process(dbSet, false);
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		createOrderTransaction.process(db, false);
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{1, 2});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1, 2});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(50000))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(0))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(50000))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(0))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		Order orderA = dbSet.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderA.getId()));
+		Order orderA = db.getOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(0)));
 		Assert.assertEquals(false, orderA.isFulfilled());
 		
-		Order orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		Order orderB = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(0)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
 		//CHECK TRADES
-		Assert.assertEquals(0, orderB.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(0, orderB.getInitiatedTrades(db).size());
 		
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[]{3, 4});
-		createOrderTransaction.process(dbSet, false);
+		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{3, 4});
+		createOrderTransaction.process(db, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(49850))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, dbSet).compareTo(BigDecimal.valueOf(150))); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, dbSet).compareTo(BigDecimal.valueOf(1250))); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(49850))); //BALANCE B FOR ACCOUNT B	
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, db).compareTo(BigDecimal.valueOf(150))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, db).compareTo(BigDecimal.valueOf(1250))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
-		orderA = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderA.getId()));
+		orderA = db.getCompletedOrderMap().get(new BigInteger(new byte[]{5, 6}));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
 		Assert.assertEquals(0, orderA.getFulfilled().compareTo(BigDecimal.valueOf(1000)));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		
-		orderB = dbSet.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
-		Assert.assertEquals(false, dbSet.getCompletedOrderMap().contains(orderB.getId()));
+		orderB = db.getOrderMap().get(new BigInteger(new byte[]{1, 2}));
+		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
 		Assert.assertEquals(0, orderB.getFulfilled().compareTo(BigDecimal.valueOf(250)));
 		Assert.assertEquals(false, orderB.isFulfilled());	
 		
-		Order orderC = dbSet.getCompletedOrderMap().get(new BigInteger(new byte[]{3, 4}));
-		Assert.assertEquals(false, dbSet.getOrderMap().contains(orderC.getId()));
+		Order orderC = db.getCompletedOrderMap().get(new BigInteger(new byte[]{3, 4}));
+		Assert.assertEquals(false, db.getOrderMap().contains(orderC.getId()));
 		Assert.assertEquals(0, orderC.getFulfilled().compareTo(BigDecimal.valueOf(150)));
 		Assert.assertEquals(true, orderC.isFulfilled());
 		
 		//CHECK TRADES
-		Assert.assertEquals(0, orderA.getInitiatedTrades(dbSet).size());
-		Assert.assertEquals(0, orderB.getInitiatedTrades(dbSet).size());
-		Assert.assertEquals(2, orderC.getInitiatedTrades(dbSet).size());
+		Assert.assertEquals(0, orderA.getInitiatedTrades(db).size());
+		Assert.assertEquals(0, orderB.getInitiatedTrades(db).size());
+		Assert.assertEquals(2, orderC.getInitiatedTrades(db).size());
 		
-		Trade trade = orderC.getInitiatedTrades(dbSet).get(1);
+		Trade trade = orderC.getInitiatedTrades(db).get(1);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{3, 4})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[]{5, 6})));
-		Assert.assertEquals(0, trade.getAmount().compareTo(new BigDecimal("1000")));
-		Assert.assertEquals(0, trade.getPrice().compareTo(new BigDecimal("100")));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(new BigDecimal("1000")));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(new BigDecimal("100")));
 		
-		trade = orderC.getInitiatedTrades(dbSet).get(0);
+		trade = orderC.getInitiatedTrades(db).get(0);
 		Assert.assertEquals(0, trade.getInitiator().compareTo(new BigInteger(new byte[]{3, 4})));
 		Assert.assertEquals(0, trade.getTarget().compareTo(new BigInteger(new byte[]{1, 2})));
-		Assert.assertEquals(0, trade.getAmount().compareTo(new BigDecimal("250")));
-		Assert.assertEquals(0, trade.getPrice().compareTo(new BigDecimal("50")));
+		Assert.assertEquals(0, trade.getAmountHave().compareTo(new BigDecimal("250")));
+		Assert.assertEquals(0, trade.getAmountWant().compareTo(new BigDecimal("50")));
 	}
 	
 	@Test
 	public void testOrderProcessingForks()
 	{
-		DBSet dbSet = DBSet.createEmptyDatabaseSet();
-		
-		//CREATE ASSET A
-		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount accountA = new PrivateKeyAccount(privateKey);
-		
-		//Transaction transaction = new GenesisTransaction(accountA, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		//transaction.process(dbSet, false);
-		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 
+		init();
+		
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(maker, "a", "a", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(null, accountA,assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker,assetA, (byte)0, System.currentTimeMillis(), maker.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET B
 		seed = Crypto.getInstance().digest("testb".getBytes());
@@ -782,37 +767,37 @@ public class OrderTests
 		
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", "b", 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
-		issueAssetTransaction = new IssueAssetTransaction(null, accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(dbSet), new byte[64]);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction = new IssueAssetTransaction(accountB,assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
+		issueAssetTransaction.process(db, false);
 		
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
-		DBSet fork1 = dbSet.fork();
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork1), new byte[]{5,6});
+		DBSet fork1 = db.fork();
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.1).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(fork1), new byte[]{5,6});
 		createOrderTransaction.process(fork1, false);
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
 		DBSet fork2 = fork1.fork();
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(fork2), new byte[]{1, 2});
 		createOrderTransaction.process(fork2, false);
 		
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
 		DBSet fork3 = fork2.fork();
-		createOrderTransaction = new CreateOrderTransaction(null, accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork3), new byte[]{3, 4});
+		createOrderTransaction = new CreateOrderTransaction(accountB, 2l, 1l, BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(5).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(fork3), new byte[]{3, 4});
 		createOrderTransaction.process(fork3, false);
 		
 		//ORPHAN ORDER THREE
 		createOrderTransaction.orphan(fork3, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, fork3).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, fork3).compareTo(BigDecimal.valueOf(48000))); //BALANCE A FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, fork3).compareTo(BigDecimal.valueOf(50000))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, fork3).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, fork3).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, fork3).compareTo(BigDecimal.valueOf(0))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
@@ -830,13 +815,13 @@ public class OrderTests
 		Assert.assertEquals(0, orderB.getInitiatedTrades(fork3).size());
 		
 		//ORPHAN ORDER TWO
-		createOrderTransaction = new CreateOrderTransaction(null, accountA, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
+		createOrderTransaction = new CreateOrderTransaction(maker, 1l, 2l, BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(0.2).setScale(8), (byte)0, System.currentTimeMillis(), maker.getLastReference(fork2), new byte[]{1, 2});
 		createOrderTransaction.orphan(fork2, false);
 		
 		//CHECK BALANCES
-		Assert.assertEquals(0, accountA.getConfirmedBalance(1l, fork2).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(0, maker.getConfirmedBalance(1l, fork2).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getConfirmedBalance(2l, fork2).compareTo(BigDecimal.valueOf(50000))); //BALANCE B FOR ACCOUNT B	
-		Assert.assertEquals(0, accountA.getConfirmedBalance(2l, fork2).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(0, maker.getConfirmedBalance(2l, fork2).compareTo(BigDecimal.valueOf(0))); //BALANCE B FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getConfirmedBalance(1l, fork2).compareTo(BigDecimal.valueOf(0))); //BALANCE A FOR ACCOUNT B
 		
 		//CHECK ORDERS
@@ -848,4 +833,215 @@ public class OrderTests
 		Assert.assertEquals(false, fork2.getOrderMap().contains(new BigInteger(new byte[]{1, 2})));
 		Assert.assertEquals(false, fork2.getCompletedOrderMap().contains(new BigInteger(new byte[]{1, 2})));
 	}
+
+	
+	//CANCEL ORDER
+	
+	@Test
+	public void validateSignatureCancelOrderTransaction()
+	{
+		
+
+		init();
+		
+		//CREATE ORDER CANCEL
+		Transaction cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, maker.getLastReference(db));
+		cancelOrderTransaction.sign(maker, false);
+		//CHECK IF ORDER CANCEL IS VALID
+		assertEquals(true, cancelOrderTransaction.isSignatureValid());
+		
+		//INVALID SIGNATURE
+		cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, maker.getLastReference(db), new byte[1]);
+		
+		//CHECK IF ORDER CANCEL
+		assertEquals(false, cancelOrderTransaction.isSignatureValid());
+	}
+	
+	@Test
+	public void validateCancelOrderTransaction() 
+	{
+
+		init();
+				
+		//CREATE ORDER
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, ermAssetKey, FEE_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		createOrderTransaction.sign(maker, false);
+		createOrderTransaction.process(db, false);
+		
+		//this.creator.getBalance(1, db).compareTo(this.fee) == -1)
+		//LOGGER.info("createOrderTransaction.creator.getBalance(1, db): " + createOrderTransaction.getCreator().getBalance(1, dbSet));
+		//LOGGER.info("CreateOrderTransaction.creator.getBalance(1, db): " + account.getBalance(1, dbSet));
+
+		//CREATE CANCEL ORDER
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});		
+		//CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(account, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), account.getLastReference(dbSet));
+		//cancelOrderTransaction.sign(account);
+		//CHECK IF CANCEL ORDER IS VALID
+		assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(db, releaserReference));
+		
+		//CREATE INVALID CANCEL ORDER ORDER DOES NOT EXIST
+		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,7}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});		
+		
+		//CHECK IF CANCEL ORDER IS INVALID
+		assertEquals(Transaction.ORDER_DOES_NOT_EXIST, cancelOrderTransaction.isValid(db, releaserReference));
+		
+		//CREATE INVALID CANCEL ORDER INCORRECT CREATOR
+		seed = Crypto.getInstance().digest("invalid".getBytes());
+		privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+		PrivateKeyAccount invalidCreator = new PrivateKeyAccount(privateKey);
+		cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});		
+		
+		//CHECK IF CANCEL ORDER IS INVALID
+		assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(db, releaserReference));
+				
+		//CREATE INVALID CANCEL ORDER NO BALANCE
+		DBSet fork = db.fork();
+		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});		
+		maker.setConfirmedBalance(FEE_KEY, BigDecimal.ZERO, fork);		
+		
+		//CHECK IF CANCEL ORDER IS INVALID
+		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
+				
+		//CREATE CANCEL ORDER INVALID REFERENCE
+		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), -123L, new byte[]{1,2});		
+				
+		//CHECK IF NAME REGISTRATION IS INVALID
+		assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(db, releaserReference));
+		
+	}
+
+	@Test
+	public void parseCancelOrderTransaction() 
+	{
+		
+
+		init();
+		
+		//CREATE CANCEL ORDER
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, maker.getLastReference(db));
+		cancelOrderTransaction.sign(maker, false);
+		
+		//CONVERT TO BYTES
+		byte[] rawCancelOrder = cancelOrderTransaction.toBytes(true, null);
+		
+		//CHECK DATALENGTH
+		assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			CancelOrderTransaction parsedCancelOrder = (CancelOrderTransaction) TransactionFactory.getInstance().parse(rawCancelOrder, releaserReference);
+			
+			//CHECK INSTANCE
+			assertEquals(true, parsedCancelOrder instanceof CancelOrderTransaction);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(cancelOrderTransaction.getSignature(), parsedCancelOrder.getSignature()));
+			
+			//CHECK AMOUNT CREATOR
+			assertEquals(cancelOrderTransaction.getAmount(maker), parsedCancelOrder.getAmount(maker));	
+			
+			//CHECK OWNER
+			assertEquals(cancelOrderTransaction.getCreator().getAddress(), parsedCancelOrder.getCreator().getAddress());	
+			
+			//CHECK ORDER
+			assertEquals(0, cancelOrderTransaction.getOrder().compareTo(parsedCancelOrder.getOrder()));	
+			
+			//CHECK FEE
+			assertEquals(cancelOrderTransaction.getFee(), parsedCancelOrder.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(cancelOrderTransaction.getReference(), parsedCancelOrder.getReference());	
+			
+			//CHECK TIMESTAMP
+			assertEquals(cancelOrderTransaction.getTimestamp(), parsedCancelOrder.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction.");
+		}
+		
+		//PARSE TRANSACTION FROM WRONG BYTES
+		rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(false)];
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			TransactionFactory.getInstance().parse(rawCancelOrder, releaserReference);
+			
+			//FAIL
+			fail("this should throw an exception");
+		}
+		catch (Exception e) 
+		{
+			//EXCEPTION IS THROWN OK
+		}	
+	}
+	
+	@Test
+	public void processCancelOrderTransaction()
+	{
+
+		init();
+				
+		//CREATE ORDER
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, ermAssetKey, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		createOrderTransaction.sign(maker, false);
+		createOrderTransaction.process(db, false);
+		
+		//CREATE CANCEL ORDER
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});
+		cancelOrderTransaction.sign(maker, false);
+		cancelOrderTransaction.process(db, false);
+		
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(ermAsset.getQuantity()).setScale(8), maker.getConfirmedBalance(ermAssetKey, db));
+						
+		//CHECK REFERENCE SENDER
+		assertEquals(cancelOrderTransaction.getSignature(), maker.getLastReference(db));
+				
+		//CHECK ORDER EXISTS
+		assertEquals(false, db.getOrderMap().contains(new BigInteger(new byte[]{5,6})));
+	}
+
+	@Test
+	public void orphanCancelOrderTransaction()
+	{
+		init();
+		
+		//CREATE ISSUE ASSET TRANSACTION
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, ermAsset, FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db));
+		issueAssetTransaction.sign(maker, false);
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+		issueAssetTransaction.process(db, false);
+
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance(ermAssetKey, db));
+		
+		//CREATE ORDER
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, ermAssetKey, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{5,6});
+		createOrderTransaction.sign(maker, false);
+		createOrderTransaction.process(db, false);
+
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(49000).setScale(8), maker.getConfirmedBalance(ermAssetKey, db));
+		
+		//CREATE CANCEL ORDER
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), maker.getLastReference(db), new byte[]{1,2});
+		cancelOrderTransaction.sign(maker, false);
+		cancelOrderTransaction.process(db, false);
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getConfirmedBalance( ermAssetKey, db));
+		cancelOrderTransaction.orphan(db, false);
+		
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(49000).setScale(8), maker.getConfirmedBalance( ermAssetKey, db));
+						
+		//CHECK REFERENCE SENDER
+		assertEquals(createOrderTransaction.getSignature(), maker.getLastReference(db));
+				
+		//CHECK ORDER EXISTS
+		assertEquals(true, db.getOrderMap().contains(new BigInteger(new byte[]{5,6})));
+	}
+
 }

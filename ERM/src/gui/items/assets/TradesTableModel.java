@@ -48,13 +48,13 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 			if(type.equals("Buy"))
 			{
-				sumAsset1 = sumAsset1.add(tradePair.getB().getAmount());
-				sumAsset2 = sumAsset2.add(tradePair.getB().getPrice());
+				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountHave());
+				sumAsset2 = sumAsset2.add(tradePair.getB().getPriceCalc());
 			}
 			else
 			{
-				sumAsset1 = sumAsset1.add(tradePair.getB().getPrice());
-				sumAsset2 = sumAsset2.add(tradePair.getB().getAmount());
+				sumAsset1 = sumAsset1.add(tradePair.getB().getPriceCalc());
+				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountHave());
 			}
 			
 		}
@@ -141,9 +141,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
 				
 				if(type.equals("Buy"))
-					return NumberAsString.getInstance().numberAsString(trade.getAmount());
+					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 				else
-					return NumberAsString.getInstance().numberAsString(trade.getPrice());
+					return NumberAsString.getInstance().numberAsString(trade.getPriceCalc());
 				
 			case COLUMN_PRICE:
 				
@@ -151,9 +151,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 					return null;
 				
 				if(type.equals("Buy"))
-					return NumberAsString.getInstance().numberAsString(trade.getPrice().divide(trade.getAmount(), 8, RoundingMode.FLOOR));
+					return NumberAsString.getInstance().numberAsString(trade.getPriceCalc().divide(trade.getAmountHave(), 8, RoundingMode.FLOOR));
 				else
-					return NumberAsString.getInstance().numberAsString(trade.getAmount().divide(trade.getPrice(), 8, RoundingMode.FLOOR));
+					return NumberAsString.getInstance().numberAsString(trade.getAmountHave().divide(trade.getPriceCalc(), 8, RoundingMode.FLOOR));
 			
 			case COLUMN_ASSET_2:
 
@@ -161,9 +161,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
 
 				if(type.equals("Buy"))
-					return NumberAsString.getInstance().numberAsString(trade.getPrice());
+					return NumberAsString.getInstance().numberAsString(trade.getPriceCalc());
 				else
-					return NumberAsString.getInstance().numberAsString(trade.getAmount());
+					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 				
 		}
 		

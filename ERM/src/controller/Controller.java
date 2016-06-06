@@ -1837,12 +1837,12 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> createOrder(PrivateKeyAccount creator,
-			AssetCls have, AssetCls want, BigDecimal amount, BigDecimal price,
+			AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amountWant,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createOrderTransaction(creator,
-					have, want, amount, price, feePow);
+					have, want, amountHave, amountWant, feePow);
 		}
 	}
 

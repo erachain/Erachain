@@ -126,7 +126,7 @@ public class CancelOrderFrame extends JFrame
       		
       	//TXT WANT
       	txtGBC.gridy = 4;
-      	JTextField txtAmount = new JTextField(order.getAmount().toPlainString());
+      	JTextField txtAmount = new JTextField(order.getAmountHave().toPlainString());
       	txtAmount.setEditable(false);
       	this.add(txtAmount, txtGBC);
         
@@ -137,7 +137,7 @@ public class CancelOrderFrame extends JFrame
       		
       	//TXT PRICE
       	txtGBC.gridy = 5;
-      	JTextField txtPrice = new JTextField(order.getPrice().toPlainString());
+      	JTextField txtPrice = new JTextField(order.getPriceCalc().toPlainString());
       	txtPrice.setEditable(false);
       	this.add(txtPrice, txtGBC);
       	

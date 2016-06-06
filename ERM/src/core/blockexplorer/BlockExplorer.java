@@ -951,8 +951,8 @@ public class BlockExplorer
 			count ++;
 			pairsTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), count);
 
-			volumePrice = volumePrice.add(trade.getPrice());
-			volumeAmount = volumeAmount.add(trade.getAmount());
+			volumePrice = volumePrice.add(trade.getAmountWant());
+			volumeAmount = volumeAmount.add(trade.getAmountHave());
 
 			volumePriceTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), volumePrice);
 			volumeAmountTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), volumeAmount);
@@ -973,8 +973,8 @@ public class BlockExplorer
 			count ++;
 			pairsTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), count);
 
-			volumePrice = volumePrice.add(trade.getAmount());
-			volumeAmount = volumeAmount.add(trade.getPrice());
+			volumePrice = volumePrice.add(trade.getAmountHave());
+			volumeAmount = volumeAmount.add(trade.getAmountWant());
 
 			volumePriceTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), volumePrice);
 			volumeAmountTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), volumeAmount);
@@ -1152,13 +1152,13 @@ public class BlockExplorer
 		{
 			Map sellJSON = new LinkedHashMap();
 
-			sellJSON.put("price", order.getPrice().toPlainString());
+			sellJSON.put("price", order.getPriceCalc().toPlainString());
 			sellJSON.put("amount", order.getAmountLeft().toPlainString());
 			sumAmount = sumAmount.add(order.getAmountLeft());
 
-			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(8).divide(order.getPrice(), 8, RoundingMode.DOWN).toPlainString());
+			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal sellingAmount = order.getPrice().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
@@ -1199,14 +1199,14 @@ public class BlockExplorer
 		{	
 			Map buyJSON = new LinkedHashMap();
 
-			buyJSON.put("price", order.getPrice().toPlainString());
+			buyJSON.put("price", order.getPriceCalc().toPlainString());
 			buyJSON.put("amount", order.getAmountLeft().toPlainString());
 
 			sumAmount = sumAmount.add(order.getAmountLeft());
 
-			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(8).divide(order.getPrice(), 8, RoundingMode.DOWN).toPlainString());
+			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal buyingAmount = order.getPrice().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
@@ -1252,33 +1252,33 @@ public class BlockExplorer
 
 			Order orderTarget = trade.getTargetOrder(DBSet.getInstance());
 
-			tradeJSON.put("amount", trade.getAmount().toPlainString());
-			tradeJSON.put("price", trade.getPrice().toPlainString());
+			tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
+			tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
 
-			tradeJSON.put("realPrice", trade.getPrice().divide(trade.getAmount(), 8, RoundingMode.FLOOR).toPlainString());
-			tradeJSON.put("realReversePrice", trade.getAmount().divide(trade.getPrice(), 8, RoundingMode.FLOOR).toPlainString());
+			tradeJSON.put("realPrice", trade.getAmountWant().divide(trade.getAmountHave(), 8, RoundingMode.FLOOR).toPlainString());
+			tradeJSON.put("realReversePrice", trade.getAmountHave().divide(trade.getAmountWant(), 8, RoundingMode.FLOOR).toPlainString());
 
 			tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.getId()));
 
 			tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
-			tradeJSON.put("initiatorAmount", orderInitiator.getAmount().toPlainString());
+			tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
 			if(orderInitiator.getHave() == have)
 			{
 				tradeJSON.put("type", "sell");
-				tradeWantAmount = tradeWantAmount.add(trade.getAmount());
-				tradeHaveAmount = tradeHaveAmount.add(trade.getPrice());
+				tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
+				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
 			}
 			else
 			{
 				tradeJSON.put("type", "buy");
 
-				tradeWantAmount = tradeWantAmount.add(trade.getPrice());
-				tradeHaveAmount = tradeHaveAmount.add(trade.getAmount());
+				tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
+				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
 			}	
 			tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.getId()));
 			tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress());
-			tradeJSON.put("targetAmount", orderTarget.getAmount().toPlainString());
+			tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
 			tradeJSON.put("timestamp", trade.getTimestamp());
 			tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
@@ -1498,15 +1498,15 @@ public class BlockExplorer
 			}
 			 */
 
-			transactionDataJSON.put("amount", trade.getAmount().toPlainString());
-			transactionDataJSON.put("price", trade.getPrice().toPlainString());
+			transactionDataJSON.put("amountHave", trade.getAmountHave().toPlainString());
+			transactionDataJSON.put("amountWant", trade.getAmountWant().toPlainString());
 
-			transactionDataJSON.put("realPrice", trade.getPrice().divide(trade.getAmount(), 8, RoundingMode.FLOOR).toPlainString());
+			transactionDataJSON.put("realPrice", trade.getAmountWant().divide(trade.getAmountHave(), 8, RoundingMode.FLOOR).toPlainString());
 
 			transactionDataJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.getId()));
 
 			transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
-			transactionDataJSON.put("initiatorAmount", orderInitiator.getAmount().toPlainString());
+			transactionDataJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
 			transactionDataJSON.put("initiatorHave", orderInitiator.getHave());
 			transactionDataJSON.put("initiatorWant", orderInitiator.getWant());
 
@@ -1518,7 +1518,7 @@ public class BlockExplorer
 
 			transactionDataJSON.put("targetTxSignature", Base58.encode(orderTarget.getId()));
 			transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
-			transactionDataJSON.put("targetAmount", orderTarget.getAmount().toPlainString());
+			transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
 			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getParent(); 
 			transactionDataJSON.put("height", parentBlock.getHeight());
@@ -1586,9 +1586,10 @@ public class BlockExplorer
 				orderJSON.put("have", order.getHave());
 				orderJSON.put("want", order.getWant());
 				
-				orderJSON.put("amount", order.getAmount().toPlainString());
+				orderJSON.put("amount", order.getAmountHave().toPlainString());
 				orderJSON.put("amountLeft", order.getAmountLeft().toPlainString());
-				orderJSON.put("price", order.getPrice().toPlainString());
+				orderJSON.put("amountWant", order.getAmountWant().toPlainString());
+				orderJSON.put("price", order.getPriceCalc().toPlainString());
 
 				transactionDataJSON.put("orderSource", orderJSON);
 			}
@@ -2141,12 +2142,12 @@ public class BlockExplorer
 
 				if(addresses.contains(orderInitiator.getCreator().getAddress())) 
 				{
-					tXincome = Transaction.addAssetAmount(tXincome, orderInitiator.getCreator().getAddress(), orderInitiator.getWant(), trade.getAmount());
+					tXincome = Transaction.addAssetAmount(tXincome, orderInitiator.getCreator().getAddress(), orderInitiator.getWant(), trade.getAmountHave());
 				}
 
 				if(addresses.contains(orderTarget.getCreator().getAddress())) {
 					
-					tXincome = Transaction.addAssetAmount(tXincome, orderTarget.getCreator().getAddress(), orderInitiator.getHave(), trade.getPrice());
+					tXincome = Transaction.addAssetAmount(tXincome, orderTarget.getCreator().getAddress(), orderInitiator.getHave(), trade.getAmountWant());
 					
 				}
 
