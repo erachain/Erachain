@@ -25,6 +25,7 @@ import core.transaction.MultiPaymentTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -128,6 +129,10 @@ public class TransactionDetailsFactory
 		case Transaction.SEND_ASSET_TRANSACTION:
 			R_Send r_Send = (R_Send)transaction;
 			return new Send_RecordDetailsFrame(r_Send);
+			
+		case Transaction.VOUCH_TRANSACTION:
+			R_Vouch r_Vouch = (R_Vouch)transaction;
+			return new VouchingDetailsFrame(r_Vouch);
 
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 			R_SertifyPubKeys sertifyPubKeysRecord = (R_SertifyPubKeys)transaction;

@@ -435,7 +435,8 @@ public class OrderPanel extends JPanel
 			amountHave = price;
 		}
 		
-		if (true) {
+		if (false) {
+			// for develop
 			JOptionPane.showMessageDialog(new JFrame(),
 					amountHave.toPlainString() + " - " + amountWant.toPlainString(),
 					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -444,7 +445,7 @@ public class OrderPanel extends JPanel
 		}
 
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave, amountWant, feePow);
+		Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave.setScale(8), amountWant.setScale(8), feePow);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {

@@ -223,14 +223,22 @@ public class R_Vouch extends Transaction {
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result;
 
-		//Block block = Controller.getInstance().getBlockByHeight(db, height);
+		/*
+		//Block block1 = Controller.getInstance().getBlockByHeight(db, height);
 		byte[] b = db.getHeightMap().getBlockByHeight(height);
-		if (b == null ) return INVALID_BLOCK_HEIGHT_ERROR;
+		if (b == null )
+			return INVALID_BLOCK_HEIGHT_ERROR;
+
 		Block block = db.getBlockMap().get(b);
-		if (block == null) return INVALID_BLOCK_HEIGHT_ERROR;
-		
+		if (block == null)
+			return INVALID_BLOCK_HEIGHT_ERROR;		
 		Transaction tx = block.getTransaction(seq);
-		if (tx == null ) return INVALID_BLOCK_TRANS_SEQ_ERROR;
+		if (tx == null )
+			return INVALID_BLOCK_TRANS_SEQ_ERROR;
+			*/
+		Transaction tx = db.getTransactionFinalMap().getTransaction(height, seq);
+		if (tx == null )
+			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		
 		
 		if (!this.creator.isPerson(db))

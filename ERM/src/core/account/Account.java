@@ -303,13 +303,23 @@ public class Account {
 	@Override
 	public String toString()
 	{
-		/*
-		return NumberAsString.getInstance().numberAsString(this.getBalance(0))
-				+ " {" + this.getConfirmedBalance(Transaction.FEE_KEY) + "}"
-				+ " - " + this.getAddress();
-				*/
-		return this.getConfirmedBalance(FEE_KEY)
-				+ " - " + this.getAddress();
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		String personStr;
+		String addressStr;
+		if (personRes == null) {
+			personStr = "";
+			addressStr = this.getAddress();
+		}
+		else {
+			personStr = personRes.b.getShort();
+			addressStr = this.getAddress().substring(0, 8);
+			if (personRes.a == -2) personStr = "[-]" + personStr;
+			else if (personRes.a == -1) personStr = "[?]" + personStr;
+			else if (personRes.a == 0) personStr = "[++]" + personStr;
+			else if (personRes.a == 1) personStr = "[+]" + personStr;
+		}
+		return " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
+				+ " " + addressStr + " " + personStr;
 	}
 	
 	public String toString(long key)

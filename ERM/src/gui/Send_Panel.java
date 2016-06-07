@@ -503,7 +503,8 @@ public class Send_Panel extends JPanel
 			
 			txtRecDetails.setText(account.toString(asset.getKey()));
 			
-			if(account.getConfirmedBalance(asset.getKey()).compareTo(BigDecimal.ZERO) == 0)
+			if(account.getConfirmedBalance(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+					&& account.getConfirmedBalance(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0)
 			{
 				txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
 			}
