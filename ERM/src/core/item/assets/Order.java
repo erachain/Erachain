@@ -22,7 +22,6 @@ public class Order implements Comparable<Order> {
 	private static final int WANT_LENGTH = 8;
 	private static final int AMOUNT_LENGTH = 12;
 	private static final int FULFILLED_LENGTH = 12;
-	//private static final int PRICE_LENGTH = 12;
 	private static final int TIMESTAMP_LENGTH = 8;
 	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2*AMOUNT_LENGTH + FULFILLED_LENGTH + TIMESTAMP_LENGTH;
 	
@@ -33,7 +32,6 @@ public class Order implements Comparable<Order> {
 	private BigDecimal amountHave;
 	private BigDecimal fulfilled;
 	private BigDecimal amountWant;
-	private BigDecimal priceCalc;
 	private long timestamp;
 	
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
@@ -170,18 +168,18 @@ public class Order implements Comparable<Order> {
 		{
 			//CHECK IF TOTAL RETURN DOES NOT HAVE ANY DECIMALS
 			BigDecimal amountHave = this.amountHave;
-			BigDecimal price = this.amountWant;
-			BigDecimal mul = amountHave.multiply(price);
+			BigDecimal amountWant = this.amountWant;
+			BigDecimal mul = amountHave.multiply(amountWant);
 			int scale = mul.stripTrailingZeros().scale();
 			if(scale > 0)
 			{
 				if (this.getHaveAsset(db).isDivisible() && scale > 5) {
-					// round for divisible HAVE - amount or price
+					// round for divisible HAVE - amountHave or priceWant
 					mul = mul.setScale(0, RoundingMode.HALF_DOWN);
-					if (amountHave.compareTo(price) < 0) {
+					if (amountHave.compareTo(amountWant) < 0) {
 						this.amountWant = mul.divide(amountHave, 8, RoundingMode.HALF_UP); 
 					} else {
-						this.amountHave = mul.divide(price, 8, RoundingMode.HALF_UP);
+						this.amountHave = mul.divide(amountWant, 8, RoundingMode.HALF_UP);
 					}
 				} else {
 					return false;
@@ -335,7 +333,7 @@ public class Order implements Comparable<Order> {
 			Order order = orders.get(i);
 			
 			//CALCULATE BUYING PRICE
-			BigDecimal buyingPrice = BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN);
+			BigDecimal buyingPrice = BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.UP);
 			
 			//CHECK IF OWNERS OF BOTH ORDER ARE NOT THE SAME
 	
@@ -345,7 +343,7 @@ public class Order implements Comparable<Order> {
 				{
 					//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
 					BigDecimal amount = order.getAmountLeft();
-					amount = amount.min(this.getAmountLeft().multiply(buyingPrice));
+					amount = amount.min(this.getAmountLeft().multiply(buyingPrice)).setScale(8, RoundingMode.DOWN);
 									
 					//CHECK IF WE CAN BUY ANYTHING
 					if(amount.compareTo(BigDecimal.ZERO) > 0)
@@ -357,7 +355,7 @@ public class Order implements Comparable<Order> {
 						amount = amount.subtract(amount.remainder(increment));
 						
 						//CALCULATE THE PRICE WE HAVE TO PAY
-						BigDecimal amountGet = amount.multiply(order.getPriceCalc()).setScale(8);
+						BigDecimal amountGet = amount.multiply(order.getPriceCalc()).setScale(8, RoundingMode.UP);
 						
 						//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
 						if(amount.compareTo(BigDecimal.ZERO) > 0)
@@ -399,7 +397,8 @@ public class Order implements Comparable<Order> {
 		
 		//CALCULATE THE MINIMUM INCREMENT AT WHICH I CAN BUY USING GCD
 		BigInteger haveAmount = BigInteger.ONE.multiply(multiplier);
-		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier)).toBigInteger();
+		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier))
+				.setScale(8, RoundingMode.HALF_DOWN).toBigInteger();
 		BigInteger gcd = haveAmount.gcd(priceAmount);
 		haveAmount = haveAmount.divide(gcd);
 		priceAmount = priceAmount.divide(gcd);
@@ -432,7 +431,7 @@ public class Order implements Comparable<Order> {
 	public int compareTo(Order order) 
 	{	
 		//COMPARE ONLY BY PRICE
-		return this.amountWant.compareTo(order.getPriceCalc());	
+		return this.getPriceCalc().compareTo(order.getPriceCalc());	
 	}
 	
 	//COPY
