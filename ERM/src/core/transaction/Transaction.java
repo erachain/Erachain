@@ -681,7 +681,9 @@ public abstract class Transaction {
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				this.creator.setLastReference(this.timestamp, db);
+				if (this.reference != null )
+					// IT IS REFERENCER RECORD?
+					this.creator.setLastReference(this.timestamp, db);
 			}
 		}
 
@@ -700,7 +702,9 @@ public abstract class Transaction {
 				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				this.creator.setLastReference(this.reference, db);
+				if (this.reference != null )
+					// IT IS REFERENCER RECORD?
+					this.creator.setLastReference(this.reference, db);
 			}
 		}
 	}

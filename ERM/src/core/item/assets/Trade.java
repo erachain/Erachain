@@ -14,14 +14,12 @@ public class Trade {
 	
 	private static final int ORDER_LENGTH = 64;
 	private static final int AMOUNT_LENGTH = 12;
-	//private static final int PRICE_LENGTH = 12;
 	private static final int TIMESTAMP_LENGTH = 8;
 	private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
 	
 	private BigInteger initiator;
 	private BigInteger target;
 	private BigDecimal amountHave;
-	//private BigDecimal priceCalc;
 	private BigDecimal amountWant;
 	private long timestamp;
 	
@@ -30,10 +28,9 @@ public class Trade {
 	{
 		this.initiator = initiator;
 		this.target = target;
-		this.amountHave = amountHave;
-		this.amountWant = amountWant;
+		this.amountHave = amountHave.setScale(8);
+		this.amountWant = amountWant.setScale(8);
 		this.timestamp = timestamp;
-		//this.priceCalc = this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
 	}
 
 	public BigInteger getInitiator() 
@@ -77,7 +74,7 @@ public class Trade {
 
 	public BigDecimal getPriceCalc() 
 	{
-		return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_UP);
+		return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
 	}
 	
 	public long getTimestamp()
