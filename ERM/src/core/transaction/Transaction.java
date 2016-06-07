@@ -80,7 +80,6 @@ public abstract class Transaction {
 	public static final int INVALID_PAYMENTS_LENGTH = 34;
 	public static final int NEGATIVE_PRICE = 35;
 	public static final int INVALID_CREATION_BYTES = 36;
-	public static final int AT_ERROR = 10000;
 	public static final int INVALID_TAGS_LENGTH = 37;
 	public static final int INVALID_TYPE_LENGTH = 38;
 	public static final int INVALID_TIMESTAMP = 39;
@@ -105,6 +104,8 @@ public abstract class Transaction {
 	public static final int ITEM_DOES_NOT_STATUSED = 61;
 	public static final int ITEM_DOES_NOT_UNITED = 62;
 
+	public static final int ACCOUNT_ALREADY_PERSONALIZED = 66;
+
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 70;
 	public static final int ITEM_PERSON_LONGITUDE_ERROR = 71;
 	public static final int ITEM_PERSON_RACE_ERROR = 72;
@@ -118,6 +119,7 @@ public abstract class Transaction {
 	public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 81;
 
 	public static final int NOT_YET_RELEASED = 1000;
+	public static final int AT_ERROR = 10000;
 	
 	//TYPES *******
 	// universal

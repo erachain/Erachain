@@ -343,7 +343,7 @@ public class Menu extends JMenuBar
         dealsMenu.add(dealsMenuSendMessage);
         
         JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)

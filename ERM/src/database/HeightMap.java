@@ -32,7 +32,7 @@ public class HeightMap extends DBMap<byte[], Integer>
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void createIndexes(DB database){
-		heightIndex = database.createTreeMap("block_height_index").makeOrGet();
+		this.heightIndex = database.createTreeMap("block_height_index").makeOrGet();
 		
 		Bind.secondaryKey((BTreeMap)this.map, heightIndex, new Fun.Function2<Integer, byte[], Integer>() {
 			@Override

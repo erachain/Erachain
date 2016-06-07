@@ -250,6 +250,17 @@ public class OnDealClick
 		case Transaction.ITEM_PERSON_HEIGHT_ERROR:
 			mess = "Invalid height";
 			break;
+		case Transaction.ACCOUNT_ALREADY_PERSONALIZED:
+			mess = "Account already personalizes";
+			break;
+			
+		case Transaction.INVALID_BLOCK_HEIGHT_ERROR:
+			mess = "Invalid block height";
+			break;
+		case Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR:
+			mess = "Invalid block record sequence";
+			break;
+			
 		}
 		return mess;
 	}

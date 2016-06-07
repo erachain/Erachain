@@ -22,14 +22,10 @@ import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
-import core.crypto.Base58;
-import core.item.ItemCls;
-import core.item.statuses.StatusCls;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.items.persons.RIPPersonFrame;
+//import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
@@ -152,7 +148,7 @@ public class VouchRecordDialog extends JDialog  {
 	        jLabel_RecordInfo = new javax.swing.JScrollPane();
 	        //jLabel_RecordInfo = new javax.swing.JLabel();
 	        jLabel_YourAddress = new javax.swing.JLabel();
-	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
+	        //jComboBox_YourAddress = new javax.swing.JComboBox<>();
 
 	        jLabel_recordID = new javax.swing.JLabel();
 	        jTextField_recordID = new javax.swing.JFormattedTextField();
@@ -248,6 +244,7 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(21, 27, 0, 0);
 	        getContentPane().add(jLabel_YourAddress, gridBagConstraints);
 
+	        //AccountsComboBoxModel
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
 	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
 	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
