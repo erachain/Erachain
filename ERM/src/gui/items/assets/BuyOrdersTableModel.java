@@ -52,7 +52,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		sumTotal = BigDecimal.ZERO.setScale(8);
 		for (Pair<BigInteger, Order> orderPair : this.orders) 	
 		{
-			sumAmount = sumAmount.add(orderPair.getB().getPriceCalc().multiply(orderPair.getB().getAmountLeft()).setScale(8, RoundingMode.DOWN));
+			sumAmount = sumAmount.add(orderPair.getB().getWantAmountLeft());
 			sumTotal = sumTotal.add(orderPair.getB().getAmountLeft());
 		}
 	}
@@ -108,14 +108,15 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				if(row == this.orders.size())
 					return "<html>Total:</html>";
 				
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN));
+				
+				return NumberAsString.getInstance().numberAsString(order.getWantPriceCalc());
 				
 			case COLUMN_BUYING_AMOUNT:
 				
 				if(row == this.orders.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
 				
-				return NumberAsString.getInstance().numberAsString(order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN));
+				return NumberAsString.getInstance().numberAsString(order.getWantAmountLeft());
 			
 			case COLUMN_PRICE:
 				

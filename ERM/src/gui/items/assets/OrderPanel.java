@@ -131,6 +131,7 @@ public class OrderPanel extends JPanel
 				
 		if(false & buying)
 		{
+			/*
 			//LABEL BUYING PRICE
 			labelGBC.gridy++;
 			JLabel buyingPriceLabel = new JLabel(Lang.getInstance().translate("Buying price") + ":");
@@ -165,6 +166,7 @@ public class OrderPanel extends JPanel
 					calculateBuyingPrice(txtBuyingPrice);
 				}
 			});
+			*/
 		}
 		else
 		{
@@ -320,7 +322,8 @@ public class OrderPanel extends JPanel
 	    }
 	}
 	
-	public void calculateBuyingPrice(JTextField target) 
+	/*
+	public void calculateBuyingPrice(JTextField target, boolean buying) 
 	{
 	    try
 	    {
@@ -332,8 +335,9 @@ public class OrderPanel extends JPanel
 	    	target.setText("0");
 	    }
 	    
-	    calculateBuyingAmount(txtBuyingAmount, false);
+	    calculateBuyingAmount(txtBuyingAmount, buying);
 	}
+	*/
 	
 	public void calculateBuyingAmount(JTextField target, boolean buying) 
 	{
@@ -341,7 +345,19 @@ public class OrderPanel extends JPanel
 	    {
 	    	BigDecimal price = new BigDecimal(txtPrice.getText());		    	
 	    	BigDecimal amount = new BigDecimal(txtAmount.getText());
-	    	target.setText(price.multiply(amount).setScale(8, RoundingMode.DOWN).toPlainString());
+	    	if (buying) {
+	    		if (this.have.isDivisible()) {
+	    	    	target.setText(price.multiply(amount).setScale(8, RoundingMode.HALF_UP).toPlainString());
+	    		} else {
+	    	    	target.setText(price.multiply(amount).setScale(3, RoundingMode.HALF_UP).toPlainString());
+	    		}
+	    	} else {
+	    		if (this.want.isDivisible()) {
+	    	    	target.setText(price.multiply(amount).setScale(8, RoundingMode.HALF_UP).toPlainString());
+	    		} else {
+	    	    	target.setText(price.multiply(amount).setScale(3, RoundingMode.HALF_UP).toPlainString());
+	    		}
+	    	}
 	    }
 	    catch(Exception e)
 	    {
@@ -445,7 +461,7 @@ public class OrderPanel extends JPanel
 		}
 
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave.setScale(8), amountWant.setScale(8), feePow);
+		Pair<Transaction, Integer> result = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave.setScale(8, RoundingMode.HALF_DOWN), amountWant.setScale(8, RoundingMode.HALF_DOWN), feePow);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {

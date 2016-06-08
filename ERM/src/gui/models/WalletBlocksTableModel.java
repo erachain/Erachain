@@ -67,7 +67,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	{
 		try 
 		{
-			if(blocks == null || blocks.size() - 1 < row)
+			if(blocks == null || blocks.size() < 1 || blocks.size() - 1 < row)
 			{
 				return null;
 			}
