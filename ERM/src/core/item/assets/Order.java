@@ -113,6 +113,15 @@ public class Order implements Comparable<Order> {
 	{
 		return this.amountHave.subtract(this.fulfilled);
 	}
+	
+	public BigDecimal getWantAmountLeft()
+	{
+		if (this.getWantAsset().isDivisible())
+			return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
+		
+		return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
+		
+	}
 
 	public BigDecimal getAmountWant() 
 	{
@@ -120,7 +129,11 @@ public class Order implements Comparable<Order> {
 	}
 	public BigDecimal getPriceCalc() 
 	{
-		return this.amountWant.divide(amountHave, 12, RoundingMode.DOWN);
+			return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
+	}	
+	public BigDecimal getWantPriceCalc() 
+	{
+			return this.amountHave.divide(amountWant, 12, RoundingMode.HALF_UP);
 	}	
 	
 	public BigDecimal getFulfilled()
