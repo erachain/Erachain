@@ -402,6 +402,11 @@ public abstract class Transaction {
 	{
 		return this.reference;
 	}			
+	// for isValid - check reference value
+	public boolean isReferenced()
+	{
+		return true;
+	}			
 
 	
 	public int calcCommonFee()
@@ -639,15 +644,13 @@ public abstract class Transaction {
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		if(this.reference != null)
-		{
-			Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		if (reference != null && this.isReferenced()) {
 			if (reference.compareTo(this.reference) != 0)
 				return INVALID_REFERENCE;
-			if (reference.compareTo(this.timestamp) >= 0)
+			else if (reference.compareTo(this.timestamp) >= 0)
 				return INVALID_TIMESTAMP;
-		}
-		
+		}		
 
 		//CHECK CREATOR
 		if(!Crypto.getInstance().isValidAddress(this.creator.getAddress()))
@@ -683,8 +686,8 @@ public abstract class Transaction {
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				if (this.reference != null )
-					// IT IS REFERENCER RECORD?
+				if (this.isReferenced() )
+					// IT IS REFERENCED RECORD?
 					this.creator.setLastReference(this.timestamp, db);
 			}
 		}
@@ -704,8 +707,8 @@ public abstract class Transaction {
 				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
-				if (this.reference != null )
-					// IT IS REFERENCER RECORD?
+				if (this.isReferenced() )
+					// IT IS REFERENCED RECORD?
 					this.creator.setLastReference(this.reference, db);
 			}
 		}

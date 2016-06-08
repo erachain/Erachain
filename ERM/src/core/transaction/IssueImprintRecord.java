@@ -70,6 +70,13 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Imprint"; }
 	
+	@Override
+	public boolean isReferenced()
+	{
+		// reference not used - because all imprint is unique
+		return false;
+	}			
+
 
 	//PARSE CONVERT
 	
