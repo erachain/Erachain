@@ -93,17 +93,18 @@ public class GenesisBlock extends Block{
 						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.1330, (float)1.9224,
 						"-", "-", "-", (int) 188, "-");
 				
-				// SEND GENESIS ASSETS
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 0l, bdAmount0));
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 				//CREATE ISSUE PERSON TRANSACTION
-				this.addTransaction(new GenesisIssuePersonRecord(user));
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
 				this.addTransaction(new GenesisCertifyPersonRecord(recipient, nonce++));
 
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
+
+				// SEND GENESIS ASSETS
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 		    }
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
 			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERM.jar -testnet=" + genesisTimestamp;
@@ -240,16 +241,17 @@ public class GenesisBlock extends Block{
 				
 				recipient = user.getCreator();
 				
+				//CREATE ISSUE PERSON TRANSACTION
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
+
 				bdAmount0 = new BigDecimal(Math.round(pick * generalKoeff0)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 0l, bdAmount0));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal(Math.round(pick * generalKoeff1)).setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
 
 			}
 
@@ -261,16 +263,16 @@ public class GenesisBlock extends Block{
 				
 				recipient = user.getCreator();
 				
+				//CREATE ISSUE PERSON TRANSACTION
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
+
 				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 0l, bdAmount0));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal("0.001").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
-
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
 				// CERTIFY PERSON
 				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
@@ -285,36 +287,20 @@ public class GenesisBlock extends Block{
 				
 				recipient = user.getCreator();
 				
+				//CREATE ISSUE PERSON TRANSACTION
+				//this.addTransaction(new GenesisIssuePersonRecord(user));
+
 				bdAmount0 = new BigDecimal(Math.round(pick * minorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 0l, bdAmount0));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal("0.0001").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user, recipient));
 
 				// CERTIFY PERSON
 				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
-
-			}
-
-			// NOT PERSONALIZE INVESTORS
-			for(List<Object> item: genesisInvestors)
-			{
-				
-				pick = (int)item.get(0);				
-				recipient = new Account((String)item.get(1));
-				
-				bdAmount0 = new BigDecimal(Math.round(pick * investorKoeff)).setScale(8);
-				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 0l, bdAmount0));
-
-				bdAmount1 = new BigDecimal("0.01").setScale(8);
-				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, 1l, bdAmount1));
 
 			}
 
@@ -327,10 +313,28 @@ public class GenesisBlock extends Block{
 				{
 					//throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
 					LOGGER.error(Lang.getInstance().translate("Genesis person error"));
+				} else {
+					//this.addTransaction(new GenesisIssuePersonRecord(person));
 				}
-
-				//this.addTransaction(new GenesisIssuePersonRecord(person));
 			}
+
+			// NOT PERSONALIZE INVESTORS
+			for(List<Object> item: genesisInvestors)
+			{
+				
+				pick = (int)item.get(0);				
+				recipient = new Account((String)item.get(1));
+				
+				bdAmount0 = new BigDecimal(Math.round(pick * investorKoeff)).setScale(8);
+				//bal0 = bal0.add(bdAmount0).setScale(8);
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+
+				bdAmount1 = new BigDecimal("0.01").setScale(8);
+				//bal1 = bal1.add(bdAmount1).setScale(8);
+				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+
+			}
+
 
 			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
 			this.setTransactionsSignature(this.generateHash());
@@ -353,11 +357,11 @@ public class GenesisBlock extends Block{
 			this.addTransaction(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
-		for (int i = 0; i <= NoteCls.HIRING_KEY; i++) 
+		for (int i = 1; i <= NoteCls.HIRING_KEY; i++) 
 			this.addTransaction(new GenesisIssueNoteRecord(makeNote(i)));
 
 		///// STATUSES
-		for (int i = 0; i <= StatusCls.EXPIRED_KEY; i++) 
+		for (int i = 1; i <= StatusCls.EXPIRED_KEY; i++) 
 			this.addTransaction(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
@@ -441,7 +445,7 @@ public class GenesisBlock extends Block{
 	//GETTERS
 	
 	@Override
-	public Block getParent()
+	public Block getParent(DBSet db)
 	{
 		//PARENT DOES NOT EXIST
 		return null;
@@ -525,7 +529,7 @@ public class GenesisBlock extends Block{
 	}
 	
 	@Override
-	public boolean isValid(DBSet db)
+	public boolean isValid(DBSet db, boolean noTime)
 	{
 		//CHECK IF NO OTHER BLOCK IN DB
 		if(db.getBlockMap().getLastBlock() != null)

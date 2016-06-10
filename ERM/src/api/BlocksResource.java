@@ -152,7 +152,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
 		}
 		
-		Block child = block.getChild();
+		Block child = block.getChild(DBSet.getInstance());
 		
 		//CHECK IF CHILD EXISTS
 		if(child == null)
@@ -245,7 +245,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
 		}
 		
-		return String.valueOf(block.getHeight());
+		return String.valueOf(block.getHeight(DBSet.getInstance()));
 	}
 	
 	@GET

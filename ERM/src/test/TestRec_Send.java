@@ -32,8 +32,8 @@ public class TestRec_Send {
 
 	Long releaserReference = null;
 
-	long ERMO_KEY = 0l;
-	long FEE_KEY = 1l;
+	long ERMO_KEY = AssetCls.ERMO_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -126,7 +126,7 @@ public class TestRec_Send {
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
 				recipient, 
-				0l, 
+				ERMO_KEY, 
 				null,
 				data,
 				isText,
@@ -157,7 +157,7 @@ public class TestRec_Send {
 		assertEquals(new String(r_SendV3.getData()), new String(messageTransactionV3_2.getData()));
 		assertEquals(r_SendV3.getCreator(), messageTransactionV3_2.getCreator());
 		assertEquals(r_SendV3.getRecipient(), messageTransactionV3_2.getRecipient());
-		assertEquals(r_SendV3.getKey(), messageTransactionV3_2.getKey());
+		assertEquals(-1, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
@@ -248,7 +248,7 @@ public class TestRec_Send {
 		assertEquals(null,messageTransactionV3_2.getData());
 		assertEquals(r_SendV3.getCreator(), messageTransactionV3_2.getCreator());
 		assertEquals(r_SendV3.getRecipient(), messageTransactionV3_2.getRecipient());
-		assertEquals(r_SendV3.getKey(), messageTransactionV3_2.getKey());
+		assertEquals(-1, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
 		assertEquals(r_SendV3.isSignatureValid(), true);
@@ -295,7 +295,7 @@ public class TestRec_Send {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, maker.getLastReference(db)
+				++timestamp, maker.getLastReference(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		

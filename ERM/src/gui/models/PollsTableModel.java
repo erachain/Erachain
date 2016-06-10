@@ -25,7 +25,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	
 	public PollsTableModel()
 	{
-		this.asset = Controller.getInstance().getAsset(0l);
+		this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
 		Controller.getInstance().addObserver(this);
 	}
 	

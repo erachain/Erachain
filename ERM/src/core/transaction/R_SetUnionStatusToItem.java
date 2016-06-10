@@ -325,7 +325,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 		super.process(db, asPack);
 		
 		Block block = db.getBlockMap().getLastBlock();
-		int blockIndex = block.getHeight();
+		int blockIndex = block.getHeight(db);
 		int transactionIndex = block.getTransactionIndex(signature);
 
 		Tuple4<Long, Long, Integer, Integer> itemP = new Tuple4<Long, Long, Integer, Integer>

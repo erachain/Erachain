@@ -24,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
 import core.voting.Poll;
 import database.wallet.PollMap;
 
@@ -94,7 +95,7 @@ public class VotingPanel extends JPanel
 				{
 					row = table.convertRowIndexToModel(row);
 					Poll poll = pollsModel.getPoll(row);
-					new PollFrame(poll, Controller.getInstance().getAsset(0l));
+					new PollFrame(poll, Controller.getInstance().getAsset(AssetCls.FEE_KEY));
 				}
 		     }
 		});

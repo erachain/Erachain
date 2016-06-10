@@ -151,7 +151,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 
 		Block block = new GenesisBlock();
-		int blockIndex = block.getHeight();
+		int blockIndex = block.getHeight(db);
 		int transactionIndex = block.getTransactionIndex(signature);
 		//UPDATE RECIPIENT
 		Tuple4<Long, Long, Integer, Integer> itemP = 

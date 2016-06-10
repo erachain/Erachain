@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
+import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
 import lang.Lang;
 import utils.DateTimeFormat;
@@ -27,6 +28,8 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 	{
 		super(orderCreation);
 				
+		Order order = orderCreation.getOrder();
+		
 		//LABEL HAVE
 		++labelGBC.gridy;
 		JLabel haveLabel = new JLabel(Lang.getInstance().translate("Have") + ":");
@@ -35,8 +38,8 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		//HAVE
 		++detailGBC.gridy;
 		JTextField have = new JTextField(
-				orderCreation.getOrder().getAmountHave().toPlainString() + " x "
-				+ String.valueOf(orderCreation.getOrder().getHaveAsset().toString()));
+				order.getAmountHave().toPlainString() + " x "
+				+ String.valueOf(order.getHaveAsset().toString()));
 		have.setEditable(false);
 		MenuPopupUtil.installContextMenu(have);
 		this.add(have, detailGBC);
@@ -49,8 +52,8 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		//HAVE
 		++detailGBC.gridy;
 		JTextField want = new JTextField(
-				orderCreation.getOrder().getAmountWant().toPlainString() + " x "
-				+ String.valueOf(orderCreation.getOrder().getWantAsset().toString()));
+				order.getAmountWant().toPlainString() + " x "
+				+ String.valueOf(order.getWantAsset().toString()));
 		want.setEditable(false);
 		MenuPopupUtil.installContextMenu(want);
 		this.add(want, detailGBC);
@@ -62,7 +65,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 				
 		//PRICE
 		++detailGBC.gridy;
-		JTextField price = new JTextField(orderCreation.getOrder().getPriceCalc().toPlainString());
+		JTextField price = new JTextField(order.getPriceCalc().toPlainString() + " / " + order.getWantPriceCalc().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);	

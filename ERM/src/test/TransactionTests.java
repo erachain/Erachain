@@ -867,7 +867,7 @@ public class TransactionTests {
 		//CREATE NAME UPDATE
 		SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
-		nameSaleTransaction.process(false);
+		nameSaleTransaction.process(db, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawNameSale = nameSaleTransaction.toBytes(true, null);

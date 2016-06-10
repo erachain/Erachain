@@ -20,6 +20,7 @@ import utils.Corekeys;
 import utils.StorageUtils;
 import api.NameStorageResource;
 import controller.Controller;
+import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.payment.Payment;
 import database.DBSet;
@@ -482,7 +483,7 @@ public class Profile {
 				 JSONObject amountAssetJson = new JSONObject();
 				 amountAssetJson.put(NameStorageResource.AMOUNT_JSON_KEY, payment.getAmount().toString());
 				 long asset = payment.getAsset();
-				 if(asset != 0L)
+				 if(asset != AssetCls.FEE_KEY)
 				 {
 					 amountAssetJson.put(NameStorageResource.ASSET_JSON_KEY, asset);
 				 }

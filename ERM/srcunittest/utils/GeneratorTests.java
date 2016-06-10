@@ -44,11 +44,11 @@ public class GeneratorTests {
 		generator.setConfirmedBalance(Transaction.FEE_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
 				
 		//GENERATE NEXT BLOCK
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
-		Account recipient = new Account("QcA6u3ejXLHKH4Km2wH9rXNGJAp2e4iFeA");
+		Account recipient = new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5");
 		DBSet snapshot = databaseSet.fork();
 		for(int i=0; i<1000; i++)
 		{
@@ -72,7 +72,7 @@ public class GeneratorTests {
 		assertEquals(1000, newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet));
+		assertEquals(true, newBlock.isValid(databaseSet, true));
 	}
 	//TODO CALCULATETRANSACTIONSIGNATURE
 }

@@ -35,27 +35,24 @@ public class Synchronizer
 		this.run = true;
 	}
 	
-	public List<Transaction> synchronize(DBSet db, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks) throws Exception
 	{
-		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
-		
-		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-		DBSet fork = db.fork();	
 		
 		AT_API_Platform_Impl.getInstance().setDBSet( fork );
-
-//		int originalHeight = 0;
+	
+		//int originalHeight = 0;
 		
 		//ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
 		if(lastCommonBlock != null)
 		{
 			//GET STATES TO RESTORE
-			Map<String, byte[]> states = db.getATStateMap().getStates( lastCommonBlock.getHeight() );
+			Map<String, byte[]> states = fork.getATStateMap().getStates( lastCommonBlock.getHeight(fork) );
 			
 			//HEIGHT TO ROLL BACK
-//			originalHeight = lastCommonBlock.getHeight();
-			int height = (int)(Math.round( lastCommonBlock.getHeight() /AT_Constants.STATE_STORE_DISTANCE))*AT_Constants.STATE_STORE_DISTANCE;
-
+	//		originalHeight = lastCommonBlock.getHeight();
+			int height = (int)(Math.round( lastCommonBlock.getHeight(fork) /AT_Constants.STATE_STORE_DISTANCE))
+					*AT_Constants.STATE_STORE_DISTANCE;
+	
 			//GET LAST BLOCK
 			Block lastBlock = fork.getBlockMap().getLastBlock();
 			
@@ -65,8 +62,8 @@ public class Synchronizer
 				lastBlock.orphan(fork);
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
-
-			while ( lastBlock.getHeight() >= height && lastBlock.getHeight() > 11 )
+	
+			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 11 )
 			{
 				newBlocks.add( 0 , lastBlock );
 				//Block tempBlock = fork.getBlockMap().getLastBlock();
@@ -79,7 +76,7 @@ public class Synchronizer
 			{
 				byte[] address = Base58.decode( id ); //25 BYTES
 				address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
-				AT at = db.getATMap().getAT( address );
+				AT at = fork.getATMap().getAT( address );
 				
 				at.setState( states.get( id ) );
 				
@@ -90,39 +87,51 @@ public class Synchronizer
 			fork.getATMap().deleteAllAfterHeight( height );
 			fork.getATStateMap().deleteStatesAfter( height );
 			
-
+	
 		}
 		
 		//VALIDATE THE NEW BLOCKS
 		for(Block block: newBlocks)
 		{
+			int heigh = block.getHeight(fork);
+
 			//CHECK IF VALID
-			if(block.isValid(fork))
+			if(block.isValid(fork, false))
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				block.process(fork);
 			}
 			else
 			{
-				AT_API_Platform_Impl.getInstance().setDBSet( db );
+				AT_API_Platform_Impl.getInstance().setDBSet( fork );
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer");
 			}
 		}
+	}
 
-		AT_API_Platform_Impl.getInstance().setDBSet( db );
+	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	{
+		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
+		
+		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
+		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks);	
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+
+		AT_API_Platform_Impl.getInstance().setDBSet( dbSet );
+		
 		if(lastCommonBlock != null)
 		{
 			//GET STATES TO RESTORE
-			Map<String, byte[]> states = db.getATStateMap().getStates( lastCommonBlock.getHeight() );
+			Map<String, byte[]> states = dbSet.getATStateMap().getStates( lastCommonBlock.getHeight(dbSet) );
 			
 			//HEIGHT TO ROLL BACK
-			int height = (int)(Math.round( lastCommonBlock.getHeight()/AT_Constants.STATE_STORE_DISTANCE))*AT_Constants.STATE_STORE_DISTANCE;
+			int height = (int)(Math.round( lastCommonBlock.getHeight(dbSet)/AT_Constants.STATE_STORE_DISTANCE))
+					*AT_Constants.STATE_STORE_DISTANCE;
 
 			//GET LAST BLOCK
-			Block lastBlock = db.getBlockMap().getLastBlock();
+			Block lastBlock = dbSet.getBlockMap().getLastBlock();
 			
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
@@ -130,31 +139,31 @@ public class Synchronizer
 				//ADD ORPHANED TRANSACTIONS
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				
-				lastBlock.orphan(db);
-				lastBlock = db.getBlockMap().getLastBlock();
+				lastBlock.orphan(dbSet);
+				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 
-			while ( lastBlock.getHeight() >= height && lastBlock.getHeight() > 11 )
+			while ( lastBlock.getHeight(dbSet) >= height && lastBlock.getHeight(dbSet) > 11 )
 			{
 				orphanedTransactions.addAll(lastBlock.getTransactions());
-				lastBlock.orphan();
-				lastBlock = db.getBlockMap().getLastBlock();
+				lastBlock.orphan(dbSet);
+				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 			
 			for ( String id : states.keySet() )
 			{
 				byte[] address = Base58.decode( id ); //25 BYTES
 				address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
-				AT at = db.getATMap().getAT( address );
+				AT at = dbSet.getATMap().getAT( address );
 				
 				at.setState( states.get( id ) );
 				
-				db.getATMap().update( at , height );
+				dbSet.getATMap().update( at , height );
 				
 			}
 
-			db.getATMap().deleteAllAfterHeight( height );
-			db.getATStateMap().deleteStatesAfter( height );
+			dbSet.getATMap().deleteAllAfterHeight( height );
+			dbSet.getATStateMap().deleteStatesAfter( height );
 
 		}
 		
@@ -162,7 +171,7 @@ public class Synchronizer
 		for(Block block: newBlocks)
 		{
 			//SYNCHRONIZED PROCESSING
-			this.process(block);
+			this.process(dbSet, block);
 		}	
 		
 		return orphanedTransactions;
@@ -174,10 +183,12 @@ public class Synchronizer
 		
 		//FIND LAST COMMON BLOCK
 		Block common =  this.findLastCommonBlock(peer);
-				
+		
+		DBSet dbSet = DBSet.getInstance();
+		
 		//CHECK COMMON BLOCK EXISTS
 		List<byte[]> signatures;
-		if(Arrays.equals(common.getSignature(), DBSet.getInstance().getBlockMap().getLastBlockSignature()))
+		if(Arrays.equals(common.getSignature(), dbSet.getBlockMap().getLastBlockSignature()))
 		{
 			//GET NEXT 500 SIGNATURES
 			signatures = this.getBlockSignatures(common, BlockChain.MAX_SIGNATURES, peer);
@@ -192,10 +203,10 @@ public class Synchronizer
 				Block block = blockBuffer.getBlock(signature);
 				
 				//PROCESS BLOCK
-				if(!this.process(block))
+				if(!this.process(dbSet, block))
 				{
 					//INVALID BLOCK THROW EXCEPTION
-					throw new Exception("Dishonest peer");
+					throw new Exception("Dishonest peer on block " + block.getHeight(dbSet));
 				}
 			}
 			
@@ -205,13 +216,14 @@ public class Synchronizer
 		else
 		{
 			//GET SIGNATURES FROM COMMON HEIGHT UNTIL CURRENT HEIGHT
-			signatures = this.getBlockSignatures(common, DBSet.getInstance().getBlockMap().getLastBlock().getHeight() - common.getHeight(), peer);	
+			signatures = this.getBlockSignatures(common, dbSet.getBlockMap().getLastBlock()
+					.getHeight(dbSet) - common.getHeight(dbSet), peer);	
 			
 			//GET THE BLOCKS FROM SIGNATURES
 			List<Block> blocks = this.getBlocks(signatures, peer);
 							
 			//SYNCHRONIZE BLOCKS
-			List<Transaction> orphanedTransactions = this.synchronize(DBSet.getInstance(), common, blocks);
+			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER
 			for(Transaction transaction: orphanedTransactions)
@@ -256,16 +268,20 @@ public class Synchronizer
 	
 	private Block findLastCommonBlock(Peer peer) throws Exception
 	{
-		Block block = DBSet.getInstance().getBlockMap().getLastBlock();
+		
+		DBSet dbSet = DBSet.getInstance();
+		
+		Block block = dbSet.getBlockMap().getLastBlock();
 		
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
 		List<byte[]> headers = this.getBlockSignatures(block.getSignature(), peer);
-		while(headers.size() == 0 && block.getHeight() > 1)
+		
+		while(headers.size() == 0 && block.getHeight(dbSet) > 1)
 		{
 			//GO 500 BLOCKS BACK
-			for(int i=0; i<BlockChain.MAX_SIGNATURES && block.getHeight() > 1; i++)
+			for(int i=0; i<BlockChain.MAX_SIGNATURES && block.getHeight(dbSet) > 1; i++)
 			{
-				block = block.getParent();
+				block = block.getParent(dbSet);
 			}
 			
 			headers = this.getBlockSignatures(block.getSignature(), peer);
@@ -281,9 +297,9 @@ public class Synchronizer
 		for(int i=headers.size()-1; i>=0; i--)
 		{
 			//CHECK IF WE KNOW BLOCK
-			if(DBSet.getInstance().getBlockMap().contains(headers.get(i)))
+			if(dbSet.getBlockMap().contains(headers.get(i)))
 			{
-				return DBSet.getInstance().getBlockMap().get(headers.get(i));
+				return dbSet.getBlockMap().get(headers.get(i));
 			}
 		}
 		
@@ -330,18 +346,18 @@ public class Synchronizer
 	
 	
 	//SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
-	public synchronized boolean process(Block block) 
+	public synchronized boolean process(DBSet dbSet, Block block) 
 	{
 		//CHECK IF WE ARE STILL PROCESSING BLOCKS
 		if(this.run)
 		{
 			//SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-			if(block.isValid())
+			if(block.isValid(dbSet, false))
 			{
 				//PROCESS
-				DBSet.getInstance().getBlockMap().setProcessing(true);
-				block.process();		
-				DBSet.getInstance().getBlockMap().setProcessing(false);
+				dbSet.getBlockMap().setProcessing(true);
+				block.process(dbSet);		
+				dbSet.getBlockMap().setProcessing(false);
 				
 				return true;
 			}
@@ -353,6 +369,6 @@ public class Synchronizer
 	public void stop() {
 		
 		this.run = false;
-		this.process(null);
+		this.process(DBSet.getInstance(), null);
 	}
 }

@@ -17,27 +17,27 @@ import database.wallet.FavoriteItem;
 public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
-	public static final long ERMO_KEY = 0l;
+	public static final long ERMO_KEY = 1l;
 	public static final String ERMO_ABBREV = "ERM"; // ERMO (main rights units)
 	public static final String ERMO_NAME = "ERMO";
 	public static final String ERMO_DESCR = "It is the basic unit of Environment Real Management Objects (" + ERMO_NAME + ")";
 	// FEE KEY
-	public static final long FEE_KEY = 1l;
+	public static final long FEE_KEY = 2l;
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
 	public static final String FEE_NAME = "COMPU";
 	public static final String FEE_DESCR = "It is an drops of computation used for deals (" + FEE_NAME + ")";
 	// TRUST KEY
-	public static final long TRUST_KEY = 2l;
+	public static final long TRUST_KEY = 3l;
 	public static final String TRUST_ABBREV = "TRU"; // COMPU (compute units)
 	public static final String TRUST_NAME = "TRUST";
 	public static final String TRUST_DESCR = "It is an drops of the trust (" + TRUST_NAME + ")";
 	// REAL KEY
-	public static final long REAL_KEY = 3l;
+	public static final long REAL_KEY = 4l;
 	public static final String REAL_ABBREV = "RIL"; // COMPU (compute units)
 	public static final String REAL_NAME = "REAL";
 	public static final String REAL_DESCR = "It is an drops of the real (" + REAL_NAME + ")";
 	// DEaL KEY
-	public static final long DEAL_KEY = 4l;
+	public static final long DEAL_KEY = 5l;
 	public static final String DEAL_ABBREV = "DIL"; // COMPU (compute units)
 	public static final String DEAL_NAME = "DEAL";
 	public static final String DEAL_DESCR = "It is an drops of the deal (" + DEAL_NAME + ")";
@@ -46,7 +46,7 @@ public abstract class AssetCls extends ItemCls {
 	public static final int VENTURE = 2;
 	public static final int NAME = 3;
 	
-	public static final int INITIAL_FAVORITES = 2;
+	public static final int INITIAL_FAVORITES = 4;
 		
 	public AssetCls(byte[] typeBytes, Account creator, String name, String description)
 	{

@@ -33,7 +33,7 @@ public class UpdateUtil {
 		Block b = new GenesisBlock();
 		do
 		{
-			if ( b.getHeight() >= height )
+			if ( b.getHeight(DBSet.getInstance()) >= height )
 			{
 				List<Transaction> txs = b.getTransactions();
 				for (Transaction tx : txs) {
@@ -87,7 +87,7 @@ public class UpdateUtil {
 					}
 				}
 			}
-			b = b.getChild();
+			b = b.getChild(DBSet.getInstance());
 		}while ( b != null );
 
 	}
@@ -104,15 +104,15 @@ public class UpdateUtil {
 			int counter = 1;
 			for (Transaction tx : txs)
 			{
-				DBSet.getInstance().getTransactionFinalMap().add(b.getHeight(), counter, tx);
+				DBSet.getInstance().getTransactionFinalMap().add(b.getHeight(DBSet.getInstance()), counter, tx);
 				counter++;
 			}
-			if ( b.getHeight()%2000 == 0 )
+			if ( b.getHeight(DBSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
+				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight(DBSet.getInstance()));
 				DBSet.getInstance().commit();
 			}
-			b = b.getChild();
+			b = b.getChild(DBSet.getInstance());
 		}while ( b != null );
 
 	}
@@ -135,12 +135,12 @@ public class UpdateUtil {
 					}
 				}
 			}
-			if ( b.getHeight()%2000 == 0 )
+			if ( b.getHeight(DBSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
+				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight(DBSet.getInstance()));
 				DBSet.getInstance().commit();
 			}
-			b = b.getChild();
+			b = b.getChild(DBSet.getInstance());
 		}while ( b != null );
 		
 	}

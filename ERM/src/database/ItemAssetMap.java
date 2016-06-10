@@ -36,8 +36,6 @@ public class ItemAssetMap extends Item_Map
 	public ItemAssetMap(ItemAssetMap parent) 
 	{
 		super(parent);
-		
-		this.key = this.getKey();
 	}
 
 	// type+name not initialized yet! - it call as Super in New

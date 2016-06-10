@@ -10,6 +10,7 @@ import utils.ObserverMessage;
 import controller.Controller;
 import core.block.Block;
 import database.BlockMap;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -78,7 +79,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			{
 			case COLUMN_HEIGHT:
 				
-				return block.getHeight();
+				return block.getHeight(DBSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				

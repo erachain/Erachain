@@ -313,7 +313,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 	{		
 		for (int i=0; i < cbxFavorites.getItemCount(); i++)
 		{
-			AssetCls asset  = cbxFavorites.getItemAt(i);
+			AssetCls asset  = cbxFavorites.getItemAt(i+1);
 			if (asset.getKey() == AssetCls.FEE_KEY)
 			{
 				cbxFavorites.setSelectedIndex(i);

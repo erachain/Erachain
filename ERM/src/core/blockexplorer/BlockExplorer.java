@@ -1320,12 +1320,12 @@ public class BlockExplorer
 		else
 		{
 			block = getLastBlock();	
-			start = block.getHeight(); 
+			start = block.getHeight(DBSet.getInstance()); 
 		}
 
 		Map output=new LinkedHashMap();
 
-		output.put("maxHeight", block.getHeight());
+		output.put("maxHeight", block.getHeight(DBSet.getInstance()));
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
 
@@ -1370,7 +1370,7 @@ public class BlockExplorer
 			output.put(counter, blockJSON);
 
 			counter --;
-			block = block.getParent();
+			block = block.getParent(DBSet.getInstance());
 		}
 		while(block != null && counter >= start - 20);
 
@@ -1384,7 +1384,7 @@ public class BlockExplorer
 
 		Block lastBlock = getLastBlock();
 
-		output.put("height", lastBlock.getHeight());
+		output.put("height", lastBlock.getHeight(DBSet.getInstance()));
 		output.put("timestamp", lastBlock.getTimestamp());
 		output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp()));
 
@@ -1520,9 +1520,9 @@ public class BlockExplorer
 			transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
 			transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getParent(); 
-			transactionDataJSON.put("height", parentBlock.getHeight());
-			transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight() + 1 );
+			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getParent(DBSet.getInstance()); 
+			transactionDataJSON.put("height", parentBlock.getHeight(DBSet.getInstance()));
+			transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(DBSet.getInstance()) + 1 );
 
 			transactionDataJSON.put("timestamp", trade.getTimestamp());
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
@@ -1688,14 +1688,14 @@ public class BlockExplorer
 
 			if(transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) 
 			{
-				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount().getAddress());
+				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount(DBSet.getInstance()).getAddress());
 			}
 
 			if(transaction.isConfirmed(db))
 			{
-				Block parent = transaction.getParent();
+				Block parent = transaction.getParent(DBSet.getInstance());
 				transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
-				transactionDataJSON.put("blockHeight", parent.getHeight());
+				transactionDataJSON.put("blockHeight", parent.getHeight(DBSet.getInstance()));
 			}
 
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
@@ -1712,7 +1712,7 @@ public class BlockExplorer
 			transactionDataJSON.put("timestamp", block.getTimestamp());
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
-			int height = block.getHeight();
+			int height = block.getHeight(DBSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 
@@ -1791,7 +1791,7 @@ public class BlockExplorer
 				}
 				seq ++;
 			}
-			block = block.getChild();
+			block = block.getChild(DBSet.getInstance());
 			height ++;
 		}
 		while(block != null);
@@ -1981,7 +1981,7 @@ public class BlockExplorer
 			for (Transaction transaction : block.getTransactions()) {
 				if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION )
 				{
-					Account atAccount = ((DeployATTransaction)transaction).getATaccount();
+					Account atAccount = ((DeployATTransaction)transaction).getATaccount(DBSet.getInstance());
 
 					if(atAccount.getAddress().equals(address))
 					{
@@ -2017,7 +2017,7 @@ public class BlockExplorer
 				for (byte[] b : blocks)
 				{
 					Block block = DBSet.getInstance().getBlockMap().get(b);
-					all.add( new BlExpUnit( block.getHeight(), 0, block ) );
+					all.add( new BlExpUnit( block.getHeight(DBSet.getInstance()), 0, block ) );
 				}
 			}
 		
@@ -2045,7 +2045,8 @@ public class BlockExplorer
 				
 				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 				
-				all.add( new BlExpUnit(txInitiator.getParent().getHeight(), txTarget.getParent().getHeight(), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
+				all.add( new BlExpUnit(txInitiator.getParent(DBSet.getInstance()).getHeight(DBSet.getInstance()),
+						txTarget.getParent(DBSet.getInstance()).getHeight(DBSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 			}
 			
 			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
@@ -2715,7 +2716,7 @@ public class BlockExplorer
 
 		int txsCount = all.size();
 
-		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight());
+		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight(DBSet.getInstance()));
 
 		for(Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet())
 		{	
@@ -2726,16 +2727,16 @@ public class BlockExplorer
 		output.put("type", "block");
 
 		output.put("blockSignature", Base58.encode(block.getSignature()));
-		output.put("blockHeight", block.getHeight());
+		output.put("blockHeight", block.getHeight(DBSet.getInstance()));
 
-		if(block.getParent() != null)
+		if(block.getParent(DBSet.getInstance()) != null)
 		{
-			output.put("parentBlockSignature", Base58.encode(block.getParent().getSignature()));
+			output.put("parentBlockSignature", Base58.encode(block.getParent(DBSet.getInstance()).getSignature()));
 		}
 
-		if(block.getChild() != null)
+		if(block.getChild(DBSet.getInstance()) != null)
 		{
-			output.put("childBlockSignature", Base58.encode(block.getChild().getSignature()));
+			output.put("childBlockSignature", Base58.encode(block.getChild(DBSet.getInstance()).getSignature()));
 		}
 
 		int size = all.size();
@@ -2814,7 +2815,7 @@ public class BlockExplorer
 			transactionDataJSON.put("timestamp", block.getTimestamp());
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
-			int height = block.getHeight();
+			int height = block.getHeight(DBSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 

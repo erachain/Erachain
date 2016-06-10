@@ -25,23 +25,23 @@ public class BlockChain
 	{	
 		//CREATE GENESIS BLOCK
 		GenesisBlock genesisBlock = new GenesisBlock();
-		DBSet db = DBSet.getInstance();
+		DBSet dbSet = DBSet.getInstance();
 
 		if(Settings.getInstance().isTestnet()) {
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
-		if(	!db.getBlockMap().contains(genesisBlock.getSignature())
+		if(	!dbSet.getBlockMap().contains(genesisBlock.getSignature())
 			||
-			db.getBlockMap().get(genesisBlock.getSignature()).getTimestamp() != genesisBlock.getTimestamp())
+			dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp() != genesisBlock.getTimestamp())
 		// process genesis block
 		{
-			if(db.getBlockMap().getLastBlockSignature() != null)
+			if(dbSet.getBlockMap().getLastBlockSignature() != null)
 			{
 				LOGGER.info("reCreate Database...");	
 		
 	        	try {
-	        		db.close();
+	        		dbSet.close();
 					Controller.getInstance().reCreateDB(false);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(),e);
@@ -49,35 +49,35 @@ public class BlockChain
 			}
 
         	//PROCESS
-        	genesisBlock.process();
+        	genesisBlock.process(dbSet);
 
         }
 	}
 	
-	public int getHeight() {
+	public int getHeight(DBSet dbSet) {
 		
 		//GET LAST BLOCK
-		byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
+		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 		
 		//RETURN HEIGHT
-		return DBSet.getInstance().getHeightMap().get(lastBlockSignature);
+		return dbSet.getHeightMap().get(lastBlockSignature);
 	}
 
-	public List<byte[]> getSignatures(byte[] parent) {
+	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
 		//CHECK IF BLOCK EXISTS
-		if(DBSet.getInstance().getBlockMap().contains(parent))
+		if(dbSet.getBlockMap().contains(parent))
 		{
-			Block parentBlock = DBSet.getInstance().getBlockMap().get(parent).getChild();
+			Block parentBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
 			
 			int counter = 0;
 			while(parentBlock != null && counter < MAX_SIGNATURES)
 			{
 				headers.add(parentBlock.getSignature());
 				
-				parentBlock = parentBlock.getChild();
+				parentBlock = parentBlock.getChild(dbSet);
 				
 				counter ++;
 			}
@@ -86,12 +86,12 @@ public class BlockChain
 		return headers;		
 	}
 
-	public Block getBlock(byte[] header) {
+	public Block getBlock(DBSet dbSet, byte[] header) {
 
-		return DBSet.getInstance().getBlockMap().get(header);
+		return dbSet.getBlockMap().get(header);
 	}
 
-	public boolean isNewBlockValid(Block block) {
+	public boolean isNewBlockValid(DBSet dbSet, Block block) {
 		
 		//CHECK IF NOT GENESIS
 		if(block instanceof GenesisBlock)
@@ -106,13 +106,13 @@ public class BlockChain
 		}
 		
 		//CHECK IF WE KNOW REFERENCE
-		if(!DBSet.getInstance().getBlockMap().contains(block.getReference()))
+		if(!dbSet.getBlockMap().contains(block.getReference()))
 		{
 			return false;
 		}
 		
 		//CHECK IF REFERENCE IS LASTBLOCK
-		if(!Arrays.equals(DBSet.getInstance().getBlockMap().getLastBlockSignature(), block.getReference()))
+		if(!Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), block.getReference()))
 		{
 			return false;
 		}
@@ -131,6 +131,7 @@ public class BlockChain
 			block = new GenesisBlock();
 		}
 		
+		DBSet dbSet = DBSet.getInstance();
 		//START FROM BLOCK
 		int scannedBlocks = 0;
 		do
@@ -166,7 +167,7 @@ public class BlockChain
 			}
 			
 			//SET BLOCK TO CHILD
-			block = block.getChild();
+			block = block.getChild(dbSet);
 			scannedBlocks++;
 		}
 		//WHILE BLOCKS EXIST && NOT REACHED TRANSACTIONLIMIT && NOT REACHED BLOCK LIMIT
@@ -175,19 +176,19 @@ public class BlockChain
 		//CHECK IF WE REACHED THE END
 		if(block == null)
 		{
-			block = this.getLastBlock();
+			block = this.getLastBlock(dbSet);
 		}
 		else
 		{
-			block = block.getParent();
+			block = block.getParent(dbSet);
 		}
 		
 		//RETURN PARENT BLOCK AS WE GET CHILD RIGHT BEFORE END OF WHILE
 		return new Pair<Block, List<Transaction>>(block, transactions);
 	}
 	
-	public Block getLastBlock() 
+	public Block getLastBlock(DBSet db) 
 	{	
-		return DBSet.getInstance().getBlockMap().getLastBlock();
+		return db.getBlockMap().getLastBlock();
 	}
 }

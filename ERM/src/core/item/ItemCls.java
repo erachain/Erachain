@@ -296,12 +296,14 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		int mapSize = dbMap.size();
+		//int mapSize = dbMap.size();
 		//LOGGER.info("GENESIS MAP SIZE: " + assetMap.size());
-		long key = 0l;
-		if (mapSize == 0) {
+		long key = 0L;
+		//if (mapSize == 0) { // it is ERROR when FORK a DB - new FORK.size() = 0
+		if (false && dbMap.getKey() == -1) {
 			// initial map set
-			dbMap.set(0L, this);
+			//key = 0L;
+			//dbMap.set(this);
 		} else {
 			key = dbMap.add(this);
 		}

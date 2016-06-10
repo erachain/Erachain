@@ -62,12 +62,14 @@ public class VouchRecordDialog extends JDialog  {
 	private Transaction refreshRecordDetails()
 	{
 		
+		/*
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			infoPanel.show_mess(Lang.getInstance().translate("Status must be OK to show public key details."));
 	        jLabel_RecordInfo.setViewportView(infoPanel);
 			return null;
 		}
+		*/
 
 		Transaction record = null;
 		record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jTextField_recordID.getText());

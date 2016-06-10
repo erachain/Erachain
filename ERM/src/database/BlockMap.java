@@ -78,7 +78,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		createIndex(HEIGHT_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Integer, byte[], Block>() {
 		   	@Override
 		    public Integer run(byte[] key, Block value) {
-		   		return value.getHeight();
+		   		return value.getHeight(DBSet.getInstance());
 		    }
 		});
 		

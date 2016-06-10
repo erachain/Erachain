@@ -634,15 +634,16 @@ public class Wallet extends Observable implements Observer
 		try{
 			Controller.getInstance().setNeedSync(false);
 			Controller.getInstance().setProcessingWalletSynchronize(true);
+			DBSet dbSet = DBSet.getInstance();
 			this.syncHeight = 1;
 			do
 			{
 				//UPDATE
 				this.update(this, new ObserverMessage(ObserverMessage.ADD_BLOCK_TYPE, block));
 				
-				if(block.getHeight() % 2000 == 0) 
+				if(block.getHeight(dbSet) % 2000 == 0) 
 				{
-					this.syncHeight = block.getHeight();
+					this.syncHeight = block.getHeight(dbSet);
 					
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 					
@@ -651,7 +652,7 @@ public class Wallet extends Observable implements Observer
 				}
 				
 				//LOAD NEXT
-				block = block.getChild();
+				block = block.getChild(dbSet);
 			}
 			while(block != null);
 			

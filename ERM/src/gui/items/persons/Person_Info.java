@@ -63,13 +63,20 @@ public class Person_Info extends JTextPane {
 			message += "<h3>"+ Lang.getInstance().translate("Personalized Accounts") +"</h3>";
 			// for each account seek active date
 			String active_date_str;
-			for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> e : addresses.entrySet())
+			for( Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry : addresses.entrySet())
 			{
-				Tuple3<Integer, Integer, Integer> active_date = e.getValue().peek();
-				if (active_date.a == 0) active_date_str = "active";
-				else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
+				if (entry == null) continue;
 				
-				message += "<div><input  style='background: #00ffff'; type='text' size='33' value='"+ e.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
+				java.util.Stack<Tuple3<Integer, Integer, Integer>> stack = entry.getValue(); 
+				if ( stack == null || stack.isEmpty() ) 
+					active_date_str = "???";
+				else {					
+					Tuple3<Integer, Integer, Integer> active_date = stack.peek();
+					if (active_date.a == 0) active_date_str = "active";
+					else active_date_str = formatDate.format( new Date(active_date.a * (long)86400000));
+				}
+				
+				message += "<div><input  style='background: #00ffff'; type='text' size='33' value='"+ entry.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
 						+ " -> <b>" + active_date_str +"</b></div>";
 			}
 		}	
@@ -85,7 +92,9 @@ public class Person_Info extends JTextPane {
 			ItemStatusMap statusesMap = DBSet.getInstance().getItemStatusMap();
 			for( Map.Entry<Long, java.util.Stack<Tuple4<Long, Long, Integer, Integer>>> status: statuses.entrySet())
 			{
+				if (status == null) continue;
 				message += "<div>" + statusesMap.get(status.getKey()).toString() + " : ";
+				
 				
 				Tuple4<Long, Long, Integer, Integer> dates = status.getValue().peek();
 				

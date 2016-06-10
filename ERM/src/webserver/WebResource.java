@@ -63,6 +63,7 @@ import core.account.PrivateKeyAccount;
 import core.blockexplorer.BlockExplorer;
 import core.crypto.Base58;
 import core.crypto.Base64;
+import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransaction;
@@ -2091,7 +2092,7 @@ public class WebResource {
 							{
 								BigDecimal amount = BigDecimal.TEN;
 								amount = amount.setScale(8);
-								payments.add(new Payment(new Account(creator), 0L,amount ));
+								payments.add(new Payment(new Account(creator), AssetCls.FEE_KEY,amount ));
 							}
 							result = activeProfileOpt.saveProfile(payments);
 
