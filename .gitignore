@@ -1,3 +1,4 @@
 ﻿*.class
 
-Qora/settings.json
+ERM/settings.json
+ERM/*.jar
