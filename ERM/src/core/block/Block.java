@@ -725,7 +725,7 @@ public class Block {
 			}
 
 			//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-			transaction.process(fork, false);		
+			transaction.process(fork, false);
 		}
 
 		//BLOCK IS VALID
