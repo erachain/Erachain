@@ -10,5 +10,6 @@ log.txt
 log.txt.*
 peers.json
 settings.json
+/*.jar
 *.jar
 *.zip
