@@ -253,7 +253,7 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel feeHintLabel = new JLabel( Controller.getInstance().getAsset(0).getShort());
+		JLabel feeHintLabel = new JLabel( Controller.getInstance().getAsset(AssetCls.FEE_KEY).getShort());
 		this.add(feeHintLabel, assetHintGBC);
 		
 		//ADD SELL BUTTON
