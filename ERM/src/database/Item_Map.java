@@ -16,8 +16,6 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	protected int type;
-	//protected String name;
-	//protected Serializer serializer;
 	
 	protected Atomic.Long atomicKey;
 	protected long key;
@@ -31,9 +29,8 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 		super(databaseSet, database);
 		
 		this.type = type;
-		//this.name = name;
-		//this.Serializer = serializer;
 		this.atomicKey = database.getAtomicLong(name +"_key");
+		// restore key from dbase
 		this.key = this.atomicKey.get();
 		
 		this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
@@ -41,34 +38,21 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 		this.observableData.put(DBMap.NOTIFY_LIST, observeList);
 	}
 
+	
 	public Item_Map(Item_Map parent) 
 	{
 		super(parent);
 		
-		this.key = this.getKey();
+		this.key = parent.getKey();
 	}
 	
-	protected long getKey()
+	
+	public long getKey()
 	{
 		return this.key;
 	}
-	
+
 	protected void createIndexes(DB database){}
-
-	/*
-	@Override
-	protected Map<Long, ItemCls> getMap(DB database, int type, String name) 
-	{
-		
-		// type+name not initialized yet!
-		this.type = type;
-
-		//OPEN MAP
-		return database.createTreeMap(name)
-				.valueSerializer(new ItemSerializer(type))
-				.makeOrGet();
-	}
-	*/
 
 	@Override
 	protected Map<Long, ItemCls> getMemoryMap() 

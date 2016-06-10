@@ -242,17 +242,10 @@ public class Block {
 			return getTransactions().get(index);
 		else return null;
 	}
-
-
 	
 	public byte[] getBlockATs()
 	{
 		return this.atBytes;
-	}
-
-	public Block getParent()
-	{
-		return this.getParent(DBSet.getInstance());
 	}
 
 	public Block getParent(DBSet db)
@@ -260,19 +253,9 @@ public class Block {
 		return db.getBlockMap().get(this.reference);
 	}
 
-	public Block getChild()
-	{
-		return this.getChild(DBSet.getInstance());
-	}
-
 	public Block getChild(DBSet db)
 	{
 		return db.getChildMap().get(this);
-	}
-
-	public int getHeight()
-	{
-		return this.getHeight(DBSet.getInstance());
 	}
 
 	public int getHeight(DBSet db)
@@ -293,7 +276,8 @@ public class Block {
 
 	public byte[] getSignature()
 	{
-		return Bytes.concat(this.generatorSignature, this.transactionsSignature);
+		return Bytes.concat(this.generatorSignature,
+				this.transactionsSignature == null?new byte[64]:this.transactionsSignature);
 	}
 
 	//PARSE/CONVERT
@@ -395,7 +379,7 @@ public class Block {
 		block.put("transactionsSignature", Base58.encode(this.transactionsSignature));
 		block.put("generatorSignature", Base58.encode(this.generatorSignature));
 		block.put("signature",  Base58.encode(this.getSignature()));
-		block.put("height", this.getHeight());
+		block.put("height", this.getHeight(DBSet.getInstance()));
 
 		//CREATE TRANSACTIONS
 		JSONArray transactionsArray = new JSONArray();
@@ -601,33 +585,31 @@ public class Block {
 		*/
 	}
 
-	public boolean isValid()
-	{
-		return this.isValid(DBSet.getInstance());
-	}
-
-	public boolean isValid(DBSet db)
+	public boolean isValid(DBSet db, boolean noTime)
 	{		
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].refence invalid");
+			LOGGER.error("*** Block[" + this.getHeight(db) + "].reference invalid");
 			return false;
 		}
 
-		//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-		if(true & (this.timestamp - 500 > NTP.getTime()
-				|| this.timestamp < this.getParent(db).timestamp))
-		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp invalid");
-			return false;
-		}
-
-		//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
-		if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
-		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp % 1000 invalid");
-			return false;
+		//if (false) {
+		if (!noTime) {
+			//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
+			if(true & (this.timestamp - 500 > NTP.getTime()
+					|| this.timestamp < this.getParent(db).timestamp))
+			{
+				LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp invalid");
+				return false;
+			}
+	
+			//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
+			if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
+			{
+				LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp % 1000 invalid");
+				return false;
+			}
 		}
 
 		//CHECK IF GENERATING BALANCE IS CORRECT
@@ -662,7 +644,8 @@ public class Block {
 		target = target.multiply(this.generator.getGeneratingBalance(db).toBigInteger());
 
 		//MULTIPLE TARGET BY GUESSES
-		long guesses = (this.timestamp - this.getParent(db).getTimestamp()) / 1000;
+		long guesses = (this.timestamp - this.getParent(db).getTimestamp()) / 1000; // orid /1000
+		//BigInteger lowerTarget = target.multiply(BigInteger.valueOf(guesses-1)); // orig -1
 		BigInteger lowerTarget = target.multiply(BigInteger.valueOf(guesses-1));
 		target = target.multiply(BigInteger.valueOf(guesses));
 
@@ -672,14 +655,18 @@ public class Block {
 		//CHECK IF HASH LOWER THEN TARGET (blockchain total hash - "chain length")
 		if(hashValue.compareTo(target) >= 0)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].target is small! Your blockchain has better length.");
+			LOGGER.error("*** Block[" + this.getHeight(db)
+					+ "].target is invalid!. " + "guesses: " + guesses
+					+ "\nhash >= target:\n" + hashValue.toString() + "\n" + target.toString());
 			return false;
 		}
 
 		//CHECK IF FIRST BLOCK OF USER	
 		if(hashValue.compareTo(lowerTarget) < 0)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].lowerTarget invalid! Your genesis block has better length.");
+			LOGGER.error("*** Block[" + this.getHeight(db)
+				+ "].lowerTarget invalid!. " + "guesses: " + guesses
+				+ "\nhash < lower:\n" + hashValue.toString() + "\n" + lowerTarget.toString());
 			return false;
 		}
 
@@ -717,20 +704,23 @@ public class Block {
 				DeployATTransaction atTx = (DeployATTransaction)transaction;
 				if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 				{
-					LOGGER.error("*** Block[" + this.getHeight(db) + "].atTx invalid");
+					LOGGER.error("*** Block[" + this.getHeight(fork) + "].atTx invalid");
 					return false;
 				}
 			}
 			else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 			{
-				LOGGER.error("*** Block[" + this.getHeight(db) + "].Tx invalid");
+				LOGGER.error("*** Block[" + this.getHeight(fork)
+					+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+					+ transaction.viewFullTypeName() + "]"
+					+ "invalid code: " + transaction.isValid(fork, null));
 				return false;
 			}
 
 			//CHECK TIMESTAMP AND DEADLINE
 			if(transaction.getTimestamp() > this.timestamp || transaction.getDeadline() <= this.timestamp)
 			{
-				LOGGER.error("*** Block[" + this.getHeight(db) + "].TX.timestamp invalid");
+				LOGGER.error("*** Block[" + this.getHeight(fork) + "].TX.timestamp invalid");
 				return false;
 			}
 
@@ -743,11 +733,6 @@ public class Block {
 	}
 
 	//PROCESS/ORPHAN
-
-	public void process()
-	{
-		this.process(DBSet.getInstance());
-	}
 
 	public void process(DBSet db)
 	{	
@@ -819,15 +804,10 @@ public class Block {
 		db.getBlockMap().setLastBlock(this);	
 	}
 
-	public void orphan()
-	{	
-		this.orphan(DBSet.getInstance());
-	}
-
-	public void orphan(DBSet db)
+	public void orphan(DBSet dbSet)
 	{
 		//ORPHAN AT TRANSACTIONS
-		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(this.getHeight(db));
+		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(this.getHeight(dbSet));
 
 		Iterator<AT_Transaction> iter = atTxs.values().iterator();
 
@@ -838,47 +818,47 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  db ).subtract( BigDecimal.valueOf( amount, 8 ) ) , db );
-				if ( recipient.getLastReference(db) != null)
+				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				if ( recipient.getLastReference(dbSet) != null)
 				{
-					recipient.removeReference(db);
+					recipient.removeReference(dbSet);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setConfirmedBalance(Transaction.FEE_KEY,  sender.getConfirmedBalance(Transaction.FEE_KEY,  db ).add( BigDecimal.valueOf( amount, 8 ) ) , db );
+			sender.setConfirmedBalance(Transaction.FEE_KEY,  sender.getConfirmedBalance(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
 
 		}
 
 		//ORPHAN TRANSACTIONS
-		this.orphanTransactions(this.getTransactions(), db);
+		this.orphanTransactions(this.getTransactions(), dbSet);
 
 		//REMOVE FEE
 		BigDecimal blockFee = this.getTotalFee();
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.generator.setConfirmedBalance(Transaction.FEE_KEY, this.generator.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(blockFee), db);
+			this.generator.setConfirmedBalance(Transaction.FEE_KEY, this.generator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).subtract(blockFee), dbSet);
 		}
 
 		//DELETE AT TRANSACTIONS FROM DB
-		db.getATTransactionMap().delete(this.getHeight(db));
+		dbSet.getATTransactionMap().delete(this.getHeight(dbSet));
 		
 		//DELETE TRANSACTIONS FROM FINAL MAP
-		db.getTransactionFinalMap().delete(this.getHeight(db));
+		dbSet.getTransactionFinalMap().delete(this.getHeight(dbSet));
 
 		//DELETE BLOCK FROM DB
-		db.getBlockMap().delete(this);
+		dbSet.getBlockMap().delete(this);
 
 		//SET PARENT AS LAST BLOCK
-		db.getBlockMap().setLastBlock(this.getParent(db));
+		dbSet.getBlockMap().setLastBlock(this.getParent(dbSet));
 				
 		for(Transaction transaction: this.getTransactions())
 		{
 			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-			db.getTransactionMap().add(transaction);
+			dbSet.getTransactionMap().add(transaction);
 
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
-			db.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
+			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
 	}
 

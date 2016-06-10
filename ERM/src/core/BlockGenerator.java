@@ -82,14 +82,14 @@ public class BlockGenerator extends Thread implements Observer
 	private boolean walletOnceUnlocked = false;
 	
 	
-	public BlockGenerator()
+	public BlockGenerator(boolean withObserve)
 	{
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled())
 		{
 			this.cachedAccounts = new ArrayList<PrivateKeyAccount>();
 		}
 		
-		addObserver();
+		if (withObserve) addObserver();
 	}
 
 	public void addObserver() {
@@ -274,19 +274,19 @@ public class BlockGenerator extends Thread implements Observer
 		}
 	}
 	
-	public Block generateNextBlock(DBSet db, PrivateKeyAccount account, Block block)
+	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, Block block)
 	{
 		//CHECK IF ACCOUNT HAS BALANCE
-		if(account.getGeneratingBalance(db).compareTo(Settings.BLOCK_GENERATING_BALANCE_NEED) < 0)
+		if(account.getGeneratingBalance(dbSet).compareTo(Settings.BLOCK_GENERATING_BALANCE_NEED) < 0)
 		{
 			return null;
 		}
 
 		//CALCULATE SIGNATURE
-		byte[] signature = this.calculateSignature(db, block, account);
+		byte[] signature = this.calculateSignature(dbSet, block, account);
 
 		//DETERMINE BLOCK VERSION
-		int version = block.getNextBlockVersion(db);
+		int version = block.getNextBlockVersion(dbSet);
 
 		//CALCULATE HASH
 		byte[] hash;
@@ -321,11 +321,11 @@ public class BlockGenerator extends Thread implements Observer
 		BigInteger target = new BigInteger(1, targetBytes);
 								
 		//DIVIDE TARGET BY BASE TARGET
-		BigInteger baseTarget = BigInteger.valueOf(getBaseTarget(getNextBlockGeneratingBalance(db, block)));
+		BigInteger baseTarget = BigInteger.valueOf(getBaseTarget(getNextBlockGeneratingBalance(dbSet, block)));
 		target = target.divide(baseTarget);
 			
 		//MULTIPLY TARGET BY USER BALANCE
-		target = target.multiply(account.getGeneratingBalance(db).toBigInteger());
+		target = target.multiply(account.getGeneratingBalance(dbSet).toBigInteger());
 		
 		//CALCULATE GUESSES
 		//long guesses = hashValue.divide(target).longValue() + 1;
@@ -345,18 +345,19 @@ public class BlockGenerator extends Thread implements Observer
 		Block newBlock;
 		if ( version > 1 )
 		{
-			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK( block.getHeight() ) , block.getHeight() + 1 );
+			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
+					block.getHeight(dbSet)) , block.getHeight(dbSet) + 1 );
 			byte[] atBytes = atBlock.getBytesForBlock();
-			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature, atBytes, atBlock.getTotalFees());
+			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(dbSet, block), account, signature, atBytes, atBlock.getTotalFees());
 		}
 		else
 		{
-			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(db, block), account, signature);
+			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(dbSet, block), account, signature);
 		}
 		return newBlock;
 	}
 	
-	public byte[] calculateSignature(DBSet db, Block solvingBlock, PrivateKeyAccount account) 
+	public byte[] calculateSignature(DBSet dbSet, Block solvingBlock, PrivateKeyAccount account) 
 	{	
 		byte[] data = new byte[0];
 		
@@ -365,7 +366,7 @@ public class BlockGenerator extends Thread implements Observer
 		data = Bytes.concat(data, generatorSignature);
 		
 		//WRITE GENERATING BALANCE
-		byte[] baseTargetBytes = Longs.toByteArray(getNextBlockGeneratingBalance(db, solvingBlock));
+		byte[] baseTargetBytes = Longs.toByteArray(getNextBlockGeneratingBalance(dbSet, solvingBlock));
 		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, Block.GENERATING_BALANCE_LENGTH, 0);
 		data = Bytes.concat(data,baseTargetBytes);
 		

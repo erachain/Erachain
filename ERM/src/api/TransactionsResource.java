@@ -360,11 +360,11 @@ public class TransactionsResource {
 			
 			if(block != null)
 			{
-				json.put("amount", result.getA().getHeight() - block.getHeight() + 1);
+				json.put("amount", result.getA().getHeight(DBSet.getInstance()) - block.getHeight(DBSet.getInstance()) + 1);
 			}
 			else
 			{
-				json.put("amount", result.getA().getHeight());
+				json.put("amount", result.getA().getHeight(DBSet.getInstance()));
 			}
 			
 			JSONArray transactions = new JSONArray();

@@ -450,6 +450,16 @@ public class R_SertifyPubKeys extends Transaction {
 			}
 		}
 
+		//PersonCls.getItem(db, ItemCls.PERSON_TYPE, key);
+		LOGGER.error("*** SERTIFY --- Block[" + this.getBlockHeight(db) + "].TX.R_SertifyPubKeys \n"
+				+ "keys: " + db.getItemPersonMap().getKeys().toString() + "\n"
+				+ "values: " + db.getItemPersonMap().getValues().toString());
+		LOGGER.error("***  +++ Block[" + this.getBlockHeight(db) + "].TX.IssueItem [" + this.viewFullTypeName() + "\n"
+				+ "keys: " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).getDBMap(db).getKeys().toString() + "\n"
+				+ "values: " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).getDBMap(db).getValues().toString());
+		LOGGER.error(" +++ " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).toString(db) + "\n"
+				);
+
 		if ( !db.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
@@ -477,7 +487,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 		// ?? Controller.getInstance().getHeight()
 		Block block = db.getBlockMap().getLastBlock();
-		int blockIndex = block.getHeight();
+		int blockIndex = block.getHeight(db);
 		int transactionIndex = block.getTransactionIndex(signature);
 
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);

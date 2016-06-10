@@ -81,14 +81,14 @@ public class BlockExplorerTest {
 			
 			block.process(databaseSet);
 			
-			if ( block.getHeight()%2000 == 0 )
+			if ( block.getHeight(DBSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.error(block.getHeight());
+				LOGGER.error(block.getHeight(DBSet.getInstance()));
 			}
 			
 			balancesBlocks.add(new Pair<>(block, block.getGenerator().getBalance(1, Transaction.FEE_KEY, databaseSet)));
 			
-			block = block.getChild();
+			block = block.getChild(DBSet.getInstance());
 			
 		} while (block != null);
 		

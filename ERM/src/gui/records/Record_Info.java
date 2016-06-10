@@ -58,6 +58,7 @@ public class Record_Info extends JTextPane {
 		message += "<div>Item: <font size='4'>" + record.viewItemName() + "</font></div>";
 		message += "<div>Amount: <font size='4'>" + record.viewAmount() + "</font></div>";
 		message += "<div>Recipient: <font size='4'>" + record.viewRecipient() + "</font></div>";
+		message += "<div>JSON: <font size='4'>" + record.toJson().toString() + "</font></div>";
 
 		return message;
 	}

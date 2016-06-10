@@ -55,7 +55,7 @@ public class SynchronizerTests {
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		List<Block> firstBlocks = new ArrayList<Block>();
 		for(int i=0; i<5; i++)
 		{	
@@ -150,6 +150,7 @@ public class SynchronizerTests {
 	@Test
 	public void synchronizeCommonBlock()
 	{	
+		
 		//GENERATE 5 BLOCKS FROM ACCOUNT 1
 		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
 		DBSet databaseSet2 = DBSet.createEmptyDatabaseSet();
@@ -169,7 +170,9 @@ public class SynchronizerTests {
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
+		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet2);
 
 		
 		//CREATE KNOWN ACCOUNT 2
@@ -179,16 +182,16 @@ public class SynchronizerTests {
 		
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR2 HAS FUNDS
 		//transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
-		GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		transaction.process(databaseSet, false);
-		transaction.process(databaseSet2, false);
-		//generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
-		//generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet2);
+		//GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		//transaction.process(databaseSet, false);
+		//transaction.process(databaseSet2, false);
+		generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
 		
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
@@ -233,26 +236,26 @@ public class SynchronizerTests {
 		try
 		{
 			synchronizer.synchronize(databaseSet, genesisBlock, newBlocks);
-			
-			//CHECK BLOCKS
-			lastBlock = databaseSet.getBlockMap().getLastBlock();
-			for(int i=9; i>=0; i--)
-			{
-				//CHECK LAST BLOCK
-				assertEquals(true, Arrays.equals(newBlocks.get(i).getSignature(), lastBlock.getSignature()));
-				lastBlock = lastBlock.getParent(databaseSet);
-			}
-			
-			//CHECK LAST BLOCK
-			assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
-			
-			//CHECK HEIGHT
-			assertEquals(11, databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet));
 		}
 		catch(Exception e)
 		{
 			LOGGER.error(e.getMessage(),e);
 			fail("Exception during synchronize");
 		}	
+			
+		//CHECK BLOCKS
+		lastBlock = databaseSet.getBlockMap().getLastBlock();
+		for(int i=9; i>=0; i--)
+		{
+			//CHECK LAST BLOCK
+			assertEquals(true, Arrays.equals(newBlocks.get(i).getSignature(), lastBlock.getSignature()));
+			lastBlock = lastBlock.getParent(databaseSet);
+		}
+		
+		//CHECK LAST BLOCK
+		assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
+		
+		//CHECK HEIGHT
+		assertEquals(11, databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet));
 	}	
 }

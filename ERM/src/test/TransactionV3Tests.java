@@ -32,8 +32,8 @@ public class TransactionV3Tests {
 
 	Long releaserReference = null;
 
-	long ERMO_KEY = 0l;
-	long FEE_KEY = 1l;
+	long ERMO_KEY = AssetCls.ERMO_KEY;
+	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();

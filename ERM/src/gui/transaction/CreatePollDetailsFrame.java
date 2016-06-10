@@ -73,7 +73,7 @@ public class CreatePollDetailsFrame extends Rec_DetailsFrame
 		//OPTIONS
 		++detailGBC.gridy;
 		PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
-				Controller.getInstance().getAsset(0l));
+				Controller.getInstance().getAsset(AssetCls.FEE_KEY));
 		JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
 		
 		TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();

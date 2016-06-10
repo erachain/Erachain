@@ -7,6 +7,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.block.Block;
+import database.DBSet;
 
 public class BlockMessage extends Message{
 
@@ -52,7 +53,7 @@ public class BlockMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE BLOCK HEIGHT
-		byte[] heightBytes = Ints.toByteArray(this.block.getHeight());
+		byte[] heightBytes = Ints.toByteArray(this.block.getHeight(DBSet.getInstance()));
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK

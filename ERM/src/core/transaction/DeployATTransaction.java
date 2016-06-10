@@ -439,7 +439,7 @@ public class DeployATTransaction extends Transaction
 		return bf.array().clone();
 	}
 	
-	public Account getATaccount()
+	public Account getATaccount(DBSet db)
 	{
 		byte[] name = StringUtil.getUtf8Bytes(this.name );
 		byte[] desc = StringUtil.getUtf8Bytes(this.description.replaceAll("\\s", "") );
@@ -450,7 +450,8 @@ public class DeployATTransaction extends Transaction
 		bf.put( desc );
 		bf.put( this.creator.getPublicKey() );
 		bf.put( this.creationBytes );
-		bf.putInt( getParent().getHeight() );
+		
+		bf.putInt( getParent(db).getHeight(db) );
 
 		String atId = Crypto.getInstance().getATAddress( bf.array().clone() );
 
@@ -502,7 +503,7 @@ public class DeployATTransaction extends Transaction
 	public HashSet<Account> getRecipientAccounts()
 	{
 		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.getATaccount());
+		accounts.add(this.getATaccount(DBSet.getInstance()));
 		return accounts;
 	}
 	
@@ -516,7 +517,7 @@ public class DeployATTransaction extends Transaction
 			return true;
 		}
 
-		if(address.equals(this.getATaccount().getAddress()))
+		if(address.equals(this.getATaccount(DBSet.getInstance()).getAddress()))
 		{
 			return true;
 		}
@@ -542,7 +543,7 @@ public class DeployATTransaction extends Transaction
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.getATaccount().getAddress(), FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.getATaccount(DBSet.getInstance()).getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

@@ -31,8 +31,7 @@ public class ItemStatusMap extends Item_Map
 
 	public ItemStatusMap(ItemStatusMap parent) 
 	{
-		super(parent);
-		
+		super(parent);	
 	}
 	
 	// type+name not initialized yet! - it call as Super in New

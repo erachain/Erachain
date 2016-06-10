@@ -446,10 +446,6 @@ public abstract class Transaction {
 		
 		return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
 	}
-	public Block getParent() {
-		
-		return this.getParent(DBSet.getInstance());
-	}
 
 	// VIEW
 	public String viewType() {
@@ -670,10 +666,6 @@ public abstract class Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(boolean asPack)
-	{
-		this.process(DBSet.getInstance(), asPack);
-	}
 	//public abstract void process(DBSet db);
 	public void process(DBSet db, boolean asPack)
 	{
@@ -693,13 +685,7 @@ public abstract class Transaction {
 		}
 
 	}
-
-	public void orphan(boolean asPack)
-	{
-		this.orphan(DBSet.getInstance(), asPack);
-	}
 	
-	//public abstract void orphan(DBSet db);
 	public void orphan(DBSet db, boolean asPack)
 	{
 		if (!asPack) {
@@ -727,21 +713,15 @@ public abstract class Transaction {
 	{
 		if(this.isConfirmed(db))
 		{
-			return this.getParent().getHeight();
+			return this.getParent(db).getHeight(db);
 		}
 		return -1;
 	}
-	/*
-	public int getBlockHeight()
-	{
-		return getBlockHeight(db);
-	}
-	*/
 	public int getSeqNo(DBSet db)
 	{
 		if(this.isConfirmed(db))
 		{
-			return this.getParent().getTransactionSeq(this.signature);
+			return this.getParent(db).getTransactionSeq(this.signature);
 		}
 		return -1;
 	}

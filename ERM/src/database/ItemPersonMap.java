@@ -30,10 +30,12 @@ public class ItemPersonMap extends Item_Map
 				);
 			}
 
-	public ItemPersonMap(ItemPersonMap parent) 
+
+	public ItemPersonMap(Item_Map parent) 
 	{
 		super(parent);
 	}
+
 
 	// type+name not initialized yet! - it call as Super in New
 	protected Map<Long, ItemCls> getMap(DB database) 

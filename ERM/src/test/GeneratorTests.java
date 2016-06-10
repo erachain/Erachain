@@ -51,7 +51,7 @@ public class GeneratorTests {
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		for(int i=0; i<2000; i++)
 		{	
 			//GENERATE NEXT BLOCK
@@ -67,7 +67,7 @@ public class GeneratorTests {
 			assertEquals(true, newBlock.isSignatureValid());
 			
 			//CHECK IF BLOCK IS VALID
-			assertEquals(true, newBlock.isValid(databaseSet));
+			assertEquals(true, newBlock.isValid(databaseSet, true));
 			
 			//PROCESS NEW BLOCK
 			newBlock.process(databaseSet);
@@ -100,7 +100,7 @@ public class GeneratorTests {
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 
 		//GENERATE NEXT BLOCK
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
@@ -125,7 +125,7 @@ public class GeneratorTests {
 		blockGenerator.addUnconfirmedTransactions(databaseSet, newBlock);
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet));
+		assertEquals(true, newBlock.isValid(databaseSet, true));
 	}
 	
 	@Test
@@ -152,7 +152,7 @@ public class GeneratorTests {
 
 				
 		//GENERATE NEXT BLOCK
-		BlockGenerator blockGenerator = new BlockGenerator();
+		BlockGenerator blockGenerator = new BlockGenerator(false);
 		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
@@ -180,7 +180,7 @@ public class GeneratorTests {
 		assertNotEquals(10000, newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet));
+		assertEquals(true, newBlock.isValid(databaseSet, true));
 	}
 	
 	//TODO CALCULATETRANSACTIONSIGNATURE

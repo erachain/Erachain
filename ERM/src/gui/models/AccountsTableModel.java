@@ -100,7 +100,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			
 		case COLUMN_GENERATING_BALANCE:
 			
-			if(this.asset == null || this.asset.getKey() == 0l)
+			if(this.asset == null || this.asset.getKey() == AssetCls.FEE_KEY)
 			{
 				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());	
 			}

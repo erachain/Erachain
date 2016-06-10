@@ -259,7 +259,7 @@ public class InitiateAcctFrame extends JFrame {
 		//LABEL BLOCKS
 		labelGBC.gridx = 2;
 		labelGBC.gridwidth = 3;
-		JLabel blocksLabel = new JLabel(Lang.getInstance().translate("blocks ( 1 block approx. %min% min )").replace("%min%", String.valueOf(AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(DBSet.getInstance().getBlockMap().getLastBlock().getHeight()))));
+		JLabel blocksLabel = new JLabel(Lang.getInstance().translate("blocks ( 1 block approx. %min% min )").replace("%min%", String.valueOf(AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(DBSet.getInstance().getBlockMap().getLastBlock().getHeight(DBSet.getInstance())))));
 		this.add(blocksLabel, labelGBC);
 		labelGBC.gridwidth = 1;
 
@@ -468,9 +468,9 @@ public class InitiateAcctFrame extends JFrame {
 
 			long lFee = Longs.fromByteArray(balanceBytes);
 
-			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock().getHeight()) > lFee )
+			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock().getHeight(DBSet.getInstance())) > lFee )
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock().getHeight()) + " !", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock().getHeight(DBSet.getInstance())) + " !", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				return;
 			}
@@ -495,7 +495,7 @@ public class InitiateAcctFrame extends JFrame {
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
 
-			creation.putShort(AT_Constants.getInstance().AT_VERSION( DBSet.getInstance().getBlockMap().getLastBlock().getHeight() ));
+			creation.putShort(AT_Constants.getInstance().AT_VERSION( DBSet.getInstance().getBlockMap().getLastBlock().getHeight(DBSet.getInstance()) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);
 			creation.putShort((short)dpages);

@@ -9,6 +9,7 @@ import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.block.Block;
+import database.DBSet;
 import database.SortableList;
 import database.wallet.BlockMap;
 import lang.Lang;
@@ -78,7 +79,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			{
 			case COLUMN_HEIGHT:
 				
-				return block.getHeight();
+				return block.getHeight(DBSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				
