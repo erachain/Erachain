@@ -106,7 +106,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				if(row == this.orders.size())
 					return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 				
-				return NumberAsString.getInstance().numberAsString(order.getPriceCalc());
+				return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
 			
 			case COLUMN_AMOUNT:
 				

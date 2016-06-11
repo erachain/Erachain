@@ -76,6 +76,10 @@ public class Trade {
 	{
 		return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
 	}
+	public BigDecimal getPriceCalcBack() 
+	{
+		return this.amountHave.divide(amountWant, 12, RoundingMode.HALF_UP);
+	}
 	
 	public long getTimestamp()
 	{

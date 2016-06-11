@@ -109,7 +109,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 					return "<html>Total:</html>";
 				
 				
-				return NumberAsString.getInstance().numberAsString(order.getWantPriceCalc());
+				return NumberAsString.getInstance().numberAsString12(order.getWantPriceCalc());
 				
 			case COLUMN_BUYING_AMOUNT:
 				
@@ -123,7 +123,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				if(row == this.orders.size())
 					return "";
 							
-				return NumberAsString.getInstance().numberAsString(order.getPriceCalc());
+				return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
 				
 			case COLUMN_AMOUNT:
 				
