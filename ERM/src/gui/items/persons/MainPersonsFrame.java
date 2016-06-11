@@ -20,10 +20,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import controller.Controller;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
@@ -31,6 +35,7 @@ import gui.Split_Panel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
+import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 
@@ -38,6 +43,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 2717571093561259483L;
 
 	private TableModelPersons tableModelPersons;
+	private WalletItemPersonsTableModel personsModel;
 	
 	public MainPersonsFrame(){
 	
@@ -164,6 +170,82 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		//////////////////////////
 		// MENU
 		JPopupMenu all_Persons_Table_menu = new JPopupMenu();
+		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+		favorite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				favorite_all(personsTable);
+
+							
+				
+				
+				
+			}
+		});
+		
+		all_Persons_Table_menu.addPopupMenuListener(new PopupMenuListener(){
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				int row = personsTable.getSelectedRow();
+				row = personsTable.convertRowIndexToModel(row);
+				PersonCls asset = tableModelPersons.getPerson(row);
+				
+				//IF ASSET CONFIRMED AND NOT ERM
+				
+					favorite.setVisible(true);
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(asset))
+					{
+						favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						favorite.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					/*	
+					//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+					this.favoritesButton.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							onFavoriteClick();
+						}
+					});	
+					this.add(this.favoritesButton, labelGBC);
+					*/
+				
+			
+			
+			
+			
+			}
+			
+		}
+		
+		);
+		
+		
+		all_Persons_Table_menu.add(favorite);
+		
+		
+		
+		
+		
 		JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
 		confirm_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -201,7 +283,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		personsTable.setComponentPopupMenu(all_Persons_Table_menu);
 		
 		// DOUBLE CLICK EVENT
-		/*
+		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -216,9 +298,36 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		//			new PersonFrame(person);
 					
 				}
+			
+				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+				{
+					
+					if (personsTable.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
+						row = personsTable.convertRowIndexToModel(row);
+						PersonCls asset = tableModelPersons.getPerson(row);
+						favorite_all( personsTable);	
+						
+						
+						
+					}
+					
+					
+				}
+			
+			
+			
+			
+			
+			
 			}
+			
+			
+			
+			
+			
+			
 		});
-		*/
+		
 	 
 		//////////////////////////////////////	
 		// MY PERSONS
@@ -233,7 +342,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		my_Person_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
 		
 		//TABLE
-		final WalletItemPersonsTableModel personsModel = new WalletItemPersonsTableModel();
+		 personsModel = new WalletItemPersonsTableModel();
 		final JTable table = new JTable(personsModel);
 		
 		columnModel = table.getColumnModel(); // read column model
@@ -338,8 +447,150 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		});
 		
 		my_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
+	
 		
 	
+
+		//////////////////////////
+		// MENU
+		JPopupMenu my_Persons_Table_menu = new JPopupMenu();
+		JMenuItem my_favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+		my_favorite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				favorite_my(table);
+
+							
+				
+				
+				
+			}
+		});
+		
+		my_Persons_Table_menu.addPopupMenuListener(new PopupMenuListener(){
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				PersonCls asset = personsModel.getItem(row);
+				
+				//IF ASSET CONFIRMED AND NOT ERM
+				
+					favorite.setVisible(true);
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(asset))
+					{
+						my_favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						my_favorite.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					/*	
+					//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+					this.favoritesButton.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							onFavoriteClick();
+						}
+					});	
+					this.add(this.favoritesButton, labelGBC);
+					*/
+				
+			
+			
+			
+			
+			}
+			
+		}
+		
+		);
+		
+		
+		my_Persons_Table_menu.add(my_favorite);
+		
+		
+		table.setComponentPopupMenu(my_Persons_Table_menu);
+		
+		
+	
+	// DOUBLE CLICK EVENT
+		
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				Point p = e.getPoint();
+				int row = table.rowAtPoint(p);
+	//			table.setRowSelectionInterval(row, row);
+				
+				if(e.getClickCount() == 2)
+				{
+					row = table.convertRowIndexToModel(row);
+					PersonCls person = personsModel.getItem(row);
+		//			new PersonFrame(person);
+					
+				}
+			
+				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+				{
+					
+					if (table.getSelectedColumn() == WalletItemPersonsTableModel.COLUMN_FAVORITE){
+						row = table.convertRowIndexToModel(row);
+						PersonCls asset = personsModel.getItem(row);
+						favorite_my( table);	
+						
+						
+						
+					}
+					
+					
+				}
+			
+			
+			
+			
+			
+			
+			}
+			
+			
+			
+			
+			
+			
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////
 		
@@ -371,6 +622,55 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 	
 	 	search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	 	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	}
+	
+	void favorite_all(JTable personsTable){
+		int row = personsTable.getSelectedRow();
+		row = personsTable.convertRowIndexToModel(row);
+
+		PersonCls asset = tableModelPersons.getPerson(row);
+		//new AssetPairSelect(asset.getKey());
+
+		
+			//CHECK IF FAVORITES
+			if(Controller.getInstance().isItemFavorite(asset))
+			{
+				
+				Controller.getInstance().removeItemFavorite(asset);
+			}
+			else
+			{
+				
+				Controller.getInstance().addItemFavorite(asset);
+			}
+				
+
+			personsTable.repaint();
+
+	}
+	void favorite_my(JTable table){
+		int row = table.getSelectedRow();
+		row = table.convertRowIndexToModel(row);
+
+		PersonCls asset = personsModel.getItem(row);
+		//new AssetPairSelect(asset.getKey());
+
+		
+			//CHECK IF FAVORITES
+			if(Controller.getInstance().isItemFavorite(asset))
+			{
+				
+				Controller.getInstance().removeItemFavorite(asset);
+			}
+			else
+			{
+				
+				Controller.getInstance().addItemFavorite(asset);
+			}
+				
+
+			table.repaint();
+
 	}
 
 }
