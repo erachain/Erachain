@@ -95,7 +95,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 			
 		case COLUMN_PRICE:
 			
-			return NumberAsString.getInstance().numberAsString(trade.getPriceCalc());
+			return NumberAsString.getInstance().numberAsString12(trade.getPriceCalc());
 
 		case COLUMN_AMOUNT_WANT:
 			

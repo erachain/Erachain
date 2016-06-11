@@ -438,7 +438,9 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
-	
+
+		//int transactionIndex = block.getTransactionIndex(signature);
+
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
 			//CHECK IF PERSON PUBLIC KEY IS VALID
@@ -446,19 +448,10 @@ public class R_SertifyPubKeys extends Transaction {
 			{
 				return INVALID_PUBLIC_KEY;
 			} else if (publicAccount.hasPerson(db) != null) {
+				LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.hasPerson(db));
 				return ACCOUNT_ALREADY_PERSONALIZED;
 			}
 		}
-
-		//PersonCls.getItem(db, ItemCls.PERSON_TYPE, key);
-		LOGGER.error("*** SERTIFY --- Block[" + this.getBlockHeight(db) + "].TX.R_SertifyPubKeys \n"
-				+ "keys: " + db.getItemPersonMap().getKeys().toString() + "\n"
-				+ "values: " + db.getItemPersonMap().getValues().toString());
-		LOGGER.error("***  +++ Block[" + this.getBlockHeight(db) + "].TX.IssueItem [" + this.viewFullTypeName() + "\n"
-				+ "keys: " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).getDBMap(db).getKeys().toString() + "\n"
-				+ "values: " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).getDBMap(db).getValues().toString());
-		LOGGER.error(" +++ " + PersonCls.getItem(db, ItemCls.PERSON_TYPE, key).toString(db) + "\n"
-				);
 
 		if ( !db.getItemPersonMap().contains(this.key) )
 		{
@@ -485,10 +478,22 @@ public class R_SertifyPubKeys extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 
-		// ?? Controller.getInstance().getHeight()
-		Block block = db.getBlockMap().getLastBlock();
-		int blockIndex = block.getHeight(db);
-		int transactionIndex = block.getTransactionIndex(signature);
+		// Controller.getInstance().getHeight()
+		// TODO нужно сделать запись что данная транзакция принадлежит данному блоку чтобы в нем найти её номер
+		int transactionIndex = -1;
+		int blockIndex = -1;
+		Block block = this.getParent(db);// == null (((
+		if (block == null) {
+			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+		} else {
+			blockIndex = block.getHeight(db);
+			if (blockIndex < 1 ) {
+				// if block not is confirmed - get last block + 1
+				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+			} else {
+				transactionIndex = block.getTransactionIndex(signature);
+			}			
+		}
 
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 		// send GIFT FEE_KEY

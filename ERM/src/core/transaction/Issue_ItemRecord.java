@@ -148,16 +148,14 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//INSERT INTO DATABASE
 		long key = this.item.insertToMap(db);
-
-		if ( db.getItemPersonMap().getKeys().isEmpty()) {
-			int iii = 0;
-		}
 		
+		/*
 		LOGGER.error("*** ISSUE +++ Block[" + this.getBlockHeight(db) + "].TX.IssueItem [" + this.viewFullTypeName() + "\n"
 				+ "keys: " + this.item.getDBMap(db).getKeys().toString() + "\n"
 				+ "values: " + this.item.getDBMap(db).getValues().toString());
 		LOGGER.error(" +++ " + this.item.toString(db) + "\n"
 				);
+		*/
 
 	}
 

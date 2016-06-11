@@ -6,7 +6,8 @@ import java.util.Locale;
 
 public class NumberAsString {
 	private static NumberAsString instance;
-	private DecimalFormat decimalFormat; 
+	private DecimalFormat decimalFormat;
+	private DecimalFormat decimalFormat12;
 	
 	public static NumberAsString getInstance()
 	{
@@ -26,10 +27,19 @@ public class NumberAsString {
 		symbols.setGroupingSeparator(',');
 		
 		decimalFormat = new DecimalFormat("###,##0.00000000", symbols);
+
+		String ss = "";
+		for (int i=0; i< 12; i++) {
+			ss += "0";
+		}
+		decimalFormat12 = new DecimalFormat("###,##0." + ss, symbols);
 	}
 	
 	public String numberAsString(Object amount) {
 		return decimalFormat.format(amount);
+	}
+	public String numberAsString12(Object amount) {
+		return decimalFormat12.format(amount);
 	}
 
 }
