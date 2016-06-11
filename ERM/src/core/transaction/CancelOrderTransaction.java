@@ -161,7 +161,8 @@ public class CancelOrderTransaction extends Transaction
 		{
 			return ORDER_DOES_NOT_EXIST;
 		}
-						
+		
+		/// 
 		//CHECK IF CREATOR IS CREATOR
 		if(!order.getCreator().getAddress().equals(this.creator.getAddress()))
 		{
