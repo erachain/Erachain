@@ -25,6 +25,7 @@ public class MainAssetsFrame extends Main_Internal_Frame{
 
 	private static final long serialVersionUID = 1L;
 	AssetDetailsPanel001 info2;
+	
 
 public MainAssetsFrame(){
 // not show buttons main Toolbar
@@ -49,6 +50,7 @@ public MainAssetsFrame(){
 	 Asset_Info info = new Asset_Info();
 	
 	// обработка изменения положения курсора в таблице
+	
 		my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 			@SuppressWarnings({ "unused" })
 			@Override
@@ -64,15 +66,18 @@ public MainAssetsFrame(){
 						WalletItemAssetsTableModel tableModelAssets = (WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
 						Object asset = tableModelAssets.getAsset(my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 						info.show_Asset_001((AssetCls) asset);
+						info2=new AssetDetailsPanel001((AssetCls) asset);
 						my_Assets_SplitPanel.jSplitPanel.setDividerLocation(my_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
 						my_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+						my_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info2);
 					}
 				}
 			});				
-			my_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
+		//	my_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
+		
 	
 	
-	
+		
 	
 	
 	

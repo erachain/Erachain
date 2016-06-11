@@ -23,9 +23,12 @@ import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
@@ -40,6 +43,7 @@ public class My_Assets_Tab extends Split_Panel {
 	/**
 	 * 
 	 */
+	WalletItemAssetsTableModel assetsModel;
 	private static final long serialVersionUID = 1L;
 
 	public My_Assets_Tab()
@@ -55,7 +59,7 @@ public class My_Assets_Tab extends Split_Panel {
 		jButton2_jToolBar_RightPanel.setVisible(false);
 		
 	//TABLE
-	final WalletItemAssetsTableModel assetsModel = new WalletItemAssetsTableModel();
+	 assetsModel = new WalletItemAssetsTableModel();
 	final JTable table = new JTable(assetsModel);
 	//assetsModel.getAsset(row)
 	//POLLS SORTER
@@ -149,6 +153,79 @@ public class My_Assets_Tab extends Split_Panel {
 	
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
+	
+	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	favorite.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			
+			favorite_set( table);
+			
+		}
+	});
+	
+	assetsMenu.addPopupMenuListener(new PopupMenuListener(){
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+			int row = table.getSelectedRow();
+			row = table.convertRowIndexToModel(row);
+			AssetCls asset = assetsModel.getAsset(row);
+			
+			//IF ASSET CONFIRMED AND NOT ERM
+			
+				favorite.setVisible(true);
+				//CHECK IF FAVORITES
+				if(Controller.getInstance().isItemFavorite(asset))
+				{
+					favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+				}
+				else
+				{
+					favorite.setText(Lang.getInstance().translate("Add Favorite"));
+				}
+				/*	
+				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+				this.favoritesButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						onFavoriteClick();
+					}
+				});	
+				this.add(this.favoritesButton, labelGBC);
+				*/
+			
+		
+		
+		
+		
+		}
+		
+	}
+	
+	);
+	
+	
+	assetsMenu.add(favorite);
+	
+	
+	
+	
+	
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -156,10 +233,10 @@ public class My_Assets_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = assetsModel.getAsset(row);
-			new AssetFrame(asset);
+//			new AssetFrame(asset);
 		}
 	});
-	assetsMenu.add(details);
+//	assetsMenu.add(details);
 	JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
 	dividend.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -200,6 +277,20 @@ public class My_Assets_Tab extends Split_Panel {
 				AssetCls asset = assetsModel.getAsset(row);
 				new AssetFrame(asset);
 			}
+			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+			{
+				
+				if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE){
+					row = table.convertRowIndexToModel(row);
+					AssetCls asset = assetsModel.getAsset(row);
+					favorite_set( table);	
+					
+					
+					
+				}
+				
+				
+			}
 	     }
 	});
 	
@@ -223,7 +314,34 @@ public void onMyOrdersClick()
 	new MyOrdersFrame();
 }
 
+public void favorite_set(JTable assetsTable){
 
+
+int row = assetsTable.getSelectedRow();
+row = assetsTable.convertRowIndexToModel(row);
+
+AssetCls asset = assetsModel.getAsset(row);
+//new AssetPairSelect(asset.getKey());
+
+if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
+{
+	//CHECK IF FAVORITES
+	if(Controller.getInstance().isItemFavorite(asset))
+	{
+		
+		Controller.getInstance().removeItemFavorite(asset);
+	}
+	else
+	{
+		
+		Controller.getInstance().addItemFavorite(asset);
+	}
+		
+
+	assetsTable.repaint();
+
+}
+}
 
 
 }
