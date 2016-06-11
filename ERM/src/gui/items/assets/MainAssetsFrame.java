@@ -76,11 +76,11 @@ public MainAssetsFrame(){
 	
 	
 	
-	
 // search Assets
 	Search_Assets_Tab search_Assets_SplitPanel = new Search_Assets_Tab();
+	search_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setBorder(null);
 	
-	 Asset_Info info1 = new Asset_Info();
+	// Asset_Info info1 = new Asset_Info();
 	
 		
 		// обработка изменения положения курсора в таблице
@@ -98,15 +98,15 @@ public MainAssetsFrame(){
 						if (search_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
 							TableModelItemAssets tableModelAssets1 =  (TableModelItemAssets) search_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
 							Object asset = tableModelAssets1.getAsset(search_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(search_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-							info1.show_Asset_002((AssetCls) asset);
+						//	info1.show_Asset_002((AssetCls) asset);
 							
 							
 							
 							 //info2 = new AssetPanel((AssetCls) asset);
-							 info2 = new AssetDetailsPanel001((AssetCls) asset);
-							search_Assets_SplitPanel.jSplitPanel.setDividerLocation(search_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
-							search_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-							
+						//	 info2 = new AssetDetailsPanel001((AssetCls) asset);
+						//	search_Assets_SplitPanel.jSplitPanel.setDividerLocation(search_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
+						//	search_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+						/*	
 							 search_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setVisible(false);
 							 
 							 GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -128,9 +128,10 @@ public MainAssetsFrame(){
 							}
 						
 							search_Assets_SplitPanel.rightPanel1.add(info2, gridBagConstraints);
-								
-						
-						
+						*/		
+							
+							search_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+							
 							 
 						}
 					}
