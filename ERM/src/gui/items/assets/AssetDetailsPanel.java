@@ -37,7 +37,7 @@ public class AssetDetailsPanel extends JPanel {
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
-		
+		this.setSize(50,100);
 		int gridy = 0;
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();

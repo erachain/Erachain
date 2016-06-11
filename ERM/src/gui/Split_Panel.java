@@ -5,6 +5,9 @@
  */
 package gui;
 
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+
 /**
  *
  * @author Саша
@@ -138,6 +141,7 @@ public class Split_Panel extends javax.swing.JPanel {
         rightPanel1.setMinimumSize(new java.awt.Dimension(150, 0));
         rightPanel1.setName(""); // NOI18N
         rightPanel1.setLayout(new java.awt.GridBagLayout());
+      //  rightPanel1.setBackground(new Color(0,0,0));
 
         jToolBar_RightPanel.setFloatable(false);
         jToolBar_RightPanel.setRollover(true);
@@ -168,8 +172,8 @@ public class Split_Panel extends javax.swing.JPanel {
         jPanel_RightPanel.setAlignmentY(1.0F);
 
         jScrollPane_jPanel_RightPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jScrollPane_jPanel_RightPanel.setAlignmentX(0.0F);
-        jScrollPane_jPanel_RightPanel.setAlignmentY(0.0F);
+        jScrollPane_jPanel_RightPanel.setAlignmentX(1.0F);
+        jScrollPane_jPanel_RightPanel.setAlignmentY(1.0F);
         jScrollPane_jPanel_RightPanel.setAutoscrolls(true);
         jScrollPane_jPanel_RightPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         jScrollPane_jPanel_RightPanel.setName(""); // NOI18N
@@ -186,7 +190,7 @@ public class Split_Panel extends javax.swing.JPanel {
         jLabel2.setMinimumSize(new java.awt.Dimension(0, 0));
         jLabel2.setName(""); // NOI18N
         jScrollPane_jPanel_RightPanel.setViewportView(jLabel2);
-
+/*
         javax.swing.GroupLayout jPanel_RightPanelLayout = new javax.swing.GroupLayout(jPanel_RightPanel);
         jPanel_RightPanel.setLayout(jPanel_RightPanelLayout);
         jPanel_RightPanelLayout.setHorizontalGroup(
@@ -198,6 +202,28 @@ public class Split_Panel extends javax.swing.JPanel {
             .addComponent(jScrollPane_jPanel_RightPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
         );
 
+        jPanel_RightPanel.setLayout(new java.awt.GridBagLayout());
+        GridBagConstraints gridBagConstraints1 = new java.awt.GridBagConstraints();
+        gridBagConstraints1.gridx = 0;
+        gridBagConstraints1.gridy = 0;
+        gridBagConstraints1.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints1.weightx = 1.0;
+        gridBagConstraints1.insets = new java.awt.Insets(5, 9, 0, 8);
+        jPanel_RightPanel.add(jScrollPane_jPanel_RightPanel, gridBagConstraints1);
+        
+  */      
+        
+        
+        
+        
+        
+ //       jScrollPane_jPanel_RightPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        
+        
+        
+        
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -206,7 +232,13 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        rightPanel1.add(jPanel_RightPanel, gridBagConstraints);
+        rightPanel1.add(jScrollPane_jPanel_RightPanel, gridBagConstraints);
+        
+       
+        
+        
+        
+        
 
         jSplitPanel.setRightComponent(rightPanel1);
 
