@@ -203,10 +203,10 @@ public class TestRecAsset {
 		
 		issueAssetTransaction.process(db, false);
 		
-		LOGGER.info("asset KEY: " + asset.getKey());
+		LOGGER.info("asset KEY: " + asset.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(asset.getKey(), db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getConfirmedBalance(asset.getKey(db), db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
@@ -302,7 +302,7 @@ public class TestRecAsset {
 
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
-		long key = asset.getKey();
+		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		
@@ -547,7 +547,7 @@ public class TestRecAsset {
 
 		issueMessageTransaction.sign(maker, false);
 		issueMessageTransaction.process(db, false);
-		long key = asset.getKey();
+		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
 		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getConfirmedBalance(key, db));
 		

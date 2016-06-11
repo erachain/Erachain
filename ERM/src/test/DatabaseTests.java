@@ -179,23 +179,24 @@ public class DatabaseTests {
 	{
 		
 		DBSet.reCreateDatabase();
+				
 		GenesisBlock gb = new GenesisBlock();
-		gb.process(DBSet.getInstance());
+		gb.process(dbSet);
 		
-		ItemAssetMap db = DBSet.getInstance().getItemAssetMap();
-		Collection<ItemCls> assets = db.getValues();
+		ItemAssetMap dbMap = dbSet.getItemAssetMap();
+		Collection<ItemCls> assets = dbMap.getValues();
 		for (ItemCls asset:assets) {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
 			AssetCls aa = (AssetCls) asset;
-			LOGGER.info("ASSET - " + asset.getKey() + " : " + asset.getName()
+			LOGGER.info("ASSET - " + asset.getKey(dbSet) + " : " + asset.getName()
 				+ " : " + aa.getQuantity()	
 				+ " - " + aa.getReference().length	
 				+ ": " + aa.getReference());	
 			//db.add(asset);
 		}
 				
-		db.add(db.get(1l));
-		LOGGER.info("keys " + db.getKeys());
+		dbMap.add(dbMap.get(1l));
+		LOGGER.info("keys " + dbMap.getKeys());
 
 		//Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValues();
 		
@@ -215,7 +216,7 @@ public class DatabaseTests {
 		issueAssetTransaction.process(dbSet, false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
-		long key = asset.getKey();
+		long key = asset.getKey(dbSet);
 		
 		ItemAssetMap assetDB = dbSet.getItemAssetMap();
 		Collection<ItemCls> assets = assetDB.getValues();

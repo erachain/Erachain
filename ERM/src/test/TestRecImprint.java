@@ -185,19 +185,19 @@ public class TestRecImprint {
 		
 		issueImprintRecord.process(db, false);
 		
-		LOGGER.info("imprint KEY: " + imprint.getKey());
+		LOGGER.info("imprint KEY: " + imprint.getKey(db));
 				
 		//CHECK IMPRINT EXISTS SENDER
 		///////// NOT FONT THROUGHT db.get(issueImprintRecord)
 		//long key = db.getIssueImprintMap().get(issueImprintRecord);
-		long key = issueImprintRecord.getItem().getKey();
+		long key = issueImprintRecord.getItem().getKey(db);
 		assertEquals(true, db.getItemImprintMap().contains(key));
 		
 		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), "e");				
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10);
 		issueImprintTransaction_2.sign(maker, false);
 		issueImprintTransaction_2.process(db, false);
-		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey());
+		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
 		issueImprintTransaction_2.orphan(db, false);
 		ItemImprintMap imprintMap = db.getItemImprintMap();
 		int mapSize = imprintMap.size();

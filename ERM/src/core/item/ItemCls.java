@@ -137,13 +137,15 @@ public abstract class ItemCls {
 	public String getName() {
 		return this.name;
 	}
+	
+	
+	public long getKey() {
+		return getKey(DBSet.getInstance());
+	}
 	public long getKey(DBSet db) {
 		// resolve key in that DB
 		resolveKey(db);
 		return this.key;
-	}
-	public long getKey() {
-		return getKey(DBSet.getInstance());
 	}
 	public long resolveKey(DBSet db) {
 		if (this.key <0 // & this.reference != null

@@ -114,12 +114,23 @@ public class Order implements Comparable<Order> {
 		return this.amountHave.subtract(this.fulfilled);
 	}
 	
-	public BigDecimal getWantAmountLeft()
+	public BigDecimal getWantAmountLeft() {
+		return getWantAmountLeft(DBSet.getInstance());
+	}
+	public BigDecimal getWantAmountLeft(DBSet db)
 	{
-		if (this.getWantAsset().isDivisible())
+		if (this.getWantAsset(db).isDivisible())
 			return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
 		
 		return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
+		
+	}
+	public BigDecimal getWantAmountLeft(DBSet db, BigDecimal newPrice)
+	{
+		if (this.getWantAsset(db).isDivisible())
+			return newPrice.multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
+		
+		return newPrice.multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
 		
 	}
 
@@ -166,7 +177,7 @@ public class Order implements Comparable<Order> {
 		return db.getTradeMap().getInitiatedTrades(this);
 	}
 	
-	public boolean isConfirmed() 
+	public boolean isConfirmed()
 	{
 		return DBSet.getInstance().getOrderMap().contains(this.id)
 				|| DBSet.getInstance().getCompletedOrderMap().contains(this.id);
@@ -335,57 +346,89 @@ public class Order implements Comparable<Order> {
 		List<Order> orders = db.getOrderMap().getOrders(this.want, this.have);
 		
 		//TRY AND COMPLETE ORDERS
-		boolean completedOrder = true;
-		int i = 0;
-		while(completedOrder && i < orders.size())
+		boolean completedOrder = false;
+		int i = -1;
+		BigDecimal thisPrice = this.getPriceCalc();
+		BigDecimal thisWantPrice = this.getWantPriceCalc();
+		BigDecimal thisAmountLeft = this.getAmountLeft();
+		BigDecimal thisWantAmountLeft = this.getWantAmountLeft(db);
+		boolean reversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+		
+		while( !completedOrder && ++i < orders.size())
 		{
-			//RESET COMPLETED
-			completedOrder = false;
-			
 			//GET ORDER
 			Order order = orders.get(i);
+			BigDecimal tradeAmount;
+			BigDecimal tradeAmountGet;
+			BigDecimal orderAmountLeft;
+			Trade trade;
 			
-			//CALCULATE BUYING PRICE
-			BigDecimal buyingPrice = BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.UP);
-			
-			//CHECK IF OWNERS OF BOTH ORDER ARE NOT THE SAME
-	
+			if (!reversePrice) {
+				
+				//CALCULATE BUYING PRICE
+				BigDecimal orderWantPrice = order.getWantPriceCalc();
+		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-			BigDecimal thisPrice = this.getPriceCalc();
-				if(buyingPrice.compareTo(this.getPriceCalc()) >= 0)
-				{
-					//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
-					BigDecimal amount = order.getAmountLeft();
-					amount = amount.min(this.getAmountLeft().multiply(buyingPrice)).setScale(8, RoundingMode.DOWN);
-									
-					//CHECK IF WE CAN BUY ANYTHING
-					if(amount.compareTo(BigDecimal.ZERO) > 0)
-					{
-						//CALCULATE THE INCREMENTS AT WHICH WE HAVE TO BUY
-						BigDecimal increment = this.calculateBuyIncrement(order, db);
-						
-						//CALCULATE THE AMOUNT WE CAN BUY
-						amount = amount.subtract(amount.remainder(increment));
-						
-						//CALCULATE THE PRICE WE HAVE TO PAY
-						BigDecimal amountGet = amount.multiply(order.getPriceCalc()).setScale(8, RoundingMode.UP);
-						
-						//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
-						if(amount.compareTo(BigDecimal.ZERO) > 0)
-						{
-							//CREATE TRADE
-							Trade trade = new Trade(this.getId(), order.getId(), amount, amountGet, transaction.getTimestamp());
-							trade.process(db);
-							this.fulfilled = this.fulfilled.add(amountGet);
-						}
-						
-						//COMPLETED ORDER
-						completedOrder = true;
-					}
-				}
+				if(orderWantPrice.compareTo(thisPrice) < 0)
+					continue;
+
+				// get price from ORDER
+
+				orderAmountLeft = order.getAmountLeft();
+				
+				// recalc with order price wanted amount left
+				thisWantAmountLeft = this.getWantAmountLeft(db, orderWantPrice);
+				
+				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+					//RESET COMPLETED
+					completedOrder = true;
+					tradeAmount = thisWantAmountLeft;
+					tradeAmountGet = thisAmountLeft;
+				} else {
+					tradeAmount = orderAmountLeft;
+					tradeAmountGet = order.getWantAmountLeft(db);	
+				}									
+
+			} else {
+				// reverse price for accuracy
+				
+				//CALCULATE BUYING PRICE
+				BigDecimal orderWantPrice = order.getPriceCalc();
+		
+				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
+				if(orderWantPrice.compareTo(thisWantPrice) > 0)
+					continue;
+
+				orderAmountLeft = order.getAmountLeft();
+
+				// recalc with order price wanted amount left
+				thisWantAmountLeft = this.getWantAmountLeft(db);
+
+				//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
+				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+					//RESET COMPLETED
+					completedOrder = true;
+					// recalc amount for order price
+					tradeAmount = thisWantAmountLeft;
+					tradeAmountGet = thisAmountLeft;
+				} else {
+					tradeAmount = orderAmountLeft;
+					tradeAmountGet = order.getWantAmountLeft(db);						
+				}									
+			}
+
+			//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
+			//CHECK IF WE CAN BUY ANYTHING
+			if(tradeAmount.compareTo(BigDecimal.ZERO) > 0)
+			{
+				//CREATE TRADE
+				trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
+				trade.process(db);
+				this.fulfilled = this.fulfilled.add(tradeAmountGet);
+			}
 			
 			//INCREMENT I
-			i++;
+			//i++;
 		}	
 	}
 	
@@ -404,6 +447,7 @@ public class Order implements Comparable<Order> {
 		this.creator.setConfirmedBalance(this.have, this.creator.getConfirmedBalance(this.have, db).add(this.amountHave), db);
 	}
 	
+	// TODO delete this
 	public BigDecimal calculateBuyIncrement(Order order, DBSet db)
 	{
 		BigInteger multiplier = BigInteger.valueOf(100000000l);

@@ -18,6 +18,7 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.web.ServletUtils;
+import database.DBSet;
 import gui.PasswordPane;
 import settings.Settings;
 import test.TestRecNote;
@@ -98,7 +99,7 @@ public class APIUtils {
 		Pair<Transaction, Integer> result;
 		// SEND ASSET PAYMENT
 		result = Controller.getInstance()
-			.r_Send(account, feePow, new Account(recipient), asset.getKey(), bdAmount);
+			.r_Send(account, feePow, new Account(recipient), asset.getKey(DBSet.getInstance()), bdAmount);
 			
 		switch (result.getB()) {
 		case Transaction.VALIDATE_OK:

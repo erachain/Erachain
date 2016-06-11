@@ -82,7 +82,7 @@ public class TestRecGenesisPerson2 {
 		if (toProcess)
 		{ 
 			genesisIssuePersonTransaction.process(db, false);
-			keyPerson = person.getKey();
+			keyPerson = person.getKey(db);
 		}
 		
 	}
@@ -188,7 +188,7 @@ public class TestRecGenesisPerson2 {
 			//CHECK DESCRIPTION
 			assertEquals(genesisIssuePersonTransaction.getItem().getDescription(), parsedGenesisIssuePersonRecord.getItem().getDescription());
 							
-			assertEquals(genesisIssuePersonTransaction.getItem().getKey(), parsedGenesisIssuePersonRecord.getItem().getKey());	
+			assertEquals(genesisIssuePersonTransaction.getItem().getKey(db), parsedGenesisIssuePersonRecord.getItem().getKey(db));	
 
 		}
 		catch (Exception e) 
@@ -226,11 +226,11 @@ public class TestRecGenesisPerson2 {
 		assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
 
 		genesisIssuePersonTransaction.process(db, false);
-		keyPerson = person.getKey();
+		keyPerson = person.getKey(db);
 
 		//CHECK PERSON EXISTS SENDER
 		assertEquals(true, db.getItemPersonMap().contains(keyPerson));
-		assertEquals(genesisIssuePersonTransaction.getItem().getKey(), keyPerson);
+		assertEquals(genesisIssuePersonTransaction.getItem().getKey(db), keyPerson);
 		assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 		
 		//CHECK PERSON IS CORRECT

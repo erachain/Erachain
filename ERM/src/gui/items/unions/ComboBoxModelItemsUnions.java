@@ -13,6 +13,7 @@ import javax.swing.DefaultComboBoxModel;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.unions.UnionCls;
+import database.DBSet;
 
 @SuppressWarnings("serial")
 public class ComboBoxModelItemsUnions extends DefaultComboBoxModel<UnionCls> implements Observer {
@@ -76,7 +77,7 @@ public class ComboBoxModelItemsUnions extends DefaultComboBoxModel<UnionCls> imp
 			{
 				for(UnionCls union: unions)
 				{
-					if(union.getKey() == selected.getKey())
+					if(union.getKey() == selected.getKey(DBSet.getInstance()))
 					{
 						this.setSelectedItem(union);
 						return;

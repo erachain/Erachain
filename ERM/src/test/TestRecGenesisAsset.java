@@ -68,7 +68,7 @@ public class TestRecGenesisAsset {
 		if (toProcess)
 		{ 
 			genesisIssueAssetTransaction.process(db, false);
-			key = asset.getKey();
+			key = asset.getKey(db);
 		}
 		
 	}

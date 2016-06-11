@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.statuses.StatusCls;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -71,7 +72,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		{
 		case COLUMN_KEY:
 			
-			return status.getKey();
+			return status.getKey(DBSet.getInstance());
 		
 		case COLUMN_NAME:
 			

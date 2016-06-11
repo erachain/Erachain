@@ -182,7 +182,7 @@ public class TestRecStatus {
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(db, false);
 		
-		LOGGER.info("status KEY: " + status.getKey());
+		LOGGER.info("status KEY: " + status.getKey(db));
 				
 		//CHECK STATUS EXISTS SENDER
 		long key = db.getIssueStatusMap().get(issueStatusRecord);
@@ -192,7 +192,7 @@ public class TestRecStatus {
 		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueStatusTransaction_2.sign(maker, false);
 		issueStatusTransaction_2.process(db, false);
-		LOGGER.info("status_2 KEY: " + status_2.getKey());
+		LOGGER.info("status_2 KEY: " + status_2.getKey(db));
 		issueStatusTransaction_2.orphan(db, false);
 		assertEquals(mapSize + 1, statusMap.size());
 		

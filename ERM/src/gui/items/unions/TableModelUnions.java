@@ -7,6 +7,7 @@ import controller.Controller;
 import core.item.unions.UnionCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import database.DBSet;
 import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -77,7 +78,7 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 		{
 		case COLUMN_KEY:
 			
-			return union.getKey();
+			return union.getKey(DBSet.getInstance());
 		
 		case COLUMN_NAME:
 			

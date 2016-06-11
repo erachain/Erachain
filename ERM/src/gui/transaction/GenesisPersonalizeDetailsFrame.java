@@ -6,6 +6,7 @@ import javax.swing.JTextField;
 
 import controller.Controller;
 import core.transaction.GenesisIssuePersonRecord;
+import database.DBSet;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
@@ -35,7 +36,7 @@ public class GenesisPersonalizeDetailsFrame extends RecGenesis_DetailsFrame
 		
 		//PERSON
 		++detailGBC.gridy;
-		JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getItem().getKey()).toString()));
+		JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getItem().getKey(DBSet.getInstance())).toString()));
 		asset.setEditable(false);
 		MenuPopupUtil.installContextMenu(asset);
 		this.add(asset, detailGBC);	

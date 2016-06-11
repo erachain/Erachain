@@ -68,9 +68,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Asset"; }
 
-	public long getAssetKey()
+	public long getAssetKey(DBSet db)
 	{
-		return this.getItem().getKey();
+		return this.getItem().getKey(db);
 	}
 
 	@Override
@@ -238,7 +238,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.process(db, asPack);
 										
 		//ADD ASSETS TO OWNER
-		this.creator.setConfirmedBalance(this.getItem().getKey(),
+		this.creator.setConfirmedBalance(this.getItem().getKey(db),
 				new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(8), db);
 		
 
@@ -251,7 +251,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.orphan(db, asPack);
 
 		//REMOVE ASSETS FROM OWNER
-		this.creator.setConfirmedBalance(this.getItem().getKey(), BigDecimal.ZERO.setScale(8), db);
+		this.creator.setConfirmedBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(8), db);
 	}
 
 	/*
@@ -291,7 +291,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
 		AssetCls asset = (AssetCls)this.getItem();
-		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(),
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(DBSet.getInstance()),
 				new BigDecimal(asset.getQuantity()).setScale(8));
 
 		return assetAmount;

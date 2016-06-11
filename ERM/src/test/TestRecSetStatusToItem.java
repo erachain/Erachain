@@ -91,7 +91,7 @@ public class TestRecSetStatusToItem {
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
 		issuePersonTransaction.process(db, false);
 		person = (PersonCls)issuePersonTransaction.getItem();
-		personkey = person.getKey();
+		personkey = person.getKey(db);
 
 		timestamp += 100;
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
@@ -201,7 +201,7 @@ public class TestRecSetStatusToItem {
 		init();				
 		
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
-		assertEquals(db.getPersonStatusMap().get(person.getKey()).size(),	0);
+		assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(),	0);
 
 		Tuple4<Long, Long, Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person

@@ -140,7 +140,7 @@ public class TestRecUnion {
 		issueUnionTransaction.sign(certifier, false);
 		
 		issueUnionTransaction.process(db, false);
-		unionKey = union.getKey();
+		unionKey = union.getKey(db);
 
 		assertEquals( 1, unionKey);
 		//assertEquals( null, dbPS.getItem(unionKey));
@@ -315,7 +315,7 @@ public class TestRecUnion {
 		
 		issueUnionTransaction.process(db, false);
 		
-		LOGGER.info("union KEY: " + union.getKey());
+		LOGGER.info("union KEY: " + union.getKey(db));
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getConfirmedBalance(ERM_KEY, db));

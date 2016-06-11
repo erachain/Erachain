@@ -152,7 +152,7 @@ public class TestRecPerson {
 		issuePersonTransaction.sign(certifier, false);
 		
 		issuePersonTransaction.process(db, false);
-		personKey = person.getKey();
+		personKey = person.getKey(db);
 
 		// issue 1 genesis person in init() here
 		assertEquals( 1, personKey);
@@ -343,7 +343,7 @@ public class TestRecPerson {
 		
 		issuePersonTransaction.process(db, false);
 		
-		LOGGER.info("person KEY: " + person.getKey());
+		LOGGER.info("person KEY: " + person.getKey(db));
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getConfirmedBalance(ERM_KEY, db));

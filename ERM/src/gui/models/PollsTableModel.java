@@ -94,7 +94,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 			
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(poll.getTotalVotes(this.asset.getKey()));
+			return NumberAsString.getInstance().numberAsString(poll.getTotalVotes(this.asset.getKey(DBSet.getInstance())));
 			
 		}
 		

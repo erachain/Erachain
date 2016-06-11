@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.voting.PollOption;
+import database.DBSet;
 import lang.Lang;
 import utils.NumberAsString;
 import utils.Pair;
@@ -68,7 +69,7 @@ public class VotesTableModel extends AbstractTableModel
 			
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(vote.getA().getConfirmedBalance(asset.getKey()));
+			return NumberAsString.getInstance().numberAsString(vote.getA().getConfirmedBalance(asset.getKey(DBSet.getInstance())));
 			
 		}
 		

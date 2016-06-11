@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.assets.AssetCls;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -77,7 +78,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		{
 		case COLUMN_KEY:
 			
-			return asset.getKey();
+			return asset.getKey(DBSet.getInstance());
 		
 		case COLUMN_NAME:
 			

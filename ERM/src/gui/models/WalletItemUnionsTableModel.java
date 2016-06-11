@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.unions.UnionCls;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -75,7 +76,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 		{
 		case COLUMN_KEY:
 			
-			return union.getKey();
+			return union.getKey(DBSet.getInstance());
 		
 		case COLUMN_NAME:
 			

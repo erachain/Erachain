@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.imprints.ImprintCls;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -74,7 +75,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		{
 		case COLUMN_KEY:
 			
-			return imprint.getKey();
+			return imprint.getKey(DBSet.getInstance());
 		
 		case COLUMN_NAME:
 			

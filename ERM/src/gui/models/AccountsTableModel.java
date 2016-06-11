@@ -14,6 +14,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -86,11 +87,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return account.asPerson();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey()));			
+			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance())));			
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getUnconfirmedBalance(this.asset.getKey())
-					.subtract(account.getConfirmedBalance(this.asset.getKey())));
+			return NumberAsString.getInstance().numberAsString(account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()))
+					.subtract(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance()))));
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";
 			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
@@ -164,7 +165,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			}
 			else
 			{
-				totalBalance = totalBalance.add(account.getConfirmedBalance(this.asset.getKey()));
+				totalBalance = totalBalance.add(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance())));
 			}
 		}
 		
