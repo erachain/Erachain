@@ -24,7 +24,7 @@ import lang.Lang;
 public class MainAssetsFrame extends Main_Internal_Frame{
 
 	private static final long serialVersionUID = 1L;
-	AssetPanel info2;
+	AssetDetailsPanel001 info2;
 
 public MainAssetsFrame(){
 // not show buttons main Toolbar
@@ -102,7 +102,8 @@ public MainAssetsFrame(){
 							
 							
 							
-							 info2 = new AssetPanel((AssetCls) asset);
+							 //info2 = new AssetPanel((AssetCls) asset);
+							 info2 = new AssetDetailsPanel001((AssetCls) asset);
 							search_Assets_SplitPanel.jSplitPanel.setDividerLocation(search_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
 							search_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 							

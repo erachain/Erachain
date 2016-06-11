@@ -31,21 +31,26 @@ public class AssetDetailsPanel extends JPanel {
 	public AssetDetailsPanel(AssetCls asset)
 	{
 		this.asset = asset;
-	
+	this.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 		//LAYOUT
-		this.setLayout(new GridBagLayout());
+	
+	this.setLayout(new GridBagLayout());
 		
 		//PADDING
-		this.setBorder(new EmptyBorder(5, 5, 5, 5));
-		this.setSize(50,100);
+	//	this.setBorder(new EmptyBorder(5, 5, 5, 5));
+	//	this.setSize(50,100);
 		int gridy = 0;
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(0, 5, 5, 0);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelGBC.fill = GridBagConstraints.BOTH;   
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
+		labelGBC.weightx = 1;
+		labelGBC.weighty =1;
 		labelGBC.gridx = 0;
+		
+		
+		
 		
 		//DETAIL GBC
 		GridBagConstraints detailGBC = new GridBagConstraints();
@@ -149,7 +154,7 @@ public class AssetDetailsPanel extends JPanel {
 					onOpenPairClick();
 				}
 			});	
-			this.add(openPairButton, labelGBC);
+	//		this.add(openPairButton, labelGBC);
 		}
 		
 		//IF ASSET CONFIRMED AND NOT ERM
@@ -178,7 +183,7 @@ public class AssetDetailsPanel extends JPanel {
 					onFavoriteClick();
 				}
 			});	
-			this.add(this.favoritesButton, labelGBC);
+	//		this.add(this.favoritesButton, labelGBC);
 			
 		}
 		

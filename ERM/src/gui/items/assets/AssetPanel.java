@@ -37,31 +37,25 @@ public class AssetPanel extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel3 = new AssetDetailsPanel(asset);
+        jPanel3 = new AssetDetailsPanel001(asset);
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
 
         setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
-/*
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 557, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 363, Short.MAX_VALUE)
-        );
-*/
+        //jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jScrollPane1.setBorder(null);
+        jScrollPane2.setBorder(null);
+
         jScrollPane1.setViewportView(jPanel3);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridx =0;
+        gridBagConstraints.gridy =0;
         jPanel1.add(jScrollPane1, gridBagConstraints);
 
         jTabbedPane1.addTab(Lang.getInstance().translate("Details"), jPanel1);
@@ -73,7 +67,7 @@ public class AssetPanel extends javax.swing.JPanel {
         
         jScrollPane2.setViewportView(balancesTable);
 
-        jTabbedPane1.addTab(Lang.getInstance().translate("Holders"), jScrollPane2);
+    //    jTabbedPane1.addTab(Lang.getInstance().translate("Holders"), jScrollPane2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;

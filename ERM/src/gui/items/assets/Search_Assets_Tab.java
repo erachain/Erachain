@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.DefaultRowSorter;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,9 +31,12 @@ import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
@@ -93,7 +98,13 @@ public class Search_Assets_Tab extends Split_Panel {
 				column3.setMinWidth(50);
 				column3.setMaxWidth(1000);
 				column3.setPreferredWidth(50);
-	//Sorter
+	
+								
+				
+				
+				
+				
+//Sorter
 		RowSorter sorter =   new TableRowSorter(tableModelItemAssets);
 		assetsTable.setRowSorter(sorter);	
 	// UPDATE FILTER ON TEXT CHANGE
@@ -131,6 +142,92 @@ public class Search_Assets_Tab extends Split_Panel {
 		
 	// MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
+	
+	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	favorite.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			
+			favorite_set( assetsTable);
+			
+		}
+	});
+	
+	
+	
+	nameSalesMenu.addPopupMenuListener(new PopupMenuListener(){
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+			int row = assetsTable.getSelectedRow();
+			row = assetsTable.convertRowIndexToModel(row);
+			AssetCls asset = tableModelItemAssets.getAsset(row);
+			
+			//IF ASSET CONFIRMED AND NOT ERM
+			if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
+			{
+				favorite.setVisible(true);
+				//CHECK IF FAVORITES
+				if(Controller.getInstance().isItemFavorite(asset))
+				{
+					favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+				}
+				else
+				{
+					favorite.setText(Lang.getInstance().translate("Add Favorite"));
+				}
+				/*	
+				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+				this.favoritesButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						onFavoriteClick();
+					}
+				});	
+				this.add(this.favoritesButton, labelGBC);
+				*/
+			} else {
+				
+				favorite.setVisible(false);
+			}
+	
+		
+		
+		
+		
+		}
+		
+	}
+	
+	);
+	
+	
+	
+	
+
+	
+	
+	nameSalesMenu.add(favorite);
+	
+	
+	
+	
+	
+	
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -141,7 +238,23 @@ public class Search_Assets_Tab extends Split_Panel {
 			new AssetFrame(asset);
 		}
 	});
-	nameSalesMenu.add(details);
+//	nameSalesMenu.add(details);
+	
+	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	excahge.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = assetsTable.getSelectedRow();
+			row = assetsTable.convertRowIndexToModel(row);
+
+			AssetCls asset = tableModelItemAssets.getAsset(row);
+			new AssetPairSelect(asset.getKey());
+		}
+	});
+	nameSalesMenu.add(excahge);
+	
+	
+	
+	
 
 	assetsTable.setComponentPopupMenu(nameSalesMenu);
 	assetsTable.addMouseListener(new MouseAdapter() {
@@ -155,7 +268,21 @@ public class Search_Assets_Tab extends Split_Panel {
 			{
 				row = assetsTable.convertRowIndexToModel(row);
 				AssetCls asset = tableModelItemAssets.getAsset(row);
-				new AssetFrame(asset);
+		//		new AssetFrame(asset);
+			}
+			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+			{
+				
+				if (assetsTable.getSelectedColumn() == TableModelItemAssets.COLUMN_FAVORITE){
+					row = assetsTable.convertRowIndexToModel(row);
+					AssetCls asset = tableModelItemAssets.getAsset(row);
+					favorite_set( assetsTable);	
+					
+					
+					
+				}
+				
+				
 			}
 		}
 	});
@@ -165,5 +292,34 @@ public class Search_Assets_Tab extends Split_Panel {
 
 public void removeObservers() {
 	this.tableModelItemAssets.removeObservers();
+}
+
+public void favorite_set(JTable assetsTable){
+
+
+int row = assetsTable.getSelectedRow();
+row = assetsTable.convertRowIndexToModel(row);
+
+AssetCls asset = tableModelItemAssets.getAsset(row);
+//new AssetPairSelect(asset.getKey());
+
+if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
+{
+	//CHECK IF FAVORITES
+	if(Controller.getInstance().isItemFavorite(asset))
+	{
+		
+		Controller.getInstance().removeItemFavorite(asset);
+	}
+	else
+	{
+		
+		Controller.getInstance().addItemFavorite(asset);
+	}
+		
+
+	assetsTable.repaint();
+
+}
 }
 }
