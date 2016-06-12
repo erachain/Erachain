@@ -176,12 +176,16 @@ public class Trade {
 		//ADD TRADE TO DATABASE
 		db.getTradeMap().add(this);
 		
-		//UPDATE FULFILLED
+		//UPDATE FULFILLED HAVE
 		initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));
 		target.setFulfilledHave(target.getFulfilledHave().add(this.amountHave));
-		
+
+		//UPDATE FULFILLED WANT
+		initiator.setFulfilledWant(initiator.getFulfilledWant().add(this.amountHave));
+		target.setFulfilledWant(target.getFulfilledWant().add(this.amountWant));
+
 		//CHECK IF FULFILLED
-		if(initiator.isFulfilledHave())
+		if(initiator.isFulfilled())
 		{
 			//REMOVE FROM ORDERS
 			db.getOrderMap().delete(initiator);
@@ -195,7 +199,7 @@ public class Trade {
 			db.getOrderMap().add(initiator);
 		}
 		
-		if(target.isFulfilledHave())
+		if(target.isFulfilled())
 		{
 			//REMOVE FROM ORDERS
 			db.getOrderMap().delete(target);

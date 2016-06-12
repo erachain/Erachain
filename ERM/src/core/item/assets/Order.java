@@ -203,6 +203,11 @@ public class Order implements Comparable<Order> {
 	{
 		return this.fulfilledWant.compareTo(this.amountWant) == 0;
 	}
+	public boolean isFulfilled()
+	{
+		return this.fulfilledHave.compareTo(this.amountHave) == 0
+				|| this.fulfilledWant.compareTo(this.amountWant) == 0;
+	}
 
 	///////// PRICE
 	public BigDecimal getPriceCalc() 
@@ -413,8 +418,9 @@ public class Order implements Comparable<Order> {
 		int i = -1;
 		BigDecimal thisPrice = this.getPriceCalc();
 		BigDecimal thisWantPrice = this.getPriceCalcReverse();
-		BigDecimal tradeFulfilled;
 		boolean reversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+		boolean isDivisibleHave = this.isHaveDivisible(db);
+		boolean isDivisibleWant = this.isWantDivisible(db);
 		
 		while( !completedOrder && ++i < orders.size())
 		{
@@ -429,7 +435,6 @@ public class Order implements Comparable<Order> {
 			BigDecimal tradeAmountGet;
 			BigDecimal orderAmountLeft;
 			Trade trade;
-			tradeFulfilled = thisAmountHaveLeft;
 
 			if (!reversePrice) {
 				
@@ -457,7 +462,6 @@ public class Order implements Comparable<Order> {
 					completedOrder = true;
 					tradeAmount = thisAmountWantLeft;
 					tradeAmountGet = thisAmountHaveLeft;
-					tradeFulfilled = thisAmountHaveLeft;
 				} else {
 					
 					tradeAmountGet = order.getAmountWantLeft();	
@@ -495,7 +499,6 @@ public class Order implements Comparable<Order> {
 					completedOrder = true;
 					// recalc amount for order price
 					tradeAmount = thisAmountWantLeft;
-					tradeFulfilled = tradeAmountGet;
 				} else {
 
 					tradeAmountGet = order.getAmountWantLeft();			
@@ -504,7 +507,6 @@ public class Order implements Comparable<Order> {
 						continue;
 
 					tradeAmount = orderAmountLeft;
-					tradeFulfilled = tradeAmountGet;
 				}									
 			}
 
@@ -516,9 +518,10 @@ public class Order implements Comparable<Order> {
 				trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
 				trade.process(db);
 				
-				this.fulfilledHave = this.fulfilledHave.add(tradeFulfilled);
+				this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
+				this.fulfilledWant = this.fulfilledWant.add(tradeAmount);
 				if (completedOrder 
-					&& this.fulfilledHave.compareTo(BigDecimal.ZERO) >0) {
+					&& this.amountHave.subtract(this.fulfilledHave).compareTo(BigDecimal.ZERO) >0) {
 					// cancel order if it not fulfiled isDivisible
 					CancelOrderTransaction.process_it(db, this);
 				}
