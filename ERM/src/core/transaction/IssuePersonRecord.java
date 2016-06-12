@@ -166,5 +166,9 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	
 	//PROCESS/ORPHAN
 
+	@Override
+	public int calcBaseFee() {
+		return 3 * calcCommonFee();
+	}
 
 }

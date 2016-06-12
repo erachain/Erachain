@@ -174,23 +174,40 @@ public class CancelOrderTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
+	public static void process_it(DBSet db, Order order) 
+	{
+		//SET ORPHAN DATA
+		db.getCompletedOrderMap().add(order);
+		
+		//UPDATE BALANCE OF CREATOR
+		Account creator = order.getCreator(); 
+		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).add(order.getAmountLeft()), db);
+		
+		//DELETE FROM DATABASE
+		db.getOrderMap().delete(order);
+	}
+	
 	//@Override
 	public void process(DBSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
 				
-		//SET ORPHAN DATA
-		Order order = db.getOrderMap().get(this.order);
-		db.getCompletedOrderMap().add(order);
-		
-		//UPDATE BALANCE OF CREATOR
-		this.creator.setConfirmedBalance(order.getHave(), this.creator.getConfirmedBalance(order.getHave(), db).add(order.getAmountLeft()), db);
-		
-		//DELETE FROM DATABASE
-		db.getOrderMap().delete(this.order);	
+		Order order = db.getCompletedOrderMap().get(this.order);
+		process_it(db, order);
 	}
 
+	public static void orphan_it(DBSet db, Order order) 
+	{
+		db.getOrderMap().add(order);	
+		
+		//REMOVE BALANCE OF CREATOR
+		Account creator = order.getCreator(); 
+		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).subtract(order.getAmountLeft()), db);
+		
+		//DELETE ORPHAN DATA
+		db.getCompletedOrderMap().delete(order);
+	}
 	//@Override
 	public void orphan(DBSet db, boolean asPack) 
 	{
@@ -199,13 +216,7 @@ public class CancelOrderTransaction extends Transaction
 																
 		//ADD TO DATABASE
 		Order order = db.getCompletedOrderMap().get(this.order);
-		db.getOrderMap().add(order);	
-		
-		//REMOVE BALANCE OF CREATOR
-		this.creator.setConfirmedBalance(order.getHave(), this.creator.getConfirmedBalance(order.getHave(), db).subtract(order.getAmountLeft()), db);
-		
-		//DELETE ORPHAN DATA
-		db.getCompletedOrderMap().delete(this.order);
+		orphan_it(db, order);
 	}
 
 	@Override
@@ -273,6 +284,6 @@ public class CancelOrderTransaction extends Transaction
 		return assetAmount;
 	}
 	public int calcBaseFee() {
-		return calcCommonFee();
+		return 2 * calcCommonFee();
 	}
 }

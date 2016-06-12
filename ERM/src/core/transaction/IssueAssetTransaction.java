@@ -296,7 +296,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		return assetAmount;
 	}
+	
+	@Override
 	public int calcBaseFee() {
-		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 1000);
+		return 10 * (calcCommonFee() + (Transaction.FEE_PER_BYTE * 1000));
 	}
 }

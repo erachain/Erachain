@@ -369,6 +369,6 @@ public class CreateOrderTransaction extends Transaction
 		return assetAmount;
 	}
 	public int calcBaseFee() {
-		return calcCommonFee();
+		return 5 * calcCommonFee();
 	}
 }

@@ -11,6 +11,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
 
@@ -33,6 +34,8 @@ public class Order implements Comparable<Order> {
 	private BigDecimal fulfilled;
 	private BigDecimal amountWant;
 	private long timestamp;
+	private int haveDivisible;
+	private int wantDivisible;
 	
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
 	{
@@ -113,24 +116,55 @@ public class Order implements Comparable<Order> {
 	{
 		return this.amountHave.subtract(this.fulfilled);
 	}
+
+	public boolean isHaveDivisible(DBSet db)
+	{
+		if (this.haveDivisible == 0)
+			this.haveDivisible = this.getHaveAsset(db).isDivisible()? 1:-1;
+		
+		return this.haveDivisible == 1;
+	}
+	
+	public boolean isHaveDivisibleGood(DBSet db, BigDecimal amount)
+	{
+		if(this.isHaveDivisible(db))
+			return true;
+		
+		return amount.stripTrailingZeros().scale() == 0;
+	}
+
+	public boolean isWantDivisible(DBSet db)
+	{
+		if (this.wantDivisible == 0)
+			this.wantDivisible = this.getWantAsset(db).isDivisible()? 1:-1;
+		
+		return this.wantDivisible == 1;
+	}
+
+	public boolean isWantDivisibleGood(DBSet db, BigDecimal amount)
+	{
+		if(this.isWantDivisible(db))
+			return true;
+		
+		return amount.stripTrailingZeros().scale() == 0;
+	}
+
+	public BigDecimal getAmountLeft(DBSet db, BigDecimal newPrice)
+	{
+		if (this.isHaveDivisible(db))
+			return this.amountHave.subtract(this.fulfilled).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
+		return this.amountHave.subtract(this.fulfilled).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+	}
 	
 	public BigDecimal getWantAmountLeft() {
 		return getWantAmountLeft(DBSet.getInstance());
 	}
 	public BigDecimal getWantAmountLeft(DBSet db)
 	{
-		if (this.getWantAsset(db).isDivisible())
+		if (this.isWantDivisible(db))
 			return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
 		
 		return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
-		
-	}
-	public BigDecimal getWantAmountLeft(DBSet db, BigDecimal newPrice)
-	{
-		if (this.getWantAsset(db).isDivisible())
-			return newPrice.multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
-		
-		return newPrice.multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
 		
 	}
 
@@ -350,6 +384,7 @@ public class Order implements Comparable<Order> {
 		int i = -1;
 		BigDecimal thisPrice = this.getPriceCalc();
 		BigDecimal thisWantPrice = this.getWantPriceCalc();
+		BigDecimal tradeFulfilled;
 		BigDecimal thisAmountLeft = this.getAmountLeft();
 		BigDecimal thisWantAmountLeft = this.getWantAmountLeft(db);
 		boolean reversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
@@ -362,7 +397,8 @@ public class Order implements Comparable<Order> {
 			BigDecimal tradeAmountGet;
 			BigDecimal orderAmountLeft;
 			Trade trade;
-			
+			tradeFulfilled = thisAmountLeft;
+
 			if (!reversePrice) {
 				
 				//CALCULATE BUYING PRICE
@@ -377,54 +413,83 @@ public class Order implements Comparable<Order> {
 				orderAmountLeft = order.getAmountLeft();
 				
 				// recalc with order price wanted amount left
-				thisWantAmountLeft = this.getWantAmountLeft(db, orderWantPrice);
+				thisWantAmountLeft = this.getWantAmountLeft(db).multiply(orderWantPrice).setScale(8, RoundingMode.HALF_UP);
 				
 				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+					
+					if (!this.isHaveDivisibleGood(db, thisWantAmountLeft))
+						// amount not good for non divisible HAVE value
+						continue;
+					
 					//RESET COMPLETED
 					completedOrder = true;
 					tradeAmount = thisWantAmountLeft;
 					tradeAmountGet = thisAmountLeft;
+					tradeFulfilled = thisAmountLeft;
 				} else {
-					tradeAmount = orderAmountLeft;
+					
 					tradeAmountGet = order.getWantAmountLeft(db);	
-				}									
+					if (!this.isWantDivisibleGood(db, tradeAmountGet))
+						// amount not good for non divisible WANT value
+						continue;
+					
+					tradeAmount = orderAmountLeft;
+				}				
 
 			} else {
 				// reverse price for accuracy
 				
 				//CALCULATE BUYING PRICE
-				BigDecimal orderWantPrice = order.getPriceCalc();
+				BigDecimal orderPrice = order.getPriceCalc();
 		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-				if(orderWantPrice.compareTo(thisWantPrice) > 0)
+				if(orderPrice.compareTo(thisWantPrice) > 0)
 					continue;
 
 				orderAmountLeft = order.getAmountLeft();
 
-				// recalc with order price wanted amount left
-				thisWantAmountLeft = this.getWantAmountLeft(db);
+				//// recalc with order price wanted amount left
+				////thisWantAmountLeft = this.getWantAmountLeft(db);
 
 				//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
 				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+					
+					tradeAmountGet = this.getWantAmountLeft(db).multiply(orderPrice).setScale(8, RoundingMode.HALF_UP);
+					if (!this.isWantDivisibleGood(db, tradeAmountGet))
+						// amount not good for non divisible WANT value
+						continue;
+
 					//RESET COMPLETED
 					completedOrder = true;
 					// recalc amount for order price
 					tradeAmount = thisWantAmountLeft;
-					tradeAmountGet = thisAmountLeft;
+					tradeFulfilled = tradeAmountGet;
 				} else {
+
+					tradeAmountGet = order.getWantAmountLeft(db);			
+					if (!this.isHaveDivisibleGood(db, tradeAmountGet))
+						// amount not good for non divisible WANT value
+						continue;
+
 					tradeAmount = orderAmountLeft;
-					tradeAmountGet = order.getWantAmountLeft(db);						
+					tradeFulfilled = tradeAmountGet;
 				}									
 			}
 
 			//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
-			//CHECK IF WE CAN BUY ANYTHING
+			//AND WE CAN BUY ANYTHING
 			if(tradeAmount.compareTo(BigDecimal.ZERO) > 0)
 			{
 				//CREATE TRADE
 				trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
 				trade.process(db);
-				this.fulfilled = this.fulfilled.add(tradeAmountGet);
+				
+				this.fulfilled = this.fulfilled.add(tradeFulfilled);
+				if (completedOrder) {
+					// cancel order if it not fulfiled isDivisible
+					CancelOrderTransaction.process_it(db, this);
+				}
+				
 			}
 			
 			//INCREMENT I

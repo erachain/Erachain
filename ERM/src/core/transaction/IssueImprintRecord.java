@@ -185,7 +185,8 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	@Override
 	public int calcBaseFee() {
 		// + name length ^ 2
-		return calcCommonFee() + this.getItem().getName().getBytes().length * this.getItem().getName().getBytes().length ;
+		int length = this.getItem().getName().getBytes().length;
+		return calcCommonFee() + length * 10 ;
 	}
 
 
