@@ -96,7 +96,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 			
 		case COLUMN_FULFILLED:
 			
-			return order.getFulfilled().toPlainString();
+			return order.getFulfilledHave().toPlainString();
 			
 		case COLUMN_CREATOR:
 			

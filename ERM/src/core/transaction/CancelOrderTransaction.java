@@ -181,7 +181,7 @@ public class CancelOrderTransaction extends Transaction
 		
 		//UPDATE BALANCE OF CREATOR
 		Account creator = order.getCreator(); 
-		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).add(order.getAmountLeft()), db);
+		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).add(order.getAmountHaveLeft()), db);
 		
 		//DELETE FROM DATABASE
 		db.getOrderMap().delete(order);
@@ -203,7 +203,7 @@ public class CancelOrderTransaction extends Transaction
 		
 		//REMOVE BALANCE OF CREATOR
 		Account creator = order.getCreator(); 
-		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).subtract(order.getAmountLeft()), db);
+		creator.setConfirmedBalance(order.getHave(), creator.getConfirmedBalance(order.getHave(), db).subtract(order.getAmountHaveLeft()), db);
 		
 		//DELETE ORPHAN DATA
 		db.getCompletedOrderMap().delete(order);
@@ -279,7 +279,7 @@ public class CancelOrderTransaction extends Transaction
 			order =  DBSet.getInstance().getOrderMap().get(this.order);
 		}	
 		
-		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountLeft());
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHaveLeft());
 		
 		return assetAmount;
 	}

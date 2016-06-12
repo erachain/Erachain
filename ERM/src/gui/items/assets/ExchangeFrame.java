@@ -151,7 +151,7 @@ public class ExchangeFrame extends JFrame
 
 					if(row < sellOrdersTableModel.orders.size())
 					{
-						buyOrderPanel.txtAmount.setText(sellOrdersTableModel.orders.get(row).getB().getAmountLeft().toPlainString());
+						buyOrderPanel.txtAmount.setText(sellOrdersTableModel.orders.get(row).getB().getAmountHaveLeft().toPlainString());
 						buyOrderPanel.txtPrice.setText(sellOrdersTableModel.orders.get(row).getB().getPriceCalc().toPlainString());
 					}
 				}
@@ -174,8 +174,8 @@ public class ExchangeFrame extends JFrame
 					if(row < buyOrdersTableModel.orders.size())
 					{
 						//if (buying)
-						sellOrderPanel.txtAmount.setText(buyOrdersTableModel.orders.get(row).getB().getWantAmountLeft().toPlainString());
-						sellOrderPanel.txtPrice.setText(buyOrdersTableModel.orders.get(row).getB().getWantPriceCalc().toPlainString());
+						sellOrderPanel.txtAmount.setText(buyOrdersTableModel.orders.get(row).getB().getAmountWantLeft().toPlainString());
+						sellOrderPanel.txtPrice.setText(buyOrdersTableModel.orders.get(row).getB().getPriceCalcReverse().toPlainString());
 					}
 				}
 			}

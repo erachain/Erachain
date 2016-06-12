@@ -148,7 +148,7 @@ public class CancelOrderFrame extends JFrame
       		
       	//TXT FULFILLED
       	txtGBC.gridy = 6;
-      	JTextField txtFulfilled = new JTextField(order.getFulfilled().toPlainString());
+      	JTextField txtFulfilled = new JTextField(order.getFulfilledHave().toPlainString());
       	txtFulfilled.setEditable(false);
       	this.add(txtFulfilled, txtGBC);
       	

@@ -177,11 +177,11 @@ public class Trade {
 		db.getTradeMap().add(this);
 		
 		//UPDATE FULFILLED
-		initiator.setFulfilled(initiator.getFulfilled().add(this.amountWant));
-		target.setFulfilled(target.getFulfilled().add(this.amountHave));
+		initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));
+		target.setFulfilledHave(target.getFulfilledHave().add(this.amountHave));
 		
 		//CHECK IF FULFILLED
-		if(initiator.isFulfilled())
+		if(initiator.isFulfilledHave())
 		{
 			//REMOVE FROM ORDERS
 			db.getOrderMap().delete(initiator);
@@ -195,7 +195,7 @@ public class Trade {
 			db.getOrderMap().add(initiator);
 		}
 		
-		if(target.isFulfilled())
+		if(target.isFulfilledHave())
 		{
 			//REMOVE FROM ORDERS
 			db.getOrderMap().delete(target);
@@ -224,20 +224,20 @@ public class Trade {
 		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).subtract(this.amountWant), db);	
 		
 		//CHECK IF ORDER IS FULFILLED
-		if(initiator.isFulfilled())
+		if(initiator.isFulfilledHave())
 		{
 			//REMOVE FROM COMPLETED ORDERS
 			db.getCompletedOrderMap().delete(initiator);
 		}
-		if(target.isFulfilled())
+		if(target.isFulfilledHave())
 		{
 			//DELETE TO COMPLETED ORDERS
 			db.getCompletedOrderMap().delete(target);
 		}
 		
 		//REVERSE FULFILLED
-		initiator.setFulfilled(initiator.getFulfilled().subtract(this.amountWant));
-		target.setFulfilled(target.getFulfilled().subtract(this.amountHave));
+		initiator.setFulfilledHave(initiator.getFulfilledHave().subtract(this.amountWant));
+		target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
 		
 		//UPDATE ORDERS
 		db.getOrderMap().add(initiator);

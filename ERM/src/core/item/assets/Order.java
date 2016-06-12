@@ -24,15 +24,16 @@ public class Order implements Comparable<Order> {
 	private static final int AMOUNT_LENGTH = 12;
 	private static final int FULFILLED_LENGTH = 12;
 	private static final int TIMESTAMP_LENGTH = 8;
-	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2*AMOUNT_LENGTH + FULFILLED_LENGTH + TIMESTAMP_LENGTH;
+	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2*AMOUNT_LENGTH + 2*FULFILLED_LENGTH + TIMESTAMP_LENGTH;
 	
 	private BigInteger id;
 	private Account creator;
 	private long have;
 	private long want;
 	private BigDecimal amountHave;
-	private BigDecimal fulfilled;
+	private BigDecimal fulfilledHave;
 	private BigDecimal amountWant;
+	private BigDecimal fulfilledWant;
 	private long timestamp;
 	private int haveDivisible;
 	private int wantDivisible;
@@ -44,20 +45,23 @@ public class Order implements Comparable<Order> {
 		this.have = have;
 		this.want = want;
 		this.amountHave = amountHave; //.setScale(8);
-		this.fulfilled = BigDecimal.ZERO; //.setScale(8);
 		this.amountWant = amountWant; //.setScale(8);
 		this.timestamp = timestamp;
+		this.fulfilledHave = BigDecimal.ZERO; //.setScale(8);
+		this.fulfilledWant = BigDecimal.ZERO; //.setScale(8);
 	}
 	
-	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave, BigDecimal fulfilled, BigDecimal amountWant, long timestamp)
+	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave,
+			BigDecimal fulfilledHave, BigDecimal amountWant, BigDecimal fulfilledWant, long timestamp)
 	{
 		this.id = id;
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
 		this.amountHave = amountHave;//.setScale(8);
-		this.fulfilled = fulfilled;//.setScale(8);
+		this.fulfilledHave = fulfilledHave;//.setScale(8);
 		this.amountWant = amountWant;//.setScale(8);
+		this.fulfilledWant = fulfilledWant;//.setScale(8);
 		this.timestamp = timestamp;
 	}
 	
@@ -106,17 +110,8 @@ public class Order implements Comparable<Order> {
 	{
 		return (AssetCls)db.getItemAssetMap().get(this.want);
 	}
-
-	public BigDecimal getAmountHave() 
-	{
-		return this.amountHave;
-	}
 	
-	public BigDecimal getAmountLeft()
-	{
-		return this.amountHave.subtract(this.fulfilled);
-	}
-
+	//////////// DIVISIBLE
 	public boolean isHaveDivisible(DBSet db)
 	{
 		if (this.haveDivisible == 0)
@@ -149,58 +144,81 @@ public class Order implements Comparable<Order> {
 		return amount.stripTrailingZeros().scale() == 0;
 	}
 
-	public BigDecimal getAmountLeft(DBSet db, BigDecimal newPrice)
+	///////////////////////// AMOUNTS 
+	public BigDecimal getAmountHave()
 	{
-		if (this.isHaveDivisible(db))
-			return this.amountHave.subtract(this.fulfilled).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
-		return this.amountHave.subtract(this.fulfilled).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+		return this.amountHave;
 	}
-	
-	public BigDecimal getWantAmountLeft() {
-		return getWantAmountLeft(DBSet.getInstance());
-	}
-	public BigDecimal getWantAmountLeft(DBSet db)
-	{
-		if (this.isWantDivisible(db))
-			return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(8, RoundingMode.HALF_DOWN);
-		
-		return this.getPriceCalc().multiply(this.getAmountLeft()).setScale(0, RoundingMode.HALF_DOWN);
-		
-	}
-
 	public BigDecimal getAmountWant() 
 	{
 		return this.amountWant;
 	}
+
+	public BigDecimal getAmountHaveLeft()
+	{
+		return this.amountHave.subtract(this.fulfilledHave);
+	}
+	public BigDecimal getAmountWantLeft()
+	{
+		return this.amountWant.subtract(this.fulfilledWant);
+	}
+
+	public BigDecimal getAmountHaveLeft(DBSet db, BigDecimal newPrice)
+	{
+		if (this.isHaveDivisible(db))
+			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
+		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+	}	
+	public BigDecimal getAmountWantLeft(DBSet db, BigDecimal newPrice)
+	{
+		if (this.isWantDivisible(db))
+			return this.amountWant.subtract(this.amountWant).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
+		return this.amountWant.subtract(this.amountWant).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+	}	
+
+	//////// FULFILLED
+	public BigDecimal getFulfilledHave()
+	{
+		return this.fulfilledHave;
+	}
+	public BigDecimal getFulfilledWant()
+	{
+		return this.fulfilledWant;
+	}
+
+	public void setFulfilledHave(BigDecimal fulfilled)
+	{
+		this.fulfilledHave = fulfilled;
+	}
+	public void setFulfilledWant(BigDecimal fulfilled)
+	{
+		this.fulfilledWant = fulfilled;
+	}
+
+	public boolean isFulfilledHave()
+	{
+		return this.fulfilledHave.compareTo(this.amountHave) == 0;
+	}
+	public boolean isFulfilledWant()
+	{
+		return this.fulfilledWant.compareTo(this.amountWant) == 0;
+	}
+
+	///////// PRICE
 	public BigDecimal getPriceCalc() 
 	{
-			return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
+			return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN);
 	}	
-	public BigDecimal getWantPriceCalc() 
+	public BigDecimal getPriceCalcReverse() 
 	{
-			return this.amountHave.divide(amountWant, 12, RoundingMode.HALF_UP);
+			return this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP);
 	}	
-	
-	public BigDecimal getFulfilled()
-	{
-		return this.fulfilled;
-	}
-	
+		
 	public long getTimestamp() 
 	{
 		return this.timestamp;
 	}
-	
-	public void setFulfilled(BigDecimal fulfilled)
-	{
-		this.fulfilled = fulfilled;
-	}
-	
-	public boolean isFulfilled()
-	{
-		return this.fulfilled.compareTo(this.amountHave) == 0;
-	}
-	
+			
 	public List<Trade> getInitiatedTrades()
 	{
 		return this.getInitiatedTrades(DBSet.getInstance());
@@ -287,22 +305,27 @@ public class Order implements Comparable<Order> {
 		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), 8);
 		position += AMOUNT_LENGTH;		
 		
-		//READ FULFILLED
-		byte[] fulfilledBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
-		BigDecimal fulfilled = new BigDecimal(new BigInteger(fulfilledBytes), 8);
+		//READ FULFILLED HAVE
+		byte[] fulfilledHaveBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
+		BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), 8);
 		position += FULFILLED_LENGTH;		
 		
 		//READ AMOUNT WANT
 		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), 8);
 		position += AMOUNT_LENGTH;		
-		
+
+		//READ FULFILLED WANT
+		byte[] fulfilledWantBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
+		BigDecimal fulfilledWant = new BigDecimal(new BigInteger(fulfilledWantBytes), 8);
+		position += FULFILLED_LENGTH;		
+
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);	
 		position += TIMESTAMP_LENGTH;
 		
-		return new Order(id, creator, have, want, amountHave, fulfilled, amountWant, timestamp);
+		return new Order(id, creator, have, want, amountHave, fulfilledHave, amountWant, fulfilledWant, timestamp);
 	}
 	
 	public byte[] toBytes()
@@ -341,11 +364,11 @@ public class Order implements Comparable<Order> {
 		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 		
-		//WRITE FULFILLED
-		byte[] fulfilledBytes = this.fulfilled.unscaledValue().toByteArray();
-		fill = new byte[FULFILLED_LENGTH - fulfilledBytes.length];
-		fulfilledBytes = Bytes.concat(fill, fulfilledBytes);
-		data = Bytes.concat(data, fulfilledBytes);
+		//WRITE FULFILLED HAVE
+		byte[] fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
+		fill = new byte[FULFILLED_LENGTH - fulfilledHaveBytes.length];
+		fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
+		data = Bytes.concat(data, fulfilledHaveBytes);
 		
 		//WRITE AMOUNT WANT
 		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
@@ -353,6 +376,12 @@ public class Order implements Comparable<Order> {
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
 		
+		//WRITE FULFILLED WANT
+		byte[] fulfilledWantBytes = this.fulfilledWant.unscaledValue().toByteArray();
+		fill = new byte[FULFILLED_LENGTH - fulfilledWantBytes.length];
+		fulfilledWantBytes = Bytes.concat(fill, fulfilledWantBytes);
+		data = Bytes.concat(data, fulfilledWantBytes);
+
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
@@ -383,26 +412,29 @@ public class Order implements Comparable<Order> {
 		boolean completedOrder = false;
 		int i = -1;
 		BigDecimal thisPrice = this.getPriceCalc();
-		BigDecimal thisWantPrice = this.getWantPriceCalc();
+		BigDecimal thisWantPrice = this.getPriceCalcReverse();
 		BigDecimal tradeFulfilled;
-		BigDecimal thisAmountLeft = this.getAmountLeft();
-		BigDecimal thisWantAmountLeft = this.getWantAmountLeft(db);
 		boolean reversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 		
 		while( !completedOrder && ++i < orders.size())
 		{
+			
+			// update new values
+			BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
+			BigDecimal thisAmountWantLeft = this.getAmountWantLeft();
+
 			//GET ORDER
 			Order order = orders.get(i);
 			BigDecimal tradeAmount;
 			BigDecimal tradeAmountGet;
 			BigDecimal orderAmountLeft;
 			Trade trade;
-			tradeFulfilled = thisAmountLeft;
+			tradeFulfilled = thisAmountHaveLeft;
 
 			if (!reversePrice) {
 				
 				//CALCULATE BUYING PRICE
-				BigDecimal orderWantPrice = order.getWantPriceCalc();
+				BigDecimal orderWantPrice = order.getPriceCalcReverse();
 		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
 				if(orderWantPrice.compareTo(thisPrice) < 0)
@@ -410,25 +442,25 @@ public class Order implements Comparable<Order> {
 
 				// get price from ORDER
 
-				orderAmountLeft = order.getAmountLeft();
+				orderAmountLeft = order.getAmountHaveLeft();
 				
 				// recalc with order price wanted amount left
-				thisWantAmountLeft = this.getWantAmountLeft(db).multiply(orderWantPrice).setScale(8, RoundingMode.HALF_UP);
+				thisAmountWantLeft = thisAmountWantLeft.multiply(orderWantPrice).setScale(8, RoundingMode.HALF_UP);
 				
-				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+				if (orderAmountLeft.compareTo(thisAmountWantLeft) >= 0) {
 					
-					if (!this.isHaveDivisibleGood(db, thisWantAmountLeft))
+					if (!this.isHaveDivisibleGood(db, thisAmountWantLeft))
 						// amount not good for non divisible HAVE value
 						continue;
 					
 					//RESET COMPLETED
 					completedOrder = true;
-					tradeAmount = thisWantAmountLeft;
-					tradeAmountGet = thisAmountLeft;
-					tradeFulfilled = thisAmountLeft;
+					tradeAmount = thisAmountWantLeft;
+					tradeAmountGet = thisAmountHaveLeft;
+					tradeFulfilled = thisAmountHaveLeft;
 				} else {
 					
-					tradeAmountGet = order.getWantAmountLeft(db);	
+					tradeAmountGet = order.getAmountWantLeft();	
 					if (!this.isWantDivisibleGood(db, tradeAmountGet))
 						// amount not good for non divisible WANT value
 						continue;
@@ -446,27 +478,27 @@ public class Order implements Comparable<Order> {
 				if(orderPrice.compareTo(thisWantPrice) > 0)
 					continue;
 
-				orderAmountLeft = order.getAmountLeft();
+				orderAmountLeft = order.getAmountHaveLeft();
 
 				//// recalc with order price wanted amount left
 				////thisWantAmountLeft = this.getWantAmountLeft(db);
 
 				//CALCULATE THE MAXIMUM AMOUNT WE COULD BUY
-				if (orderAmountLeft.compareTo(thisWantAmountLeft) >= 0) {
+				if (orderAmountLeft.compareTo(thisAmountWantLeft) >= 0) {
 					
-					tradeAmountGet = this.getWantAmountLeft(db).multiply(orderPrice).setScale(8, RoundingMode.HALF_UP);
-					if (!this.isWantDivisibleGood(db, tradeAmountGet))
+					tradeAmountGet = thisAmountWantLeft.multiply(orderPrice).setScale(8, RoundingMode.HALF_UP);
+					if (!this.isHaveDivisibleGood(db, tradeAmountGet))
 						// amount not good for non divisible WANT value
 						continue;
 
 					//RESET COMPLETED
 					completedOrder = true;
 					// recalc amount for order price
-					tradeAmount = thisWantAmountLeft;
+					tradeAmount = thisAmountWantLeft;
 					tradeFulfilled = tradeAmountGet;
 				} else {
 
-					tradeAmountGet = order.getWantAmountLeft(db);			
+					tradeAmountGet = order.getAmountWantLeft();			
 					if (!this.isHaveDivisibleGood(db, tradeAmountGet))
 						// amount not good for non divisible WANT value
 						continue;
@@ -484,8 +516,9 @@ public class Order implements Comparable<Order> {
 				trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
 				trade.process(db);
 				
-				this.fulfilled = this.fulfilled.add(tradeFulfilled);
-				if (completedOrder) {
+				this.fulfilledHave = this.fulfilledHave.add(tradeFulfilled);
+				if (completedOrder 
+					&& this.fulfilledHave.compareTo(BigDecimal.ZERO) >0) {
 					// cancel order if it not fulfiled isDivisible
 					CancelOrderTransaction.process_it(db, this);
 				}

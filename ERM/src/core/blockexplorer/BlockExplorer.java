@@ -886,7 +886,7 @@ public class BlockExplorer
 			count ++;
 			pairsOpenOrders.put(order.getWant(), count);
 
-			volumeAmount = volumeAmount.add(order.getAmountLeft());
+			volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
 
 			volumeAmountOrders.put(order.getWant(), volumeAmount);
 
@@ -922,7 +922,7 @@ public class BlockExplorer
 			count ++;
 			pairsOpenOrders.put(order.getHave(), count);
 
-			volumePrice = volumePrice.add(order.getAmountLeft());
+			volumePrice = volumePrice.add(order.getAmountHaveLeft());
 
 			volumePriceOrders.put(order.getHave(), volumePrice);
 
@@ -1153,17 +1153,17 @@ public class BlockExplorer
 			Map sellJSON = new LinkedHashMap();
 
 			sellJSON.put("price", order.getPriceCalc().toPlainString());
-			sellJSON.put("amount", order.getAmountLeft().toPlainString());
-			sumAmount = sumAmount.add(order.getAmountLeft());
+			sellJSON.put("amount", order.getAmountHaveLeft().toPlainString());
+			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
 			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(8, RoundingMode.DOWN);
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
 			BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
-			BigDecimal amount = order.getAmountLeft();
+			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 			
 			boolean good = (amount.compareTo(BigDecimal.ZERO) > 0);
@@ -1172,7 +1172,7 @@ public class BlockExplorer
 			
 			if(good)
 			{
-				sumAmountGood = sumAmountGood.add(order.getAmountLeft());
+				sumAmountGood = sumAmountGood.add(order.getAmountHaveLeft());
 				
 				sumSellingAmountGood = sumSellingAmountGood.add(sellingAmount);
 			}
@@ -1200,18 +1200,18 @@ public class BlockExplorer
 			Map buyJSON = new LinkedHashMap();
 
 			buyJSON.put("price", order.getPriceCalc().toPlainString());
-			buyJSON.put("amount", order.getAmountLeft().toPlainString());
+			buyJSON.put("amount", order.getAmountHaveLeft().toPlainString());
 
-			sumAmount = sumAmount.add(order.getAmountLeft());
+			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
 			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(8, RoundingMode.DOWN);
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
 			BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
-			BigDecimal amount = order.getAmountLeft();
+			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 			
 			boolean good = (amount.compareTo(BigDecimal.ZERO) > 0);
@@ -1221,7 +1221,7 @@ public class BlockExplorer
 			if(good)
 			{
 				sumBuyingAmountGood = sumBuyingAmountGood.add(buyingAmount);
-				sumAmountGood = sumAmountGood.add(order.getAmountLeft());
+				sumAmountGood = sumAmountGood.add(order.getAmountHaveLeft());
 			}
 			
 			sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
@@ -1420,7 +1420,7 @@ public class BlockExplorer
 		for (Order order : orders) {
 			if(order.getHave() == key)
 			{
-				alloreders = alloreders.add(order.getAmountLeft());
+				alloreders = alloreders.add(order.getAmountHaveLeft());
 			}
 		}
 		Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator())); 
@@ -1587,7 +1587,7 @@ public class BlockExplorer
 				orderJSON.put("want", order.getWant());
 				
 				orderJSON.put("amount", order.getAmountHave().toPlainString());
-				orderJSON.put("amountLeft", order.getAmountLeft().toPlainString());
+				orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
 				orderJSON.put("amountWant", order.getAmountWant().toPlainString());
 				orderJSON.put("price", order.getPriceCalc().toPlainString());
 

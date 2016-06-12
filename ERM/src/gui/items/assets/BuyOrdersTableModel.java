@@ -52,8 +52,8 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		sumTotal = BigDecimal.ZERO.setScale(8);
 		for (Pair<BigInteger, Order> orderPair : this.orders) 	
 		{
-			sumAmount = sumAmount.add(orderPair.getB().getWantAmountLeft());
-			sumTotal = sumTotal.add(orderPair.getB().getAmountLeft());
+			sumAmount = sumAmount.add(orderPair.getB().getAmountWantLeft());
+			sumTotal = sumTotal.add(orderPair.getB().getAmountHaveLeft());
 		}
 	}
 	
@@ -109,14 +109,14 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 					return "<html>Total:</html>";
 				
 				
-				return NumberAsString.getInstance().numberAsString12(order.getWantPriceCalc());
+				return NumberAsString.getInstance().numberAsString12(order.getPriceCalcReverse());
 				
 			case COLUMN_BUYING_AMOUNT:
 				
 				if(row == this.orders.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
 				
-				return NumberAsString.getInstance().numberAsString(order.getWantAmountLeft());
+				return NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
 			
 			case COLUMN_PRICE:
 				
@@ -132,7 +132,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				
 				// It shows unacceptably small amount of red.
 				BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
-				BigDecimal amount = order.getAmountLeft();
+				BigDecimal amount = order.getAmountHaveLeft();
 				String amountStr = NumberAsString.getInstance().numberAsString(amount);
 				amount = amount.subtract(amount.remainder(increment));
 				

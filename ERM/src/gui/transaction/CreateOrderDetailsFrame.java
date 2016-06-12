@@ -65,7 +65,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 				
 		//PRICE
 		++detailGBC.gridy;
-		JTextField price = new JTextField(order.getPriceCalc().toPlainString() + " / " + order.getWantPriceCalc().toPlainString());
+		JTextField price = new JTextField(order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);	

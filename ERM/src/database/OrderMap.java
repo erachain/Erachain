@@ -229,7 +229,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		Order order = this.get(key);
 		
 		BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
-		BigDecimal amount = order.getAmountLeft();
+		BigDecimal amount = order.getAmountHaveLeft();
 		amount = amount.subtract(amount.remainder(increment));
 		return  (amount.compareTo(BigDecimal.ZERO) > 0);
 	}
