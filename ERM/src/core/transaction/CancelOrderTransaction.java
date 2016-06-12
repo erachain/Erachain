@@ -193,7 +193,7 @@ public class CancelOrderTransaction extends Transaction
 		//UPDATE CREATOR
 		super.process(db, asPack);
 				
-		Order order = db.getCompletedOrderMap().get(this.order);
+		Order order = db.getOrderMap().get(this.order);
 		process_it(db, order);
 	}
 

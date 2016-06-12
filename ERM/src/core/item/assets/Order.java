@@ -44,11 +44,11 @@ public class Order implements Comparable<Order> {
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave; //.setScale(8);
-		this.amountWant = amountWant; //.setScale(8);
+		this.amountHave = amountHave.setScale(8);
+		this.amountWant = amountWant.setScale(8);
 		this.timestamp = timestamp;
-		this.fulfilledHave = BigDecimal.ZERO; //.setScale(8);
-		this.fulfilledWant = BigDecimal.ZERO; //.setScale(8);
+		this.fulfilledHave = BigDecimal.ZERO.setScale(8);
+		this.fulfilledWant = BigDecimal.ZERO.setScale(8);
 	}
 	
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave,
