@@ -220,8 +220,8 @@ public class Trade {
 
 	public void orphan(DBSet db) 
 	{
-		Order initiator = this.getInitiatorOrder(db).copy();
-		Order target = this.getTargetOrder(db).copy();
+		Order initiator = this.getInitiatorOrder(db); //.copy();
+		Order target = this.getTargetOrder(db); //.copy();
 		
 		//REVERSE FUNDS
 		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).subtract(this.amountHave), db);

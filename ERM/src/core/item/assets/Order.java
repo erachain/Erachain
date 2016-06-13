@@ -417,8 +417,8 @@ public class Order implements Comparable<Order> {
 		boolean completedOrder = false;
 		int i = -1;
 		BigDecimal thisPrice = this.getPriceCalc();
-		BigDecimal thisWantPrice = this.getPriceCalcReverse();
-		boolean reversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+		BigDecimal thisReversePrice = this.getPriceCalcReverse();
+		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 		boolean isDivisibleHave = this.isHaveDivisible(db);
 		boolean isDivisibleWant = this.isWantDivisible(db);
 		
@@ -436,7 +436,7 @@ public class Order implements Comparable<Order> {
 			BigDecimal orderAmountLeft;
 			Trade trade;
 
-			if (!reversePrice) {
+			if (!isReversePrice) {
 				
 				//CALCULATE BUYING PRICE
 				BigDecimal orderWantPrice = order.getPriceCalcReverse();
@@ -479,7 +479,7 @@ public class Order implements Comparable<Order> {
 				BigDecimal orderPrice = order.getPriceCalc();
 		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-				if(orderPrice.compareTo(thisWantPrice) > 0)
+				if(orderPrice.compareTo(thisReversePrice) > 0)
 					continue;
 
 				orderAmountLeft = order.getAmountHaveLeft();
@@ -520,10 +520,24 @@ public class Order implements Comparable<Order> {
 				
 				this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
 				this.fulfilledWant = this.fulfilledWant.add(tradeAmount);
+				order.fulfilledHave = order.fulfilledHave.add(tradeAmount);
+				order.fulfilledWant = order.fulfilledWant.add(tradeAmountGet);
+				
 				if (completedOrder 
 					&& this.amountHave.subtract(this.fulfilledHave).compareTo(BigDecimal.ZERO) >0) {
 					// cancel order if it not fulfiled isDivisible
 					CancelOrderTransaction.process_it(db, this);
+				} else {
+					
+					BigDecimal amountWantLeftNew = this.getAmountWantLeft();				
+					BigDecimal amountHaveLeftNew = this.getAmountHaveLeft();
+					
+					if (isReversePrice && amountWantLeftNew.multiply(thisReversePrice).compareTo(amountHaveLeftNew) > 0
+							|| !isReversePrice && amountHaveLeftNew.multiply(thisPrice).compareTo(amountWantLeftNew) < 0)
+					{
+						// cancel order if not enough HAVE
+						CancelOrderTransaction.process_it(db, this);					
+					}
 				}
 				
 			}
