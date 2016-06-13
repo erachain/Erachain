@@ -48,7 +48,7 @@ public class Settings {
 	
 	// BLOCK
 	public static final int BLOCK_MAX_SIGNATURES = 500; // blocks load onetime
-	public static final BigDecimal BLOCK_GENERATING_BALANCE_NEED = new BigDecimal(100);
+	public static final long BLOCK_GENERATING_BALANCE_NEED = 100;
 
 	//TESTNET 
 	public static final long DEFAULT_MAINNET_STAMP = 1465712274777L; //1465107777777L;

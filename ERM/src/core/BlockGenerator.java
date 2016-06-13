@@ -28,19 +28,16 @@ import com.google.common.primitives.Longs;
 import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.block.BlockFactory;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import database.DBSet;
 import lang.Lang;
+import settings.Settings;
 
 public class BlockGenerator extends Thread implements Observer
 {	
-	public static final int RETARGET = 10;
-	public static final long MIN_BALANCE = 1l;
-	public static final long MAX_BALANCE = 10000000000l;
-	public static final int MIN_BLOCK_TIME = 1 * 60;
-	public static final int MAX_BLOCK_TIME = 5 * 60;
 	
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
@@ -203,7 +200,7 @@ public class BlockGenerator extends Thread implements Observer
 					{
 						for(PrivateKeyAccount account: knownAccounts)
 						{
-							if(account.getGeneratingBalance().compareTo(BigDecimal.ONE) >= 0)
+							if(account.getGeneratingBalance().compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0)
 							{
 								//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
 								if(!this.blocks.containsKey(account))
@@ -277,7 +274,7 @@ public class BlockGenerator extends Thread implements Observer
 	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, Block block)
 	{
 		//CHECK IF ACCOUNT HAS BALANCE
-		if(account.getGeneratingBalance(dbSet).compareTo(Settings.BLOCK_GENERATING_BALANCE_NEED) < 0)
+		if(account.getGeneratingBalance(dbSet).compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) < 0)
 		{
 			return null;
 		}
@@ -458,14 +455,14 @@ public class BlockGenerator extends Thread implements Observer
 	public static long getNextBlockGeneratingBalance(DBSet db, Block block)
 	{
 		int height = block.getHeight(db);
-		if(height % RETARGET == 0)
+		if(height % GenesisBlock.GENERATING_RETARGET == 0)
 		{
 			//CALCULATE THE GENERATING TIME FOR LAST 10 BLOCKS
 			long generatingTime = block.getTimestamp();
 				
 			//GET FIRST BLOCK OF TARGET
 			Block firstBlock = block;
-			for(int i=1; i<RETARGET; i++)
+			for(int i=1; i<GenesisBlock.GENERATING_RETARGET; i++)
 			{
 				firstBlock = firstBlock.getParent(db);
 			}
@@ -473,7 +470,7 @@ public class BlockGenerator extends Thread implements Observer
 			generatingTime -= firstBlock.getTimestamp();
 			
 			//CALCULATE EXPECTED FORGING TIME
-			long expectedGeneratingTime = getBlockTime(block.getGeneratingBalance()) * RETARGET * 1000;
+			long expectedGeneratingTime = getBlockTime(block.getGeneratingBalance()) * GenesisBlock.GENERATING_RETARGET * 1000;
 			
 			//CALCULATE MULTIPLIER
 			double multiplier = (double) expectedGeneratingTime / (double) generatingTime;
@@ -500,22 +497,24 @@ public class BlockGenerator extends Thread implements Observer
 	{
 		generatingBalance = minMaxBalance(generatingBalance);
 		
-		double percentageOfTotal = (double) generatingBalance / MAX_BALANCE;
-		long actualBlockTime = (long) (MIN_BLOCK_TIME + ((MAX_BLOCK_TIME - MIN_BLOCK_TIME) * (1 - percentageOfTotal)));
+		double percentageOfTotal = (double) generatingBalance / GenesisBlock.MAX_GENERATING_BALANCE;
+		long actualBlockTime = (long) (GenesisBlock.GENERATING_MIN_BLOCK_TIME
+				+ ((GenesisBlock.GENERATING_MAX_BLOCK_TIME
+						- GenesisBlock.GENERATING_MIN_BLOCK_TIME) * (1 - percentageOfTotal)));
 		
 		return actualBlockTime;
 	}
 	
 	private static long minMaxBalance(long generatingBalance)
 	{
-		if(generatingBalance < MIN_BALANCE)
+		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 		{
-			return MIN_BALANCE;
+			return GenesisBlock.MIN_GENERATING_BALANCE;
 		}
 		
-		if(generatingBalance > MAX_BALANCE)
+		if(generatingBalance > GenesisBlock.MAX_GENERATING_BALANCE)
 		{
-			return MAX_BALANCE;
+			return GenesisBlock.MAX_GENERATING_BALANCE;
 		}
 		
 		return generatingBalance;

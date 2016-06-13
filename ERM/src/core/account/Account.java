@@ -19,6 +19,7 @@ import database.Item_Map;
 import controller.Controller;
 import core.BlockGenerator;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
@@ -210,12 +211,12 @@ public class Account {
 	// balance FOR generation
 	public void calculateGeneratingBalance(DBSet db)
 	{
-		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - foe ERM_KEY only
+		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERM_KEY only
 		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
 		
-		for(int i=1; i<BlockGenerator.RETARGET && block != null && block.getHeight(db) > 1; i++)
+		for(int i=1; i<GenesisBlock.GENERATING_RETARGET && block != null && block.getHeight(db) > 1; i++)
 		{
 			for(Transaction transaction: block.getTransactions())
 			{

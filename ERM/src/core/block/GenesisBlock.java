@@ -45,8 +45,15 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
-	private static long genesisGeneratingBalance = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
+	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
 	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
+	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
+	public static final long MIN_GENERATING_BALANCE = Settings.BLOCK_GENERATING_BALANCE_NEED;
+	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
+	public static final int GENERATING_RETARGET = 10;
+	public static final int GENERATING_MIN_BLOCK_TIME = 1 * 60;
+	public static final int GENERATING_MAX_BLOCK_TIME = 5 * 60;
+
 
 	private String testnetInfo; 
 	
@@ -56,7 +63,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGeneratingBalance / 5, genesisGenerator, generateHeadHash());
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), GENESIS_GENERATING_BALANCE / 5, genesisGenerator, generateHeadHash());
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
@@ -379,7 +386,7 @@ public class GenesisBlock extends Block{
 		case (int)AssetCls.DEAL_KEY:
 			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, genesisGeneratingBalance, (byte)0, true);
+		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, GENESIS_GENERATING_BALANCE, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 
@@ -465,7 +472,7 @@ public class GenesisBlock extends Block{
 		data = Bytes.concat(data, referenceBytes);
 		
 		//WRITE GENERATING BALANCE
-		byte[] generatingBalanceBytes = Longs.toByteArray(genesisGeneratingBalance);
+		byte[] generatingBalanceBytes = Longs.toByteArray(GENESIS_GENERATING_BALANCE);
 		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, 8, 0);
 		data = Bytes.concat(data, generatingBalanceBytes);
 		
