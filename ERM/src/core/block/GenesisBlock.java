@@ -63,7 +63,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), GENESIS_GENERATING_BALANCE / 5, genesisGenerator, generateHeadHash());
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), MAX_GENERATING_BALANCE, genesisGenerator, generateHeadHash());
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
@@ -124,6 +124,19 @@ public class GenesisBlock extends Block{
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, "-")),
+					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, "-")),
+					Arrays.asList(1, new PersonHuman(new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, "-")),
+					////
+					Arrays.asList(1, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
 							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
@@ -131,7 +144,7 @@ public class GenesisBlock extends Block{
 							"Ермолаев, Александр Сергеевич", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
-					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
+					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
 							"Скорняков, Александр Викторович", "1963-08-21", null,
 							(byte)1, "европеец-славянин", (float)1.1330, (float)13.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
