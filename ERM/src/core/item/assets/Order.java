@@ -421,36 +421,38 @@ public class Order implements Comparable<Order> {
 		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 		boolean isDivisibleHave = this.isHaveDivisible(db);
 		boolean isDivisibleWant = this.isWantDivisible(db);
+		BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
+		BigDecimal thisAmountWantLeft = this.getAmountWantLeft();
 		
 		while( !completedOrder && ++i < orders.size())
 		{
 			
-			// update new values
-			BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
-			BigDecimal thisAmountWantLeft = this.getAmountWantLeft();
-
 			//GET ORDER
 			Order order = orders.get(i);
+			BigDecimal orderAmountLeft;
+			BigDecimal orderReversePrice = order.getPriceCalcReverse();
+			BigDecimal orderPrice = order.getPriceCalc();
+
+			Trade trade;
 			BigDecimal tradeAmount;
 			BigDecimal tradeAmountGet;
-			BigDecimal orderAmountLeft;
-			Trade trade;
 
 			if (!isReversePrice) {
 				
-				//CALCULATE BUYING PRICE
-				BigDecimal orderWantPrice = order.getPriceCalcReverse();
-		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-				if(orderWantPrice.compareTo(thisPrice) < 0)
+				if(orderReversePrice.compareTo(thisPrice) < 0)
 					continue;
+					//break;
+				if (thisAmountWantLeft.compareTo(orderReversePrice) < 0)
+					// if left not enough for 1 buy by price this order
+					break;
 
 				// get price from ORDER
 
 				orderAmountLeft = order.getAmountHaveLeft();
 				
 				// recalc with order price wanted amount left
-				thisAmountWantLeft = thisAmountWantLeft.multiply(orderWantPrice).setScale(8, RoundingMode.HALF_UP);
+				thisAmountWantLeft = thisAmountWantLeft.multiply(orderReversePrice).setScale(8, RoundingMode.HALF_UP);
 				
 				if (orderAmountLeft.compareTo(thisAmountWantLeft) >= 0) {
 					
@@ -467,20 +469,21 @@ public class Order implements Comparable<Order> {
 					tradeAmountGet = order.getAmountWantLeft();	
 					if (!this.isWantDivisibleGood(db, tradeAmountGet))
 						// amount not good for non divisible WANT value
-						continue;
+						// continue;
+						break;
+					if (thisAmountHaveLeft.compareTo(orderPrice) < 0)
+						// if left not enough for 1 buy by price this order
+						break;
 					
 					tradeAmount = orderAmountLeft;
 				}				
 
 			} else {
-				// reverse price for accuracy
-				
-				//CALCULATE BUYING PRICE
-				BigDecimal orderPrice = order.getPriceCalc();
-		
+				// reverse price for accuracy		
 				//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
 				if(orderPrice.compareTo(thisReversePrice) > 0)
-					continue;
+					//continue;
+					break;
 
 				orderAmountLeft = order.getAmountHaveLeft();
 
@@ -520,24 +523,19 @@ public class Order implements Comparable<Order> {
 				
 				this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
 				this.fulfilledWant = this.fulfilledWant.add(tradeAmount);
-				order.fulfilledHave = order.fulfilledHave.add(tradeAmount);
-				order.fulfilledWant = order.fulfilledWant.add(tradeAmountGet);
+				// update new values
+				thisAmountHaveLeft = this.getAmountHaveLeft();
+				thisAmountWantLeft = this.getAmountWantLeft();
 				
-				if (completedOrder 
-					&& this.amountHave.subtract(this.fulfilledHave).compareTo(BigDecimal.ZERO) >0) {
+				// recalc new LEFTS
+				if (completedOrder && thisAmountHaveLeft.compareTo(BigDecimal.ZERO) >0
+					|| thisAmountHaveLeft.compareTo(orderPrice) < 0)
+				{
 					// cancel order if it not fulfiled isDivisible
+					// or HAVE not enough to one WANT  = price
 					CancelOrderTransaction.process_it(db, this);
-				} else {
-					
-					BigDecimal amountWantLeftNew = this.getAmountWantLeft();				
-					BigDecimal amountHaveLeftNew = this.getAmountHaveLeft();
-					
-					if (isReversePrice && amountWantLeftNew.multiply(thisReversePrice).compareTo(amountHaveLeftNew) > 0
-							|| !isReversePrice && amountHaveLeftNew.multiply(thisPrice).compareTo(amountWantLeftNew) < 0)
-					{
-						// cancel order if not enough HAVE
-						CancelOrderTransaction.process_it(db, this);					
-					}
+					//and stop resolve
+					break;
 				}
 				
 			}
