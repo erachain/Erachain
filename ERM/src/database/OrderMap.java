@@ -2,6 +2,7 @@ package database;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -226,12 +227,25 @@ public class OrderMap extends DBMap<BigInteger, Order>
 
 	public boolean isExecutable(BigInteger key) 
 	{
+
+		/* OLD
 		Order order = this.get(key);
 		
-		BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
+		BigDecimal increment = order.calculateBuyIncrement(order, db);
 		BigDecimal amount = order.getAmountHaveLeft();
 		amount = amount.subtract(amount.remainder(increment));
 		return  (amount.compareTo(BigDecimal.ZERO) > 0);
+		} else {
+			
+		}
+		*/
+		Order order = this.get(key);
+		BigDecimal thisPrice = order.getPriceCalc();
+		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+		if (isReversePrice)
+			return order.getAmountHaveLeft().compareTo(order.getPriceCalc()) >= 0;
+		return BigDecimal.ONE.divide(order.getAmountHaveLeft(), 12,  RoundingMode.HALF_UP )
+				.compareTo(order.getPriceCalcReverse()) >= 0;
 	}
 	
 	public List<Order> getOrders(long have, long want) 
