@@ -196,6 +196,7 @@ public class Trade {
 		else
 		{
 			//UPDATE ORDER
+			// in any case because .copy
 			db.getOrderMap().add(initiator);
 		}
 		
@@ -228,12 +229,12 @@ public class Trade {
 		target.getCreator().setConfirmedBalance(target.getWant(), target.getCreator().getConfirmedBalance(target.getWant(), db).subtract(this.amountWant), db);	
 		
 		//CHECK IF ORDER IS FULFILLED
-		if(initiator.isFulfilledHave())
+		if(initiator.isFulfilled())
 		{
 			//REMOVE FROM COMPLETED ORDERS
 			db.getCompletedOrderMap().delete(initiator);
 		}
-		if(target.isFulfilledHave())
+		if(target.isFulfilled())
 		{
 			//DELETE TO COMPLETED ORDERS
 			db.getCompletedOrderMap().delete(target);
