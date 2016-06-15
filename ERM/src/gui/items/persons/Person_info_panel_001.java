@@ -94,7 +94,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         layout.rowHeights = new int[] {0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0};
         setLayout(layout);
 
-        jLabel1.setText("Name");
+        jLabel1.setText(Lang.getInstance().translate("Name")+":");
         jLabel1.setAlignmentY(0.2F);
         jLabel1.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -120,7 +120,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(name_jTextField, gridBagConstraints);
 
-        jLabel2.setText("Description");
+        jLabel2.setText(Lang.getInstance().translate("Description")+":");
         jLabel2.setAlignmentY(0.2F);
         jLabel2.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -130,7 +130,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
         add(jLabel2, gridBagConstraints);
 
-        jLabel3.setText("Gender");
+        jLabel3.setText(Lang.getInstance().translate("Gender")+":");
         jLabel3.setAlignmentY(0.2F);
         jLabel3.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -156,7 +156,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(gender_jTextField, gridBagConstraints);
 
-        jLabel4.setText("Birthday");
+        jLabel4.setText(Lang.getInstance().translate("Birthday")+":");
         jLabel4.setAlignmentY(0.2F);
         jLabel4.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -177,7 +177,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(birthday_jTextField, gridBagConstraints);
 
-        jLabel5.setText("Deathday");
+        jLabel5.setText(Lang.getInstance().translate("Deathday")+":");
         jLabel5.setAlignmentY(0.2F);
         jLabel5.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -198,7 +198,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(deathday_jTextField, gridBagConstraints);
 
-        jLabel6.setText("Race");
+        jLabel6.setText(Lang.getInstance().translate("Race")+":");
         jLabel6.setAlignmentY(0.2F);
         jLabel6.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -224,7 +224,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(race_jTextField, gridBagConstraints);
 
-        jLabel7.setText("Birth Latitude");
+        jLabel7.setText(Lang.getInstance().translate("Birth Latitude")+":");
         jLabel7.setAlignmentY(0.2F);
         jLabel7.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -245,7 +245,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(birth_Latitude_jTextField, gridBagConstraints);
 
-        jLabel8.setText("Birth Longitude");
+        jLabel8.setText(Lang.getInstance().translate("Birth Longitude")+":");
         jLabel8.setAlignmentY(0.2F);
         jLabel8.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -266,7 +266,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(birth_Longitude_jTextField, gridBagConstraints);
 
-        Skin_Color_jLabel.setText("Skin Color");
+        Skin_Color_jLabel.setText(Lang.getInstance().translate("Skin Color")+":");
         Skin_Color_jLabel.setAlignmentY(0.2F);
         Skin_Color_jLabel.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -287,7 +287,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(skin_Color_jTextField, gridBagConstraints);
 
-        jLabel10.setText("Eye Color");
+        jLabel10.setText(Lang.getInstance().translate("Eye Color")+":");
         jLabel10.setAlignmentY(0.2F);
         jLabel10.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -308,7 +308,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(eye_Color_jTextField, gridBagConstraints);
 
-        jLabel11.setText("Hair Сolor");
+        jLabel11.setText(Lang.getInstance().translate("Hair Сolor")+":");
         jLabel11.setAlignmentY(0.2F);
         jLabel11.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -329,7 +329,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(hair_Сolor_jTextField, gridBagConstraints);
 
-        jLabel12.setText("Height");
+        jLabel12.setText(Lang.getInstance().translate("Height")+":");
         jLabel12.setAlignmentY(0.2F);
         jLabel12.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -350,7 +350,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(height_jTextField, gridBagConstraints);
 
-        jLabel13.setText("jLabel13");
+        jLabel13.setText(Lang.getInstance().translate("Fee")+":");
         jLabel13.setAlignmentY(0.2F);
         jLabel13.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -371,7 +371,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jTextField13, gridBagConstraints);
 
-        jLabel14.setText("jLabel14");
+        jLabel14.setText(Lang.getInstance().translate("Statuses"));
         jLabel14.setAlignmentY(0.2F);
         jLabel14.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -406,7 +406,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(jScrollPane1, gridBagConstraints);
 
-        jLabel15.setText("jLabel15");
+        jLabel15.setText(Lang.getInstance().translate("Accounts"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 32;
@@ -426,7 +426,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         
         
-    //    jTable2.setModel(tableModelPersonAddresses);
+        jTable2.setModel(tableModelPersonAddresses);
         
         
       
@@ -466,7 +466,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jScrollPane3, gridBagConstraints);
 
-        key_jLabel.setText("Key");
+        key_jLabel.setText(Lang.getInstance().translate("Key")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
