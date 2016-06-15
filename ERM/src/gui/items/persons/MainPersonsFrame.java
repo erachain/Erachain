@@ -157,14 +157,17 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				PersonCls person = null;
 				if (personsTable.getSelectedRow() >= 0 ) person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
 				
-				info.show_001(person);
+			//	info.show_001(person);
 				
 				search_Person_SplitPanel.jSplitPanel.setDividerLocation(search_Person_SplitPanel.jSplitPanel.getDividerLocation());	
 				search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+				Person_info_panel_001 info_panel = new Person_info_panel_001(person);
+				info_panel.setPreferredSize(new Dimension(search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().width-50,search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().height-50));
+				search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 			}
 		});
 		
-		search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
+		//search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
 		
 		
 		//////////////////////////
