@@ -15,6 +15,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.item.imprints.ImprintCls;
 import database.DBSet;
@@ -29,7 +30,6 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_ADDRESS = 1;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
-	private SortableList<Tuple2<String, String>, ImprintCls> imprints;
 	
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
@@ -38,24 +38,29 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public PersonAccountsModel(long person_Key)
 	{
 		Controller.getInstance().addWalletListener(this);
-		addresses= DBSet.getInstance().getPersonAddressMap().getItems(person_Key);
+		addresses = DBSet.getInstance().getPersonAddressMap().getItems(person_Key);
 	}
+
 	
-	@Override
+	//@Override
 	//public SortableList<Tuple2<String, String>, ImprintCls> getSortableList() {
 	//	return this.imprints;
 	//}
 	
 
 // set class
+	/*
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		       return getValueAt(0, c).getClass();
-		    }
-	
+		   }
+		   */
+
+	/*
 	public ImprintCls getItem(int row)
 	{
-		return this.imprints.get(row).getB();
+		return this.address.get(row).getB();
 	}
+	*/
 	
 	
 	@Override
@@ -86,27 +91,28 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			return null;
 		}
 		
-		Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry  =  addresses.entrySet();
+		//Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry  =  records.entrySet();
+		String addrses_key_value = "-";
+		int i = 0;
+		for (String addrses_key: addresses.keySet()) {
+			if (i == row)
+			{
+				addrses_key_value = addrses_key;
+				break;
+			}
+		}
+		Stack<Tuple3<Integer, Integer, Integer>> entry = addresses.get(addrses_key_value);
+		if (entry == null || entry.isEmpty() ) return "-";
 		
+		Tuple3<Integer, Integer, Integer> value = entry.peek();
 		
 		switch(column)
 		{
-		case COLUMN_KEY:
-			
-			return entry.getKey(); //.getvalue()...getKey(DBSet.getInstance());
-		
-//		case COLUMN_NAME:
-			
-//			return entry.getValue(); //imprint.getName();
 		
 		case COLUMN_ADDRESS:
 			
-			return  entry.getValue(); //imprint.getCreator().asPerson();
-						
-//		case COLUMN_CONFIRMED:
-			
-//			return imprint.isConfirmed();
-			
+			return  addrses_key_value;
+									
 		}
 		
 		return null;

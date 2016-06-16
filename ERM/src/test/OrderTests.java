@@ -470,8 +470,8 @@ public class OrderTests
 		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(1000).setScale(8));
 		
 		//CREATE ORDER THREE (SELLING 19.99999999 A FOR B AT A PRICE OF 20)
-		BigDecimal amoHave = BigDecimal.valueOf(1.999999999);
-		BigDecimal amoWant = BigDecimal.valueOf(3.999999998);
+		BigDecimal amoHave = BigDecimal.valueOf(1.99999999);
+		BigDecimal amoWant = BigDecimal.valueOf(3.99999998);
 		
 		createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				amoHave, amoWant,

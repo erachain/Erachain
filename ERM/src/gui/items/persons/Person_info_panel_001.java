@@ -426,7 +426,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         
         
-        jTable2.setModel(tableModelPersonAddresses);
+        jTable2.setModel(new PersonAccountsModel(person.getKey()));
         
         
       
