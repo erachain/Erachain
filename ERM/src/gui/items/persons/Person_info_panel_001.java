@@ -7,12 +7,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
 
 import org.mapdb.Fun.Tuple3;
 
 import core.item.persons.PersonCls;
 import database.DBSet;
 import gui.models.PersonAccountsModel;
+import gui.models.PersonStatusesModel;
+import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Left;
 import lang.Lang;
 
 /*
@@ -382,18 +386,18 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(jLabel14, gridBagConstraints);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jTable1.setPreferredSize(new java.awt.Dimension(100, 64));
+        PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
+        jTable1.setModel(statusModel);
+        
+        jTable1.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+        //CHECKBOX FOR FAVORITE
+        		TableColumn to_Date_Column1 = jTable1.getColumnModel().getColumn( PersonStatusesModel.COLUMN_TO_DATE);	
+        		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+        		to_Date_Column1.setMinWidth(80);
+        		to_Date_Column1.setMaxWidth(200);
+        		to_Date_Column1.setPreferredWidth(120);//.setWidth(30);
+        
+       // jTable1.setPreferredSize(new java.awt.Dimension(100, 64));
         jScrollPane1.setViewportView(jTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -424,12 +428,19 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         
         
+        PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
+       
         
+        jTable2.setModel(personModel);
         
-        jTable2.setModel(new PersonAccountsModel(person.getKey()));
+        jTable2.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+      //CHECKBOX FOR FAVORITE
+      		TableColumn to_Date_Column = jTable2.getColumnModel().getColumn( PersonAccountsModel.COLUMN_TO_DATE);	
+      		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+      		to_Date_Column.setMinWidth(50);
+      		to_Date_Column.setMaxWidth(200);
+      		to_Date_Column.setPreferredWidth(80);//.setWidth(30);
         
-        
-      
         
         
         /*
@@ -438,7 +449,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
             title
         ));
         */
-        jTable2.setPreferredSize(new java.awt.Dimension(100, 64));
+      //  jTable2.setPreferredSize(new java.awt.Dimension(100, 64));
         jScrollPane2.setViewportView(jTable2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

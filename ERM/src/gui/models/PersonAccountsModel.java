@@ -3,6 +3,8 @@ import java.util.Map.Entry;
 
 import javax.swing.table.AbstractTableModel;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 ////////
 import java.util.Observable;
@@ -25,15 +27,16 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public  class PersonAccountsModel extends  AbstractTableModel implements Observer
 {
-	public static final int COLUMN_KEY = 0;
+	public static final int COLUMN_TO_DATE = 1;
 	//public static final int COLUMN_NAME = 1;
-	public static final int COLUMN_ADDRESS = 1;
+	public static final int COLUMN_ADDRESS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
 	
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Address"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","To Date"}); //, "Data"});
+	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	
 	public PersonAccountsModel(long person_Key)
 	{
@@ -49,11 +52,11 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	
 
 // set class
-	/*
+	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		       return getValueAt(0, c).getClass();
 		   }
-		   */
+		   
 
 	/*
 	public ImprintCls getItem(int row)
@@ -113,11 +116,17 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			
 			return  addrses_key_value;
 									
+		case COLUMN_TO_DATE:
+			
+			return  formatDate.format( new Date(value.a)).toString();
+			
 		}
+		
+		
 		
 		return null;
 	}
-/*
+
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
@@ -135,9 +144,9 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+		/*
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_IMPRINT_TYPE)
+		if(message.getType() == ObserverMessage.l.LIST_IMPRINT_TYPE)
 		{
 			if(this.imprints == null)
 			{
@@ -148,18 +157,19 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			
 			this.fireTableDataChanged();
 		}
-		
+		*/
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.REMOVE_IMPRINT_TYPE)
+		if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	
 	}
-	*/
-
+	
+/*
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
 		
 	}
+	*/
 }
