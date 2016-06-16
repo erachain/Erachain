@@ -1,5 +1,6 @@
 package gui.items.imprints;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,12 +18,16 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import core.item.imprints.ImprintCls;
+import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.persons.Person_info_panel_001;
 import gui.items.unions.TableModelUnions;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -98,6 +103,30 @@ public Search_Imprints_Tab(){
 	jTable_jScrollPanel_LeftPanel.setModel(this.tableModelImprints);
 	jTable_jScrollPanel_LeftPanel = imprintsTable;
 	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+	
+	// Event LISTENER		
+	jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+				@Override
+				public void valueChanged(ListSelectionEvent arg0) {
+					ImprintCls imprint = null;
+					if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ) imprint = tableModelImprints.getImprint(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+					
+					
+					
+				//	info.show_001(person);
+					
+				//	search_Person_SplitPanel.jSplitPanel.setDividerLocation(search_Person_SplitPanel.jSplitPanel.getDividerLocation());	
+				//	search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+					 Imprints_Info_Panel info_panel = new Imprints_Info_Panel(imprint);
+					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				}
+			});
+	
+	
+	
+	
+	
 	
 // MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();

@@ -34,6 +34,15 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 		this.balances.registerObserver();
 	}
 	
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
+	
+	
+	
+	
 	@Override
 	public int getColumnCount() 
 	{
