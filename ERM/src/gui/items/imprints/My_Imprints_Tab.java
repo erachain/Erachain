@@ -86,7 +86,7 @@ public My_Imprints_Tab(){
 				});
 		
 	
-	
+/*	
 //MENU
 	JPopupMenu imprintsMenu = new JPopupMenu();
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
@@ -112,7 +112,8 @@ public My_Imprints_Tab(){
 			tableImprints.setRowSelectionInterval(row, row);
 		}
 	});
-			
+	
+		
 	tableImprints.addMouseListener(new MouseAdapter() 
 	{
 	@Override
@@ -129,7 +130,7 @@ public My_Imprints_Tab(){
 			}
 		}
 	});
-	
+	*/	
 	}
 		
 		public void onIssueClick()

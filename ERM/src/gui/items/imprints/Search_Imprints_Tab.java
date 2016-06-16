@@ -127,7 +127,7 @@ public Search_Imprints_Tab(){
 	
 	
 	
-	
+	/*
 // MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
@@ -155,6 +155,7 @@ public Search_Imprints_Tab(){
 			}
 		}
 	});
+	*/
 	
 }
 }

@@ -354,7 +354,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(height_jTextField, gridBagConstraints);
 
-        jLabel13.setText(Lang.getInstance().translate("Fee")+":");
+        jLabel13.setText(Lang.getInstance().translate("Creator")+":");
         jLabel13.setAlignmentY(0.2F);
         jLabel13.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -365,7 +365,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(jLabel13, gridBagConstraints);
 
         jTextField13.setEditable(false);
-        jTextField13.setToolTipText("");
+        jTextField13.setText(person.getCreator().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 26;
