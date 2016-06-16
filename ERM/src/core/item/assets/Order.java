@@ -230,11 +230,19 @@ public class Order implements Comparable<Order> {
 	///////// PRICE
 	public BigDecimal getPriceCalc() 
 	{
-			return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN);
 	}	
 	public BigDecimal getPriceCalcReverse() 
 	{
-			return this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP);
+		return this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP);
+	}	
+	public String viewPrice() 
+	{
+		if(this.amountHave.compareTo(this.amountWant) > 0)
+			return ":" + this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP).toPlainString();
+
+		return "*" + this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN).toPlainString();
+		
 	}	
 		
 	public long getTimestamp() 
@@ -414,8 +422,6 @@ public class Order implements Comparable<Order> {
 		boolean isDivisibleHave = this.isHaveDivisible(db);
 		boolean isDivisibleWant = this.isWantDivisible(db);
 		BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
-		//BigDecimal thisAmountWantLeft = this.getAmountWantLeft();
-		BigDecimal thisAmountWantLeft;
 		
 		while( !completedOrder && ++i < orders.size())
 		{
@@ -511,7 +517,6 @@ public class Order implements Comparable<Order> {
 				
 				// update new values
 				thisAmountHaveLeft = this.getAmountHaveLeft();
-				//thisAmountWantLeft = this.getAmountWantLeft();
 				
 				// recalc new LEFTS
 				// if amountWant id not Divisible
@@ -529,14 +534,9 @@ public class Order implements Comparable<Order> {
 				
 			}
 		}
-		/*
 		if (!completedOrder) {
-			// +recalc fulfilledWant
-			// add to orders map
-			this.calcFulfilledWant(db);
 			db.getOrderMap().add(this);
 		}
-		*/
 	}
 	
 	public void orphan(DBSet db) {

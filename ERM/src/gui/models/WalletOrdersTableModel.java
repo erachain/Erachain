@@ -10,6 +10,7 @@ import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.assets.Order;
+import database.DBSet;
 import database.SortableList;
 import lang.Lang;
 
@@ -24,10 +25,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 	public static final int COLUMN_FULFILLED = 5;
 	public static final int COLUMN_CREATOR = 6;
 	public static final int COLUMN_CONFIRMED = 7;
+	public static final int COLUMN_DONE = 8;
 	
 	private SortableList<Tuple2<String, BigInteger>, Order> orders;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Have", "Want", "Amount", "Price", "Fulfilled", "Creator", "Confirmed"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Have", "Want", "Amount", "Price", "Fulfilled", "Creator", "Confirmed", "DONE"});
 	
 	public WalletOrdersTableModel()
 	{
@@ -80,11 +82,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		
 		case COLUMN_HAVE:
 			
-			return order.getHave();
+			return order.getHaveAsset().getShort();
 		
 		case COLUMN_WANT:
 			
-			return order.getWant();
+			return order.getWantAsset().getShort();
 		
 		case COLUMN_AMOUNT:
 			
@@ -92,7 +94,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 			
 		case COLUMN_PRICE:
 			
-			return order.getPriceCalc().toPlainString();
+			return order.viewPrice();
 			
 		case COLUMN_FULFILLED:
 			
@@ -106,6 +108,12 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 			
 			return order.isConfirmed();
 			
+		case COLUMN_DONE:
+			
+			if (DBSet.getInstance().getOrderMap().contains(order.getId()))
+				return "";
+			return "++";
+
 		}
 		
 		return null;
