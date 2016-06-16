@@ -527,7 +527,7 @@ public class Order implements Comparable<Order> {
 				{
 					// cancel order if it not fulfiled isDivisible
 					// or HAVE not enough to one WANT  = price
-					CancelOrderTransaction.process_it(db, this);
+					CancelOrderTransaction.process_it(db, this.copy());
 					//and stop resolve
 					return;
 				}
@@ -535,7 +535,9 @@ public class Order implements Comparable<Order> {
 			}
 		}
 		if (!completedOrder) {
-			db.getOrderMap().add(this);
+			db.getOrderMap().add(this.copy());
+		} else {
+			db.getCompletedOrderMap().add(this.copy());			
 		}
 	}
 	
