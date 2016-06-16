@@ -31,7 +31,7 @@ public class OrderSerializer implements Serializer<Order>, Serializable
         try 
         {
         	return Order.parse(bytes);
-		} 
+		}
         catch (Exception e) 
         {
         	LOGGER.error(e.getMessage(),e);

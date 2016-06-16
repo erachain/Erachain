@@ -156,11 +156,12 @@ public class CancelOrderTransaction extends Transaction
 	public int isValid(DBSet db, Long releaserReference) 
 	{
 		//CHECK IF ORDER EXISTS
-		Order order = db.getOrderMap().get(this.order);
-		if(order== null)
-		{
+		Order order = null;
+		if(db.getOrderMap().contains(this.order))
+			order = db.getOrderMap().get(this.order);
+
+		if (order== null)
 			return ORDER_DOES_NOT_EXIST;
-		}
 		
 		/// 
 		//CHECK IF CREATOR IS CREATOR

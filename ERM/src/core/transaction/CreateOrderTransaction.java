@@ -282,6 +282,11 @@ public class CreateOrderTransaction extends Transaction
 			//WANT DOES NOT EXIST
 			return ASSET_DOES_NOT_EXIST;
 		}
+		
+		// 
+		if (new BigDecimal(wantAsset.getQuantity()).compareTo(this.order.getAmountWant()) < 0)
+			return INVALID_QUANTITY;
+		
 		//CHECK IF WANT IS NOT DIVISIBLE
 		if(!wantAsset.isDivisible())
 		{
@@ -305,6 +310,7 @@ public class CreateOrderTransaction extends Transaction
 		super.process(db, asPack);
 		
 		//PROCESS ORDER
+		// NEED COPY for check block.isValid() and not modify ORDER for block.process
 		this.order.copy().process(db, this);
 	}
 

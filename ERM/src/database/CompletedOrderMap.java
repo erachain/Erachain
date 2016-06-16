@@ -74,7 +74,15 @@ public class CompletedOrderMap extends DBMap<BigInteger, Order>
 
 	public void add(Order order)
 	{
+		order.setExecutable(false);
 		this.set(order.getId(), order);
+	}
+
+	public Order get(BigInteger key)
+	{
+		Order order = super.get(key);
+		order.setExecutable(false);
+		return order;
 	}
 
 	public void delete(Order order) 

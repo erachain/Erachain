@@ -60,7 +60,10 @@ public class Trade {
 			return db.getOrderMap().get(key);
 		}
 		
-		return db.getCompletedOrderMap().get(key);
+		Order order = db.getCompletedOrderMap().get(key);
+		order.setExecutable(false);
+		
+		return order;
 	}
 
 	public BigDecimal getAmountHave() 
@@ -221,8 +224,8 @@ public class Trade {
 
 	public void orphan(DBSet db) 
 	{
-		Order initiator = this.getInitiatorOrder(db); //.copy();
-		Order target = this.getTargetOrder(db); //.copy();
+		Order initiator = this.getInitiatorOrder(db).copy();
+		Order target = this.getTargetOrder(db).copy();
 		
 		//REVERSE FUNDS
 		initiator.getCreator().setConfirmedBalance(initiator.getWant(), initiator.getCreator().getConfirmedBalance(initiator.getWant(), db).subtract(this.amountHave), db);

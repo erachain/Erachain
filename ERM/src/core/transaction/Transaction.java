@@ -29,6 +29,7 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import database.DBSet;
 import settings.Settings;
 //import lang.Lang;
@@ -698,6 +699,18 @@ public abstract class Transaction {
 					this.creator.setLastReference(this.reference, db);
 			}
 		}
+	}
+
+	public Transaction copy() 
+	{	
+		try 
+		{
+			return TransactionFactory.getInstance().parse(this.toBytes(false, null), null);
+		}
+		catch (Exception e) 
+		{
+			return null;
+		}	
 	}
 
 	

@@ -120,6 +120,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 	}
 
 	public void add(Order order) {
+		order.setExecutable(true);
 		this.set(order.getId(), order);
 	}
 	
@@ -205,7 +206,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		{
 			//Filters orders with unacceptably small amount. These orders have not worked
 			if(filter){
-				if(isExecutable(orderKey.getKey()))
+				if(isExecutable(DBSet.getInstance(), orderKey.getKey()))
 					orders.add(this.get(orderKey.getKey()));
 			}
 			else
@@ -225,7 +226,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		return orders;
 	}
 
-	public boolean isExecutable(BigInteger key) 
+	public boolean isExecutable(DBSet db, BigInteger key) 
 	{
 
 		/* OLD
@@ -239,13 +240,30 @@ public class OrderMap extends DBMap<BigInteger, Order>
 			
 		}
 		*/
+
+
 		Order order = this.get(key);
+		if (order.getAmountHaveLeft().compareTo(BigDecimal.ZERO) == 0)
+			return false;
+		BigDecimal price = order.getPriceCalcReverse();
+		if ( !order.isWantDivisible(db)
+				&&
+				order.getAmountHaveLeft().compareTo(price) < 0)
+			return false;
+		
+		/*
 		BigDecimal thisPrice = order.getPriceCalc();
 		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
-		if (isReversePrice)
-			return order.getAmountHaveLeft().compareTo(order.getPriceCalc()) >= 0;
-		return BigDecimal.ONE.divide(order.getAmountHaveLeft(), 12,  RoundingMode.HALF_UP )
-				.compareTo(order.getPriceCalcReverse()) >= 0;
+		//if (isReversePrice)
+			//return order.getAmountHaveLeft().compareTo(order.getPriceCalc()) >= 0;
+		
+			
+		//return BigDecimal.ONE.divide(order.getAmountHaveLeft(), 12,  RoundingMode.HALF_UP )
+		//		.compareTo(order.getPriceCalcReverse()) >= 0;
+		 */
+		
+		return order.isExecutable();
+		
 	}
 	
 	public List<Order> getOrders(long have, long want) 
@@ -292,7 +310,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 			Iterator<BigInteger> iter = keys.iterator();
 			while (iter.hasNext()) {
 				BigInteger key = iter.next();
-				if(isExecutable(key))
+				if(isExecutable(DBSet.getInstance(), key))
 					keys2.add(key);
 			}
 			keys = keys2;
@@ -325,6 +343,13 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		//RETURN
 		return new SortableList<BigInteger, Order>(this, keys);
 	}
+	public Order get(BigInteger key)
+	{
+		Order order = super.get(key);
+		order.setExecutable(true);
+		return order;
+	}
+
 
 	public void delete(Order order) 
 	{

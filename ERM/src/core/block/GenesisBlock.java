@@ -97,7 +97,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account(address);
 
 				user = new PersonHuman(recipient,
-						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.1330, (float)1.9224,
+						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.0, (float)0.0,
 						"-", "-", "-", (int) 188, "-");
 				
 
@@ -204,13 +204,8 @@ public class GenesisBlock extends Block{
 
 			////////// INVESTORS
 			List<List<Object>> genesisInvestors = Arrays.asList(
-					Arrays.asList(100, "7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"),
-					Arrays.asList(100, "78T3Eof2c4EyhuHc3qCunJ3Wk3TCYyQTnb"),
-					Arrays.asList(100, "7NavQiMdL4nSsDMppnVoc6gtoCnREZXrEC"),
-					Arrays.asList(100, "753BpHWMyKxKVjsSUiceBab1mydcVEoKDD"),
-					Arrays.asList(100, "7QGXujqsuJeb9YeW5L83vaEu3SsWXsRtXc"),
-					Arrays.asList(100, "7RLwEuNLN6tJaksaKH1CuBmDGPnmLNDwri"),
-					Arrays.asList(100, "73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo")
+					//Arrays.asList(100, "7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"),
+					//Arrays.asList(100, "73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo")
 					);
 
 
@@ -349,7 +344,7 @@ public class GenesisBlock extends Block{
 				//bal0 = bal0.add(bdAmount0).setScale(8);
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
-				bdAmount1 = new BigDecimal("0.01").setScale(8);
+				bdAmount1 = new BigDecimal("0.1").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
 				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
