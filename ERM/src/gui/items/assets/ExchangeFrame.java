@@ -29,6 +29,8 @@ import javax.swing.border.EmptyBorder;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.item.assets.Trade;
+import database.DBSet;
 
 
 public class ExchangeFrame extends JFrame
@@ -263,6 +265,7 @@ public class ExchangeFrame extends JFrame
 		buyOrdersMenu.add(buyCancel);
 		buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
 
+		
 		this.add(new JScrollPane(buyOrdersTable), tableGBC);
 		
 		//CREATE TRADE HISTORY LABEL
@@ -277,9 +280,47 @@ public class ExchangeFrame extends JFrame
 		tableGBC.gridy = 6;
 		tableGBC.gridwidth = 2;
 		this.tradesTableModel = new TradesTableModel(this.have, this.want);
-		final JTable TradesTable = new JTable(this.tradesTableModel);
+		final JTable tradesTable = new JTable(this.tradesTableModel);
 		
-		this.add(new JScrollPane(TradesTable), tableGBC);
+		////
+		tradesTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				
+				JTable target = (JTable)e.getSource();
+				int row = target.getSelectedRow();
+
+				if(row > tradesTableModel.getSortableList().size())
+					return;
+				
+				Trade trade = tradesTableModel.getTrade(row);
+				if (trade == null)
+					return;
+				
+				boolean type = trade.getInitiatorOrder(DBSet.getInstance()).getHave() == have.getKey();
+				
+				if (e.getClickCount() == 2) {
+
+					if (type) {
+						BigDecimal price = trade.getAmountHave().divide(trade.getAmountWant(), 8, RoundingMode.HALF_DOWN);
+						sellOrderPanel.txtAmount.setText(trade.getAmountWant().toPlainString());
+						sellOrderPanel.txtPrice.setText(price.toPlainString());
+	
+						buyOrderPanel.txtAmount.setText(trade.getAmountWant().toPlainString());
+						buyOrderPanel.txtPrice.setText(price.toPlainString());
+					} else {
+						BigDecimal price = trade.getAmountWant().divide(trade.getAmountHave(), 8, RoundingMode.HALF_DOWN);
+						sellOrderPanel.txtAmount.setText(trade.getAmountHave().toPlainString());
+						sellOrderPanel.txtPrice.setText(price.toPlainString());
+	
+						buyOrderPanel.txtAmount.setText(trade.getAmountHave().toPlainString());
+						buyOrderPanel.txtPrice.setText(price.toPlainString());						
+					}
+				}
+			}
+		});
+
+		////
+		this.add(new JScrollPane(tradesTable), tableGBC);
 		
 		//PACK
 		this.pack();
