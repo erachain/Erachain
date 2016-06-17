@@ -1179,6 +1179,20 @@ public class Controller extends Observable {
 
 		return this.wallet.getAccounts();
 	}
+	
+	public boolean isAddressIsMine(String address)
+	{
+		if(!this.doesWalletExists())
+			return false;
+
+		List<Account> accounts = this.wallet.getAccounts();
+		for (Account account: accounts) {
+			if (account.getAddress().equals(address))
+				return true;
+		}
+		return false;
+	}
+	
 	public List<PublicKeyAccount> getPublicKeyAccounts() {
 
 		return this.wallet.getPublicKeyAccounts();

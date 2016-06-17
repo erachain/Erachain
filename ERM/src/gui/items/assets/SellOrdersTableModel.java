@@ -94,9 +94,14 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		}
 		
 		Order order = null;
+		boolean isMine = false;
 		if(row < this.orders.size())
 		{
 			order = this.orders.get(row).getB();
+			Controller cntr = Controller.getInstance();
+			if(cntr.isAddressIsMine(order.getCreator().getAddress())) {
+				isMine = true;
+			}
 		}
 		
 		switch(column)
@@ -121,17 +126,24 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				amount = amount.subtract(amount.remainder(increment));
 				
 				if (amount.compareTo(BigDecimal.ZERO) <= 0)
-					return "<html><font color=#808080>" + amountStr + "</font></html>";
-				else
-					return "<html>" + amountStr + "</html>";
+					amountStr = "<font color=#808080>" + amountStr + "</font>";
 
+				if (isMine)
+					amountStr = "<b>" + amountStr + "</b>";
+				
+				return "<html>" + amountStr + "</html>";
 			
 			case COLUMN_TOTAL:
 	
 				if(row == this.orders.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 	
-				return NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
+				amountStr = NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
+
+				if (isMine)
+					amountStr = "<b>" + amountStr + "</b>";
+
+				return "<html>" + amountStr + "</html>";
 					
 		}
 		

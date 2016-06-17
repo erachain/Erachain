@@ -429,7 +429,7 @@ public class Order implements Comparable<Order> {
 		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
 		List<Order> orders = db.getOrderMap().getOrders(this.want, this.have);
-		//Collections.sort(orders);		
+		//Collections.sort(orders);
 
 		boolean isDivisibleHave = this.isHaveDivisible(db);
 		boolean isDivisibleWant = this.isWantDivisible(db);
@@ -437,7 +437,6 @@ public class Order implements Comparable<Order> {
 		
 		while( !completedOrder && ++i < orders.size())
 		{
-			
 			//GET ORDER
 			Order order = orders.get(i);
 			

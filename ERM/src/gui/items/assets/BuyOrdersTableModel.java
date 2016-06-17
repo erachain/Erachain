@@ -3,10 +3,12 @@ package gui.items.assets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
+import core.account.Account;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import utils.NumberAsString;
@@ -96,9 +98,14 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		}
 		
 		Order order = null;
+		boolean isMine = false;
 		if(row < this.orders.size())
 		{
 			order = this.orders.get(row).getB();
+			Controller cntr = Controller.getInstance();
+			if(cntr.isAddressIsMine(order.getCreator().getAddress())) {
+				isMine = true;
+			}
 		}
 		
 		switch(column)
@@ -116,6 +123,9 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				if(row == this.orders.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
 				
+				if (isMine)
+					return "<html><b>" + NumberAsString.getInstance().numberAsString(order.getAmountWantLeft()) + "</b></html>";
+				
 				return NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
 			
 			case COLUMN_PRICE:
@@ -123,6 +133,8 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				if(row == this.orders.size())
 					return "";
 							
+				if (isMine)
+					return "<html><b>" + NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
 				return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
 				
 			case COLUMN_AMOUNT:

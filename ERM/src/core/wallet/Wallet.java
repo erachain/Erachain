@@ -1499,7 +1499,9 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//ADD ORDER
-		this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(), DBSet.getInstance()));
+		//Order = orderCreation.getOrder();
+		//this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(), DBSet.getInstance()));
+		this.addOrder(orderCreation.getOrder());
 		
 	}
 	
@@ -1509,7 +1511,11 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(order.getCreator().getAddress()))
 		{
 			//ADD ORDER
-			this.database.getOrderMap().add(order);
+			// reload order
+			Order orderReloaded = Trade.getOrder(order.getId(), DBSet.getInstance());
+			this.database.getOrderMap().add(orderReloaded == null?
+					order:
+					orderReloaded);
 		}
 	}
 	

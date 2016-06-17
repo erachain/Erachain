@@ -349,7 +349,12 @@ public class OrderMap extends DBMap<BigInteger, Order>
 	public Order get(BigInteger key)
 	{
 		Order order = super.get(key);
-		order.setExecutable(true);
+		if (order != null )
+			order.setExecutable(true);
+		else
+			LOGGER.error("*** database.OrderMap.get(BigInteger) - key[" + key + "] not found!");
+
+		
 		return order;
 	}
 

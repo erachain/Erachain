@@ -60,10 +60,15 @@ public class Trade {
 			return db.getOrderMap().get(key);
 		}
 		
-		Order order = db.getCompletedOrderMap().get(key);
-		order.setExecutable(false);
+		if(db.getCompletedOrderMap().contains(key))
+		{
+			Order order = db.getCompletedOrderMap().get(key);
+			order.setExecutable(false);
+			return order;
+		}
 		
-		return order;
+		return null;
+		
 	}
 
 	public BigDecimal getAmountHave() 

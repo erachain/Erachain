@@ -15,6 +15,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBSet;
 import database.SortableList;
@@ -49,11 +50,11 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			if(type.equals("Buy"))
 			{
 				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountHave());
-				sumAsset2 = sumAsset2.add(tradePair.getB().getPriceCalc());
+				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountWant());
 			}
 			else
 			{
-				sumAsset1 = sumAsset1.add(tradePair.getB().getPriceCalc());
+				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountWant());
 				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountHave());
 			}
 			
@@ -115,11 +116,18 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		}
 		
 		Trade trade = null;
-		String type = null;
+		int type = 0;
+		
 		if(row < this.trades.size())
 		{
 			trade = this.trades.get(row).getB();
-			type = trade.getInitiatorOrder(DBSet.getInstance()).getHave() == this.have.getKey() ? "Sell" : "Buy";
+			Order initator = null;
+			if(trade != null)
+				//  "Sell" : "Buy";
+				initator = trade.getInitiatorOrder(DBSet.getInstance()); 
+				type = initator.getHave()
+							== this.have.getKey()?
+									-1:1;
 		}
 		
 		switch(column)
@@ -133,14 +141,14 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				
 			case COLUMN_TYPE:
 				
-				return type;
+				return type == 0? "": type > 0? "Sell" : "Buy";
 	
 			case COLUMN_ASSET_1:
 				
 				if(row == this.trades.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
 				
-				if(type.equals("Buy"))
+				if(type > 0)
 					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 				else
 					return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
@@ -150,7 +158,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				if(row == this.trades.size())
 					return null;
 				
-				if(type.equals("Buy"))
+				if(type > 0)
 					return NumberAsString.getInstance().numberAsString12(trade.getPriceCalc());
 				else
 					return NumberAsString.getInstance().numberAsString12(trade.getPriceCalcBack());
@@ -160,7 +168,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				if(row == this.trades.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
 
-				if(type.equals("Buy"))
+				if(type > 0)
 					return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
 				else
 					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
