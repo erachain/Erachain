@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
@@ -18,11 +20,14 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 
 
 public class ExchangeFrame extends JFrame
@@ -158,6 +163,32 @@ public class ExchangeFrame extends JFrame
 			}
 		});
 		
+		// MENU on MY ORDERS
+		JPopupMenu sellOrdersMenu = new JPopupMenu();
+		JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
+		trades.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = sellOrdersTable.getSelectedRow();
+				row = sellOrdersTable.convertRowIndexToModel(row);
+
+				Order order = sellOrdersTableModel.getOrder(row);
+				new TradesFrame(order);
+			}
+		});
+		sellOrdersMenu.add(trades);
+		JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = sellOrdersTable.getSelectedRow();
+				row = sellOrdersTable.convertRowIndexToModel(row);
+
+				Order order = sellOrdersTableModel.getOrder(row);
+				new CancelOrderFrame(order);
+			}
+		});
+		sellOrdersMenu.add(cancel);
+		sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
+
 		this.add(new JScrollPane(sellOrdersTable), tableGBC);
 		
 		//CREATE BUY ORDERS TABLE
@@ -180,7 +211,32 @@ public class ExchangeFrame extends JFrame
 				}
 			}
 		});
-		
+		// MENU on MY ORDERS
+		JPopupMenu buyOrdersMenu = new JPopupMenu();
+		JMenuItem buyTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
+		buyTrades.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = buyOrdersTable.getSelectedRow();
+				row = buyOrdersTable.convertRowIndexToModel(row);
+
+				Order order = buyOrdersTableModel.getOrder(row);
+				new TradesFrame(order);
+			}
+		});
+		buyOrdersMenu.add(buyTrades);
+		JMenuItem buyCancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
+		buyCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = buyOrdersTable.getSelectedRow();
+				row = buyOrdersTable.convertRowIndexToModel(row);
+
+				Order order = buyOrdersTableModel.getOrder(row);
+				new CancelOrderFrame(order);
+			}
+		});
+		buyOrdersMenu.add(buyCancel);
+		buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
+
 		this.add(new JScrollPane(buyOrdersTable), tableGBC);
 		
 		//CREATE TRADE HISTORY LABEL
