@@ -102,9 +102,11 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		if(row < this.orders.size())
 		{
 			order = this.orders.get(row).getB();
-			Controller cntr = Controller.getInstance();
-			if(cntr.isAddressIsMine(order.getCreator().getAddress())) {
-				isMine = true;
+			if (order != null) {
+				Controller cntr = Controller.getInstance();
+				if(cntr.isAddressIsMine(order.getCreator().getAddress())) {
+					isMine = true;
+				}
 			}
 		}
 		

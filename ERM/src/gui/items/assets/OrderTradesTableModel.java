@@ -30,7 +30,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 	private SortableList<Tuple2<BigInteger, BigInteger>, Trade> trades;
 	private Order order;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Price", "Amount", "Total"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
 	
 	public OrderTradesTableModel(Order order)
 	{
@@ -78,7 +78,17 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 		}
 		
 		Trade trade = this.trades.get(row).getB();
-		
+		int type = 0;
+		Order initatorOrder = null;
+		Order targetOrder = null;
+
+		if(trade != null) {
+			DBSet db = DBSet.getInstance();
+			
+			initatorOrder = trade.getInitiatorOrder(db); 				
+			targetOrder = trade.getTargetOrder(db);
+		}
+
 		switch(column)
 		{
 		case COLUMN_TIMESTAMP:
@@ -91,7 +101,13 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 				
 		case COLUMN_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+			String result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+			
+			if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+				result = "<html><b>" + result + "</b></html>";
+			}
+			
+			return result;
 			
 		case COLUMN_PRICE:
 			
@@ -99,8 +115,14 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 
 		case COLUMN_AMOUNT_WANT:
 			
-			return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
-	
+			result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+			
+			if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+				result = "<html><b>" + result + "</b></html>";
+			}
+			
+			return result;
+
 		}
 		
 		return null;

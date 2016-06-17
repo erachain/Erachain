@@ -117,17 +117,23 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		
 		Trade trade = null;
 		int type = 0;
+		Order initatorOrder = null;
+		Order targetOrder = null;
 		
 		if(row < this.trades.size())
 		{
 			trade = this.trades.get(row).getB();
-			Order initator = null;
-			if(trade != null)
-				//  "Sell" : "Buy";
-				initator = trade.getInitiatorOrder(DBSet.getInstance()); 
-				type = initator.getHave()
-							== this.have.getKey()?
-									-1:1;
+			if(trade != null) {
+				DBSet db = DBSet.getInstance();
+				
+				initatorOrder = trade.getInitiatorOrder(db); 				
+				targetOrder = trade.getTargetOrder(db); 
+
+				type = initatorOrder.getHave()
+						== this.have.getKey()?
+								-1:1;
+
+			}
 		}
 		
 		switch(column)
@@ -147,11 +153,19 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				
 				if(row == this.trades.size())
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
-				
+
+				String result = "";
 				if(type > 0)
-					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+					result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 				else
-					return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+					result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+				
+				if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+					result = "<html><b>" + result + "</b></html>";
+				}
+				
+				return result;
+
 				
 			case COLUMN_PRICE:
 				
@@ -169,10 +183,16 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
 
 				if(type > 0)
-					return NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+					result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
 				else
-					return NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+					result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+
+				if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+					result = "<html><b>" + result + "</b></html>";
+				}
 				
+				return result;
+
 		}
 		
 		return null;

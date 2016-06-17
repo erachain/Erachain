@@ -26,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
+import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 
@@ -43,6 +44,9 @@ public class ExchangeFrame extends JFrame
 	private OrderPanel sellOrderPanel;
 	private OrderPanel buyOrderPanel;
 	
+	private JPopupMenu sellOrdersMenu = new JPopupMenu();
+	private JPopupMenu buyOrdersMenu = new JPopupMenu();
+
 	public ExchangeFrame(AssetCls have, AssetCls want) 
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange"));
@@ -148,23 +152,7 @@ public class ExchangeFrame extends JFrame
 		this.sellOrdersTableModel = new SellOrdersTableModel(this.have, this.want);
 		final JTable sellOrdersTable = new JTable(this.sellOrdersTableModel);
 		
-		sellOrdersTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					JTable target = (JTable)e.getSource();
-					int row = target.getSelectedRow();
-
-					if(row < sellOrdersTableModel.orders.size())
-					{
-						buyOrderPanel.txtAmount.setText(sellOrdersTableModel.orders.get(row).getB().getAmountHaveLeft().toPlainString());
-						buyOrderPanel.txtPrice.setText(sellOrdersTableModel.orders.get(row).getB().getPriceCalc().toPlainString());
-					}
-				}
-			}
-		});
-		
 		// MENU on MY ORDERS
-		JPopupMenu sellOrdersMenu = new JPopupMenu();
 		JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
 		trades.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -189,6 +177,35 @@ public class ExchangeFrame extends JFrame
 		sellOrdersMenu.add(cancel);
 		sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
 
+		sellOrdersTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				
+				JTable target = (JTable)e.getSource();
+				int row = target.getSelectedRow();
+
+				if(row > sellOrdersTableModel.orders.size())
+					return;
+				
+				Order order = sellOrdersTableModel.orders.get(row).getB();
+				if (order == null)
+					return;
+
+				if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
+					sellOrdersMenu.getComponent(1).setEnabled(true);
+				else
+					sellOrdersMenu.getComponent(1).setEnabled(false);
+				
+				if (e.getClickCount() == 2) {
+
+					if(row < sellOrdersTableModel.orders.size())
+					{
+						buyOrderPanel.txtAmount.setText(order.getAmountHaveLeft().toPlainString());
+						buyOrderPanel.txtPrice.setText(order.getPriceCalc().toPlainString());
+					}
+				}
+			}
+		});
+		
 		this.add(new JScrollPane(sellOrdersTable), tableGBC);
 		
 		//CREATE BUY ORDERS TABLE
@@ -198,21 +215,30 @@ public class ExchangeFrame extends JFrame
 		
 		buyOrdersTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					JTable target = (JTable)e.getSource();
-					int row = target.getSelectedRow();
 
-					if(row < buyOrdersTableModel.orders.size())
-					{
-						//if (buying)
-						sellOrderPanel.txtAmount.setText(buyOrdersTableModel.orders.get(row).getB().getAmountWantLeft().toPlainString());
-						sellOrderPanel.txtPrice.setText(buyOrdersTableModel.orders.get(row).getB().getPriceCalcReverse().toPlainString());
-					}
+				JTable target = (JTable)e.getSource();
+				int row = target.getSelectedRow();
+
+				if(row > buyOrdersTableModel.orders.size())
+					return;
+				
+				Order order = buyOrdersTableModel.orders.get(row).getB();
+				if (order == null)
+					return;
+				
+				if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
+					buyOrdersMenu.getComponent(1).setEnabled(true);
+				else
+					buyOrdersMenu.getComponent(1).setEnabled(false);
+				
+				if (e.getClickCount() == 2) {
+					//if (buying)
+					sellOrderPanel.txtAmount.setText(buyOrdersTableModel.orders.get(row).getB().getAmountWantLeft().toPlainString());
+					sellOrderPanel.txtPrice.setText(buyOrdersTableModel.orders.get(row).getB().getPriceCalcReverse().toPlainString());
 				}
 			}
 		});
 		// MENU on MY ORDERS
-		JPopupMenu buyOrdersMenu = new JPopupMenu();
 		JMenuItem buyTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
 		buyTrades.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
