@@ -53,7 +53,7 @@ public class Trade {
 		return this.getOrder(this.target, db);
 	}
 	
-	private Order getOrder(BigInteger key, DBSet db)
+	public static Order getOrder(BigInteger key, DBSet db)
 	{
 		if(db.getOrderMap().contains(key))
 		{

@@ -27,8 +27,9 @@ public class Order implements Comparable<Order> {
 	private static final int AMOUNT_LENGTH = 12;
 	private static final int FULFILLED_LENGTH = AMOUNT_LENGTH;
 	private static final int TIMESTAMP_LENGTH = 8;
+	private static final int EXECUTABLE_LENGTH = 1;
 	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
-			+ 2*AMOUNT_LENGTH + 2*FULFILLED_LENGTH + TIMESTAMP_LENGTH;
+			+ 2*AMOUNT_LENGTH + 2*FULFILLED_LENGTH + TIMESTAMP_LENGTH + EXECUTABLE_LENGTH;
 	
 	private BigInteger id;
 	private Account creator;
@@ -57,7 +58,8 @@ public class Order implements Comparable<Order> {
 	}
 	
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave,
-			BigDecimal amountWant, BigDecimal fulfilledHave, BigDecimal fulfilledWant, long timestamp)
+			BigDecimal amountWant, BigDecimal fulfilledHave, BigDecimal fulfilledWant,
+			byte isExecutable, long timestamp)
 	{
 		this.id = id;
 		this.creator = creator;
@@ -67,6 +69,7 @@ public class Order implements Comparable<Order> {
 		this.amountWant = amountWant;//.setScale(8);
 		this.fulfilledHave = fulfilledHave;//.setScale(8);
 		this.fulfilledWant = fulfilledWant;//.setScale(8);
+		this.isExecutable = isExecutable == 1? true: false;
 		this.timestamp = timestamp;
 	}
 	
@@ -266,7 +269,6 @@ public class Order implements Comparable<Order> {
 				|| DBSet.getInstance().getCompletedOrderMap().contains(this.id);
 	}
 	
-
 	//PARSE/CONVERT
 	
 	// forDB - use fulFill
@@ -327,7 +329,12 @@ public class Order implements Comparable<Order> {
 		BigDecimal fulfilledWant = new BigDecimal(new BigInteger(fulfilledWantBytes), 8);
 		position += FULFILLED_LENGTH;		
 
-		return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave, fulfilledWant, timestamp);
+		//READ IS EXECUTABLE
+		byte[] isExecutableBytes = Arrays.copyOfRange(data, position, position + 1);
+		byte isExecutable = isExecutableBytes[0];
+		position += 1;
+
+		return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave, fulfilledWant, isExecutable, timestamp);
 
 	}
 	
@@ -389,6 +396,11 @@ public class Order implements Comparable<Order> {
 		fill = new byte[FULFILLED_LENGTH - fulfilledWantBytes.length];
 		fulfilledWantBytes = Bytes.concat(fill, fulfilledWantBytes);
 		data = Bytes.concat(data, fulfilledWantBytes);
+		
+		//WRITE IS EXECUTABLE
+		byte[] isExecutableBytes = new byte[1];
+		isExecutableBytes[0] = this.isExecutable? (byte)1: (byte)0;
+		data = Bytes.concat(data, isExecutableBytes);
 
 		return data;
 	}

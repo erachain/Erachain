@@ -28,6 +28,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
@@ -52,6 +53,7 @@ import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
+
 
 //import core.wallet.ItemsFavorites;
 import core.wallet.AssetsFavorites;
@@ -1497,7 +1499,8 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//ADD ORDER
-		this.addOrder(orderCreation.getOrder());
+		this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(), DBSet.getInstance()));
+		
 	}
 	
 	private void addOrder(Order order)

@@ -259,6 +259,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 	
 	@SuppressWarnings("unchecked")
 	public List<Trade> getTrades(long haveWant)
+	// get trades for order as HAVE and as WANT
 	{
 		Map<Tuple2<BigInteger, BigInteger>, Boolean> tradesKeys = new TreeMap<Tuple2<BigInteger, BigInteger>, Boolean>();
 		

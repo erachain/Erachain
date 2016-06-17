@@ -111,7 +111,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 			
 		case COLUMN_DONE:
 			
-			if (DBSet.getInstance().getOrderMap().contains(order.getId()))
+			if (order.isExecutable())
+			//if (DBSet.getInstance().getOrderMap().contains(order.getId()))
 				return "";
 			return "++";
 

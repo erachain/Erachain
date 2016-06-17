@@ -80,6 +80,7 @@ public class OrderMap extends DBMap<Tuple2<String, BigInteger>, Order>
 	}
 
 	public void add(Order order) {
+				
 		this.set(new Tuple2<String, BigInteger>(order.getCreator().getAddress(), order.getId()), order);
 	}
 	

@@ -74,7 +74,9 @@ public class CompletedOrderMap extends DBMap<BigInteger, Order>
 
 	public void add(Order order)
 	{
+		// this order is NOT executable
 		order.setExecutable(false);
+
 		this.set(order.getId(), order);
 	}
 

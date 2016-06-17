@@ -221,6 +221,7 @@ public class OrderTestsMy
 		orderCreation.sign(accountA, false);
 		
 		//CONVERT TO BYTES
+		////orderCreation.getOrder().setExecutable(false);
 		byte[] rawOrderCreation = orderCreation.toBytes(true, null);
 		assertEquals(rawOrderCreation.length, orderCreation.getDataLength(false));
 		
@@ -238,6 +239,9 @@ public class OrderTestsMy
 		//CHECK INSTANCE
 		assertEquals(true, parsedOrderCreation instanceof CreateOrderTransaction);
 		
+		/////CHECK EXECUTABLE
+		////assertEquals(orderCreation.getOrder().isExecutable(), parsedOrderCreation.getOrder().isExecutable());	
+
 		//CHECK SIGNATURE
 		assertEquals(true, Arrays.equals(orderCreation.getSignature(), parsedOrderCreation.getSignature()));
 		
