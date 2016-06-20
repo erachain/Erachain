@@ -20,10 +20,11 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public static final int COLUMN_AMOUNT = 3;
 	public static final int COLUMN_DIVISIBLE = 4;
 	public static final int COLUMN_FAVORITE = 5;
+	public static final int COLUMN_I_OWNER = 6;
 
 	private SortableList<Long, AssetCls> assets;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Favorite", "I Owner"});
 	
 	public TableModelItemAssets()
 	{
@@ -99,7 +100,11 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		case COLUMN_FAVORITE:
 			
 			return asset.isFavorite();
-
+		
+		case COLUMN_I_OWNER:
+			
+			if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress()))	return true;
+			return false;
 		}
 		
 		return null;

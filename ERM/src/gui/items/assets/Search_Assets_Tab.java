@@ -98,7 +98,10 @@ public class Search_Assets_Tab extends Split_Panel {
 				column3.setMinWidth(50);
 				column3.setMaxWidth(1000);
 				column3.setPreferredWidth(50);
-	
+				TableColumn column4 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_I_OWNER);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+				column4.setMinWidth(60);
+				column4.setMaxWidth(1000);
+				column4.setPreferredWidth(60);
 								
 				
 				
@@ -143,7 +146,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	// MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
 	
-	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 	favorite.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			
@@ -151,6 +154,21 @@ public class Search_Assets_Tab extends Split_Panel {
 			
 		}
 	});
+	
+	
+	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+	sell.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = assetsTable.getSelectedRow();
+			row = assetsTable.convertRowIndexToModel(row);
+
+			AssetCls asset = tableModelItemAssets.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "To sell");
+		}
+	});
+	
+	
+	
 	
 	
 	
@@ -204,6 +222,13 @@ public class Search_Assets_Tab extends Split_Panel {
 				
 				favorite.setVisible(false);
 			}
+			sell.setVisible(false);
+		//	boolean a = Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress());
+			if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
+			{
+				sell.setVisible(true);
+			}
+			
 	
 		
 		
@@ -247,14 +272,30 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey());
+			new AssetPairSelect(asset.getKey(), "");
 		}
 	});
-	nameSalesMenu.add(excahge);
+	 nameSalesMenu.add(excahge);
 	
 	
+	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+	buy.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = assetsTable.getSelectedRow();
+			row = assetsTable.convertRowIndexToModel(row);
+
+			AssetCls asset = tableModelItemAssets.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "Buy");
+		}
+	});
 	
+	nameSalesMenu.addSeparator();
+	nameSalesMenu.add(buy);
 	
+	nameSalesMenu.add(sell);
+	nameSalesMenu.addSeparator();
+	
+	nameSalesMenu.add(favorite);
 
 	assetsTable.setComponentPopupMenu(nameSalesMenu);
 	assetsTable.addMouseListener(new MouseAdapter() {

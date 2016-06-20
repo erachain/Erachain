@@ -49,7 +49,7 @@ public class ExchangeFrame extends JFrame
 	private JPopupMenu sellOrdersMenu = new JPopupMenu();
 	private JPopupMenu buyOrdersMenu = new JPopupMenu();
 
-	public ExchangeFrame(AssetCls have, AssetCls want) 
+	public ExchangeFrame(AssetCls have, AssetCls want, String action) 
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange"));
 		
@@ -104,33 +104,44 @@ public class ExchangeFrame extends JFrame
 				
 		lblTitle.setFont(new Font("Serif", Font.PLAIN, 24));
 		this.add(lblTitle, labelGBC);
+		if(action == "Buy" || action =="To sell") lblTitle.setVisible(false);
 		
 		//CREATE BUY LABEL
 		labelGBC.gridy = 1;
 		JLabel lblBuy = new JLabel( Lang.getInstance().translate("Buy %have% \u2014 Sell %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 		lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblBuy, labelGBC);
+		if (action == "To sell")lblBuy.setVisible(false);
 		
 		//CREATE SELL LABEL
 		labelGBC.gridx = 1;
+		if (action == "To sell")labelGBC.gridx = 0;
+		
+		
 		JLabel lblSell = new JLabel( Lang.getInstance().translate("Sell %have% \u2014 Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
 		lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblSell, labelGBC);
+		if (action == "Buy")lblSell.setVisible(false);
 		
 		//CREATE BUY PANEL
 		buyOrderPanel = new OrderPanel(this.want, this.have, true);
 		this.add(buyOrderPanel, orderGBC);
 		//buyOrderPanel.setBackground(Color.BLUE);
+		if (action == "To sell")buyOrderPanel.setVisible(false);
 		
 		//CREATE SELL PANEL
 		orderGBC.gridx = 1;
+		if (action == "To sell")orderGBC.gridx = 0;
 		sellOrderPanel = new OrderPanel(this.have, this.want, false);
 		//sellOrderPanel.setBackground(Color.BLUE);
 		
 		orderGBC.fill = GridBagConstraints.NORTH;  
 		
 		this.add(sellOrderPanel, orderGBC);
+		if (action == "Buy")sellOrderPanel.setVisible(false);
+		
+		
 		
 		sellOrderPanel.setPreferredSize(new Dimension((int)sellOrderPanel.getPreferredSize().getWidth(), (int)buyOrderPanel.getPreferredSize().getHeight()));
 		sellOrderPanel.setMinimumSize(new Dimension((int)sellOrderPanel.getPreferredSize().getWidth(), (int)buyOrderPanel.getPreferredSize().getHeight()));
@@ -143,12 +154,15 @@ public class ExchangeFrame extends JFrame
 		JLabel lblSellOrders = new JLabel(Lang.getInstance().translate("Sell orders"));
 		lblSellOrders.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblSellOrders, labelGBC);
+		if (action == "To sell")lblSellOrders.setVisible(false);
 		
 		//CREATE BUY ORDERS LABEL
 		labelGBC.gridx = 1;
+		if (action == "To sell")labelGBC.gridx = 0;
 		JLabel lblBuyOrders = new JLabel(Lang.getInstance().translate("Buy orders"));
 		lblBuyOrders.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblBuyOrders, labelGBC);
+		if (action == "Buy")lblBuyOrders.setVisible(false);
 						
 		//CREATE SELL ORDERS TABLE
 		this.sellOrdersTableModel = new SellOrdersTableModel(this.have, this.want);
@@ -208,10 +222,15 @@ public class ExchangeFrame extends JFrame
 			}
 		});
 		
-		this.add(new JScrollPane(sellOrdersTable), tableGBC);
+		JScrollPane sellScrollPane = new JScrollPane(sellOrdersTable);
+		
+		this.add(sellScrollPane, tableGBC);
+		
+		if (action == "To sell")sellScrollPane.setVisible(false);
 		
 		//CREATE BUY ORDERS TABLE
 		tableGBC.gridx = 1;
+		if (action == "To sell")tableGBC.gridx = 0;
 		this.buyOrdersTableModel = new BuyOrdersTableModel(this.want, this.have);
 		final JTable buyOrdersTable = new JTable(this.buyOrdersTableModel);
 		
@@ -265,8 +284,10 @@ public class ExchangeFrame extends JFrame
 		buyOrdersMenu.add(buyCancel);
 		buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
 
+		JScrollPane buyScrollPane = new JScrollPane(buyOrdersTable);
+		this.add(buyScrollPane, tableGBC);
 		
-		this.add(new JScrollPane(buyOrdersTable), tableGBC);
+		if (action == "Buy")buyScrollPane.setVisible(false);
 		
 		//CREATE TRADE HISTORY LABEL
 		labelGBC.gridx = 0;
@@ -325,6 +346,7 @@ public class ExchangeFrame extends JFrame
 		//PACK
 		this.pack();
 		this.setResizable(true);
+		if(action == "Buy" || action =="To sell") this.setSize(900,800);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}

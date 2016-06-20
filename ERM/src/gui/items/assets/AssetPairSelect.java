@@ -16,6 +16,7 @@ import lang.Lang;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +33,7 @@ public class AssetPairSelect extends JFrame{
 	
 	public AssetPairSelectTableModel assetPairSelectTableModel;
 
-	public AssetPairSelect(long key) {
+	public AssetPairSelect(long key, String action) {
 		
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		
@@ -55,6 +56,22 @@ public class AssetPairSelect extends JFrame{
 		//PADDING
 		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 		
+		
+		//Label GBC
+				GridBagConstraints labelGBC = new GridBagConstraints();
+				labelGBC.insets = new Insets(0, 5, 5, 0);
+				labelGBC.fill = GridBagConstraints.BOTH;  
+				labelGBC.anchor = GridBagConstraints.NORTHWEST;
+				labelGBC.weightx = 1;	
+				labelGBC.weighty = 1;	
+				labelGBC.gridwidth = 2;
+				labelGBC.gridx = 0;	
+				labelGBC.gridy = 0;	
+		
+				JLabel label = new JLabel("Выберите пару");
+				
+				if (action == "Buy") label.setText("Укажите актив на который хотите купить " +  Controller.getInstance().getAsset(key).toString() );
+				if (action == "To sell") label.setText("Укажите актив за который хотите продать " +  Controller.getInstance().getAsset(key).toString());
 		//TABLE GBC
 		GridBagConstraints tableGBC = new GridBagConstraints();
 		tableGBC.insets = new Insets(0, 5, 5, 0);
@@ -116,7 +133,7 @@ public class AssetPairSelect extends JFrame{
 					{
 						new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
-								(AssetCls) assetPairSelectTableModel.assets.get(row));
+								(AssetCls) assetPairSelectTableModel.assets.get(row), action);
 						((JFrame) (assetsPairTable.getTopLevelAncestor())).dispose();
 					}
 				}
@@ -124,6 +141,7 @@ public class AssetPairSelect extends JFrame{
 		});
 	    
 		this.add(new JScrollPane(assetsPairTable), tableGBC);
+		this.add(label, labelGBC);
 		
 		//PACK
 		this.pack();
