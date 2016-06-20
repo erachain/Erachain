@@ -106,7 +106,10 @@ public class OrderPanel extends JPanel
 		GridBagConstraints assetHintGBC = new GridBagConstraints();
 		assetHintGBC.insets = new Insets(0, 5, 5, 0);
 		assetHintGBC.fill = GridBagConstraints.HORIZONTAL;  
-		assetHintGBC.anchor = GridBagConstraints.NORTHWEST;
+		assetHintGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+		assetHintGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		assetHintGBC.weightx = 1.0;
+	
 		assetHintGBC.gridx = 2;	
 		
 		//LABEL FROM

@@ -261,7 +261,7 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 15));
+		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300));
 	}
 	public String getShort()
 	{
