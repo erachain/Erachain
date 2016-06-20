@@ -132,11 +132,16 @@ public class ExchangeFrame extends JFrame
 		
 		//CREATE SELL PANEL
 		orderGBC.gridx = 1;
-		if (action == "To sell")orderGBC.gridx = 0;
+		
 		sellOrderPanel = new OrderPanel(this.have, this.want, false);
 		//sellOrderPanel.setBackground(Color.BLUE);
 		
 		orderGBC.fill = GridBagConstraints.NORTH;  
+		if (action == "To sell"){
+			orderGBC.gridx = 0;
+			orderGBC.fill = GridBagConstraints.BOTH;
+			
+		}
 		
 		this.add(sellOrderPanel, orderGBC);
 		if (action == "Buy")sellOrderPanel.setVisible(false);
