@@ -8,6 +8,7 @@ import gui.transaction.OnDealClick;
 import lang.Lang;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -90,6 +91,16 @@ public class OrderPanel extends JPanel
 		detailGBC.fill = GridBagConstraints.HORIZONTAL;  
 		detailGBC.anchor = GridBagConstraints.NORTHWEST;
 		detailGBC.gridx = 1;	
+		
+	
+        detailGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        detailGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        detailGBC.weightx = 1.0;
+        
+		
+		
+		
+		
 		
 		//DETAIL GBC
 		GridBagConstraints assetHintGBC = new GridBagConstraints();
@@ -278,10 +289,15 @@ public class OrderPanel extends JPanel
 		
 		labelGBC.gridy++;
 		
-		if(buying)
+		if(buying){
 			this.sellButton = new JButton(Lang.getInstance().translate("Buy"));	
-		else
+		this.sellButton.setBackground(new Color(204,255,204));
+		}
+		else{
 			this.sellButton = new JButton(Lang.getInstance().translate("Sell"));	
+			this.sellButton.setBackground(new Color (255,153,153));
+		}
+			
 		
 		this.sellButton.setPreferredSize(new Dimension(125, 25));
 		this.sellButton.addActionListener(new ActionListener()
