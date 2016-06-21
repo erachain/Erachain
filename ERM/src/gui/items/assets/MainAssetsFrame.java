@@ -143,9 +143,78 @@ public MainAssetsFrame(){
 				});				
 	
 		
+// my orders
+	 
+	// search Assets
+		 My_Order_Tab my_Orders_SplitPanel = new My_Order_Tab();
+		my_Orders_SplitPanel.jScrollPane_jPanel_RightPanel.setBorder(null);
+		
+		// Asset_Info info1 = new Asset_Info();
+		
+			
+			// обработка изменения положения курсора в таблице
+		my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+					@SuppressWarnings({ "unused" })
+					@Override
+						public void valueChanged(ListSelectionEvent arg0) {
+							String dateAlive;
+							String date_birthday;
+							String message; 
+			// устанавливаем формат даты
+							SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+			//создаем объект персоны
+							UnionCls union;
+							if (my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+								TableModelItemAssets tableModelAssets1 =  (TableModelItemAssets) my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+								Object asset = tableModelAssets1.getAsset(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+							//	info1.show_Asset_002((AssetCls) asset);
+								
+								
+								
+								 //info2 = new AssetPanel((AssetCls) asset);
+							//	 info2 = new AssetDetailsPanel001((AssetCls) asset);
+							//	search_Assets_SplitPanel.jSplitPanel.setDividerLocation(search_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
+							//	search_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+							/*	
+								 search_Assets_SplitPanel.jScrollPane_jPanel_RightPanel.setVisible(false);
+								 
+								 GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+							        gridBagConstraints.gridx = 0;
+							        gridBagConstraints.gridy = 1;
+							        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+							        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+							        gridBagConstraints.weightx = 1.0;
+							        gridBagConstraints.weighty = 1.0;
+							        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
+							       
+							       
+							// delete info component
+								 Component[] comp = search_Assets_SplitPanel.rightPanel1.getComponents();
+								for (int i=0; i<comp.length; i=i+1){
+									if (comp[i].getClass().getName()==info2.getClass().getName()){
+										search_Assets_SplitPanel.rightPanel1.remove(comp[i]);
+									}
+								}
+							
+								search_Assets_SplitPanel.rightPanel1.add(info2, gridBagConstraints);
+							*/		
+								
+				//				my_Orders_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+								
+								 
+							}
+						}
+					});				
+		
+			
+			
+			
 		
 		
 	
+	 
+	 
+	 
 	
 	
 	
@@ -154,6 +223,7 @@ public MainAssetsFrame(){
 	
 	
 	this.jTabbedPane.add(search_Assets_SplitPanel);
+	this.jTabbedPane.add(my_Orders_SplitPanel);
 	this.pack();
 	this.setSize(800,600);
 	this.setMaximizable(true);

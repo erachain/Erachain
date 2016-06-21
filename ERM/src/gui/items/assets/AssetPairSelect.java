@@ -83,7 +83,7 @@ public class AssetPairSelect extends JFrame{
 		tableGBC.gridx = 0;	
 		tableGBC.gridy = 1;	
 		
-		assetPairSelectTableModel = new AssetPairSelectTableModel(key);
+		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
 				
 		final JTable assetsPairTable = new JTable(assetPairSelectTableModel);
 		

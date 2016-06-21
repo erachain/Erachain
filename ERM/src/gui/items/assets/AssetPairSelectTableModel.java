@@ -40,7 +40,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	public List<ItemCls> assets;
 	Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all; 
 	
-	public AssetPairSelectTableModel(long key)
+	public AssetPairSelectTableModel(long key, String action)
 	{
 		this.key = key;
 		//Controller.getInstance().addObserver(this);
@@ -51,7 +51,13 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			AssetCls asset = (AssetCls) item;
 			if(asset.getKey() != this.key)
 			{
-				assets.add(asset);
+				/*
+				if (action =="Buy"){
+					if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress()))
+						assets.add(asset);
+				}else 
+					*/
+					assets.add(asset);
 			}
 		}
 				
