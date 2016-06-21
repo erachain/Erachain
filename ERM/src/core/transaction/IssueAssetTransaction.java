@@ -221,7 +221,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		//CHECK QUANTITY
 		AssetCls asset = (AssetCls)this.getItem();
 		long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-		if(asset.getQuantity() < 1 || asset.getQuantity() > maxQuantity)
+		long quantity = asset.getQuantity();
+		//if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+		if(quantity > maxQuantity || quantity < 0 )
 		{
 			return INVALID_QUANTITY;
 		}

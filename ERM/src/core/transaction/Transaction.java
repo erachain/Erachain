@@ -105,6 +105,8 @@ public abstract class Transaction {
 	public static final int ITEM_DOES_NOT_STATUSED = 61;
 	public static final int ITEM_DOES_NOT_UNITED = 62;
 
+	public static final int AMOUNT_DIVISIBLE = 63;
+
 	public static final int ACCOUNT_ALREADY_PERSONALIZED = 66;
 
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 70;

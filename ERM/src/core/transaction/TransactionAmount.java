@@ -16,6 +16,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 //import database.BalanceMap;
 import database.DBSet;
 import utils.NumberAsString;
@@ -243,16 +244,6 @@ public abstract class TransactionAmount extends Transaction {
 			return NOT_ENOUGH_FEE;
 		}
 		
-		//CHECK IF AMOUNT IS DIVISIBLE
-		if(!db.getAssetMap().get(this.key).isDivisible())
-		{
-			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if(this.getAmount().stripTrailingZeros().scale() > 0)
-			{
-				//AMOUNT HAS DECIMALS
-				return INVALID_AMOUNT;
-			}
-		}
 
 		//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
 		if(this.creator.getConfirmedBalance(this.key, fork).compareTo(this.amount) == -1)
@@ -261,14 +252,36 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		*/
 
+		//CHECK IF AMOUNT IS DIVISIBLE
+		AssetCls asset = (AssetCls)db.getItemAssetMap().get(this.key);
+		if (asset == null) {
+			return ASSET_DOES_NOT_EXIST;
+		}
+		
+		if(!asset.isDivisible())
+		{
+			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
+			if(this.amount.stripTrailingZeros().scale() > 0)
+			{
+				//AMOUNT HAS DECIMALS
+				return AMOUNT_DIVISIBLE;
+			}
+		}
+		
+
 		if (this.key != FEE_KEY || this.amount == null) {
 			// CHECK FEE
 			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
+
+			// if asset is unlimited and me is creator of this asset 
+			boolean unLimited = asset.getQuantity().equals(0l)
+					&& asset.getCreator().getAddress().equals(this.creator.getAddress());
+
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-			if(this.amount != null && this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
+			if(!unLimited && this.amount != null && this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
 			{
 				return NO_BALANCE;
 			}

@@ -57,7 +57,6 @@ public abstract class AssetCls extends ItemCls {
 		this(new byte[TYPE_LENGTH], creator, name, description);
 		this.typeBytes[0] = (byte)type;
 	}
-	
 
 	//GETTERS/SETTERS
 

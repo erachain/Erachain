@@ -25,7 +25,7 @@ public class AssetVenture extends AssetCls {
 
 	private static final int TYPE_ID = AssetCls.VENTURE;
 
-	protected long quantity;
+	protected long quantity = 0;
 	protected byte scale;
 	protected boolean divisible;
 

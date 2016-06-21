@@ -198,6 +198,13 @@ public abstract class Issue_ItemRecord extends Transaction
 
 	@Override
 	public int calcBaseFee() {
-		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500);
+		
+		int add_fee = 0;
+		int len = this.getItem().getName().length();
+		if (len < 10) {
+			add_fee = 3^(10-len) * 100;
+		}
+	
+		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500) + add_fee;
 	}
 }

@@ -224,7 +224,8 @@ public class CreateOrderTransaction extends Transaction
 	{
 		//CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
-		if(have == this.order.getWant())
+		long want = this.order.getWant();
+		if(have == want)
 		{
 			return HAVE_EQUALS_WANT;
 		}
@@ -251,13 +252,19 @@ public class CreateOrderTransaction extends Transaction
 			{
 				return NO_BALANCE;
 			}
-		} else {			
+		} else {
+
 			//CHECK IF SENDER HAS ENOUGH FEE BALANCE
 			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
-			if(this.creator.getConfirmedBalance(have, db).compareTo(
+			
+			// if asset is unlimited and me is creator of this asset 
+			boolean unLimited = haveAsset.getQuantity().equals(0l)
+					&& haveAsset.getCreator().getAddress().equals(this.creator.getAddress());
+
+			if( !unLimited && this.creator.getConfirmedBalance(have, db).compareTo(
 					this.order.getAmountHave()) == -1)
 			{
 				return NO_BALANCE;
