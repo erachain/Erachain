@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -29,10 +30,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
+import core.account.Account;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
@@ -40,19 +43,20 @@ import gui.models.WalletItemImprintsTableModel;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
 
-public class My_Order_Tab extends Split_Panel {
+public class My_Balance_Tab extends Split_Panel {
 	
 	/**
 	 * 
 	 */
-	WalletOrdersTableModel ordersModel;
+	
 	private static final long serialVersionUID = 1L;
-
-	public My_Order_Tab()
+	Balance_from_Adress_TableModel BalancesModel;
+	
+	public My_Balance_Tab()
 	{
 
 	
-	this.setName(Lang.getInstance().translate("My Orders"));
+	this.setName(Lang.getInstance().translate("My Balance"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
 		button1_ToolBar_LeftPanel.setVisible(false);
@@ -61,14 +65,15 @@ public class My_Order_Tab extends Split_Panel {
 		jButton2_jToolBar_RightPanel.setVisible(false);
 		
 	//TABLE
-		ordersModel = new WalletOrdersTableModel();
-	final JTable table = new JTable(ordersModel);
+		
+		  BalancesModel = new Balance_from_Adress_TableModel();
+	final JTable table = new JTable(BalancesModel);
 	
 	
 	
 	//assetsModel.getAsset(row)
 	//POLLS SORTER
-	RowSorter sorter =   new TableRowSorter(ordersModel);
+	RowSorter sorter =   new TableRowSorter(BalancesModel);
 	table.setRowSorter(sorter);	
 //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 //	CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
@@ -88,15 +93,17 @@ public class My_Order_Tab extends Split_Panel {
 	
 	//Custom renderer for the String column;
 	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+	table.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
 	table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
 	table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
 // column #1
-	TableColumn column1 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
+	TableColumn column1 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
 	column1.setMinWidth(1);
 	column1.setMaxWidth(1000);
 	column1.setPreferredWidth(50);
-// column #1
+/*
+	// column #1
 	TableColumn column2 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);//.COLUMN_CONFIRMED);
 	column2.setMinWidth(50);
 	column2.setMaxWidth(1000);
@@ -111,13 +118,13 @@ public class My_Order_Tab extends Split_Panel {
 		column4.setMinWidth(50);
 		column4.setMaxWidth(1000);
 		column4.setPreferredWidth(50);
-	
+*/	
 		
 		
 // add listener
 //		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
 // show	
-	this.jTable_jScrollPanel_LeftPanel.setModel(ordersModel);
+	this.jTable_jScrollPanel_LeftPanel.setModel(BalancesModel);
 	this.jTable_jScrollPanel_LeftPanel = table;
 	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 	
@@ -141,10 +148,10 @@ public class My_Order_Tab extends Split_Panel {
 					String search = searchTextField_SearchToolBar_LeftPanel.getText();
 
 		// SET FILTER
-					ordersModel.fireTableDataChanged();
+					BalancesModel.fireTableDataChanged();
 					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
 					((DefaultRowSorter) sorter).setRowFilter(filter);
-					ordersModel.fireTableDataChanged();
+					BalancesModel.fireTableDataChanged();
 									
 				}
 			});
@@ -188,7 +195,7 @@ public class My_Order_Tab extends Split_Panel {
 			
 			int row = table.getSelectedRow();
 			row = table.convertRowIndexToModel(row);
-			 Order order = ordersModel.getOrder(row);
+			 Class<? extends Object> order = BalancesModel.getColumnClass(row);
 			
 			//IF ASSET CONFIRMED AND NOT ERM
 			/*
@@ -326,7 +333,7 @@ public void favorite_set(JTable assetsTable){
 int row = assetsTable.getSelectedRow();
 row = assetsTable.convertRowIndexToModel(row);
 
-Order order = ordersModel.getOrder(row);
+//Order order = ordersModel.getOrder(row);
 //new AssetPairSelect(asset.getKey());
 /*
 if(order.getKey() >= AssetCls.INITIAL_FAVORITES)

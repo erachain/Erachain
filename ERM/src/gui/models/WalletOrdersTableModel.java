@@ -41,6 +41,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		return this.orders;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? null : item.getClass();
+    }
+	
 	public Order getOrder(int row)
 	{
 		return this.orders.get(row).getB();
