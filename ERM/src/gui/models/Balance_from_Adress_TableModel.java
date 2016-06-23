@@ -63,9 +63,13 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	}
 	
 	
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	       return getValueAt(0, c).getClass();
-	    }
+//	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	     
+		
+//		Class<? extends Object> a = getValueAt(0, c).getClass();
+		
+//		return getValueAt(0, c).getClass();
+//	    }
 	
 	
 	public AssetCls getAsset(int row)

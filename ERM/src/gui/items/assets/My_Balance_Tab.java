@@ -102,23 +102,27 @@ public class My_Balance_Tab extends Split_Panel {
 	column1.setMinWidth(1);
 	column1.setMaxWidth(1000);
 	column1.setPreferredWidth(50);
-/*
+	column1.setCellRenderer(new Renderer_Right());
+
 	// column #1
-	TableColumn column2 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);//.COLUMN_CONFIRMED);
+	TableColumn column2 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_BALANCE);//.COLUMN_CONFIRMED);
 	column2.setMinWidth(50);
 	column2.setMaxWidth(1000);
 	column2.setPreferredWidth(50);
+	column2.setCellRenderer(new Renderer_Right());
 		// column #1
-		TableColumn column3 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_DIVISIBLE);//.COLUMN_CONFIRMED);
+		TableColumn column3 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
 		column3.setMinWidth(50);
 		column3.setMaxWidth(1000);
 		column3.setPreferredWidth(50);
+		column3.setCellRenderer(new Renderer_Right());
 		// column #1
-		TableColumn column4 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+		TableColumn column4 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column4.setMinWidth(50);
 		column4.setMaxWidth(1000);
 		column4.setPreferredWidth(50);
-*/	
+		column4.setCellRenderer(new Renderer_Right());
+	
 		
 		
 // add listener
