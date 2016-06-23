@@ -56,7 +56,7 @@ public class ExchangeFrame extends JFrame
 		this.have = have;
 		this.want = want;
 		
-		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
+	//	this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -100,25 +100,38 @@ public class ExchangeFrame extends JFrame
 		tableGBC.gridy = 4;	
 		
 		//CREATE TITLE LABEL
-		JLabel lblTitle = new JLabel(this.have.toString() + " / " + this.want.toString());
+		JLabel lblTitle = new JLabel(Lang.getInstance().translate("Buy %have%").replace("%have%", this.have.getName().toString()).replace("%want%", this.want.getName().toString()));//this.have.toString() + " / " + this.want.toString());
 				
-		lblTitle.setFont(new Font("Serif", Font.PLAIN, 24));
+		lblTitle.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblTitle, labelGBC);
 		if(action == "Buy" || action =="To sell") lblTitle.setVisible(false);
 		
+				
 		//CREATE BUY LABEL
 		labelGBC.gridy = 1;
-		JLabel lblBuy = new JLabel( Lang.getInstance().translate("Buy %have% \u2014 Sell %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
+		JLabel lblBuy = new JLabel( Lang.getInstance().translate("Sell %want%").replace("%have%", this.have.getName().toString()).replace("%want%", this.want.getName().toString()));
 		lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblBuy, labelGBC);
 		if (action == "To sell")lblBuy.setVisible(false);
 		
 		//CREATE SELL LABEL
+		
+		
+		
+		labelGBC.gridy = 0;
 		labelGBC.gridx = 1;
 		if (action == "To sell")labelGBC.gridx = 0;
 		
+		//CREATE TITLE LABEL
+				JLabel lblTitle1 = new JLabel(Lang.getInstance().translate("Sell %have%" ).replace("%have%", this.have.getName().toString()).replace("%want%", this.want.getName().toString()));
+						
+				lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
+				this.add(lblTitle1, labelGBC);
+				if(action == "Buy" || action =="To sell") lblTitle1.setVisible(false);
+				
+				labelGBC.gridy = 1;
 		
-		JLabel lblSell = new JLabel( Lang.getInstance().translate("Sell %have% \u2014 Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
+		JLabel lblSell = new JLabel( Lang.getInstance().translate(" Buy %want%").replace("%have%", this.have.getName().toString()).replace("%want%", this.want.getName().toString()));
 
 		lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblSell, labelGBC);

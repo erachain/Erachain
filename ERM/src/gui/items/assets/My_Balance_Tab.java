@@ -170,11 +170,11 @@ public class My_Balance_Tab extends Split_Panel {
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
 	
-	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
-	favorite.addActionListener(new ActionListener() {
+	JMenuItem exchange_menu = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	exchange_menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			
-			favorite_set( table);
+			//favorite_set( table);
 			
 		}
 	});
@@ -259,7 +259,7 @@ public class My_Balance_Tab extends Split_Panel {
 	);
 	
 	
-	assetsMenu.add(favorite);
+	assetsMenu.add(exchange_menu);
 	
 	
 	

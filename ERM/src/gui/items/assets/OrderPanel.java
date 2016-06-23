@@ -143,7 +143,7 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel accountHintLabel = new JLabel( have.getShort() );
+		JLabel accountHintLabel = new JLabel( have.getName());//.getShort() );
 		this.add(accountHintLabel, assetHintGBC);
         
 		//LABEL PRICE
@@ -158,7 +158,7 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel priceHintLabel = new JLabel( buying?have.getShort():want.getShort() );
+		JLabel priceHintLabel = new JLabel( buying?have.getName():want.getName() );
 		this.add(priceHintLabel, assetHintGBC);
 				
 		if(false & buying)
@@ -234,7 +234,7 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel amountHintLabel = new JLabel( buying?want.getShort():have.getShort() );
+		JLabel amountHintLabel = new JLabel( buying?want.getName():have.getName() );
 
 		this.add(amountHintLabel, assetHintGBC);
 		
@@ -251,7 +251,7 @@ public class OrderPanel extends JPanel
 			
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel buyingAmountHintLabel = new JLabel( buying?have.getShort():want.getShort() );
+		JLabel buyingAmountHintLabel = new JLabel( buying?have.getName():want.getName() );
 		this.add(buyingAmountHintLabel, assetHintGBC);
 		
 		//ON PRICE CHANGE
@@ -285,7 +285,7 @@ public class OrderPanel extends JPanel
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel feeHintLabel = new JLabel( Controller.getInstance().getAsset(AssetCls.FEE_KEY).getShort());
+		JLabel feeHintLabel = new JLabel( Controller.getInstance().getAsset(AssetCls.FEE_KEY).getName());
 		this.add(feeHintLabel, assetHintGBC);
 		
 		//ADD SELL BUTTON
