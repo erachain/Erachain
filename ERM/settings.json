@@ -1,6 +1,6 @@
 {
-	"weballowed":[
-		"127.0.0.1"
+	"lang":"en.json"
+}127.0.0.1"
 	],
 	"rpcallowed":[
 		"127.0.0.1"
@@ -8,6 +8,7 @@
 	"lang":"ru.json",
 	"knownpeers":[
 		
-	],
-	"generatorkeycaching":true
+	]
+}keycaching":true
+}ng":true
 }

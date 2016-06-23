@@ -369,15 +369,26 @@ public class Account {
 		}
 		else {
 			String personStr = personRes.b.getShort();
-			String addressStr = this.getAddress().substring(0, 8);
+			String addressStr = this.getAddress().substring(1, 6);
 			if (personRes.a == -2) personStr = "[-]" + personStr;
 			else if (personRes.a == -1) personStr = "[?]" + personStr;
 			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
 			else if (personRes.a == 1) personStr = "[+]" + personStr;
-			return addressStr + " " + personStr;
+			return addressStr + ": " + personStr;
 		}
 	}
-	
+
+	public String asPerson_01(boolean shrt)
+	{
+		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		if (personRes == null) {
+			return "";
+		}
+		else {
+			return shrt? personRes.b.getShort(): personRes.b.getName();
+		}
+	}
+
 	@Override
 	public int hashCode()
 	{
