@@ -175,8 +175,31 @@ public class My_Balance_Tab extends Split_Panel {
 		}
 	});
 	
+	
+	
+	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+	sell.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			if (row >=0 ) {
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = BalancesModel.getAsset(row);
+			String account = BalancesModel.getAccount(row);
+			AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", account);
+			}
+			
+		}
+	});
+	
+	assetsMenu.add(sell);
+	
 	assetsMenu.addPopupMenuListener(new PopupMenuListener(){
 
+	
+		
+		
+		
 		@Override
 		public void popupMenuCanceled(PopupMenuEvent arg0) {
 			// TODO Auto-generated method stub

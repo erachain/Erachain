@@ -9,6 +9,7 @@ import lang.Lang;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +19,10 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -50,7 +54,7 @@ public class OrderPanel extends JPanel
 	private AssetCls have;
 	private AssetCls want;
 	private JButton sellButton;
-	private JComboBox<Account> cbxAccount;
+	public JComboBox<Account> cbxAccount;
 	public JTextField txtAmount;
 	public JTextField txtPrice;
 	private JTextField txtFeePow;
@@ -58,7 +62,7 @@ public class OrderPanel extends JPanel
 	private JTextField txtBuyingAmount;
 	private JTextPane superHintText;
 	
-	public OrderPanel(AssetCls have, AssetCls want, boolean buying)
+	public OrderPanel(AssetCls have, AssetCls want, boolean buying, String account)
 	{
 		this.setLayout(new GridBagLayout());
 		
@@ -121,7 +125,21 @@ public class OrderPanel extends JPanel
 		detailGBC.gridy = 0;
 		this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
 		this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
-        this.add(this.cbxAccount, detailGBC);
+	// select accounts in combobox			
+		if (account !="")
+		{
+		 for (int i=0; this.cbxAccount.getModel().getSize()>i;i++){
+				 Account elem = this.cbxAccount.getModel().getElementAt(i);
+				if (elem.getAddress().toString().contentEquals(account))
+					this.cbxAccount.setSelectedIndex(i);
+					
+					this.cbxAccount.repaint();
+			 }
+			this.cbxAccount.setEnabled(false);
+		}
+		
+		
+		this.add(this.cbxAccount, detailGBC);
 		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;

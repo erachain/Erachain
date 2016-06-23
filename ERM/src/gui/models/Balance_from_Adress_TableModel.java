@@ -68,8 +68,15 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	    }
 	
 	
+	public AssetCls getAsset(int row)
+	{
+		return Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
+	}
 	
-	
+	public String getAccount(int row) {
+		// TODO Auto-generated method stub
+		return table_balance.get(row).getA().getAddress();
+	}
 	
 	@Override
 	public int getColumnCount() 
@@ -156,4 +163,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 		this.balances.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+
+	
 }

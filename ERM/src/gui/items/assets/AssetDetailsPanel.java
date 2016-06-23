@@ -194,7 +194,7 @@ public class AssetDetailsPanel extends JPanel {
 	public void onOpenPairClick() {
 		
 		String action = null;
-		new AssetPairSelect(this.asset.getKey(), action);
+		new AssetPairSelect(this.asset.getKey(), action, "");
 		
 	}
 	

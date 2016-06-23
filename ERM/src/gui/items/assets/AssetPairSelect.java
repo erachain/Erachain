@@ -33,7 +33,7 @@ public class AssetPairSelect extends JFrame{
 	
 	public AssetPairSelectTableModel assetPairSelectTableModel;
 
-	public AssetPairSelect(long key, String action) {
+	public AssetPairSelect(long key, String action, String account) {
 		
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		
@@ -133,7 +133,7 @@ public class AssetPairSelect extends JFrame{
 					{
 						new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
-								(AssetCls) assetPairSelectTableModel.assets.get(row), action);
+								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
 						((JFrame) (assetsPairTable.getTopLevelAncestor())).dispose();
 					}
 				}

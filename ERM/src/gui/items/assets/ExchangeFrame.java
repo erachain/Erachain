@@ -44,12 +44,12 @@ public class ExchangeFrame extends JFrame
 	private BuyOrdersTableModel buyOrdersTableModel;
 	private TradesTableModel tradesTableModel;
 	private OrderPanel sellOrderPanel;
-	private OrderPanel buyOrderPanel;
+	public OrderPanel buyOrderPanel;
 	
 	private JPopupMenu sellOrdersMenu = new JPopupMenu();
 	private JPopupMenu buyOrdersMenu = new JPopupMenu();
 
-	public ExchangeFrame(AssetCls have, AssetCls want, String action) 
+	public ExchangeFrame(AssetCls have, AssetCls want, String action, String account) 
 	{
 		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange"));
 		
@@ -125,7 +125,7 @@ public class ExchangeFrame extends JFrame
 		if (action == "Buy")lblSell.setVisible(false);
 		
 		//CREATE BUY PANEL
-		buyOrderPanel = new OrderPanel(this.want, this.have, true);
+		buyOrderPanel = new OrderPanel(this.want, this.have, true, account);
 		this.add(buyOrderPanel, orderGBC);
 		//buyOrderPanel.setBackground(Color.BLUE);
 		if (action == "To sell")buyOrderPanel.setVisible(false);
@@ -133,7 +133,9 @@ public class ExchangeFrame extends JFrame
 		//CREATE SELL PANEL
 		orderGBC.gridx = 1;
 		
-		sellOrderPanel = new OrderPanel(this.have, this.want, false);
+		sellOrderPanel = new OrderPanel(this.have, this.want, false, account);
+		
+		
 		//sellOrderPanel.setBackground(Color.BLUE);
 		
 		orderGBC.fill = GridBagConstraints.NORTH;  

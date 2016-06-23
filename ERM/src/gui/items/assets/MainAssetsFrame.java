@@ -31,6 +31,7 @@ import database.SortableList;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.items.unions.Union_Info;
+import gui.models.Balance_from_Adress_TableModel;
 import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
 import utils.Pair;
@@ -220,7 +221,7 @@ public MainAssetsFrame(){
 								search_Assets_SplitPanel.rightPanel1.add(info2, gridBagConstraints);
 							*/		
 								
-				//				my_Orders_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+						//		my_Orders_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
 								
 								 
 							}
@@ -253,10 +254,9 @@ public MainAssetsFrame(){
 				//создаем объект персоны
 								UnionCls union;
 								if (my_Balanses_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
-									 TableModel tableModelOrder = my_Balanses_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
-						//			Object asset = tableModelOrder..get.getAsset(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-								//	info1.show_Asset_002((AssetCls) asset);
-									
+									Balance_from_Adress_TableModel tableModelAssets1 = (Balance_from_Adress_TableModel) my_Balanses_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+									 AssetCls asset = tableModelAssets1.getAsset(my_Balanses_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Balanses_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+			 						// AssetCls asset = tableModelAssets1.getAsset(item);
 									
 									
 									 //info2 = new AssetPanel((AssetCls) asset);
@@ -287,7 +287,7 @@ public MainAssetsFrame(){
 									search_Assets_SplitPanel.rightPanel1.add(info2, gridBagConstraints);
 								*/		
 									
-					//				my_Orders_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+			 						my_Balanses_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
 									
 									 
 								}

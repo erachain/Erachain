@@ -163,7 +163,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "To sell");
+			new AssetPairSelect(asset.getKey(), "To sell",  "");
 		}
 	});
 	
@@ -272,7 +272,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "");
+			new AssetPairSelect(asset.getKey(), "","");
 		}
 	});
 	 nameSalesMenu.add(excahge);
@@ -285,7 +285,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "Buy");
+			new AssetPairSelect(asset.getKey(), "Buy","");
 		}
 	});
 	
