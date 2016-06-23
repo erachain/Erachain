@@ -163,6 +163,57 @@ public class My_Assets_Tab extends Split_Panel {
 		}
 	});
 	
+	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+	sell.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			if (row >=0 ) {
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = assetsModel.getAsset(row);
+		//	String account = assetsModel..getAccount(row);
+			AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+			}
+			
+		}
+	});
+	
+	
+	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	excahge.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = assetsModel.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "","");
+		}
+	});
+	assetsMenu.add(excahge);
+	
+	
+	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+	buy.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = assetsModel.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "Buy","");
+		}
+	});
+	
+	assetsMenu.addSeparator();
+	assetsMenu.add(buy);
+	
+	assetsMenu.add(sell);
+	assetsMenu.addSeparator();
+	
+	
+	
+	
+	
+	
 	assetsMenu.addPopupMenuListener(new PopupMenuListener(){
 
 		@Override

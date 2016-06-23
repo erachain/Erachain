@@ -104,7 +104,7 @@ public class ExchangeFrame extends JFrame
 				
 		lblTitle.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblTitle, labelGBC);
-		if(action == "Buy" || action =="To sell") lblTitle.setVisible(false);
+		if (action =="To sell") lblTitle.setVisible(false);
 		
 				
 		//CREATE BUY LABEL
@@ -127,11 +127,11 @@ public class ExchangeFrame extends JFrame
 						
 				lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
 				this.add(lblTitle1, labelGBC);
-				if(action == "Buy" || action =="To sell") lblTitle1.setVisible(false);
+				if(action == "Buy" ) lblTitle1.setVisible(false);
 				
 				labelGBC.gridy = 1;
 		
-		JLabel lblSell = new JLabel( Lang.getInstance().translate(" Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
+		JLabel lblSell = new JLabel( Lang.getInstance().translate("Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
 		lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
 		this.add(lblSell, labelGBC);

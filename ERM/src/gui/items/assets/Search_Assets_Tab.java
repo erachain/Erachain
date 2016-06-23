@@ -222,12 +222,12 @@ public class Search_Assets_Tab extends Split_Panel {
 				
 				favorite.setVisible(false);
 			}
-			sell.setVisible(false);
+		//	sell.setVisible(false);
 		//	boolean a = Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress());
-			if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
-			{
-				sell.setVisible(true);
-			}
+		//	if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
+		//	{
+		//		sell.setVisible(true);
+		//	}
 			
 	
 		

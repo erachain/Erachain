@@ -7,8 +7,16 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,10 +30,15 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -103,7 +116,8 @@ public class My_Balance_Tab extends Split_Panel {
 	column1.setMaxWidth(1000);
 	column1.setPreferredWidth(50);
 	column1.setCellRenderer(new Renderer_Right());
-
+	
+	
 	// column #1
 	TableColumn column2 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_BALANCE);//.COLUMN_CONFIRMED);
 	column2.setMinWidth(50);
@@ -170,14 +184,7 @@ public class My_Balance_Tab extends Split_Panel {
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
 	
-	JMenuItem exchange_menu = new JMenuItem(Lang.getInstance().translate("Exchange"));
-	exchange_menu.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			
-			//favorite_set( table);
-			
-		}
-	});
+	
 	
 	
 	
@@ -196,7 +203,36 @@ public class My_Balance_Tab extends Split_Panel {
 		}
 	});
 	
+	
+	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+	excahge.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = BalancesModel.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "","");
+		}
+	});
+	assetsMenu.add(excahge);
+	
+	
+	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+	buy.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			row = table.convertRowIndexToModel(row);
+
+			AssetCls asset = BalancesModel.getAsset(row);
+			new AssetPairSelect(asset.getKey(), "Buy","");
+		}
+	});
+	
+	assetsMenu.addSeparator();
+	assetsMenu.add(buy);
+	
 	assetsMenu.add(sell);
+	assetsMenu.addSeparator();
 	
 	assetsMenu.addPopupMenuListener(new PopupMenuListener(){
 
@@ -259,7 +295,7 @@ public class My_Balance_Tab extends Split_Panel {
 	);
 	
 	
-	assetsMenu.add(exchange_menu);
+
 	
 	
 	
