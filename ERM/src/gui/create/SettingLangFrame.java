@@ -107,6 +107,10 @@ public class SettingLangFrame extends JDialog {
 		} catch (Exception e1) {
 			LOGGER.error(e1.getMessage(),e1);
 			stringFromInternet = "";
+		
+		
+		
+		
 		}
 		
 		JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);

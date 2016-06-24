@@ -2,36 +2,66 @@ package gui.items.assets;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import lang.Lang;
 
+import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import gui.MainFrame;
+import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
+import gui.models.WalletItemAssetsTableModel;
 
 @SuppressWarnings("serial")
 public class AssetPairSelect extends JFrame{
 	
 	public AssetPairSelectTableModel assetPairSelectTableModel;
+	 AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
+	 RowSorter sorter;
 
 	public AssetPairSelect(long key, String action, String account) {
 		
@@ -83,47 +113,129 @@ public class AssetPairSelect extends JFrame{
 		tableGBC.gridx = 0;	
 		tableGBC.gridy = 1;	
 		
+		
+		pair_Panel.button1_ToolBar_LeftPanel.setVisible(false);
+		pair_Panel.button2_ToolBar_LeftPanel.setVisible(false);
+		
+		
 		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
 				
 		final JTable assetsPairTable = new JTable(assetPairSelectTableModel);
 		
-		assetsPairTable.setIntercellSpacing(new java.awt.Dimension(2, 2));
+		sorter = new TableRowSorter(assetPairSelectTableModel);
+		assetsPairTable.setRowSorter(sorter);	
+		
+		
+		
+		pair_Panel.jTable_jScrollPanel_LeftPanel.setModel(assetPairSelectTableModel);
+	    pair_Panel.jTable_jScrollPanel_LeftPanel = assetsPairTable;
+		
+	    pair_Panel.jTable_jScrollPanel_LeftPanel .setIntercellSpacing(new java.awt.Dimension(2, 2));
 
-		assetsPairTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	  //Custom renderer for the String column;
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
-	    for (int i = 0; i < assetsPairTable.getColumnCount(); i++) {
-	      DefaultTableColumnModel colModel = (DefaultTableColumnModel) assetsPairTable.getColumnModel();
-	      TableColumn col = colModel.getColumn(i);
-	      int width = 0;
-
-	      TableCellRenderer renderer = col.getHeaderRenderer();
-	      for (int r = 0; r < assetsPairTable.getRowCount(); r++) {
-	        renderer = assetsPairTable.getCellRenderer(r, i);
-	        Component comp = renderer.getTableCellRendererComponent(assetsPairTable, assetsPairTable.getValueAt(r, i),
-	            false, false, r, i);
-	        width = Math.max(width, comp.getPreferredSize().width);
-	      }
-	      col.setPreferredWidth(width + 2);
-	    }
-
-	    for (int row = 0; row < assetsPairTable.getRowCount(); row++)
-	    {
-	        int rowHeight = assetsPairTable.getRowHeight();
-
-	        for (int column = 0; column < assetsPairTable.getColumnCount(); column++)
-	        {
-	            Component comp = assetsPairTable.prepareRenderer(assetsPairTable.getCellRenderer(row, column), row, column);
-	            rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
-	        }
-
-	        assetsPairTable.setRowHeight(row, rowHeight);
-	    }
-
-	    assetsPairTable.getTableHeader().setPreferredSize(new Dimension(10, (int)(assetsPairTable.getTableHeader().getPreferredSize().getHeight()+6)));
-
-	    assetsPairTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 	    
-	    assetsPairTable.addMouseListener(new MouseAdapter() {
+		 // column #1
+			TableColumn column1 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
+			column1.setMinWidth(1);
+			column1.setMaxWidth(1000);
+			column1.setPreferredWidth(50);
+		// column #1
+			TableColumn column2 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_NAME);//.COLUMN_CONFIRMED);
+			column2.setMinWidth(50);
+			column2.setMaxWidth(1000);
+			column2.setPreferredWidth(200);
+				// column #1
+				TableColumn column3 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_ORDERS_COUNT);//.COLUMN_CONFIRMED);
+				column3.setMinWidth(50);
+				column3.setMaxWidth(1000);
+				column3.setPreferredWidth(50);
+				// column #1
+				TableColumn column4 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_ORDERS_VOLUME);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+				column4.setMinWidth(50);
+				column4.setMaxWidth(1000);
+				column4.setPreferredWidth(200);
+		    
+				TableColumn column5 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_TRADES_COUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+				column5.setMinWidth(50);
+				column5.setMaxWidth(1000);
+				column5.setPreferredWidth(50);
+				
+				TableColumn column6 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_TRADES_VOLUME);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+				column6.setMinWidth(50);
+				column6.setMaxWidth(1000);
+				column6.setPreferredWidth(200);
+	    
+	    
+	    
+	    for (int i = 0; i < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) { 
+	   pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(i).addPropertyChangeListener(new PropertyChangeListener(){
+
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+			// TODO Auto-generated method stub
+		PropertyChangeEvent prop = arg0;	
+		if (arg0.getPropertyName() == "width") Table_Render("333" + arg0.getSource().toString());
+		
+	//	arg0.getSource().
+		//System.out.println();
+	//	setPreferredSize(getMaximumSize());
+		
+		}
+		   
+	   });
+	    }
+	   
+	    
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.addComponentListener(new ComponentListener(){
+
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+			
+				Table_Render("2");
+				
+				
+			}
+
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	    	
+	    	
+	    	
+	    	
+	    });
+	    
+	    
+	    
+//	   Table_Render("1");
+	    
+
+	    pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().setPreferredSize(new Dimension(10, (int)(pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().getPreferredSize().getHeight()+6)));
+
+	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+	    
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					JTable target = (JTable)e.getSource();
@@ -134,21 +246,130 @@ public class AssetPairSelect extends JFrame{
 						new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
-						((JFrame) (assetsPairTable.getTopLevelAncestor())).dispose();
+						((JFrame) (pair_Panel.getTopLevelAncestor())).dispose();
 					}
 				}
 			}
 		});
 	    
-		this.add(new JScrollPane(assetsPairTable), tableGBC);
-		this.add(label, labelGBC);
+		//this.add(new JScrollPane(assetsPairTable), tableGBC);
+		//this.add(label, labelGBC);
 		
+	    pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.jTable_jScrollPanel_LeftPanel);
+	    pair_Panel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+	    
+	 // UPDATE FILTER ON TEXT CHANGE
+	    pair_Panel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+	 				public void changedUpdate(DocumentEvent e) {
+	 					onChange();
+	 				}
+
+	 				public void removeUpdate(DocumentEvent e) {
+	 					onChange();
+	 				}
+
+	 				public void insertUpdate(DocumentEvent e) {
+	 					onChange();
+	 				}
+
+	 				public void onChange() {
+
+	 		// GET VALUE
+	 					String search = pair_Panel.searchTextField_SearchToolBar_LeftPanel.getText();
+
+	 		// SET FILTER
+	 					assetPairSelectTableModel.fireTableDataChanged();
+	 					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+	 					((DefaultRowSorter) sorter).setRowFilter(filter);
+	 					assetPairSelectTableModel.fireTableDataChanged();
+	 									
+	 				}
+	 			});
+	 	
+	 	
+	 	
+	    
+	    
+	    
+	    
+	    Dimension size = MainFrame.desktopPane.getSize();
+	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	    this.add(pair_Panel, labelGBC);
 		//PACK
 		this.pack();
-		this.setSize(800, this.getHeight());
+		this.setSize(1000, this.getHeight());
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+	}
+	
+	void Table_Render(String st){
+		
+	//	if (st==st) return;
+		Font ff = pair_Panel.jTable_jScrollPanel_LeftPanel.getFont();
+	/*	
+		 for (int i = 0; i < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) {
+		      DefaultTableColumnModel colModel = (DefaultTableColumnModel) pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnModel();
+		      TableColumn col = colModel.getColumn(i);
+		      int width = 0;
+
+		      TableCellRenderer renderer = col.getHeaderRenderer();
+		      for (int r = 0; r < pair_Panel.jTable_jScrollPanel_LeftPanel .getRowCount(); r++) {
+		        renderer = pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(r, i);
+		        Component comp = renderer.getTableCellRendererComponent(pair_Panel.jTable_jScrollPanel_LeftPanel , pair_Panel.jTable_jScrollPanel_LeftPanel .getValueAt(r, i),
+		            false, false, r, i);
+		        width = Math.max(width, comp.getPreferredSize().width);
+		      }
+		      col.setPreferredWidth(width + 2);
+		    } 
+*/
+		    for (int row = 0; row < pair_Panel.jTable_jScrollPanel_LeftPanel .getRowCount(); row++)
+		    {
+		        int rowHeight = pair_Panel.jTable_jScrollPanel_LeftPanel .getRowHeight();
+		        int roww =0;
+		     //   JLabel label = new JLabel("Test label");
+		     //   Graphics g = label.getGraphics();
+		     //   FontMetrics fm = g.getFontMetrics();
+		        
+		      //  TextLayout tl = new TextLayout(text, font, new FontRenderContext(null, true, true)); 
+		        
+		        for (int column = 0; column < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); column++)
+		        {
+		           
+		        	if (column ==3){
+		        		column=column;
+		        		
+		        		
+		        	}
+		        	// Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(row, column), row, column);
+		           // rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+		        	// читаем данные из ячейки таблицы 
+		        	String a = pair_Panel.jTable_jScrollPanel_LeftPanel.getModel().getValueAt(row, column).toString();
+		        	if (a ==null || a =="") a=" ";
+		        	// читаем фонт ячейки таблицы
+		        	
+		        	// вычисляем длину текста в пикселях
+		        	 TextLayout tl1 = new TextLayout(a, ff, new FontRenderContext(null, true, true)); 
+		        	 Rectangle2D ss = tl1.getBounds();
+		        	 
+		        	// берем длину ячейки в пикселях
+		        	 Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(row, column), row, column);
+		        	 int ww = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(column).getWidth();
+		        	 //int ww = comp.getWidth();//.getSize().width;//.getPreferredSize().width;
+		        	 // вычисляем количество строк
+		        	  double ssh = ss.getWidth();
+		        	   int roww1 = (int)Math.ceil(ss.getWidth()/ww);
+		        	   if (roww1 <1) roww1=1;
+		        	   roww = Math.max(roww, roww1);
+		        	  
+		        	 
+		        }
+
+		        pair_Panel.jTable_jScrollPanel_LeftPanel .setRowHeight(row, rowHeight * roww);
+		    }
+		
+		
+		
 	}
 
 }

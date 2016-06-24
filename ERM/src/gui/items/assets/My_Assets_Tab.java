@@ -45,6 +45,7 @@ public class My_Assets_Tab extends Split_Panel {
 	 */
 	WalletItemAssetsTableModel assetsModel;
 	private static final long serialVersionUID = 1L;
+	RowSorter<WalletItemAssetsTableModel> sorter;
 
 	public My_Assets_Tab()
 	{
@@ -63,7 +64,7 @@ public class My_Assets_Tab extends Split_Panel {
 	final JTable table = new JTable(assetsModel);
 	//assetsModel.getAsset(row)
 	//POLLS SORTER
-	RowSorter sorter =   new TableRowSorter(assetsModel);
+	 sorter =   new TableRowSorter<WalletItemAssetsTableModel>(assetsModel);
 	table.setRowSorter(sorter);	
 //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 //	CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);

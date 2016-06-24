@@ -25,12 +25,12 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class AssetPairSelectTableModel extends AbstractTableModel implements Observer
 {
-	private static final int COLUMN_KEY = 0;
-	private static final int COLUMN_NAME = 1;
-	private static final int COLUMN_ORDERS_COUNT = 2;
-	private static final int COLUMN_ORDERS_VOLUME = 3;
-	private static final int COLUMN_TRADES_COUNT = 4;
-	private static final int COLUMN_TRADES_VOLUME = 5;
+	public static final int COLUMN_KEY = 0;
+	public static final int COLUMN_NAME = 1;
+	public static final int COLUMN_ORDERS_COUNT = 2;
+	public static final int COLUMN_ORDERS_VOLUME = 3;
+	public static final int COLUMN_TRADES_COUNT = 4;
+	public static final int COLUMN_TRADES_VOLUME = 5;
 	
 	private static final Logger LOGGER = Logger
 			.getLogger(AssetPairSelectTableModel.class);
@@ -75,6 +75,14 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		return columnNames.length;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	     
+		Class<? extends Object> a = getValueAt(0, c).getClass();
+		
+		return a;
+	    }
+	
+	
 	@Override
 	public String getColumnName(int index) 
 	{
@@ -112,13 +120,14 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			return this.assets.get(row).getName();
 			
 		case COLUMN_ORDERS_COUNT:
+			 
 			
 			return item == null?"":this.all.get(key).a;
 			
 		case COLUMN_ORDERS_VOLUME:
 			
 			return item == null?"":"<html>" + NumberAsString.getInstance().numberAsString(this.all.get(key).c) 
-					+ " " + this.assets.get(row).getShort() + "<br>" 
+					+ " " + this.assets.get(row).getShort() + "&hArr;  "//"<br>" 
 					+ NumberAsString.getInstance().numberAsString(this.all.get(key).d) 
 					+ " " + Controller.getInstance().getAsset(this.key).getShort()
 					+ "</html>";
@@ -136,12 +145,12 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			if (item == null) return "";
 			if(this.all.get(key).b > 0)
 				return "<html>" + NumberAsString.getInstance().numberAsString(this.all.get(key).e) 
-					+ " " + this.assets.get(row).getShort() + "<br>" 
+					+ " " + this.assets.get(row).getShort() + "&hArr; " //"<br>" 
 					+ NumberAsString.getInstance().numberAsString(this.all.get(key).f) 
 					+ " " + Controller.getInstance().getAsset(this.key).getShort()
 					+ "</html>";
 			else
-				return null;
+				return "";
 			
 			
 		}

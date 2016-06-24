@@ -2,7 +2,11 @@
 
       import java.awt.Color;
       import java.awt.Component;
+import java.awt.Font;
 import java.awt.SystemColor;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JLabel;
       import javax.swing.JTable;
@@ -24,7 +28,9 @@ import javax.swing.JLabel;
           setFont(table.getFont());
           setBackground(new Color(255, 255, 220));
           setOpaque(true);
-          
+         // setAlignmentY(TOP_ALIGNMENT);
+         // setVerticalAlignment(verTOP_ALIGNMEN);
+          setVerticalAlignment(TOP);
           
           if(isSelected)
           {
@@ -50,6 +56,11 @@ import javax.swing.JLabel;
          setHorizontalTextPosition(JLabel.LEFT);//.RIGHT);
    //      setAlignmentX(10);
           setText((value == null) ? "" :  value + "</></>  ");
+          
+       
+          
+          
+          
           return this;
         }
       }
