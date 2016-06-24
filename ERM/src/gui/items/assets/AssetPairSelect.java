@@ -353,7 +353,7 @@ public class AssetPairSelect extends JFrame{
 		        	 Rectangle2D ss = tl1.getBounds();
 		        	 
 		        	// берем длину ячейки в пикселях
-		        	 Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(row, column), row, column);
+		        	 Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row), column), row, column);
 		        	 int ww = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(column).getWidth();
 		        	 //int ww = comp.getWidth();//.getSize().width;//.getPreferredSize().width;
 		        	 // вычисляем количество строк
@@ -365,7 +365,7 @@ public class AssetPairSelect extends JFrame{
 		        	 
 		        }
 
-		        pair_Panel.jTable_jScrollPanel_LeftPanel .setRowHeight(row, rowHeight * roww);
+		        pair_Panel.jTable_jScrollPanel_LeftPanel .setRowHeight(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row), rowHeight * roww);
 		    }
 		
 		
