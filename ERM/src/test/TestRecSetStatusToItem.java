@@ -14,6 +14,7 @@ import ntp.NTP;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.account.PrivateKeyAccount;
@@ -203,7 +204,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
 		assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(),	0);
 
-		Tuple4<Long, Long, Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
+		Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		assertEquals( null, statusDuration);
 

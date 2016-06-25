@@ -10,6 +10,7 @@ import javax.swing.JTextPane;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
@@ -81,7 +82,7 @@ public class Person_Info extends JTextPane {
 			}
 		}	
 		
-		TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> statuses = DBSet.getInstance().getPersonStatusMap().get(person.getKey());
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DBSet.getInstance().getPersonStatusMap().get(person.getKey());
 		if ( statuses.isEmpty()){
 			message += "<p>" +  Lang.getInstance().translate("Not statuses")+ "</p";
 		} else {
@@ -90,13 +91,12 @@ public class Person_Info extends JTextPane {
 			String to_date_str;
 			Long dte;
 			ItemStatusMap statusesMap = DBSet.getInstance().getItemStatusMap();
-			for( Map.Entry<Long, java.util.Stack<Tuple4<Long, Long, Integer, Integer>>> status: statuses.entrySet())
+			for( Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status: statuses.entrySet())
 			{
 				if (status == null) continue;
 				message += "<div>" + statusesMap.get(status.getKey()).toString() + " : ";
 				
-				
-				Tuple4<Long, Long, Integer, Integer> dates = status.getValue().peek();
+				Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
 				
 				dte = dates.a;
 				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";

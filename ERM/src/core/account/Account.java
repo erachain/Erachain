@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import api.ApiErrorFactory;
 
@@ -430,7 +431,7 @@ public class Account {
 
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
-		Tuple4<Long, Long, Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		Long end_date = personDuration.b;
 		if (end_date == null ) return true; // permanent active
@@ -458,14 +459,14 @@ public class Account {
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
 		// IF PERSON is DEAD
-		Tuple4<Long, Long, Integer, Integer> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
+		Tuple5<Long, Long, byte[], Integer, Integer> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
 		if (personDead != null) {
 			// person is dead
 			return new Tuple2<Integer, PersonCls>(-2, person);
 		}
 
 		// IF PERSON is ALIVE
-		Tuple4<Long, Long, Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		Long end_date = personDuration.b;
 		if (end_date == null )

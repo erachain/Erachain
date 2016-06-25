@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -320,14 +320,19 @@ public class R_SetUnionToItem extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		Block block = db.getBlockMap().getLastBlock();
-		int blockIndex = block.getHeight(db);
-		int transactionIndex = block.getTransactionIndex(signature);
+		// pack additional data
+		byte[] a_data = null;//this.value1;
 
-		Tuple4<Long, Long, Integer, Integer> itemP = new Tuple4<Long, Long, Integer, Integer>
-				(beg_date, end_date,
-				//Controller.getInstance().getHeight(), this.signature);
-				blockIndex, transactionIndex);
+		//Block block = db.getBlockMap().getLastBlock();
+		//int blockIndex = block.getHeight(db);
+		//int transactionIndex = block.getTransactionIndex(signature);
+
+		Tuple5<Long, Long, byte[], Integer, Integer> itemP = new Tuple5<Long, Long, byte[], Integer, Integer>
+		(
+				beg_date, end_date,
+				a_data,
+				this.getBlockHeight(db), this.getSeqNo(db)
+			);
 
 		// SET UNION to ITEM for DURATION
 		if (this.itemType == ItemCls.PERSON_TYPE)

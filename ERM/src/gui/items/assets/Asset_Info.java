@@ -7,6 +7,7 @@ import javax.swing.JEditorPane;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import core.item.assets.AssetCls;
 import core.item.statuses.StatusCls;
@@ -68,7 +69,7 @@ public  Asset_Info() {
 	
 	
 //читаем таблицу .
-		  Tuple4<Long, Long, Integer, Integer> t3 = DBSet.getInstance().getAssetStatusMap().getItem(asset.getKey(), StatusCls.ALIVE_KEY); //(Long) assetsTable.getValueAt(assetsTable.getSelectedRow(),0));
+		  Tuple5<Long, Long, byte[], Integer, Integer> t3 = DBSet.getInstance().getAssetStatusMap().getItem(asset.getKey(), StatusCls.ALIVE_KEY); //(Long) assetsTable.getValueAt(assetsTable.getSelectedRow(),0));
 // преобразование в дату
 
 	message = message + "</html>";

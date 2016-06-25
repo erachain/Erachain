@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import utils.ObserverMessage;
 import utils.Pair;
@@ -34,7 +34,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_STATUS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
-	TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> statuses;
+	TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
 	
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
@@ -54,7 +54,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	}
 
 	
-	public TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> getSortableList() {
+	public TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> getSortableList() {
 		return statuses;
 	}
 	
@@ -90,7 +90,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	public int getRowCount() 
 	{
 		
-		 TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> a = statuses;
+		 TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> a = statuses;
 		return  statuses.size();
 	}
 
@@ -112,10 +112,10 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 				break;
 			}
 		}
-		 Stack<Tuple4<Long, Long, Integer, Integer>> entry = statuses.get(status_key_value);
+		 Stack<Tuple5<Long, Long, byte[], Integer, Integer>> entry = statuses.get(status_key_value);
 		if (entry == null || entry.isEmpty() ) return 0;
 		
-		 Tuple4<Long, Long, Integer, Integer> value = entry.peek();
+		 Tuple5<Long, Long, byte[], Integer, Integer> value = entry.peek();
 	//	 if (value == null ) return 0;
 		
 		 switch(column)
@@ -168,7 +168,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		{
 			if(this.statuses == null)
 			{
-				this.statuses = (TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>) message.getValue();
+				this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			//	this.statusesMap .registerObserver();
 				//this.imprints.sort(PollMap.NAME_INDEX);
 			}

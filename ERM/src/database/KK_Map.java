@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 //import core.block.Block;
 //import core.item.statuses.StatusCls;
@@ -20,9 +20,12 @@ import database.DBSet;
 public class KK_Map extends DBMap<
 			Long, // item1 Key
 			TreeMap<Long, // item2 Key
-				Stack<Tuple4<
+				Stack<Tuple5<
 					Long, // beg_date
 					Long, // end_date
+
+					byte[], // any additional data
+					
 					/*
 public Block getBlockByHeight(int parseInt) {
 		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);
@@ -58,10 +61,10 @@ public Block getBlockByHeight(int parseInt) {
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Long, TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>> getMap(DB database) 
+	protected Map<Long, TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>> getMap(DB database) 
 	{
 		//OPEN MAP
-		BTreeMap<Long, TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>> map =  database.createTreeMap(name)
+		BTreeMap<Long, TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>> map =  database.createTreeMap(name)
 				.keySerializer(BTreeKeySerializer.BASIC)
 				.counterEnable()
 				.makeOrGet();
@@ -71,16 +74,16 @@ public Block getBlockByHeight(int parseInt) {
 	}
 
 	@Override
-	protected Map<Long, TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>> getMemoryMap() 
+	protected Map<Long, TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>> getMemoryMap() 
 	{
 		// HashMap ?
-		return new TreeMap<Long, TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>>();
+		return new TreeMap<Long, TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>>();
 	}
 
 	@Override
-	protected TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> getDefaultValue() 
+	protected TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> getDefaultValue() 
 	{
-		return new TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>>();
+		return new TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>();
 	}
 	
 	@Override
@@ -89,13 +92,13 @@ public Block getBlockByHeight(int parseInt) {
 		return this.observableData;
 	}
 
-	public void addItem(Long key, Long itemKey, Tuple4<Long, Long, Integer, Integer> item)
+	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
 	{
 
-		TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> value = this.get(key);
-		Stack<Tuple4<Long, Long, Integer, Integer>> stack = value.get(itemKey);
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
 		if (stack == null) {
-			stack = new Stack<Tuple4<Long, Long, Integer, Integer>>();
+			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
 			stack.add(item);
 		}
 		else {
@@ -103,7 +106,7 @@ public Block getBlockByHeight(int parseInt) {
 				// item has NULL values id dates - reset it by last values
 				Long valA;
 				Long valB;
-				Tuple4<Long, Long, Integer, Integer> lastItem = stack.peek();
+				Tuple5<Long, Long, byte[], Integer, Integer> lastItem = stack.peek();
 				if (item.a == null) {
 					// if input item Begin Date = null - take date from stack (last value)
 					valA = lastItem.a;
@@ -116,7 +119,7 @@ public Block getBlockByHeight(int parseInt) {
 				} else {
 					valB = item.b;					
 				}
-				stack.add(new Tuple4<Long, Long, Integer, Integer>(valA, valB, item.c, item.d));
+				stack.add(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
 			} else {
 				stack.add(item);
 			}
@@ -127,18 +130,18 @@ public Block getBlockByHeight(int parseInt) {
 		this.set(key, value);
 	}
 	
-	public Tuple4<Long, Long, Integer, Integer> getItem(Long key, Long itemKey)
+	public Tuple5<Long, Long, byte[], Integer, Integer> getItem(Long key, Long itemKey)
 	{
-		TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> value = this.get(key);
-		Stack<Tuple4<Long, Long, Integer, Integer>> stack = value.get(itemKey);
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
 	
 	// remove only last item from stack for this key of itemKey
 	public void removeItem(Long key, Long itemKey)
 	{
-		TreeMap<Long, Stack<Tuple4<Long, Long, Integer, Integer>>> value = this.get(key);
-		Stack<Tuple4<Long, Long, Integer, Integer>> stack = value.get(itemKey);
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
 		if (stack==null) return;
 
 		if (stack != null && stack.size() > 0 )

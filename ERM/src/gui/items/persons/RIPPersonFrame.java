@@ -19,7 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.mapdb.Fun.Tuple4;
+
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -229,7 +231,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
 			// IF PERSON DEAD
-			Tuple4<Long, Long, Integer, Integer> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
+			Tuple5<Long, Long, byte[], Integer, Integer> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
 			if (deadDay != null)
 			{
 				if (false & deadDay.b == Long.MIN_VALUE)
@@ -242,7 +244,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 				}
 			} else {
 				// IF PERSON ALIVE
-				Tuple4<Long, Long, Integer, Integer> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+				Tuple5<Long, Long, byte[], Integer, Integer> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 				if (aliveDay == null)
 				{} else {
 					if (aliveDay.b == null || aliveDay.b == Long.MAX_VALUE)

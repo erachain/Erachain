@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -516,8 +517,9 @@ public class R_SertifyPubKeys extends Transaction {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
 			PersonCls person = (PersonCls)db.getItemPersonMap().get(key);
 			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY,
-					new Tuple4<Long, Long, Integer, Integer>(
+					new Tuple5<Long, Long, byte[], Integer, Integer>(
 							person.getBirthday(), Long.MAX_VALUE,
+							null,
 							blockIndex, transactionIndex));
 		}
 

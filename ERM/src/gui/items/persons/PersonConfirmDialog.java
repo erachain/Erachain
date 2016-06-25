@@ -15,7 +15,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
+
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
@@ -360,7 +363,7 @@ public class PersonConfirmDialog extends JDialog  {
 
 				// IF PERSON ALIVE
 				Long personKey = addressDuration.a;
-				Tuple4<Long, Long, Integer, Integer> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
+				Tuple5<Long, Long, byte[], Integer, Integer> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
 				daysLeft = (int)((aliveDuration.b - current_time) / (long)86400000);	
 				if (daysLeft < 0 ) personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
 				else personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);

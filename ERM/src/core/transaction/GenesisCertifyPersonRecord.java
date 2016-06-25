@@ -13,6 +13,7 @@ import ntp.NTP;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -154,9 +155,9 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		int blockIndex = block.getHeight(db);
 		int transactionIndex = block.getTransactionIndex(signature);
 		//UPDATE RECIPIENT
-		Tuple4<Long, Long, Integer, Integer> itemP = 
-				new Tuple4<Long, Long, Integer, Integer>
-					(timestamp, Long.MAX_VALUE, blockIndex, transactionIndex);
+		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
+				new Tuple5<Long, Long, byte[], Integer, Integer>
+					(timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
 
 		// SET ALIVE PERSON for DURATION permanent
 		db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
