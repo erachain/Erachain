@@ -230,7 +230,8 @@ public class R_SetUnionToItem extends Transaction {
 					beg_date, end_date, timestamp, reference, signature);
 		} else {
 			return new R_SetStatusToItem(typeBytes, creator, key, itemType, itemKey,
-					beg_date, end_date, signature);
+					beg_date, end_date, 0, 0, null, 0,
+					signature);
 		}
 
 	}

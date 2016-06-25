@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 //import java.math.BigInteger;
 //import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,7 +98,9 @@ public class TestRecSetStatusToItem {
 		timestamp += 100;
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db),
-				to_date, birthDay + 1000, timestamp, maker.getLastReference(db));
+				to_date, birthDay + 1000,
+				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
+				timestamp, maker.getLastReference(db));
 		timestamp += 100;
 
 	}
@@ -119,7 +122,9 @@ public class TestRecSetStatusToItem {
 		
 		//INVALID SIGNATURE
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
-				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp, maker.getLastReference(db), new byte[64]);
+				person.getItemTypeInt(), person.getKey(db), to_date, null,
+				3, 2, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l,
+				timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, setStatusTransaction.isSignatureValid());
@@ -220,7 +225,9 @@ public class TestRecSetStatusToItem {
 		
 		to_date = timestamp + 1234L * 84600000L;
 		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
-				person.getItemTypeInt(), person.getKey(db), to_date, null, timestamp+10, maker.getLastReference(db));
+				person.getItemTypeInt(), person.getKey(db), to_date, null,
+				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
+				timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
 

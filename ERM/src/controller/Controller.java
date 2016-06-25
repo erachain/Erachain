@@ -1929,11 +1929,15 @@ public class Controller extends Observable {
 
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
-			ItemCls item, Long beg_date, Long end_date) {
+			ItemCls item, Long beg_date, Long end_date,
+			int value_1, int value_2, byte[] data, long refParent
+			) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_SetStatusToItem( version, asPack,
 					creator, feePow, key,
-					item, beg_date, end_date);
+					item, beg_date, end_date,
+					value_1, value_2, data, refParent
+					);
 		}
 	}
 	/*

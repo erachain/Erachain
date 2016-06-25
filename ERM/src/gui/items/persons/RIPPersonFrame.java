@@ -306,10 +306,16 @@ public class RIPPersonFrame extends JInternalFrame  {
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
 		int version = 0; // without user signs
+		int value_1 = 0;
+		int value_2 = 0;
+		byte[] data = null;
+		long refParent = 0l;
 		
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
-				feePow, StatusCls.DEAD_KEY, person, endDate, Long.MAX_VALUE);
+				feePow, StatusCls.DEAD_KEY, person, endDate, Long.MAX_VALUE,
+				value_1, value_2, data, refParent
+				);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person listed as dead"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

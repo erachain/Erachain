@@ -512,7 +512,9 @@ public class TransactionCreator
 
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
-			Long beg_date, Long end_date) {
+			Long beg_date, Long end_date,
+			int value_1, int value_2, byte[] data, long refParent
+			) {
 		
 		this.checkUpdate();
 		
@@ -523,7 +525,8 @@ public class TransactionCreator
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
 		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
-				beg_date, end_date, timestamp, creator.getLastReference(this.fork));
+				beg_date, end_date, value_1, value_2, data, refParent,
+				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
 		return afterCreate(record, asPack);
