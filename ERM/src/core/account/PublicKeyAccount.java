@@ -21,7 +21,7 @@ import utils.NameUtils.NameResult;
 public class PublicKeyAccount extends Account {
 
 	public static final int PUBLIC_KEY_LENGTH = 32;
-	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	protected byte[] publicKey;
 	
 	public PublicKeyAccount(byte[] publicKey)

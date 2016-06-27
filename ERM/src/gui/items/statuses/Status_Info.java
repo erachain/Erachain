@@ -43,8 +43,12 @@ public class Status_Info extends JTextPane {
 		}
 		message = "<div><b>" + message + "</b> : " + status.getName().toString() + "</div>";
 		
-		message += "<p>" + status.getDescription() + "</p>";
-			
+		message += "<div>" + status.getDescription() + "</div>";
+
+		String creator = status.getCreator() == null? "GENESIS": status.getCreator().asPerson_01(false);
+
+		message += "<div> Creator: " + (creator.length()==0?status.getCreator().getAddress():creator) + "</div>";
+
 		return message;
 	}
 	 	

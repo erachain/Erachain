@@ -189,6 +189,13 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.ref_to_parent;
 	}
+	public String viewRefParent()
+	{
+		byte[] bytes = Longs.toByteArray(this.ref_to_parent);
+		int blockID = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4)); 
+		int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+		return blockID + "-" + seqNo;
+	}
 
 	
 	@Override

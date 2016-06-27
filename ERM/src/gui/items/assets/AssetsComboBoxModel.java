@@ -63,7 +63,8 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 			List<AssetCls> assets = new ArrayList<AssetCls>();
 			for(Long key: keys)
 			{				
-				if(key !=0){
+				if(key==0) continue;
+
 				//GET ASSET
 				AssetCls asset = Controller.getInstance().getAsset(key);
 				assets.add(asset);
@@ -71,7 +72,6 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 				//ADD
 				
 				this.addElement(asset);
-				}
 			}
 				
 			//RESET SELECTED ITEM

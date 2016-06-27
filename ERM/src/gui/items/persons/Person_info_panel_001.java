@@ -35,8 +35,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
 	/**
      * Creates new form person_info
      */
-    public Person_info_panel_001(PersonCls person) {
-        initComponents(person);
+    public Person_info_panel_001(PersonCls person, boolean full) {
+        initComponents(person, full);
     }
 
     /**
@@ -46,7 +46,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents(PersonCls person) {
+    private void initComponents(PersonCls person, boolean full) {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel1 = new javax.swing.JLabel();
@@ -88,8 +88,6 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
         
-        
-        
         setMaximumSize(new java.awt.Dimension(400, 300));
         setName(""); // NOI18N
         setPreferredSize(new java.awt.Dimension(454, 500));
@@ -98,12 +96,13 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         layout.rowHeights = new int[] {0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0};
         setLayout(layout);
 
+        int gridy = 2;
         jLabel1.setText(Lang.getInstance().translate("Name")+":");
         jLabel1.setAlignmentY(0.2F);
         jLabel1.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
         add(jLabel1, gridBagConstraints);
@@ -117,7 +116,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -207,157 +206,159 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(deathday_jTextField, gridBagConstraints);
 
-        jLabel6.setText(Lang.getInstance().translate("Race")+":");
-        jLabel6.setAlignmentY(0.2F);
-        jLabel6.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel6, gridBagConstraints);
-
-        race_jTextField.setEditable(false);
-        race_jTextField.setText(person.getRace()+"");
-        race_jTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                race_jTextFieldActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(race_jTextField, gridBagConstraints);
-
-        jLabel7.setText(Lang.getInstance().translate("Birth Latitude")+":");
-        jLabel7.setAlignmentY(0.2F);
-        jLabel7.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel7, gridBagConstraints);
-
-        birth_Latitude_jTextField.setEditable(false);
-        birth_Latitude_jTextField.setText(person.getBirthLatitude()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(birth_Latitude_jTextField, gridBagConstraints);
-
-        jLabel8.setText(Lang.getInstance().translate("Birth Longitude")+":");
-        jLabel8.setAlignmentY(0.2F);
-        jLabel8.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel8, gridBagConstraints);
-
-        birth_Longitude_jTextField.setEditable(false);
-        birth_Longitude_jTextField.setText(person.getBirthLongitude()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(birth_Longitude_jTextField, gridBagConstraints);
-
-        Skin_Color_jLabel.setText(Lang.getInstance().translate("Skin Color")+":");
-        Skin_Color_jLabel.setAlignmentY(0.2F);
-        Skin_Color_jLabel.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(Skin_Color_jLabel, gridBagConstraints);
-
-        skin_Color_jTextField.setEditable(false);
-        skin_Color_jTextField.setText(person.getSkinColor()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(skin_Color_jTextField, gridBagConstraints);
-
-        jLabel10.setText(Lang.getInstance().translate("Eye Color")+":");
-        jLabel10.setAlignmentY(0.2F);
-        jLabel10.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel10, gridBagConstraints);
-
-        eye_Color_jTextField.setEditable(false);
-        eye_Color_jTextField.setText(person.getEyeColor()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 20;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(eye_Color_jTextField, gridBagConstraints);
-
-        jLabel11.setText(Lang.getInstance().translate("Hair Сolor")+":");
-        jLabel11.setAlignmentY(0.2F);
-        jLabel11.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel11, gridBagConstraints);
-
-        hair_Сolor_jTextField.setEditable(false);
-        hair_Сolor_jTextField.setText(person.getHairСolor()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 22;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(hair_Сolor_jTextField, gridBagConstraints);
-
-        jLabel12.setText(Lang.getInstance().translate("Height")+":");
-        jLabel12.setAlignmentY(0.2F);
-        jLabel12.setAutoscrolls(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 24;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
-        add(jLabel12, gridBagConstraints);
-
-        height_jTextField.setEditable(false);
-        height_jTextField.setText(person.getHeight()+"");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 24;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        add(height_jTextField, gridBagConstraints);
+        if (full) {
+	        jLabel6.setText(Lang.getInstance().translate("Race")+":");
+	        jLabel6.setAlignmentY(0.2F);
+	        jLabel6.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel6, gridBagConstraints);
+	
+	        race_jTextField.setEditable(false);
+	        race_jTextField.setText(person.getRace()+"");
+	        race_jTextField.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                race_jTextFieldActionPerformed(evt);
+	            }
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(race_jTextField, gridBagConstraints);
+	
+	        jLabel7.setText(Lang.getInstance().translate("Birth Latitude")+":");
+	        jLabel7.setAlignmentY(0.2F);
+	        jLabel7.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel7, gridBagConstraints);
+	
+	        birth_Latitude_jTextField.setEditable(false);
+	        birth_Latitude_jTextField.setText(person.getBirthLatitude()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(birth_Latitude_jTextField, gridBagConstraints);
+	
+	        jLabel8.setText(Lang.getInstance().translate("Birth Longitude")+":");
+	        jLabel8.setAlignmentY(0.2F);
+	        jLabel8.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel8, gridBagConstraints);
+	
+	        birth_Longitude_jTextField.setEditable(false);
+	        birth_Longitude_jTextField.setText(person.getBirthLongitude()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(birth_Longitude_jTextField, gridBagConstraints);
+	
+	        Skin_Color_jLabel.setText(Lang.getInstance().translate("Skin Color")+":");
+	        Skin_Color_jLabel.setAlignmentY(0.2F);
+	        Skin_Color_jLabel.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 18;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(Skin_Color_jLabel, gridBagConstraints);
+	
+	        skin_Color_jTextField.setEditable(false);
+	        skin_Color_jTextField.setText(person.getSkinColor()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 18;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(skin_Color_jTextField, gridBagConstraints);
+	
+	        jLabel10.setText(Lang.getInstance().translate("Eye Color")+":");
+	        jLabel10.setAlignmentY(0.2F);
+	        jLabel10.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 20;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel10, gridBagConstraints);
+	
+	        eye_Color_jTextField.setEditable(false);
+	        eye_Color_jTextField.setText(person.getEyeColor()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 20;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(eye_Color_jTextField, gridBagConstraints);
+	
+	        jLabel11.setText(Lang.getInstance().translate("Hair Сolor")+":");
+	        jLabel11.setAlignmentY(0.2F);
+	        jLabel11.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 22;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel11, gridBagConstraints);
+	
+	        hair_Сolor_jTextField.setEditable(false);
+	        hair_Сolor_jTextField.setText(person.getHairСolor()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 22;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(hair_Сolor_jTextField, gridBagConstraints);
+	
+	        jLabel12.setText(Lang.getInstance().translate("Height")+":");
+	        jLabel12.setAlignmentY(0.2F);
+	        jLabel12.setAutoscrolls(true);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 24;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 1);
+	        add(jLabel12, gridBagConstraints);
+	
+	        height_jTextField.setEditable(false);
+	        height_jTextField.setText(person.getHeight()+"");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 24;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+	        add(height_jTextField, gridBagConstraints);
+        }
 
         jLabel13.setText(Lang.getInstance().translate("Creator")+":");
         jLabel13.setAlignmentY(0.2F);

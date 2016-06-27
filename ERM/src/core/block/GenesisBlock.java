@@ -46,7 +46,7 @@ public class GenesisBlock extends Block{
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
 	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
-	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(Bytes.ensureCapacity(new byte[]{0,1,2,3,4,13,31,13,31,13,31}, PublicKeyAccount.PUBLIC_KEY_LENGTH, 0));
+	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
 	public static final long MIN_GENERATING_BALANCE = Settings.BLOCK_GENERATING_BALANCE_NEED;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
@@ -376,7 +376,7 @@ public class GenesisBlock extends Block{
 			this.addTransaction(new GenesisIssueNoteRecord(makeNote(i)));
 
 		///// STATUSES
-		for (int i = 1; i <= StatusCls.EXPIRED_KEY; i++) 
+		for (int i = 1; i <= StatusCls.MARRIED_KEY; i++) 
 			this.addTransaction(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
@@ -413,43 +413,18 @@ public class GenesisBlock extends Block{
 		return new Note(genesisGenerator, "I", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 	// make notes
-	public static Status makeStatus(int key) 
+	public static Status makeStatus(int key)
 	{
-		// if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
-		if  (key == StatusCls.AA_KEY) return new Status(genesisGenerator, "AA", "Rights level AA");
-		else if  (key == StatusCls.BB_KEY) return new Status(genesisGenerator, "BB", "Rights level AA");
-		else if  (key == StatusCls.CC_KEY) return new Status(genesisGenerator, "CC", "Rights level AA");
-		else if  (key == StatusCls.DD_KEY) return new Status(genesisGenerator, "DD", "Rights level AA");
-		else if  (key == StatusCls.EE_KEY) return new Status(genesisGenerator, "EE", "Rights level AA");
-		else if  (key == StatusCls.FF_KEY) return new Status(genesisGenerator, "FF", "Rights level AA");
-		else if  (key == StatusCls.GG_KEY) return new Status(genesisGenerator, "GG", "Rights level AA");
-		else if  (key == StatusCls.HH_KEY) return new Status(genesisGenerator, "HH", "Rights level AA");
-		
-		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "alive", "Person is alive");
-		else if (key == StatusCls.DEAD_KEY) return new Status(genesisGenerator, "dead", "Person is dead");
+		if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "Director, Manager, Worker, Member, Holder");
+		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "Alive", "Alive or Dead");
+		else if (key == StatusCls.RANK_KEY) return new Status(genesisGenerator, "Rank", "General, Major or Minor");
+		else if (key == StatusCls.USER_KEY) return new Status(genesisGenerator, "User", "Admin, User, Observer");
+		else if (key == StatusCls.MAKER_KEY) return new Status(genesisGenerator, "Maker", "Creator, Designer, Maker");
+		else if (key == StatusCls.DELEGATE_KEY) return new Status(genesisGenerator, "Delegate", "President, Senator, Deputy");
+		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", "Certified, Notarized, Confirmed");
+		else if (key == StatusCls.MARRIED_KEY) return new Status(genesisGenerator, "Married", "Husband, Wife, Spouse");
 
-		else if (key == StatusCls.CITIZEN_KEY) return new Status(genesisGenerator, "Сitizen", "I am citizen of %country%");
-		else if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "I am member of %union%");
-		else if (key == StatusCls.SPOUSE_KEY) return new Status(genesisGenerator, "Spouse", "I am spouse on %spouse%");
-
-		else if (key == StatusCls.GENERAL_KEY) return new Status(genesisGenerator, "General", "");
-		else if (key == StatusCls.MAJOR_KEY) return new Status(genesisGenerator, "Major", "");
-		else if (key == StatusCls.MINOR_KEY) return new Status(genesisGenerator, "Minor", "");
-		else if (key == StatusCls.ADMIN_KEY) return new Status(genesisGenerator, "Admin", "");
-		else if (key == StatusCls.MANAGER_KEY) return new Status(genesisGenerator, "Manager", "");
-		else if (key == StatusCls.WORKER_KEY) return new Status(genesisGenerator, "Worker", "");
-		else if (key == StatusCls.CREATOR_KEY) return new Status(genesisGenerator, "Creator", "");
-		else if (key == StatusCls.PRESIDENT_KEY) return new Status(genesisGenerator, "President", "");
-		else if (key == StatusCls.DIRECTOR_KEY) return new Status(genesisGenerator, "Director", "");
-		else if (key == StatusCls.SENATOR_KEY) return new Status(genesisGenerator, "Senator", "");
-		else if (key == StatusCls.DEPUTATE_KEY) return new Status(genesisGenerator, "Deputy", "");
-		else if (key == StatusCls.OBSERVER_KEY) return new Status(genesisGenerator, "Observer", "");
-
-		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", "");
-		else if (key == StatusCls.CONFIRMED_KEY) return new Status(genesisGenerator, "Confirmed", "");
-		else if (key == StatusCls.EXPIRED_KEY) return new Status(genesisGenerator, "Expired", "");
-
-		else return new Status(genesisGenerator, "AA", "Rights level AA");
+		return new Status(genesisGenerator, "RIGHTs", "Rights");		
 	}
 
 	public String getTestNetInfo() 

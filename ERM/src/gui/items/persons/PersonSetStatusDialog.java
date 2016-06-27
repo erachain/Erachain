@@ -1,6 +1,7 @@
 package gui.items.persons;
 
 import java.awt.Dimension;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -9,15 +10,26 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.transaction.R_Vouch;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.models.AccountsComboBoxModel;
+import gui.records.Record_Info;
+import gui.records.VouchRecordDialog;
 import gui.items.statuses.ComboBoxModelItemsStatuses;
 import gui.transaction.OnDealClick;
+import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
 import utils.Pair;
 
@@ -29,6 +41,9 @@ public class PersonSetStatusDialog extends JDialog {
 	 */
 	//private static final long serialVersionUID = 1L;
 	private static final long serialVersionUID = 2717571093561259483L;
+
+	private static Transaction parentRecord;
+	private static Record_Info infoPanel;
 
 	public PersonSetStatusDialog(JComponent  apers, PersonCls person) {
 		super();
@@ -46,6 +61,41 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	   
 	}
 	
+	private Transaction refreshRecordDetails()
+	{
+		
+		/*
+		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		{
+			infoPanel.show_mess(Lang.getInstance().translate("Status must be OK to show public key details."));
+	        jLabel_RecordInfo.setViewportView(infoPanel);
+			return null;
+		}
+		*/
+
+		Transaction record = null;
+		if (jParentRecTxt.getText().length() == 0) {
+			infoPanel.show_mess(Lang.getInstance().translate(""));
+	        jLabel_RecordInfo.setViewportView(infoPanel);
+			return record;
+		}
+		
+		record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jParentRecTxt.getText());
+		if (record == null) {
+			infoPanel.show_mess(Lang.getInstance().translate("Error - use 1233-321."));
+	        jLabel_RecordInfo.setViewportView(infoPanel);
+			return record;
+		}
+		
+		////ENABLE
+		//jButton_Confirm.setEnabled(true);
+
+		infoPanel.show_001(record);
+		//infoPanel.setFocusable(false);
+        jLabel_RecordInfo.setViewportView(infoPanel);
+
+        return record;
+	}
 
 	public void onGoClick(
 			PersonCls person, JButton Button_Confirm,
@@ -60,6 +110,13 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     	long toDate = 0;
     	int feePow = 0;
     	int parse = 0;
+
+    	int value_1 = 0;
+		int value_2 = 0;
+		byte[] data = jADataTxt.getText().length()==0? null:
+			jADataTxt.getText().getBytes( Charset.forName("UTF-8") );
+		long refParent = 0l;
+
     	try {
 
 			//READ FEE POW
@@ -76,12 +133,27 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			}
 
 			//READ TO DATE
+			parse++;
 			str = toDateTxt.getText();
 			if (str.equals("0000-00-00")) 
 				toDate = Long.MAX_VALUE;
 			else {
 				if (str.length() < 11) str = str + " 00:00:00";
 				toDate = Timestamp.valueOf(str).getTime();
+			}
+
+			//READ VALUE 1
+			parse++;
+			if (jPar1Txt.getText().length() > 0) {
+				value_1 = Integer.parseInt(jPar1Txt.getText());
+				assert(value_1 >=0);
+			}
+
+			//READ VALUE 2
+			parse++;
+			if (jPar2Txt.getText().length() > 0) {
+				value_2 = Integer.parseInt(jPar2Txt.getText());
+				assert(value_2 >=0);
 			}
 
 		}
@@ -99,6 +171,14 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid To Date") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
+			else if (parse == 3)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Value 1") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			else if (parse == 4)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid Value 2") + e, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
 			
 			//ENABLE
 			Button_Confirm.setEnabled(true);
@@ -111,10 +191,13 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
 		int version = 0;
-		int value_1 = 0;
-		int value_2 = 0;
-		byte[] data = null;
-		long refParent = 0l;
+		if (PersonSetStatusDialog.parentRecord != null) {
+			int blockID = PersonSetStatusDialog.parentRecord.getBlockHeight(DBSet.getInstance());
+			int seqNo = PersonSetStatusDialog.parentRecord.getSeqNo(DBSet.getInstance());
+			byte[] bytesParent = Ints.toByteArray(blockID);
+			bytesParent = Bytes.concat(bytesParent, Ints.toByteArray(seqNo));
+			refParent = Longs.fromByteArray(bytesParent);
+		}
 		
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
 				feePow, status.getKey(), 
@@ -148,9 +231,15 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        java.awt.GridBagConstraints gridBagConstraints;
 
 	        jLabel_PersonInfo = new javax.swing.JScrollPane();
+	        jLabel_RecordInfo = new javax.swing.JScrollPane();
+
 	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
 	        jFormattedTextField_fromDate = new javax.swing.JFormattedTextField();
 	        jFormattedTextField_toDate = new javax.swing.JFormattedTextField();
+	        jPar1Txt = new javax.swing.JFormattedTextField();
+	        jPar2Txt = new javax.swing.JFormattedTextField();
+	        jADataTxt = new javax.swing.JFormattedTextField();
+	        jParentRecTxt = new javax.swing.JFormattedTextField();
 	        jFeeTxt = new javax.swing.JFormattedTextField();
 	        jButton_Cansel = new javax.swing.JButton();
 	        jButton_SetStatus = new javax.swing.JButton();
@@ -171,23 +260,6 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        layout.columnWidths = new int[] {0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
 	        layout.rowHeights = new int[] {0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
 	        getContentPane().setLayout(layout);
-
-	        jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-	        Person_Info info = new Person_Info(); 
-	        info.show_001(person);
-	        info.setFocusable(false);
-	        jLabel_PersonInfo.setViewportView( info);
-	   //     jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 4;
-	        gridBagConstraints.gridwidth = 11;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.weighty = 1.0;
-	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
-	        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
@@ -210,13 +282,58 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
 	        getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
+	        // PERSON INFO
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 10;
+	        gridBagConstraints.gridy = 2;
+	        gridBagConstraints.gridwidth = 9;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Information about the person")+":"),
+	        		gridBagConstraints);
+
+	        jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+	        Person_Info info = new Person_Info(); 
+	        info.show_001(person);
+	        info.setFocusable(false);
+	        jLabel_PersonInfo.setViewportView( info);
+	   //     jLabel_PersonInfo.setText(new Person_Info().Get_HTML_Person_Info_001(person) );
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 3;
+	        gridBagConstraints.gridwidth = 11;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.weighty = 1.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
+	        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
+	        
+	        /// STATUS
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 13;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Status")+":"),
 	        		gridBagConstraints);
+	        
+	        jComboBox_Status =new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
+	        jComboBox_Status.setMinimumSize(new java.awt.Dimension(400, 22));
+	        jComboBox_Status.setPreferredSize(new java.awt.Dimension(400, 22));
+	        jComboBox_Status.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jComboBox_StatusActionPerformed(evt);
+	            }
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 13;
+	        gridBagConstraints.gridwidth = 5;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        getContentPane().add(jComboBox_Status, gridBagConstraints);
 
 	        /// FROM DATE
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -250,7 +367,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 	        /// TO DATE
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
@@ -279,10 +396,126 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jFormattedTextField_toDate, gridBagConstraints);
 
+	        /////////////////// PAR 1
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 15;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Parameter")+" 1:"),
+	        		gridBagConstraints);
+
+	        jPar1Txt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jPar1Txt.setText("0");
+	        jPar1Txt.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jPar1Txt.setPreferredSize(new java.awt.Dimension(100, 20));
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 15;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        getContentPane().add(jPar1Txt, gridBagConstraints);
+
+	        /////////////////// PAR 2
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridy = 15;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Parameter")+" 2:"),
+	        		gridBagConstraints);
+
+	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+	        jPar2Txt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jPar2Txt.setText("0");
+	        jPar2Txt.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jPar2Txt.setPreferredSize(new java.awt.Dimension(100, 20));
+	        gridBagConstraints.gridx = 4;
+	        gridBagConstraints.gridy = 15;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        getContentPane().add(jPar2Txt, gridBagConstraints);
+
+	        /////////////////// ADDITIONAL DATA
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Additional")+":"),
+	        		gridBagConstraints);
+
+	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+	        jADataTxt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jADataTxt.setText("");
+	        jADataTxt.setMinimumSize(new java.awt.Dimension(400, 22));
+	        jADataTxt.setPreferredSize(new java.awt.Dimension(400, 22));
+
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.gridwidth = 5;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        getContentPane().add(jADataTxt, gridBagConstraints);
+
+	        /////////////////// PARENT RECORD
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 17;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Parent Record")+":"),
+	        		gridBagConstraints);
+
+	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
+	        jParentRecTxt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	        jParentRecTxt.setText("0");
+	        jParentRecTxt.setMinimumSize(new java.awt.Dimension(100, 20));
+	        jParentRecTxt.setPreferredSize(new java.awt.Dimension(100, 20));
+	        jParentRecTxt.getDocument().addDocumentListener(new DocumentListener() {
+	            
+				@Override
+				public void changedUpdate(DocumentEvent arg0) {
+				}
+				@Override
+				public void insertUpdate(DocumentEvent arg0) {
+					PersonSetStatusDialog.parentRecord = refreshRecordDetails();
+				}
+				@Override
+				public void removeUpdate(DocumentEvent arg0) {
+					PersonSetStatusDialog.parentRecord = refreshRecordDetails();
+				}
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 17;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        getContentPane().add(jParentRecTxt, gridBagConstraints);
+
+	        jLabel_RecordInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+	        infoPanel = new Record_Info(); 
+	        //info.show_001(record);
+	        //infoPanel.setFocusable(false);
+	        //jLabel_RecordInfo.setViewportView(infoPanel);
+
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 19;
+	        gridBagConstraints.gridwidth = 11;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.weighty = 1.0;
+	    //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 0, 9);
+	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
+	        getContentPane().add(jLabel_RecordInfo, gridBagConstraints);
+
+	        
 	        //////////////// FEE
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 6;
-	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 20;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee Power (0..6)")+":"),
@@ -299,8 +532,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 7;
-	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 20;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
 	        getContentPane().add(jFeeTxt, gridBagConstraints);
@@ -312,8 +545,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 4;
-	        gridBagConstraints.gridy = 18;
+	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridy = 22;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 	        gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
 	        getContentPane().add(jButton_Cansel, gridBagConstraints);
@@ -328,37 +561,10 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 6;
-	        gridBagConstraints.gridy = 18;
+	        gridBagConstraints.gridx = 5;
+	        gridBagConstraints.gridy = 22;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
 	        getContentPane().add(jButton_SetStatus, gridBagConstraints);
-
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 2;
-	        gridBagConstraints.gridwidth = 9;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Information about the person")+":"),
-	        		gridBagConstraints);
-
-	        //jComboBox_Status.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-	        jComboBox_Status =new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
-	        jComboBox_Status.setMinimumSize(new java.awt.Dimension(400, 22));
-	        jComboBox_Status.setPreferredSize(new java.awt.Dimension(400, 22));
-	        jComboBox_Status.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jComboBox_StatusActionPerformed(evt);
-	            }
-	        });
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 2;
-	        gridBagConstraints.gridy = 10;
-	        gridBagConstraints.gridwidth = 5;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-	        getContentPane().add(jComboBox_Status, gridBagConstraints);
 
 	        pack();
 	    }// </editor-fold>                        
@@ -401,10 +607,15 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	    private javax.swing.JButton jButton_SetStatus;
 	    private JComboBox<StatusCls> jComboBox_Status;
 	    private JComboBox<Account> jComboBox_YourAddress;
+	    private javax.swing.JTextField jPar1Txt;
+	    private javax.swing.JTextField jPar2Txt;
+	    private javax.swing.JTextField jADataTxt;
+	    private javax.swing.JTextField jParentRecTxt;
 	    private javax.swing.JTextField jFeeTxt;
 	    private javax.swing.JFormattedTextField jFormattedTextField_fromDate;
 	    private javax.swing.JFormattedTextField jFormattedTextField_toDate;
 	    private javax.swing.JScrollPane jLabel_PersonInfo;
+	    private javax.swing.JScrollPane jLabel_RecordInfo;
 	    // End of variables declaration                   
 	
 }

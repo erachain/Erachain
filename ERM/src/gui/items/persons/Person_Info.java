@@ -41,21 +41,23 @@ public class Person_Info extends JTextPane {
 		String date_birthday;
 		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 		
-		if (person == null) return message += "Empty Person";
+		if (person == null) return "Empty Person";
 		
 		if (!person.isConfirmed()) {
 			message = Lang.getInstance().translate("Not confirmed");
 		} else {
 			message = "" + person.getKey();
 		}
-		message = "<div><b>" + message + "</b> : " + person.getName().toString() + "</div>";
 	
+		message = "<b>" + message + "</b> : " + person.getName();
 		date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-		message += "<div>" + date_birthday;
+		message += " (" + date_birthday;
 		if ( person.getBirthday() < person.getDeathday())
 			message += " - " + formatDate.format(new Date(Long.valueOf(person.getDeathday())));
-		message += "</div>";
-						
+		message += ")";
+		message = "<div>" + message + "</div>";
+
+		/*
 		// GET CERTIFIED ACCOUNTS
 		TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 		if ( addresses.isEmpty()){
@@ -80,13 +82,15 @@ public class Person_Info extends JTextPane {
 				message += "<div><input  style='background: #00ffff'; type='text' size='33' value='"+ entry.getKey() +"' disabled='disabled' class='disabled' onchange =''>"
 						+ " -> <b>" + active_date_str +"</b></div>";
 			}
-		}	
+		}
+		*/
 		
+		/// STATUSES
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DBSet.getInstance().getPersonStatusMap().get(person.getKey());
 		if ( statuses.isEmpty()){
-			message += "<p>" +  Lang.getInstance().translate("Not statuses")+ "</p";
+			message += "<div>" +  Lang.getInstance().translate("Not statuses")+ "</div";
 		} else {
-			message += "<h3>"+ "Statuses" +"</h3>";
+			//message += "<h3>"+ "Statuses" +"</h3>";
 			String from_date_str;
 			String to_date_str;
 			Long dte;
@@ -113,7 +117,7 @@ public class Person_Info extends JTextPane {
 		}
 		
 		//message += "<div><font size='2'>" + Base58.encode(person.getReference()).substring(0, 25) + "..</font></div>";
-		message += "<div>" + Base58.encode(person.getReference()).substring(0, 25) + "..</div>";
+		//message += "<div>" + Base58.encode(person.getReference()).substring(0, 25) + "..</div>";
 
 		return message;
 	}

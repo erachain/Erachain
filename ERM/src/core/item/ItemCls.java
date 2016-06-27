@@ -13,6 +13,7 @@ import com.google.common.primitives.Ints;
 
 import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -39,7 +40,7 @@ public abstract class ItemCls {
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
-	
+		
 	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
 	//protected DBMap dbMap;
@@ -251,8 +252,9 @@ public abstract class ItemCls {
 	public String toString(DBSet db)
 	{		
 		long key = this.getKey(db);
-		String creator = this.creator == null? "GENESIS": this.creator.asPerson_01(false);
-		return (key<0?"?:":key + "." + this.typeBytes[0] + " ") + this.name + " (" + creator + ")";
+		String creator = this.creator.getAddress() == Account.EMPTY_PUBLICK_ADDRESS? "GENESIS": this.creator.asPerson_01(false);
+		return (key<0?"?:":key + "." + this.typeBytes[0] + " ") + this.name  
+				+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String toString()
 	{
@@ -262,8 +264,9 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		String creator = this.creator == null? "GENESIS": this.creator.asPerson_01(true);
-		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300)) + " (" + creator + ")";
+		String creator = this.creator.getAddress() == Account.EMPTY_PUBLICK_ADDRESS? "GENESIS": this.creator.asPerson_01(true);
+		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300))
+				+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String getShort()
 	{

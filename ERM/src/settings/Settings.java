@@ -51,7 +51,7 @@ public class Settings {
 	public static final long BLOCK_GENERATING_BALANCE_NEED = 100;
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1465712274777L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1467046186777L; //1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC

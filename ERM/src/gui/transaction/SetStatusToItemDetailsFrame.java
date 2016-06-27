@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,6 +81,56 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 		fromToDate.setEditable(false);
 		MenuPopupUtil.installContextMenu(fromToDate);
 		this.add(fromToDate, detailGBC);
+
+		if (setStatusToItem.getValue1() != 0) {
+			//LABEL VALUE 1
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("Value") + " 1:"), labelGBC);
+			//VALUE 1
+			++detailGBC.gridy;
+			JTextField statusValue1 = new JTextField("" + setStatusToItem.getValue1());
+			statusValue1.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusValue1);
+			this.add(statusValue1, detailGBC);
+		}
+
+		if (setStatusToItem.getValue2() != 0) {
+			//LABEL VALUE 2
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("Value") + " 2:"), labelGBC);
+			//VALUE 2
+			++detailGBC.gridy;
+			JTextField statusValue2 = new JTextField("" + setStatusToItem.getValue2());
+			statusValue2.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusValue2);
+			this.add(statusValue2, detailGBC);
+		}
+
+		if (setStatusToItem.getData() != null) {
+
+			//LABEL ADDITION DATA
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("DATA") + ":"), labelGBC);
+			//DATA
+			++detailGBC.gridy;
+			JTextField statusAData = new JTextField(new String(setStatusToItem.getData(), Charset.forName("UTF-8")));
+			statusAData.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusAData);
+			this.add(statusAData, detailGBC);
+		}
+
+		if (setStatusToItem.getRefParent() != 0l) {
+
+			//LABEL PARENT
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("Parent") + ":"), labelGBC);
+			//DATA
+			++detailGBC.gridy;
+			JTextField statusRefParent = new JTextField("" + setStatusToItem.viewRefParent());
+			statusRefParent.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusRefParent);
+			this.add(statusRefParent, detailGBC);
+		}
 
 		// //// ITEM
 		//LABEL NAME

@@ -63,6 +63,8 @@ public class ComboBoxModelItemsStatuses extends DefaultComboBoxModel<StatusCls> 
 			List<StatusCls> statuses = new ArrayList<StatusCls>();
 			for(Long key: keys)
 			{				
+				if(key==0) continue;
+
 				//GET STATUS
 				StatusCls status = Controller.getInstance().getItemStatus(key);
 				statuses.add(status);

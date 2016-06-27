@@ -231,30 +231,26 @@ public class RIPPersonFrame extends JInternalFrame  {
 			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
 			// IF PERSON DEAD
-			Tuple5<Long, Long, byte[], Integer, Integer> deadDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.DEAD_KEY);
-			if (deadDay != null)
+			Tuple5<Long, Long, byte[], Integer, Integer> aliveStatus = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
+			if (aliveStatus == null) {}
+			else if (aliveStatus != null && aliveStatus.c[0] == (byte)2)
 			{
-				if (false & deadDay.b == Long.MIN_VALUE)
+				if (false & aliveStatus.b == Long.MIN_VALUE)
 					personDetails += "<br>Dead";
 				else {
 					long current_time = NTP.getTime();
-					int daysLeft = (int)((deadDay.a - current_time) / 86400000);
-					//personDetails += "<br>" + Lang.getInstance().translate("Date of death %days%").replace("%days%", ""+daysLeft);
+					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000);
 					personDetails += "<br>" + Lang.getInstance().translate("Died %days% days ago").replace("%days%", ""+daysLeft);
 				}
 			} else {
 				// IF PERSON ALIVE
-				Tuple5<Long, Long, byte[], Integer, Integer> aliveDay = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
-				if (aliveDay == null)
-				{} else {
-					if (aliveDay.b == null || aliveDay.b == Long.MAX_VALUE)
-						personDetails += "<br>Alive";
-					else {
-						long current_time = NTP.getTime();
-						int daysLeft = (int)((aliveDay.a - current_time) / 86400000);
-						if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
-						else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
-					}
+				if (aliveStatus.b == null || aliveStatus.b == Long.MAX_VALUE)
+					personDetails += "<br>Alive";
+				else {
+					long current_time = NTP.getTime();
+					int daysLeft = (int)((aliveStatus.a - current_time) / 86400000);
+					if (daysLeft < 0 ) personDetails += "<br>" + Lang.getInstance().translate("Person died %days% ago days ago").replace("%days%", ""+daysLeft);
+					else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				}
 			}
 			
@@ -308,12 +304,14 @@ public class RIPPersonFrame extends JInternalFrame  {
 		int version = 0; // without user signs
 		int value_1 = 0;
 		int value_2 = 0;
-		byte[] data = null;
+		byte[] data = null;//  new byte[]{2}; // set ALIVE status to DEAD
 		long refParent = 0l;
 		
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
-				feePow, StatusCls.DEAD_KEY, person, endDate, Long.MAX_VALUE,
+				feePow, StatusCls.ALIVE_KEY, person,
+				//endDate, Long.MAX_VALUE,
+				null, endDate,
 				value_1, value_2, data, refParent
 				);
 		//CHECK VALIDATE MESSAGE

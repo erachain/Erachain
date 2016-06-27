@@ -18,6 +18,7 @@ import api.ApiErrorFactory;
 import at.AT_Transaction;
 import database.Item_Map;
 import controller.Controller;
+//import core.account.PublicKeyAccount;
 import core.BlockGenerator;
 import core.block.Block;
 import core.block.GenesisBlock;
@@ -43,7 +44,8 @@ public class Account {
 	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
-	public static final long DEAD_KEY = StatusCls.DEAD_KEY;
+	public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
+
 
 	protected String address;
 	
@@ -458,13 +460,6 @@ public class Account {
 		if (days < 0 || days * (long)86400000 < current_time )
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
-		// IF PERSON is DEAD
-		Tuple5<Long, Long, byte[], Integer, Integer> personDead = db.getPersonStatusMap().getItem(personKey, DEAD_KEY);
-		if (personDead != null) {
-			// person is dead
-			return new Tuple2<Integer, PersonCls>(-2, person);
-		}
-
 		// IF PERSON is ALIVE
 		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
@@ -472,7 +467,12 @@ public class Account {
 		if (end_date == null )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);
-		if (end_date < current_time + 86400000 )
+		/*
+		else if (personDuration.c[0] == (byte)2 )
+			// is DEAD
+			return new Tuple2<Integer, PersonCls>(-2, person);
+			*/
+		else if (end_date < current_time + 86400000 )
 			// ALIVE expired
 			return new Tuple2<Integer, PersonCls>(-1, person);
 		
