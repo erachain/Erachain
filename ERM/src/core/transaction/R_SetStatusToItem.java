@@ -41,7 +41,7 @@ public class R_SetStatusToItem extends Transaction {
 	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Status";
 	private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
-	private static final int REF_LENGTH = Long.SIZE;
+	private static final int REF_LENGTH = 8;
 	private static final int ITEM_TYPE_LENGTH = 1;
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
@@ -428,7 +428,7 @@ public class R_SetStatusToItem extends Transaction {
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		len += (this.value_1 == 0? 0: 1)
 				+ (this.value_2 == 0? 0: 1)
-				+ (this.data == null? 0: 1 + this.data.length)
+				+ (this.data == null? 0: 4 + this.data.length)
 				+ (this.ref_to_parent == 0? 0: REF_LENGTH);
 		return len;
 	}

@@ -99,7 +99,7 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db),
 				to_date, birthDay + 1000,
-				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
+				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 123456l,
 				timestamp, maker.getLastReference(db));
 		timestamp += 100;
 
@@ -196,7 +196,9 @@ public class TestRecSetStatusToItem {
 		
 		//CHECK TIMESTAMP
 		assertEquals(setStatusTransaction.getTimestamp(), parsedSetStatusTransaction.getTimestamp());				
-		
+
+		assertEquals(setStatusTransaction.getRefParent(), parsedSetStatusTransaction.getRefParent());				
+
 	}
 
 	
