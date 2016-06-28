@@ -103,10 +103,10 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		}
 		
 		//Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry  =  records.entrySet();
-		Long status_key_value = (long) 0.0;
+		Long status_key_value = 0l;
 		int i = 0;
 		for ( Long status_key: statuses.keySet()) {
-			if (i == row)
+			if (i++ == row)
 			{
 				status_key_value = status_key;
 				break;
@@ -123,7 +123,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		
 		case COLUMN_STATUS:
 			
-			return statusesMap.get(status_key_value).toString();//addrses_key_value;
+			return statusesMap.get(status_key_value).toString(DBSet.getInstance(), value.c);//addrses_key_value;
 									
 		case COLUMN_TO_DATE:
 			

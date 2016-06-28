@@ -185,6 +185,18 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.data;
 	}
+	// value 1, value 2, data, parent_ref as (int, int)
+	public Tuple5<Byte, Byte, byte[], Integer, Integer> getUnpakedData()
+	{
+		// Unpack data from DB
+		return new Tuple5<Byte, Byte, byte[], Integer, Integer>(
+				this.data[0], data[1],
+				Arrays.copyOfRange(this.data, 10, this.data.length),
+				Ints.fromByteArray(Arrays.copyOfRange(this.data, 2, 6)),
+				Ints.fromByteArray(Arrays.copyOfRange(this.data, 6, 10))
+				);
+	}
+
 	public long getRefParent()
 	{
 		return this.ref_to_parent;
@@ -471,6 +483,16 @@ public class R_SetStatusToItem extends Transaction {
 			return Transaction.ITEM_DOES_NOT_EXIST;
 		}
 		
+		if (this.ref_to_parent != 0l) {
+			// TODO seek parent record
+			byte[] bytes = Longs.toByteArray(this.ref_to_parent);
+			int height = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4)); 
+			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+			Transaction tx = db.getTransactionFinalMap().getTransaction(height, seqNo);
+			if (tx == null )
+				return INVALID_BLOCK_TRANS_SEQ_ERROR;
+		}
+		
 		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
 		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
@@ -492,7 +514,10 @@ public class R_SetStatusToItem extends Transaction {
 		super.process(db, asPack);
 		
 		// pack additional data
-		byte[] a_data = null; //this.value1;
+		byte[] a_data = new byte[]{this.value_1, this.value_2};
+		a_data = Bytes.concat(a_data, Longs.toByteArray(this.ref_to_parent));
+		if (this.data != null && this.data.length > 0)
+			a_data = Bytes.concat(a_data, this.data);
 		
 		//Block block = db.getBlockMap().getLastBlock();
 		//int blockIndex = block.getHeight(db);

@@ -1,9 +1,11 @@
 package core.item;
 
+import java.nio.charset.Charset;
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
+import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
@@ -20,6 +22,7 @@ import database.DBSet;
 //import database.DBMap;
 import database.Item_Map;
 import database.wallet.FavoriteItem;
+import lang.Lang;
 import database.Issue_ItemMap;
 
 import utils.Pair;
@@ -256,6 +259,18 @@ public abstract class ItemCls {
 		return (key<0?"?:":key + "." + this.typeBytes[0] + " ") + this.name  
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
+	public String toString(DBSet db, byte[] data) {
+		String str = this.toString(db);
+		if (str.contains("%1"))
+			str = str.replace("%1", "" + data[0]);
+		if (str.contains("%2"))
+			str = str.replace("%2", "" + data[1]);
+		if (str.contains("%D"))
+			str = str.replace("%D", new String(new String(Arrays.copyOfRange(data, 10, data.length), Charset.forName("UTF-8"))));
+		
+		return str;
+	}
+
 	public String toString()
 	{
 		return toString(DBSet.getInstance());
