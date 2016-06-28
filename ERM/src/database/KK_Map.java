@@ -125,9 +125,12 @@ public Block getBlockByHeight(int parseInt) {
 			}
 		}
 		
-		value.put(itemKey, stack);
+		// !!!! NEEED .clone() !!!
+		// need for updates only in fork - not in parent DB
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		value_new.put(itemKey, stack);
 		
-		this.set(key, value);
+		this.set(key, value_new);
 	}
 	
 	public Tuple5<Long, Long, byte[], Integer, Integer> getItem(Long key, Long itemKey)

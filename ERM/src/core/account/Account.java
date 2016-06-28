@@ -452,7 +452,7 @@ public class Account {
 		
 		// get person
 		Long personKey = addressDuration.a;
-		PersonCls person = (PersonCls)Controller.getInstance().getItem(ItemCls.PERSON_TYPE, personKey);
+		PersonCls person = (PersonCls)Controller.getInstance().getItem(db, ItemCls.PERSON_TYPE, personKey);
 		
 		// TEST ADDRESS is ACTIVE?
 		int days = addressDuration.b;
@@ -463,6 +463,8 @@ public class Account {
 		// IF PERSON is ALIVE
 		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
+		if (personDuration == null)
+			return new Tuple2<Integer, PersonCls>(-2, person);
 		Long end_date = personDuration.b;
 		if (end_date == null )
 			// permanent active

@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import ntp.NTP;
 
@@ -155,7 +156,7 @@ public class TestRecPerson {
 		personKey = person.getKey(db);
 
 		// issue 1 genesis person in init() here
-		assertEquals( 1, personKey);
+		assertEquals( 2, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 		
 		//CREATE PERSONALIZE REcORD
@@ -575,7 +576,7 @@ public class TestRecPerson {
 
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
-		assertEquals(1, personKey);
+		assertEquals(2, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES
@@ -755,4 +756,200 @@ public class TestRecPerson {
 		
 	}
 	
+	@Test
+	public void fork_process_orphan_PersonalizeRecord()
+	{
+		
+		init();
+
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+
+		assertEquals(false, userAccount1.isPerson(db));
+		assertEquals(false, userAccount2.isPerson(db));
+		assertEquals(false, userAccount3.isPerson(db));
+		
+		initPersonalize();
+		
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
+		// PERSON STATUS ALIVE
+		// exist assertEquals( null, dbPS.getItem(personKey));
+		// exist assertEquals( new TreeMap<String, Stack<Tuple3<Integer, Integer, byte[]>>>(), dbPA.getItems(personKey));
+
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
+		// PERSON STATUS ALIVE
+		assertEquals(2, personKey);
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+
+		// ADDRESSES
+		assertEquals( null, dbAP.getItem(userAddress1));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress1));
+
+		assertEquals( null, dbAP.getItem(userAddress2));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress2));
+
+		assertEquals( null, dbAP.getItem(userAddress3));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress3));
+		
+		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
+		
+		BigDecimal erm_amount = certifier.getConfirmedBalance(ERM_KEY,db);
+		BigDecimal oil_amount = certifier.getConfirmedBalance(FEE_KEY, db);
+		
+		BigDecimal erm_amount_user = userAccount1.getConfirmedBalance(ERM_KEY, db);
+		BigDecimal oil_amount_user = userAccount1.getConfirmedBalance(FEE_KEY, db);
+		
+		last_ref = certifier.getLastReference(db);
+		
+		//// PROCESS /////
+		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
+		r_SertifyPubKeys.sign(certifier, false);
+		
+		DBSet fork = db.fork();
+
+		PersonAddressMap dbPA_fork = fork.getPersonAddressMap();
+		AddressPersonMap dbAP_fork = fork.getAddressPersonMap();
+		KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
+
+		
+		r_SertifyPubKeys.process(fork, false);
+		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
+		
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+
+		//CHECK BALANCE SENDER
+		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, db));
+		// CHECK FEE BALANCE - FEE - GIFT
+		assertEquals(oil_amount,
+				certifier.getConfirmedBalance(FEE_KEY, db));
+
+		// INN FORK
+		//CHECK BALANCE SENDER
+		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, fork));
+		// CHECK FEE BALANCE - FEE - GIFT
+		assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPubKeys.getFee()),
+				certifier.getConfirmedBalance(FEE_KEY, fork));
+
+		//CHECK BALANCE RECIPIENT
+		assertEquals(BG_ZERO, userAccount1.getConfirmedBalance(ERM_KEY, db));
+		// in FORK
+		//CHECK BALANCE RECIPIENT
+		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getConfirmedBalance(FEE_KEY, fork));
+
+		//CHECK REFERENCE SENDER
+		assertEquals(last_ref, certifier.getLastReference(db));
+		assertEquals(r_SertifyPubKeys.getTimestamp(), certifier.getLastReference(fork));
+		
+		//CHECK REFERENCE RECIPIENT
+		// TRUE - new reference for first send FEE
+		assertEquals(null, userAccount1.getLastReference(db));
+		assertEquals(r_SertifyPubKeys.getTimestamp(), userAccount1.getLastReference(fork));
+
+		////////// TO DATE ////////
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
+		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
+
+		// PERSON STATUS ALIVE - beg_date = person birthDay
+		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
+		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
+		assertEquals( (long)Long.MAX_VALUE, (long)dbPS_fork.getItem(personKey, ALIVE_KEY).b);
+		//assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
+		assertEquals( (int)dbPS_fork.getItem(personKey, ALIVE_KEY).d, transactionIndex);
+
+		// ADDRESSES
+		assertEquals( null, dbAP.getItem(userAddress1));
+		Tuple4<Long, Integer, Integer, Integer> item_AP = dbAP_fork.getItem(userAddress1);
+		assertEquals( (long)personKey, (long)item_AP.a);
+		assertEquals( to_date, (int)item_AP.b);
+		assertEquals( 1, (int)item_AP.c);
+//		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress1).d, r_SertifyPubKeys.getSignature()));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress1));
+		assertEquals( to_date, (int)dbPA_fork.getItem(personKey, userAddress1).a);
+		assertEquals( 1, (int)dbPA_fork.getItem(personKey, userAddress1).b);
+//		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress1).c, r_SertifyPubKeys.getSignature()));
+
+		assertEquals( null, dbAP.getItem(userAddress2));
+		assertEquals( (long)personKey, (long)dbAP_fork.getItem(userAddress2).a);
+		assertEquals( to_date, (int)dbAP_fork.getItem(userAddress2).b);
+		//assertEquals( 1, (int)dbAP_fork.getItem(userAddress2).c);
+//		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress2).d, r_SertifyPubKeys.getSignature()));
+
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress2));
+		assertEquals( to_date, (int)dbPA_fork.getItem(personKey, userAddress2).a);
+		//assertEquals( 1, (int)dbPA_fork.getItem(personKey, userAddress2).b);
+//		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress2).c, r_SertifyPubKeys.getSignature()));
+
+		assertEquals( null, dbAP.getItem(userAddress3));
+		assertEquals( (long)personKey, (long)dbAP_fork.getItem(userAddress3).a);
+		assertEquals( to_date, (int)dbAP_fork.getItem(userAddress3).b);
+		//assertEquals( 1, (int)dbAP_fork.getItem(userAddress3).c);
+//		assertEquals( true, Arrays.equals(dbAP.getItem(userAddress3).d, r_SertifyPubKeys.getSignature()));
+
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA.getItem(personKey, userAddress3));
+		assertEquals( to_date, (int)dbPA_fork.getItem(personKey, userAddress3).a);
+		//assertEquals( 1, (int)dbPA_fork.getItem(personKey, userAddress3).b);
+//		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress3).c, r_SertifyPubKeys.getSignature()));
+
+		assertEquals(false, userAccount1.isPerson(db));
+		assertEquals(null, userAccount1.hasPerson(db));
+		assertEquals(false, userAccount2.isPerson(db));
+		assertEquals(false, userAccount3.isPerson(db));
+
+		assertEquals(true, userAccount1.isPerson(fork));
+		assertNotEquals(null, userAccount1.hasPerson(fork));
+		assertEquals(true, userAccount2.isPerson(fork));
+		assertEquals(true, userAccount3.isPerson(fork));
+
+		
+		////////// ORPHAN //////////////////
+		r_SertifyPubKeys.orphan(fork, false);
+
+		//CHECK BALANCE SENDER
+		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, fork));
+		assertEquals(oil_amount, certifier.getConfirmedBalance(FEE_KEY, fork));
+				
+		//CHECK BALANCE RECIPIENT
+		assertEquals(erm_amount_user, userAccount1.getConfirmedBalance(ERM_KEY, fork));
+		assertEquals(oil_amount_user, userAccount1.getConfirmedBalance(FEE_KEY, fork));
+		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(ERM_KEY, fork));
+		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(FEE_KEY, fork));
+		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(ERM_KEY, fork));
+		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, fork));
+		
+		//CHECK REFERENCE SENDER
+		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));
+		
+		//CHECK REFERENCE RECIPIENT
+		assertEquals(null, userAccount1.getLastReference(fork));
+		assertEquals(null, userAccount2.getLastReference(fork));
+		assertEquals(null, userAccount3.getLastReference(fork));
+		
+		// .a - personKey, .b - end_date, .c - block height, .d - reference
+		// PERSON STATUS ALIVE - must not be modified!
+		assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
+
+		// ADDRESSES
+		assertEquals( null, dbAP_fork.getItem(userAddress1));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA_fork.getItem(personKey, userAddress1));
+
+		assertEquals( null, dbAP_fork.getItem(userAddress2));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA_fork.getItem(personKey, userAddress2));
+
+		assertEquals( null, dbAP_fork.getItem(userAddress3));
+		// PERSON -> ADDRESS
+		assertEquals( null, dbPA_fork.getItem(personKey, userAddress3));
+
+		assertEquals(false, userAccount1.isPerson(fork));
+		assertEquals(false, userAccount2.isPerson(fork));
+		assertEquals(false, userAccount3.isPerson(fork));
+	}
+
 }

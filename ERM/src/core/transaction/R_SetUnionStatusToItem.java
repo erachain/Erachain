@@ -325,7 +325,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 		super.process(db, asPack);
 
 		// pack additional data
-		byte[] a_data = null;//this.value1;
+		byte[] a_data = new byte[0];//this.value1;
 
 		//Block block = db.getBlockMap().getLastBlock();
 		//int blockIndex = block.getHeight(db);

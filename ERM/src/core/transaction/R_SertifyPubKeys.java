@@ -495,7 +495,7 @@ public class R_SertifyPubKeys extends Transaction {
 				transactionIndex = block.getTransactionIndex(signature);
 			}			
 		}
-
+		
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 		// send GIFT FEE_KEY
 		this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
@@ -513,13 +513,14 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
 				blockIndex, transactionIndex);
 		
-		if (db.getPersonStatusMap().getItem(key, StatusCls.ALIVE_KEY) == null) {
+		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
+		if (psItem == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			PersonCls person = (PersonCls)db.getItemPersonMap().get(key);
-			db.getPersonStatusMap().addItem(key, StatusCls.ALIVE_KEY,
+			PersonCls person = (PersonCls)db.getItemPersonMap().get(this.key);
+			db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY,
 					new Tuple5<Long, Long, byte[], Integer, Integer>(
 							person.getBirthday(), Long.MAX_VALUE,
-							null,
+							new byte[0],
 							blockIndex, transactionIndex));
 		}
 
