@@ -98,9 +98,10 @@ public class Person_Info extends JTextPane {
 			for( Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status: statuses.entrySet())
 			{
 				if (status == null) continue;
-				message += "<div>" + statusesMap.get(status.getKey()).toString() + " : ";
 				
 				Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
+
+				message += "<div>" + statusesMap.get(status.getKey()).toString(DBSet.getInstance(), dates.c) + " : ";
 				
 				dte = dates.a;
 				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
