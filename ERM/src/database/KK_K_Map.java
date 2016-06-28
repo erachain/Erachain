@@ -10,6 +10,7 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import core.item.statuses.StatusCls;
 import utils.ObserverMessage;
@@ -89,12 +90,24 @@ public class KK_K_Map extends DBMap<
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
-		if (stack == null) stack = new Stack<Tuple3<Long, Integer, byte[]>>();
+		if (stack == null)
+			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
 		
 		stack.add(item);
-		value.put(itemKey, stack);
 		
-		this.set(key, value);
+		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>)value.clone();
+		}
+		
+		value_new.put(itemKey, stack);
+		
+		this.set(key, value_new);
+
 	}
 	
 	public Tuple3<Long, Integer, byte[]> getItem(Long key1, Long key2, Long itemKey)
@@ -115,12 +128,21 @@ public class KK_K_Map extends DBMap<
 
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
-		if (stack==null) return;
+		if (stack==null || stack.size() == 0) return;
 
-		if (stack != null && stack.size() > 0 )
-			stack.pop();
-		value.put(itemKey, stack);
-		this.set(key, value);
+		stack.pop();
+		
+		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>)value.clone();
+		}
+
+		value_new.put(itemKey, stack);
+		this.set(key, value_new);
 		
 	}
 	

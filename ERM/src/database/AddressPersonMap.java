@@ -10,6 +10,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple3;
 //import org.mapdb.Fun.Tuple2;
 //import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -71,9 +72,19 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 	{
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		
-		value.add(item);
+		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>)value.clone();
+		}
+
+		value_new.add(item);
 		
-		this.set(address, value);
+		this.set(address, value_new);
+		
 	}
 	
 	public Tuple4<Long, Integer, Integer, Integer> getItem(String address)
@@ -86,8 +97,18 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		if (value==null || value.size() == 0) return;
 
-		value.pop();
-		this.set(address, value);
+		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>)value.clone();
+		}
+
+		value_new.pop();
+		
+		this.set(address, value_new);
 		
 	}
 

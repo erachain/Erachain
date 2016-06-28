@@ -125,9 +125,15 @@ public Block getBlockByHeight(int parseInt) {
 			}
 		}
 		
-		// !!!! NEEED .clone() !!!
-		// need for updates only in fork - not in parent DB
-		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		}
+		
 		value_new.put(itemKey, stack);
 		
 		this.set(key, value_new);
@@ -145,11 +151,19 @@ public Block getBlockByHeight(int parseInt) {
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
-		if (stack==null) return;
+		if (stack==null || stack.size() == 0)
+			return;
 
-		if (stack != null && stack.size() > 0 )
-			stack.pop();
-		value.put(itemKey, stack);
-		this.set(key, value);
+		stack.pop();
+		
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		}
+
+		value_new.put(itemKey, stack);
+		this.set(key, value_new);
 	}
 }
