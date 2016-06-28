@@ -11,6 +11,7 @@ import javax.swing.JTextPane;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
+import core.account.Account;
 import core.item.statuses.StatusCls;
 import database.ItemStatusMap;
 import database.DBSet;
@@ -45,7 +46,9 @@ public class Status_Info extends JTextPane {
 		
 		message += "<div>" + status.getDescription() + "</div>";
 
-		String creator = status.getCreator() == null? "GENESIS": status.getCreator().asPerson_01(false);
+		String creator = status.getCreator().getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)?
+				"GENESIS":
+					status.getCreator().asPerson_01(false);
 
 		message += "<div> Creator: " + (creator.length()==0?status.getCreator().getAddress():creator) + "</div>";
 

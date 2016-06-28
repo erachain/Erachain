@@ -255,7 +255,7 @@ public abstract class ItemCls {
 	public String toString(DBSet db)
 	{		
 		long key = this.getKey(db);
-		String creator = this.creator.getAddress() == Account.EMPTY_PUBLICK_ADDRESS? "GENESIS": this.creator.asPerson_01(false);
+		String creator = this.creator.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.creator.asPerson_01(false);
 		return (key<0?"?:":key + "." + this.typeBytes[0] + " ") + this.name  
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
@@ -279,7 +279,7 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		String creator = this.creator.getAddress() == Account.EMPTY_PUBLICK_ADDRESS? "GENESIS": this.creator.asPerson_01(true);
+		String creator = this.creator.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.creator.asPerson_01(true);
 		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300))
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
