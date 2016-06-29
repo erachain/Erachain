@@ -79,7 +79,8 @@ public class TransactionsResource {
 	@Path("limit/{limit}")
 	public String getTransactionsLimited(@PathParam("limit") int limit)
 	{
-		APIUtils.askAPICallAllowed("GET transactions/limit/" + limit, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET transactions/limit/" + limit, request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())
@@ -127,7 +128,8 @@ public class TransactionsResource {
 	@Path("address/{address}/limit/{limit}")
 	public String getTransactionsLimited(@PathParam("address") String address, @PathParam("limit") int limit)
 	{
-		APIUtils.askAPICallAllowed("GET transactions/address/" + address + "/limit/" + limit, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET transactions/address/" + address + "/limit/" + limit, request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())

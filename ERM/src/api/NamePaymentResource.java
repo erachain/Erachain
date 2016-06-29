@@ -42,15 +42,16 @@ public class NamePaymentResource {
 			String feePow = (String) jsonObject.get("feePow");
 			String sender = (String) jsonObject.get("sender");
 			String nameName = (String) jsonObject.get("recipient");	
+			String password = (String) jsonObject.get("password");
 			
 			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(nameName);
 			if(nameToAdress.getB() == NameResult.OK)
 			{
 				String recipient = nameToAdress.getA().getAddress();
-				return APIUtils.processPayment(sender, feePow, recipient, assetKey, amount,  x, request);
+				return APIUtils.processPayment(password, sender, feePow, recipient, assetKey,  amount, x, request);
 			}else
 			{
-				return APIUtils.processPayment(sender, feePow, nameName, assetKey, amount,  x, request);
+				return APIUtils.processPayment(password, sender, feePow, nameName, assetKey,  amount, x, request);
 			}
 		}
 		catch(NullPointerException | ClassCastException e)

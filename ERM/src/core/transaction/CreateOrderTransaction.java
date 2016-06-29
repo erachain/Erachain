@@ -290,8 +290,9 @@ public class CreateOrderTransaction extends Transaction
 			return ASSET_DOES_NOT_EXIST;
 		}
 		
-		// 
-		if (new BigDecimal(wantAsset.getQuantity()).compareTo(this.order.getAmountWant()) < 0)
+		//
+		Long maxWant = wantAsset.getQuantity();
+		if (maxWant > 0 && new BigDecimal(maxWant).compareTo(this.order.getAmountWant()) < 0)
 			return INVALID_QUANTITY;
 		
 		//CHECK IF WANT IS NOT DIVISIBLE

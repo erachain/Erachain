@@ -130,7 +130,7 @@ public class R_Send extends TransactionAmount {
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 
-		if (data != null & data.length > 0) {
+		if (data != null && data.length > 0) {
 
 			//ADD CREATOR/SERVICE/DATA
 			if ( this.isText() && !this.isEncrypted() )

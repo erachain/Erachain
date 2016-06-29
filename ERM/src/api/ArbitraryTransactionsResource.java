@@ -42,7 +42,8 @@ public class ArbitraryTransactionsResource
 	{
 		try
 		{
-			APIUtils.askAPICallAllowed("POST arbitrarytransactions\n" + x, request );
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST arbitrarytransactions\n" + x, request );
 
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);

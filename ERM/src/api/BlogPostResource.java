@@ -79,8 +79,9 @@ public class BlogPostResource {
 						ApiErrorFactory.ERROR_INVALID_ADDRESS);
 			}
 
-			APIUtils.askAPICallAllowed("POST blogpost/comment/"
-					+ signatureOfComment, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST blogpost/comment/"
+							+ signatureOfComment, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -187,8 +188,9 @@ public class BlogPostResource {
 						ApiErrorFactory.ERROR_COMMENTING_DISABLED);
 			}
 
-			APIUtils.askAPICallAllowed("POST blogpost/comment" + "\n" + x,
-					request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password,
+					"POST blogpost/comment" + "\n" + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -299,8 +301,9 @@ public class BlogPostResource {
 
 			isPostAllowed(blogname);
 
-			APIUtils.askAPICallAllowed("POST blogpost/" + blogname + "\n" + x,
-					request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password,
+					"POST blogpost/" + blogname + "\n" + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {

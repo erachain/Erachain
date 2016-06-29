@@ -27,9 +27,9 @@ public class APIUtils {
 
 	static Logger LOGGER = Logger.getLogger(APIUtils.class.getName());
 
-	public static String processPayment(String sender, String feePowStr,
-			String recipient, String assetKeyString, String amount, String x,
-			HttpServletRequest request) {
+	public static String processPayment(String password, String sender,
+			String feePowStr, String recipient, String assetKeyString, String amount,
+			String x, HttpServletRequest request) {
 		
 		// PARSE AMOUNT		
 		AssetCls asset;
@@ -73,7 +73,7 @@ public class APIUtils {
 					ApiErrorFactory.ERROR_INVALID_SENDER);
 		}
 
-		APIUtils.askAPICallAllowed("POST payment\n" + x, request);
+		APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -158,11 +158,21 @@ public class APIUtils {
 		}
 	}
 
-	public static void askAPICallAllowed(final String messageToDisplay,
-			HttpServletRequest request) throws WebApplicationException {
+	public static void askAPICallAllowed(String password,
+			final String messageToDisplay, HttpServletRequest request) throws WebApplicationException {
 		// CHECK API CALL ALLOWED
+		
 		try {
 			disallowRemote(request);
+
+			if(password != null && password.length() > 0)
+				if (Controller.getInstance().unlockWallet(password))
+					return;
+
+			if (!gui.Gui.isGuiStarted()) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+			}
 
 			int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay,	request); 
 			
@@ -180,13 +190,14 @@ public class APIUtils {
 			if(!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled()))
 			{	
 				if(!Controller.getInstance().isWalletUnlocked()) {
-					String password = PasswordPane.showUnlockWalletDialog(); 
+					password = PasswordPane.showUnlockWalletDialog(); 
 					if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
 					{
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
+			
 		} catch (Exception e) {
 			if (e instanceof WebApplicationException) {
 				throw (WebApplicationException) e;

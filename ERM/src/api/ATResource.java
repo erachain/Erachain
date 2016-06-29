@@ -157,7 +157,8 @@ public class ATResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SENDER);
 			}
 
-			APIUtils.askAPICallAllowed("POST at "+ x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST at "+ x, request);
 
 			//CHECK IF WALLET EXISTS
 			if(!Controller.getInstance().doesWalletExists())

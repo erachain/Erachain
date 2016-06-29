@@ -44,7 +44,9 @@ public class AddressesResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	public String getAddresses() {
-		APIUtils.askAPICallAllowed("GET addresses", request);
+
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET addresses", request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -164,7 +166,8 @@ public class AddressesResource {
 	@GET
 	@Path("/seed/{address}")
 	public String getSeed(@PathParam("address") String address) {
-		APIUtils.askAPICallAllowed("GET addresses/seed/" + address+ "\nWARNING, your seed will be revealed to the caller!", request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET addresses/seed/" + address+ "\nWARNING, your seed will be revealed to the caller!", request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -198,7 +201,8 @@ public class AddressesResource {
 	@GET
 	@Path("/new")
 	public String generateNewAccount() {
-		APIUtils.askAPICallAllowed("GET addresses/new", request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET addresses/new", request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -220,7 +224,8 @@ public class AddressesResource {
 	public String createNewAddress(String x) {
 		// CHECK IF CONTENT IS EMPTY
 		if (x.isEmpty()) {
-			APIUtils.askAPICallAllowed("POST addresses seed\nGenerates a new account", request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST addresses seed\nGenerates a new account", request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -236,7 +241,8 @@ public class AddressesResource {
 
 			return Controller.getInstance().generateNewAccount();
 		} else {
-			APIUtils.askAPICallAllowed("POST addresses seed\n " + x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST addresses seed\n " + x, request);
 
 			String seed = x;
 
@@ -276,7 +282,8 @@ public class AddressesResource {
 	@DELETE
 	@Path("/{address}")
 	public String deleteAddress(@PathParam("address") String address) {
-		APIUtils.askAPICallAllowed("DELETE addresses/" + address, request );
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request );
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -394,7 +401,8 @@ public class AddressesResource {
 	@POST
 	@Path("sign/{address}")
 	public String sign(String x, @PathParam("address") String address) {
-		APIUtils.askAPICallAllowed("POST addresses/sign/"+ address, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "POST addresses/sign/"+ address, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {

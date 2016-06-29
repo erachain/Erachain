@@ -1,14 +1,14 @@
 {
-	"lang":"en.json"
-}7.0.0.1"
+	"weballowed":[
+		"127.0.0.1"
 	],
+	"guienabled":true,
 	"rpcallowed":[
 		"127.0.0.1"
 	],
-	"lang":"ru.json",
+	"lang":"en.json",
 	"knownpeers":[
 		
-	]
-}keycaching":true
-}ng":true
+	],
+	"generatorkeycaching":true
 }

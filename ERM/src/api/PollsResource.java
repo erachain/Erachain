@@ -87,7 +87,8 @@ public class PollsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
 			}
 
-			APIUtils.askAPICallAllowed("POST polls " + x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST polls " + x, request);
 
 			//CHECK IF WALLET EXISTS
 			if(!Controller.getInstance().doesWalletExists())
@@ -204,7 +205,8 @@ public class PollsResource
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
 			}
 
-			APIUtils.askAPICallAllowed("POST polls/vote/" + name + "\n"+x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST polls/vote/" + name + "\n"+x, request);
 
 			//CHECK IF WALLET EXISTS
 			if(!Controller.getInstance().doesWalletExists())
@@ -297,7 +299,8 @@ public class PollsResource
 	@GET
 	public String getPolls()
 	{
-		APIUtils.askAPICallAllowed("GET polls", request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET polls", request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())
@@ -321,7 +324,8 @@ public class PollsResource
 	@Path("/address/{address}")	
 	public String getPolls(@PathParam("address") String address)
 	{
-		APIUtils.askAPICallAllowed("GET polls/address/" + address, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET polls/address/" + address, request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())

@@ -779,7 +779,12 @@ public abstract class Transaction {
 		
 		//CALCULATE CONFIRMATIONS
 		int lastBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getBlockMap().getLastBlockSignature());
-		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature));
+		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
+		Block block = this.getParent(DBSet.getInstance());
+		
+		//if (block == null)return 0;
+		
+		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;

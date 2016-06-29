@@ -44,7 +44,8 @@ public class MultiPaymentResource
 	{
 		try
 		{
-			APIUtils.askAPICallAllowed("POST multipayment\n" + x, request );
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST multipayment\n" + x, request );
 
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);

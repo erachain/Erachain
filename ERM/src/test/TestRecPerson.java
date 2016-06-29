@@ -760,6 +760,8 @@ public class TestRecPerson {
 	public void fork_process_orphan_PersonalizeRecord()
 	{
 		
+		// TODO !!!
+		// need .process in DB then .process in FORK - then test DB values!!!
 		init();
 
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));

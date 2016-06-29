@@ -34,7 +34,8 @@ public class BlocksResource
 	@GET
 	public String getBlocks()
 	{
-		APIUtils.askAPICallAllowed("GET blocks", request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET blocks", request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())
@@ -65,7 +66,8 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
 		}
 
-		APIUtils.askAPICallAllowed("GET blocks/address/" + address, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET blocks/address/" + address, request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())

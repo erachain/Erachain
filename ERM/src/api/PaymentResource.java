@@ -3,6 +3,7 @@ package api;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,20 +27,25 @@ public class PaymentResource
 	HttpServletRequest request;
 	
 	@POST
+	//@GET
 	@Consumes(MediaType.WILDCARD)
 	public String createPayment(String x)
 	{
+		//APIUtils.askAPICallAllowed("POST payment\n " + x, request);
+
 		try
 		{
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String assetKey = (String) jsonObject.get("assetKey");
-			String feePow = (String) jsonObject.get("feePow");
-			String amount = (String) jsonObject.get("amount");
+			String assetKey = "" + jsonObject.get("assetKey");
+			String feePow = "" + jsonObject.get("feePow");
+			String amount = "" + jsonObject.get("amount");
 			String sender = (String) jsonObject.get("sender");
 			String recipient = (String) jsonObject.get("recipient");
+			String message = (String) jsonObject.get("message");
+			String password = (String) jsonObject.get("password");
 			
-			return APIUtils.processPayment(sender, feePow,  recipient, assetKey, amount, x, request );
+			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, x, request );
 		}
 		catch(NullPointerException| ClassCastException e)
 		{
@@ -49,8 +55,5 @@ public class PaymentResource
 		}
 	}
 
-	
-	
-	
-	
+
 }

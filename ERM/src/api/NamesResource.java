@@ -44,7 +44,8 @@ public class NamesResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	public String getNames() {
-		APIUtils.askAPICallAllowed("GET names", request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET names", request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -183,7 +184,8 @@ public class NamesResource {
 						ApiErrorFactory.ERROR_INVALID_ADDRESS);
 			}
 
-			APIUtils.askAPICallAllowed("POST names " + x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "POST names " + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -277,8 +279,9 @@ public class NamesResource {
 						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
-			APIUtils.askAPICallAllowed("DELETE names/key/" + nameName + "\n"
-				                           + x, request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password, "DELETE names/key/" + nameName + "\n"
+											                           + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -408,8 +411,9 @@ public class NamesResource {
 						ApiErrorFactory.ERROR_INVALID_FEE);
 			}
 
-			APIUtils.askAPICallAllowed("POST names/key/" + nameName + "\n" + x,
-				request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password,
+				"POST names/key/" + nameName + "\n" + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -511,8 +515,9 @@ public class NamesResource {
 						ApiErrorFactory.ERROR_INVALID_ADDRESS);
 			}
 
-			APIUtils.askAPICallAllowed("POST names/" + nameName + "\n" + x,
-				request);
+			String password = null;
+			APIUtils.askAPICallAllowed(password,
+				"POST names/" + nameName + "\n" + x, request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
