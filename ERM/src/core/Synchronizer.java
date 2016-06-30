@@ -186,6 +186,9 @@ public class Synchronizer
 		
 		DBSet dbSet = DBSet.getInstance();
 		
+		int blockHeight = common.getHeight(dbSet);
+		LOGGER.info("Synchronizing from blockHeight " + blockHeight);
+		
 		//CHECK COMMON BLOCK EXISTS
 		List<byte[]> signatures;
 		if(Arrays.equals(common.getSignature(), dbSet.getBlockMap().getLastBlockSignature()))
@@ -200,13 +203,14 @@ public class Synchronizer
 			for(byte[] signature: signatures)
 			{
 				//GET BLOCK
-				Block block = blockBuffer.getBlock(signature);
+				Block blockFromPeer = blockBuffer.getBlock(signature);
+				int blockHeightFromPeer = blockFromPeer.getHeight(dbSet);
 				
 				//PROCESS BLOCK
-				if(!this.process(dbSet, block))
+				if(!this.process(dbSet, blockFromPeer))
 				{
 					//INVALID BLOCK THROW EXCEPTION
-					throw new Exception("Dishonest peer on block " + block.getHeight(dbSet));
+					throw new Exception("Dishonest peer on block " + blockFromPeer.getHeight(dbSet));
 				}
 			}
 			
@@ -237,7 +241,8 @@ public class Synchronizer
 	private List<byte[]> getBlockSignatures(Block start, int amount, Peer peer) throws Exception
 	{
 		//ASK NEXT 500 HEADERS SINCE START
-		List<byte[]> headers = this.getBlockSignatures(start.getSignature(), peer);
+		byte[] startSignature = start.getSignature();
+		List<byte[]> headers = this.getBlockSignatures(startSignature, peer);
 		List<byte[]> nextHeaders;
 		if(headers.size() > 0 && headers.size() < amount)
 		{
@@ -258,6 +263,8 @@ public class Synchronizer
 		Message message = MessageFactory.getInstance().createGetHeadersMessage(header);
 		
 		//SEND MESSAGE TO PEER
+		// see response callback in controller.Controller.onMessage(Message)
+		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
 		if (response == null)
@@ -272,6 +279,7 @@ public class Synchronizer
 		DBSet dbSet = DBSet.getInstance();
 		
 		Block block = dbSet.getBlockMap().getLastBlock();
+		int hh = block.getHeight(dbSet);
 		
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
 		List<byte[]> headers = this.getBlockSignatures(block.getSignature(), peer);
@@ -299,7 +307,9 @@ public class Synchronizer
 			//CHECK IF WE KNOW BLOCK
 			if(dbSet.getBlockMap().contains(headers.get(i)))
 			{
-				return dbSet.getBlockMap().get(headers.get(i));
+				Block newBlock = dbSet.getBlockMap().get(headers.get(i));
+				int hhh = newBlock.getHeight(dbSet);
+				return newBlock;
 			}
 		}
 		

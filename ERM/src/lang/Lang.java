@@ -18,7 +18,7 @@ import settings.Settings;
 
 public class Lang {
 												
-	public static final String translationsUrl = "https://raw.githubusercontent.com/icreator/ERMbase/master/ERM/languages/";
+	public static final String translationsUrl = "https://raw.githubusercontent.com/icreator/ERMbase_lands/master/ERM/languages/";
 	
 	private static final Logger LOGGER = Logger.getLogger(Lang.class);
 	private static Lang instance;
@@ -147,7 +147,7 @@ public class Lang {
         		try {
         			JSONObject langFile = openLangFile(fileList.get(i));
         			String lang_name = (String)langFile.get("_lang_name_");
-        			long time_of_translation = ((Long)langFile.get("_timestamp_of_translation_")).longValue();
+        			long time_of_translation = Long.parseLong((String)langFile.get("_timestamp_of_translation_"));
         			lngList.add( new LangFile( lang_name, fileList.get(i), time_of_translation) );
         		} catch (Exception e) {
         			LOGGER.error(e.getMessage(),e);

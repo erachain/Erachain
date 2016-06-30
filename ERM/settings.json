@@ -2,13 +2,11 @@
 	"weballowed":[
 		"127.0.0.1"
 	],
-	"guienabled":true,
+	"lang":"ru.json",
 	"rpcallowed":[
 		"127.0.0.1"
 	],
-	"lang":"en.json",
 	"knownpeers":[
 		
-	],
-	"generatorkeycaching":true
+	]
 }

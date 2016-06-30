@@ -162,7 +162,7 @@ public class Peer extends Thread{
 					//PROCESS NEW MESSAGE
 					Message message = MessageFactory.getInstance().parse(this, in);
 					
-					//LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
+					LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
 					
 					//CHECK IF WE ARE WAITING FOR A MESSAGE WITH THAT ID
 					if(message.hasId() && this.messages.containsKey(message.getId()))
@@ -173,6 +173,8 @@ public class Peer extends Thread{
 					else
 					{
 						//CALLBACK
+						// see in network.Network.onMessage(Message)
+						// and then see controller.Controller.onMessage(Message)
 						this.callback.onMessage(message);
 					}
 				}
