@@ -1900,10 +1900,10 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> recordNote(boolean asPack, PrivateKeyAccount sender,
-			int feePow,	long key, byte[] message, byte[] isText) {
+	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount sender,
+			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.recordNote(asPack, sender, feePow, key, isText, message);
+			return this.transactionCreator.signNote(asPack, sender, feePow, key, message, isText, encrypted);
 		}
 	}
 

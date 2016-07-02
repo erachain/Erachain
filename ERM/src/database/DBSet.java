@@ -24,6 +24,7 @@ public class DBSet implements Observer, IDB {
 	private static DBSet instance;
 	
 	private ItemAssetBalanceMap assetBalanceMap;
+	private AddressNoteMap addressNoteMap;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
 	private KKAssetStatusMap kKAssetStatusMap;
 	private KKPersonStatusMap kKPersonStatusMap;
@@ -70,6 +71,7 @@ public class DBSet implements Observer, IDB {
 	private IssueImprintMap issueImprintMap;
 	private ItemNoteMap itemNoteMap;
 	private IssueNoteMap issueNoteMap;
+	private IssueStatementMap issueStatementMap;
 	private ItemPersonMap itemPersonMap;
 	private IssuePersonMap issuePersonMap;
 	private ItemUnionMap itemUnionMap;
@@ -126,6 +128,7 @@ public class DBSet implements Observer, IDB {
 			this.actions = 0;
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
+			this.addressNoteMap = new AddressNoteMap(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 			this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
 			this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
@@ -171,6 +174,7 @@ public class DBSet implements Observer, IDB {
 			this.issueImprintMap = new IssueImprintMap(this, database);
 			this.itemNoteMap = new ItemNoteMap(this, database);
 			this.issueNoteMap = new IssueNoteMap(this, database);
+			this.issueStatementMap = new IssueStatementMap(this, database);
 			this.itemPersonMap = new ItemPersonMap(this, database);
 			this.issuePersonMap = new IssuePersonMap(this, database);
 			this.itemStatusMap = new ItemStatusMap(this, database);
@@ -190,6 +194,7 @@ public class DBSet implements Observer, IDB {
 	protected DBSet(DBSet parent)
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
+		this.addressNoteMap = new AddressNoteMap(parent.addressNoteMap);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
 		this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
 		this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
@@ -235,6 +240,7 @@ public class DBSet implements Observer, IDB {
 		this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
 		this.itemNoteMap = new ItemNoteMap(parent.itemNoteMap);
 		this.issueNoteMap = new IssueNoteMap(parent.getIssueNoteMap());
+		this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap);		
 		this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap());
 		this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap());
 		this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap);
@@ -249,6 +255,7 @@ public class DBSet implements Observer, IDB {
 	public void reset() {
 		
 		this.assetBalanceMap.reset();
+		this.addressNoteMap.reset();
 		this.assetBalanceAccountingMap.reset();
 		this.kKAssetStatusMap.reset();
 		this.kKPersonStatusMap.reset();
@@ -290,6 +297,7 @@ public class DBSet implements Observer, IDB {
 		this.issueImprintMap.reset();
 		this.imprintMap.reset();
 		this.issueNoteMap.reset();
+		this.issueStatementMap.reset();
 		this.itemNoteMap.reset();
 		this.issuePersonMap.reset();
 		this.itemPersonMap.reset();
@@ -306,6 +314,11 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.assetBalanceMap;
 	}
+	public AddressNoteMap getAddressNoteMap() 
+	{
+		return this.addressNoteMap;
+	}
+	
 	public ItemAssetBalanceMap getAssetBalanceAccountingMap() 
 	{
 		return this.assetBalanceAccountingMap;
@@ -520,6 +533,11 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.issueNoteMap;
 	}
+	public IssueStatementMap getIssueStatementMap()
+	{
+		return this.issueStatementMap;
+	}
+	
 	public ItemPersonMap getItemPersonMap()
 	{
 		return this.itemPersonMap;

@@ -29,7 +29,7 @@ import database.DBSet;
 
 
 
-public class R_SignNote extends Transaction {
+public class IssueStatementRecord extends Transaction {
 
 	private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
 	private static final String NAME_ID = "Sign Note";
@@ -50,7 +50,7 @@ public class R_SignNote extends Transaction {
 	protected PublicKeyAccount[] signers; // for all it need ecnrypt
 	protected byte[][] signatures; // - multi sign
 	
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
@@ -59,28 +59,28 @@ public class R_SignNote extends Transaction {
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
 	}
 	// asPack
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
 		this(typeBytes, creator, (byte)0, noteKey, data, isText, encrypted, 0l, reference);
 		this.signature = signature;
 		// not need this.calcFee();
 	}
-	public R_SignNote(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference, signature);
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data,
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data,
 			byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference, signature);
@@ -89,7 +89,7 @@ public class R_SignNote extends Transaction {
 		this.setTypeBytes();
 	}
 	// as Pack
-	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data,
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data,
 			byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, noteKey, data, isText, encrypted, reference, signature);
@@ -97,7 +97,7 @@ public class R_SignNote extends Transaction {
 		this.signatures = signatures;
 		this.setTypeBytes();
 	}
-	public R_SignNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference)
+	public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference)
 	{
 		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
 	}
@@ -347,15 +347,15 @@ public class R_SignNote extends Transaction {
 		
 		if (signersLen == 0) {
 			if (!asPack) {
-				return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+				return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 			} else {
-				return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
+				return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
 			}
 		} else {
 			if (!asPack) {
-				return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, timestamp, reference, signatureBytes);
+				return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, timestamp, reference, signatureBytes);
 			} else {
-				return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
+				return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
 			}
 			
 		}

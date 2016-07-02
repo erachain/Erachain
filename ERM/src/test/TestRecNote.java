@@ -14,12 +14,14 @@ import ntp.NTP;
 
 
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.notes.Note;
 import core.item.notes.NoteCls;
 import core.transaction.IssueNoteRecord;
+import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 
@@ -43,6 +45,10 @@ public class TestRecNote {
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	byte[] data = "test123!".getBytes();
+	byte[] isText = new byte[] { 1 };
+	byte[] encrypted = new byte[] { 0 };
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -51,6 +57,11 @@ public class TestRecNote {
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
+	NoteCls note;
+	long noteKey = -1;
+	IssueNoteRecord issueNoteRecord;
+	R_SignNote signNoteRecord;
+
 	
 	ItemNoteMap noteMap;
 
@@ -68,6 +79,18 @@ public class TestRecNote {
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
+	private void initNote(boolean process) {
+		
+		note = new Note(maker, "test132", "12345678910strontje");
+				
+		//CREATE ISSUE NOTE TRANSACTION
+		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteRecord.sign(maker, false);
+		if (process) {
+			issueNoteRecord.process(db, false);
+			noteKey = note.getKey(db);
+		}
+	}
 	
 	@Test
 	public void testAddreessVersion() 
@@ -84,21 +107,16 @@ public class TestRecNote {
 		
 		init();
 		
-		//CREATE NOTE
-		Note note = new Note(maker, "test", "strontje");
-				
-		//CREATE ISSUE NOTE TRANSACTION
-		Transaction issueNoteTransaction = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
-		issueNoteTransaction.sign(maker, false);
+		initNote(false);
 		
 		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
-		assertEquals(true, issueNoteTransaction.isSignatureValid());
+		assertEquals(true, issueNoteRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueNoteTransaction = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
+		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE NOTE IS INVALID
-		assertEquals(false, issueNoteTransaction.isSignatureValid());
+		assertEquals(false, issueNoteRecord.isSignatureValid());
 	}
 		
 
@@ -229,4 +247,263 @@ public class TestRecNote {
 	}
 	
 	// TODO - in statement - valid on key = 999
+
+	//SIGN NOTE TRANSACTION
+	
+	@Test
+	public void validateSignatureSignNoteTransaction() 
+	{
+		
+		init();
+		
+		initNote(true);
+		
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		signNoteRecord.sign(maker, asPack);
+		
+		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
+		assertEquals(true, signNoteRecord.isSignatureValid());
+		
+		//INVALID SIGNATURE
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db), new byte[64]);
+		
+		//CHECK IF ISSUE NOTE IS INVALID
+		assertEquals(false, signNoteRecord.isSignatureValid());
+	}
+		
+
+	
+	@Test
+	public void parseSignNoteTransaction() 
+	{
+		
+		init();
+		
+		initNote(true);
+		
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		signNoteRecord.sign(maker, asPack);
+		
+		//CONVERT TO BYTES
+		byte[] rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+			
+			//CHECK OWNER
+			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+			
+			//CHECK NAME
+			assertEquals(true, Arrays.equals(signNoteRecord.getData(), parsedSignNoteRecord.getData()));
+				
+			//CHECK DESCRIPTION
+			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+							
+			//CHECK FEE
+			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			
+			//CHECK TIMESTAMP
+			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction. " + e);
+		}
+
+		
+		// NOT DATA
+		data = null;
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord.sign(maker, asPack);
+		
+		//CONVERT TO BYTES
+		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+			
+			//CHECK OWNER
+			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+			
+			//CHECK NAME
+			assertEquals(null, parsedSignNoteRecord.getData());
+				
+			//CHECK DESCRIPTION
+			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+							
+			//CHECK FEE
+			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			
+			//CHECK TIMESTAMP
+			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction. " + e);
+		}
+
+		// NOT KEY
+		//data = null;
+		noteKey = 0;
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord.sign(maker, asPack);
+		
+		//CONVERT TO BYTES
+		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+			
+			//CHECK OWNER
+			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+			
+			//CHECK NAME
+			assertEquals(null, parsedSignNoteRecord.getData());
+				
+			//CHECK DESCRIPTION
+			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+							
+			//CHECK FEE
+			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			
+			//CHECK TIMESTAMP
+			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction. " + e);
+		}
+
+		// NOT KEY
+		data = null;
+		noteKey = 0;
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord.sign(maker, asPack);
+		
+		//CONVERT TO BYTES
+		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+		
+		//CHECK DATA LENGTH
+		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+			
+			//CHECK ISSUER
+			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+			
+			//CHECK OWNER
+			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+			
+			//CHECK NAME
+			assertEquals(null, parsedSignNoteRecord.getData());
+				
+			//CHECK DESCRIPTION
+			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+							
+			//CHECK FEE
+			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
+			
+			//CHECK REFERENCE
+			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			
+			//CHECK TIMESTAMP
+			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction. " + e);
+		}
+
+	}
+
+	
+	@Test
+	public void processSignNoteTransaction()
+	{
+		
+		init();
+		
+		initNote(true);
+		
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		
+		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(db, releaserReference));
+		
+		signNoteRecord.sign(maker, false);
+		signNoteRecord.process(db, false);
+							
+		//CHECK REFERENCE SENDER
+		assertEquals(signNoteRecord.getTimestamp(), maker.getLastReference(db));	
+			
+		///// ORPHAN
+		signNoteRecord.orphan(db, false);
+										
+		//CHECK REFERENCE SENDER
+		assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
+	}
+
 }

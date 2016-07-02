@@ -54,7 +54,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class RecordNotePanel extends JPanel 
+public class SignNotePanel extends JPanel 
 {
 	//private static long NONE_KEY = Transaction.FEE_KEY;
 	//private final MessagesTableModel messagesTableModel;
@@ -64,6 +64,7 @@ public class RecordNotePanel extends JPanel
 	private JTextField txtFeePow;
 	public JTextArea txtMessage;
 	private JCheckBox isText;
+	private JCheckBox encrypted;
 	private JButton sendButton;
 	private JButton packButton;
 	private AccountsComboBoxModel accountsModel;
@@ -71,7 +72,7 @@ public class RecordNotePanel extends JPanel
 	private JTextArea txtRecDetails;
 	private JLabel messageLabel;
 	
-	public RecordNotePanel()
+	public SignNotePanel()
 	{
 		
 		
@@ -193,6 +194,34 @@ public class RecordNotePanel extends JPanel
         isText.setSelected(true);
         this.add(isText, isChkTextGBC);
 
+        //LABEL ENCRYPTED
+		GridBagConstraints labelEncGBC = new GridBagConstraints();
+		labelEncGBC.insets = new Insets(5,5,5,5);
+		labelEncGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelEncGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelEncGBC.weightx = 0;	
+		labelEncGBC.gridx = 4;
+		labelEncGBC.gridx = 2;
+		labelEncGBC.gridy = 5;
+		
+		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
+		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.add(encLabel, labelEncGBC);
+		
+        //ENCRYPTED CHECKBOX
+		GridBagConstraints ChkEncGBC = new GridBagConstraints();
+		ChkEncGBC.insets = new Insets(5,5,5,5);
+		ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;   
+		ChkEncGBC.anchor = GridBagConstraints.NORTHWEST;
+		ChkEncGBC.weightx = 0;	
+		ChkEncGBC.gridx = 3;
+		ChkEncGBC.gridy = 5;
+		
+		encrypted = new JCheckBox();
+		encrypted.setSelected(true);
+		this.add(encrypted, ChkEncGBC);
+		
+		/////
 		this.accountsModel = new AccountsComboBoxModel();
         
 		//LABEL FROM
@@ -403,15 +432,18 @@ public class RecordNotePanel extends JPanel
 			//Pair<Transaction, Integer> result;
 
 			byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
+
+			boolean encryptMessage = encrypted.isSelected();			
+			byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
 			
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			NoteCls note = (NoteCls) this.cbxFavorites.getSelectedItem();
 			long key = note.getKey(); 
 
 			//CREATE TX MESSAGE
-			result = Controller.getInstance().recordNote(asPack,
+			result = Controller.getInstance().signNote(asPack,
 					Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
-					feePow, key, isTextByte, messageBytes);
+					feePow, key, messageBytes, isTextByte, encrypted);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

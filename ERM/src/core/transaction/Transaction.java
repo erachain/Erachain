@@ -145,6 +145,7 @@ public abstract class Transaction {
 	public static final int ISSUE_PERSON_TRANSACTION = 24;
 	public static final int ISSUE_STATUS_TRANSACTION = 25;
 	public static final int ISSUE_UNION_TRANSACTION = 26;
+	public static final int ISSUE_STATEMENT_TRANSACTION = 27;
 	// USE ITEMS
 	public static final int SEND_ASSET_TRANSACTION = 31;
 	public static final int SIGN_NOTE_TRANSACTION = 32;

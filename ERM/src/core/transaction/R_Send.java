@@ -220,7 +220,8 @@ public class R_Send extends TransactionAmount {
 			amount = new BigDecimal(new BigInteger(amountBytes), 8);
 			position += AMOUNT_LENGTH;
 		}
-				
+
+		// DATA +++
 		byte[] arbitraryData = null;
 		byte[] encryptedByte = null;
 		byte[] isTextByte = null;
