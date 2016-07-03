@@ -49,12 +49,14 @@ public class StatementResource {
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String password = (String) jsonObject.get("password");
 			String noteKeyString = (String) jsonObject.get("note");
-			String sender = (String) jsonObject.get("sender");
+			String maker = (String) jsonObject.get("maker");
 			String message = (String) jsonObject.get("message");
-			String isTextMessageString = (String) jsonObject
-					.get("istextmessage");
+			String isTextMessageString = (String) jsonObject.get("istextmessage");
 			String encryptString = (String) jsonObject.get("encrypt");
 
+			if (maker == null)
+				return "use parameters: note=12&maker=ADDRESS&message=MESS&istextmessage&encrypt&password=PASSWORD";
+					
 			boolean isTextMessage = true;
 			if (isTextMessageString != null) {
 				isTextMessage = Boolean.valueOf(isTextMessageString);
@@ -72,7 +74,7 @@ public class StatementResource {
 			}
 
 			// CHECK ADDRESS
-			if (!Crypto.getInstance().isValidAddress(sender)) {
+			if (!Crypto.getInstance().isValidAddress(maker)) {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_SENDER);
 			}
@@ -97,7 +99,7 @@ public class StatementResource {
 
 			// GET ACCOUNT
 			PrivateKeyAccount account = Controller.getInstance()
-					.getPrivateKeyAccountByAddress(sender);
+					.getPrivateKeyAccountByAddress(maker);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_INVALID_SENDER);
@@ -105,35 +107,36 @@ public class StatementResource {
 
 			// TODO this is duplicate code -> Send money Panel, we should add
 			// that to a common place later
-			byte[] messageBytes;
-			if (isTextMessage) {
-				messageBytes = message.getBytes(StandardCharsets.UTF_8);
-			} else {
-				try {
-					messageBytes = Converter.parseHexString(message);
-				} catch (Exception e) {
-					LOGGER.error(e.getMessage(),e);
+			byte[] messageBytes = null;
+			if (message != null) {
+				if (isTextMessage) {
+					messageBytes = message.getBytes(StandardCharsets.UTF_8);
+				} else {
+					try {
+						messageBytes = Converter.parseHexString(message);
+					} catch (Exception e) {
+						LOGGER.error(e.getMessage(),e);
+						throw ApiErrorFactory.getInstance().createError(
+								ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
+					}
+				}
+
+				if (messageBytes.length > 4000) {
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_MESSAGE_FORMAT_NOT_HEX);
+							ApiErrorFactory.ERROR_MESSAGESIZE_EXCEEDED);
+				}
+
+				// TODO duplicate code -> SendMoneyPanel
+				if (encrypt) {
+					// sender
+					PrivateKeyAccount pkAccount = Controller.getInstance()
+							.getPrivateKeyAccountByAddress(maker);
+					byte[] privateKey = pkAccount.getPrivateKey();
+
+					messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey,
+							pkAccount.getPublicKey());
 				}
 			}
-
-			if (messageBytes.length > 4000) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_MESSAGESIZE_EXCEEDED);
-			}
-
-			// TODO duplicate code -> SendMoneyPanel
-			if (encrypt) {
-				// sender
-				PrivateKeyAccount pkAccount = Controller.getInstance()
-						.getPrivateKeyAccountByAddress(sender);
-				byte[] privateKey = pkAccount.getPrivateKey();
-
-				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey,
-						pkAccount.getPublicKey());
-			}
-			
 
 			//APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee Power: "+ bdFee.toPlainString(), request);
 
@@ -144,7 +147,7 @@ public class StatementResource {
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.signNote(false,
 							Controller.getInstance()
-									.getPrivateKeyAccountByAddress(sender),
+									.getPrivateKeyAccountByAddress(maker),
 							0, noteKey, messageBytes,
 							isTextByte, encrypted);
 

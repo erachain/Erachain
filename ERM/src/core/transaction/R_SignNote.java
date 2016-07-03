@@ -413,7 +413,10 @@ public class R_SignNote extends Transaction {
 	public int isValid(DBSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
-		if(data.length > 4000 || data.length < 1)
+		if (data == null && key <= 0)
+			return INVALID_DATA_LENGTH;
+		
+		if(data != null && data.length > 4000)
 		{
 			return INVALID_DATA_LENGTH;
 		}
@@ -423,7 +426,7 @@ public class R_SignNote extends Transaction {
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		// ITEM EXIST? - for assets transfer not need - amount expect instead
-		if (!db.getItemNoteMap().contains(this.key))
+		if (this.key > 0 && !db.getItemNoteMap().contains(this.key))
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
 		return Transaction.VALIDATE_OK;

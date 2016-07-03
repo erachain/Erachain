@@ -463,7 +463,8 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		recordNoteTx = new R_SignNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
+		//recordNoteTx = new R_SignNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
+		recordNoteTx = new R_SignNote(creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
 			
 		return afterCreate(recordNoteTx, asPack);
