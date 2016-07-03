@@ -489,17 +489,23 @@ public abstract class Transaction {
 		
 	}
 	// reference in Map - or as signatire or as BlockHeight + seqNo
-	public Transaction findByDBRef(DBSet db, byte[] dbRef)
+	public static Transaction findByDBRef(DBSet db, byte[] dbRef)
 	{
+		
+		if (dbRef == null) return null;
+		
+		Tuple2<Integer, Integer> key;
 		if(dbRef.length > 20)
 		{
 			// soft or hard confirmations
-			return db.getTransactionFinalMap().getTransactionBySignature(dbRef);
+			key = db.getTransactionFinalMap().getTransactionBySignature(dbRef);
+		} else {
+			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
+			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
+			key = new Tuple2<Integer,Integer>(blockHeight, seqNo);
 		}
 		
-		int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
-		int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
-		return db.getTransactionFinalMap().get(new Tuple2<Integer,Integer>(blockHeight, seqNo));
+		return db.getTransactionFinalMap().get(key);
 		
 	}
 

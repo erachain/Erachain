@@ -126,7 +126,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 		});
 
 		this.signatureKey = database.createTreeMap("signature_tx")
-				.comparator(Fun.BYTE_ARRAY_COMPARATOR)
+				.comparator(Fun.COMPARABLE_ARRAY_COMPARATOR)
 				.makeOrGet();
 
 		// find transactions by signature
@@ -252,10 +252,9 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Transaction getTransactionBySignature(byte[] signature)
+	public Tuple2<Integer, Integer> getTransactionBySignature(byte[] signature)
 	{
-		Transaction tx = (Transaction)signatureKey.get(signature);
-		return tx;
+		return (Tuple2<Integer, Integer>)signatureKey.get(signature);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
