@@ -1586,6 +1586,9 @@ public class Controller extends Observable {
 	public PersonCls getPerson(long key) {
 		return (PersonCls) this.dbSet.getItemPersonMap().get(key);
 	}
+	public NoteCls getNote(long key) {
+		return (NoteCls) this.dbSet.getItemNoteMap().get(key);
+	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
 		return this.getOrders(have, want, false);

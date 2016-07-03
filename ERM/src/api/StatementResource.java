@@ -55,7 +55,7 @@ public class StatementResource {
 			String encryptString = (String) jsonObject.get("encrypt");
 
 			if (maker == null)
-				return "use parameters: note=12&maker=ADDRESS&message=MESS&istextmessage&encrypt&password=PASSWORD";
+				return "use parameters: note=12&maker=ADDRESS&message=MESS&istextmessage=true&encrypt=true&password=PASSWORD";
 					
 			boolean isTextMessage = true;
 			if (isTextMessageString != null) {

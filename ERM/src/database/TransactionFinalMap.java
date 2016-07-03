@@ -126,11 +126,11 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 		});
 
 		this.signatureKey = database.createTreeMap("signature_tx")
-				.comparator(Fun.COMPARABLE_ARRAY_COMPARATOR)
+				.comparator(Fun.BYTE_ARRAY_COMPARATOR)
 				.makeOrGet();
 
 		// find transactions by signature
-		Bind.secondaryKey(map, this.signatureKey,
+		Bind.secondaryKey((BTreeMap)map, this.signatureKey,
 				new Fun.Function2<byte[], Tuple2<Integer,Integer>, Transaction>(){
 			@Override
 			public byte[] run(Tuple2<Integer, Integer> key, Transaction val) {

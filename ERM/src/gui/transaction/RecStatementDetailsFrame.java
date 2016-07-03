@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import utils.Converter;
@@ -40,23 +41,103 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 {
 	private JTextField messageText;
 	
-	public RecStatementDetailsFrame(final R_SignNote recStatement)
+	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
+	
+	public RecStatementDetailsFrame(final R_SignNote r_Statement)
 	{
-		super(recStatement);
-				
-		//LABEL MESSAGE
-		++labelGBC.gridy;
-		JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
-		this.add(serviceLabel, labelGBC);
+		super(r_Statement);
 		
-		//ISTEXT
-		++detailGBC.gridy;
-		detailGBC.gridwidth = 2;
-		messageText = new JTextField( ( recStatement.isText() ) ? new String(recStatement.getData(), Charset.forName("UTF-8")) : Base58.encode(recStatement.getData()));
-		messageText.setEditable(false);
-		MenuPopupUtil.installContextMenu(messageText);
-		this.add(messageText, detailGBC);			
-		detailGBC.gridwidth = 3;
+		if (r_Statement.getKey() > 0) {
+			++labelGBC.gridy;
+			++detailGBC.gridy;
+			detailGBC.gridx = 1;
+			detailGBC.gridwidth = 3;		           
+			JTextField note = new JTextField(Controller.getInstance().getNote( r_Statement.getKey()).toString());
+			note.setEditable(false);
+			MenuPopupUtil.installContextMenu(note);
+			this.add(note, detailGBC);	
+		}
+		
+		if (r_Statement.getData() != null) {
+			//LABEL MESSAGE
+			++labelGBC.gridy;
+			JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+			this.add(serviceLabel, labelGBC);
+			
+			// ISTEXT
+			++detailGBC.gridy;
+			detailGBC.gridwidth = 2;
+			messageText = new JTextField( ( r_Statement.isText() ) ? new String(r_Statement.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Statement.getData()));
+			messageText.setEditable(false);
+			MenuPopupUtil.installContextMenu(messageText);
+			this.add(messageText, detailGBC);			
+			detailGBC.gridwidth = 3;
+			
+			//ENCRYPTED CHECKBOX
+			
+			//ENCRYPTED
+			GridBagConstraints chcGBC = new GridBagConstraints();
+			chcGBC.fill = GridBagConstraints.HORIZONTAL;  
+			chcGBC.anchor = GridBagConstraints.NORTHWEST;
+			chcGBC.gridy = labelGBC.gridy;
+			chcGBC.gridx = 3;
+			chcGBC.gridwidth = 1;
+	        final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+	        
+	        encrypted.setSelected(r_Statement.isEncrypted());
+	        encrypted.setEnabled(r_Statement.isEncrypted());
+	        
+	        this.add(encrypted, chcGBC);
+	        
+	        encrypted.addActionListener(new ActionListener()
+	        {
+	        	public void actionPerformed(ActionEvent e)
+	        	{
+	        		if(!encrypted.isSelected())
+	        		{
+		        		if(!Controller.getInstance().isWalletUnlocked())
+		        		{
+		        			//ASK FOR PASSWORD
+		        			String password = PasswordPane.showUnlockWalletDialog(); 
+		        			if(!Controller.getInstance().unlockWallet(password))
+		        			{
+		        				//WRONG PASSWORD
+		        				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+		        				
+		        				encrypted.setSelected(!encrypted.isSelected());
+		        				
+		        				return;
+		        			}
+		        		}
+		
+		        		Account account = Controller.getInstance().getAccountByAddress(r_Statement.getCreator().getAddress());	
+		        		
+		        		byte[] privateKey = null; 
+		        		byte[] publicKey = null;
+	            		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+	    				privateKey = accountRecipient.getPrivateKey();		
+	    				
+	    				publicKey = accountRecipient.getPublicKey();    				
+		        		
+		        		try {
+		        			messageText.setText(new String(AEScrypto.dataDecrypt(r_Statement.getData(), privateKey, publicKey), "UTF-8"));
+						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+							LOGGER.error(e1.getMessage(),e1);
+						}
+	        		}
+	        		else
+	        		{
+	        			try {
+	        				messageText.setText(new String(r_Statement.getData(), "UTF-8"));
+						} catch (UnsupportedEncodingException e1) {
+							LOGGER.error(e1.getMessage(),e1);
+						}
+	        		}
+	        		//encrypted.isSelected();
+	        		
+	        	}
+	        });
+		}
 		        				           
         //PACK
 		this.pack();
