@@ -54,7 +54,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class SignNotePanel extends JPanel 
+public class Sign_Panel extends JPanel 
 {
 	//private static long NONE_KEY = Transaction.FEE_KEY;
 	//private final MessagesTableModel messagesTableModel;
@@ -72,7 +72,7 @@ public class SignNotePanel extends JPanel
 	private JTextArea txtRecDetails;
 	private JLabel messageLabel;
 	
-	public SignNotePanel()
+	public Sign_Panel(NoteCls note, Account account)
 	{
 		
 		
@@ -99,6 +99,8 @@ public class SignNotePanel extends JPanel
 		//			ObserverMessage.LIST_NOTE_FAVORITES_TYPE, ItemCls.NOTE_TYPE));
 		cbxFavorites = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
 		this.add(cbxFavorites, favoritesGBC);
+		if (note != null) cbxFavorites.setSelectedItem(note);
+
 
 		//LABEL RECEIVER
 		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
@@ -249,6 +251,7 @@ public class SignNotePanel extends JPanel
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
 		this.add(this.cbxFrom, cbxFromGBC);
+		if (account != null) cbxFrom.setSelectedItem(account);
 
     	//LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();

@@ -241,11 +241,12 @@ public class ApiErrorFactory
 	
 	
 	@SuppressWarnings("unchecked")
-	public WebApplicationException createError(int error)
+	public JSONObject createErrorJSON(int error)
 	{
 
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("error", error);
+		
 		if ( error > Transaction.AT_ERROR )
 		{
 			jsonObject.put("message", AT_Error.getATError(error - Transaction.AT_ERROR) );
@@ -256,6 +257,14 @@ public class ApiErrorFactory
 		}
 		
 		
-		return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(jsonObject.toJSONString()).build());
+		return jsonObject;
+	}
+
+	@SuppressWarnings("unchecked")
+	public WebApplicationException createError(int error)
+	{		
+		//return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+		return new WebApplicationException(Response.status(Response.Status.OK).entity(
+				createErrorJSON(error).toJSONString()).build());
 	}
 }

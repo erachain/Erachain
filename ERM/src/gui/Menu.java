@@ -355,6 +355,18 @@ public class Menu extends JMenuBar
         });
         dealsMenu.add(dealsMenuVouchRecord);
         
+        JMenuItem dealsMenuSignNote = new JMenuItem(Lang.getInstance().translate("Statement"));
+        dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statement record"));
+        dealsMenuSignNote.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		selectOrAdd(new Sign_Frame(null, null), MainFrame.desktopPane.getAllFrames());
+        	}
+        });
+        dealsMenu.add(dealsMenuSignNote);
 
         // Imprints menu
         JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));

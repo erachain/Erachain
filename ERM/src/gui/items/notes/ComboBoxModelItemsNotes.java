@@ -62,7 +62,14 @@ public class ComboBoxModelItemsNotes extends DefaultComboBoxModel<NoteCls> imple
 			Set<Long> keys = (Set<Long>) message.getValue();
 			List<NoteCls> notes = new ArrayList<NoteCls>();
 			for(Long key: keys)
-			{				
+			{
+				/* key 0 - need as EMPTY
+				if(key==0) {
+					notes.add(null);
+					continue;
+				}
+				*/
+
 				//GET NOTE
 				NoteCls note = Controller.getInstance().getItemNote(key);
 				notes.add(note);
