@@ -10,7 +10,7 @@ import core.account.Account;
 import database.DBSet;
 
 // seek reference to tx_Parent by address
-// account.addres -> <tx2.parentTimestamp>
+// account.address -> <tx2.parentTimestamp>
 public class ReferenceMap extends DBMap<String, Long> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

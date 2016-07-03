@@ -437,7 +437,7 @@ public class R_SignNote extends Transaction {
 		//UPDATE SENDER
 		super.process(db, asPack);
 		
-		byte[] ref = this.getRef_ForMap(db);
+		byte[] ref = this.getDBRef(db);
 		if (ref != null)
 			db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, ref);
 
@@ -449,7 +449,7 @@ public class R_SignNote extends Transaction {
 		super.orphan(db, asPack);
 						
 		// UNDO ALIVE PERSON for DURATION
-		byte[] ref = this.getRef_ForMap(db);
+		byte[] ref = this.getDBRef(db);
 		if (ref != null)
 			db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
 

@@ -82,7 +82,8 @@ public class OrderMap extends DBMap<BigInteger, Order>
 				.makeOrGet();
 		
 		//BIND HAVE/WANT KEY
-		Bind.secondaryKey(map, this.haveWantKeyMap, new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
+		Bind.secondaryKey(map, this.haveWantKeyMap,
+				new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
 			@Override
 			public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key, Order value) {
 				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getHave(), value.getWant(), value.getPriceCalc(), key);

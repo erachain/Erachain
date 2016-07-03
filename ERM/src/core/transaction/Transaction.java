@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 //import javax.swing.JOptionPane;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -450,7 +451,59 @@ public abstract class Transaction {
 		
 		return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
 	}
+	
+	public int getBlockHeight(DBSet db)
+	{
+		if(this.isConfirmed(db))
+		{
+			return this.getParent(db).getHeight(db);
+		}
+		return -1;
+	}
+	public int getSeqNo(DBSet db)
+	{
+		if(this.isConfirmed(db))
+		{
+			return this.getParent(db).getTransactionSeq(this.signature);
+		}
+		return -1;
+	}
+	
+	// reference in Map - or as signatire or as BlockHeight + seqNo
+	public byte[] getDBRef(DBSet db)
+	{
+		if(this.getConfirmations(db) < 500)
+		{
+			// soft or hard confirmations
+			return this.signature;
+		}
+		
+		int bh = this.getBlockHeight(db);
+		if (bh < 1)
+			// not in chain
+			return null;
+		
+		byte[] ref = Ints.toByteArray(bh);
+		Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
+		return ref;
+		
+	}
+	// reference in Map - or as signatire or as BlockHeight + seqNo
+	public Transaction findByDBRef(DBSet db, byte[] dbRef)
+	{
+		if(dbRef.length > 20)
+		{
+			// soft or hard confirmations
+			return db.getTransactionFinalMap().getTransactionBySignature(dbRef);
+		}
+		
+		int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
+		int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
+		return db.getTransactionFinalMap().get(new Tuple2<Integer,Integer>(blockHeight, seqNo));
+		
+	}
 
+	////
 	// VIEW
 	public String viewType() {
 		return Byte.toUnsignedInt(typeBytes[0])+"."+Byte.toUnsignedInt(typeBytes[1]);
@@ -725,43 +778,6 @@ public abstract class Transaction {
 		
 	public abstract boolean isInvolved(Account account);
  
-	
-	public int getBlockHeight(DBSet db)
-	{
-		if(this.isConfirmed(db))
-		{
-			return this.getParent(db).getHeight(db);
-		}
-		return -1;
-	}
-	public int getSeqNo(DBSet db)
-	{
-		if(this.isConfirmed(db))
-		{
-			return this.getParent(db).getTransactionSeq(this.signature);
-		}
-		return -1;
-	}
-	
-	// reference in Map - or as signatire or as BlockHeight + seqNo
-	public byte[] getRef_ForMap(DBSet db)
-	{
-		if(this.getConfirmations(db) < 500)
-		{
-			// soft or hard confirmations
-			return this.signature;
-		}
-		
-		int bh = this.getBlockHeight(db);
-		if (bh < 1)
-			// not in chain
-			return null;
-		
-		byte[] ref = Ints.toByteArray(bh);
-		Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
-		return ref;
-		
-	}
 
 	@Override 
 	public boolean equals(Object object)
