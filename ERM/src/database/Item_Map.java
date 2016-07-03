@@ -15,12 +15,14 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
-	protected int type;
+	//protected int type;
 	
 	protected Atomic.Long atomicKey;
 	protected long key;
 	
-	public Item_Map(DBSet databaseSet, DB database, int type, String name,
+	public Item_Map(DBSet databaseSet, DB database,
+			//int type,
+			String name,
 			int observeAdd,
 			int observeRemove,
 			int observeList
@@ -28,7 +30,7 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	{
 		super(databaseSet, database);
 		
-		this.type = type;
+		//this.type = type;
 		this.atomicKey = database.getAtomicLong(name +"_key");
 		// restore key from dbase
 		this.key = this.atomicKey.get();

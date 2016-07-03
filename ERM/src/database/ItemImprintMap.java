@@ -22,7 +22,8 @@ public class ItemImprintMap extends Item_Map
 	public ItemImprintMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
-				TYPE, "item_imprints",
+				//TYPE,
+				"item_imprints",
 				ObserverMessage.ADD_IMPRINT_TYPE,
 				ObserverMessage.REMOVE_IMPRINT_TYPE,
 				ObserverMessage.LIST_IMPRINT_TYPE

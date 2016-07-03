@@ -22,7 +22,8 @@ public class ItemStatusMap extends Item_Map
 	public ItemStatusMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
-				TYPE, NAME,
+				//TYPE,
+				NAME,
 				ObserverMessage.ADD_STATUS_TYPE,
 				ObserverMessage.REMOVE_STATUS_TYPE,
 				ObserverMessage.LIST_STATUS_TYPE

@@ -127,6 +127,12 @@ public class ObserverMessage {
 	public static final int LIST_PERSON_STATUS_UNION_TYPE = 95;
 	public static final int LIST_PERSON_STATUS_UNION_FAVORITES_TYPE = 96;
 
+	public static final int ADD_STATEMENT_TYPE = 97;
+	public static final int REMOVE_STATEMENT_TYPE = 98;
+	public static final int LIST_STATEMENT_TYPE = 99;
+	public static final int LIST_STATEMENT_FAVORITES_TYPE = 100;
+
+
 	private int type;
 	private Object value;
 	

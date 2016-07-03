@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -429,6 +430,31 @@ public class R_SignNote extends Transaction {
 
 	}
 	
+	//PROCESS/ORPHAN
+	
+	public void process(DBSet db, boolean asPack) {
+
+		//UPDATE SENDER
+		super.process(db, asPack);
+		
+		byte[] ref = this.getRef_ForMap(db);
+		if (ref != null)
+			db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, ref);
+
+	}
+
+	public void orphan(DBSet db, boolean asPack) {
+
+		//UPDATE SENDER
+		super.orphan(db, asPack);
+						
+		// UNDO ALIVE PERSON for DURATION
+		byte[] ref = this.getRef_ForMap(db);
+		if (ref != null)
+			db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
+
+	}
+
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
 	{

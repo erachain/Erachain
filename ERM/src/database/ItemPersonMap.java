@@ -23,7 +23,8 @@ public class ItemPersonMap extends Item_Map
 	public ItemPersonMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
-				TYPE, NAME,
+				//TYPE,
+				NAME,
 				ObserverMessage.ADD_PERSON_TYPE,
 				ObserverMessage.REMOVE_PERSON_TYPE,
 				ObserverMessage.LIST_PERSON_TYPE

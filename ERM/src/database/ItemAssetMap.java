@@ -26,7 +26,8 @@ public class ItemAssetMap extends Item_Map
 	public ItemAssetMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
-				TYPE, NAME,
+				//TYPE,
+				NAME,
 				ObserverMessage.ADD_ASSET_TYPE,
 				ObserverMessage.REMOVE_ASSET_TYPE,
 				ObserverMessage.LIST_ASSET_TYPE

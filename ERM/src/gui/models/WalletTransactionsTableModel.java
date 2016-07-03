@@ -150,7 +150,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 			case COLUMN_CONFIRMATIONS:
 				
-				return transaction.getConfirmations();
+				return transaction.getConfirmations(DBSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				

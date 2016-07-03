@@ -194,7 +194,7 @@ public class Rec_DetailsFrame extends JFrame
 								
 		//CONFIRMATIONS
 		detailGBC.gridy = componentLevel;
-		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations()));
+		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(DBSet.getInstance())));
 		this.add(confirmations, detailGBC);	
 		  
 	}

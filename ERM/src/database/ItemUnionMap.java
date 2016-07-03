@@ -22,7 +22,8 @@ public class ItemUnionMap extends Item_Map
 	public ItemUnionMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
-				TYPE, NAME,
+				//TYPE,
+				NAME,
 				ObserverMessage.ADD_UNION_TYPE,
 				ObserverMessage.REMOVE_UNION_TYPE,
 				ObserverMessage.LIST_UNION_TYPE

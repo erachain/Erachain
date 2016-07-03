@@ -24,7 +24,7 @@ public class DBSet implements Observer, IDB {
 	private static DBSet instance;
 	
 	private ItemAssetBalanceMap assetBalanceMap;
-	private AddressNoteMap addressNoteMap;
+	private AddressStatement_Refs addressStatement_Refs;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
 	private KKAssetStatusMap kKAssetStatusMap;
 	private KKPersonStatusMap kKPersonStatusMap;
@@ -128,7 +128,7 @@ public class DBSet implements Observer, IDB {
 			this.actions = 0;
 			
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
-			this.addressNoteMap = new AddressNoteMap(this, database);
+			this.addressStatement_Refs = new AddressStatement_Refs(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 			this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
 			this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
@@ -194,7 +194,7 @@ public class DBSet implements Observer, IDB {
 	protected DBSet(DBSet parent)
 	{
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
-		this.addressNoteMap = new AddressNoteMap(parent.addressNoteMap);
+		this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
 		this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
 		this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
@@ -255,7 +255,7 @@ public class DBSet implements Observer, IDB {
 	public void reset() {
 		
 		this.assetBalanceMap.reset();
-		this.addressNoteMap.reset();
+		this.addressStatement_Refs.reset();
 		this.assetBalanceAccountingMap.reset();
 		this.kKAssetStatusMap.reset();
 		this.kKPersonStatusMap.reset();
@@ -314,9 +314,9 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.assetBalanceMap;
 	}
-	public AddressNoteMap getAddressNoteMap() 
+	public AddressStatement_Refs getAddressStatement_Refs() 
 	{
-		return this.addressNoteMap;
+		return this.addressStatement_Refs;
 	}
 	
 	public ItemAssetBalanceMap getAssetBalanceAccountingMap() 

@@ -28,11 +28,11 @@ import core.item.ItemCls;
 import database.DBSet;
 
 
-
+// issue statement
 public class IssueStatementRecord extends Transaction {
 
-	private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
-	private static final String NAME_ID = "Sign Note";
+	private static final byte TYPE_ID = (byte) ISSUE_STATEMENT_TRANSACTION;
+	private static final String NAME_ID = "Issue Statement";
 
 	protected static final byte HAS_NOTE_MASK = (byte)(1 << 7);
 	/*

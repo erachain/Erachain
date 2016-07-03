@@ -518,7 +518,7 @@ public abstract class Transaction {
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
-		transaction.put("confirmations", this.getConfirmations());
+		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
 		if (this.creator == null )
 		{
 			transaction.put("creator", "genesis");
@@ -725,6 +725,7 @@ public abstract class Transaction {
 		
 	public abstract boolean isInvolved(Account account);
  
+	
 	public int getBlockHeight(DBSet db)
 	{
 		if(this.isConfirmed(db))
@@ -740,6 +741,26 @@ public abstract class Transaction {
 			return this.getParent(db).getTransactionSeq(this.signature);
 		}
 		return -1;
+	}
+	
+	// reference in Map - or as signatire or as BlockHeight + seqNo
+	public byte[] getRef_ForMap(DBSet db)
+	{
+		if(this.getConfirmations(db) < 500)
+		{
+			// soft or hard confirmations
+			return this.signature;
+		}
+		
+		int bh = this.getBlockHeight(db);
+		if (bh < 1)
+			// not in chain
+			return null;
+		
+		byte[] ref = Ints.toByteArray(bh);
+		Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
+		return ref;
+		
 	}
 
 	@Override 
@@ -767,25 +788,25 @@ public abstract class Transaction {
 		return db.getTransactionRef_BlockRef_Map().contains(this.getSignature());
 	}
 	
-	public int getConfirmations()
+	public int getConfirmations(DBSet db)
 	{
 		
 		try
 		{
 		//CHECK IF IN TRANSACTIONDATABASE
-		if(DBSet.getInstance().getTransactionMap().contains(this))
+		if(db.getTransactionMap().contains(this))
 		{
 			return 0;
 		}
 		
 		//CALCULATE CONFIRMATIONS
-		int lastBlockHeight = DBSet.getInstance().getHeightMap().get(DBSet.getInstance().getBlockMap().getLastBlockSignature());
+		int lastBlockHeight = db.getHeightMap().get(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
-		Block block = this.getParent(DBSet.getInstance());
+		Block block = this.getParent(db);
 		
 		//if (block == null)return 0;
 		
-		int transactionBlockHeight = DBSet.getInstance().getHeightMap().get(block);
+		int transactionBlockHeight = db.getHeightMap().get(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;
@@ -802,7 +823,8 @@ public abstract class Transaction {
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
 		if(this.isConfirmed(db))
 		{
-			return DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
+			//return DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
+			return this.getParent(db).getVersion();
 		}
 		
 		// IF UNCONFIRMED

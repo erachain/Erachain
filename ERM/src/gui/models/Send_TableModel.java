@@ -678,7 +678,7 @@ public class Send_TableModel extends JTable implements Observer{
 				Transaction tx = Controller.getInstance().getTransaction(this.signature);
 				if(tx != null)
 				{
-					return tx.getConfirmations();	
+					return tx.getConfirmations(DBSet.getInstance());	
 				}
 				else
 				{
