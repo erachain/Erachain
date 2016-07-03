@@ -51,6 +51,7 @@ import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import gui.MainFrame;
+import gui.Table_Formats;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -172,63 +173,9 @@ public class AssetPairSelect extends JFrame{
 				column6.setPreferredWidth(200);
 	    
 	    
-	    
-	    for (int i = 0; i < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) { 
-	   pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(i).addPropertyChangeListener(new PropertyChangeListener(){
-
-		@Override
-		public void propertyChange(PropertyChangeEvent arg0) {
-			// TODO Auto-generated method stub
-		PropertyChangeEvent prop = arg0;	
-		if (arg0.getPropertyName() == "width") Table_Render("333" + arg0.getSource().toString());
-		
-	//	arg0.getSource().
-		//System.out.println();
-	//	setPreferredSize(getMaximumSize());
-		
-		}
-		   
-	   });
-	    }
-	   
-	    
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.addComponentListener(new ComponentListener(){
-
-			@Override
-			public void componentHidden(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
+				// изменение высоты строки при изменении ширины  
 				
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void componentResized(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-			
-				Table_Render("2");
-				
-				
-			}
-
-			@Override
-			public void componentShown(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-	    	
-	    	
-	    	
-	    	
-	    });
-	    
-	    
-	    
-//	   Table_Render("1");
+				pair_Panel.setRowHeightFormat(true);
 	    
 
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().setPreferredSize(new Dimension(10, (int)(pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().getPreferredSize().getHeight()+6)));
@@ -303,73 +250,5 @@ public class AssetPairSelect extends JFrame{
 		this.setVisible(true);
 	}
 	
-	void Table_Render(String st){
-		
-	//	if (st==st) return;
-		Font ff = pair_Panel.jTable_jScrollPanel_LeftPanel.getFont();
-	/*	
-		 for (int i = 0; i < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) {
-		      DefaultTableColumnModel colModel = (DefaultTableColumnModel) pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnModel();
-		      TableColumn col = colModel.getColumn(i);
-		      int width = 0;
-
-		      TableCellRenderer renderer = col.getHeaderRenderer();
-		      for (int r = 0; r < pair_Panel.jTable_jScrollPanel_LeftPanel .getRowCount(); r++) {
-		        renderer = pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(r, i);
-		        Component comp = renderer.getTableCellRendererComponent(pair_Panel.jTable_jScrollPanel_LeftPanel , pair_Panel.jTable_jScrollPanel_LeftPanel .getValueAt(r, i),
-		            false, false, r, i);
-		        width = Math.max(width, comp.getPreferredSize().width);
-		      }
-		      col.setPreferredWidth(width + 2);
-		    } 
-*/
-		    for (int row = 0; row < pair_Panel.jTable_jScrollPanel_LeftPanel .getRowCount(); row++)
-		    {
-		        int rowHeight = pair_Panel.jTable_jScrollPanel_LeftPanel .getRowHeight();
-		        int roww =0;
-		     //   JLabel label = new JLabel("Test label");
-		     //   Graphics g = label.getGraphics();
-		     //   FontMetrics fm = g.getFontMetrics();
-		        
-		      //  TextLayout tl = new TextLayout(text, font, new FontRenderContext(null, true, true)); 
-		        
-		        for (int column = 0; column < pair_Panel.jTable_jScrollPanel_LeftPanel .getColumnCount(); column++)
-		        {
-		           
-		        	if (column ==3){
-		        		column=column;
-		        		
-		        		
-		        	}
-		        	// Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(row, column), row, column);
-		           // rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
-		        	// читаем данные из ячейки таблицы 
-		        	String a = pair_Panel.jTable_jScrollPanel_LeftPanel.getModel().getValueAt(row, column).toString();
-		        	if (a ==null || a =="") a=" ";
-		        	// читаем фонт ячейки таблицы
-		        	
-		        	// вычисляем длину текста в пикселях
-		        	 TextLayout tl1 = new TextLayout(a, ff, new FontRenderContext(null, true, true)); 
-		        	 Rectangle2D ss = tl1.getBounds();
-		        	 
-		        	// берем длину ячейки в пикселях
-		        	 Component comp = pair_Panel.jTable_jScrollPanel_LeftPanel .prepareRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel .getCellRenderer(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row), column), row, column);
-		        	 int ww = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(column).getWidth();
-		        	 //int ww = comp.getWidth();//.getSize().width;//.getPreferredSize().width;
-		        	 // вычисляем количество строк
-		        	  double ssh = ss.getWidth();
-		        	   int roww1 = (int)Math.ceil(ss.getWidth()/ww);
-		        	   if (roww1 <1) roww1=1;
-		        	   roww = Math.max(roww, roww1);
-		        	  
-		        	 
-		        }
-
-		        pair_Panel.jTable_jScrollPanel_LeftPanel .setRowHeight(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row), rowHeight * roww);
-		    }
-		
-		
-		
-	}
 
 }

@@ -9,8 +9,12 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +44,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.Table_Formats;
 import gui.items.unions.TableModelUnions;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -49,7 +54,7 @@ import lang.Lang;
 
 public class Search_Assets_Tab extends Split_Panel {
 	private TableModelItemAssets tableModelItemAssets;
-
+	final JTable assetsTable;
 	public Search_Assets_Tab(){
 		
 		
@@ -64,7 +69,7 @@ public class Search_Assets_Tab extends Split_Panel {
 
 	//CREATE TABLE
 	tableModelItemAssets = new TableModelItemAssets();
-	final JTable assetsTable = new JTable(tableModelItemAssets);
+	 assetsTable = new JTable(tableModelItemAssets);
 	
 	//CHECKBOX FOR DIVISIBLE
 //	TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);
@@ -143,6 +148,17 @@ public class Search_Assets_Tab extends Split_Panel {
 		jTable_jScrollPanel_LeftPanel = assetsTable;
 		jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 		
+	
+		
+// изменение высоты строки при изменении ширины  
+		
+		this.setRowHeightFormat(true);
+	  
+		
+		
+		
+		
+	
 	// MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
 	

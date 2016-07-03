@@ -144,6 +144,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel.setModel(this.tableModelPersons);
 		search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel = personsTable;
 		search_Person_SplitPanel.jScrollPanel_LeftPanel.setViewportView(search_Person_SplitPanel.jTable_jScrollPanel_LeftPanel);
+		
+		search_Person_SplitPanel.setRowHeightFormat(true);
 	
 		// select row table persons as html	
 		Person_Info info = new Person_Info(); 
@@ -425,6 +427,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		my_Person_SplitPanel.jTable_jScrollPanel_LeftPanel.setModel(personsModel);
 		my_Person_SplitPanel.jTable_jScrollPanel_LeftPanel = table;
 		my_Person_SplitPanel.jScrollPanel_LeftPanel.setViewportView(my_Person_SplitPanel.jTable_jScrollPanel_LeftPanel);		
+		my_Person_SplitPanel.setRowHeightFormat(true);
 				
 		// select row table persons	
 		Person_Info info1 = new Person_Info();

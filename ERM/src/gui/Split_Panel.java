@@ -7,6 +7,8 @@ package gui;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  *
@@ -24,7 +26,37 @@ public class Split_Panel extends javax.swing.JPanel {
     public Split_Panel() {
         initComponents();
 
+
+        
+        
+        
+        
       
+    }
+    public void setRowHeightFormat(boolean format){
+    	// изменение высоты строки при изменении ширины
+    	if (!format) return;
+	    for (int i = 0; i < jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) { 
+	   jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(i).addPropertyChangeListener(new PropertyChangeListener(){
+
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+			// TODO Auto-generated method stub
+		PropertyChangeEvent prop = arg0;	
+		if (arg0.getPropertyName() == "width") 		new Table_Formats().Table_Row_Auto_Height(jTable_jScrollPanel_LeftPanel); //Table_Render("333" + arg0.getSource().toString(), pair_Panel.jTable_jScrollPanel_LeftPanel);
+		
+	//	arg0.getSource().
+		//System.out.println();
+	//	setPreferredSize(getMaximumSize());
+		
+		}
+		   
+	   });
+	    }
+    	
+    	
+    	
+    	
     }
 
     /**

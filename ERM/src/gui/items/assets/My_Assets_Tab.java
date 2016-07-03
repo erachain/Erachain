@@ -7,6 +7,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
@@ -32,6 +34,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.Table_Formats;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
@@ -46,6 +49,7 @@ public class My_Assets_Tab extends Split_Panel {
 	WalletItemAssetsTableModel assetsModel;
 	private static final long serialVersionUID = 1L;
 	RowSorter<WalletItemAssetsTableModel> sorter;
+	final JTable table;
 
 	public My_Assets_Tab()
 	{
@@ -61,7 +65,7 @@ public class My_Assets_Tab extends Split_Panel {
 		
 	//TABLE
 	 assetsModel = new WalletItemAssetsTableModel();
-	final JTable table = new JTable(assetsModel);
+	table = new JTable(assetsModel);
 	//assetsModel.getAsset(row)
 	//POLLS SORTER
 	 sorter =   new TableRowSorter<WalletItemAssetsTableModel>(assetsModel);
@@ -146,9 +150,38 @@ public class My_Assets_Tab extends Split_Panel {
 			});
 	
 	
+			this.jTable_jScrollPanel_LeftPanel.addComponentListener(new ComponentListener(){
+
+					@Override
+					public void componentHidden(ComponentEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void componentMoved(ComponentEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void componentResized(ComponentEvent arg0) {
+						// TODO Auto-generated method stub
+					
+					//	Table_Render("2", pair_Panel.jTable_jScrollPanel_LeftPanel);
+						
+				new Table_Formats().Table_Row_Auto_Height(table);
+						
+					}
+
+					@Override
+					public void componentShown(ComponentEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+			    	
 	
-	
-	
+			});
 	
 	
 	
