@@ -140,7 +140,7 @@ public class TransactionsResource {
 		//CHECK ADDRESS
 		if(!Crypto.getInstance().isValidAddress(address))
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
 		
 		//CHECK ACCOUNT IN WALLET
@@ -171,7 +171,7 @@ public class TransactionsResource {
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 		
 		//GET TRANSACTION
@@ -180,7 +180,7 @@ public class TransactionsResource {
 		//CHECK IF TRANSACTION EXISTS
 		if(transaction == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_TRANSACTION_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
 		
 		return transaction.toJson().toJSONString();
@@ -241,7 +241,7 @@ public class TransactionsResource {
 				}
 				catch(Exception e)
 				{
-					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 				}
 						
 				block = Controller.getInstance().getBlock(signatureBytes);
@@ -249,7 +249,7 @@ public class TransactionsResource {
 				//CHECK IF BLOCK EXISTS
 				if(block == null)
 				{
-					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 				}	
 			}
 			
@@ -334,7 +334,7 @@ public class TransactionsResource {
 					//CHECK ADDRESS
 					if(!Crypto.getInstance().isValidAddress(address))
 					{
-						throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 					}
 					
 					account = new Account(address);
@@ -421,7 +421,7 @@ public class TransactionsResource {
 		// CHECK IF VALID ADDRESS
 		if (address != null && !Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 		
 		String sender = (String) jsonObject.get("sender");
@@ -429,7 +429,7 @@ public class TransactionsResource {
 		// CHECK IF VALID ADDRESS
 		if (sender != null && !Crypto.getInstance().isValidAddress(sender)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 		
 		String recipient = (String) jsonObject.get("recipient");
@@ -437,7 +437,7 @@ public class TransactionsResource {
 		// CHECK IF VALID ADDRESS
 		if (recipient != null && !Crypto.getInstance().isValidAddress(recipient)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 		
 		boolean count = false;

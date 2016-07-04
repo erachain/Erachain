@@ -20,6 +20,7 @@ import utils.Pair;
 import controller.Controller;
 import core.crypto.Base58;
 import core.payment.Payment;
+import core.transaction.Transaction;
 import api.BlogPostResource;
 
 @Path("calcfee")
@@ -49,7 +50,7 @@ public class CalcFeeResource {
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DATA);
 			}
 
 			List<Payment> payments = MultiPaymentResource.jsonPaymentParser(((JSONArray)jsonObject.get("payments")));

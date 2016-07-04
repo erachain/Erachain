@@ -2,6 +2,7 @@ package gui.naming;
 
 import gui.PasswordPane;
 import gui.models.NameSalesComboBoxModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -21,6 +22,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
@@ -221,55 +223,13 @@ public class CancelSellNameFrame extends JFrame
 			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(owner, nameSale, feePow);
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK) {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Cancel name sale has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				this.dispose();
-				break;	
-			
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			case Transaction.NAME_DOES_NOT_EXIST:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("That name does not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-			
-			case Transaction.INVALID_ADDRESS:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid owner!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_NAME_CREATOR:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("You are no longer the owner this name!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.NAME_NOT_FOR_SALE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("That name is not for sale!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.NO_BALANCE:
-			
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
 			}
+			else {
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			this.dispose();
 		}
 		catch(Exception e)
 		{

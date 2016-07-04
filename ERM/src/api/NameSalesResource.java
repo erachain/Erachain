@@ -76,7 +76,7 @@ public class NameSalesResource
 		//CHECK ADDRESS
 		if(!Crypto.getInstance().isValidAddress(address))
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
 				
 		//CHECK ACCOUNT IN WALLET
@@ -104,7 +104,7 @@ public class NameSalesResource
 		//CHECK IF NAME SALE EXISTS
 		if(nameSale == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_SALE_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 		}
 		
 		return nameSale.toJson().toJSONString();
@@ -147,7 +147,7 @@ public class NameSalesResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
 			}
 				
 			
@@ -180,61 +180,24 @@ public class NameSalesResource
 			Name name = Controller.getInstance().getName(nameName);
 			if(name == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			//GET OWNER
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(name.getOwner().getAddress());				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);
+				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
 				
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().sellName(account, nameName, bdAmount, feePow);
 				
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-			
-			case Transaction.INVALID_NAME_LENGTH:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-					
-			case Transaction.NAME_DOES_NOT_EXIST:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);	
-				
-			case Transaction.INVALID_ADDRESS:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);		
-				
-			case Transaction.INVALID_NAME_CREATOR:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);		
-			
-			case Transaction.NAME_ALREADY_ON_SALE:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);	
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);				
-				
-			case Transaction.NOT_ENOUGH_FEE:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-									
-			case Transaction.NO_BALANCE:	
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-				
-			default:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
-			}
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
+
 		}
 		catch(NullPointerException e)
 		{
@@ -263,7 +226,7 @@ public class NameSalesResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
 			}	
 			
 			NameSale nameSale = Controller.getInstance().getNameSale(nameName);
@@ -286,57 +249,24 @@ public class NameSalesResource
 			//CHECK IF NAME SALE EXISTS
 			if(nameSale == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			//GET OWNER
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);
+				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
 			
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(account, nameSale, feePow);
 				
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-			
-			case Transaction.INVALID_NAME_LENGTH:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-					
-			case Transaction.NAME_DOES_NOT_EXIST:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);	
-				
-			case Transaction.INVALID_ADDRESS:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);		
-				
-			case Transaction.INVALID_NAME_CREATOR:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_OWNER);		
-			
-			case Transaction.NAME_NOT_FOR_SALE:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_SALE_NO_EXISTS);	
-					
-			case Transaction.NOT_ENOUGH_FEE:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-									
-			case Transaction.NO_BALANCE:	
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-				
-			default:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
-			}
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
+
 		}
 		catch(NullPointerException e)
 		{
@@ -370,7 +300,7 @@ public class NameSalesResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
 			}
 
 			String password = null;
@@ -393,67 +323,30 @@ public class NameSalesResource
 			//CHECK IF NAME SALE EXISTS
 			if(nameSale == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(buyer))
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 			}
 			
 			//GET BUYER
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(buyer);				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_BUYER);
+				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
 			
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(account, nameSale, feePow);
 				
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-			
-			case Transaction.INVALID_NAME_LENGTH:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);
-				
-			case Transaction.INVALID_AMOUNT:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);	
-					
-			case Transaction.NAME_DOES_NOT_EXIST:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NO_EXISTS);	
-							
-			case Transaction.BUYER_ALREADY_OWNER: 	
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BUYER_ALREADY_OWNER);	
-				
-			case Transaction.NAME_NOT_FOR_SALE:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_SALE_NO_EXISTS);		
-				
-			case Transaction.NOT_ENOUGH_FEE:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-					
-			case Transaction.NO_BALANCE:	
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-				
-			default:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
-			}
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
+
 		}
 		catch(NullPointerException e)
 		{

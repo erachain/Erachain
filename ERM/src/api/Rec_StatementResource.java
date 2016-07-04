@@ -24,19 +24,21 @@ import core.crypto.Crypto;
 import core.naming.Name;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.transaction.OnDealClick;
+import lang.Lang;
 import ntp.NTP;
 import utils.APIUtils;
 import utils.Converter;
 import utils.Pair;
 
-@Path("statement")
+@Path("rec_statement")
 @Produces(MediaType.APPLICATION_JSON)
-public class StatementResource {
+public class Rec_StatementResource {
 
 	
 	
 	private static final Logger LOGGER = Logger
-			.getLogger(StatementResource.class);
+			.getLogger(Rec_StatementResource.class);
 	
 	@Context
 	HttpServletRequest request;
@@ -76,7 +78,7 @@ public class StatementResource {
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(maker)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_SENDER);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			// check this up here to avoid leaking wallet information to remote user
@@ -102,7 +104,7 @@ public class StatementResource {
 					.getPrivateKeyAccountByAddress(maker);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_SENDER);
+						Transaction.CREATOR_NOT_OWNER);
 			}
 
 			// TODO this is duplicate code -> Send money Panel, we should add
@@ -123,7 +125,7 @@ public class StatementResource {
 
 				if (messageBytes.length > 4000) {
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_MESSAGESIZE_EXCEEDED);
+							Transaction.INVALID_DATA_LENGTH);
 				}
 
 				// TODO duplicate code -> SendMoneyPanel
@@ -153,11 +155,9 @@ public class StatementResource {
 
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-			else {
-
+			else
 				throw ApiErrorFactory.getInstance().createError(result.getB());
 
-			}
 		}
 		catch(NullPointerException| ClassCastException e)
 		{

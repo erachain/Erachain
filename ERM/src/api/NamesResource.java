@@ -81,7 +81,7 @@ public class NamesResource {
 		// CHECK ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 
 		JSONArray array = new JSONArray();
@@ -152,7 +152,7 @@ public class NamesResource {
 		// CHECK IF NAME EXISTS
 		if (name == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
 		return name.toJson().toJSONString();
@@ -175,13 +175,13 @@ public class NamesResource {
 				feePow = Integer.parseInt(fee);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						Transaction.INVALID_FEE_POWER);
 			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(registrant)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -204,48 +204,18 @@ public class NamesResource {
 					.getPrivateKeyAccountByAddress(registrant);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			// CREATE NAME
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.registerName(account, account, name, value, feePow);
 
-			switch (result.getB()) {
-			case Transaction.VALIDATE_OK:
-
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-
-			case Transaction.NAME_NOT_LOWER_CASE:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NOT_LOWER_CASE);
-
-			case Transaction.INVALID_NAME_LENGTH:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-
-			case Transaction.INVALID_VALUE_LENGTH:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_VALUE_LENGTH);
-
-			case Transaction.NAME_ALREADY_REGISTRED:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_ALREADY_EXISTS);
-
-			case Transaction.NO_BALANCE:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NO_BALANCE);
-
-			default:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_UNKNOWN);
-			}
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
+			
 		} catch (NullPointerException e) {
 			// JSON EXCEPTION
 			throw ApiErrorFactory.getInstance().createError(
@@ -276,7 +246,7 @@ public class NamesResource {
 				feePow = Integer.parseInt(fee);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						Transaction.INVALID_FEE_POWER);
 			}
 
 			String password = null;
@@ -300,7 +270,7 @@ public class NamesResource {
 			Name name = Controller.getInstance().getName(nameName);
 			if (name == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 			}
 
 			// GET ACCOUNT
@@ -309,7 +279,8 @@ public class NamesResource {
 					.getPrivateKeyAccountByAddress(name.getOwner().getAddress());
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_NAME_OWNER);
+						Transaction.CREATOR_NOT_OWNER);
+
 			}
 
 			String oldValue = GZIP.webDecompress(name.getValue());
@@ -324,7 +295,7 @@ public class NamesResource {
 				if (!resultJson.containsKey(key)) {
 
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_KEY_NOT_EXISTS);
+							Transaction.NAME_DOES_NOT_EXIST);
 
 				} else {
 
@@ -346,10 +317,10 @@ public class NamesResource {
 				if(key.equals(Corekeys.DEFAULT.toString()))
 				{
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_LAST_KEY_IS_DEFAULT_KEY_ERROR);
+							Transaction.LAST_KEY_IS_DEFAULT_KEY);
 				}
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_KEY_NOT_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 
 			}
 
@@ -398,7 +369,7 @@ public class NamesResource {
 					update = Boolean.parseBoolean(updateString);
 				} else {
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_INVALID_UPDATE_VALUE);
+							Transaction.INVALID_UPDATE_VALUE);
 				}
 			}
 
@@ -408,7 +379,7 @@ public class NamesResource {
 				feePow = Integer.parseInt(fee);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						Transaction.INVALID_FEE_POWER);
 			}
 
 			String password = null;
@@ -431,7 +402,7 @@ public class NamesResource {
 			Name name = Controller.getInstance().getName(nameName);
 			if (name == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 			}
 
 			// GET ACCOUNT
@@ -440,7 +411,7 @@ public class NamesResource {
 					.getPrivateKeyAccountByAddress(name.getOwner().getAddress());
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_NAME_OWNER);
+						Transaction.CREATOR_NOT_OWNER);
 			}
 
 			String oldValue = GZIP.webDecompress(name.getValue());
@@ -455,7 +426,7 @@ public class NamesResource {
 				if (resultJson.containsKey(key)) {
 					if (!update) {
 						throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_KEY_ALREADY_EXISTS);
+								Transaction.NAME_KEY_ALREADY_EXISTS);
 					}
 
 				}
@@ -506,13 +477,13 @@ public class NamesResource {
 				feePow = Integer.parseInt(fee);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_FEE);
+						Transaction.INVALID_FEE_POWER);
 			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(newOwner)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -535,7 +506,7 @@ public class NamesResource {
 			Name name = Controller.getInstance().getName(nameName);
 			if (name == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.CREATOR_NOT_OWNER);
 			}
 
 			// GET ACCOUNT
@@ -544,7 +515,7 @@ public class NamesResource {
 					.getPrivateKeyAccountByAddress(name.getOwner().getAddress());
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_NAME_OWNER);
+						Transaction.CREATOR_NOT_OWNER);
 			}
 
 			// UPDATE NAME
@@ -565,40 +536,9 @@ public class NamesResource {
 	}
 
 	public String checkNameTransaction(Pair<Transaction, Integer> result) {
-		switch (result.getB()) {
-		case Transaction.VALIDATE_OK:
-
+		if (result.getB() == Transaction.VALIDATE_OK)
 			return result.getA().toJson().toJSONString();
-
-		case Transaction.INVALID_NAME_LENGTH:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-
-		case Transaction.INVALID_VALUE_LENGTH:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_VALUE_LENGTH);
-
-		case Transaction.NAME_DOES_NOT_EXIST:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_NO_EXISTS);
-
-		case Transaction.NAME_ALREADY_ON_SALE:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_ALREADY_FOR_SALE);
-
-		case Transaction.NO_BALANCE:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NO_BALANCE);
-
-		default:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_UNKNOWN);
-		}
+		else
+			throw ApiErrorFactory.getInstance().createError(result.getB());
 	}
 }

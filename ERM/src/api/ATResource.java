@@ -154,7 +154,9 @@ public class ATResource
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(creator))
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SENDER);
+				throw ApiErrorFactory.getInstance().createError(
+						//ApiErrorFactory.ERROR_INVALID_SENDER);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -176,14 +178,14 @@ public class ATResource
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SENDER);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_CREATOR);
 			}
 			
 			String name = (String) jsonObject.get("name");
 			
 			if ( name.getBytes(StandardCharsets.UTF_8).length > AT_Constants.NAME_MAX_LENGTH || name.length() < 1 )
 			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_NAME_LENGTH );
+				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_NAME_LENGTH );
 			}
 			
 			String desc = (String) jsonObject.get("description");
@@ -214,7 +216,7 @@ public class ATResource
 			}
 			catch (Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
+				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_FEE_POWER );
 
 			}
 			
@@ -226,7 +228,7 @@ public class ATResource
 			}
 			catch (Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_AMOUNT );
+				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_AMOUNT );
 
 			}
 			
@@ -242,7 +244,7 @@ public class ATResource
 				data = "";
 			if((data.length() & 1) != 0)
 			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_DATA_SIZE );
+				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_DATA_LENGTH );
 			}
 
 			int cpages = (code.length() / 2 / 256) + (((code.length() / 2) % 256 ) != 0 ? 1 : 0);
@@ -277,7 +279,7 @@ public class ATResource
 			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock()
 					.getHeight(DBSet.getInstance())) > lFee )
 			{
-				throw ApiErrorFactory.getInstance().createError( ApiErrorFactory.ERROR_INVALID_FEE );
+				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_FEE_POWER );
 			}
 			BigDecimal minActivationAmountB = new BigDecimal((String) jsonObject.get("minActivationAmount")).setScale(8);
 
@@ -332,27 +334,10 @@ public class ATResource
 			
 			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(sender, name, desc , type , tags , creationBytes, quantity, feePow);
 
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
-			case Transaction.INVALID_CREATION_BYTES:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_CREATION_BYTES);
-			case Transaction.NOT_YET_RELEASED:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);	
-			case Transaction.NOT_ENOUGH_FEE:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);	
-			case Transaction.NEGATIVE_AMOUNT:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);	
-			case Transaction.NO_BALANCE:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);	
-			case Transaction.INVALID_NAME_LENGTH:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);	
-			case Transaction.INVALID_DESCRIPTION_LENGTH:
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DESC_LENGTH);	
-			default:
-				throw ApiErrorFactory.getInstance().createError(result.getB());		
-			}
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
 			
 	}
 	

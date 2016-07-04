@@ -63,7 +63,8 @@ public class PollsResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_FEE_POWER);
 			}	
 			
 			//PARSE OPTIONS
@@ -84,7 +85,7 @@ public class PollsResource
 			//CHECK CREATOR
 			if(!Crypto.getInstance().isValidAddress(creator))
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -106,66 +107,17 @@ public class PollsResource
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
 				
 			//CREATE POLL
 			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, feePow);
 				
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
 			
-			case Transaction.NOT_YET_RELEASED:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);		
-				
-			case Transaction.NAME_NOT_LOWER_CASE:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NOT_LOWER_CASE);	
-				
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);	
-			
-			case Transaction.INVALID_VALUE_LENGTH:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_VALUE_LENGTH);	
-				
-			case Transaction.POLL_ALREADY_CREATED:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_ALREADY_EXISTS);		
-				
-			case Transaction.INVALID_ADDRESS:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
-					
-			case Transaction.INVALID_OPTIONS_LENGTH:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_OPTIONS_LENGTH);	
-				
-			case Transaction.INVALID_OPTION_LENGTH:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_OPTION_LENGTH);	
-				
-			case Transaction.DUPLICATE_OPTION:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_DUPLICATE_OPTION);		
-			
-			case Transaction.NOT_ENOUGH_FEE:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-									
-			case Transaction.NO_BALANCE:	
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-			
-			default:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);	
-			}
 		}
 		catch(NullPointerException | ClassCastException e)
 		{
@@ -196,13 +148,14 @@ public class PollsResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_FEE_POWER);
 			}	
 			
 			//CHECK VOTER
 			if(!Crypto.getInstance().isValidAddress(voter))
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -224,68 +177,31 @@ public class PollsResource
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(voter);				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
 			
 			//GET POLL
 			Poll poll = Controller.getInstance().getPoll(name);
 			if(poll == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
 			}
 			
 			//GET OPTION
 			PollOption pollOption = poll.getOption(option);
 			if(pollOption == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_OPTION_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.POLL_OPTION_NOT_EXISTS);
 			}
 				
 			//CREATE POLL
 			Pair<Transaction, Integer> result = Controller.getInstance().createPollVote(account, poll, pollOption, feePow);
 				
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
 			
-			case Transaction.NOT_YET_RELEASED:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);		
-				
-			case Transaction.NAME_NOT_LOWER_CASE:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NAME_NOT_LOWER_CASE);	
-				
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);	
-			
-			case Transaction.POLL_NOT_EXISTS:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_NO_EXISTS);
-				
-			case Transaction.OPTION_NOT_EXISTS:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_OPTION_NO_EXISTS);	
-				
-			case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_ALREADY_VOTED_FOR_THAT_OPTION);	
-				
-			case Transaction.NOT_ENOUGH_FEE:
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-									
-			case Transaction.NO_BALANCE:	
-					
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-			
-			default:
-				
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);	
-			}
 		}
 		catch(NullPointerException | ClassCastException e)
 		{
@@ -336,7 +252,7 @@ public class PollsResource
 		//CHECK ADDRESS
 		if(!Crypto.getInstance().isValidAddress(address))
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
 				
 		//CHECK ACCOUNT IN WALLET
@@ -364,7 +280,7 @@ public class PollsResource
 		//CHECK IF NAME EXISTS
 		if(poll == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_POLL_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
 		}
 		
 		return poll.toJson().toJSONString();

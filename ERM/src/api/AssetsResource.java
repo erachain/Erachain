@@ -10,6 +10,7 @@ import org.json.simple.JSONValue;
 
 import controller.Controller;
 import core.blockexplorer.BlockExplorer;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @Path("assets")
@@ -41,13 +42,17 @@ public class AssetsResource
 
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+
 		}
 
 		// DOES ASSETID EXIST
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+
 		}
 		
 		return Controller.getInstance().getAsset(assetAsLong).toJson().toJSONString();
@@ -65,13 +70,16 @@ public class AssetsResource
 
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+
 		}
 
 		// DOES ASSETID EXIST
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
 		}
 		
 		return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAsset(assetAsLong));

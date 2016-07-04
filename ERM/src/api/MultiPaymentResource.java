@@ -61,7 +61,7 @@ public class MultiPaymentResource
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
 			}
 
 			List<Payment> payments = jsonPaymentParser((JSONArray)jsonObject.get("payments"), defaultAsset);
@@ -69,7 +69,7 @@ public class MultiPaymentResource
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(sender)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_SENDER);
+						Transaction.INVALID_ADDRESS);
 			}
 			
 			// CHECK IF WALLET EXISTS
@@ -89,7 +89,7 @@ public class MultiPaymentResource
 					.getPrivateKeyAccountByAddress(sender);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_SENDER);
+						Transaction.INVALID_ADDRESS);
 			}
 			
 			int feePow=0;
@@ -106,39 +106,11 @@ public class MultiPaymentResource
 			
 			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(account, payments, feePow);
 			
-			switch (result.getB()) {
-			case Transaction.VALIDATE_OK:
-
+			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
+			else
+				throw ApiErrorFactory.getInstance().createError(result.getB());
 
-			case Transaction.INVALID_ADDRESS:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_RECIPIENT);
-
-			case Transaction.NOT_ENOUGH_FEE:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NO_BALANCE);
-
-			case Transaction.NO_BALANCE:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NO_BALANCE);
-
-			case Transaction.INVALID_AMOUNT:
-				throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_AMOUNT);
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_AMOUNT);
-				
-			default:
-
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_UNKNOWN);
-			}
 		}
 		catch(NullPointerException | ClassCastException e)
 		{
@@ -168,7 +140,7 @@ public class MultiPaymentResource
 			String recipient = jsonPayment.get("recipient").toString();
 			if (!Crypto.getInstance().isValidAddress(recipient)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_RECIPIENT);
+						Transaction.INVALID_ADDRESS);
 			}
 			Account paymentRecipient = new Account(jsonPayment.get("recipient").toString());
 			
@@ -178,7 +150,7 @@ public class MultiPaymentResource
 					paymentAsset = Controller.getInstance().getAsset(new Long(jsonPayment.get("asset").toString()));
 				} catch (Exception e) {
 					throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+							Transaction.INVALID_ITEM_VALUE);
 				}
 			}
 			
@@ -189,7 +161,7 @@ public class MultiPaymentResource
 				bdAmount = bdAmount.setScale(8);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_AMOUNT);
+						Transaction.INVALID_AMOUNT);
 			}
 			
 			Payment payment = new Payment(paymentRecipient, paymentAsset.getKey(), bdAmount);

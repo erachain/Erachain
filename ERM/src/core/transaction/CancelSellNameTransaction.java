@@ -200,7 +200,7 @@ public class CancelSellNameTransaction extends Transaction
 		//CHECK IF OWNER IS OWNER
 		if(!name.getOwner().getAddress().equals(this.creator.getAddress()))
 		{
-			return INVALID_NAME_CREATOR;
+			return INVALID_MAKER_ADDRESS;
 		}
 		
 		//CHECK IF NAME FOR SALE ALREADY

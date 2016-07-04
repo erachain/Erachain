@@ -21,6 +21,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.transaction.Transaction;
 import database.DBSet;
 
 @Path("blocks")
@@ -63,7 +64,7 @@ public class BlocksResource
 		//CHECK ADDRESS
 		if(!Crypto.getInstance().isValidAddress(address))
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
 
 		String password = null;
@@ -103,7 +104,7 @@ public class BlocksResource
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 				
 		Block block = Controller.getInstance().getBlock(signatureBytes);
@@ -111,7 +112,7 @@ public class BlocksResource
 		//CHECK IF BLOCK EXISTS
 		if(block == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
 		return block.toJson().toJSONString();
@@ -143,7 +144,7 @@ public class BlocksResource
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 				
 		Block block = Controller.getInstance().getBlock(signatureBytes);
@@ -151,7 +152,7 @@ public class BlocksResource
 		//CHECK IF BLOCK EXISTS
 		if(block == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
 		Block child = block.getChild(DBSet.getInstance());
@@ -159,7 +160,7 @@ public class BlocksResource
 		//CHECK IF CHILD EXISTS
 		if(child == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
 		return child.toJson().toJSONString();
@@ -185,7 +186,7 @@ public class BlocksResource
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 		
 		Block block = Controller.getInstance().getBlock(signatureBytes);
@@ -193,7 +194,7 @@ public class BlocksResource
 		//CHECK IF BLOCK EXISTS
 		if(block == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
 		long generatingBalance = Controller.getInstance().getNextBlockGeneratingBalance(block);
@@ -236,7 +237,7 @@ public class BlocksResource
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 
 		Block block = DBSet.getInstance().getBlockMap().get(signatureBytes);
@@ -244,7 +245,7 @@ public class BlocksResource
 		//CHECK IF BLOCK EXISTS
 		if(block == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
 		return String.valueOf(block.getHeight(DBSet.getInstance()));
@@ -260,12 +261,12 @@ public class BlocksResource
 			block = Controller.getInstance().getBlockByHeight(height);
 			if(block == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 			}
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_BLOCK_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		return block.toJson().toJSONString();
 	}

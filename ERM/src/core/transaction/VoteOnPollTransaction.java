@@ -240,7 +240,7 @@ public class VoteOnPollTransaction extends Transaction
 		Poll poll = db.getPollMap().get(this.poll);
 		if(poll.getOptions().size()-1 < this.option || this.option < 0)
 		{
-			return OPTION_NOT_EXISTS;
+			return POLL_OPTION_NOT_EXISTS;
 		}
 		
 		//CHECK IF NOT VOTED ALREADY

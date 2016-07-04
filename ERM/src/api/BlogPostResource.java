@@ -76,7 +76,7 @@ public class BlogPostResource {
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(creator)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			String password = null;
@@ -100,7 +100,7 @@ public class BlogPostResource {
 					.getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			JSONObject dataStructure = new JSONObject();
@@ -179,7 +179,7 @@ public class BlogPostResource {
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(creator)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			Profile profileOpt = Profile.getProfileOpt(blognameOpt);
@@ -228,7 +228,7 @@ public class BlogPostResource {
 					.getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			JSONObject dataStructure = new JSONObject();
@@ -296,7 +296,7 @@ public class BlogPostResource {
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(creator)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			isPostAllowed(blogname);
@@ -341,7 +341,7 @@ public class BlogPostResource {
 					.getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			JSONObject dataStructure = new JSONObject();

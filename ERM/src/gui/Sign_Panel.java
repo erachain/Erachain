@@ -16,9 +16,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -526,6 +530,20 @@ public class Sign_Panel extends JPanel
 		this.packButton.setEnabled(true);
 	}
 
+	private List<String> vars = new ArrayList<String>();
+
+	// find variables in description
+	// ...{{Name!format}}...
+	// format - 
+	private void handleVars(String description) {
+		Pattern pattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
+		//Pattern pattern = Pattern.compile("{{(.+)}}");
+		Matcher matcher = pattern.matcher(description);
+		while (matcher.find()) {
+			String varName = matcher.group(1);
+			vars.add(varName);
+			//description = description.replace(matcher.group(), getImgHtml(url));
+		}
+	}
+
 }
-
-

@@ -63,7 +63,9 @@ public class ArbitraryTransactionsResource
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+						Transaction.ASSET_DOES_NOT_EXIST);
+
 			}
 			
 			List<Payment> payments = MultiPaymentResource.jsonPaymentParser((JSONArray)jsonObject.get("payments"), defaultAsset);
@@ -76,7 +78,9 @@ public class ArbitraryTransactionsResource
 			}
 			catch(Exception e)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA);
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_DATA);
+
 			}
 				
 			//PARSE FEE
@@ -89,14 +93,19 @@ public class ArbitraryTransactionsResource
 				}
 				catch(Exception e)
 				{
-					throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_FEE);
+					throw ApiErrorFactory.getInstance().createError(
+							Transaction.INVALID_FEE_POWER);
+
 				}	
 			}
 			
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(creator))
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(
+						//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
+
 			}
 				
 			//CHECK IF WALLET EXISTS
@@ -117,7 +126,10 @@ public class ArbitraryTransactionsResource
 			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);				
 			if(account == null)
 			{
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(
+						//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
+
 			}
 				
 			//SEND PAYMENT
@@ -134,36 +146,11 @@ public class ArbitraryTransactionsResource
 	}
 
 	public static String checkArbitraryTransaction(Pair<Transaction, Integer> result) {
-		switch(result.getB())
-		{
-		case Transaction.VALIDATE_OK:
-			
+		
+		
+		if (result.getB() == Transaction.VALIDATE_OK)
 			return result.getA().toJson().toJSONString();
-			
-		case Transaction.NOT_YET_RELEASED:
-			
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NOT_YET_RELEASED);			
 		
-		case Transaction.INVALID_DATA_LENGTH:
-			
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_DATA_LENGTH);	
-
-		case Transaction.NOT_ENOUGH_FEE:
-				
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-							
-		case Transaction.NO_BALANCE:	
-				
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_NO_BALANCE);
-		
-		case Transaction.NEGATIVE_AMOUNT:	
-		case Transaction.INVALID_AMOUNT:
-			
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_AMOUNT);
-			
-		default:
-			
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);	
-		}
+		throw ApiErrorFactory.getInstance().createError(result.getB());			
 	}
 }

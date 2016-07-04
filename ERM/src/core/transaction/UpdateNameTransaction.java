@@ -203,7 +203,7 @@ public class UpdateNameTransaction extends Transaction
 		//CHECK IF CREATOR IS CREATOR
 		if(!db.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress()))
 		{
-			return INVALID_NAME_CREATOR;
+			return INVALID_CREATOR;
 		}
 						
 		return super.isValid(db, releaserReference);

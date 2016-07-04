@@ -58,7 +58,7 @@ public class NameStorageResource {
 
 		if (nameObj == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_NOT_REGISTERED);
+					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
 		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
@@ -85,7 +85,7 @@ public class NameStorageResource {
 
 		if (nameObj == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_NOT_REGISTERED);
+					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
 		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
@@ -112,7 +112,7 @@ public class NameStorageResource {
 
 		if (nameObj == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_NOT_REGISTERED);
+					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
 		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
@@ -160,7 +160,7 @@ public class NameStorageResource {
 				if(accountByAddress == null)
 				{
 					throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_NAME_NOT_REGISTERED);
+							Transaction.NAME_DOES_NOT_EXIST);
 				}
 
 				creator = name;
@@ -172,7 +172,7 @@ public class NameStorageResource {
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(creator)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			// CHECK ACCOUNT IN WALLET
@@ -197,7 +197,7 @@ public class NameStorageResource {
 					
 					if (!Crypto.getInstance().isValidAddress(address)) {
 						throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_INVALID_ADDRESS);
+								Transaction.INVALID_ADDRESS);
 					}
 					
 					String amountAssetJson = (String) paymentsJson.get(address);
@@ -213,7 +213,7 @@ public class NameStorageResource {
 						bdAmount = bdAmount.setScale(8);
 					} catch (Exception e) {
 						throw ApiErrorFactory.getInstance().createError(
-							ApiErrorFactory.ERROR_INVALID_AMOUNT);
+								Transaction.INVALID_AMOUNT);
 					}
 					
 					AssetCls paymentAsset = Controller.getInstance().getAsset(new Long(0L));
@@ -223,7 +223,7 @@ public class NameStorageResource {
 							paymentAsset = Controller.getInstance().getAsset(new Long(amountAssetJsonObject.get(ASSET_JSON_KEY).toString()));
 						} catch (Exception e) {
 							throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+									Transaction.ASSET_DOES_NOT_EXIST);
 						}
 					}
 					
@@ -388,13 +388,13 @@ public class NameStorageResource {
 							.getPrivateKeyAccountByAddress(creator);
 					if (account == null) {
 						throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_INVALID_ADDRESS);
+								Transaction.CREATOR_NOT_OWNER);
 					}
 					
 					if (account.getBalance(1, Transaction.FEE_KEY, DBSet.getInstance()).compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
-								ApiErrorFactory.ERROR_NO_BALANCE);
+								Transaction.NO_BALANCE);
 					}
 					
 					Pair<Transaction, Integer> result;
@@ -445,7 +445,7 @@ public class NameStorageResource {
 					.getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.CREATOR_NOT_OWNER);
 			}
 			
 			// SEND PAYMENT

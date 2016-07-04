@@ -580,7 +580,7 @@ public class TransactionTests {
 		nameRegistration.process(databaseSet, false);	
 		
 		//CHECK IF NAME UPDATE IS INVALID
-		assertEquals(Transaction.INVALID_NAME_CREATOR, nameUpdate.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameUpdate.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		name = new Name(invalidOwner, "test2", "this is the value");
@@ -830,7 +830,7 @@ public class TransactionTests {
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-		assertEquals(Transaction.INVALID_NAME_CREATOR, nameSaleTransaction.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(8));
@@ -1085,7 +1085,7 @@ public class TransactionTests {
 		//CHECK IF NAME UPDATE IS INVALID
 		cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
-		assertEquals(Transaction.INVALID_NAME_CREATOR, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.INVALID_MAKER_ADDRESS, cancelNameSaleTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
 		cancelNameSaleTransaction = new CancelSellNameTransaction(invalidOwner, "test2", FEE_POWER, timestamp, last_ref);
@@ -1848,13 +1848,13 @@ public class TransactionTests {
 		pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);	
 		
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CREATE INVALID POLL VOTE INVALID OPTION
 		pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, last_ref);	
 				
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(Transaction.OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
+		assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(databaseSet, releaserReference));
 		
 		//CRTEATE INVALID POLL VOTE VOTED ALREADY
 		pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);

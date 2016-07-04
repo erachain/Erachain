@@ -107,14 +107,14 @@ public class TestRec_Vouch {
 		assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(db, releaserReference));
 		
 		vouchRecord = new R_Vouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastReference(db), new byte[64]);		
-		assertEquals(Transaction.INVALID_BLOCK_HEIGHT_ERROR, vouchRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(db, releaserReference));
 
 		// SET <2 in isValid()
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastReference(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(db, releaserReference));
 
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastReference(db), new byte[64]);		
-		assertEquals(Transaction.INVALID_BLOCK_HEIGHT_ERROR, vouchRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(db, releaserReference));
 
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastReference(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(db, releaserReference));

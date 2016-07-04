@@ -217,7 +217,7 @@ public class BuyNameTransaction extends Transaction
 		//CHECK IF SELLER IS SELLER
 		if(!name.getOwner().getAddress().equals(this.seller.getAddress()))
 		{
-			return INVALID_SELLER;
+			return INVALID_MAKER_ADDRESS;
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY

@@ -194,7 +194,7 @@ public class SellNameTransaction extends Transaction
 		//CHECK IF CREATOR IS CREATOR
 		if(!db.getNameMap().get(this.nameSale.getKey()).getOwner().getAddress().equals(this.creator.getAddress()))
 		{
-			return INVALID_NAME_CREATOR;
+			return INVALID_MAKER_ADDRESS;
 		}
 		
 		//CHECK IF NOT FOR SALE ALREADY

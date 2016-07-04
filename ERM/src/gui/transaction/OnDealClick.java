@@ -74,6 +74,10 @@ public class OnDealClick
 		case Transaction.NOT_ENOUGH_FEE:
 			mess = "Not enought fee";
 			break;
+		case Transaction.INVALID_FEE_POWER:
+			mess = "Invalid fee power";
+			break;
+			
 		case Transaction.NO_BALANCE:
 			mess = "No balance";
 			break;
@@ -83,7 +87,12 @@ public class OnDealClick
 		case Transaction.INVALID_TIMESTAMP:
 			mess = "Invalid timestamp";
 			break;
-			
+		case Transaction.INVALID_MAKER_ADDRESS:
+			mess = "Invalid maker address";
+			break;
+		case Transaction.INVALID_PUBLIC_KEY:
+			mess = "Invalid public key";
+			break;
 
 		case Transaction.INVALID_NAME_LENGTH:
 			mess = "Invalid  name length";
@@ -94,12 +103,9 @@ public class OnDealClick
 		case Transaction.NAME_ALREADY_REGISTRED:
 			mess = "Name already registred";
 			break;
-			
+						
 		case Transaction.NAME_DOES_NOT_EXIST:
 			mess = "Name does not exist";
-			break;
-		case Transaction.INVALID_NAME_CREATOR:
-			mess = "Invalid name creator";
 			break;
 		case Transaction.NAME_ALREADY_ON_SALE:
 			mess = "Name already on sale";
@@ -107,14 +113,27 @@ public class OnDealClick
 		case Transaction.NAME_NOT_FOR_SALE:
 			mess = "Name not for sale";
 			break;
+
+		case Transaction.INVALID_UPDATE_VALUE:
+			mess = "Invalid update value";
+			break;
+		case Transaction.NAME_KEY_ALREADY_EXISTS:
+			mess = "Name key already exists";
+			break;
+		case Transaction.NAME_KEY_NOT_EXISTS:
+			mess = "Name key not exists";
+			break;
+		case Transaction.LAST_KEY_IS_DEFAULT_KEY:
+			mess = "Name name key id default key";
+			break;
+
+
+			
 		case Transaction.BUYER_ALREADY_OWNER:
 			mess = "Buyer already owner";
 			break;
 		case Transaction.INVALID_AMOUNT:
 			mess = "Invalid amount";
-			break;
-		case Transaction.INVALID_SELLER:
-			mess = "Invalid seller";
 			break;
 			
 		case Transaction.NAME_NOT_LOWER_CASE:
@@ -142,7 +161,7 @@ public class OnDealClick
 		case Transaction.POLL_NOT_EXISTS:
 			mess = "Poll not exists";
 			break;
-		case Transaction.OPTION_NOT_EXISTS:
+		case Transaction.POLL_OPTION_NOT_EXISTS:
 			mess = "Option not exists";
 			break;
 		case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
@@ -151,6 +170,16 @@ public class OnDealClick
 		case Transaction.INVALID_DATA_LENGTH:
 			mess = "Invalid data length";
 			break;
+		case Transaction.INVALID_DATA:
+			mess = "Invalid data";
+			break;
+		case Transaction.INVALID_SIGNATURE:
+			mess = "Invalid signature";
+			break;
+		case Transaction.TRANSACTION_DOES_NOT_EXIST:
+			mess = "Transaction does not exist";
+			break;
+			
 			
 		case Transaction.INVALID_QUANTITY:
 			mess = "Invalid quantity";
@@ -176,6 +205,9 @@ public class OnDealClick
 		case Transaction.NEGATIVE_PRICE:
 			mess = "Negative price";
 			break;
+		case Transaction.INVALID_PRICE:
+			mess = "Invalid price";
+			break;
 		case Transaction.INVALID_CREATION_BYTES:
 			mess = "Invalid creation bytes";
 			break;
@@ -200,16 +232,27 @@ public class OnDealClick
 		case Transaction.NOT_ENOUGH_RIGHTS:
 			mess = "Not enough rights";
 			break;
+			
+		case Transaction.INVALID_ITEM_VALUE:
+			mess = "Invalid item value";
+			break;
+		case Transaction.CREATOR_NOT_OWNER:
+			mess = "Creator not owner";
+			break;
+			
 		case Transaction.ITEM_DOES_NOT_EXIST:
 			mess = "Item does not exist";
 			break;
 		case Transaction.ACCOUNT_NOT_PERSONALIZED:
 			mess = "This Account is not personalized";
 			break;
-		case Transaction.DUPLICATE_KEY:
+		case Transaction.ITEM_DUPLICATE_KEY:
 			mess = "Duplicate key";
 			break;
-	
+		case Transaction.INVALID_CREATOR:
+			mess = "Invalis creator";
+			break;
+			
 		case Transaction.ITEM_ASSET_DOES_NOT_EXIST:
 			mess = "Item asset does not exist";
 			break;
@@ -254,7 +297,7 @@ public class OnDealClick
 			mess = "Account already personalizes";
 			break;
 			
-		case Transaction.INVALID_BLOCK_HEIGHT_ERROR:
+		case Transaction.INVALID_BLOCK_HEIGHT:
 			mess = "Invalid block height";
 			break;
 		case Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR:

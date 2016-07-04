@@ -630,31 +630,34 @@ public class Send_Panel extends JPanel
 		
 		boolean isTextB = isText.isSelected();
 		
-		byte[] messageBytes;
+		byte[] messageBytes = null;
 		
-		if ( isTextB )
+		if (message != null && message.length() > 0)
 		{
-			messageBytes = message.getBytes( Charset.forName("UTF-8") );
-		}
-		else
-		{
-			try
+			if ( isTextB )
 			{
-				messageBytes = Converter.parseHexString( message );
+				messageBytes = message.getBytes( Charset.forName("UTF-8") );
 			}
-			catch (Exception g)
+			else
 			{
 				try
 				{
-					messageBytes = Base58.decode(message);
+					messageBytes = Converter.parseHexString( message );
 				}
-				catch (Exception e)
+				catch (Exception g)
 				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-					
-					//ENABLE
-					this.sendButton.setEnabled(true);
-					return;
+					try
+					{
+						messageBytes = Base58.decode(message);
+					}
+					catch (Exception e)
+					{
+						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						
+						//ENABLE
+						this.sendButton.setEnabled(true);
+						return;
+					}
 				}
 			}
 		}

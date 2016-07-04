@@ -343,7 +343,7 @@ public class PersonConfirmDialog extends JDialog  {
 		}
 		if (!isValid) {
 			// SHOW error message
-			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_INVALID_ADDRESS));
+			pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(Transaction.INVALID_ADDRESS));
 		} else {
 			PublicKeyAccount account = new PublicKeyAccount(toValue); 
 			// SHOW account for FEE asset
@@ -461,9 +461,9 @@ public class PersonConfirmDialog extends JDialog  {
 		if (result.getB() == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
-		} else {
-		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		} else {		
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+					+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE

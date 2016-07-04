@@ -8,6 +8,9 @@ import javax.swing.JOptionPane;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple3;
 
 import api.ApiClient;
 import api.ApiErrorFactory;
@@ -44,7 +47,7 @@ public class APIUtils {
 				asset = Controller.getInstance().getAsset(new Long(assetKeyString));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+						Transaction.ASSET_DOES_NOT_EXIST);
 			}
 		}
 		
@@ -55,7 +58,7 @@ public class APIUtils {
 			bdAmount = bdAmount.setScale(8);
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_AMOUNT);
+					Transaction.INVALID_AMOUNT);
 		}
 
 		// PARSE FEE POWER
@@ -64,13 +67,13 @@ public class APIUtils {
 			feePow = Integer.parseInt(feePowStr);
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_FEE);
+					Transaction.INVALID_FEE_POWER);
 		}
 
 		// CHECK ADDRESS
 		if (!Crypto.getInstance().isValidAddress(sender)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_SENDER);
+					Transaction.INVALID_MAKER_ADDRESS);
 		}
 
 		APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
@@ -92,7 +95,7 @@ public class APIUtils {
 				.getPrivateKeyAccountByAddress(sender);
 		if (account == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_SENDER);
+					Transaction.INVALID_MAKER_ADDRESS);
 		}
 
 		// TODO R_Send insert!
@@ -101,51 +104,13 @@ public class APIUtils {
 		result = Controller.getInstance()
 			.r_Send(account, feePow, new Account(recipient), asset.getKey(DBSet.getInstance()), bdAmount);
 			
-		switch (result.getB()) {
-		case Transaction.VALIDATE_OK:
-
+		if (result.getB() == Transaction.VALIDATE_OK)
 			return result.getA().toJson().toJSONString();
+		else {
 
-		case Transaction.INVALID_NAME_LENGTH:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_NAME_LENGTH);
-
-		case Transaction.INVALID_VALUE_LENGTH:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_VALUE_LENGTH);
-
-		case Transaction.INVALID_ADDRESS:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_RECIPIENT);
-
-		case Transaction.NAME_ALREADY_REGISTRED:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NAME_ALREADY_EXISTS);
-
-		case Transaction.NEGATIVE_AMOUNT:
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_AMOUNT);
-		
-		
+			//Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
+			throw ApiErrorFactory.getInstance().createError(result.getB());
 			
-		case Transaction.NOT_ENOUGH_FEE:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NO_BALANCE);
-
-		case Transaction.NO_BALANCE:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_NO_BALANCE);
-
-		default:
-
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_UNKNOWN);
 		}
 	}
 
@@ -208,5 +173,69 @@ public class APIUtils {
 		}
 
 	}
+	
+	public static Tuple3<JSONObject, PrivateKeyAccount, Integer> postPars( HttpServletRequest request, String x) {
+		
+		try
+		{
+			
+			// READ JSON
+			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+			String sender = (String) jsonObject.get("sender");
+			String feePowStr = (String) jsonObject.get("feePow");
+			String password = (String) jsonObject.get("password");
+
+			// PARSE FEE POWER
+			int feePow;
+			try {
+				feePow = Integer.parseInt(feePowStr);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_FEE_POWER);
+			}
+
+			// CHECK ADDRESS
+			if (!Crypto.getInstance().isValidAddress(sender)) {
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_MAKER_ADDRESS);
+			}
+
+			// check this up here to avoid leaking wallet information to remote user
+			// full check is later to prompt user with calculated fee
+			disallowRemote(request);
+
+			// CHECK IF WALLET EXISTS
+			if (!Controller.getInstance().doesWalletExists()) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+			}
+
+			// CHECK WALLET UNLOCKED
+			if (!Controller.getInstance().isWalletUnlocked()) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_WALLET_LOCKED);
+			}
+
+			// GET ACCOUNT
+			PrivateKeyAccount account = Controller.getInstance()
+					.getPrivateKeyAccountByAddress(sender);
+			if (account == null) {
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_MAKER_ADDRESS);
+			}
+
+			APIUtils.askAPICallAllowed(password, x, request);
+
+			return new Tuple3<JSONObject, PrivateKeyAccount, Integer>(jsonObject, account, feePow);
+
+		} catch (NullPointerException | ClassCastException e) {
+			// JSON EXCEPTION
+			// LOGGER.info(e);
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_JSON);
+		}
+		
+	}
+
 
 }

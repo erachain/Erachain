@@ -27,7 +27,7 @@ public class ApiService {
         s.add(BlocksResource.class);
         s.add(AddressesResource.class);
         s.add(WalletResource.class);
-        s.add(PaymentResource.class);
+        s.add(Rec_PaymentResource.class);
         s.add(NamesResource.class);
         s.add(NameSalesResource.class);
         s.add(PollsResource.class);
@@ -38,9 +38,9 @@ public class ApiService {
 		s.add(BlogResource.class);
 		//s.add(CalcFeeResource.class);
 		s.add(NameStorageResource.class);
-		s.add(MessageResource.class);
+		s.add(Rec_MessageResource.class);
 		s.add(AssetsResource.class);
-		s.add(StatementResource.class);
+		s.add(Rec_StatementResource.class);
 		s.add(MultiPaymentResource.class);
 		
 		ResourceConfig config = new ResourceConfig(s);

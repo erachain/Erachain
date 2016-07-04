@@ -47,7 +47,7 @@ public class BlogResource {
 			
 			if(name == null){
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			Profile profile = Profile.getProfileOpt(name);
@@ -81,7 +81,7 @@ public class BlogResource {
 		}
 		catch(Exception e)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 		
 		//GET TRANSACTION
@@ -90,7 +90,7 @@ public class BlogResource {
 		//CHECK IF TRANSACTION EXISTS
 		if(transaction == null)
 		{
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_TRANSACTION_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
 		
 		BlogEntry blogEntry = BlogUtils.getBlogEntryOpt(signatureBytes);
@@ -123,7 +123,7 @@ public class BlogResource {
 			
 			if(name == null){
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			Profile profile = Profile.getProfileOpt(name);
@@ -182,7 +182,7 @@ public class BlogResource {
 			
 			if(name == null){
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_NAME_NO_EXISTS);
+						Transaction.NAME_DOES_NOT_EXIST);
 			}
 			
 			Profile profile = Profile.getProfileOpt(name);

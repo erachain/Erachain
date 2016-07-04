@@ -2,6 +2,7 @@ package gui.items.assets;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -263,51 +264,14 @@ public class IssueAssetDialog extends JDialog //JFrame
 			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), quantity, scale, this.chkDivisible.isSelected(), feePow);
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK) {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Asset issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
-				break;	
-				
-			case Transaction.INVALID_QUANTITY:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_DESCRIPTION_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_PAYMENTS_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-
-			default:
-				
+			} else {		
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
 						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
 			}
+
 		}
 		catch(Exception e)
 		{

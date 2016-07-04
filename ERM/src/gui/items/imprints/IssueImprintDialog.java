@@ -2,6 +2,7 @@ package gui.items.imprints;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -284,46 +285,15 @@ public class IssueImprintDialog extends JDialog
 			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description, feePow);
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
+			if (result.getB() == Transaction.VALIDATE_OK) {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
-				break;	
-
-			case Transaction.DUPLICATE_KEY:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("This Imprint already exists!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-												
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_DESCRIPTION_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-
-			default:
-				
+			}
+			else {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
 						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
 			}
+
 		}
 		catch(Exception e)
 		{

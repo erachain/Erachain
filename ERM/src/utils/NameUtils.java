@@ -23,13 +23,13 @@ public class NameUtils {
 	public enum NameResult {
 		OK("OK", "OK", 0), NAME_NOT_REGISTERED("The name is not registered",
 				"Invalid address or name not registered!",
-				ApiErrorFactory.ERROR_NAME_NOT_REGISTERED), NAME_WITH_SPACE(
+				Transaction.NAME_DOES_NOT_EXIST), NAME_WITH_SPACE(
 				"For security purposes sending payments to a name that starts or ends with spaces is forbidden.",
 				"Name Payments with trailing or leading spaces are not allowed!",
-				ApiErrorFactory.ERROR_NAME_WITH_SPACE), NAME_FOR_SALE(
+				Transaction.NAME_WITH_SPACE), NAME_FOR_SALE(
 				"For security purposes sending payments to a name that can be purchased through name exchange is disabled.",
 				"Payments with names that are for sale are not allowed!",
-				ApiErrorFactory.ERROR_NAME_FOR_SALE);
+				Transaction.NAME_NOT_FOR_SALE);
 
 		private String statusMessage;
 		private String shortStatusMessage;

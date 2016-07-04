@@ -74,7 +74,8 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 		
 		// GET ACCOUNT
@@ -98,7 +99,8 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 		
 		// GET ACCOUNT
@@ -184,7 +186,8 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 
 		// CHECK ACCOUNT IN WALLET
@@ -300,7 +303,9 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
 		}
 
 		// DELETE
@@ -316,7 +321,9 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
 		}
 
 		return new Account(address).getGeneratingBalance().toPlainString();
@@ -336,7 +343,9 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
 		}
 
 		Long assetAsLong = null;
@@ -347,13 +356,16 @@ public class AddressesResource {
 
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
 		}
 
 		// DOES ASSETID EXIST
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+
 		}
 
 		return DBSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
@@ -367,7 +379,9 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
 		}
 
 		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
@@ -391,7 +405,8 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 
 		return new Account(address).getBalance(confirmations, Transaction.FEE_KEY).toPlainString();
@@ -419,7 +434,8 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
 		}
 
 		// GET OWNER
@@ -454,7 +470,8 @@ public class AddressesResource {
 			// CHECK IF VALID ADDRESS
 			if (!Crypto.getInstance().isValidAddress(address)) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+						Transaction.INVALID_ADDRESS);
 			}
 
 			// DECODE SIGNATURE
@@ -463,7 +480,8 @@ public class AddressesResource {
 				signatureBytes = Base58.decode(signature);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_SIGNATURE);
+						Transaction.INVALID_SIGNATURE);
+
 			}
 
 			// DECODE PUBLICKEY
@@ -472,7 +490,9 @@ public class AddressesResource {
 				publicKeyBytes = Base58.decode(publicKey);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_INVALID_PUBLIC_KEY);
+						//ApiErrorFactory.ERROR_INVALID_PUBLIC_KEY);
+						Transaction.INVALID_PUBLIC_KEY);
+
 			}
 
 			PublicKeyAccount account = new PublicKeyAccount(publicKeyBytes);
@@ -501,14 +521,16 @@ public class AddressesResource {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
 		}
 
 		byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(address);
 
 		if (publicKey == null) {
 			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_PUBLIC_KEY_NOT_FOUND);
+					Transaction.INVALID_PUBLIC_KEY);
 		} else {
 			return Base58.encode(publicKey);
 		}

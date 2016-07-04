@@ -16,13 +16,13 @@ import org.json.simple.JSONValue;
 
 import utils.APIUtils;
 
-@Path("payment")
+@Path("rec_payment")
 @Produces(MediaType.APPLICATION_JSON)
-public class PaymentResource 
+public class Rec_PaymentResource 
 {
 	
 	private static final Logger LOGGER = Logger
-			.getLogger(PaymentResource.class);
+			.getLogger(Rec_PaymentResource.class);
 	@Context
 	HttpServletRequest request;
 	

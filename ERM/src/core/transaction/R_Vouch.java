@@ -212,7 +212,7 @@ public class R_Vouch extends Transaction {
 		
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS
-			return INVALID_BLOCK_HEIGHT_ERROR;
+			return INVALID_BLOCK_HEIGHT;
 		}
 
 		if (this.seq < 0 ) {

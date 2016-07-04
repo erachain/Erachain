@@ -3,10 +3,17 @@ package test;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 //import java.math.BigInteger;
 //import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 //import java.util.List;
  import org.apache.log4j.Logger;
 
@@ -26,6 +33,7 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 
 import utils.Corekeys;
+import webserver.WebResource;
 
 //import com.google.common.primitives.Longs;
 
@@ -505,5 +513,26 @@ public class TestRecNote {
 		//CHECK REFERENCE SENDER
 		assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
 	}
+
+	private List<String> imagelinks = new ArrayList<String>();
+
+	private void handleVars(String description) {
+		Pattern pattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
+		//Pattern pattern = Pattern.compile("{{(.+)}}");
+		Matcher matcher = pattern.matcher(description);
+		while (matcher.find()) {
+			String url = matcher.group(1);
+			imagelinks.add(url);
+			//description = description.replace(matcher.group(), getImgHtml(url));
+		}
+	}
+	@Test
+	public void regExTest()
+	{
+		String descr = "AJH {{wer}}, asdj {{we431!12}}";
+		handleVars(descr);
+		assertEquals(imagelinks, "");
+	}
+
 
 }
