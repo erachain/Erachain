@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.account.Account;
@@ -47,11 +48,15 @@ public class Rec_StatementResource {
 	@Consumes(MediaType.WILDCARD)
 	public String signNote(String x) {
 		try {
-			// READ JSON
-			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String password = (String) jsonObject.get("password");
+			
+			// READ JSON and TRY UNLOCK WALLET
+			Tuple3<JSONObject, PrivateKeyAccount, Integer> resultRequet = APIUtils.postPars(request, x);
+			
+			JSONObject jsonObject = resultRequet.a;
+			PrivateKeyAccount maker = resultRequet.b;
+			int feePow = resultRequet.c;
+
 			String noteKeyString = (String) jsonObject.get("note");
-			String maker = (String) jsonObject.get("maker");
 			String message = (String) jsonObject.get("message");
 			String isTextMessageString = (String) jsonObject.get("istextmessage");
 			String encryptString = (String) jsonObject.get("encrypt");
@@ -73,38 +78,6 @@ public class Rec_StatementResource {
 			boolean encrypt = true;
 			if (encryptString != null) {
 				encrypt = Boolean.valueOf(encryptString);
-			}
-
-			// CHECK ADDRESS
-			if (!Crypto.getInstance().isValidAddress(maker)) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.INVALID_ADDRESS);
-			}
-
-			// check this up here to avoid leaking wallet information to remote user
-			// full check is later to prompt user with calculated fee
-			//APIUtils.disallowRemote(request);
-			APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
-
-
-			// CHECK IF WALLET EXISTS
-			if (!Controller.getInstance().doesWalletExists()) {
-				return ApiErrorFactory.getInstance().createErrorJSON(
-						ApiErrorFactory.ERROR_WALLET_NO_EXISTS).toJSONString();
-			}
-
-			// CHECK WALLET UNLOCKED
-			if (!Controller.getInstance().isWalletUnlocked()) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_WALLET_LOCKED);
-			}
-
-			// GET ACCOUNT
-			PrivateKeyAccount account = Controller.getInstance()
-					.getPrivateKeyAccountByAddress(maker);
-			if (account == null) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.CREATOR_NOT_OWNER);
 			}
 
 			// TODO this is duplicate code -> Send money Panel, we should add
@@ -131,16 +104,12 @@ public class Rec_StatementResource {
 				// TODO duplicate code -> SendMoneyPanel
 				if (encrypt) {
 					// sender
-					PrivateKeyAccount pkAccount = Controller.getInstance()
-							.getPrivateKeyAccountByAddress(maker);
-					byte[] privateKey = pkAccount.getPrivateKey();
+					byte[] privateKey = maker.getPrivateKey();
 
 					messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey,
-							pkAccount.getPublicKey());
+							maker.getPublicKey());
 				}
 			}
-
-			//APIUtils.askAPICallAllowed("POST message\n" + x + "\n Fee Power: "+ bdFee.toPlainString(), request);
 
 			byte[] encrypted = (encrypt) ? new byte[] { 1 } : new byte[] { 0 };
 			byte[] isTextByte = (isTextMessage) ? new byte[] { 1 }
@@ -148,9 +117,8 @@ public class Rec_StatementResource {
 
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.signNote(false,
-							Controller.getInstance()
-									.getPrivateKeyAccountByAddress(maker),
-							0, noteKey, messageBytes,
+							maker,
+							feePow, noteKey, messageBytes,
 							isTextByte, encrypted);
 
 			if (result.getB() == Transaction.VALIDATE_OK)

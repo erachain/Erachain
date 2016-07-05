@@ -51,11 +51,12 @@ public class Rec_MessageResource {
 	@Consumes(MediaType.WILDCARD)
 	public String sendMessage(String x) {
 		try {
+
 			// READ JSON
 			Tuple3<JSONObject, PrivateKeyAccount, Integer> resultRequet = APIUtils.postPars(request, x);
 			
 			JSONObject jsonObject = resultRequet.a;
-			PrivateKeyAccount sender = resultRequet.b;
+			PrivateKeyAccount maker = resultRequet.b;
 			int feePow = resultRequet.c;
 
 			String amount = (String) jsonObject.get("amount");
@@ -162,7 +163,7 @@ public class Rec_MessageResource {
 			
 			if (encrypt) {
 				// sender
-				byte[] privateKey = sender.getPrivateKey();
+				byte[] privateKey = maker.getPrivateKey();
 
 				// recipient
 				byte[] publicKey = Controller.getInstance()
@@ -182,7 +183,7 @@ public class Rec_MessageResource {
 					: new byte[] { 0 };
 
 			Pair<Transaction, Integer> result = Controller.getInstance()
-					.r_Send(sender, feePow,
+					.r_Send(maker, feePow,
 							recipientAccount, assetKey, bdAmount, messageBytes,
 							isTextByte, encrypted);
 

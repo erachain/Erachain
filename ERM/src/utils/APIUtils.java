@@ -87,7 +87,8 @@ public class APIUtils {
 					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
 
-		APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
+		// TRU UNLOCK
+		askAPICallAllowed(password, "POST payment\n" + x, request);
 
 		// CHECK WALLET UNLOCKED
 		if (!Controller.getInstance().isWalletUnlocked()) {
@@ -218,6 +219,9 @@ public class APIUtils {
 						ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 			}
 
+			// TRY UNLOCK
+			askAPICallAllowed(password, x, request);
+
 			// CHECK WALLET UNLOCKED
 			if (!Controller.getInstance().isWalletUnlocked()) {
 				throw ApiErrorFactory.getInstance().createError(
@@ -231,8 +235,6 @@ public class APIUtils {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_MAKER_ADDRESS);
 			}
-
-			APIUtils.askAPICallAllowed(password, x, request);
 
 			return new Tuple3<JSONObject, PrivateKeyAccount, Integer>(jsonObject, account, feePow);
 
