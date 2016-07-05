@@ -19,7 +19,8 @@ import utils.NameUtils.NameResult;
 public class ApiErrorFactory 
 {
 	//COMMON
-	private static final int ERROR = Transaction.AT_ERROR + 1;
+	
+	private static final int ERROR = Transaction.AT_ERROR + 100;
 	public static final int ERROR_UNKNOWN = ERROR;
 	public static final int ERROR_JSON = ERROR + 1;
 	//public static final int Екфтыфсешщт = 2;
@@ -250,9 +251,14 @@ public class ApiErrorFactory
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("error", error);
 		
-		if ( error > Transaction.AT_ERROR )
+		if ( error > ERROR )
 		{
 			// errors for API
+			jsonObject.put("message", this.errorMessages.get(error) );
+			
+		} else if ( error > Transaction.AT_ERROR )
+		{
+			// AT errors
 			jsonObject.put("message", AT_Error.getATError(error - Transaction.AT_ERROR) );
 		}
 		else

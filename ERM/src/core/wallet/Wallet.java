@@ -815,7 +815,7 @@ public class Wallet extends Observable implements Observer
 	{
 		if(this.isUnlocked())
 		{
-			return false;
+			return true;
 		}
 		
 		//TRY TO UNLOCK
@@ -858,7 +858,7 @@ public class Wallet extends Observable implements Observer
 	{
 		if(!this.isUnlocked())
 		{
-			return false;
+			return true;
 		}
 		
 		//CLOSE

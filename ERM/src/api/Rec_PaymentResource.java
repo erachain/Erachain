@@ -42,7 +42,6 @@ public class Rec_PaymentResource
 			String amount = "" + jsonObject.get("amount");
 			String sender = (String) jsonObject.get("sender");
 			String recipient = (String) jsonObject.get("recipient");
-			String message = (String) jsonObject.get("message");
 			String password = (String) jsonObject.get("password");
 			
 			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, x, request );

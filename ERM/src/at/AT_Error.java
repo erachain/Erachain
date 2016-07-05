@@ -16,7 +16,8 @@ public enum AT_Error {
 	INCORRECT_CREATION_TX( 9 , "Incorrect AT creation tx."),
 	INCORRECT_CREATION_FEE( 10 , "Incorrect creation fee for given number of pages" ),
 	INCORRECT_TYPE( 11, "Incorrect type" ),
-	DUPLICATE_AT(12, "Same AT exists");
+	DUPLICATE_AT(12, "Same AT exists"),
+	COUNT(13, "**need for get max index");
 	
     private static Map<Integer, String> map = new HashMap<Integer, String>();
 

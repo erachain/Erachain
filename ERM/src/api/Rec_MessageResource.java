@@ -104,6 +104,23 @@ public class Rec_MessageResource {
 			}
 
 			// TODO this is duplicate code -> Send money Panel, we should add
+			// check this up here to avoid leaking wallet information to remote user
+			// full check is later to prompt user with calculated fee
+			APIUtils.disallowRemote(request);
+
+			// CHECK IF WALLET EXISTS
+			if (!Controller.getInstance().doesWalletExists()) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+			}
+
+			// CHECK WALLET UNLOCKED
+			if (!Controller.getInstance().isWalletUnlocked()) {
+				throw ApiErrorFactory.getInstance().createError(
+						ApiErrorFactory.ERROR_WALLET_LOCKED);
+			}
+
+			// TODO this is duplicate code -> Send money Panel, we should add
 			// that to a common place later
 			byte[] messageBytes = null;
 			

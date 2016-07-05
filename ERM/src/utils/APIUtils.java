@@ -51,6 +51,10 @@ public class APIUtils {
 			}
 		}
 		
+		if (asset == null )
+			throw ApiErrorFactory.getInstance().createError(
+					Transaction.ASSET_DOES_NOT_EXIST);
+		
 		// PARSE AMOUNT
 		BigDecimal bdAmount;
 		try {
@@ -76,13 +80,14 @@ public class APIUtils {
 					Transaction.INVALID_MAKER_ADDRESS);
 		}
 
-		APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
+
+		APIUtils.askAPICallAllowed(password, "POST payment\n" + x, request);
 
 		// CHECK WALLET UNLOCKED
 		if (!Controller.getInstance().isWalletUnlocked()) {
@@ -131,6 +136,9 @@ public class APIUtils {
 			disallowRemote(request);
 
 			if(password != null && password.length() > 0)
+				if (Controller.getInstance().isWalletUnlocked())
+						return;
+
 				if (Controller.getInstance().unlockWallet(password))
 					return;
 
