@@ -57,11 +57,11 @@ public class Table_Formats {
 			        for (int column = 0; column < table .getColumnCount(); column++)
 			        {
 			           
-			        	if (column ==3){
-			        		column=column;
+			//        	if (column ==3){
+			//        		column=column;
 			        		
 			        		
-			        	}
+			//        	}
 			        	// Component comp = table .prepareRenderer(table .getCellRenderer(row, column), row, column);
 			           // rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
 			        	// читаем данные из ячейки таблицы 
@@ -77,7 +77,7 @@ public class Table_Formats {
 			        	 Rectangle2D ss = tl1.getBounds();
 			        	 
 			        	// берем длину ячейки в пикселях
-			        	 Component comp = table .prepareRenderer(table .getCellRenderer(table.convertRowIndexToModel(row), column), row, column);
+	//		        	 Component comp = table .prepareRenderer(table .getCellRenderer(table.convertRowIndexToModel(row), column), row, column);
 			        	 int ww = table.getColumnModel().getColumn(column).getWidth()-10;
 			        	 //int ww = comp.getWidth();//.getSize().width;//.getPreferredSize().width;
 			        	 // вычисляем количество строк

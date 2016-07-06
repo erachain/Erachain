@@ -47,6 +47,8 @@ public MainAssetsFrame(){
 	this.setTitle(Lang.getInstance().translate("Assets"));
 	this.jButton2_jToolBar.setVisible(false);
 	this.jButton3_jToolBar.setVisible(false);
+	this.jButton1_jToolBar.setVisible(false);
+	this.jToolBar.setVisible(false);
 // buttun1
 	this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Assets"));
 // status panel
@@ -295,7 +297,10 @@ public MainAssetsFrame(){
 						});				
 			
 				
-				
+			// issue Assets
+				 IssueAssetPanel Issue_Assets_SplitPanel = new IssueAssetPanel();
+				 Issue_Assets_SplitPanel.setName("Issue Asset");
+						
 				
 			
 	
@@ -311,6 +316,7 @@ public MainAssetsFrame(){
 	this.jTabbedPane.add(my_Balanses_SplitPanel);
 	this.jTabbedPane.add(search_Assets_SplitPanel);
 	this.jTabbedPane.add(my_Orders_SplitPanel);
+	this.jTabbedPane.add(Issue_Assets_SplitPanel);	
 	this.pack();
 	this.setSize(800,600);
 	this.setMaximizable(true);
