@@ -28,9 +28,9 @@ public class CancelOrderDetailsFrame extends Rec_DetailsFrame
 		super(orderCreation);
 				           
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+//		this.pack();
+ //       this.setResizable(false);
+//        this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

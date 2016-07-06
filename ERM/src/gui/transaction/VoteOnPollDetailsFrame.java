@@ -47,9 +47,9 @@ public class VoteOnPollDetailsFrame extends Rec_DetailsFrame
 		this.add(option, detailGBC);		
 				           
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+	//	this.pack();
+    //    this.setResizable(false);
+   //     this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

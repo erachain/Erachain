@@ -110,9 +110,9 @@ public class ArbitraryTransactionDetailsFrame extends Rec_DetailsFrame
 		}
 				           
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+//		this.pack();
+ //       this.setResizable(false);
+//        this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

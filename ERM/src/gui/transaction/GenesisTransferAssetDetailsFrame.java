@@ -73,9 +73,9 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame
 		this.add(amount, detailGBC);	
 						           
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+	//	this.pack();
+  //      this.setResizable(false);
+ //       this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

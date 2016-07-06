@@ -20,6 +20,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -37,7 +38,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 
 @SuppressWarnings("serial")
-public class Rec_DetailsFrame extends JFrame
+public class Rec_DetailsFrame extends JPanel //JFrame
 {
 
 	public GridBagConstraints labelGBC = new GridBagConstraints();
@@ -45,7 +46,7 @@ public class Rec_DetailsFrame extends JFrame
 	
 	public Rec_DetailsFrame(final Transaction record)
 	{
-		super(Lang.getInstance().translate("ERMbase") + " - " + Lang.getInstance().translate(record.viewTypeName()));
+//		super(Lang.getInstance().translate("ERMbase") + " - " + Lang.getInstance().translate(record.viewTypeName()));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -53,16 +54,16 @@ public class Rec_DetailsFrame extends JFrame
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
+//		this.setIconImages(icons);
 		
 		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
 		//PADDING
-		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
+//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 		
 		//LABEL GBC
 		labelGBC = new GridBagConstraints();

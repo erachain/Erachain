@@ -299,7 +299,7 @@ public MainAssetsFrame(){
 				
 			// issue Assets
 				 IssueAssetPanel Issue_Assets_SplitPanel = new IssueAssetPanel();
-				 Issue_Assets_SplitPanel.setName("Issue Asset");
+				 Issue_Assets_SplitPanel.setName(Lang.getInstance().translate("Issue Asset"));
 						
 				
 			

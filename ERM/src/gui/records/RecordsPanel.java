@@ -1,6 +1,10 @@
 package gui.records;
 
 import gui.CoreRowSorter;
+import gui.MainFrame;
+import gui.Split_Panel;
+import gui.items.assets.AssetDetailsPanel001;
+import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -15,7 +19,9 @@ import java.awt.RenderingHints;
 //import java.awt.la
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.awt.AWTEvent;
+import java.awt.Dimension;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,9 +30,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 
+import core.item.assets.AssetCls;
+import core.item.unions.UnionCls;
 import core.transaction.Transaction;
 import database.wallet.TransactionMap;
 
@@ -114,19 +125,70 @@ public class RecordsPanel extends  JPanel // JPanel
 				if(e.getClickCount() == 2) 
 				{
 					//GET ROW
-			        int row = transactionsTable.getSelectedRow();
-			        row = transactionsTable.convertRowIndexToModel(row);
+	//		        int row = transactionsTable.getSelectedRow();
+	//		        row = transactionsTable.convertRowIndexToModel(row);
 			        
 			        //GET TRANSACTION
-			        Transaction transaction = transactionsModel.getTransaction(row);
+	//		        Transaction transaction = transactionsModel.getTransaction(row);
 			         
 			        //SHOW DETAIL SCREEN OF TRANSACTION
-			        TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+	//		        TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 			    }
 			}
 		});			
 		
-		this.add(new JScrollPane(this.transactionsTable), tableGBC);
+		
+		Split_Panel record_stpit = new Split_Panel();
+		record_stpit.toolBar_LeftPanel.setVisible(false);
+		record_stpit.jToolBar_RightPanel.setVisible(false);
+		Dimension size = MainFrame.desktopPane.getSize();
+		this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+		
+		// show	
+		record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);
+		record_stpit.jTable_jScrollPanel_LeftPanel = transactionsTable;
+		record_stpit.jScrollPanel_LeftPanel.setViewportView(record_stpit.jTable_jScrollPanel_LeftPanel);
+		
+		
+		
+		
+		// обработка изменения положения курсора в таблице
+		record_stpit.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+					@SuppressWarnings({ "unused" })
+					@Override
+						public void valueChanged(ListSelectionEvent arg0) {
+							String dateAlive;
+							String date_birthday;
+							String message; 
+			// устанавливаем формат даты
+							SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+			//создаем объект персоны
+							UnionCls union;
+							if (record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+								 
+								//GET ROW
+							        int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
+							        row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+							        
+							        //GET TRANSACTION
+							        Transaction transaction = transactionsModel.getTransaction(row);
+							      //SHOW DETAIL SCREEN OF TRANSACTION
+							     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+								  
+								  
+								 
+								
+							        record_stpit.jScrollPane_jPanel_RightPanel.setViewportView( TransactionDetailsFactory.getInstance().createTransactionDetail(transaction));
+								
+								 
+							}
+						}
+					});				
+		
+		
+		
+		this.add(record_stpit, tableGBC);
 
 		//this.add(this.transactionsTable);       
 		

@@ -69,9 +69,9 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 		this.add(gender, detailGBC);	
 
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+	//	this.pack();
+    //    this.setResizable(false);
+    //    this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

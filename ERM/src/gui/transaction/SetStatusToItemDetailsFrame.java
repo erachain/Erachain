@@ -161,9 +161,9 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 		this.add(txtAreaItemDescription, detailGBC);		
 						           
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+	//	this.pack();
+   //     this.setResizable(false);
+   //     this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

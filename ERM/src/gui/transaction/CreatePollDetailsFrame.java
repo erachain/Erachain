@@ -82,9 +82,9 @@ public class CreatePollDetailsFrame extends Rec_DetailsFrame
 		this.add(new JScrollPane(table), detailGBC);
 		
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+	//	this.pack();
+    //    this.setResizable(false);
+    //    this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}
 }

@@ -83,9 +83,9 @@ public class IssueUnionDetailsFrame extends Rec_DetailsFrame
 		this.add(parent, detailGBC);	
 
         //PACK
-		this.pack();
-        this.setResizable(false);
-        this.setLocationRelativeTo(null);
+//		this.pack();
+  //      this.setResizable(false);
+ //       this.setLocationRelativeTo(null);
         this.setVisible(true);
         
 	}

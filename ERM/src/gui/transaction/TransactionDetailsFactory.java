@@ -1,6 +1,7 @@
 package gui.transaction;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import core.transaction.ArbitraryTransaction;
 import core.transaction.BuyNameTransaction;
@@ -46,7 +47,7 @@ public class TransactionDetailsFactory
 		return instance;
 	}
 	
-	public JFrame createTransactionDetail(Transaction transaction)
+	public JPanel createTransactionDetail(Transaction transaction)
 	{
 		switch(transaction.getType())
 		{
