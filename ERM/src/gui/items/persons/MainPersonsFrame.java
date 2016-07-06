@@ -32,6 +32,7 @@ import core.item.persons.PersonCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
+import gui.items.assets.IssueAssetPanel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -51,7 +52,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		this.setTitle(Lang.getInstance().translate("Persons"));
 		this.jButton2_jToolBar.setVisible(false);
 		this.jButton3_jToolBar.setVisible(false);
-		
+		this.jToolBar.setVisible(false);
 		// buttun1
 		this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Person"));
 		// status panel
@@ -590,7 +591,9 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		
 		
-		
+		// issue Assets
+		  IssuePersonPanel Issue_Person_Panel = new IssuePersonPanel();
+		  Issue_Person_Panel.setName(Lang.getInstance().translate("Issue Person"));
 		
 		
 		
@@ -607,7 +610,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		this.jTabbedPane.add(my_Person_SplitPanel);
 		
 		this.jTabbedPane.add(search_Person_SplitPanel);
-		
+		this.jTabbedPane.add(Issue_Person_Panel);
 		
 		this.pack();
 		//	this.setSize(800,600);
