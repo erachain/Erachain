@@ -26,9 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -176,10 +178,36 @@ public class RecordsPanel extends  JPanel // JPanel
 							      //SHOW DETAIL SCREEN OF TRANSACTION
 							     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 								  
-								  
-								 
+								 JPanel panel = new JPanel();
+							        panel.setLayout(new GridBagLayout());
+							      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+									
+									//TABLE GBC
+									GridBagConstraints tableGBC = new GridBagConstraints();
+									tableGBC.fill = GridBagConstraints.BOTH; 
+									tableGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+									tableGBC.weightx = 1;
+									tableGBC.weighty = 1;
+									tableGBC.gridx = 0;	
+									tableGBC.gridy= 0;	
+									JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+									panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction),tableGBC);
+									  JLabel jLabel9 = new JLabel();
+										jLabel9.setText("");
+								        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+								        gridBagConstraints.gridx = 0;
+								        gridBagConstraints.gridy = 1;
+								        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+								        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+								        gridBagConstraints.weightx = 1.0;
+								        gridBagConstraints.weighty = 1.0;
+								        panel. add(jLabel9, gridBagConstraints);
+									
+									
+									
+									
 								
-							        record_stpit.jScrollPane_jPanel_RightPanel.setViewportView( TransactionDetailsFactory.getInstance().createTransactionDetail(transaction));
+							        record_stpit.jScrollPane_jPanel_RightPanel.setViewportView( panel);
 								
 								 
 							}
