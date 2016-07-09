@@ -155,13 +155,14 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
       	txtGBC.gridy = gridy++;
       	this.txtareaDescription = new JTextArea();
        	
-      	this.txtareaDescription.setRows(6);
+      	this.txtareaDescription.setRows(4);
+      	this.txtareaDescription.setLineWrap(true);
       	this.txtareaDescription.setColumns(20);
-      	this.txtareaDescription.setBorder(this.txtName.getBorder());
+      //	this.txtareaDescription.setBorder(this.txtName.getBorder());
 
       	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
-      	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-      	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+     // 	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+    //  	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(scrollDescription, txtGBC);
       	      	
       	//LABEL GENDER
