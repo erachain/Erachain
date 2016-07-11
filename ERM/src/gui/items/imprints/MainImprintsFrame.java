@@ -30,11 +30,16 @@ public MainImprintsFrame(){
 			{
 				new IssueImprintDialog();
 			}
-	});		
+	});	
+	this.jToolBar.setVisible(false);
 	My_Imprints_Tab my_Imprints_SplitPanel = new My_Imprints_Tab();
 	this.jTabbedPane.add(my_Imprints_SplitPanel);
 	Search_Imprints_Tab search_Imprints_SplitPanel = new Search_Imprints_Tab();
 	this.jTabbedPane.add(search_Imprints_SplitPanel);
+	IssueImprintPanel issue_Imprint = new IssueImprintPanel();
+	this.jTabbedPane.add(issue_Imprint, Lang.getInstance().translate("Issue Imprint"));
+	
+	
 	this.pack();
 	this.setSize(800,600);
 	this.setMaximizable(true);
