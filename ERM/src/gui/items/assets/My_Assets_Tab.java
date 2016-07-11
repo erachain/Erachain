@@ -360,7 +360,7 @@ public class My_Assets_Tab extends Split_Panel {
 			{
 				row = table.convertRowIndexToModel(row);
 				AssetCls asset = assetsModel.getAsset(row);
-				new AssetFrame(asset);
+		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
 			{
