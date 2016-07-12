@@ -603,19 +603,19 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 			
 			
 			txtFeePow.setText("");
-			txtName.setText("");;
-			txtareaDescription.setText("");;
-			txtBirthday.setText("0000-00-00");;
-			txtDeathday.setText("0000-00-00");;
+			txtName.setText("");
+			txtareaDescription.setText("");
+			txtBirthday.setText("0000-00-00");
+			txtDeathday.setText("0000-00-00");
 			
-			txtGender.setSelectedIndex(2);;
-			txtRace.setText("");;
-			 txtBirthLatitude.setText("");;
-			 txtBirthLongitude.setText("");;
-			 txtSkinColor.setText("");;
-			 txtEyeColor.setText("");;
-			 txtHairСolor.setText("");;
-			 txtHeight.setText("");;
+			txtGender.setSelectedIndex(2);
+			txtRace.setText("");
+			 txtBirthLatitude.setText("");
+			 txtBirthLongitude.setText("");
+			 txtSkinColor.setText("");
+			 txtEyeColor.setText("");
+			 txtHairСolor.setText("");
+			 txtHeight.setText("");
 			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
 			
 			
