@@ -663,7 +663,7 @@ public class Send_Panel extends JPanel
 		}
 
 		// if no TEXT - set null
-		if (messageBytes.length == 0) messageBytes = null;
+		if (messageBytes != null && messageBytes.length == 0) messageBytes = null;
 		// if amount = 0 - set null
 		if (amount.compareTo(BigDecimal.ZERO) == 0) amount = null;
 		

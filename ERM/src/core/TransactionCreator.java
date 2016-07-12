@@ -314,7 +314,8 @@ public class TransactionCreator
 
 	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
 					byte gender, String race, float birthLatitude, float birthLongitude,
-					String skinColor, String eyeColor, String hairСolor, int height, String description) 
+					String skinColor, String eyeColor, String hairСolor, int height,
+					byte[] icon, byte[] image, String description) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();

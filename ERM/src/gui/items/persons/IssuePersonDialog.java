@@ -444,7 +444,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
-				this.txtHairСolor.getText(), height, this.txtareaDescription.getText()
+				this.txtHairСolor.getText(), height, null, null, this.txtareaDescription.getText()
 				);
 		
 		//CHECK VALIDATE MESSAGE

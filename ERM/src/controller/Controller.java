@@ -1822,12 +1822,14 @@ public class Controller extends Observable {
 	public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, String fullName, int feePow,
 			long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, String description) {
+			String skinColor, String eyeColor, String hairСolor, int height,
+			byte[] icon, byte[] image, String description) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday, deathday,
 					gender, race, birthLatitude, birthLongitude,
-					skinColor, eyeColor, hairСolor, height, description);
+					skinColor, eyeColor, hairСolor, height,
+					icon, image, description);
 		}
 	}
 

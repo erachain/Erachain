@@ -70,6 +70,8 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	private JTextField txtHairСolor;
 	private JTextField txtHeight;
 	private JButton issueButton;
+	
+	private byte[] imgButes;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssuePersonPanel()
@@ -431,7 +433,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	       }
 	       
 // его надо в базу вставлять
-	        byte[] imgButes = null; 
+	        imgButes = null; 
 			try {
 				imgButes = getBytesFromFile(file);
 			} catch (IOException e) {
@@ -589,7 +591,8 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
-				this.txtHairСolor.getText(), height, this.txtareaDescription.getText()
+				this.txtHairСolor.getText(), height,
+				this.imgButes, this.imgButes, this.txtareaDescription.getText()
 				);
 		
 		//CHECK VALIDATE MESSAGE
