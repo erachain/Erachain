@@ -1,14 +1,21 @@
 package gui.items.persons;
 
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.sql.Blob;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import org.glassfish.jersey.internal.util.Base64;
 import org.mapdb.Fun.Tuple3;
 
 import core.item.persons.PersonCls;
@@ -83,7 +90,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         jScrollPane3 = new javax.swing.JScrollPane();
         description_jTextPane = new javax.swing.JTextPane();
         key_jLabel = new javax.swing.JLabel();
-        key_jTextField = new javax.swing.JTextField();
+        iconLabel = new javax.swing.JLabel();
 
         
         SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
@@ -483,21 +490,50 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jScrollPane3, gridBagConstraints);
 
-        key_jLabel.setText(Lang.getInstance().translate("Key")+":");
+        key_jLabel.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_START;//.FIRST_LINE_END;//.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 10, 0, 0);
         add(key_jLabel, gridBagConstraints);
 
-        key_jTextField.setEditable(false);
-        key_jTextField.setText(person.getKey()+"");
-        key_jTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                key_jTextFieldActionPerformed(evt);
-            }
-        });
+     //   iconLabel.setEditable(false);
+        iconLabel.setText(Lang.getInstance().translate("Key")+":" + person.getKey()+"");
+   
+        
+        
+        
+      //в формате Base64;
+        java.lang.String aa = "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";
+        ImageIcon ii;
+        byte[] bl = Base64.decode(aa.getBytes());
+        ii = new ImageIcon(bl);
+        key_jLabel .setIcon(ii);
+        // в формате Blob
+        /*
+        ResultSet rs = null; // результат из базы данных
+         Blob bl1 = null;
+		try {
+			bl1 = rs.getBlob(1);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			ii = new ImageIcon(bl1.getBytes(1, (int) bl1.length()));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    //    .setIcon(ii);
+        */
+        
+        
+        
+        
+        
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -505,7 +541,13 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 6);
-        add(key_jTextField, gridBagConstraints);
+        add(iconLabel, gridBagConstraints);
+        
+        
+        
+        
+        
+        
     }// </editor-fold>                        
 
     private void name_jTextFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                
@@ -557,7 +599,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField13;
     private javax.swing.JLabel key_jLabel;
-    private javax.swing.JTextField key_jTextField;
+    private javax.swing.JLabel iconLabel;
     private javax.swing.JTextField name_jTextField;
     private javax.swing.JTextField race_jTextField;
     private javax.swing.JTextField skin_Color_jTextField;
