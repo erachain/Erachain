@@ -12,6 +12,7 @@ import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
@@ -592,11 +593,12 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		
 		// issue Assets
-		  IssuePersonPanel Issue_Person_Panel = new IssuePersonPanel();
+		
+		   JScrollPane Issue_Person_Panel = new JScrollPane();
 		  Issue_Person_Panel.setName(Lang.getInstance().translate("Issue Person"));
+		  Issue_Person_Panel.add(new IssuePersonPanel());
 		
-		
-		
+		  Issue_Person_Panel.setViewportView(new IssuePersonPanel());
 		
 		
 		

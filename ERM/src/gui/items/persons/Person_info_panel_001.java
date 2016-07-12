@@ -1,6 +1,7 @@
 package gui.items.persons;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.sql.Blob;
 import java.sql.Date;
@@ -511,7 +512,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
      //   ii = new ImageIcon(bl);
      //   key_jLabel .setIcon(ii);
         
-        person.getImage();
+     //   person.getImage();
         // в формате Blob
         /*
         ResultSet rs = null; // результат из базы данных
@@ -531,11 +532,20 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
     //    .setIcon(ii);
         */
         
-        key_jLabel.setIcon(new ImageIcon(person.getImage()));
+      key_jLabel.setIcon(new ImageIcon(person.getImage()));;
+       
+       
+       //ImageIcon ii = new ImageIcon(person.getImage());
+     //  key_jLabel.setIcon(new ImageIcon(ii.getImage().getScaledInstance(100, 100, ii.getImage().SCALE_DEFAULT)));
+       
+      
         
-        
-        
-        
+    //    key_jLabel.setPreferredSize(new Dimension(50,70));
+    //    key_jLabel.setMaximumSize(new Dimension(50,70));
+   //     key_jLabel.setMaximumSize(new Dimension(50,70));
+   //     key_jLabel.setSize(new Dimension(50,70));
+       
+                
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
