@@ -37,14 +37,14 @@ public abstract class PersonCls extends ItemCls {
 	protected static final int DEATHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
 	public static final int GENDER_LENGTH = 1;
 	protected static final int RACE_SIZE_LENGTH = 1;
-	public static final int MAX_RACE_LENGTH = 256 * RACE_SIZE_LENGTH;
+	public static final int MAX_RACE_LENGTH = 256 ^ RACE_SIZE_LENGTH - 1;
 	protected static final int LATITUDE_LENGTH = 4;
 	protected static final int SKIN_COLOR_SIZE_LENGTH = 1;
-	public static final int MAX_SKIN_COLOR_LENGTH = 256 * SKIN_COLOR_SIZE_LENGTH;
+	public static final int MAX_SKIN_COLOR_LENGTH = 256 ^ SKIN_COLOR_SIZE_LENGTH - 1;
 	protected static final int EYE_COLOR_SIZE_LENGTH = 1;
-	public static final int MAX_EYE_COLOR_LENGTH = 256 * EYE_COLOR_SIZE_LENGTH;
+	public static final int MAX_EYE_COLOR_LENGTH = 256 ^ EYE_COLOR_SIZE_LENGTH - 1;
 	protected static final int HAIR_COLOR_SIZE_LENGTH = 1;
-	public static final int MAX_HAIR_COLOR_LENGTH = 256 * HAIR_COLOR_SIZE_LENGTH;
+	public static final int MAX_HAIR_COLOR_LENGTH = 256 ^ HAIR_COLOR_SIZE_LENGTH - 1;
 	public static final int HEIGHT_LENGTH = 1;
 	protected static final int BASE_LENGTH = BIRTHDAY_LENGTH + DEATHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
 			+ SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH

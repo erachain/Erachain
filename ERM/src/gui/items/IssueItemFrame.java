@@ -35,6 +35,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 
@@ -290,6 +291,14 @@ public class IssueItemFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
+			case Transaction.INVALID_ICON_LENGTH:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Icon size must be less then ") + ItemCls.MAX_ICON_LENGTH, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;	
+			case Transaction.INVALID_IMAGE_LENGTH:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Image size must be less then ") + ItemCls.MAX_IMAGE_LENGTH, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;	
 			case Transaction.INVALID_DESCRIPTION_LENGTH:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

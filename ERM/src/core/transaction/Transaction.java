@@ -77,7 +77,9 @@ public abstract class Transaction {
 	public static final int INVALID_TYPE_LENGTH = 43;
 
 	public static final int INVALID_NAME_LENGTH = 50;
-	public static final int INVALID_DESCRIPTION_LENGTH = 51;
+	public static final int INVALID_ICON_LENGTH = 51;
+	public static final int INVALID_IMAGE_LENGTH = 52;
+	public static final int INVALID_DESCRIPTION_LENGTH = 53;
 
 	public static final int INVALID_VALUE_LENGTH = 55;
 

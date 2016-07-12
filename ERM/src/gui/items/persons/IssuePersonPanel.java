@@ -592,7 +592,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height,
-				this.imgButes, this.imgButes, this.txtareaDescription.getText()
+				null, this.imgButes, this.txtareaDescription.getText()
 				);
 		
 		//CHECK VALIDATE MESSAGE

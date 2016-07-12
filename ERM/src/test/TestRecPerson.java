@@ -60,7 +60,7 @@ public class TestRecPerson {
 	long timestamp = NTP.getTime();
 	
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
-	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+	private byte[] image = new byte[2000]; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;

@@ -139,6 +139,12 @@ public class OnDealClick
 		case Transaction.NAME_NOT_LOWER_CASE:
 			mess = "Name not lower case";
 			break;
+		case Transaction.INVALID_ICON_LENGTH:
+			mess = "Invalid icon length";
+			break;
+		case Transaction.INVALID_IMAGE_LENGTH:
+			mess = "Invalid image length";
+			break;
 			
 		case Transaction.INVALID_DESCRIPTION_LENGTH:
 			mess = "Invalid description length";
