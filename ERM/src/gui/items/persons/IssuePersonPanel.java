@@ -168,6 +168,13 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
         labelGBC.gridy = gridy;
         iconButton = new JButton(Lang.getInstance().translate("Add Image..."));
         this.add(iconButton, labelGBC);
+        
+        iconButton.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        iconButton.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        iconButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        
+        
         iconButton.addActionListener(new ActionListener(){
 
 			@Override
@@ -445,6 +452,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 				BufferedImage image = ImageIO.read(inputStream);
 				iconButton.setIcon(new ImageIcon(imgButes));
 				
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -617,6 +625,8 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 			 txtHairСolor.setText("");
 			 txtHeight.setText("");
 			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
+			 imgButes = null;
+			 iconButton.setIcon(null);
 			
 			
 			
