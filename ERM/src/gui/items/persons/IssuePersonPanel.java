@@ -11,13 +11,23 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 //import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,12 +38,15 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
+//import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.transaction.Transaction;
+
 import gui.transaction.OnDealClick;
 
 @SuppressWarnings("serial")
@@ -45,6 +58,8 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	private JTextArea txtareaDescription;
 	private JTextField txtBirthday;
 	private JTextField txtDeathday;
+	private JLabel iconLabel;
+	private JButton iconButton;
 	@SuppressWarnings("rawtypes")
 	private JComboBox txtGender;
 	private JTextField txtRace;
@@ -146,13 +161,35 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
       	this.txtName = new JTextField();
         this.add(this.txtName, txtGBC);
         
+      
+        // кнопка загрузки изображения
+        labelGBC.gridy = gridy;
+        iconButton = new JButton(Lang.getInstance().translate("Add Image..."));
+        this.add(iconButton, labelGBC);
+        iconButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+			addimage();
+				
+				
+			}
+        	
+        	
+        	
+        });
+        
+        
         //LABEL DESCRIPTION
       	labelGBC.gridy = gridy;
+      	labelGBC.gridx = 1;
       	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
       	this.add(descriptionLabel, labelGBC);
       		
       	//TXTAREA DESCRIPTION
       	txtGBC.gridy = gridy++;
+      	txtGBC.gridx = 2;
       	this.txtareaDescription = new JTextArea();
        	
       	this.txtareaDescription.setRows(4);
@@ -167,6 +204,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
       	      	
       	//LABEL GENDER
       	labelGBC.gridy = gridy;
+      	labelGBC.gridx =0;
       	JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");
       	this.add(genderLabel, labelGBC);
       	
@@ -178,6 +216,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
         	};	
       	//TXT GENDER
       	txtGBC.gridy = gridy++;
+      	txtGBC.gridx=1;
       	//this.txtGender = new JTextField();
       	txtGender = new JComboBox(items);
       	//this.txtGender.setText("1");
@@ -329,6 +368,103 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
         
 	}
 	
+    private static byte[] getBytesFromFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        long length = file.length();
+        if (length > Integer.MAX_VALUE) {
+            // File is too large
+        }
+        byte[] bytes = new byte[(int)length];
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
+        }
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+        is.close();
+        return bytes;
+    }
+	
+	protected void addimage() {
+		// TODO Auto-generated method stub
+		
+		
+		// открыть диалог для файла
+		JFileChooser chooser = new JFileChooser();
+		/*
+	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
+	    // under the demo/jfc directory in the JDK.
+		final String[][] FILTERS = {{"png", "File (*.png)"},
+                {"jpg" , "File(*.jpg)"}};	
+		
+		
+		 for (int i = 0; i < FILTERS[0].length; i++) {
+				FileFilterExt eff = new FileFilterExt(FILTERS[i][0], 
+						                              FILTERS[i][1]);
+				chooser.addChoosableFileFilter(eff);
+         }
+		*/
+		
+		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                 "Image", "png", "jpg");
+		 chooser.setFileFilter(filter);
+		 
+	    int returnVal = chooser.showOpenDialog(getParent());
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	       System.out.println("You chose to open this file: " +
+	            chooser.getSelectedFile().getName());
+	    
+	//       String a = chooser.getSelectedFile().getName();
+	//       String b = chooser.getSelectedFile().getPath();
+	//       String c = chooser.getSelectedFile().getAbsolutePath();
+	       
+	       File file = new File(chooser.getSelectedFile().getPath());
+// если размер больше 30к то не вставляем	       
+	       if (file.length()>30000) {
+	    	   
+	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+	    	   
+	    	   return;
+	       }
+	       
+// его надо в базу вставлять
+	        byte[] imgButes = null; 
+			try {
+				imgButes = getBytesFromFile(file);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        InputStream inputStream = new ByteArrayInputStream(imgButes);
+	        try {
+				BufferedImage image = ImageIO.read(inputStream);
+				iconButton.setIcon(new ImageIcon(imgButes));
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
+	       
+	       
+	       
+	    }
+		
+		// прочитать
+		
+		// преобразовать в bloom
+		
+		// вывести на экран в кнопку
+		
+		
+		
+		
+		
+	}
+
 	public void onIssueClick()
 	{
 		//DISABLE
@@ -374,6 +510,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		float birthLatitude = 0;
 		float birthLongitude = 0;
 		int height = 0;
+		Blob[] imgBlob;
 		try
 		{
 			
@@ -476,6 +613,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 			 txtEyeColor.setText("");;
 			 txtHairСolor.setText("");;
 			 txtHeight.setText("");;
+			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
 			
 			
 			
@@ -490,3 +628,33 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		this.issueButton.setEnabled(true);
 	}
 }
+// Фильтр выбора файлов определенного типа
+class FileFilterExt extends javax.swing.filechooser.FileFilter 
+{
+	String extension  ;  // расширение файла
+	String description;  // описание типа файлов
+
+	FileFilterExt(String extension, String descr)
+	{
+		this.extension = extension;
+		this.description = descr;
+	}
+	@Override
+	public boolean accept(java.io.File file)
+	{
+		if(file != null) {
+			if (file.isDirectory())
+				return true;
+			if( extension == null )
+				return (extension.length() == 0);
+			return file.getName().endsWith(extension);
+		}
+		return false;
+	}
+	// Функция описания типов файлов
+	@Override
+	public String getDescription() {
+		return description;
+	}
+}
+
