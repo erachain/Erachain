@@ -31,8 +31,12 @@ import settings.Settings;
 
 
 public class BlockExplorerTest {
+	
 
 	static Logger LOGGER = Logger.getLogger(BlockExplorerTest.class.getName());
+
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	public void maxBalance() 
 	{
@@ -73,7 +77,7 @@ public class BlockExplorerTest {
 		Stopwatch stopwatchAll = new Stopwatch();
 		
 		//ADD ERM ASSET
-		AssetVenture ermAsset = new AssetVenture(block.getGenerator(), "ERM", ".", 10000000000L, (byte)0, true); //, block.getGeneratorSignature());
+		AssetVenture ermAsset = new AssetVenture(block.getGenerator(), "ERM", icon, image, ".", 10000000000L, (byte)0, true); //, block.getGeneratorSignature());
     	databaseSet.getIssueAssetMap().set(block.getGeneratorSignature(), 0l);
     	databaseSet.getItemAssetMap().set(0l, ermAsset);
     	

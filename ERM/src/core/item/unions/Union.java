@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
  import org.apache.log4j.Logger;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
@@ -15,13 +16,13 @@ public class Union extends UnionCls {
 	
 	private static final int TYPE_ID = UnionCls.UNION;
 
-	public Union(Account creator, String name, long birthday, long parent, String description)
+	public Union(Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, creator, name, birthday, parent, description);
+		super(TYPE_ID, creator, name, birthday, parent, icon, image, description);
 	}
-	public Union(byte[] typeBytes, Account creator, String name, long birthday, long parent, String description)
+	public Union(byte[] typeBytes, Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, birthday, parent, description);
+		super(typeBytes, creator, name, birthday, parent, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -57,6 +58,32 @@ public class Union extends UnionCls {
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
 				
+		//READ ICON
+		byte[] iconLengthBytes = Arrays.copyOfRange(data, position, position + ICON_SIZE_LENGTH);
+		int iconLength = Ints.fromBytes( (byte)0, (byte)0, iconLengthBytes[0], iconLengthBytes[1]);
+		position += ICON_SIZE_LENGTH;
+		
+		if(iconLength > MAX_ICON_LENGTH)
+		{
+			throw new Exception("Invalid icon length");
+		}
+		
+		byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
+		position += iconLength;
+
+		//READ IMAGE
+		byte[] imageLengthBytes = Arrays.copyOfRange(data, position, position + IMAGE_SIZE_LENGTH);
+		int imageLength = Ints.fromByteArray(imageLengthBytes);
+		position += IMAGE_SIZE_LENGTH;
+		
+		if(imageLength > MAX_IMAGE_LENGTH)
+		{
+			throw new Exception("Invalid image length");
+		}
+		
+		byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
+		position += imageLength;
+
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
@@ -90,7 +117,7 @@ public class Union extends UnionCls {
 		}
 		
 		//RETURN
-		Union note = new Union(typeBytes, creator, name, birthday, parent, description);
+		Union note = new Union(typeBytes, creator, name, birthday, parent, icon, image, description);
 		if (includeReference)
 		{
 			note.setReference(reference);

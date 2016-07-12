@@ -43,6 +43,9 @@ public class TestRecStatus {
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -86,7 +89,7 @@ public class TestRecStatus {
 		init();
 		
 		//CREATE STATUS
-		Status status = new Status(maker, "test", "strontje");
+		Status status = new Status(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE STATUS TRANSACTION
 		Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -110,7 +113,7 @@ public class TestRecStatus {
 		
 		init();
 		
-		StatusCls status = new Status(maker, "test132", "12345678910strontje");
+		StatusCls status = new Status(maker, "test132", icon, image, "12345678910strontje");
 		byte[] raw = status.toBytes(false);
 		assertEquals(raw.length, status.getDataLength(false));
 				
@@ -172,7 +175,7 @@ public class TestRecStatus {
 		
 		init();				
 		
-		Status status = new Status(maker, "test", "strontje");
+		Status status = new Status(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -188,7 +191,7 @@ public class TestRecStatus {
 		long key = db.getIssueStatusMap().get(issueStatusRecord);
 		assertEquals(true, db.getItemStatusMap().contains(key));
 		
-		StatusCls status_2 = new Status(maker, "test132_2", "2_12345678910strontje");				
+		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueStatusTransaction_2.sign(maker, false);
 		issueStatusTransaction_2.process(db, false);

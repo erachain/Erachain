@@ -59,6 +59,9 @@ public class TestRecPerson {
 	byte[] personReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -88,6 +91,7 @@ public class TestRecPerson {
     	
 	PersonCls personGeneral;
 	PersonCls person;
+	long genesisPersonKey = -1;
 	long personKey = -1;
 	IssuePersonRecord issuePersonTransaction;
 	R_SertifyPubKeys r_SertifyPubKeys;
@@ -110,6 +114,8 @@ public class TestRecPerson {
 		gb = new GenesisBlock();
 		gb.process(db);
 		
+		genesisPersonKey = db.getIssuePersonMap().size();
+		
 		last_ref = gb.getTimestamp();
 		
 		// GET RIGHTS TO CERTIFIER
@@ -117,7 +123,7 @@ public class TestRecPerson {
 		long birthDay = timestamp - 12345678;
 		personGeneral = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
 		genesis_issue_person.process(db, false);
@@ -130,7 +136,7 @@ public class TestRecPerson {
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastReference(db));
@@ -156,7 +162,7 @@ public class TestRecPerson {
 		personKey = person.getKey(db);
 
 		// issue 1 genesis person in init() here
-		assertEquals( 2, personKey);
+		//assertEquals( genesisPersonKey + 1, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 		
 		//CREATE PERSONALIZE REcORD
@@ -576,7 +582,7 @@ public class TestRecPerson {
 
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
-		assertEquals(2, personKey);
+		//assertEquals( genesisPersonKey + 1, personKey);
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES

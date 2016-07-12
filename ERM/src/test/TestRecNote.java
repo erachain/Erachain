@@ -53,6 +53,9 @@ public class TestRecNote {
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	byte[] data = "test123!".getBytes();
 	byte[] isText = new byte[] { 1 };
 	byte[] encrypted = new byte[] { 0 };
@@ -89,7 +92,7 @@ public class TestRecNote {
 	}
 	private void initNote(boolean process) {
 		
-		note = new Note(maker, "test132", "12345678910strontje");
+		note = new Note(maker, "test132", icon, image, "12345678910strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -135,7 +138,7 @@ public class TestRecNote {
 		
 		init();
 		
-		NoteCls note = new Note(maker, "test132", "12345678910strontje");
+		NoteCls note = new Note(maker, "test132", icon, image, "12345678910strontje");
 		byte[] raw = note.toBytes(false);
 		assertEquals(raw.length, note.getDataLength(false));
 				
@@ -197,7 +200,7 @@ public class TestRecNote {
 		
 		init();				
 		
-		Note note = new Note(maker, "test", "strontje");
+		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -214,7 +217,7 @@ public class TestRecNote {
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
 		assertEquals(true, noteMap.contains(key));
 		
-		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
+		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueNoteTransaction_2.sign(maker, false);
 		issueNoteTransaction_2.process(db, false);
@@ -236,7 +239,7 @@ public class TestRecNote {
 		
 		init();
 				
-		Note note = new Note(maker, "test", "strontje");
+		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));

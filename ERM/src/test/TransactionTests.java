@@ -60,6 +60,9 @@ public class TransactionTests {
 	Long last_ref;
 	Long new_ref;
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -2267,7 +2270,7 @@ public class TransactionTests {
 		init();
 		
 		//CREATE ASSET
-		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
 		//byte[] data = asset.toBytes(false);
 		//Asset asset2 = Asset.parse(data);
 		
@@ -2300,7 +2303,7 @@ public class TransactionTests {
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -2382,7 +2385,7 @@ public class TransactionTests {
 		
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
 
 				
 		//CREATE ISSUE ASSET TRANSACTION
@@ -2421,7 +2424,7 @@ public class TransactionTests {
 				
 		
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(db));

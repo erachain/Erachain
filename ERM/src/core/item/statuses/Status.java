@@ -3,6 +3,7 @@ package core.item.statuses;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.account.Account;
@@ -12,13 +13,13 @@ public class Status extends StatusCls {
 	
 	private static final int TYPE_ID = StatusCls.STATUS;
 
-	public Status(Account creator, String name, String description)
+	public Status(Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, creator, name, description);
+		super(TYPE_ID, creator, name, icon, image, description);
 	}
-	public Status(byte[] typeBytes, Account creator, String name, String description)
+	public Status(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -55,6 +56,32 @@ public class Status extends StatusCls {
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
 				
+		//READ ICON
+		byte[] iconLengthBytes = Arrays.copyOfRange(data, position, position + ICON_SIZE_LENGTH);
+		int iconLength = Ints.fromBytes( (byte)0, (byte)0, iconLengthBytes[0], iconLengthBytes[1]);
+		position += ICON_SIZE_LENGTH;
+		
+		if(iconLength > MAX_ICON_LENGTH)
+		{
+			throw new Exception("Invalid icon length");
+		}
+		
+		byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
+		position += iconLength;
+
+		//READ IMAGE
+		byte[] imageLengthBytes = Arrays.copyOfRange(data, position, position + IMAGE_SIZE_LENGTH);
+		int imageLength = Ints.fromByteArray(imageLengthBytes);
+		position += IMAGE_SIZE_LENGTH;
+		
+		if(imageLength > MAX_IMAGE_LENGTH)
+		{
+			throw new Exception("Invalid image length");
+		}
+		
+		byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
+		position += imageLength;
+
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
@@ -78,7 +105,7 @@ public class Status extends StatusCls {
 		}
 		
 		//RETURN
-		Status status = new Status(typeBytes, creator, name, description);
+		Status status = new Status(typeBytes, creator, name, icon, image, description);
 		if (includeReference)
 		{
 			status.setReference(reference);

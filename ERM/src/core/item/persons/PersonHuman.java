@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
  import org.apache.log4j.Logger;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
@@ -18,27 +19,27 @@ public class PersonHuman extends PersonCls {
 
 	public PersonHuman(Account creator, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
 	{
 		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, (byte)height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
 	}
 	public PersonHuman(Account creator, String fullName, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
 	{
 		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, (byte)height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
 	}
 	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
 	{
 		super(typeBytes, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, (byte)height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -72,6 +73,32 @@ public class PersonHuman extends PersonCls {
 		String fullName = new String(fullNameBytes, StandardCharsets.UTF_8);
 		position += fullNameLength;
 				
+		//READ ICON
+		byte[] iconLengthBytes = Arrays.copyOfRange(data, position, position + ICON_SIZE_LENGTH);
+		int iconLength = Ints.fromBytes( (byte)0, (byte)0, iconLengthBytes[0], iconLengthBytes[1]);
+		position += ICON_SIZE_LENGTH;
+		
+		if(iconLength > MAX_ICON_LENGTH)
+		{
+			throw new Exception("Invalid icon length");
+		}
+		
+		byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
+		position += iconLength;
+
+		//READ IMAGE
+		byte[] imageLengthBytes = Arrays.copyOfRange(data, position, position + IMAGE_SIZE_LENGTH);
+		int imageLength = Ints.fromByteArray(imageLengthBytes);
+		position += IMAGE_SIZE_LENGTH;
+		
+		if(imageLength > MAX_IMAGE_LENGTH)
+		{
+			throw new Exception("Invalid image length");
+		}
+		
+		byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
+		position += imageLength;
+
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
@@ -175,7 +202,7 @@ public class PersonHuman extends PersonCls {
 		//RETURN
 		PersonHuman personHuman = new PersonHuman(typeBytes, creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, description);
+				skinColor, eyeColor, hairСolor, height, icon, image, description);
 		if (includeReference)
 		{
 			personHuman.setReference(reference);

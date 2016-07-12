@@ -30,23 +30,22 @@ public abstract class UnionCls extends ItemCls{
 
 	protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
 	protected static final int PARENT_LENGTH = Transaction.KEY_LENGTH;
-	protected static final int BASE_LENGTH = ItemCls.BASE_LENGTH
-			+ BIRTHDAY_LENGTH + PARENT_LENGTH;
+	protected static final int BASE_LENGTH = BIRTHDAY_LENGTH + PARENT_LENGTH;
 
 	// TODO add setNote - document for birth union
 	protected long birthday; // timestamp
 	protected long parent; // parent union
 
-	public UnionCls(byte[] typeBytes, Account creator, String name, long birthday, long parent, String description)
+	public UnionCls(byte[] typeBytes, Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 		this.birthday = birthday;
 		this.parent = parent;
 
 	}
-	public UnionCls(int type, Account creator, String name, long birthday, long parent, String description)
+	public UnionCls(int type, Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, birthday, parent, description);
+		this(new byte[TYPE_LENGTH], creator, name, birthday, parent, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 
@@ -90,17 +89,12 @@ public abstract class UnionCls extends ItemCls{
 
 		return data;
 	}
-
-	@Override
+	
+	
 	public int getDataLength(boolean includeReference) 
 	{
-		return BASE_LENGTH
-				+ this.name.getBytes(StandardCharsets.UTF_8).length
-				+ this.description.getBytes(StandardCharsets.UTF_8).length
-				+ (includeReference? REFERENCE_LENGTH: 0);
-
+		return super.getDataLength(includeReference) + BASE_LENGTH;
 	}	
-	
 	//OTHER
 
 	@Override

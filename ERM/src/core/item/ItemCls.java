@@ -39,10 +39,14 @@ public abstract class ItemCls {
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int CREATOR_LENGTH = Account.ADDRESS_LENGTH;
 	protected static final int NAME_SIZE_LENGTH = 1;
-	public static final int MAX_NAME_LENGTH = 255 * NAME_SIZE_LENGTH;
+	public static final int MAX_NAME_LENGTH = 256 * NAME_SIZE_LENGTH - 1;
+	protected static final int ICON_SIZE_LENGTH = 2;
+	public static final int MAX_ICON_LENGTH = 256 * ICON_SIZE_LENGTH - 1;
+	protected static final int IMAGE_SIZE_LENGTH = 4;
+	public static final int MAX_IMAGE_LENGTH = 256 * IMAGE_SIZE_LENGTH - 1;
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
-	protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
+	protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 		
 	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
@@ -56,18 +60,22 @@ public abstract class ItemCls {
 	protected String description;
 	protected long key = -1;
 	protected byte[] reference = null; // this is signature of issued record
+	protected byte[] icon;
+	protected byte[] image;
 	
-	public ItemCls(byte[] typeBytes, Account creator, String name, String description)
+	public ItemCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
 		this.typeBytes = typeBytes;
 		this.creator = creator;
 		this.name = name;
 		this.description = description;
+		this.icon = icon == null? new byte[0]: icon;
+		this.image = image == null? new byte[0]: image;
 		
 	}
-	public ItemCls(int type, Account creator, String name, String description)
+	public ItemCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, description);
+		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 
@@ -140,6 +148,12 @@ public abstract class ItemCls {
 	
 	public String getName() {
 		return this.name;
+	}
+	public byte[] getIcon() {
+		return this.icon;
+	}
+	public byte[] getImage() {
+		return this.image;
 	}
 	
 	
@@ -218,6 +232,22 @@ public abstract class ItemCls {
 		
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
+
+		//WRITE ICON SIZE - 2 bytes = 64kB max
+		int iconLength = this.icon.length;
+		byte[] iconLengthBytes = Ints.toByteArray(iconLength);
+		data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+				
+		//WRITE ICON
+		data = Bytes.concat(data, this.icon);
+
+		//WRITE IMAGE SIZE
+		int imageLength = this.image.length;
+		byte[] imageLengthBytes = Ints.toByteArray(imageLength);
+		data = Bytes.concat(data, imageLengthBytes);
+				
+		//WRITE IMAGE
+		data = Bytes.concat(data, this.image);
 		
 		//WRITE DESCRIPTION SIZE
 		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
@@ -245,7 +275,9 @@ public abstract class ItemCls {
 	public int getDataLength(boolean includeReference) 
 	{
 		return BASE_LENGTH
-				+ this.name.getBytes(StandardCharsets.UTF_8).length // BASE58 - not UTF
+				+ this.name.getBytes(StandardCharsets.UTF_8).length
+				+ this.icon.length
+				+ this.image.length
 				+ this.description.getBytes(StandardCharsets.UTF_8).length
 				+ (includeReference? REFERENCE_LENGTH: 0);
 	}	
@@ -310,6 +342,17 @@ public abstract class ItemCls {
 		{
 			itemJSON.put("timestamp", txReference.getTimestamp());
 		}
+		
+		return itemJSON;
+	}
+	@SuppressWarnings("unchecked")
+	public JSONObject toJsonData() {
+		
+		JSONObject itemJSON = new JSONObject();
+
+		// ADD DATA
+		itemJSON.put("icon", Base58.encode(this.icon));
+		itemJSON.put("image", Base58.encode(this.image));
 		
 		return itemJSON;
 	}

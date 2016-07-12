@@ -55,6 +55,9 @@ public class TestRecSetStatusToItem {
 	Long to_date = null;
 	long personkey;
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -87,7 +90,7 @@ public class TestRecSetStatusToItem {
 		long birthDay =  timestamp - 12345678;
 		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
 				(byte)1, "Slav", (float)128.12345, (float)33.7777,
-				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -99,7 +102,7 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db),
 				to_date, birthDay + 1000,
-				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 123456l,
+				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
 				timestamp, maker.getLastReference(db));
 		timestamp += 100;
 

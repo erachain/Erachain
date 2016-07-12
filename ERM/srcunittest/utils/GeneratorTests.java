@@ -19,7 +19,7 @@ import database.DBSet;
 
 public class GeneratorTests {
 
-	byte FEE_KEY = 1;
+	long ERMO_KEY = 1l;
 	byte FEE_POWER = (byte)0;
 	
 	@Test
@@ -41,7 +41,7 @@ public class GeneratorTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(10000000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getTimestamp(), databaseSet);
-		generator.setConfirmedBalance(Transaction.FEE_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
+		generator.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
 				
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator(false);
@@ -55,7 +55,7 @@ public class GeneratorTests {
 			long timestamp = newBlock.getTimestamp() + i - 10000;
 						 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, ERMO_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB

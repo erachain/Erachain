@@ -24,14 +24,14 @@ public abstract class NoteCls extends ItemCls {
 
 	public static final int INITIAL_FAVORITES = 3;
 
-	public NoteCls(byte[] typeBytes, Account creator, String name, String description)
+	public NoteCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 		
 	}
-	public NoteCls(int type, Account creator, String name, String description)
+	public NoteCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, description);
+		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 
@@ -50,51 +50,4 @@ public abstract class NoteCls extends ItemCls {
 		return db.getIssueNoteMap();
 	}	
 	
-	/*
-	public long getKey(DBSet db) {
-		// TODO if ophran ?
-		if (this.key <0) this.key = db.getIssueNoteMap().get(this.reference);
-		return this.key;
-	}
-		
-	public boolean isConfirmed(DBSet db) {
-		return db.getIssueNoteMap().contains(this.reference);
-	}	
-	
-	public long insertToMap(DBSet db)
-	{
-		//INSERT INTO DATABASE
-		ItemNoteMap dbMap = db.getNoteMap();
-		int mapSize = dbMap.size();
-		//LOGGER.info("GENESIS MAP SIZE: " + assetMap.size());
-		long key = 0l;
-		if (mapSize == 0) {
-			// initial map set
-			dbMap.set(0l, this);
-		} else {
-			key = dbMap.add(this);
-			//this.asset.setKey(key);
-		}
-		
-		//SET ORPHAN DATA
-		db.getIssueNoteMap().set(this.reference, key);
-		
-		return key;
-		
-	}
-	
-	public long removeFromMap(DBSet db)
-	{
-		//DELETE FROM DATABASE
-		long key = db.getIssueNoteMap().get(this.reference);
-		db.getNoteMap().delete(key);	
-				
-		//DELETE ORPHAN DATA
-		db.getIssueNoteMap().delete(this.reference);
-		
-		return key;
-
-	}
-	
-	*/
 }

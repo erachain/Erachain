@@ -68,6 +68,9 @@ public class TransactionCreator
 	private DBSet fork;
 	private Block lastBlock;
 	
+	private byte[] icon = new byte[0]; // default value
+	private byte[] image = new byte[0]; // default value
+	
 	private void checkUpdate()
 	{
 		//CHECK IF WE ALREADY HAVE A FORK
@@ -263,7 +266,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		AssetCls asset = new AssetVenture(creator, name, description, quantity, scale, divisible);
+		AssetCls asset = new AssetVenture(creator, name, icon, image, description, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
@@ -281,7 +284,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 			
-		ImprintCls imprint = new Imprint(creator, name, description);
+		ImprintCls imprint = new Imprint(creator, name, icon, image, description);
 							
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
@@ -299,7 +302,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		NoteCls note = new Note(creator, name, description);
+		NoteCls note = new Note(creator, name, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(creator, note, (byte)feePow, time, creator.getLastReference(this.fork));
@@ -321,7 +324,7 @@ public class TransactionCreator
 
 		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, description);
+				skinColor, eyeColor, hairСolor, height, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, creator.getLastReference(this.fork));
@@ -339,7 +342,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		StatusCls status = new Status(creator, name, description);
+		StatusCls status = new Status(creator, name, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));
@@ -357,7 +360,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		UnionCls union = new Union(creator, name, birthday, parent, description);
+		UnionCls union = new Union(creator, name, birthday, parent, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastReference(this.fork));

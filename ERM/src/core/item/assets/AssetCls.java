@@ -48,13 +48,13 @@ public abstract class AssetCls extends ItemCls {
 	
 	public static final int INITIAL_FAVORITES = 4;
 		
-	public AssetCls(byte[] typeBytes, Account creator, String name, String description)
+	public AssetCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 	}
-	public AssetCls(int type, Account creator, String name, String description)
+	public AssetCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, description);
+		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 

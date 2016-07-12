@@ -13,14 +13,14 @@ public abstract class ImprintCls extends ItemCls {
 		
 	protected static final int IMPRINT = 1;
 
-	public ImprintCls(byte[] typeBytes, Account creator, String name, String description)
+	public ImprintCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 		
 	}
-	public ImprintCls(int type, Account creator, String name, String description)
+	public ImprintCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, description);
+		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 

@@ -46,8 +46,7 @@ public abstract class PersonCls extends ItemCls {
 	protected static final int HAIR_COLOR_SIZE_LENGTH = 1;
 	public static final int MAX_HAIR_COLOR_LENGTH = 256 * HAIR_COLOR_SIZE_LENGTH;
 	public static final int HEIGHT_LENGTH = 1;
-	protected static final int BASE_LENGTH = ItemCls.BASE_LENGTH
-			+ BIRTHDAY_LENGTH + DEATHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
+	protected static final int BASE_LENGTH = BIRTHDAY_LENGTH + DEATHDAY_LENGTH + GENDER_LENGTH + RACE_SIZE_LENGTH + LATITUDE_LENGTH * 2
 			+ SKIN_COLOR_SIZE_LENGTH + EYE_COLOR_SIZE_LENGTH + HAIR_COLOR_SIZE_LENGTH
 			+ HEIGHT_LENGTH;
 	
@@ -65,9 +64,9 @@ public abstract class PersonCls extends ItemCls {
 	
 	public PersonCls(byte[] typeBytes, Account creator, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 		this.birthday = birthday;
 		this.deathday = deathday;
 		this.gender = gender;
@@ -82,11 +81,11 @@ public abstract class PersonCls extends ItemCls {
 	
 	public PersonCls(byte[] typeBytes, Account creator, String name, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
 		this(typeBytes, creator, name, 0, 0,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, (byte)height, description);
+				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
 		
 		if (birthday.length() < 11) birthday += " 00:01:01";
 		this.birthday = Timestamp.valueOf(birthday).getTime();
@@ -97,11 +96,11 @@ public abstract class PersonCls extends ItemCls {
 	
 	public PersonCls(int type, Account creator, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, byte height, String description)
+			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
 		this(new byte[]{(byte)type}, creator, name, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, description);
+				skinColor, eyeColor, hairСolor, height, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -214,17 +213,15 @@ public abstract class PersonCls extends ItemCls {
 		return data;
 	}
 
-	@Override
+	//@Override
 	public int getDataLength(boolean includeReference) 
 	{
-		return BASE_LENGTH
-				+ this.name.getBytes(StandardCharsets.UTF_8).length
-				+ this.description.getBytes(StandardCharsets.UTF_8).length
+		return super.getDataLength(includeReference)
+				+ BASE_LENGTH
 				+ this.race.getBytes(StandardCharsets.UTF_8).length
 				+ this.skinColor.getBytes(StandardCharsets.UTF_8).length
 				+ this.eyeColor.getBytes(StandardCharsets.UTF_8).length
-				+ this.hairСolor.getBytes(StandardCharsets.UTF_8).length
-				+ (includeReference? REFERENCE_LENGTH: 0);
+				+ this.hairСolor.getBytes(StandardCharsets.UTF_8).length;
 	}	
 	
 	//OTHER

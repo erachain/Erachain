@@ -52,6 +52,9 @@ public class DatabaseTests {
 	byte[] personReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[0]; // default value
+	private byte[] image = new byte[0]; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet dbSet;
 	private GenesisBlock gb;
@@ -87,7 +90,7 @@ public class DatabaseTests {
 		long birthDay = timestamp - 12345678;
 		personGeneral = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
 		genesis_issue_person.process(dbSet, false);
@@ -100,7 +103,7 @@ public class DatabaseTests {
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(dbSet));
@@ -210,7 +213,7 @@ public class DatabaseTests {
 
 		init();
 						
-		AssetCls asset = new AssetVenture(maker, "test", "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dbSet));
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(dbSet, false);

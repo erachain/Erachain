@@ -54,6 +54,9 @@ public class TestRecUnion {
 	byte[] unionReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -106,7 +109,7 @@ public class TestRecUnion {
 
 		// GET RIGHTS TO CERTIFIER
 		unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
-				parent, "Союз Совестких Социалистических Республик");
+				parent, icon, image, "Союз Совестких Социалистических Республик");
 		//GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, certifier);
 		//genesis_issue_union.process(db, false);
 		//GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
@@ -117,7 +120,7 @@ public class TestRecUnion {
 		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		union = new Union(certifier, "РСФСР", timestamp - 1234567,
-				parent + 1, "Россия");
+				parent + 1, icon, image, "Россия");
 
 		//CREATE ISSUE UNION TRANSACTION
 		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastReference(db));
@@ -323,7 +326,7 @@ public class TestRecUnion {
 		
 		//CHECK UNION EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssueUnionMap().get(issueUnionTransaction);
-		assertEquals(0, key);
+		assertEquals(1, key);
 		assertEquals(true, db.getItemUnionMap().contains(key));
 		
 		//CHECK UNION IS CORRECT

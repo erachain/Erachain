@@ -44,6 +44,9 @@ public class TestRecImprint {
 	byte[] imprintReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -72,7 +75,7 @@ public class TestRecImprint {
 		maker.setLastReference(gb.getTimestamp(), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
-		imprint = new Imprint(maker, name_total, "");
+		imprint = new Imprint(maker, name_total, icon, image, "");
 
 	}
 	
@@ -193,7 +196,7 @@ public class TestRecImprint {
 		long key = issueImprintRecord.getItem().getKey(db);
 		assertEquals(true, db.getItemImprintMap().contains(key));
 		
-		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), "e");				
+		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");				
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10);
 		issueImprintTransaction_2.sign(maker, false);
 		issueImprintTransaction_2.process(db, false);

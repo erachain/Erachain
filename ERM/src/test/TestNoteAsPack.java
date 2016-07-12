@@ -39,7 +39,10 @@ public class TestNoteAsPack {
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();
-	
+
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -73,7 +76,7 @@ public class TestNoteAsPack {
 		init();
 		
 		//CREATE NOTE
-		Note note = new Note(maker, "test", "strontje");
+		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		Transaction issueNoteTransaction = new IssueNoteRecord(maker, note);
@@ -97,7 +100,7 @@ public class TestNoteAsPack {
 		
 		init();
 		
-		NoteCls note = new Note(maker, "test132", "12345678910strontje");
+		NoteCls note = new Note(maker, "test132", icon, image, "12345678910strontje");
 		byte[] raw = note.toBytes(includeReference);
 		assertEquals(raw.length, note.getDataLength(includeReference));
 				
@@ -151,7 +154,7 @@ public class TestNoteAsPack {
 		
 		init();				
 		
-		Note note = new Note(maker, "test", "strontje");
+		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note);
@@ -167,7 +170,7 @@ public class TestNoteAsPack {
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
 		assertEquals(true, db.getItemNoteMap().contains(key));
 		
-		NoteCls note_2 = new Note(maker, "test132_2", "2_12345678910strontje");				
+		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2);
 		issueNoteTransaction_2.sign(maker, asPack);
 		issueNoteTransaction_2.process(db, asPack);
@@ -191,7 +194,7 @@ public class TestNoteAsPack {
 		
 		init();				
 				
-		Note note = new Note(maker, "test", "strontje");
+		Note note = new Note(maker, "test", icon, image, "strontje");
 		Long makerReference = maker.getLastReference(db);
 				
 		//CREATE ISSUE NOTE TRANSACTION

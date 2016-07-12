@@ -38,6 +38,9 @@ public class TransactionV3Tests {
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
+	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
@@ -126,7 +129,7 @@ public class TransactionV3Tests {
 		init();
 		
 		//ADD ERM ASSET
-		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
+		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getGenerator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(assetReference);
 		db.getItemAssetMap().set(61l, aTFundingAsset);
     	
@@ -210,7 +213,7 @@ public class TransactionV3Tests {
 
 		init();
 		
-		AssetCls aTFundingAsset = new AssetVenture(gb.getGenerator(), "ATFunding", "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
+		AssetCls aTFundingAsset = new AssetVenture(gb.getGenerator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(gb.getGeneratorSignature());
 		db.getItemAssetMap().set(61l, aTFundingAsset);
 

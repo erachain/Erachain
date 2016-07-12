@@ -54,6 +54,8 @@ public class GenesisBlock extends Block{
 	public static final int GENERATING_MIN_BLOCK_TIME = 1 * 60;
 	public static final int GENERATING_MAX_BLOCK_TIME = 5 * 60;
 
+	private static byte[] icon = new byte[0];
+	private static byte[] image = new byte[0];
 
 	private String testnetInfo; 
 	
@@ -98,7 +100,7 @@ public class GenesisBlock extends Block{
 
 				user = new PersonHuman(recipient,
 						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.0, (float)0.0,
-						"-", "-", "-", (int) 188, "-");
+						"-", "-", "-", (int) 188, icon, image, "-");
 				
 
 				//CREATE ISSUE PERSON TRANSACTION
@@ -126,80 +128,80 @@ public class GenesisBlock extends Block{
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, "-")),
+							"-", "-", "-", (int) 188, icon, image, "-")),
 					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, "-")),
+							"-", "-", "-", (int) 188, icon, image, "-")),
 					Arrays.asList(1, new PersonHuman(new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, "-")),
+							"-", "-", "-", (int) 188, icon, image, "-")),
 					////
 					Arrays.asList(1, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
 							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
 							"Ермолаев, Александр Сергеевич", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
+							"белый", "серо-зеленый", "светло-коричневый", (int) 188, icon, image, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
 					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
 							"Скорняков, Александр Викторович", "1963-08-21", null,
 							(byte)1, "европеец-славянин", (float)1.1330, (float)13.9224,
-							"белый", "серо-зеленый", "светло-коричневый", (int) 188, "-"))
+							"белый", "серо-зеленый", "светло-коричневый", (int) 188, icon, image, "-"))
 				);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
 					Arrays.asList(1000, new PersonHuman(new Account("7FoC1wAtbR9Z5iwtcw4Ju1u2DnLBQ1TNS7"),
 							"Симанков, Дмитрий", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("78A24nTM2PPdpjLF2JWbghPDUhPK1zQ51Y"),
 							"Добрышкин, Сергей", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("76GJujhki7z2BeX1bnp4KL5Qp22NsakWeT"),
 							"Бородин, Олег", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "")),
 					Arrays.asList(1000, new PersonHuman(new Account("7RhYgcBSLNLKURXzv85BRuzp4DBb2bpCag"),
 							"Попилин, Максим Александрович", "1984-08-10", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
 							"Кузьмин, Павел Иванович", "1970-12-08", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7JWNnyeiti3X7MYo83kDJVw15PLR7VqUjb"),
 							"Рабчевский, Павел Александрович", "1979-09-08", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7EDf4NPP6wRTmTtZcszo7ivNYhWrP2X44P"),
 							"Стриженок, Арсений Сергеевич", "1991-02-05", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7McpCLj5a27mnSpo9UGHCcDr2CysC382VJ"),
 							"Скорняков, Александр Викторович", "1956-02-01", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-")),
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7L4erwEVLbGfY6hw4o3GKMjdi8KsJjPdCt"),
 							"Симонов, Олег Вадимович", "1967-02-11", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-"))
 				);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					Arrays.asList(100, new PersonHuman(new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo"),
 							"неизвестный участник", "1966-08-21",  null,
 							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 188, "-"))
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-"))
 					);
 			List<PersonCls> personGenesisUsers = Arrays.asList(
 					new PersonHuman(genesisGenerator,
 							"Менделеев, Дмитрий Иванович", "1834-02-08", "1907-02-02",
 							(byte)1, "европеец-славянин", (float)58.195278, (float)68.258056,
-							"белый", "серо-зеленый", "серо-коричневый", (int) 180, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
+							"белый", "серо-зеленый", "серо-коричневый", (int) 180, icon, image, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
 					);
 
 			////////// INVESTORS
@@ -386,15 +388,15 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)AssetCls.FEE_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, AssetCls.REAL_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0L, (byte)8, true);
 		case (int)AssetCls.DEAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, AssetCls.ERMO_DESCR, GENESIS_GENERATING_BALANCE, (byte)0, true);
+		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, GENESIS_GENERATING_BALANCE, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 
@@ -402,29 +404,29 @@ public class GenesisBlock extends Block{
 		switch(key)
 		{
 		case (int)NoteCls.EMPTY_KEY:
-			return new Note(genesisGenerator, "empty", "empty");
+			return new Note(genesisGenerator, "empty", icon, image, "empty");
 		case (int)NoteCls.ESTABLISH_UNION_KEY:
-			return new Note(genesisGenerator, "Establish the Union", "Union name \"%Company Name%\" in country \"%Country%\"");
+			return new Note(genesisGenerator, "Establish the Union", icon, image, "Union name \"%Company Name%\" in country \"%Country%\"");
 		case (int)NoteCls.MARRIAGE_KEY:
-			return new Note(genesisGenerator, "Marriage", "%person1% marries  %person2%");
+			return new Note(genesisGenerator, "Marriage", icon, image, "%person1% marries  %person2%");
 		case (int)NoteCls.HIRING_KEY:
-			return new Note(genesisGenerator, "Hiring", "Hiring to %union%");
+			return new Note(genesisGenerator, "Hiring", icon, image, "Hiring to %union%");
 		}
-		return new Note(genesisGenerator, "I", "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		return new Note(genesisGenerator, "I", icon, image, "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 	// make notes
 	public static Status makeStatus(int key)
 	{
-		if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", "Director, Manager, Worker, Member, Holder");
-		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "Alive", "Alive or Dead");
-		else if (key == StatusCls.RANK_KEY) return new Status(genesisGenerator, "Rank", "General, Major or Minor");
-		else if (key == StatusCls.USER_KEY) return new Status(genesisGenerator, "User", "Admin, User, Observer");
-		else if (key == StatusCls.MAKER_KEY) return new Status(genesisGenerator, "Maker", "Creator, Designer, Maker");
-		else if (key == StatusCls.DELEGATE_KEY) return new Status(genesisGenerator, "Delegate", "President, Senator, Deputy");
-		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", "Certified, Notarized, Confirmed");
-		else if (key == StatusCls.MARRIED_KEY) return new Status(genesisGenerator, "Married", "Husband, Wife, Spouse");
+		if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", icon, image, "Director, Manager, Worker, Member, Holder");
+		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "Alive", icon, image, "Alive or Dead");
+		else if (key == StatusCls.RANK_KEY) return new Status(genesisGenerator, "Rank", icon, image, "General, Major or Minor");
+		else if (key == StatusCls.USER_KEY) return new Status(genesisGenerator, "User", icon, image, "Admin, User, Observer");
+		else if (key == StatusCls.MAKER_KEY) return new Status(genesisGenerator, "Maker", icon, image, "Creator, Designer, Maker");
+		else if (key == StatusCls.DELEGATE_KEY) return new Status(genesisGenerator, "Delegate", icon, image, "President, Senator, Deputy");
+		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", icon, image, "Certified, Notarized, Confirmed");
+		else if (key == StatusCls.MARRIED_KEY) return new Status(genesisGenerator, "Married", icon, image, "Husband, Wife, Spouse");
 
-		return new Status(genesisGenerator, "RIGHTs", "Rights");		
+		return new Status(genesisGenerator, "RIGHTs", icon, image, "Rights");		
 	}
 
 	public String getTestNetInfo() 

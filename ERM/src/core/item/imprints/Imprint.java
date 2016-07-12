@@ -19,15 +19,15 @@ public class Imprint extends ImprintCls {
 	private static final int TYPE_ID = ImprintCls.IMPRINT;
 	private static final int CUTTED_REFERENCE_LENGTH = 20;
 
-	public Imprint(Account creator, String name, String description)
+	public Imprint(Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, creator, name, description);
+		super(TYPE_ID, creator, name, icon, image, description);
 		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 
 	}
-	public Imprint(byte[] typeBytes, Account creator, String name, String description)
+	public Imprint(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, description);
+		super(typeBytes, creator, name, icon, image, description);
 		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 	}
 
@@ -75,6 +75,32 @@ public class Imprint extends ImprintCls {
 		String name = new String(nameBytes, StandardCharsets.UTF_8);
 		position += nameLength;
 				
+		//READ ICON
+		byte[] iconLengthBytes = Arrays.copyOfRange(data, position, position + ICON_SIZE_LENGTH);
+		int iconLength = Ints.fromBytes( (byte)0, (byte)0, iconLengthBytes[0], iconLengthBytes[1]);
+		position += ICON_SIZE_LENGTH;
+		
+		if(iconLength > MAX_ICON_LENGTH)
+		{
+			throw new Exception("Invalid icon length");
+		}
+		
+		byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
+		position += iconLength;
+
+		//READ IMAGE
+		byte[] imageLengthBytes = Arrays.copyOfRange(data, position, position + IMAGE_SIZE_LENGTH);
+		int imageLength = Ints.fromByteArray(imageLengthBytes);
+		position += IMAGE_SIZE_LENGTH;
+		
+		if(imageLength > MAX_IMAGE_LENGTH)
+		{
+			throw new Exception("Invalid image length");
+		}
+		
+		byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
+		position += imageLength;
+
 		//READ DESCRIPTION
 		byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
@@ -98,7 +124,7 @@ public class Imprint extends ImprintCls {
 		}
 		
 		//RETURN
-		Imprint imprint = new Imprint(typeBytes, creator, name, description);
+		Imprint imprint = new Imprint(typeBytes, creator, name, icon, image, description);
 		if (includeReference)
 		{
 			imprint.setReference(reference);
@@ -107,13 +133,12 @@ public class Imprint extends ImprintCls {
 		return imprint;
 	}
 	
-	@Override
+	//@Override
 	public int getDataLength(boolean includeReference) 
 	{
-		return BASE_LENGTH
-				+ this.name.getBytes().length // it is Base58 - not UTF
-				+ this.description.getBytes(StandardCharsets.UTF_8).length
-				+ (includeReference? REFERENCE_LENGTH: 0);
+		return super.getDataLength(includeReference)
+				- this.name.getBytes(StandardCharsets.UTF_8).length // remove UTF8
+				+ this.name.getBytes().length; // it is Base58 - not UTF
 	}	
 
 	
