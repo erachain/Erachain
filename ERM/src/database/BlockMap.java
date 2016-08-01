@@ -19,6 +19,7 @@ import com.google.common.primitives.UnsignedBytes;
 
 import core.block.Block;
 import database.serializer.BlockSerializer;
+import settings.Settings;
 import utils.Converter;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
@@ -31,6 +32,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	
 	private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
+	private int lastTrueBlockHeight = 1; // checkpoint
 	
 	private Var<Boolean> processingVar;
 	private Boolean processing;
@@ -60,6 +62,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
+		this.lastTrueBlockHeight = parent.getLastTrueBlockHeight();
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -131,6 +134,20 @@ public class BlockMap extends DBMap<byte[], Block>
 		}
 		
 		this.lastBlockSignature = block.getSignature();
+		
+		// SET TRUE LAST BLOCK
+		//byte[] b = dbSet.getHeightMap().getBlockByHeight(block.getHeight(dbSet) - Settings.CONFIRMS_TRUE);
+		//Block trueBlock = dbSet.getBlockMap().get(b);
+		DBSet dbSet = (DBSet)this.databaseSet;
+		// TAKE getHeight from PARENT, !child getHeight = null
+		Block parent = block.getParent(dbSet);
+		if (parent == null)
+			return;
+		
+		int th = parent.getHeight(dbSet) - Settings.CONFIRMS_TRUE;
+		if (this.lastTrueBlockHeight < th)
+			this.lastTrueBlockHeight = th;
+		
 	}
 	
 	public Block getLastBlock()
@@ -141,6 +158,12 @@ public class BlockMap extends DBMap<byte[], Block>
 	public byte[] getLastBlockSignature()
 	{
 		return this.lastBlockSignature;
+	}
+	
+	// checkpoint
+	public int getLastTrueBlockHeight()
+	{
+		return this.lastTrueBlockHeight;
 	}
 	
 	public boolean isProcessing() 

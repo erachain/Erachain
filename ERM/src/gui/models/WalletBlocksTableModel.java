@@ -9,6 +9,7 @@ import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.block.Block;
+import core.wallet.Wallet;
 import database.DBSet;
 import database.SortableList;
 import database.wallet.BlockMap;
@@ -68,10 +69,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	{
 		try 
 		{
-			if(blocks == null || blocks.size() < 1 || blocks.size() - 1 < row)
+			if(blocks == null || blocks.size() < 1 || blocks.size() - 1 < row || row == 0)
 			{
 				return null;
 			}
+			
+			//if (!blocks.contains(row)) {
+				//return -1;
+			//}
 			
 			Block block = this.blocks.get(row).getB();
 			
@@ -103,7 +108,12 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
+			// TODO здесь если кошелек на удален то данные ломаются и в цепочке - туда не катается данные нужные
+			// icreator - reset wallet.DB!
+			Controller.getInstance().synchronizeWallet();
+			//Controller.getInstance().setNeedSync(true);
+			//Controller.getInstance().actionAfterConnect();
 		}
 		
 		return null;

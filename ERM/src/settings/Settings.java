@@ -50,6 +50,11 @@ public class Settings {
 	public static final int BLOCK_MAX_SIGNATURES = 500; // blocks load onetime
 	public static final long BLOCK_GENERATING_BALANCE_NEED = 100;
 
+	// CHAIN
+	public static final int CONFIRMS_HARD = 11; // for reference by signature 
+	// MAX orphan CHAIN
+	public static final int CONFIRMS_TRUE = 333; // for reference by ITEM_KEY
+
 	//TESTNET 
 	public static final long DEFAULT_MAINNET_STAMP = 1468312650777L; //1465107777777L;
 	private long genesisStamp = -1;

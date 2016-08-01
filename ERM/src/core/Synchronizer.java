@@ -13,12 +13,14 @@ import network.message.Message;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
 import network.message.TransactionMessage;
+import settings.Settings;
 import at.AT;
 import at.AT_API_Platform_Impl;
 import at.AT_Constants;
 import core.block.Block;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import settings.Settings;
 
 import com.google.common.primitives.Bytes;
 
@@ -63,7 +65,7 @@ public class Synchronizer
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 	
-			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 11 )
+			while ( lastBlock.getHeight(fork) >= height)
 			{
 				newBlocks.add( 0 , lastBlock );
 				//Block tempBlock = fork.getBlockMap().getLastBlock();
@@ -105,11 +107,12 @@ public class Synchronizer
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork );
 				//INVALID BLOCK THROW EXCEPTION
-				throw new Exception("Dishonest peer");
+				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
 			}
 		}
 	}
 
+	// process new BLOCKS to DB and orphan DB
 	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks) throws Exception
 	{
 		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
@@ -143,7 +146,7 @@ public class Synchronizer
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 
-			while ( lastBlock.getHeight(dbSet) >= height && lastBlock.getHeight(dbSet) > 11 )
+			while ( lastBlock.getHeight(dbSet) >= height )
 			{
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				lastBlock.orphan(dbSet);
@@ -177,17 +180,19 @@ public class Synchronizer
 		return orphanedTransactions;
 	}
 	
-	public void synchronize(Peer peer) throws Exception
+	public void synchronize(DBSet dbSet, int lastTrueBlockHeight, Peer peer) throws Exception
 	{
-		LOGGER.info("Synchronizing: " + peer.getAddress().getHostAddress() + " - " + peer.getPing());
+		LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer.getAddress().getHostAddress() + " - " + peer.getPing());
 		
 		//FIND LAST COMMON BLOCK
 		Block common =  this.findLastCommonBlock(peer);
-		
-		DBSet dbSet = DBSet.getInstance();
-		
-		int blockHeight = common.getHeight(dbSet);
-		LOGGER.info("Synchronizing from blockHeight " + blockHeight);
+				
+		int commonBlockHeight = common.getHeight(dbSet);
+		if (lastTrueBlockHeight > commonBlockHeight )
+			// MAX orhpan CHAIN LEN
+			throw new Exception("Dishonest peer on TRUE block > CONFIRMS_TRUE " + common.getHeight(dbSet));
+
+		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
 		//CHECK COMMON BLOCK EXISTS
 		List<byte[]> signatures;
@@ -204,7 +209,7 @@ public class Synchronizer
 			{
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
-				int blockHeightFromPeer = blockFromPeer.getHeight(dbSet);
+				//int blockHeightFromPeer = blockFromPeer.getHeight(dbSet);
 				
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
@@ -227,6 +232,7 @@ public class Synchronizer
 			List<Block> blocks = this.getBlocks(signatures, peer);
 							
 			//SYNCHRONIZE BLOCKS
+			LOGGER.info("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER

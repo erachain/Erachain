@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import ntp.NTP;
+import settings.Settings;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -792,7 +793,7 @@ public class Block {
 			seq++;
 		}
 
-		if(height % 2000 == 0) 
+		if(height % Settings.BLOCK_MAX_SIGNATURES == 0) 
 		{
 			Controller.getInstance().blockchainSyncStatusUpdate(height);
 		}

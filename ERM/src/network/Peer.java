@@ -147,20 +147,53 @@ public class Peer extends Thread{
 	
 	public void run()
 	{
+		DataInputStream in = null;
 		try 
 		{
-			DataInputStream in = new DataInputStream(socket.getInputStream());
+			in = new DataInputStream(socket.getInputStream());
+		} 
+		catch (Exception e) 
+		{
+			LOGGER.error(e.getMessage(), e);
 			
-			while(true)
+			//DISCONNECT
+			callback.onDisconnect(this);
+			return;
+		}
+
+			while(in != null)
 			{
 				//READ FIRST 4 BYTES
 				byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
-				in.readFully(messageMagic);
+				try 
+				{
+					in.readFully(messageMagic);
+				} 
+				catch (Exception e) 
+				{
+					LOGGER.error(e.getMessage(), e);
+					
+					//DISCONNECT
+					callback.onDisconnect(this);
+					return;
+				}
 				
 				if(Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic()))
 				{
 					//PROCESS NEW MESSAGE
-					Message message = MessageFactory.getInstance().parse(this, in);
+					Message message;
+					try 
+					{
+						message = MessageFactory.getInstance().parse(this, in);
+					} 
+					catch (Exception e) 
+					{
+						LOGGER.error(e.getMessage(), e);
+						
+						//DISCONNECT
+						callback.onDisconnect(this);
+						return;
+					}
 					
 					//LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
 					
@@ -185,15 +218,6 @@ public class Peer extends Thread{
 					return;
 				}
 			}
-		} 
-		catch (Exception e) 
-		{
-			//LOGGER.error(e.getMessage(),e);
-			
-			//DISCONNECT
-			callback.onDisconnect(this);
-			return;
-		}
 	}
 	
 	public boolean sendMessage(Message message)
@@ -232,7 +256,7 @@ public class Peer extends Thread{
 	public Message getResponse(Message message)
 	{
 		//GENERATE ID
-		int id = (int) ((Math.random() * 1000000) + 1);
+		int id = (int) ((Math.random() * Integer.MAX_VALUE) + 1);
 		
 		//SET ID
 		message.setId(id);

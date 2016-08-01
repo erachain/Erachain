@@ -27,6 +27,7 @@ public class ForgingStatus extends JLabel implements Observer {
 	private ImageIcon forgingDisabledIcon;
 	private ImageIcon forgingEnabledIcon;
 	private ImageIcon forgingIcon;
+	private ImageIcon forgingWaitIcon;
 	
 	public ForgingStatus()
 	{
@@ -35,6 +36,7 @@ public class ForgingStatus extends JLabel implements Observer {
 		//CREATE ICONS
 		this.forgingDisabledIcon = this.createIcon(Color.RED);
 		this.forgingEnabledIcon = this.createIcon(Color.ORANGE);
+		this.forgingWaitIcon = this.createIcon(Color.MAGENTA);
 		this.forgingIcon = this.createIcon(Color.GREEN);
 
 		//TOOLTIP
@@ -66,6 +68,10 @@ public class ForgingStatus extends JLabel implements Observer {
 				else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_DISABLED && Controller.getInstance().getStatus() == Controller.STATUS_OK) 
 				{
 					setToolTipText(Lang.getInstance().translate("To start forging you need to unlock the wallet."));
+				}
+				else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT && Controller.getInstance().getStatus() == Controller.STATUS_OK) 
+				{
+					setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer."));
 				}
 				else
 				{
@@ -144,13 +150,15 @@ public class ForgingStatus extends JLabel implements Observer {
 		if(status == BlockGenerator.ForgingStatus.FORGING_DISABLED)
 		{
 			forgingDisabled();
-		}
-		if(status ==BlockGenerator.ForgingStatus.FORGING_ENABLED)
+		} else if (status == BlockGenerator.ForgingStatus.FORGING_ENABLED)
 		{
 			this.setIcon(forgingEnabledIcon);
 			this.setText(status.getName());
-		}
-		if(status == BlockGenerator.ForgingStatus.FORGING)
+		} else if (status == BlockGenerator.ForgingStatus.FORGING_WAIT)
+		{
+			this.setIcon(forgingWaitIcon);
+			this.setText(status.getName());
+		} else if (status == BlockGenerator.ForgingStatus.FORGING)
 		{
 			this.setIcon(forgingIcon);
 			this.setText(status.getName());

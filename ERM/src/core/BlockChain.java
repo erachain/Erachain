@@ -9,6 +9,7 @@ import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
+import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -64,6 +65,8 @@ public class BlockChain
 	}
 
 	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
+		
+		//LOGGER.debug("getSignatures ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		

@@ -53,6 +53,9 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public DBMap(DBMap<T, U> parent)
 	{
+
+		this.databaseSet = parent.databaseSet;
+
 		this.parent = parent;
 	    
 	    //OPEN MAP

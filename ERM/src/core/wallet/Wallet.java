@@ -64,6 +64,7 @@ import database.DBSet;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.WalletDatabase;
 import network.message.Message;
+import settings.Settings;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -643,7 +644,7 @@ public class Wallet extends Observable implements Observer
 				//UPDATE
 				this.update(this, new ObserverMessage(ObserverMessage.ADD_BLOCK_TYPE, block));
 				
-				if(block.getHeight(dbSet) % 2000 == 0) 
+				if(block.getHeight(dbSet) % Settings.BLOCK_MAX_SIGNATURES == 0) 
 				{
 					this.syncHeight = block.getHeight(dbSet);
 					

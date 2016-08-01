@@ -45,7 +45,8 @@ public class BlockGenerator extends Thread implements Observer
 	    
 		FORGING_DISABLED(0, Lang.getInstance().translate("Forging disabled") ),
 		FORGING_ENABLED(1, Lang.getInstance().translate("Forging enabled")),
-		FORGING(2, Lang.getInstance().translate("Forging"));
+		FORGING(2, Lang.getInstance().translate("Forging")),
+		FORGING_WAIT(3, Lang.getInstance().translate("Forging awaiting another peer sync"));
 		
 		private final int statuscode;
 		private String name;
@@ -175,10 +176,18 @@ public class BlockGenerator extends Thread implements Observer
 				Controller.getInstance().update();
 			}
 			
-			//CHECK IF WE HAVE CONNECTIONS
-			if(forgingStatus == ForgingStatus.FORGING)
+			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
+			syncForgingStatus();
+			if(forgingStatus == ForgingStatus.FORGING && Controller.getInstance().isReadyForging())
 			{
+				
 				//GET LAST BLOCK
+				// TODO lastBlock error
+				// TEST DB for last block - some time error rised
+				Block lastBlock = Controller.getInstance().getLastBlock();
+				if (lastBlock == null) {
+					return;
+				}
 				byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
@@ -543,22 +552,22 @@ public class BlockGenerator extends Thread implements Observer
 	
 	public void syncForgingStatus()
 	{
-		if(!Settings.getInstance().isForgingEnabled()) {
+		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().size() == 0) {
 			setForgingStatus(ForgingStatus.FORGING_DISABLED);
 			return;
 		}
 		
-		if(getKnownAccounts().size() > 0)
-		{
-			//CONNECTIONS OKE? -> FORGING
-			if(Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-				setForgingStatus(ForgingStatus.FORGING);
-			} else {
-				setForgingStatus(ForgingStatus.FORGING_ENABLED);
-			}
-		} else {
-			setForgingStatus(ForgingStatus.FORGING_DISABLED);
+		int status = Controller.getInstance().getStatus();
+		//CONNECTIONS OKE? -> FORGING
+		if(status != Controller.STATUS_OK) {
+			setForgingStatus(ForgingStatus.FORGING_ENABLED);
+			return;
 		}
+
+		if (Controller.getInstance().isReadyForging())
+			setForgingStatus(ForgingStatus.FORGING);
+		else
+			setForgingStatus(ForgingStatus.FORGING_WAIT);
 	}
 	
 }

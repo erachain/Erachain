@@ -864,10 +864,22 @@ public class Controller extends Observable {
 
 				GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
 
+				LOGGER.error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
+						+ Base58.encode(getHeadersMessage.getParent()));
+
 				// ASK SIGNATURES FROM BLOCKCHAIN
 				List<byte[]> headers = this.blockChain
 						.getSignatures(this.dbSet, getHeadersMessage.getParent());
 
+				LOGGER.error("this.blockChain.getSignatures.size() -> "
+						+ headers.size());
+				if (headers.size() > 0) {
+				LOGGER.error("this.blockChain.getSignatures.get(0) -> "
+						+ Base58.encode( headers.get(0) ));
+				LOGGER.error("this.blockChain.getSignatures.get(headers.size()-1) -> "
+						+ Base58.encode( headers.get(headers.size()-1) ));
+				}
+				
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createHeadersMessage(
 						headers);
@@ -1042,6 +1054,18 @@ public class Controller extends Observable {
 		return maxPeerHeight <= chainHeight;
 	}
 	
+	public boolean isReadyForging() {
+		if (this.peerHeight.size() == 0) {
+			return true;
+		}
+
+		int maxPeerHeight = this.getMaxPeerHeight();
+		int chainHeight = this.blockChain.getHeight(this.dbSet);
+		//int diff = chainHeight - maxPeerHeight;
+		//return diff >= 0 && diff < 10;
+		return chainHeight == maxPeerHeight;
+	}
+	
 	public boolean isNSUpToDate() {
 		return !Settings.getInstance().updateNameStorage();
 	}
@@ -1055,15 +1079,21 @@ public class Controller extends Observable {
 		this.notifyObservers(new ObserverMessage(
 				ObserverMessage.NETWORK_STATUS, this.status));
 		
+		DBSet dbSet = DBSet.getInstance();
+
 		Peer peer = null;
+		//Block lastBlock = getLastBlock();
+		int lastTrueBlockHeight = dbSet.getBlockMap().getLastTrueBlockHeight();
 		try {
 			// WHILE NOT UPTODATE
 			while (!this.isUpToDate()) {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxHeightPeer();
+				
+				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.toString());
 
 				// SYNCHRONIZE FROM PEER
-				this.synchronizer.synchronize(peer);
+				this.synchronizer.synchronize(dbSet, lastTrueBlockHeight, peer);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
