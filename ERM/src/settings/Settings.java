@@ -49,6 +49,8 @@ public class Settings {
 	// BLOCK
 	public static final int BLOCK_MAX_SIGNATURES = 500; // blocks load onetime
 	public static final long BLOCK_GENERATING_BALANCE_NEED = 100;
+	// penalty for continuous forging
+	public static final int GENERATE_CONTINUOUS_PENALTY = 900; // XXX/1000
 
 	// CHAIN
 	public static final int CONFIRMS_HARD = 11; // for reference by signature 

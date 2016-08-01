@@ -44,8 +44,9 @@ public class GeneratorTests {
 		generator.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(10000000).setScale(8), databaseSet);
 				
 		//GENERATE NEXT BLOCK
+		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
 		Account recipient = new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5");

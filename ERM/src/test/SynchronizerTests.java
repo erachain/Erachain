@@ -55,12 +55,13 @@ public class SynchronizerTests {
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
+		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
 		List<Block> firstBlocks = new ArrayList<Block>();
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock);
 			
 			//ADD TRANSACTION SIGNATURE
 			byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -86,7 +87,8 @@ public class SynchronizerTests {
 		//transaction.process(databaseSet, false);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
 
-		
+		genBal = generator.getGeneratingBalance(databaseSet);
+
 		//FORK
 		DBSet fork = databaseSet.fork();	
 		
@@ -95,7 +97,7 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(fork, generator, lastBlock);
+			Block newBlock = blockGenerator.generateNextBlock(fork, generator, genBal, lastBlock);
 			
 			//ADD TRANSACTION SIGNATURE
 			byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -195,7 +197,8 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock);
+			BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock);
 			
 			//ADD TRANSACTION SIGNATURE
 			byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getGeneratorSignature());
@@ -214,7 +217,8 @@ public class SynchronizerTests {
 		for(int i=0; i<10; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock);
+			BigDecimal genBal2 = generator.getGeneratingBalance(databaseSet);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, genBal2, lastBlock);
 			
 			//ADD TRANSACTION SIGNATURE
 			byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getGeneratorSignature());

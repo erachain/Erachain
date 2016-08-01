@@ -51,11 +51,12 @@ public class GeneratorTests {
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
+		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
 		for(int i=0; i<2000; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock);
 			//Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 
 			
@@ -100,8 +101,9 @@ public class GeneratorTests {
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
 
 		//GENERATE NEXT BLOCK
+		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -152,8 +154,9 @@ public class GeneratorTests {
 
 				
 		//GENERATE NEXT BLOCK
+		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock);
 		
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");

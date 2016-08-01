@@ -17,6 +17,8 @@ import api.ApiErrorFactory;
 
 import at.AT_Transaction;
 import database.Item_Map;
+import database.DBSet;
+import database.NameMap;
 import controller.Controller;
 //import core.account.PublicKeyAccount;
 import core.BlockGenerator;
@@ -30,13 +32,12 @@ import core.naming.Name;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
+import ntp.NTP;
+import settings.Settings;
 import utils.NameUtils;
 import utils.NumberAsString;
 import utils.Pair;
 import utils.NameUtils.NameResult;
-import database.DBSet;
-import database.NameMap;
-import ntp.NTP;
 
 public class Account {
 	
@@ -219,7 +220,12 @@ public class Account {
 		
 		Block block = db.getBlockMap().getLastBlock();
 		
-		for(int i=1; i<GenesisBlock.GENERATING_RETARGET && block != null && block.getHeight(db) > 1; i++)
+		int penalty_koeff = 1000000;
+		int balance_penalty = penalty_koeff;
+		
+		// icreator X 10
+		// not resolve first 100 blocks
+		for(int i=1; i<GenesisBlock.GENERATING_RETARGET * 10 && block != null && block.getHeight(db) > 100; i++)
 		{
 			for(Transaction transaction: block.getTransactions())
 			{
@@ -243,7 +249,14 @@ public class Account {
 					balance = balance.subtract( BigDecimal.valueOf(key.getAmount(), 8) );
 				}
 			}
-				
+			
+			// icreator X 0.9 for each block generated
+			if (balance_penalty > 0.1 * penalty_koeff && block.getGenerator().getAddress().equals(this.address)) {
+				balance_penalty *= Settings.GENERATE_CONTINUOUS_PENALTY * 0.001;
+			} else {
+				// reset
+				balance_penalty = penalty_koeff;
+			}
 			block = block.getParent(db);
 		}
 		
@@ -252,8 +265,10 @@ public class Account {
 		{
 			balance = BigDecimal.ZERO.setScale(8);
 		}
+
+		// use penalty
+		this.generatingBalance = balance.multiply(new BigDecimal(balance_penalty / penalty_koeff));
 		
-		this.generatingBalance = balance;
 	}
 	
 	public BigDecimal getGeneratingBalance()

@@ -1061,9 +1061,9 @@ public class Controller extends Observable {
 
 		int maxPeerHeight = this.getMaxPeerHeight();
 		int chainHeight = this.blockChain.getHeight(this.dbSet);
-		//int diff = chainHeight - maxPeerHeight;
-		//return diff >= 0 && diff < 10;
-		return chainHeight == maxPeerHeight;
+		int diff = chainHeight - maxPeerHeight;
+		return diff >= 0 && diff < 5;
+		//return chainHeight == maxPeerHeight;
 	}
 	
 	public boolean isNSUpToDate() {

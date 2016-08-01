@@ -167,8 +167,17 @@ public class BlockGenerator extends Thread implements Observer
 	{
 		while(true)
 		{
-			if(DBSet.getInstance().isStoped())
+			if(DBSet.getInstance().isStoped()) {
+				try 
+				{
+					Thread.sleep(100);
+				} 
+				catch (InterruptedException e) 
+				{
+					LOGGER.error(e.getMessage(),e);
+				}
 				continue;
+			}
 			
 			//CHECK IF WE ARE UPTODATE
 			if(!Controller.getInstance().isUpToDate() && !Controller.getInstance().isProcessingWalletSynchronize())
@@ -209,13 +218,14 @@ public class BlockGenerator extends Thread implements Observer
 					{
 						for(PrivateKeyAccount account: knownAccounts)
 						{
-							if(account.getGeneratingBalance().compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0)
+							BigDecimal generatingBalance = account.getGeneratingBalance();
+							if(generatingBalance.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0)
 							{
 								//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
 								if(!this.blocks.containsKey(account))
 								{	
 									//GENERATE NEW BLOCK FOR USER
-									this.blocks.put(account, this.generateNextBlock(DBSet.getInstance(), account, this.solvingBlock));
+									this.blocks.put(account, this.generateNextBlock(DBSet.getInstance(), account, generatingBalance, this.solvingBlock));
 								}
 							}
 						}
@@ -280,13 +290,41 @@ public class BlockGenerator extends Thread implements Observer
 		}
 	}
 	
-	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, Block block)
+	/* TODO
+	 * try use this code in Block.isValid and here
+	 * 
+	// getNextBlockGeneratingBalance(dbSet, block)
+	// block.generatingBalance
+
+	//CONVERT PROOF HASH TO BIGINT
+	BigInteger hashValue = new BigInteger(1, block.getProofHash());
+	//CONVERT HASH TO BIGINT
+	BigInteger hashValue = new BigInteger(1, hash);
+	*/
+	public long calculateGeneratingGuesses(DBSet dbSet, PrivateKeyAccount generator, long generatingBalance, Block block, BigInteger hashValue) {
+		//CREATE TARGET
+		byte[] targetBytes = new byte[32];
+		Arrays.fill(targetBytes, Byte.MAX_VALUE);
+		BigInteger target = new BigInteger(1, targetBytes);
+	
+		//DIVIDE TARGET BY BASE TARGET
+		BigInteger baseTarget = BigInteger.valueOf(BlockGenerator.getBaseTarget(generatingBalance));
+		target = target.divide(baseTarget);
+	
+		//MULTIPLY TARGET BY USER BALANCE
+		target = target.multiply(generator.getGeneratingBalance(dbSet).toBigInteger());
+	
+		//MULTIPLE TARGET BY GUESSES
+		long guesses = (block.getTimestamp() - block.getParent(dbSet).getTimestamp()) / 1000; // orid /1000
+		//BigInteger guesses = hashValue.divide(target).add(BigInteger.ONE);
+		//BigInteger lowerTarget = target.multiply(BigInteger.valueOf(guesses-1));
+		//return target.multiply(BigInteger.valueOf(guesses));
+		return guesses;
+		
+	}
+	
+	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, BigDecimal generatingBalance, Block block)
 	{
-		//CHECK IF ACCOUNT HAS BALANCE
-		if(account.getGeneratingBalance(dbSet).compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) < 0)
-		{
-			return null;
-		}
 
 		//CALCULATE SIGNATURE
 		byte[] signature = this.calculateSignature(dbSet, block, account);
@@ -331,7 +369,7 @@ public class BlockGenerator extends Thread implements Observer
 		target = target.divide(baseTarget);
 			
 		//MULTIPLY TARGET BY USER BALANCE
-		target = target.multiply(account.getGeneratingBalance(dbSet).toBigInteger());
+		target = target.multiply(generatingBalance.toBigInteger());
 		
 		//CALCULATE GUESSES
 		//long guesses = hashValue.divide(target).longValue() + 1;
