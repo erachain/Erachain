@@ -34,6 +34,11 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 		return this.notes;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
+	
 	public NoteCls getNote(int row)
 	{
 		return this.notes.get(row).getB();

@@ -24,6 +24,7 @@ import javax.swing.event.AncestorListener;
 
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
+import gui.items.notes.MainNotesFrame;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
@@ -135,6 +136,24 @@ private JFrame parent;
 			}
 		});
 		Toolbar_Main.add(button5_MainToolBar);
+		
+		
+		JButton button41_MainToolBar = new JButton();
+		button41_MainToolBar.setText(Lang.getInstance().translate("Notes"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button41_MainToolBar.setFocusable(false);
+		button41_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button41_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button41_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainNotesFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button41_MainToolBar);
+		
+		
+		
+		
 		        	
 		JButton button6_MainToolBar = new JButton();
 		button6_MainToolBar.setText(Lang.getInstance().translate("Statuses"));
