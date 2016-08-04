@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
@@ -26,6 +27,7 @@ import core.item.unions.UnionCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
+import gui.items.statuses.IssueStatusPanel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -57,6 +59,8 @@ public MainUnionsFrame (){
 
 				
 		});	
+		 
+		 this.jToolBar.setVisible(false);
 
 // all unions 
 		Split_Panel search_Union_SplitPanel = new Split_Panel();
@@ -270,9 +274,19 @@ public MainUnionsFrame (){
 			}
 		});
 		my_Union_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
+		
+		
+// issiue panel
+		
+		
+		 JPanel issuePanel = new IssueUnionPanel();
+		 issuePanel.setName(Lang.getInstance().translate("Issue Union"));	
+		
+		
 							
 		this.jTabbedPane.add(my_Union_SplitPanel);
 		this.jTabbedPane.add(search_Union_SplitPanel);
+		this.jTabbedPane.add(issuePanel);
 
 		this.pack();
 //			this.setSize(800,600);

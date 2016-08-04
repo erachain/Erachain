@@ -6,9 +6,14 @@
 package gui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -27,6 +32,11 @@ public class Split_Panel extends javax.swing.JPanel {
         initComponents();
 
 
+        
+        
+        
+     
+     		
         
         
         
@@ -58,6 +68,7 @@ public class Split_Panel extends javax.swing.JPanel {
     	
     	
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

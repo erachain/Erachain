@@ -1,11 +1,13 @@
 package gui.items.assets;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +15,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -344,6 +347,25 @@ public class Search_Assets_Tab extends Split_Panel {
 		}
 	});
 
+	// hand cursor  for Favorite column
+	assetsTable.addMouseMotionListener(new MouseMotionListener() {
+	    public void mouseMoved(MouseEvent e) {
+	       
+	        if(assetsTable.columnAtPoint(e.getPoint())==TableModelItemAssets.COLUMN_FAVORITE)
+	        {
+	     
+	        	assetsTable.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	        } else {
+	        	assetsTable.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	        }
+	    }
+
+	    public void mouseDragged(MouseEvent e) {
+	    }
+	});
+	
+	
+	
 	
 }
 

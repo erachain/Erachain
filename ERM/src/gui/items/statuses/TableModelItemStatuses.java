@@ -34,6 +34,11 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		return this.statuses;
 	}
 	
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
 	public StatusCls getStatus(int row)
 	{
 		return this.statuses.get(row).getB();

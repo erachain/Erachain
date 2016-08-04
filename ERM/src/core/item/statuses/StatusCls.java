@@ -28,7 +28,7 @@ public abstract class StatusCls extends ItemCls {
 	public static final int TITLE = 2;
 	public static final int POSITION = 3;
 	
-	public static final int INITIAL_FAVORITES = 2;
+	public static final int INITIAL_FAVORITES = 0;
 
 	public StatusCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{

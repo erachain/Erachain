@@ -1,5 +1,6 @@
 package gui.items.statuses;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -7,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
@@ -21,17 +23,21 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import core.item.statuses.StatusCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
 import gui.items.assets.AssetFrame;
+import gui.items.assets.TableModelItemAssets;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -41,6 +47,7 @@ import lang.Lang;
 public class MainStatusesFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 1L;
 	private TableModelItemStatuses tableModelItemStatuses;
+	final JTable statusesTable ;
 
 	
 	public MainStatusesFrame(){
@@ -94,7 +101,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		
 		//CREATE TABLE
 		this.tableModelItemStatuses = new TableModelItemStatuses();
-		final JTable statusesTable = new JTable(this.tableModelItemStatuses);
+		statusesTable = new JTable(this.tableModelItemStatuses);
 		TableColumnModel columnModel = statusesTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
 		//Custom renderer for the String column;
@@ -171,13 +178,13 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 				MainStatusesFrame.itemAll = status;
 				
 				search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setText(status.isFavorite()?Lang.getInstance().translate("Remove Favorite"):Lang.getInstance().translate("Add Favorite"));
-				search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(true);
+				search_Status_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
 						
 				search_Status_SplitPanel.jSplitPanel.setDividerLocation(search_Status_SplitPanel.jSplitPanel.getDividerLocation());	
 				search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 			}
 		});
-					 
+				 
 			
 			
 			
@@ -185,6 +192,18 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		// MENU
 						
 		JPopupMenu all_Statuses_Table_menu = new JPopupMenu();
+		
+		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
+		favorite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				favorite_set( statusesTable );
+				
+			}
+		});
+		
+		
+		
 		
 		/*
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
@@ -237,6 +256,10 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			
 			}
 		});
+		
+		
+
+		
 		all_Statuses_Table_menu.add(setStatus_Menu);
 
 		statusesTable.setComponentPopupMenu(all_Statuses_Table_menu);
@@ -255,8 +278,124 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		//			new StatusFrame(status);
 					
 				}
+				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+				{
+					
+					if (statusesTable.getSelectedColumn() == tableModelItemStatuses.COLUMN_FAVORITE){
+						row = statusesTable.convertRowIndexToModel(row);
+						StatusCls status = tableModelItemStatuses.getStatus(row);
+						favorite_set( statusesTable);	
+						
+						
+						
+					}
+					
+					
+				}
+				
+				
+				
+				
+				
 			}
 		});
+		
+		// hand cursor  for Favorite column
+		statusesTable.addMouseMotionListener(new MouseMotionListener() {
+		    public void mouseMoved(MouseEvent e) {
+		    	
+		     if(statusesTable.columnAtPoint(e.getPoint())==tableModelItemStatuses.COLUMN_FAVORITE)
+		        {
+		     
+		        	statusesTable.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		        } else {
+		        	statusesTable.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		        }
+		        
+		    }
+		    
+
+		    public void mouseDragged(MouseEvent e) {
+		    }
+		});
+		
+		
+		
+		all_Statuses_Table_menu.addPopupMenuListener(new PopupMenuListener(){
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				int row = statusesTable.getSelectedRow();
+				row = statusesTable.convertRowIndexToModel(row);
+				StatusCls status = tableModelItemStatuses.getStatus(row);
+				
+				//IF ASSET CONFIRMED AND NOT ERM
+				if(status.getKey() >= StatusCls.INITIAL_FAVORITES)
+				{
+					favorite.setVisible(true);
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(status))
+					{
+						favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						favorite.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					/*	
+					//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+					this.favoritesButton.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							onFavoriteClick();
+						}
+					});	
+					this.add(this.favoritesButton, labelGBC);
+					*/
+				} else {
+					
+					favorite.setVisible(false);
+				}
+			//	sell.setVisible(false);
+			//	boolean a = Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress());
+			//	if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
+			//	{
+			//		sell.setVisible(true);
+			//	}
+				
+		
+			
+			
+			
+			
+			}
+			
+		}
+		
+		);
+		
+		
+		
+		
+
+		all_Statuses_Table_menu.addSeparator();
+		
+		all_Statuses_Table_menu.add(favorite);
 	 
 			
 	// My statuses		
@@ -436,4 +575,34 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	static private ItemCls itemAll;
 	static private ItemCls itemMy;
 
+	public void favorite_set(JTable assetsTable){
+
+
+		int row = assetsTable.getSelectedRow();
+		row = assetsTable.convertRowIndexToModel(row);
+
+		 StatusCls status = tableModelItemStatuses.getStatus(row);
+		//new AssetPairSelect(asset.getKey());
+
+		if(status.getKey() >= StatusCls.INITIAL_FAVORITES)
+		{
+			//CHECK IF FAVORITES
+			if(Controller.getInstance().isItemFavorite(status))
+			{
+				
+				Controller.getInstance().removeItemFavorite(status);
+			}
+			else
+			{
+				
+				Controller.getInstance().addItemFavorite(status);
+			}
+				
+
+			assetsTable.repaint();
+
+		}
+		}
+	
+	
 }

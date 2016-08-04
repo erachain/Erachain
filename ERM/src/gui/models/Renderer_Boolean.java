@@ -2,6 +2,7 @@
 
       import java.awt.Color;
       import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.SystemColor;
@@ -37,6 +38,7 @@ import javax.swing.border.LineBorder;
               if (value instanceof Boolean) {
                   setSelected((Boolean) value);
               }
+            //  setCursor(new Cursor(Cursor.HAND_CURSOR));
               if (!isSelected) {
             	  setBackground(new Color(255, 255, 220));
             	  //setBackground(new Color(0xFFFFFF));
