@@ -328,6 +328,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			{
 				row = assetsTable.convertRowIndexToModel(row);
 				AssetCls asset = tableModelItemAssets.getAsset(row);
+				new AssetPairSelect(asset.getKey(), "","");
 		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
