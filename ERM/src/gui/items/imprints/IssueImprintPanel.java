@@ -80,7 +80,8 @@ public class IssueImprintPanel extends JPanel
 		
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(5,5,5,5);
+		//labelGBC.insets = new Insets(5,5,5,5);
+		labelGBC.insets = new java.awt.Insets(5, 15, 5, 5);
 		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelGBC.weightx = 0;	
@@ -88,7 +89,8 @@ public class IssueImprintPanel extends JPanel
 		
 		//COMBOBOX GBC
 		GridBagConstraints cbxGBC = new GridBagConstraints();
-		cbxGBC.insets = new Insets(5,5,5,5);
+		//cbxGBC.insets = new Insets(5,5,5,5);
+		cbxGBC.insets = new java.awt.Insets(5, 3, 5, 15);
 		cbxGBC.fill = GridBagConstraints.NONE;  
 		cbxGBC.anchor = GridBagConstraints.NORTHWEST;
 		cbxGBC.weightx = 0;	
@@ -96,7 +98,8 @@ public class IssueImprintPanel extends JPanel
 		
 		//TEXTFIELD GBC
 		GridBagConstraints txtGBC = new GridBagConstraints();
-		txtGBC.insets = new Insets(5,5,5,5);
+		//txtGBC.insets = new Insets(5,5,5,5);
+		txtGBC.insets = new java.awt.Insets(5, 3, 5, 15);
 		txtGBC.fill = GridBagConstraints.HORIZONTAL;  
 		txtGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtGBC.weightx = 1;	
@@ -106,16 +109,19 @@ public class IssueImprintPanel extends JPanel
 		//BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
 		buttonGBC.insets = new Insets(5,5,5,5);
+		buttonGBC.insets = new java.awt.Insets(5, 3, 5, 15);
 		buttonGBC.fill = GridBagConstraints.NONE;  
-		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
+		//buttonGBC.anchor = GridBagConstraints.NORTHWEST;
+		 buttonGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
 		buttonGBC.gridwidth = 2;
-		buttonGBC.gridx = 0;		
+		
+		buttonGBC.gridx = 2;		
 		
 		int gridy = 0;
 		//LABEL FROM
 		labelGBC.gridy = gridy++;
 		
-		
+		labelGBC.gridwidth = 3;
 		
 		
 		JLabel label1 = new JLabel("      " + Lang.getInstance().translate("Issue Imprint"));
@@ -130,7 +136,7 @@ public class IssueImprintPanel extends JPanel
 		
 		this.add(label1, labelGBC);
 		
-		
+		labelGBC.gridwidth =1;
 		
 		
 		

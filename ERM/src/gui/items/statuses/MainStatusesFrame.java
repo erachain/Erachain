@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -49,6 +50,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		this.jButton3_jToolBar.setVisible(false);
 		// buttun1
 		this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Status"));
+		this.jButton1_jToolBar.setVisible(false);
 		// status panel
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with statuses"));
 	 
@@ -59,6 +61,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		    	 new IssueStatusDialog();
 			}
 		});	
+		this.jToolBar.setVisible(false);
 		 
 		// all statuses 
 		Split_Panel search_Status_SplitPanel = new Split_Panel();
@@ -391,10 +394,18 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			my_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
 	
 		
+			
+	// issue status
+			
+		 JPanel issuePanel = new IssueStatusPanel();
+		 issuePanel.setName(Lang.getInstance().translate("Issue Status"));	
+			
 	
 		this.jTabbedPane.add(my_Status_SplitPanel);
 		
 		this.jTabbedPane.add(search_Status_SplitPanel);
+		
+		this.jTabbedPane.add(issuePanel);
 		
 		this.pack();
 	//	this.setSize(800,600);

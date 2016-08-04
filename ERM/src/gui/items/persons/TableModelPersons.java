@@ -3,6 +3,8 @@ package gui.items.persons;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.item.persons.PersonCls;
 import utils.ObserverMessage;
@@ -11,14 +13,15 @@ import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelPersons extends TableModelCls<Long, PersonCls> implements Observer
+public class TableModelPersons extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_FAVORITE = 3;
 
-	private SortableList<Long, PersonCls> persons;
+//	private SortableList<Long, PersonCls> persons;
+	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	
@@ -27,9 +30,15 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 		Controller.getInstance().addObserver(this);
 	}
 	
+//	@Override
+	//public SortableList<Long, PersonCls> getSortableList() 
+//	{
+//		return this.persons;
+//	}
+	
+	
 	@Override
-	public SortableList<Long, PersonCls> getSortableList() 
-	{
+	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
 		return this.persons;
 	}
 	
@@ -118,7 +127,8 @@ public class TableModelPersons extends TableModelCls<Long, PersonCls> implements
 		{			
 			if(this.persons == null)
 			{
-				this.persons = (SortableList<Long, PersonCls>) message.getValue();
+			//	this.persons = (SortableList<Long, PersonCls>) message.getValue();
+				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 				this.persons.addFilterField("name");
 				this.persons.registerObserver();
 			}	
