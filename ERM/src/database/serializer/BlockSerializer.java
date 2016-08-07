@@ -20,7 +20,7 @@ public class BlockSerializer implements Serializer<Block>, Serializable
 	public void serialize(DataOutput out, Block value) throws IOException 
 	{
 		out.writeInt(value.getDataLength());
-        out.write(value.toBytes());
+        out.write(value.toBytes(true));
     }
 
     @Override

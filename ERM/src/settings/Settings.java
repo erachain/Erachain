@@ -96,7 +96,7 @@ public class Settings {
 	private static final boolean DEFAULT_SOUND_MESSAGE = true;
 	private static final boolean DEFAULT_SOUND_NEW_TRANSACTION = true;
 	
-	private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
+	//private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
 	private static final boolean ALLOW_FEE_LESS_REQUIRED = false;
 	
 	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);

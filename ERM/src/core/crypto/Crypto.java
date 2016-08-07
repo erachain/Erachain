@@ -17,6 +17,9 @@ import core.account.PrivateKeyAccount;
 
 public class Crypto {
 
+	public static final int HASH_LENGTH = 32;
+	public static final int SIGNATURE_LENGTH = 2 * HASH_LENGTH;
+	
 	public static final byte ADDRESS_VERSION = 15;
 	public static final byte AT_ADDRESS_VERSION = 23;
 	

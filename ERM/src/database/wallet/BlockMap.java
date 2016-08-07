@@ -238,7 +238,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 	
 	public void delete(Block block)
 	{
-		this.delete(new Tuple2<String, String>(block.getGenerator().getAddress(), new String(block.getSignature())));
+		this.delete(new Tuple2<String, String>(block.getCreator().getAddress(), new String(block.getSignature())));
 	}
 	
 	public void deleteAll(List<Account> accounts)
@@ -251,7 +251,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 	
 	public boolean add(Block block)
 	{
-		return this.set(new Tuple2<String, String>(block.getGenerator().getAddress(), new String(block.getSignature())), block);
+		return this.set(new Tuple2<String, String>(block.getCreator().getAddress(), new String(block.getSignature())), block);
 	}
 	
 	public void addAll(Map<Account, List<Block>> blocks)

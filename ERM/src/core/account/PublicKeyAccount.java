@@ -20,7 +20,7 @@ import utils.NameUtils.NameResult;
 
 public class PublicKeyAccount extends Account {
 
-	public static final int PUBLIC_KEY_LENGTH = 32;
+	public static final int PUBLIC_KEY_LENGTH = Crypto.HASH_LENGTH;
 	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	protected byte[] publicKey;
 	

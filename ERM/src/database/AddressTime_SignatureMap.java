@@ -32,7 +32,7 @@ public class AddressTime_SignatureMap extends DBMap<Tuple2<String, Long>, byte[]
 	protected Map<Tuple2<String, Long>, byte[]> getMap(DB database) 
 	{
 		//OPEN MAP
-		return database.getTreeMap("references");
+		return database.getTreeMap("references_signs");
 	}
 
 	@Override

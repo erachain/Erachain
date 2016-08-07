@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple3;
 
 import ntp.NTP;
 import settings.Settings;
@@ -117,7 +119,6 @@ public class BlockGenerator extends Thread implements Observer
 	{
 		this.addUnconfirmedTransaction(DBSet.getInstance(), transaction, true);
 	}
-	
 	public void addUnconfirmedTransaction(DBSet db, Transaction transaction, boolean process) 
 	{
 		//ADD TO TRANSACTION DATABASE 
@@ -170,7 +171,7 @@ public class BlockGenerator extends Thread implements Observer
 			if(DBSet.getInstance().isStoped()) {
 				try 
 				{
-					Thread.sleep(100);
+					Thread.sleep(1000);
 				} 
 				catch (InterruptedException e) 
 				{
@@ -189,6 +190,9 @@ public class BlockGenerator extends Thread implements Observer
 			syncForgingStatus();
 			if(forgingStatus == ForgingStatus.FORGING && Controller.getInstance().isReadyForging())
 			{
+
+				if(!Controller.getInstance().doesWalletExists())
+					return;
 				
 				//GET LAST BLOCK
 				// TODO lastBlock error
@@ -197,7 +201,9 @@ public class BlockGenerator extends Thread implements Observer
 				if (lastBlock == null) {
 					return;
 				}
-				byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
+				
+				DBSet dbSet = DBSet.getInstance();
+				byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 				if(this.solvingBlock == null || !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature))
@@ -208,27 +214,52 @@ public class BlockGenerator extends Thread implements Observer
 					//RESET BLOCKS
 					this.blocks = new HashMap<PrivateKeyAccount, Block>();
 				}
+
+				/*
+				 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
+				 * значть их ХЭШ - 
+				 * тоже самое и AT записями поидее
+				 * и эти хэши закатываем уже в заголвок блока и подписываем
+				 * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
+				 * если победа случиласть то
+				 * далее сами трнзакции кладем в тело блока и закрываем его
+				 */
+				/*
+				 * нет не  так - вычисляеи победное значение и если оно выиграло то
+				 * к нему транзакции собираем
+				 * и время всегда одинаковое
+				 * 
+				 */
 				
 				//GENERATE NEW BLOCKS
-				if(Controller.getInstance().doesWalletExists())
+				List<Transaction> unconfirmedTransactions = null;
+				
+				//PREVENT CONCURRENT MODIFY EXCEPTION
+				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+				synchronized(knownAccounts)
 				{
-					//PREVENT CONCURRENT MODIFY EXCEPTION
-					List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-					synchronized(knownAccounts)
+					// TODO need calculate block.timestamp
+					long lastTimestamp = this.solvingBlock.getTimestamp()
+							+ GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+					
+					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, lastTimestamp);
+					// CALCULATE HASH for that transactions
+					byte[] unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
+					
+					for(PrivateKeyAccount account: knownAccounts)
 					{
-						for(PrivateKeyAccount account: knownAccounts)
-						{
-							BigDecimal generatingBalance = account.getGeneratingBalance();
-							if(generatingBalance.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0)
-							{
-								//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
-								if(!this.blocks.containsKey(account))
-								{	
-									//GENERATE NEW BLOCK FOR USER
-									this.blocks.put(account, this.generateNextBlock(DBSet.getInstance(), account, generatingBalance, this.solvingBlock));
-								}
-							}
-						}
+						BigDecimal generatingBalance = account.getGeneratingBalance();
+						if(generatingBalance.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) < 0)
+							continue;
+						
+						//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
+						if(this.blocks.containsKey(account))
+							continue;
+						
+						//GENERATE NEW BLOCK FOR USER
+						// already signed
+						this.blocks.put(account, this.generateNextBlock(DBSet.getInstance(), account, generatingBalance, this.solvingBlock, unconfirmedTransactionsHash));
 					}
 				}
 				
@@ -248,10 +279,8 @@ public class BlockGenerator extends Thread implements Observer
 					if(block.getTimestamp() <= NTP.getTime() && !validBlockFound)
 					{
 						//ADD TRANSACTIONS
-						this.addUnconfirmedTransactions(DBSet.getInstance(), block);
-						
-						//ADD TRANSACTION SIGNATURE
-						block.setTransactionsSignature(this.calculateTransactionsSignature(block, account));
+						//this.addUnconfirmedTransactions(DBSet.getInstance(), block);
+						block.setTransactions(unconfirmedTransactions);
 						
 						//PASS BLOCK TO CONTROLLER
 						Controller.getInstance().newBlockGenerated(block);
@@ -267,7 +296,7 @@ public class BlockGenerator extends Thread implements Observer
 					//SLEEP
 					try 
 					{
-						Thread.sleep(100);
+						Thread.sleep(1000);
 					} 
 					catch (InterruptedException e) 
 					{
@@ -280,7 +309,7 @@ public class BlockGenerator extends Thread implements Observer
 				//SLEEP
 				try 
 				{
-					Thread.sleep(100);
+					Thread.sleep(1000);
 				} 
 				catch (InterruptedException e) 
 				{
@@ -303,7 +332,7 @@ public class BlockGenerator extends Thread implements Observer
 	*/
 	public long calculateGeneratingGuesses(DBSet dbSet, PrivateKeyAccount generator, long generatingBalance, Block block, BigInteger hashValue) {
 		//CREATE TARGET
-		byte[] targetBytes = new byte[32];
+		byte[] targetBytes = new byte[Crypto.HASH_LENGTH];
 		Arrays.fill(targetBytes, Byte.MAX_VALUE);
 		BigInteger target = new BigInteger(1, targetBytes);
 	
@@ -322,50 +351,72 @@ public class BlockGenerator extends Thread implements Observer
 		return guesses;
 		
 	}
-	
-	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, BigDecimal generatingBalance, Block block)
+
+	public Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account, BigDecimal generatingBalance, Block parentBlock, byte[] transactionsHash)
+	{
+		Tuple3<Integer, Integer, TreeSet<String>> value = account.getForgingData(dbSet);
+		// calculate last generated block and current
+		int len = value.a - parentBlock.getHeight(dbSet);
+		long win_amount;
+		int MAX_LEN = 1000;
+		if (len < MAX_LEN ) {
+			win_amount = len * len * value.b ;
+		} else {
+			win_amount = (MAX_LEN * MAX_LEN + len - MAX_LEN) * value.b;			
+		}
+		
+		int version = parentBlock.getNextBlockVersion(dbSet);
+		byte[] atBytes;
+		if ( version > 1 )
+		{
+			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
+					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );
+			atBytes = atBlock.getBytesForBlock();
+		} else {
+			atBytes = new byte[0];
+		}
+
+		Long lastTimestamp = this.solvingBlock.getTimestamp()
+				+ GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+
+		//CREATE NEW BLOCK
+		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), lastTimestamp.longValue(), getNextBlockGeneratingBalance(dbSet, parentBlock), account, transactionsHash, atBytes);
+		newBlock.sign(account);
+		
+		return newBlock;
+
+	}
+	public Block generateNextBlock_old(DBSet dbSet, PrivateKeyAccount account, BigDecimal generatingBalance, Block parentBlock, byte[] transactionsHash)
 	{
 
 		//CALCULATE SIGNATURE
-		byte[] signature = this.calculateSignature(dbSet, block, account);
+		//byte[] signature = this.calculateSignature(dbSet, block, account);
 
 		//DETERMINE BLOCK VERSION
-		int version = block.getNextBlockVersion(dbSet);
+		int version = parentBlock.getNextBlockVersion(dbSet);
 
 		//CALCULATE HASH
 		byte[] hash;
 		if (version > 0)
 		{
-			byte[] data = Bytes.concat(block.getSignature(), account.getPublicKey());
+			byte[] data = Bytes.concat(parentBlock.getSignature(), account.getPublicKey());
 			hash = Crypto.getInstance().digest(data);
 		}
 		else
 		{
 			hash = null;
 		}
-		/*
-		if ((version < 3)
-		{
-			hash = Crypto.getInstance().digest(signature);
-		}
-		else
-		{
-			//newSig = sha256(prevSig || pubKey)
-			byte[] data = Bytes.concat(block.getSignature(), account.getPublicKey());
-			hash = Crypto.getInstance().digest(data);
-		}
-		*/
 
 		//CONVERT HASH TO BIGINT
 		BigInteger hashValue = new BigInteger(1, hash);
 		
 		//CALCULATE ACCOUNT TARGET
-		byte[] targetBytes = new byte[32];
+		byte[] targetBytes = new byte[Crypto.HASH_LENGTH];
 		Arrays.fill(targetBytes, Byte.MAX_VALUE);
 		BigInteger target = new BigInteger(1, targetBytes);
 								
 		//DIVIDE TARGET BY BASE TARGET
-		BigInteger baseTarget = BigInteger.valueOf(getBaseTarget(getNextBlockGeneratingBalance(dbSet, block)));
+		BigInteger baseTarget = BigInteger.valueOf(getBaseTarget(getNextBlockGeneratingBalance(dbSet, parentBlock)));
 		target = target.divide(baseTarget);
 			
 		//MULTIPLY TARGET BY USER BALANCE
@@ -377,36 +428,39 @@ public class BlockGenerator extends Thread implements Observer
 		
 		//CALCULATE TIMESTAMP
 		//long timestamp = block.getTimestamp() + (guesses * 1000);
-		BigInteger timestamp = guesses.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(block.getTimestamp()));
+		BigInteger timestamp = guesses.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(parentBlock.getTimestamp()));
 		
 		//CHECK IF NOT HIGHER THAN MAX LONG VALUE
 		if(timestamp.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1)
 		{
 			timestamp = BigInteger.valueOf(Long.MAX_VALUE);
 		}
-		
-		//CREATE NEW BLOCK
-		Block newBlock;
+
+		byte[] atBytes;
 		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
-					block.getHeight(dbSet)) , block.getHeight(dbSet) + 1 );
-			byte[] atBytes = atBlock.getBytesForBlock();
-			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(dbSet, block), account, signature, atBytes, atBlock.getTotalFees());
+					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );
+			atBytes = atBlock.getBytesForBlock();
+		} else {
+			atBytes = new byte[0];
 		}
-		else
-		{
-			newBlock = BlockFactory.getInstance().create(version, block.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(dbSet, block), account, signature);
-		}
+
+		//CREATE NEW BLOCK
+		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), timestamp.longValue(), getNextBlockGeneratingBalance(dbSet, parentBlock), account, transactionsHash, atBytes);
+		newBlock.sign(account);
+		
 		return newBlock;
 	}
 	
+	/*
+	// for generate only ??
 	public byte[] calculateSignature(DBSet dbSet, Block solvingBlock, PrivateKeyAccount account) 
 	{	
 		byte[] data = new byte[0];
 		
 		//WRITE PARENT GENERATOR SIGNATURE
-		byte[] generatorSignature = Bytes.ensureCapacity(solvingBlock.getGeneratorSignature(), Block.GENERATOR_SIGNATURE_LENGTH, 0);
+		byte[] generatorSignature = Bytes.ensureCapacity(solvingBlock.getSignature(), Block.SIGNATURE_LENGTH, 0);
 		data = Bytes.concat(data, generatorSignature);
 		
 		//WRITE GENERATING BALANCE
@@ -415,7 +469,7 @@ public class BlockGenerator extends Thread implements Observer
 		data = Bytes.concat(data,baseTargetBytes);
 		
 		//WRITE GENERATOR
-		byte[] generatorBytes = Bytes.ensureCapacity(account.getPublicKey(), Block.GENERATOR_LENGTH, 0);
+		byte[] generatorBytes = Bytes.ensureCapacity(account.getPublicKey(), Block.CREATOR_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 								
 		//CALC SIGNATURE OF NEWBLOCKHEADER
@@ -423,20 +477,9 @@ public class BlockGenerator extends Thread implements Observer
 		
 		return signature;
 	}
-	
-	public byte[] calculateTransactionsSignature(Block block, PrivateKeyAccount account) 
-	{	
-		byte[] data = block.getGeneratorSignature();
+	*/
 		
-		//WRITE TRANSACTION SIGNATURE
-		for(Transaction transaction: block.getTransactions())
-		{
-			data = Bytes.concat(data, transaction.getSignature());
-		}
-		
-		return Crypto.getInstance().sign(account, data);
-	}
-	
+	/*
 	public void addUnconfirmedTransactions(DBSet db, Block block)
 	{
 		long totalBytes = 0;
@@ -492,6 +535,70 @@ public class BlockGenerator extends Thread implements Observer
 			}
 		}
 		while(transactionProcessed == true);
+	}
+	*/
+	
+	public static List<Transaction> getUnconfirmedTransactions(DBSet db, long timestamp)
+	{
+		long totalBytes = 0;
+		boolean transactionProcessed;
+			
+		//CREATE FORK OF GIVEN DATABASE
+		DBSet newBlockDb = db.fork();
+					
+		//ORDER TRANSACTIONS BY FEE PER BYTE
+		List<Transaction> orderedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
+		Collections.sort(orderedTransactions, new TransactionFeeComparator());
+		//Collections.sort(orderedTransactions, Collections.reverseOrder());
+		
+		List<Transaction> transactionsList = new ArrayList<Transaction>();
+		
+		do
+		{
+			transactionProcessed = false;
+						
+			for(Transaction transaction: orderedTransactions)
+			{
+				//CHECK TRANSACTION TIMESTAMP AND DEADLINE
+				if(transaction.getTimestamp() <= timestamp && transaction.getDeadline() > timestamp)
+				{
+					try{
+						//CHECK IF VALID
+						if(transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
+						{
+							//CHECK IF ENOUGH ROOM
+							if(totalBytes + transaction.getDataLength(false) <= Block.MAX_TRANSACTION_BYTES)
+							{
+								////ADD INTO BLOCK
+								//block.addTransaction(transaction);
+								// TAKE IT
+								transactionsList.add(transaction);
+											
+								//REMOVE FROM LIST
+								orderedTransactions.remove(transaction);
+											
+								//PROCESS IN NEWBLOCKDB
+								transaction.process(newBlockDb, false);
+											
+								//TRANSACTION PROCESSES
+								transactionProcessed = true;
+								break;
+							}
+						}
+					}catch(Exception e){
+                        LOGGER.error(e.getMessage(),e);
+                        //REMOVE FROM LIST
+                        orderedTransactions.remove(transaction);
+                        transactionProcessed = true;
+                        break;                    
+					}
+				}
+						
+			}
+		}
+		while(transactionProcessed == true);
+		
+		return transactionsList;
 	}
 	
 	/*public void addObserver(Observer o)

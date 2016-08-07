@@ -2,16 +2,19 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import ntp.NTP;
 import utils.NumberAsString;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -24,6 +27,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import database.ItemAssetBalanceMap;
+import database.AddressForging;
 import database.DBSet;
 
 public class GenesisTransferAssetTransaction extends Genesis_Record {
@@ -228,6 +232,30 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
+		
+		if (this.key == Transaction.RIGHTS_KEY) {
+			// update forging balances and last generated block
+			Tuple3<Integer, Integer, TreeSet<String>> value = null;
+			AddressForging a_f = db.getAddressForging();
+			String recipient = this.recipient.getAddress();
+			if (a_f.contains(recipient)) {
+				value = a_f.get(this.recipient);
+				TreeSet<String> aList = value.c;
+				aList.add(recipient);
+				value = new Tuple3<Integer, Integer, TreeSet<String>>(
+						0, // last block
+						value.b + this.amount.intValue(),
+						aList);		
+			} else {
+				TreeSet<String> aList = new TreeSet<String>();
+				aList.add(recipient);
+				value = new Tuple3<Integer, Integer, TreeSet<String>>(
+						0, // last block
+						this.amount.intValue(),
+						aList);
+			}
+			a_f.set(recipient, value);
+		}
 	}
 
 	@Override
@@ -239,6 +267,16 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
+		
+		if (this.key == Transaction.RIGHTS_KEY) {
+			// update forging balances and last generated block
+			AddressForging a_f = db.getAddressForging();
+			String recipient = this.recipient.getAddress();
+			if (a_f.contains(recipient)) {
+				a_f.delete(recipient);
+			}
+		}
+
 	}
 
 	//REST

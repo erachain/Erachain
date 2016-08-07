@@ -23,6 +23,7 @@ public class DBSet implements Observer, IDB {
 	
 	private static DBSet instance;
 	
+	private AddressForging addressForging;
 	private ItemAssetBalanceMap assetBalanceMap;
 	private AddressStatement_Refs addressStatement_Refs;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
@@ -127,6 +128,7 @@ public class DBSet implements Observer, IDB {
 			this.database = database;
 			this.actions = 0;
 			
+			this.addressForging = new AddressForging(this, database);
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.addressStatement_Refs = new AddressStatement_Refs(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
@@ -193,6 +195,7 @@ public class DBSet implements Observer, IDB {
 	
 	protected DBSet(DBSet parent)
 	{
+		this.addressForging = new AddressForging(parent.addressForging);
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
@@ -254,6 +257,7 @@ public class DBSet implements Observer, IDB {
 	
 	public void reset() {
 		
+		this.addressForging.reset();
 		this.assetBalanceMap.reset();
 		this.addressStatement_Refs.reset();
 		this.assetBalanceAccountingMap.reset();
@@ -310,6 +314,10 @@ public class DBSet implements Observer, IDB {
 		this.atTransactionMap.reset();
 	}
 	
+	public AddressForging getAddressForging() 
+	{
+		return this.addressForging;
+	}
 	public ItemAssetBalanceMap getAssetBalanceMap() 
 	{
 		return this.assetBalanceMap;

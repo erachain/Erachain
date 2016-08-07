@@ -4,6 +4,7 @@ package core.block;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 //import java.sql.Timestamp;
@@ -44,7 +45,7 @@ import utils.SysTray;
 public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 1;
-	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, 128, 0);
+	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
 	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
 	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
@@ -61,17 +62,18 @@ public class GenesisBlock extends Block{
 	
 	AssetVenture asset0;
 	AssetVenture asset1;
+	List<Transaction> transactions = new ArrayList<Transaction>();
 
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), MAX_GENERATING_BALANCE, genesisGenerator, generateHeadHash());
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), MAX_GENERATING_BALANCE, genesisGenerator, new byte[0], new byte[0]);
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
-		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[32]);
+		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[Crypto.HASH_LENGTH]);
 		PersonCls user;
 
 		// ISSUE ITEMS
@@ -107,20 +109,16 @@ public class GenesisBlock extends Block{
 				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
 				// CERTIFY PERSON
-				this.addTransaction(new GenesisCertifyPersonRecord(recipient, nonce++));
+				transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
 
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
 
 				// SEND GENESIS ASSETS
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 		    }
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
 			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERM.jar -testnet=" + genesisTimestamp;
-
-			
-			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
-			this.setTransactionsSignature(this.generateHash());
 			
 		} else {
 			/////////// GENEGAL
@@ -263,11 +261,11 @@ public class GenesisBlock extends Block{
 
 				bdAmount0 = new BigDecimal(Math.round(pick * generalKoeff0)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal(Math.round(pick * generalKoeff1)).setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
 
 			}
@@ -285,11 +283,11 @@ public class GenesisBlock extends Block{
 
 				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal("0.001").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
 				// CERTIFY PERSON
 				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
@@ -309,11 +307,11 @@ public class GenesisBlock extends Block{
 
 				bdAmount0 = new BigDecimal(Math.round(pick * minorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal("0.0001").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
 
 				// CERTIFY PERSON
@@ -344,19 +342,18 @@ public class GenesisBlock extends Block{
 				
 				bdAmount0 = new BigDecimal(Math.round(pick * investorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 				bdAmount1 = new BigDecimal("0.1").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
-				this.addTransaction(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
-			}
-
-
-			//GENERATE AND VALIDATE TRANSACTIONSSIGNATURE
-			this.setTransactionsSignature(this.generateHash());
-			
+			}			
 		}
+		
+		//GENERATE AND VALIDATE TRANSACTIONS
+		this.setTransactions(transactions);
+		this.signature = generateHeadHash();
 	}
 	
 	private void initItems()
@@ -365,21 +362,21 @@ public class GenesisBlock extends Block{
 		///// ASSETS
 		//CREATE ERM ASSET
 		asset0 = makeAsset(AssetCls.ERMO_KEY);
-		this.addTransaction(new GenesisIssueAssetTransaction(asset0));
+		transactions.add(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
 		asset1 = makeAsset(AssetCls.FEE_KEY);
-		this.addTransaction(new GenesisIssueAssetTransaction(asset1));
+		transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
 		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.DEAL_KEY; i++) 
-			this.addTransaction(new GenesisIssueAssetTransaction(makeAsset(i)));
+			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
 		for (int i = 1; i <= NoteCls.HIRING_KEY; i++) 
-			this.addTransaction(new GenesisIssueNoteRecord(makeNote(i)));
+			transactions.add(new GenesisIssueNoteRecord(makeNote(i)));
 
 		///// STATUSES
 		for (int i = 1; i <= StatusCls.MARRIED_KEY; i++) 
-			this.addTransaction(new GenesisIssueStatusRecord(makeStatus(i)));		
+			transactions.add(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
 	// make assets
@@ -443,7 +440,7 @@ public class GenesisBlock extends Block{
 		return null;
 	}
 	
-	public static byte[] generateHeadHash()
+	public byte[] generateHeadHash()
 	{
 		byte[] data = new byte[0];
 		
@@ -453,7 +450,7 @@ public class GenesisBlock extends Block{
 		data = Bytes.concat(data, versionBytes);
 		
 		//WRITE REFERENCE
-		byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, 64, 0);
+		byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
 		
 		//WRITE GENERATING BALANCE
@@ -462,34 +459,17 @@ public class GenesisBlock extends Block{
 		data = Bytes.concat(data, generatingBalanceBytes);
 		
 		//WRITE GENERATOR
-		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), 32, 0);
+		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), Crypto.HASH_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 		
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);		
-		digest = Bytes.concat(digest, digest);
+		//DIGEST + transactionsHash
+		byte[] digest = Crypto.getInstance().digest(data);
+		
+		// byte[64]
+		digest = Bytes.concat(digest, transactionsHash);
 		
 		return digest;
 	}
-	
-	public byte[] generateHash()
-	{
-		byte[] data = new byte[0];
-		
-		/// icreator insert
-		//WRITE TRANSACTION SIGNATURE
-		for(Transaction transaction: this.getTransactions())
-		{
-			data = Bytes.concat(data, transaction.getSignature());
-		}
-		//DIGEST
-		byte[] digest = Crypto.getInstance().digest(data);		
-		digest = Bytes.concat(digest, digest);
-		
-		return digest;
-
-	}
-
 	
 	//VALIDATE
 	
@@ -499,17 +479,19 @@ public class GenesisBlock extends Block{
 		
 		//VALIDATE BLOCK SIGNATURE
 		byte[] digest = generateHeadHash();				
-		if(!Arrays.equals(digest, this.generatorSignature))
+		if(!Arrays.equals(digest, this.signature))
 		{
 			return false;
 		}
 		
+		/*
 		//VALIDATE TRANSACTIONS SIGNATURE
 		digest = this.generateHash();
-		if(!Arrays.equals(digest, this.transactionsSignature))
+		if(!Arrays.equals(digest, this.transactionsHash))
 		{
 			return false;
 		}
+		*/
 		
 		return true;
 	}
@@ -530,12 +512,20 @@ public class GenesisBlock extends Block{
 		}
 		
 		//VALIDATE TRANSACTIONS
+		byte[] transactionsSignatures = new byte[0];
 		for(Transaction transaction: this.getTransactions())
 		{
 			if(transaction.isValid(db, null) != Transaction.VALIDATE_OK)
 			{
 				return false;
 			}
+			transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
+
+		}
+		transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
+		if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+			LOGGER.error("*** GenesisBlock.digest(transactionsSignatures) invalid");
+			return false;
 		}
 		
 		return true;

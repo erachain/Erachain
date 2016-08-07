@@ -3,6 +3,7 @@ package core.account;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -251,7 +252,7 @@ public class Account {
 			}
 			
 			// icreator X 0.9 for each block generated
-			if (balance_penalty > 0.1 * penalty_koeff && block.getGenerator().getAddress().equals(this.address)) {
+			if (balance_penalty > 0.1 * penalty_koeff && block.getCreator().getAddress().equals(this.address)) {
 				balance_penalty *= Settings.GENERATE_CONTINUOUS_PENALTY * 0.001;
 			} else {
 				// reset
@@ -498,6 +499,11 @@ public class Account {
 	}
 	public Tuple2<Integer, PersonCls> hasPerson() {
 		return hasPerson(DBSet.getInstance());
+	}
+	
+	// last forging block + forging amount + list of addresses for update new last generating block
+	public Tuple3<Integer, Integer, TreeSet<String>> getForgingData(DBSet db) {
+		return db.getAddressForging().get(this.address);
 	}
 
 }

@@ -66,7 +66,7 @@ public class BlockChain
 
 	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
 		
-		//LOGGER.debug("getSignatures ->" + Base58.encode(parent));
+		//LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
@@ -84,6 +84,10 @@ public class BlockChain
 				
 				counter ++;
 			}
+			//LOGGER.debug("get size " + counter);
+		} else {
+			LOGGER.debug("*** getSignatures NOT FOUND !");
+			
 		}
 		
 		return headers;		

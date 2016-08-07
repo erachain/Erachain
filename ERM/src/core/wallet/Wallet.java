@@ -888,7 +888,7 @@ public class Wallet extends Observable implements Observer
 		}
 		
 		//CHECK LENGTH
-		if(accountSeed.length != 32)
+		if(accountSeed.length != Crypto.HASH_LENGTH)
 		{
 			return "";
 		}
@@ -1184,14 +1184,14 @@ public class Wallet extends Observable implements Observer
 		this.database.setLastBlockSignature(block.getSignature());
 			
 		//CHECK IF WE ARE GENERATOR
-		if(this.accountExists(block.getGenerator().getAddress()))
+		if(this.accountExists(block.getCreator().getAddress()))
 		{
 			//ADD BLOCK
 			this.database.getBlockMap().add(block);
 				
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator(), FEE_KEY).add(block.getTotalFee());
-			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getCreator(), FEE_KEY).add(block.getTotalFee());
+			this.database.getAccountMap().update(block.getCreator(), FEE_KEY, unconfirmedBalance);
 		}
 	}
 
@@ -1204,14 +1204,14 @@ public class Wallet extends Observable implements Observer
 		}
 				
 		//CHECK IF WE ARE GENERATOR
-		if(this.accountExists(block.getGenerator().getAddress()))
+		if(this.accountExists(block.getCreator().getAddress()))
 		{
 			//DELETE BLOCK
 			this.database.getBlockMap().delete(block);
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getGenerator(), FEE_KEY).subtract(block.getTotalFee());
-			this.database.getAccountMap().update(block.getGenerator(), FEE_KEY, unconfirmedBalance);
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getCreator(), FEE_KEY).subtract(block.getTotalFee());
+			this.database.getAccountMap().update(block.getCreator(), FEE_KEY, unconfirmedBalance);
 		}
 	}
 	

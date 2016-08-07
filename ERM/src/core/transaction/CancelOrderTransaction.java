@@ -27,7 +27,7 @@ public class CancelOrderTransaction extends Transaction
 {
 	private static final byte TYPE_ID = (byte)CANCEL_ORDER_TRANSACTION;
 	private static final String NAME_ID = "Cancel Order";
-	private static final int ORDER_LENGTH = 64;
+	private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
 	
 	private BigInteger order;

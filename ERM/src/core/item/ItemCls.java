@@ -17,6 +17,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.transaction.Transaction;
 import database.DBSet;
 //import database.DBMap;
@@ -266,7 +267,7 @@ public abstract class ItemCls {
 		else
 		{
 			//WRITE EMPTY REFERENCE
-			// data = Bytes.concat(data, new byte[64]);
+			// data = Bytes.concat(data, new byte[Crypto.SIGNATURE_LENGTH]);
 		}
 		
 		return data;

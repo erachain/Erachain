@@ -1335,7 +1335,7 @@ public class BlockExplorer
 			Map blockJSON=new LinkedHashMap();
 			blockJSON.put("height", counter);
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
-			blockJSON.put("generator", block.getGenerator().getAddress());
+			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getGeneratingBalance());
 			blockJSON.put("transactionCount", block.getTransactionCount());
 			blockJSON.put("timestamp", block.getTimestamp());
@@ -1365,7 +1365,7 @@ public class BlockExplorer
 			}
 
 			blockJSON.put("totalATAmount", totalATAmount.toPlainString());
-			blockJSON.put("aTfee", block.getATfee().toPlainString());
+			//blockJSON.put("aTfee", block.getATfee().toPlainString());
 
 			output.put(counter, blockJSON);
 
@@ -1716,7 +1716,7 @@ public class BlockExplorer
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 
-			transactionDataJSON.put("generator", block.getGenerator().getAddress());
+			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
 
 			/*
@@ -1750,7 +1750,7 @@ public class BlockExplorer
 
 			if(((AT_Transaction)unit).getRecipient().equals("1111111111111111111111111"))
 			{
-				transactionDataJSON.put("generatorAddress", block.getGenerator().getAddress());
+				transactionDataJSON.put("generatorAddress", block.getCreator().getAddress());
 			}
 
 			transactionJSON.put("type", "atTransaction");
@@ -2098,7 +2098,7 @@ public class BlockExplorer
 			} else if (unit.getUnit() instanceof Block) {
 				
 				BigDecimal fee = ((Block)unit.getUnit()).getTotalFee();
-				String generator = ((Block)unit.getUnit()).getGenerator().getAddress();
+				String generator = ((Block)unit.getUnit()).getCreator().getAddress();
 				
 				tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
 
@@ -2788,7 +2788,7 @@ public class BlockExplorer
 		}
 
 		output.put("totalATAmount", totalATAmount.toPlainString());
-		output.put("aTfee", block.getATfee().toPlainString());
+		//output.put("aTfee", block.getATfee().toPlainString());
 		output.put("totalFee", block.getTotalFee().toPlainString());
 		output.put("version", block.getVersion());
 
@@ -2819,13 +2819,13 @@ public class BlockExplorer
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 
-			transactionDataJSON.put("generator", block.getGenerator().getAddress());
+			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
 
 			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance());
-			transactionDataJSON.put("atFees", block.getATfee().toPlainString());
+			//transactionDataJSON.put("atFees", block.getATfee().toPlainString());
 			transactionDataJSON.put("reference", Base58.encode(block.getReference()));
-			transactionDataJSON.put("generatorSignature", Base58.encode(block.getGeneratorSignature()));
+			transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));
 			//transactionDataJSON.put("transactionsSignature", Base58.encode(block.getTransactionsSignature()));
 			transactionDataJSON.put("version", block.getVersion());
 

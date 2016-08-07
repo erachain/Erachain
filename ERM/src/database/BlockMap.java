@@ -90,7 +90,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		Bind.secondaryKey((BTreeMap)this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, byte[], Block>() {
 			@Override
 			public Tuple2<String, String> run(byte[] b, Block block) {
-				return new Tuple2<String, String>(block.getGenerator().getAddress(), Converter.toHex(block.getSignature()));
+				return new Tuple2<String, String>(block.getCreator().getAddress(), Converter.toHex(block.getSignature()));
 			}
 		});
 	}

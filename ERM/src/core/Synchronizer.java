@@ -65,7 +65,8 @@ public class Synchronizer
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 	
-			while ( lastBlock.getHeight(fork) >= height)
+			// AT_TRANSACTION - not from GENESIS BLOCK
+			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 1)
 			{
 				newBlocks.add( 0 , lastBlock );
 				//Block tempBlock = fork.getBlockMap().getLastBlock();
@@ -146,7 +147,8 @@ public class Synchronizer
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 
-			while ( lastBlock.getHeight(dbSet) >= height )
+			// NOT orphan GENESIS BLOCK
+			while ( lastBlock.getHeight(dbSet) >= height && lastBlock.getHeight(dbSet) > 1 )
 			{
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				lastBlock.orphan(dbSet);
@@ -353,7 +355,7 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!response.getBlock().isSignatureValid())
 		{
-			throw new Exception("Invalid block");
+			throw new Exception("*** Invalid block");
 		}
 		
 		//ADD TO LIST

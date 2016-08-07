@@ -8,11 +8,12 @@ import java.util.Arrays;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.crypto.Crypto;
 import database.DBSet;
 
 public class Trade {
 	
-	private static final int ORDER_LENGTH = 64;
+	private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int AMOUNT_LENGTH = 12;
 	private static final int TIMESTAMP_LENGTH = 8;
 	private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;

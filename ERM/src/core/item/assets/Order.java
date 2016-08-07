@@ -13,6 +13,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -20,7 +21,7 @@ import database.SortableList;
 
 public class Order implements Comparable<Order> {
 	
-	private static final int ID_LENGTH = 64;
+	private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int CREATOR_LENGTH = 25;
 	private static final int HAVE_LENGTH = 8;
 	private static final int WANT_LENGTH = 8;

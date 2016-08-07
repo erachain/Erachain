@@ -92,7 +92,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			case COLUMN_GENERATOR:
 				
-				return block.getGenerator().asPerson();
+				return block.getCreator().asPerson();
 				
 			case COLUMN_BASETARGET:
 				
@@ -108,7 +108,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
+			//LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
 			// TODO здесь если кошелек на удален то данные ломаются и в цепочке - туда не катается данные нужные
 			// icreator - reset wallet.DB!
 			Controller.getInstance().synchronizeWallet();

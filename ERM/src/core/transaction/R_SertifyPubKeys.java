@@ -387,7 +387,8 @@ public class R_SertifyPubKeys extends Transaction {
 	@Override
 	public boolean isSignatureValid() {
 
-		if ( this.signature == null || this.signature.length != 64 || this.signature == new byte[64] )
+		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
+				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH] )
 			return false;
 
 		int pAccountsSize = 0;
@@ -402,7 +403,8 @@ public class R_SertifyPubKeys extends Transaction {
 			{
 				//if (this.sertifiedSignatures.e(i);
 				singItem = this.sertifiedSignatures.get(i);
-				if (singItem == null || singItem.length != 64 || singItem == new byte[64])
+				if (singItem == null || singItem.length != Crypto.SIGNATURE_LENGTH
+						|| singItem == new byte[Crypto.SIGNATURE_LENGTH])
 				{
 					return false;
 				}

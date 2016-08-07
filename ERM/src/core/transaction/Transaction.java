@@ -264,7 +264,7 @@ public abstract class Transaction {
 	protected static final int SEQ_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;
-	//public static final int REFERENCE_LENGTH = 64;
+	//public static final int REFERENCE_LENGTH = Crypto.SIGNATURE_LENGTH;
 	public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
 	protected static final int DATA_SIZE_LENGTH = 4;
 	protected static final int ENCRYPTED_LENGTH = 1;
@@ -274,7 +274,7 @@ public abstract class Transaction {
 	//protected static final int HKEY_LENGTH = 20;
 	protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	// not need now protected static final int FEE_LENGTH = 8;
-	public static final int SIGNATURE_LENGTH = 64;
+	public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
 	// in pack toByte and Parse - reference not included
 	protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH + /*REFERENCE_LENGTH*/ + SIGNATURE_LENGTH;
@@ -687,7 +687,8 @@ public abstract class Transaction {
 	
 	public static boolean isSignatureValid(PublicKeyAccount creator, byte[] data, byte[] signature) {
 
-		if ( signature == null | signature.length != 64 | signature == new byte[64]) return false;
+		if ( signature == null | signature.length != Crypto.SIGNATURE_LENGTH
+				| signature == new byte[Crypto.SIGNATURE_LENGTH]) return false;
 		
 		if ( data == null ) return false;
 
@@ -697,7 +698,8 @@ public abstract class Transaction {
 	
 	public boolean isSignatureValid() {
 
-		if ( this.signature == null || this.signature.length != 64 || this.signature == new byte[64]) return false;
+		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
+				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH]) return false;
 		
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );

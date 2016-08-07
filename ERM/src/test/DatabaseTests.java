@@ -38,7 +38,7 @@ import database.PersonAddressMap;
 
 public class DatabaseTests {
 
-	byte[] assetReference = new byte[64];
+	byte[] assetReference = new byte[Crypto.SIGNATURE_LENGTH];
 
 	static Logger LOGGER = Logger.getLogger(DatabaseTests.class.getName());
 
@@ -49,7 +49,7 @@ public class DatabaseTests {
 	long FEE_KEY = Transaction.FEE_KEY;
 	long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
-	byte[] personReference = new byte[64];
+	byte[] personReference = new byte[Crypto.SIGNATURE_LENGTH];
 	long timestamp = NTP.getTime();
 	
 	private byte[] icon = new byte[0]; // default value

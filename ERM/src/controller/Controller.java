@@ -922,6 +922,9 @@ public class Controller extends Observable {
 						this.peerHeight.put(message.getSender(),
 								blockMessage.getHeight());
 					}
+				} else {
+					LOGGER.error("onMessage BLOCK_TYPE -> new block not valid "
+								+ Base58.encode(block.getSignature()));
 				}
 					
 				if(this.isProcessingWalletSynchronize()) {
@@ -1090,7 +1093,7 @@ public class Controller extends Observable {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxHeightPeer();
 				
-				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.toString());
+				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress());
 
 				// SYNCHRONIZE FROM PEER
 				this.synchronizer.synchronize(dbSet, lastTrueBlockHeight, peer);

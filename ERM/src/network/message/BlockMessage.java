@@ -57,7 +57,7 @@ public class BlockMessage extends Message{
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.block.toBytes();
+		byte[] blockBytes = this.block.toBytes(true);
 		data = Bytes.concat(data, blockBytes);
 		
 		//ADD CHECKSUM
