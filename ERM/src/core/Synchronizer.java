@@ -61,17 +61,21 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				lastBlock.orphan(fork);
 				if (lastBlock.getHeight(fork) == 1 || lastBlock.getParent(fork) == null)
 				{
 					break;
 				}
+				lastBlock.orphan(fork);
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 	
 			// AT_TRANSACTION - not from GENESIS BLOCK
 			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 1)
 			{
+				if (lastBlock.getHeight(fork) == 1 || lastBlock.getParent(fork) == null)
+				{
+					break;
+				}
 				newBlocks.add( 0 , lastBlock );
 				//Block tempBlock = fork.getBlockMap().getLastBlock();
 				lastBlock.orphan(fork);
@@ -144,6 +148,11 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
+				if (lastBlock.getHeight(dbSet) == 1 || lastBlock.getParent(dbSet) == null)
+				{
+					break;
+				}
+
 				//ADD ORPHANED TRANSACTIONS
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				
@@ -154,8 +163,12 @@ public class Synchronizer
 			// NOT orphan GENESIS BLOCK
 			while ( lastBlock.getHeight(dbSet) >= height && lastBlock.getHeight(dbSet) > 1 )
 			{
-				orphanedTransactions.addAll(lastBlock.getTransactions());
 				lastBlock.orphan(dbSet);
+				if (lastBlock.getHeight(dbSet) == 1 || lastBlock.getParent(dbSet) == null)
+				{
+					break;
+				}
+				orphanedTransactions.addAll(lastBlock.getTransactions());
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 			

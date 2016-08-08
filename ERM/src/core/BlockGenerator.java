@@ -254,6 +254,9 @@ public class BlockGenerator extends Thread implements Observer
 				long newTimestamp = this.solvingBlock.getTimestamp()
 						+ Block.GENERATING_MIN_BLOCK_TIME;
 				
+				if (newTimestamp + 3000 > NTP.getTime()) {
+					continue;
+				}
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 				synchronized(knownAccounts)

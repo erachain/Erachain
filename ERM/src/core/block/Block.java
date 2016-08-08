@@ -670,11 +670,14 @@ public class Block {
 			}
 		}
 		 */
-		if(this.timestamp - 500 > NTP.getTime()
-			|| this.timestamp - this.getParent(db).timestamp != GENERATING_MIN_BLOCK_TIME) {
-			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid");
+		if(this.timestamp - 3000 > NTP.getTime()) {
+			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
 			return false;			
 		}
+		if(this.timestamp - this.getParent(db).timestamp != GENERATING_MIN_BLOCK_TIME) {
+				LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid != GENERATING_MIN_BLOCK_TIME");
+				return false;			
+			}
 
 		/*
 		//CHECK IF GENERATING BALANCE IS CORRECT

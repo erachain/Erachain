@@ -1074,7 +1074,7 @@ public class Controller extends Observable {
 		int maxPeerHeight = this.getMaxPeerHeight();
 		int chainHeight = this.blockChain.getHeight(this.dbSet);
 		int diff = chainHeight - maxPeerHeight;
-		return diff >= 0 && diff < 5;
+		return diff >= 0 && diff < 2;
 		//return chainHeight == maxPeerHeight;
 	}
 	

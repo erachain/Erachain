@@ -114,6 +114,8 @@ public class BlockChain
 			return false;
 		}
 		
+		/*
+		*/
 		//CHECK IF WE KNOW REFERENCE
 		if(!dbSet.getBlockMap().contains(block.getReference()))
 		{
