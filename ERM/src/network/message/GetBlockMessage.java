@@ -6,7 +6,7 @@ public class GetBlockMessage extends Message{
 
 	private byte[] signature;
 	
-	private static final int GET_BLOCK_LENGTH = 128;
+	private static final int GET_BLOCK_LENGTH = core.block.Block.SIGNATURE_LENGTH;
 	
 	public GetBlockMessage(byte[] signature)
 	{

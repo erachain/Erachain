@@ -227,6 +227,11 @@ public class ApiClient {
 				"Errors: 101 - Invalid signature. 301 - Block does not exist."
 			},
 			{
+				"GET blocks/headers/<signature>", 
+				"Returns the list oof block headers - for test networ response in controller.Controller.onMessage(GET_SIGNATURES_TYPE).",
+				"Errors: 101 - Invalid signature. 301 - Block does not exist."
+			},
+			{
 				"GET blocks/byheight/<height>", 
 				"Returns the block whith given height.",
 				"Errors: 301 - Block does not exist."

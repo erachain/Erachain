@@ -103,24 +103,28 @@ public class BlockChain
 		//CHECK IF NOT GENESIS
 		if(block instanceof GenesisBlock)
 		{
+			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> as GenesisBlock");
 			return false;
 		}
 		
 		//CHECK IF SIGNATURE IS VALID
 		if(!block.isSignatureValid())
 		{
+			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> signature");
 			return false;
 		}
 		
 		//CHECK IF WE KNOW REFERENCE
 		if(!dbSet.getBlockMap().contains(block.getReference()))
 		{
+			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB");
 			return false;
 		}
 		
 		//CHECK IF REFERENCE IS LASTBLOCK
 		if(!Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), block.getReference()))
 		{
+			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");
 			return false;
 		}
 		

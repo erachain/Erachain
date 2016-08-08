@@ -514,6 +514,18 @@ public class Account {
 	public Tuple3<Integer, Integer, TreeSet<String>> getForgingData(DBSet db) {
 		return db.getAddressForging().get(this.address);
 	}
+	
+	public void updateForgingData(DBSet db, int blockNo ) {
+		
+		int win_amount = getGeneratingBalance(db).intValue();
+		Tuple3<Integer, Integer, TreeSet<String>> forgingData = db.getAddressForging().get(this.address);
+		
+		forgingData.c.add(this.address);
+		Tuple3<Integer, Integer, TreeSet<String>> newData = new Tuple3<Integer, Integer, TreeSet<String>>
+			(blockNo, win_amount, forgingData.c);
+		
+		db.getAddressForging().set(this.address, newData);
+	}
 
 	public long getWinValueHeight(DBSet dbSet, int height)
 	{

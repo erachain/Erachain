@@ -831,6 +831,10 @@ public class Controller extends Observable {
 		this.onDisconnect(peer);
 	}
 
+	public List<byte[]> getNextHeaders(byte[] signature) {
+		return this.blockChain.getSignatures(this.dbSet, signature);
+	}
+
 	// SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
 	public void onMessage(Message message) {
 		Message response;
@@ -871,8 +875,7 @@ public class Controller extends Observable {
 						+ Base58.encode(getHeadersMessage.getParent()));
 
 				// ASK SIGNATURES FROM BLOCKCHAIN
-				List<byte[]> headers = this.blockChain
-						.getSignatures(this.dbSet, getHeadersMessage.getParent());
+				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
 
 				LOGGER.error("this.blockChain.getSignatures.size() -> "
 						+ headers.size());
@@ -896,6 +899,9 @@ public class Controller extends Observable {
 			case Message.GET_BLOCK_TYPE:
 
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
+
+				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature() "
+						+ Base58.encode(getBlockMessage.getSignature()));
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				block = this.blockChain
@@ -926,7 +932,7 @@ public class Controller extends Observable {
 								blockMessage.getHeight());
 					}
 				} else {
-					LOGGER.error("onMessage BLOCK_TYPE -> new block not valid "
+					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> new block not valid "
 								+ Base58.encode(block.getSignature()));
 				}
 					

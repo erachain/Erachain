@@ -864,7 +864,7 @@ public class Block {
 			//UPDATE GENERATOR BALANCE WITH FEE
 			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(blockFee), db);
 		}
-
+		
 		Block parent = this.getParent(db);
 		int height = 1;
 		if(parent != null)
@@ -880,6 +880,13 @@ public class Block {
 		{
 			//IF NO PARENT HEIGHT IS 1
 			db.getHeightMap().set(this, 1);
+		}
+
+		// PROCESS FORGING DATA
+		Tuple3<Integer, Integer, TreeSet<String>> forgingData = this.creator.getForgingData(db);
+		for (String forgedAccount: forgingData.c) {
+			Account account = new Account(forgedAccount);
+			account.updateForgingData(db, height);
 		}
 
 		//PROCESS TRANSACTIONS
@@ -944,11 +951,16 @@ public class Block {
 		//DELETE TRANSACTIONS FROM FINAL MAP
 		dbSet.getTransactionFinalMap().delete(this.getHeight(dbSet));
 
+		// delete CHILDS - for proper making HEADERS in Controller.onMessage
+		dbSet.getChildMap().delete(this.signature);
+
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
 
-		//SET PARENT AS LAST BLOCK
-		dbSet.getBlockMap().setLastBlock(this.getParent(dbSet));
+		if (this.getParent(dbSet) != null) {
+			//SET PARENT AS LAST BLOCK
+			dbSet.getBlockMap().setLastBlock(this.getParent(dbSet));
+		}
 				
 		for(Transaction transaction: this.getTransactions())
 		{

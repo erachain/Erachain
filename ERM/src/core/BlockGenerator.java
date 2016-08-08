@@ -206,7 +206,7 @@ public class BlockGenerator extends Thread implements Observer
 				
 				//GET LAST BLOCK
 				// TODO lastBlock error
-				// TEST DB for last block - some time error rised
+				// TEST DB for last block - some time error raised
 				Block lastBlock = Controller.getInstance().getLastBlock();
 				if (lastBlock == null) {
 					return;
@@ -249,20 +249,16 @@ public class BlockGenerator extends Thread implements Observer
 				byte[] unconfirmedTransactionsHash = null;
 				long max_winned_value = 0;
 				long winned_value;
+
+				// TODO if empty TRNSACTIONS - longer time
+				long newTimestamp = this.solvingBlock.getTimestamp()
+						+ Block.GENERATING_MIN_BLOCK_TIME;
 				
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 				synchronized(knownAccounts)
 				{
-					// TODO need calculate block.timestamp
-					long newTimestamp = this.solvingBlock.getTimestamp()
-							+ Block.GENERATING_MIN_BLOCK_TIME;
-					
-					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
-					// CALCULATE HASH for that transactions
-					unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
-					
+										
 					for(PrivateKeyAccount account: knownAccounts)
 					{
 						BigDecimal generatingBalance = account.getGeneratingBalance();
@@ -285,6 +281,12 @@ public class BlockGenerator extends Thread implements Observer
 				
 				if(acc_winner != null)
 				{
+					
+					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
+					// CALCULATE HASH for that transactions
+					unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
+
 					//ADD TRANSACTIONS
 					//this.addUnconfirmedTransactions(dbSet, block);
 					Block block = generateNextBlock(dbSet, acc_winner, 

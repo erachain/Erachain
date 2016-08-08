@@ -9,7 +9,7 @@ import com.google.common.primitives.Ints;
 
 public class SignaturesMessage extends Message{
 
-	private static final int SIGNATURE_LENGTH = 128;
+	private static final int SIGNATURE_LENGTH = core.block.Block.SIGNATURE_LENGTH;
 	private static final int DATA_LENGTH = 4;
 	
 	private List<byte[]> signatures;

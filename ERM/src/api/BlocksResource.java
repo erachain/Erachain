@@ -1,5 +1,6 @@
 package api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -252,7 +253,44 @@ public class BlocksResource
 		
 		return String.valueOf(block.getHeight(DBSet.getInstance()));
 	}
-	
+
+	/*
+	 * GET HEADES as on nerwork communication
+	 *  -> response callback in controller.Controller.onMessage(Message)
+		 type = GET_SIGNATURES_TYPE
+		 FOR - core.Synchronizer.getBlockSignatures(byte[], Peer)
+
+	 */
+	@GET
+	@Path("/headers/{signature}")
+	public static String getHeaders(@PathParam("signature") String signature) 
+	{
+		//DECODE SIGNATURE
+		byte[] signatureBytes;
+		try
+		{
+			signatureBytes = Base58.decode(signature);
+		}
+		catch(Exception e)
+		{
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+
+		List<byte[]> headers = Controller.getInstance().getNextHeaders(signatureBytes);
+		
+		//CHECK IF BLOCK EXISTS
+		if(headers == null)
+		{
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+		List<String> result = new ArrayList<String>();
+		for ( byte[] sign: headers) {
+			result.add(Base58.encode(sign));
+		}
+		
+		return String.valueOf(result);
+	}
+
 	@GET
 	@Path("/byheight/{height}")
 	public static String getbyHeight(@PathParam("height") int height) 

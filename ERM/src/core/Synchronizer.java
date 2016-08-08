@@ -62,6 +62,10 @@ public class Synchronizer
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
 				lastBlock.orphan(fork);
+				if (lastBlock.getHeight(fork) == 1 || lastBlock.getParent(fork) == null)
+				{
+					break;
+				}
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 	
@@ -267,6 +271,9 @@ public class Synchronizer
 	
 	private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception
 	{
+
+		LOGGER.info("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " + Base58.encode(header));
+
 		///CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetHeadersMessage(header);
 		
@@ -276,7 +283,7 @@ public class Synchronizer
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
 		if (response == null)
-			throw new Exception("Failed to communicate with peer");
+			throw new Exception("Failed to communicate with peer - response = null");
 
 		return response.getSignatures();
 	}

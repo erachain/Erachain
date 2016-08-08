@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
 import ntp.NTP;
 
 import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
 
 import core.BlockGenerator;
 import core.account.Account;
@@ -194,6 +196,61 @@ public class BlockTests
 		}	
 	}
 	
+	@Test
+	public void processGenesisBlock()
+	{
+										
+		//PROCESS GENESISBLOCK
+		GenesisBlock genesisBlock = new GenesisBlock();
+												
+		//CHECK VALID
+		assertEquals(true, genesisBlock.isSignatureValid());
+		assertEquals(true, genesisBlock.isValid(db));
+		
+		//PROCESS BLOCK
+		genesisBlock.process(db);
+		
+		Account recipient1 = new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		Account recipient2 = new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz");
+				
+		//CHECK LAST REFERENCE GENERATOR
+		assertEquals((long)recipient1.getLastReference(db), 0);
+		assertEquals((long)recipient2.getLastReference(db), 0);
+		
+		//CHECK BALANCE RECIPIENT 1
+		assertEquals(1, recipient1.getConfirmedBalance(ERM_KEY, db).compareTo(BigDecimal.valueOf(100).setScale(8)));
+		assertEquals(1, recipient1.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.valueOf(100).setScale(8)));
+				
+		//CHECK BALANCE RECIPIENT2
+		assertEquals(1, recipient2.getConfirmedBalance(ERM_KEY, db).compareTo(BigDecimal.valueOf(10).setScale(8)));
+		assertEquals(1, recipient2.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
+
+		Tuple3<Integer, Integer, TreeSet<String>> forgingData = recipient1.getForgingData(db);
+		assertEquals(0, (int)forgingData.a);
+		assertEquals(recipient1.getConfirmedBalance(ERM_KEY, db).intValue(), (int)forgingData.b);
+		assertEquals(recipient1.getAddress(), forgingData.c.first());
+
+		forgingData = recipient2.getForgingData(db);
+		assertEquals(0, (int)forgingData.a);
+		assertEquals(recipient2.getConfirmedBalance(ERM_KEY, db).intValue(), (int)forgingData.b);
+		assertEquals(recipient2.getAddress(), forgingData.c.first());
+
+		//ORPHAN BLOCK
+		genesisBlock.orphan(db);
+				
+		assertEquals(true, recipient1.getLastReference(db) == null);
+		assertEquals(true, recipient2.getLastReference(db) == null);
+		
+		//CHECK BALANCE RECIPIENT 1
+		assertEquals(recipient1.getConfirmedBalance(ERM_KEY, db), BigDecimal.valueOf(0).setScale(8));		
+		assertEquals(recipient1.getConfirmedBalance(FEE_KEY, db), BigDecimal.valueOf(0).setScale(8));		
+		//CHECK BALANCE RECIPIENT 2
+		assertEquals(true, recipient2.getConfirmedBalance(ERM_KEY, db).compareTo(BigDecimal.valueOf(0)) == 0);
+		assertEquals(true, recipient2.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.valueOf(0)) == 0);
+				
+	}
+
+	////////////////
 	@Test
 	public void validateSignatureBlock()
 	{

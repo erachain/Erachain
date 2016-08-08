@@ -60,8 +60,11 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		super(parent);
 		
+		//this.lastBlockVar = parent.getLastBlockVar();
+
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
+		
 		this.lastTrueBlockHeight = parent.getLastTrueBlockHeight();
 	}
 	
@@ -119,6 +122,9 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		return null;
 	}
+	//public Var<byte[]> getLastBlockVar() {
+	//	return this.lastBlockVar;
+	//}
 	
 	@Override
 	protected Map<Integer, Integer> getObservableData() 
@@ -127,7 +133,8 @@ public class BlockMap extends DBMap<byte[], Block>
 	}
 	
 	public void setLastBlock(Block block) 
-	{		
+	{
+		
 		if(this.lastBlockVar != null)
 		{
 			this.lastBlockVar.set(block.getSignature());

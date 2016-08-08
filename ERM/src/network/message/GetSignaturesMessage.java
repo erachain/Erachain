@@ -2,11 +2,12 @@ package network.message;
 
 import com.google.common.primitives.Bytes;
 
+
 public class GetSignaturesMessage extends Message{
 
 	private byte[] parent;
 	
-	private static final int GET_HEADERS_LENGTH = 128;
+	private static final int GET_HEADERS_LENGTH = core.block.Block.SIGNATURE_LENGTH;
 	
 	public GetSignaturesMessage(byte[] parent)
 	{
