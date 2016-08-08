@@ -27,6 +27,8 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
+
 // import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
 
@@ -37,6 +39,7 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.io.FileUtils;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Longs;
 
@@ -1558,16 +1561,15 @@ public class Controller extends Observable {
 
 	}
 
+	public long getNextBlockGeneratingBalance(Block block) {
+		PublicKeyAccount account = block.getCreator();
+		return block.getWinValueForAccount(this.dbSet, account);
+	}
 	public long getNextBlockGeneratingBalance() {
-		return BlockGenerator.getNextBlockGeneratingBalance(
-				this.dbSet, this.dbSet.getBlockMap()
-						.getLastBlock());
+		Block block = this.dbSet.getBlockMap().getLastBlock();
+		return getNextBlockGeneratingBalance(block);
 	}
 
-	public long getNextBlockGeneratingBalance(Block parent) {
-		return BlockGenerator.getNextBlockGeneratingBalance(
-				this.dbSet, parent);
-	}
 
 	// FORGE
 

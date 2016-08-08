@@ -201,6 +201,7 @@ public class BlocksResource
 		return String.valueOf(generatingBalance);
 	}
 	
+	/*
 	@GET
 	@Path("/time")
 	public String getTimePerBlock()
@@ -217,6 +218,7 @@ public class BlocksResource
 		long timePerBlock = BlockGenerator.getBlockTime(generatingbalance);
 		return String.valueOf(timePerBlock);
 	}
+	*/
 	
 	@GET
 	@Path("/height")

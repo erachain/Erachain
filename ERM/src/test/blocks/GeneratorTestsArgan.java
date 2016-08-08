@@ -74,7 +74,7 @@ public class GeneratorTestsArgan {
 		
 		List<Transaction> unconfirmedTransactions = BlockGenerator.getUnconfirmedTransactions(databaseSet, timestamp);
 		byte[] unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock, unconfirmedTransactionsHash);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock, unconfirmedTransactionsHash);
 		//SET UNCONFIRMED TRANSACTIONS TO BLOCK
 		newBlock.setTransactions(unconfirmedTransactions);
 		newBlock.sign(generator);
@@ -84,7 +84,7 @@ public class GeneratorTestsArgan {
 		assertEquals(1000, newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet, true));
+		assertEquals(true, newBlock.isValid(databaseSet));
 	}
 	//TODO CALCULATETRANSACTIONSIGNATURE
 }

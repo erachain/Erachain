@@ -10,6 +10,9 @@ import java.util.List;
 //import java.sql.Timestamp;
 //import org.mapdb.Fun.Tuple3;
 //import org.mapdb.Fun.Tuple11;
+import java.util.TreeSet;
+
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -67,7 +70,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), MAX_GENERATING_BALANCE, genesisGenerator, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGenerator, new byte[0], new byte[0]);
 		
 		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
@@ -353,6 +356,7 @@ public class GenesisBlock extends Block{
 		
 		//GENERATE AND VALIDATE TRANSACTIONS
 		this.setTransactions(transactions);
+		// SIGN simple as HASH
 		this.signature = generateHeadHash();
 	}
 	
@@ -439,6 +443,12 @@ public class GenesisBlock extends Block{
 		//PARENT DOES NOT EXIST
 		return null;
 	}
+	@Override
+	public long getGeneratingBalance(DBSet db)
+	{
+		return 0l;
+	}
+
 	
 	public byte[] generateHeadHash()
 	{
@@ -453,19 +463,22 @@ public class GenesisBlock extends Block{
 		byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
 		
+		/*
 		//WRITE GENERATING BALANCE
 		byte[] generatingBalanceBytes = Longs.toByteArray(GENESIS_GENERATING_BALANCE);
 		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, 8, 0);
 		data = Bytes.concat(data, generatingBalanceBytes);
+		*/
 		
 		//WRITE GENERATOR
 		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), Crypto.HASH_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 		
-		//DIGEST + transactionsHash
+		//DIGEST [32]
 		byte[] digest = Crypto.getInstance().digest(data);
 		
-		// byte[64]
+		//DIGEST + transactionsHash
+		// = byte[64]
 		digest = Bytes.concat(digest, transactionsHash);
 		
 		return digest;
@@ -483,16 +496,7 @@ public class GenesisBlock extends Block{
 		{
 			return false;
 		}
-		
-		/*
-		//VALIDATE TRANSACTIONS SIGNATURE
-		digest = this.generateHash();
-		if(!Arrays.equals(digest, this.transactionsHash))
-		{
-			return false;
-		}
-		*/
-		
+				
 		return true;
 	}
 	
@@ -503,7 +507,7 @@ public class GenesisBlock extends Block{
 	}
 	
 	@Override
-	public boolean isValid(DBSet db, boolean noTime)
+	public boolean isValid(DBSet db)
 	{
 		//CHECK IF NO OTHER BLOCK IN DB
 		if(db.getBlockMap().getLastBlock() != null)

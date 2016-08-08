@@ -24,6 +24,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;
 import database.DBMap;
+import database.DBSet;
 import database.serializer.BlockSerializer;
 
 public class BlockMap extends DBMap<Tuple2<String, String>, Block>
@@ -99,7 +100,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Long, Tuple2<String, String>, Block>() {
 		   	@Override
 		    public Long run(Tuple2<String, String> key, Block value) {
-		   		return value.getGeneratingBalance();
+		   		return value.getGeneratingBalance(DBSet.getInstance());
 		    }
 		});
 		

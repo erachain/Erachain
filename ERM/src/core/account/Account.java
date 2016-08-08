@@ -212,9 +212,16 @@ public class Account {
 			}
 		}
 	}
-	
-	// balance FOR generation
+
+	// take current balance
 	public void calculateGeneratingBalance(DBSet db)
+	{
+		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
+		this.generatingBalance = balance;
+	}
+
+	// balance FOR generation
+	public void calculateGeneratingBalance_old(DBSet db)
 	{
 		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERM_KEY only
 		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
@@ -504,6 +511,24 @@ public class Account {
 	// last forging block + forging amount + list of addresses for update new last generating block
 	public Tuple3<Integer, Integer, TreeSet<String>> getForgingData(DBSet db) {
 		return db.getAddressForging().get(this.address);
+	}
+
+	public long getWinValueHeight(DBSet dbSet, int height)
+	{
+		
+		long win_value;
+		//
+		Tuple3<Integer, Integer, TreeSet<String>> value = this.getForgingData(dbSet);
+		
+		int len = height - value.a;
+		int MAX_LEN = 1000;
+		if (len < MAX_LEN ) {
+			win_value = len * len * value.b ;
+		} else {
+			win_value = (MAX_LEN * MAX_LEN + len - MAX_LEN) * value.b;			
+		}
+		
+		return win_value;
 	}
 
 }

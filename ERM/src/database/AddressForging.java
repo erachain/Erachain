@@ -50,7 +50,7 @@ public class AddressForging extends DBMap<String, Tuple3<Integer, Integer, TreeS
 	@Override
 	protected Tuple3<Integer, Integer, TreeSet<String>> getDefaultValue() 
 	{
-		return null;
+		return new Tuple3<Integer, Integer, TreeSet<String>>(0, 0, new TreeSet<String>());
 	}
 	
 	@Override

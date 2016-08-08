@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 import ntp.NTP;
 import settings.Settings;
@@ -16,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import utils.Converter;
 import at.AT_API_Platform_Impl;
@@ -46,9 +48,11 @@ import lang.Lang;
 public class Block {
 
 	public static final int MAX_BLOCK_BYTES = 1048576;
+	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+	
 	public static final int VERSION_LENGTH = 4;
 	public static final int TIMESTAMP_LENGTH = 8;
-	public static final int GENERATING_BALANCE_LENGTH = 8;
+	//public static final int GENERATING_BALANCE_LENGTH = 8;
 	public static final int CREATOR_LENGTH = Crypto.HASH_LENGTH;
 	public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
 	public static final int REFERENCE_LENGTH = SIGNATURE_LENGTH;
@@ -56,7 +60,7 @@ public class Block {
 	private static final int TRANSACTIONS_COUNT_LENGTH = 4;
 	private static final int TRANSACTION_SIZE_LENGTH = 4;
 	public static final int AT_BYTES_LENGTH = 4;
-	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + GENERATING_BALANCE_LENGTH + CREATOR_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
+	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
@@ -65,7 +69,7 @@ public class Block {
 	protected int version;
 	protected byte[] reference;
 	protected long timestamp;
-	protected long generatingBalance;
+	//protected long generatingBalance;
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
@@ -81,12 +85,11 @@ public class Block {
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, long timestamp, long generatingBalance, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, long timestamp, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
 	{
 		this.version = version;
 		this.reference = reference;
 		this.timestamp = timestamp;
-		this.generatingBalance = generatingBalance;
 		this.creator = creator;
 
 		this.transactionsHash = transactionsHash;
@@ -97,9 +100,9 @@ public class Block {
 	}
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, long timestamp, long generatingBalance, PublicKeyAccount creator, byte[] signature, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, long timestamp, PublicKeyAccount creator, byte[] signature, byte[] transactionsHash, byte[] atBytes)
 	{
-		this(version, reference, timestamp, generatingBalance, creator, transactionsHash, atBytes);
+		this(version, reference, timestamp, creator, transactionsHash, atBytes);
 		this.signature = signature;
 
 	}
@@ -122,9 +125,20 @@ public class Block {
 		return this.timestamp;
 	}
 
+	/*
 	public long getGeneratingBalance()
 	{
 		return this.generatingBalance;
+	}
+	*/	
+	public long getGeneratingBalance(DBSet db)
+	{
+		Tuple3<Integer, Integer, TreeSet<String>> data = this.creator.getForgingData(db);
+		return data.b;
+	}
+	public long getGeneratingBalance()
+	{
+		return getGeneratingBalance(DBSet.getInstance());
 	}
 
 	public byte[] getReference()
@@ -284,8 +298,8 @@ public class Block {
 
 	public int getHeight(DBSet db)
 	{
-		if(db.getHeightMap().contains(this.getSignature()))
-			return db.getHeightMap().get(this);
+		if(db.getHeightMap().contains(this.signature))
+			return db.getHeightMap().get(this.signature);
 		else
 		{
 			return -1;
@@ -349,10 +363,12 @@ public class Block {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 
+		/*
 		//READ GENERATING BALANCE
 		byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
 		long generatingBalance = Longs.fromByteArray(generatingBalanceBytes);
 		position += GENERATING_BALANCE_LENGTH;
+		*/
 
 		//READ GENERATOR
 		byte[] generatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -385,12 +401,12 @@ public class Block {
 	
 			//long atFeesL = Longs.fromByteArray(atFees);
 
-			block = new Block(version, reference, timestamp, generatingBalance, generator, signature, transactionsHash, atBytes); //, atFeesL);
+			block = new Block(version, reference, timestamp, generator, signature, transactionsHash, atBytes); //, atFeesL);
 		}
 		else
 		{
 			// GENESIS BLOCK version = 1
-			block = new Block(version, reference, timestamp, generatingBalance, generator, signature, transactionsHash);
+			block = new Block(version, reference, timestamp, generator, signature, transactionsHash, new byte[0]);
 		}
 
 		//READ TRANSACTIONS COUNT
@@ -416,8 +432,10 @@ public class Block {
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.timestamp);
-		block.put("generatingBalance", this.generatingBalance);
+		//block.put("generatingBalance", this.generatingBalance);
+		block.put("winValue", this.getWinValue(DBSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
+		block.put("creatorGeneratingBalance", this.creator.getGeneratingBalance());
 		block.put("fee", this.getTotalFee().toPlainString());
 		block.put("transactionsHash", Base58.encode(this.transactionsHash));
 		block.put("signature", Base58.encode(this.signature));
@@ -464,10 +482,12 @@ public class Block {
 		byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
 
+		/*
 		//WRITE GENERATING BALANCE
 		byte[] baseTargetBytes = Longs.toByteArray(this.generatingBalance);
 		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, GENERATING_BALANCE_LENGTH, 0);
 		data = Bytes.concat(data,baseTargetBytes);
+		*/
 
 		//WRITE GENERATOR
 		byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
@@ -569,6 +589,16 @@ public class Block {
 			return Crypto.getInstance().digest(data);
 		}
 	}
+	
+	public long getWinValue(DBSet dbSet)
+	{
+		return this.creator.getWinValueHeight(dbSet, this.getHeight(dbSet));
+	}
+	public long getWinValueForAccount(DBSet dbSet, PublicKeyAccount account)
+	{
+		return account.getWinValueHeight(dbSet, this.getHeight(dbSet));
+	}
+
 
 	//VALIDATE
 
@@ -611,8 +641,9 @@ public class Block {
 		*/
 	}
 
-	public boolean isValid(DBSet db, boolean noTime)
-	{		
+	public boolean isValid(DBSet db)
+	{
+		
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
@@ -620,6 +651,8 @@ public class Block {
 			return false;
 		}
 
+		/*
+		 * OLD TIME
 		//if (false) {
 		if (!noTime) {
 			//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
@@ -637,13 +670,21 @@ public class Block {
 				return false;
 			}
 		}
+		 */
+		if(this.timestamp - 500 > NTP.getTime()
+			|| this.timestamp - this.getParent(db).timestamp != GENERATING_MIN_BLOCK_TIME) {
+			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid");
+			return false;			
+		}
 
+		/*
 		//CHECK IF GENERATING BALANCE IS CORRECT
 		if(this.generatingBalance != BlockGenerator.getNextBlockGeneratingBalance(db, this.getParent(db)))
 		{
 			LOGGER.error("*** Block[" + this.getHeight(db) + "].generatingBalance invalid");
 			return false;
 		}
+		*/
 
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
@@ -657,6 +698,7 @@ public class Block {
 			return false;
 		}
 
+		/*
 		//CREATE TARGET
 		byte[] targetBytes = new byte[SIGNATURE_LENGTH];
 		Arrays.fill(targetBytes, Byte.MAX_VALUE);
@@ -695,6 +737,7 @@ public class Block {
 				+ "\nhash < lower:\n" + hashValue.toString() + "\n" + lowerTarget.toString());
 			return false;
 		}
+		*/
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
 		{

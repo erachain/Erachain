@@ -61,7 +61,7 @@ public class GeneratorTests {
 		for(int i=0; i<2000; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
 			//Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock);
 
 			
@@ -73,7 +73,7 @@ public class GeneratorTests {
 			assertEquals(true, newBlock.isSignatureValid());
 			
 			//CHECK IF BLOCK IS VALID
-			assertEquals(true, newBlock.isValid(databaseSet, true));
+			assertEquals(true, newBlock.isValid(databaseSet));
 			
 			//PROCESS NEW BLOCK
 			newBlock.process(databaseSet);
@@ -108,7 +108,7 @@ public class GeneratorTests {
 		//GENERATE NEXT BLOCK
 		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock, transactionsHash);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock, transactionsHash);
 
 		// get timestamp for block
 		long timestamp = newBlock.getTimestamp() - 10000;
@@ -138,11 +138,11 @@ public class GeneratorTests {
 		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
 
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock, transactionsHash);
+		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock, transactionsHash);
 		newBlock.setTransactions(transactions);
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet, true));
+		assertEquals(true, newBlock.isValid(databaseSet));
 
 		newBlock.sign(generator);
 		//CHECK IF BLOCK IS VALID
@@ -175,7 +175,7 @@ public class GeneratorTests {
 		//GENERATE NEXT BLOCK
 		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
-		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock, transactionsHash);
+		Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock, transactionsHash);
 		
 		// get timestamp for block
 		long timestamp = newBlock.getTimestamp() - 10000;
@@ -204,14 +204,14 @@ public class GeneratorTests {
 		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
 
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, genesisBlock, transactionsHash);
+		newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genesisBlock, transactionsHash);
 		newBlock.setTransactions(transactions);
 		
 		//CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
 		assertNotEquals(10000, newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(databaseSet, true));
+		assertEquals(true, newBlock.isValid(databaseSet));
 	}
 	
 	//TODO CALCULATETRANSACTIONSIGNATURE

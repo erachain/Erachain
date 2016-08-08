@@ -99,7 +99,7 @@ public class Synchronizer
 			int heigh = block.getHeight(fork);
 
 			//CHECK IF VALID
-			if(block.isValid(fork, false))
+			if(block.isValid(fork))
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				block.process(fork);
@@ -370,7 +370,7 @@ public class Synchronizer
 		if(this.run)
 		{
 			//SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-			if(block.isValid(dbSet, false))
+			if(block.isValid(dbSet))
 			{
 				//PROCESS
 				dbSet.getBlockMap().setProcessing(true);

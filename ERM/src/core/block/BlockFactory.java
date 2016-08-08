@@ -27,9 +27,10 @@ public class BlockFactory {
 		return Block.parse(data);
 	}
 
-	public Block create(int version, byte[] reference, long timestamp, long baseTarget, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
+	// not signed
+	public Block create(int version, byte[] reference, long timestamp, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
 	{		
-		return new Block(version, reference, timestamp, baseTarget, generator, unconfirmedTransactionsHash, atBytes);
+		return new Block(version, reference, timestamp, generator, unconfirmedTransactionsHash, atBytes);
 	}
 	
 }

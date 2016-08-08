@@ -63,7 +63,7 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -99,7 +99,7 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(fork, generator, genBal, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(fork, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -200,7 +200,7 @@ public class SynchronizerTests {
 		{	
 			//GENERATE NEXT BLOCK
 			BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, genBal, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -220,7 +220,7 @@ public class SynchronizerTests {
 		{	
 			//GENERATE NEXT BLOCK
 			BigDecimal genBal2 = generator.getGeneratingBalance(databaseSet);
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, genBal2, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
