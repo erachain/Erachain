@@ -47,8 +47,7 @@ import lang.Lang;
 
 public class Block {
 
-	public static final int MAX_BLOCK_BYTES = 1048576;
-	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
 	
 	public static final int VERSION_LENGTH = 4;
 	public static final int TIMESTAMP_LENGTH = 8;
@@ -64,7 +63,7 @@ public class Block {
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
-	public static final int MAX_TRANSACTION_BYTES = MAX_BLOCK_BYTES - BASE_LENGTH;
+	public static final int MAX_TRANSACTION_BYTES = GenesisBlock.MAX_BLOCK_BYTES - BASE_LENGTH;
 
 	protected int version;
 	protected byte[] reference;

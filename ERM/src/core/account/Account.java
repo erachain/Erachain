@@ -220,6 +220,7 @@ public class Account {
 		this.generatingBalance = balance;
 	}
 
+	/*
 	// balance FOR generation
 	public void calculateGeneratingBalance_old(DBSet db)
 	{
@@ -278,6 +279,7 @@ public class Account {
 		this.generatingBalance = balance.multiply(new BigDecimal(balance_penalty / penalty_koeff));
 		
 	}
+	*/
 	
 	public BigDecimal getGeneratingBalance()
 	{

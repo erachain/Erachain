@@ -256,7 +256,7 @@ public class BlockGenerator extends Thread implements Observer
 				{
 					// TODO need calculate block.timestamp
 					long newTimestamp = this.solvingBlock.getTimestamp()
-							+ GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+							+ Block.GENERATING_MIN_BLOCK_TIME;
 					
 					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
@@ -337,7 +337,7 @@ public class BlockGenerator extends Thread implements Observer
 		}
 
 		Long lastTimestamp = parentBlock.getTimestamp()
-				+ GenesisBlock.GENERATING_MIN_BLOCK_TIME * 60 * 1000;
+				+ Block.GENERATING_MIN_BLOCK_TIME;
 
 		//CREATE NEW BLOCK
 		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), lastTimestamp.longValue(), account,
@@ -377,11 +377,12 @@ public class BlockGenerator extends Thread implements Observer
 						if(transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
 						{
 							//CHECK IF ENOUGH ROOM
-							if(totalBytes + transaction.getDataLength(false) <= Block.MAX_TRANSACTION_BYTES)
+							if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
 							{
-								////ADD INTO BLOCK
-								//block.addTransaction(transaction);
-								// TAKE IT
+								
+								totalBytes += transaction.getDataLength(false);
+
+								////ADD INTO LIST
 								transactionsList.add(transaction);
 											
 								//REMOVE FROM LIST

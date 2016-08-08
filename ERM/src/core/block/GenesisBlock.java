@@ -52,11 +52,12 @@ public class GenesisBlock extends Block{
 	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
 	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
-	public static final long MIN_GENERATING_BALANCE = Settings.BLOCK_GENERATING_BALANCE_NEED;
+	public static final long MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
-	public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 1 * 60;
-	public static final int GENERATING_MAX_BLOCK_TIME = 5 * 60;
+	//public static final int GENERATING_RETARGET = 10;
+	public static final int GENERATING_MIN_BLOCK_TIME = 60;
+	public static final int GENERATING_MAX_BLOCK_TIME = 600;
+	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 
 	private static byte[] icon = new byte[0];
 	private static byte[] image = new byte[0];
