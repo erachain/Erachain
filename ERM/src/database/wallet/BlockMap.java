@@ -56,6 +56,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void createIndexes(DB database)
 	{
+
 		//TIMESTAMP INDEX
 		NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("blocks_index_timestamp")
 				.comparator(Fun.COMPARATOR)
@@ -68,7 +69,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<String, String>, Block>() {
 		   	@Override
 		    public Long run(Tuple2<String, String> key, Block value) {
-		   		return value.getTimestamp();
+		   		return value.getTimestamp(DBSet.getInstance());
 		    }
 		});
 		

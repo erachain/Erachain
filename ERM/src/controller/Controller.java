@@ -204,8 +204,8 @@ public class Controller extends Observable {
 			"STATUS OK\n" 
 			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock(this.dbSet).getSignature()) + "\n"
 			+ "| Last Block Height: " + this.blockChain.getLastBlock(this.dbSet).getHeight(this.dbSet) + "\n"
-			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(this.dbSet).getTimestamp()) + "\n"
-			+ "| Last Block Found " + DateTimeFormat.timeAgo(this.blockChain.getLastBlock(this.dbSet).getTimestamp()) + " ago."
+			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(this.dbSet).getTimestamp(this.dbSet)) + "\n"
+			+ "| Last Block Found " + DateTimeFormat.timeAgo(this.blockChain.getLastBlock(this.dbSet).getTimestamp(this.dbSet)) + " ago."
 			);
 	}
 	
@@ -1541,6 +1541,10 @@ public class Controller extends Observable {
 	}
 
 	// BLOCKCHAIN
+
+	public BlockChain getBlockChain() {
+		return this.blockChain;
+	}
 
 	public int getHeight() {
 		// need for TESTs

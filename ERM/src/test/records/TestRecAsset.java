@@ -70,10 +70,10 @@ public class TestRecAsset {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(), db);
+		maker.setLastReference(gb.getTimestamp(db), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
-		maker_1.setLastReference(gb.getTimestamp(), db);
+		maker_1.setLastReference(gb.getTimestamp(db), db);
 		
 		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 50000l, (byte) 2, true);
 		//key = asset.getKey();

@@ -66,7 +66,7 @@ public class TransactionTests3AssetsAsPack {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(), db);
+		maker.setLastReference(gb.getTimestamp(db), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		asset = new AssetVenture(maker, "a", icon, image, "a", 50000l, (byte) 2, true);

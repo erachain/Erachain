@@ -50,7 +50,6 @@ public class GenesisBlock extends Block{
 	private static int genesisVersion = 1;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
 	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
-	private final static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
 	public static final long MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
@@ -63,22 +62,26 @@ public class GenesisBlock extends Block{
 	private static byte[] image = new byte[0];
 
 	private String testnetInfo; 
+	private long genesisTimestamp;
 	
 	AssetVenture asset0;
 	AssetVenture asset1;
 	List<Transaction> transactions = new ArrayList<Transaction>();
+	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
+
 
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, Settings.getInstance().getGenesisStamp(), genesisGenerator, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, genesisGenerator, new byte[0], new byte[0]);
 		
-		long genesisTimestamp = Settings.getInstance().getGenesisStamp();
+		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[Crypto.HASH_LENGTH]);
 		PersonCls user;
+		
 
 		// ISSUE ITEMS
 		this.initItems();
@@ -125,6 +128,7 @@ public class GenesisBlock extends Block{
 			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERM.jar -testnet=" + genesisTimestamp;
 			
 		} else {
+
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
@@ -249,7 +253,7 @@ public class GenesisBlock extends Block{
 			double minorKoeff = minorPick * asset0.getQuantity() / minorPicked;
 			double investorKoeff = investorPick * asset0.getQuantity() / investorPicked;
 			
-			long i = 0;
+			//long i = 0;
 			int pick;
 
 			for(List<Object> item: generalGenesisUsers)
@@ -431,6 +435,11 @@ public class GenesisBlock extends Block{
 		return new Status(genesisGenerator, "RIGHTs", icon, image, "Rights");		
 	}
 
+	public long getGenesisTimestamp() 
+	{
+		return this.genesisTimestamp;
+	}
+	
 	public String getTestNetInfo() 
 	{
 		return this.testnetInfo;
@@ -464,16 +473,24 @@ public class GenesisBlock extends Block{
 		byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
 		
+		
+		//WRITE TIMESTAMP
+		byte[] genesisTimestampBytes = Longs.toByteArray(this.getGenesisTimestamp());
+		genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
+		data = Bytes.concat(data, genesisTimestampBytes);
+		
 		/*
 		//WRITE GENERATING BALANCE
 		byte[] generatingBalanceBytes = Longs.toByteArray(GENESIS_GENERATING_BALANCE);
 		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, 8, 0);
 		data = Bytes.concat(data, generatingBalanceBytes);
 		*/
-		
+	
+		/*
 		//WRITE GENERATOR
 		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), Crypto.HASH_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
+		*/
 		
 		//DIGEST [32]
 		byte[] digest = Crypto.getInstance().digest(data);

@@ -21,11 +21,12 @@ public class BlockChain
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	private GenesisBlock genesisBlock;
 	
 	public BlockChain()
 	{	
 		//CREATE GENESIS BLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
+		genesisBlock = new GenesisBlock();
 		DBSet dbSet = DBSet.getInstance();
 
 		if(Settings.getInstance().isTestnet()) {
@@ -34,7 +35,7 @@ public class BlockChain
 		
 		if(	!dbSet.getBlockMap().contains(genesisBlock.getSignature())
 			||
-			dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp() != genesisBlock.getTimestamp())
+			dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp(dbSet) != genesisBlock.getTimestamp(dbSet))
 		// process genesis block
 		{
 			if(dbSet.getBlockMap().getLastBlockSignature() != null)
@@ -53,6 +54,10 @@ public class BlockChain
         	genesisBlock.process(dbSet);
 
         }
+	}
+
+	public GenesisBlock getGenesisBlock() {
+		return this.genesisBlock;
 	}
 	
 	public int getHeight(DBSet dbSet) {

@@ -251,7 +251,7 @@ public class BlockGenerator extends Thread implements Observer
 				long winned_value;
 
 				// TODO if empty TRNSACTIONS - longer time
-				long newTimestamp = this.solvingBlock.getTimestamp()
+				long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
 						+ Block.GENERATING_MIN_BLOCK_TIME;
 				
 				if (newTimestamp + 3000 > NTP.getTime()) {
@@ -341,11 +341,8 @@ public class BlockGenerator extends Thread implements Observer
 			atBytes = new byte[0];
 		}
 
-		Long lastTimestamp = parentBlock.getTimestamp()
-				+ Block.GENERATING_MIN_BLOCK_TIME;
-
 		//CREATE NEW BLOCK
-		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), lastTimestamp.longValue(), account,
+		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 				transactionsHash, atBytes);
 		newBlock.sign(account);
 		

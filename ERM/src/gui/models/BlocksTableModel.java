@@ -83,7 +83,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(block.getTimestamp());
+				return DateTimeFormat.timestamptoString(block.getTimestamp(DBSet.getInstance()));
 				
 			case COLUMN_GENERATOR:
 				

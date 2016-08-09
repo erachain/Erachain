@@ -86,7 +86,7 @@ public class TestRecNote {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(), db);
+		maker.setLastReference(gb.getTimestamp(db), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}

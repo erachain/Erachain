@@ -96,11 +96,11 @@ public class OrderTestsMy
 		accountB = new PrivateKeyAccount(privateKey);
 		
 		// FEE FUND
-		accountA.setLastReference(gb.getTimestamp(), db);
+		accountA.setLastReference(gb.getTimestamp(db), db);
 		accountA.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
 		accountA.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), db);
 
-		accountB.setLastReference(gb.getTimestamp(), db);
+		accountB.setLastReference(gb.getTimestamp(db), db);
 		accountB.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
 		accountB.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), db);
 

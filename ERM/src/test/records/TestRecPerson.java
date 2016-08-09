@@ -116,7 +116,7 @@ public class TestRecPerson {
 		
 		genesisPersonKey = db.getIssuePersonMap().size();
 		
-		last_ref = gb.getTimestamp();
+		last_ref = gb.getTimestamp(db);
 		
 		// GET RIGHTS TO CERTIFIER
 		byte gender = 1;

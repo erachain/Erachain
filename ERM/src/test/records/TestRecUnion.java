@@ -115,7 +115,7 @@ public class TestRecUnion {
 		//GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
 		//genesis_certify.process(db, false);
 		
-		certifier.setLastReference(gb.getTimestamp(), db);
+		certifier.setLastReference(gb.getTimestamp(db), db);
 		certifier.setConfirmedBalance(ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE, db);
 		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		

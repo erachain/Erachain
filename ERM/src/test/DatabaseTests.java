@@ -83,7 +83,7 @@ public class DatabaseTests {
 		gb = new GenesisBlock();
 		gb.process(dbSet);
 		
-		last_ref = gb.getTimestamp();
+		last_ref = gb.getTimestamp(dbSet);
 		
 		// GET RIGHTS TO CERTIFIER
 		byte gender = 1;

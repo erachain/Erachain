@@ -67,7 +67,7 @@ public class TestRec_Vouch {
 		gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(), db);
+		maker.setLastReference(gb.getTimestamp(db), db);
 		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		

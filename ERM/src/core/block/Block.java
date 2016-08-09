@@ -27,6 +27,7 @@ import at.AT_Controller;
 import at.AT_Exception;
 import at.AT_Transaction;
 import controller.Controller;
+import core.BlockChain;
 import core.BlockGenerator;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -50,7 +51,7 @@ public class Block {
 	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
 	
 	public static final int VERSION_LENGTH = 4;
-	public static final int TIMESTAMP_LENGTH = 8;
+	//public static final int TIMESTAMP_LENGTH = 8;
 	//public static final int GENERATING_BALANCE_LENGTH = 8;
 	public static final int CREATOR_LENGTH = Crypto.HASH_LENGTH;
 	public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
@@ -59,7 +60,7 @@ public class Block {
 	private static final int TRANSACTIONS_COUNT_LENGTH = 4;
 	private static final int TRANSACTION_SIZE_LENGTH = 4;
 	public static final int AT_BYTES_LENGTH = 4;
-	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH + CREATOR_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
+	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
@@ -67,7 +68,7 @@ public class Block {
 
 	protected int version;
 	protected byte[] reference;
-	protected long timestamp;
+	//protected long timestamp;
 	//protected long generatingBalance;
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
@@ -84,11 +85,11 @@ public class Block {
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, long timestamp, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
 	{
 		this.version = version;
 		this.reference = reference;
-		this.timestamp = timestamp;
+		//this.timestamp = timestamp;
 		this.creator = creator;
 
 		this.transactionsHash = transactionsHash;
@@ -99,9 +100,9 @@ public class Block {
 	}
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, long timestamp, PublicKeyAccount creator, byte[] signature, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] signature, byte[] transactionsHash, byte[] atBytes)
 	{
-		this(version, reference, timestamp, creator, transactionsHash, atBytes);
+		this(version, reference, creator, transactionsHash, atBytes);
 		this.signature = signature;
 
 	}
@@ -119,17 +120,29 @@ public class Block {
 		return this.signature;
 	}
 
-	public long getTimestamp()
+	// timestamp by Height
+	public long getTimestamp(DBSet db)
 	{
-		return this.timestamp;
+		int height = -1;
+		if(db.getHeightMap().contains(this.signature)) {
+			height = db.getHeightMap().get(this.signature);
+		} else if (db.getHeightMap().contains(this.reference)) {
+			// get from parent
+			height = db.getHeightMap().get(this.reference) + 1;
+		}
+		
+		BlockChain blockChain = Controller.getInstance().getBlockChain();
+		GenesisBlock genesisBlock;
+		if (blockChain == null) {
+			genesisBlock = new GenesisBlock();
+		} else {
+			genesisBlock = blockChain.getGenesisBlock();
+		}
+
+		return (height - 1) * GENERATING_MIN_BLOCK_TIME
+				+ genesisBlock.getGenesisTimestamp();
 	}
 
-	/*
-	public long getGeneratingBalance()
-	{
-		return this.generatingBalance;
-	}
-	*/	
 	public long getGeneratingBalance(DBSet db)
 	{
 		Tuple3<Integer, Integer, TreeSet<String>> data = this.creator.getForgingData(db);
@@ -353,10 +366,12 @@ public class Block {
 		int version = Ints.fromByteArray(versionBytes);
 		position += VERSION_LENGTH;
 
+		/*
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;		
+		position += TIMESTAMP_LENGTH;
+		*/		
 
 		//READ REFERENCE
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
@@ -400,12 +415,12 @@ public class Block {
 	
 			//long atFeesL = Longs.fromByteArray(atFees);
 
-			block = new Block(version, reference, timestamp, generator, signature, transactionsHash, atBytes); //, atFeesL);
+			block = new Block(version, reference, generator, signature, transactionsHash, atBytes); //, atFeesL);
 		}
 		else
 		{
 			// GENESIS BLOCK version = 1
-			block = new Block(version, reference, timestamp, generator, signature, transactionsHash, new byte[0]);
+			block = new Block(version, reference, generator, signature, transactionsHash, new byte[0]);
 		}
 
 		//READ TRANSACTIONS COUNT
@@ -430,7 +445,7 @@ public class Block {
 
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
-		block.put("timestamp", this.timestamp);
+		block.put("timestamp", this.getTimestamp(DBSet.getInstance()));
 		//block.put("generatingBalance", this.generatingBalance);
 		block.put("winValue", this.getWinValue(DBSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
@@ -472,10 +487,12 @@ public class Block {
 		versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
 		data = Bytes.concat(data, versionBytes);
 
+		/*
 		//WRITE TIMESTAMP
 		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
+		*/
 
 		//WRITE REFERENCE
 		byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
@@ -670,11 +687,11 @@ public class Block {
 			}
 		}
 		 */
-		if(this.timestamp - 3000 > NTP.getTime()) {
+		if(this.getTimestamp(db) - 3000 > NTP.getTime()) {
 			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
 			return false;			
 		}
-		if(this.timestamp - this.getParent(db).timestamp != GENERATING_MIN_BLOCK_TIME) {
+		if(this.getTimestamp(db) - this.getParent(db).getTimestamp(db) != GENERATING_MIN_BLOCK_TIME) {
 				LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid != GENERATING_MIN_BLOCK_TIME");
 				return false;			
 			}
@@ -763,9 +780,9 @@ public class Block {
 			DBSet fork = db.fork();
 			byte[] transactionsSignatures = new byte[0];
 			
-			long timestampEnd = this.timestamp;
+			long timestampEnd = this.getTimestamp(db);
 			// because time filter used by parent block timestamp on core.BlockGenerator.run()
-			long timestampBeg = this.getParent(fork).getTimestamp();
+			long timestampBeg = this.getParent(fork).getTimestamp(fork);
 
 			for(Transaction transaction: this.getTransactions())
 			{
@@ -885,11 +902,15 @@ public class Block {
 			db.getHeightMap().set(this, 1);
 		}
 
-		// PROCESS FORGING DATA
-		Tuple3<Integer, Integer, TreeSet<String>> forgingData = this.creator.getForgingData(db);
-		for (String forgedAccount: forgingData.c) {
-			Account account = new Account(forgedAccount);
-			account.updateForgingData(db, height);
+		if (this instanceof GenesisBlock ) {
+			
+		} else {
+			// PROCESS FORGING DATA
+			Tuple3<Integer, Integer, TreeSet<String>> forgingData = this.creator.getForgingData(db);
+			for (String forgedAccount: forgingData.c) {
+				Account account = new Account(forgedAccount);
+				account.updateForgingData(db, height);
+			}
 		}
 
 		//PROCESS TRANSACTIONS

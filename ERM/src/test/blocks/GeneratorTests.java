@@ -66,7 +66,7 @@ public class GeneratorTests {
 		for(int i=0; i<2000; i++)
 		{	
 			
-			if ( NTP.getTime() - lastBlock.getTimestamp() < Block.GENERATING_MIN_BLOCK_TIME) {
+			if ( NTP.getTime() - lastBlock.getTimestamp(dbSet) < Block.GENERATING_MIN_BLOCK_TIME) {
 				break;
 			}
 			//GENERATE NEXT BLOCK
@@ -109,7 +109,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getTimestamp(), dbSet);
+		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
 
@@ -118,7 +118,7 @@ public class GeneratorTests {
 		Block newBlock = BlockGenerator.generateNextBlock(dbSet, generator, genesisBlock, transactionsHash);
 
 		// get timestamp for block
-		long timestamp = newBlock.getTimestamp() - Block.GENERATING_MIN_BLOCK_TIME / 2;
+		long timestamp = newBlock.getTimestamp(dbSet) - Block.GENERATING_MIN_BLOCK_TIME / 2;
 
 		//ADD 10 UNCONFIRMED VALID TRANSACTIONS	
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -138,7 +138,7 @@ public class GeneratorTests {
 						
 		}
 		
-		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp() );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp(dbSet) );
 		// CALCULATE HASH for that transactions
 		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
 
@@ -170,7 +170,7 @@ public class GeneratorTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getTimestamp(), dbSet);
+		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(100000).setScale(8), dbSet);
 
@@ -180,7 +180,7 @@ public class GeneratorTests {
 		Block newBlock = BlockGenerator.generateNextBlock(dbSet, generator, genesisBlock, transactionsHash);
 		
 		// get timestamp for block
-		long timestampStart = newBlock.getTimestamp() - Block.GENERATING_MIN_BLOCK_TIME / 2;
+		long timestampStart = newBlock.getTimestamp(dbSet) - Block.GENERATING_MIN_BLOCK_TIME / 2;
 		long timestamp = timestampStart;
 
 		//ADD 10000 UNCONFIRMED VALID TRANSACTIONS	
@@ -205,7 +205,7 @@ public class GeneratorTests {
 		}
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp() );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp(dbSet) );
 
 		//CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
 		assertEquals(true, max_count > transactions.size());
@@ -255,7 +255,7 @@ public class GeneratorTests {
 		Block newBlock = BlockGenerator.generateNextBlock(dbSet, userAccount1, genesisBlock, transactionsHash);
 		
 		// get timestamp for block
-		long timestampStart = newBlock.getTimestamp() - Block.GENERATING_MIN_BLOCK_TIME / 2;
+		long timestampStart = newBlock.getTimestamp(dbSet) - Block.GENERATING_MIN_BLOCK_TIME / 2;
 		long timestamp = timestampStart;
 
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -268,7 +268,7 @@ public class GeneratorTests {
 		blockGenerator.addUnconfirmedTransaction(dbSet, payment, false);
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp() );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp(dbSet) );
 		
 		// CALCULATE HASH for that transactions
 		byte[] transactionsHash = Block.makeTransactionsHash(transactions);

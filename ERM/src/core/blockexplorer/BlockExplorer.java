@@ -1338,8 +1338,8 @@ public class BlockExplorer
 			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getGeneratingBalance());
 			blockJSON.put("transactionCount", block.getTransactionCount());
-			blockJSON.put("timestamp", block.getTimestamp());
-			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
+			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
 			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
@@ -1385,8 +1385,8 @@ public class BlockExplorer
 		Block lastBlock = getLastBlock();
 
 		output.put("height", lastBlock.getHeight(DBSet.getInstance()));
-		output.put("timestamp", lastBlock.getTimestamp());
-		output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp()));
+		output.put("timestamp", lastBlock.getTimestamp(DBSet.getInstance()));
+		output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp(DBSet.getInstance())));
 
 		output.put("timezone", Settings.getInstance().getTimeZone());
 		output.put("timeformat", Settings.getInstance().getTimeFormat());
@@ -1709,8 +1709,8 @@ public class BlockExplorer
 			Block block = (Block)unit;
 
 			transactionDataJSON = new LinkedHashMap();
-			transactionDataJSON.put("timestamp", block.getTimestamp());
-			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+			transactionDataJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
+			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
 
 			int height = block.getHeight(DBSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
@@ -1742,7 +1742,7 @@ public class BlockExplorer
 			transactionDataJSON = aTtransaction.toJSON();
 
 			Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
-			long timestamp = block.getTimestamp();
+			long timestamp = block.getTimestamp(DBSet.getInstance());
 			transactionDataJSON.put("timestamp", timestamp);
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
@@ -1976,7 +1976,7 @@ public class BlockExplorer
 			
 			AT at = DBSet.getInstance().getATMap().getAT(address);
 			Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
-			long aTtimestamp = block.getTimestamp(); 
+			long aTtimestamp = block.getTimestamp(DBSet.getInstance()); 
 			BigDecimal aTbalanceCreation = BigDecimal.ZERO.setScale(8); 
 			for (Transaction transaction : block.getTransactions()) {
 				if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION )
@@ -2812,8 +2812,8 @@ public class BlockExplorer
 			Map transactionDataJSON = new LinkedHashMap();
 
 			transactionDataJSON = new LinkedHashMap();
-			transactionDataJSON.put("timestamp", block.getTimestamp());
-			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
+			transactionDataJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
+			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
 
 			int height = block.getHeight(DBSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );

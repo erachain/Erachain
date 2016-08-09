@@ -28,9 +28,9 @@ public class BlockFactory {
 	}
 
 	// not signed
-	public Block create(int version, byte[] reference, long timestamp, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
+	public Block create(int version, byte[] reference, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
 	{		
-		return new Block(version, reference, timestamp, generator, unconfirmedTransactionsHash, atBytes);
+		return new Block(version, reference, generator, unconfirmedTransactionsHash, atBytes);
 	}
 	
 }

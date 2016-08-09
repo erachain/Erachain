@@ -93,7 +93,7 @@ public class TransactionTests {
 		gb = new GenesisBlock();
 		gb.process(db);
 
-		last_ref = gb.getTimestamp();
+		last_ref = gb.getTimestamp(db);
 		
 		// FEE FUND
 		maker.setLastReference(last_ref, db);
