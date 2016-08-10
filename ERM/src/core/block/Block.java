@@ -614,7 +614,7 @@ public class Block {
 	
 	public long getWinValue(DBSet dbSet)
 	{
-		return this.creator.calcWinValue(dbSet, this.getTimestamp(dbSet), this.getHeight(dbSet));
+		return this.creator.calcWinValue(dbSet, this.getHeight(dbSet));
 	}
 
 
@@ -908,10 +908,8 @@ public class Block {
 		} else {
 			// PROCESS FORGING DATA
 			Integer prevHeight = this.creator.getLastForgingData(db);
-			if (prevHeight != null) {
-				this.creator.setForgingData(db, height, prevHeight);
-				this.creator.setLastForgingData(db, height);
-			}
+			this.creator.setForgingData(db, height, prevHeight);
+			this.creator.setLastForgingData(db, height);
 		}
 
 		//PROCESS TRANSACTIONS

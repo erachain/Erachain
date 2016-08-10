@@ -527,7 +527,7 @@ public class Account {
 		db.getAddressForging().setLast(this.address, prevHeight);
 	}
 	
-	public long getWinValueHeight2(int heightStart, int heightThis)
+	public long getWinValueHeight2(int heightThis, int heightStart)
 	{
 		int len = heightThis - heightStart;
 		int MAX_LEN = 1000;
@@ -537,7 +537,7 @@ public class Account {
 		return len * MAX_LEN;
 	}
 
-	public long calcWinValueHeight(DBSet dbSet, long timestampStart, int height)
+	public long calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)
 	{
 
 		/*
@@ -550,36 +550,45 @@ public class Account {
 		long incomed_amount = 0l;
 		long win_value = 0l;
 		long amount;
-		List<Transaction> txs = dbSet.getTransactionFinalMap()
-				.getTransactionsByTypeAndAddress(this.address, (int)ERM_KEY, 0);
+		//List<Transaction> txs = dbSet.getTransactionFinalMap()
+		//		.getTransactionsByTypeAndAddress(this.address, (int)ERM_KEY, 0);
+		
+		List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, address, previousForgingHeight,
+				0, 0, 0, false, 0, 0);
+
+		
 		for(Transaction transaction: txs)
 		{
-			if (transaction.getTimestamp() <= timestampStart)
-				continue;
 			
-			if (transaction.getRecipientAccounts().contains(this.address)) {
+			if ( transaction.getAssetKey() == ERM_KEY
+					// || transaction.getRecipientAccounts().contains(this.address)
+					) {
 				amount = transaction.getAmount().longValue();
 				incomed_amount += amount;
 				
 				win_value += getWinValueHeight2(height, transaction.getBlockHeight(dbSet)) * amount;
-			}			
+			}
+
 		}
 		// blockNo, forgingAmount, ...
-		Integer previousForgingBlockHeight = this.getForgingData(dbSet, height);
-		if (previousForgingBlockHeight != null && previousForgingBlockHeight != 0) {
+		//Integer previousForgingBlockHeightThis = this.getForgingData(dbSet, height);
+		if (previousForgingHeight > 1) {
 			// IF exist previous forged BLOCK
 			//
-			win_value += (this.getConfirmedBalance(ERM_KEY).longValue() - incomed_amount)
-					* getWinValueHeight2(height, previousForgingBlockHeight);
+			win_value += (this.getConfirmedBalance(ERM_KEY, dbSet).longValue() - incomed_amount)
+					* getWinValueHeight2(height, previousForgingHeight);
 		}
 
 		return win_value;
 
 	}
 
-	public long calcWinValue(DBSet dbSet, long timestampStart, int height)
+	public long calcWinValue(DBSet dbSet, int height)
 	{
-		int previousForgingHeight = this.getForgingData(dbSet, height);
-		return calcWinValueHeight(dbSet, timestampStart, previousForgingHeight);
+		int lastHeight = this.getLastForgingData(dbSet);
+		int previousForgingHeight = this.getForgingData(dbSet, lastHeight);
+		//if (lastHeight == previousForgingHeight)
+		//	previousForgingHeight -= 1;
+		return calcWinValueHeight(dbSet, height, previousForgingHeight);
 	}
 }

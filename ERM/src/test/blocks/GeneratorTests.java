@@ -49,26 +49,66 @@ public class GeneratorTests {
 		
 		
 		//CREATE KNOWN ACCOUNT
+		int nonce = 1;
+		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
-		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
+	    PrivateKeyAccount generator1 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce++));
+	    PrivateKeyAccount generator2 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce++));
+	    PrivateKeyAccount generator3 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce++));
+	    PrivateKeyAccount generator4 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce++));
 				
+	    int height = 1;
+	    int seq = 1;
+	    PrivateKeyAccount generator;
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		// AND LAST REFERENCE
 		// AND WIN_DATA
-		Transaction transaction = new GenesisTransferAssetTransaction(generator, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		Transaction transaction;
+		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		transaction.process(dbSet, false);
-		transaction = new GenesisTransferAssetTransaction(generator, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
+		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
+		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
+
+		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
 		transaction.process(dbSet, false);
+		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
+		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
+
+		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(300).setScale(8));
+		transaction.process(dbSet, false);
+		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
+		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
+
+		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(3000).setScale(8));
+		transaction.process(dbSet, false);
+		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
+		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
+		
+		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
+		transaction.process(dbSet, false);
+		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
+		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
+		
+		assertEquals(1000, generator1.getConfirmedBalance(ERM_KEY, dbSet).longValue());
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
-		for(int i=0; i<2000; i++)
+		for(int i=0; i<200; i++)
 		{	
 			
 			if ( NTP.getTime() - lastBlock.getTimestamp(dbSet) < Block.GENERATING_MIN_BLOCK_TIME) {
 				break;
 			}
+			
+			if (i < 10)
+				generator = generator1;
+			else if (i < 30)
+				generator = generator2;
+			else if (i < 100)
+				generator = generator3;
+			else
+				generator = generator4;
+			
 			//GENERATE NEXT BLOCK
 			Block newBlock = BlockGenerator.generateNextBlock(dbSet, generator, lastBlock, transactionsHash);
 			
@@ -85,6 +125,38 @@ public class GeneratorTests {
 			
 			//PROCESS NEW BLOCK
 			newBlock.process(dbSet);
+			
+			height = newBlock.getHeight(dbSet);
+			
+			if (i == 0) {
+				assertEquals(1000, newBlock.getWinValue(dbSet));
+				assertEquals(10000, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 1) {
+				assertEquals(1000, newBlock.getWinValue(dbSet));
+				assertEquals(40000, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 2) {
+				assertEquals(1000, newBlock.getWinValue(dbSet));
+				assertEquals(90000, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 9) {
+				assertEquals(1000, generator1.calcWinValue(dbSet, height));
+				assertEquals(1000, newBlock.getWinValue(dbSet));
+				assertEquals(1000000, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 10) {
+				assertEquals(4000, generator1.calcWinValue(dbSet, height));
+				// GENERATOR 2
+				assertEquals(1210000, newBlock.getWinValue(dbSet));
+				assertEquals(1210000, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 11) {
+				assertEquals(9000, generator1.calcWinValue(dbSet, height));
+				// GENERATOR 2
+				assertEquals(10000, newBlock.getWinValue(dbSet));
+				assertEquals(10000, generator2.calcWinValue(dbSet, height));
+			}
 			
 			//LAST BLOCK IS NEW BLOCK
 			lastBlock = newBlock;

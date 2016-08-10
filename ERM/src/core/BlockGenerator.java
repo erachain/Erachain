@@ -274,7 +274,7 @@ public class BlockGenerator extends Thread implements Observer
 						
 						//GENERATE NEW BLOCK FOR USER
 						// already signed
-						winned_value = account.calcWinValue(dbSet, newTimestamp, this.solvingBlockHeight);
+						winned_value = account.calcWinValue(dbSet, this.solvingBlockHeight + 1);
 						if (winned_value > max_winned_value) {
 							//this.winners.put(account, winned_value);
 							acc_winner = account;
