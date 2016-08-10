@@ -854,28 +854,28 @@ public class Block {
 
 	//PROCESS/ORPHAN
 
-	public void process(DBSet db)
+	public void process(DBSet dbSet)
 	{	
 		//PROCESS TRANSACTIONS
 		for(Transaction transaction: this.getTransactions())
 		{
 			//PROCESS
-			transaction.process(db, false);
+			transaction.process(dbSet, false);
 
 			//SET PARENT
-			db.getTransactionRef_BlockRef_Map().set(transaction, this);
+			dbSet.getTransactionRef_BlockRef_Map().set(transaction, this);
 
 			//REMOVE FROM UNCONFIRMED DATABASE
-			db.getTransactionMap().delete(transaction);
+			dbSet.getTransactionMap().delete(transaction);
 		}
 
 		//DELETE CONFIRMED TRANSACTIONS FROM UNCONFIRMED TRANSACTIONS LIST
-		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
+		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(dbSet.getTransactionMap().getValues());
 		for(Transaction transaction: unconfirmedTransactions)
 		{
-			if(db.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
+			if(dbSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
 			{
-				db.getTransactionMap().delete(transaction);
+				dbSet.getTransactionMap().delete(transaction);
 			}
 		}
 
@@ -884,39 +884,39 @@ public class Block {
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(blockFee), db);
+			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
 		}
 		
-		Block parent = this.getParent(db);
+		Block parent = this.getParent(dbSet);
 		int height = 1;
 		if(parent != null)
 		{
 			//SET AS CHILD OF PARENT
-			db.getChildMap().set(parent, this);		
+			dbSet.getChildMap().set(parent, this);		
 
 			//SET BLOCK HEIGHT
-			height = parent.getHeight(db) + 1;
-			db.getHeightMap().set(this, height);
+			height = parent.getHeight(dbSet) + 1;
+			dbSet.getHeightMap().set(this, height);
 		}
 		else
 		{
 			//IF NO PARENT HEIGHT IS 1
-			db.getHeightMap().set(this, 1);
+			dbSet.getHeightMap().set(this, 1);
 		}
 
 		if (this instanceof GenesisBlock ) {
 		} else {
 			// PROCESS FORGING DATA
-			Integer prevHeight = this.creator.getLastForgingData(db);
-			this.creator.setForgingData(db, height, prevHeight);
-			this.creator.setLastForgingData(db, height);
+			Integer prevHeight = this.creator.getLastForgingData(dbSet);
+			this.creator.setForgingData(dbSet, height, prevHeight);
+			this.creator.setLastForgingData(dbSet, height);
 		}
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
 		for(Transaction transaction: this.getTransactions())
 		{
-			db.getTransactionFinalMap().add( height, seq, transaction);
+			dbSet.getTransactionFinalMap().add( height, seq, transaction);
 			seq++;
 		}
 
@@ -926,10 +926,10 @@ public class Block {
 		}
 		
 		//ADD TO DB
-		db.getBlockMap().add(this);
+		dbSet.getBlockMap().add(this);
 
 		//UPDATE LAST BLOCK
-		db.getBlockMap().setLastBlock(this);	
+		dbSet.getBlockMap().setLastBlock(this);	
 	}
 
 	public void orphan(DBSet dbSet)
@@ -976,6 +976,7 @@ public class Block {
 		//DELETE TRANSACTIONS FROM FINAL MAP
 		dbSet.getTransactionFinalMap().delete(height);
 
+		dbSet.getHeightMap().delete(this.signature);
 		// delete CHILDS - for proper making HEADERS in Controller.onMessage
 		dbSet.getChildMap().delete(this.signature);
 

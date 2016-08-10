@@ -122,14 +122,14 @@ public class BlockChain
 		/*
 		*/
 		//CHECK IF WE KNOW REFERENCE
-		if(!dbSet.getBlockMap().contains(block.getReference()))
+		if(dbSet.getBlockMap().contains(block.getReference()))
 		{
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB");
 			return false;
 		}
 		
 		//CHECK IF REFERENCE IS LASTBLOCK
-		if(!Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), block.getReference()))
+		if(Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), block.getReference()))
 		{
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");
 			return false;

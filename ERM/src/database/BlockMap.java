@@ -84,7 +84,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		createIndex(HEIGHT_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Integer, byte[], Block>() {
 		   	@Override
 		    public Integer run(byte[] key, Block value) {
-		   		return value.getHeight(DBSet.getInstance());
+		   		return value.getHeight((DBSet)BlockMap.this.databaseSet);
 		    }
 		});
 		
@@ -195,6 +195,13 @@ public class BlockMap extends DBMap<byte[], Block>
 	
 	public void add(Block block)
 	{
+		/*
+		DBSet dbSet = (DBSet)this.databaseSet;
+
+		if ( dbSet.getHeightMap().contains(block.getSignature()) ) {
+			assert(1 == 2);
+		}
+		*/
 		this.set(block.getSignature(), block);
 	}
 	
