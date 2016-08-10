@@ -86,7 +86,7 @@ public class ForgingStatus extends JLabel implements Observer {
 	}
 	
 	public static String getTimeToGoodView(long intdif) {
-		String result = "";
+		String result = "+ ";
 		long diff = intdif * 1000;
 		final int ONE_DAY = 1000 * 60 * 60 * 24;
 		final int ONE_HOUR = ONE_DAY / 24;

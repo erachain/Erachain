@@ -225,15 +225,12 @@ public class BlockTests
 		assertEquals(1, recipient2.getConfirmedBalance(ERM_KEY, db).compareTo(BigDecimal.valueOf(10).setScale(8)));
 		assertEquals(1, recipient2.getConfirmedBalance(FEE_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
 
-		Tuple3<Integer, Integer, TreeSet<String>> forgingData = recipient1.getForgingData(db);
-		assertEquals(0, (int)forgingData.a);
-		assertEquals(recipient1.getConfirmedBalance(ERM_KEY, db).intValue(), (int)forgingData.b);
-		assertEquals(recipient1.getAddress(), forgingData.c.first());
+		int height = genesisBlock.getHeight(db) + 1;
+		Integer forgingData = recipient1.getForgingData(db, height);
+		assertEquals(1, (int)forgingData);
 
-		forgingData = recipient2.getForgingData(db);
-		assertEquals(0, (int)forgingData.a);
-		assertEquals(recipient2.getConfirmedBalance(ERM_KEY, db).intValue(), (int)forgingData.b);
-		assertEquals(recipient2.getAddress(), forgingData.c.first());
+		forgingData = recipient2.getForgingData(db, height);
+		assertEquals(1, (int)forgingData);
 
 		//ORPHAN BLOCK
 		genesisBlock.orphan(db);

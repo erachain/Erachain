@@ -510,39 +510,76 @@ public class Account {
 		return hasPerson(DBSet.getInstance());
 	}
 	
-	// last forging block + forging amount + list of addresses for update new last generating block
-	public Tuple3<Integer, Integer, TreeSet<String>> getForgingData(DBSet db) {
-		return db.getAddressForging().get(this.address);
+	// previous forging block
+	public Integer getForgingData(DBSet db, int height) {
+		return db.getAddressForging().get(this.address, height);
+	}
+	public void setForgingData(DBSet db, int height, int prevHeight) {
+		db.getAddressForging().set(this.address, height, prevHeight);
+	}
+	public void delForgingData(DBSet db, int height) {
+		db.getAddressForging().delete(this.address, height);
+	}
+	public Integer getLastForgingData(DBSet db) {
+		return db.getAddressForging().getLast(this.address);
+	}
+	public void setLastForgingData(DBSet db, int prevHeight) {
+		db.getAddressForging().setLast(this.address, prevHeight);
 	}
 	
-	public void updateForgingData(DBSet db, int blockNo ) {
-		
-		int win_amount = getGeneratingBalance(db).intValue();
-		Tuple3<Integer, Integer, TreeSet<String>> forgingData = db.getAddressForging().get(this.address);
-		
-		forgingData.c.add(this.address);
-		Tuple3<Integer, Integer, TreeSet<String>> newData = new Tuple3<Integer, Integer, TreeSet<String>>
-			(blockNo, win_amount, forgingData.c);
-		
-		db.getAddressForging().set(this.address, newData);
-	}
-
-	public long getWinValueHeight(DBSet dbSet, int height)
+	public long getWinValueHeight2(int heightStart, int heightThis)
 	{
-		
-		long win_value;
-		//
-		Tuple3<Integer, Integer, TreeSet<String>> value = this.getForgingData(dbSet);
-		
-		int len = height - value.a;
+		int len = heightThis - heightStart;
 		int MAX_LEN = 1000;
 		if (len < MAX_LEN ) {
-			win_value = len * len * value.b ;
-		} else {
-			win_value = (MAX_LEN * MAX_LEN + len - MAX_LEN) * value.b;			
+			return len * len;
 		}
-		
-		return win_value;
+		return len * MAX_LEN;
 	}
 
+	public long calcWinValueHeight(DBSet dbSet, long timestampStart, int height)
+	{
+
+		/*
+		findTransactionsKeys(String address, String sender, String recipient,
+				final int minHeight, final int maxHeight,
+				int type, final int service,
+				boolean desc, int offset, int limit)
+				*/
+		
+		long incomed_amount = 0l;
+		long win_value = 0l;
+		long amount;
+		List<Transaction> txs = dbSet.getTransactionFinalMap()
+				.getTransactionsByTypeAndAddress(this.address, (int)ERM_KEY, 0);
+		for(Transaction transaction: txs)
+		{
+			if (transaction.getTimestamp() <= timestampStart)
+				continue;
+			
+			if (transaction.getRecipientAccounts().contains(this.address)) {
+				amount = transaction.getAmount().longValue();
+				incomed_amount += amount;
+				
+				win_value += getWinValueHeight2(height, transaction.getBlockHeight(dbSet)) * amount;
+			}			
+		}
+		// blockNo, forgingAmount, ...
+		Integer previousForgingBlockHeight = this.getForgingData(dbSet, height);
+		if (previousForgingBlockHeight != null && previousForgingBlockHeight != 0) {
+			// IF exist previous forged BLOCK
+			//
+			win_value += (this.getConfirmedBalance(ERM_KEY).longValue() - incomed_amount)
+					* getWinValueHeight2(height, previousForgingBlockHeight);
+		}
+
+		return win_value;
+
+	}
+
+	public long calcWinValue(DBSet dbSet, long timestampStart, int height)
+	{
+		int previousForgingHeight = this.getForgingData(dbSet, height);
+		return calcWinValueHeight(dbSet, timestampStart, previousForgingHeight);
+	}
 }

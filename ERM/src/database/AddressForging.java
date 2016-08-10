@@ -1,25 +1,26 @@
 package database;
 
 import java.util.HashMap;
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
 //import java.util.TreeMap;
-import java.util.TreeSet;
+//import java.util.TreeSet;
 
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple2;
+//import org.mapdb.Fun.Tuple3;
 
-import core.account.Account;
+//import core.account.Account;
 import database.DBSet;
 
 // 
-// account.addres -> <last making block + generating balance + List of addresses that take some ERMO
-// в общем запоминаем послений блок который был сгенерирован эти аккаунтом
-// баланс который был на этом счету в момент генерации блока и список адресов куда были переведдены монеты после генреации
-// так чтобы на те адрес создать тоже такую же запись начальную 
-public class AddressForging extends DBMap<String, Tuple3<Integer, Integer, TreeSet<String>>> 
+// account.address + current block.Height ->
+//   -> last making blockHeight
+// last forged block for ADDRESS -> by height = 0
+public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	
 	
 	public AddressForging(DBSet databaseSet, DB database)
 	{
@@ -35,22 +36,22 @@ public class AddressForging extends DBMap<String, Tuple3<Integer, Integer, TreeS
 
 	@Override
 	
-	protected Map<String, Tuple3<Integer, Integer, TreeSet<String>>> getMap(DB database) 
+	protected Map<Tuple2<String, Integer>, Integer> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.getTreeMap("address_forging");
 	}
 
 	@Override
-	protected Map<String, Tuple3<Integer, Integer, TreeSet<String>>> getMemoryMap() 
+	protected Map<Tuple2<String, Integer>, Integer> getMemoryMap() 
 	{
-		return new HashMap<String, Tuple3<Integer, Integer, TreeSet<String>>>();
+		return new HashMap<Tuple2<String, Integer>, Integer>();
 	}
 
 	@Override
-	protected Tuple3<Integer, Integer, TreeSet<String>> getDefaultValue() 
+	protected Integer getDefaultValue() 
 	{
-		return new Tuple3<Integer, Integer, TreeSet<String>>(0, 0, new TreeSet<String>());
+		return 1;
 	}
 	
 	@Override
@@ -59,8 +60,24 @@ public class AddressForging extends DBMap<String, Tuple3<Integer, Integer, TreeS
 		return this.observableData;
 	}
 
-	public Tuple3<Integer, Integer, TreeSet<String>> get(Account account) 
+	public Integer get(String address, int height) 
 	{
-		return this.get(account.getAddress());
+		return this.get(new Tuple2<String, Integer>(address, height));
+	}	
+	public void set(String address, int height, int previosHeight) 
+	{
+		this.set(new Tuple2<String, Integer>(address, height), previosHeight);
+	}	
+	public void delete(String address, int height) 
+	{
+		this.delete(new Tuple2<String, Integer>(address, height));
+	}	
+	public Integer getLast(String address) 
+	{
+		return this.get(new Tuple2<String, Integer>(address, 0));
+	}	
+	public void setLast(String address, int previosHeight) 
+	{
+		this.set(new Tuple2<String, Integer>(address, 0), previosHeight);
 	}	
 }

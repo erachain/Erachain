@@ -278,14 +278,13 @@ public class GeneratorTests {
 		newBlock.setTransactions(transactions);
 		newBlock.process(dbSet);
 		
+		int height = newBlock.getHeight(dbSet);
 		//CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
-		Tuple3<Integer, Integer, TreeSet<String>> forgingData = userAccount1.getForgingData(dbSet);
-		assertEquals((int)forgingData.a, 2);
-		assertEquals((int)forgingData.b, 98000);
+		Integer forgingData = userAccount1.getForgingData(dbSet, height);
+		assertEquals((int)forgingData, 2);
 
-		forgingData = recipient.getForgingData(dbSet);
-		assertEquals((int)forgingData.a, 2);
-		assertEquals((int)forgingData.b, 2000);
+		forgingData = recipient.getForgingData(dbSet, height);
+		assertEquals((int)forgingData, 2);
 
 	}
 	

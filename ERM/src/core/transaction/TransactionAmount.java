@@ -321,6 +321,7 @@ public abstract class TransactionAmount extends Transaction {
 				}
 			}
 
+			/*
 			if (this.key == Transaction.RIGHTS_KEY) {
 				// update forging balances and last generated block
 				AddressForging a_f = db.getAddressForging();
@@ -336,8 +337,8 @@ public abstract class TransactionAmount extends Transaction {
 						value.b, // same forging balance
 						aList); // update list of account for recalculate FORGING balance late
 				a_f.set(creator, value);
-				
 			}
+			*/
 
 		}
 	}

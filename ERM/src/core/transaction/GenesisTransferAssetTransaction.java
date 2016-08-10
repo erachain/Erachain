@@ -233,6 +233,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
 		
+		/*
 		if (this.key == Transaction.RIGHTS_KEY) {
 			// update forging balances and last generated block
 			Tuple3<Integer, Integer, TreeSet<String>> value = null;
@@ -256,6 +257,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			}
 			a_f.set(recipient, value);
 		}
+		*/
 	}
 
 	@Override
@@ -268,6 +270,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
 		
+		/*
 		if (this.key == Transaction.RIGHTS_KEY) {
 			// update forging balances and last generated block
 			AddressForging a_f = db.getAddressForging();
@@ -276,6 +279,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 				a_f.delete(recipient);
 			}
 		}
+		*/
 
 	}
 

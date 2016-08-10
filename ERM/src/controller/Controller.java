@@ -1572,8 +1572,7 @@ public class Controller extends Observable {
 	}
 
 	public long getNextBlockGeneratingBalance(Block block) {
-		PublicKeyAccount account = block.getCreator();
-		return block.getWinValueForAccount(this.dbSet, account);
+		return block.getWinValue(this.dbSet);
 	}
 	public long getNextBlockGeneratingBalance() {
 		Block block = this.dbSet.getBlockMap().getLastBlock();

@@ -145,8 +145,7 @@ public class Block {
 
 	public long getGeneratingBalance(DBSet db)
 	{
-		Tuple3<Integer, Integer, TreeSet<String>> data = this.creator.getForgingData(db);
-		return data.b;
+		return this.creator.getGeneratingBalance(db).longValue();
 	}
 	public long getGeneratingBalance()
 	{
@@ -314,8 +313,15 @@ public class Block {
 			return db.getHeightMap().get(this.signature);
 		else
 		{
-			return -1;
-			//return 0; // icreator edit for TEST blocks
+			
+			if (this.reference == null)
+				// GENESIS BLOCK !!! ???
+				return 1;
+				
+			if(db.getHeightMap().contains(this.reference))
+				return db.getHeightMap().get(this.reference) + 1;
+			else
+				return -1;
 		}
 	}
 
@@ -608,11 +614,7 @@ public class Block {
 	
 	public long getWinValue(DBSet dbSet)
 	{
-		return this.creator.getWinValueHeight(dbSet, this.getHeight(dbSet));
-	}
-	public long getWinValueForAccount(DBSet dbSet, PublicKeyAccount account)
-	{
-		return account.getWinValueHeight(dbSet, this.getHeight(dbSet));
+		return this.creator.calcWinValue(dbSet, this.getTimestamp(dbSet), this.getHeight(dbSet));
 	}
 
 
@@ -903,13 +905,12 @@ public class Block {
 		}
 
 		if (this instanceof GenesisBlock ) {
-			
 		} else {
 			// PROCESS FORGING DATA
-			Tuple3<Integer, Integer, TreeSet<String>> forgingData = this.creator.getForgingData(db);
-			for (String forgedAccount: forgingData.c) {
-				Account account = new Account(forgedAccount);
-				account.updateForgingData(db, height);
+			Integer prevHeight = this.creator.getLastForgingData(db);
+			if (prevHeight != null) {
+				this.creator.setForgingData(db, height, prevHeight);
+				this.creator.setLastForgingData(db, height);
 			}
 		}
 
@@ -935,8 +936,10 @@ public class Block {
 
 	public void orphan(DBSet dbSet)
 	{
+		int height = this.getHeight(dbSet);
+		
 		//ORPHAN AT TRANSACTIONS
-		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(this.getHeight(dbSet));
+		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
 
 		Iterator<AT_Transaction> iter = atTxs.values().iterator();
 
@@ -970,13 +973,22 @@ public class Block {
 		}
 
 		//DELETE AT TRANSACTIONS FROM DB
-		dbSet.getATTransactionMap().delete(this.getHeight(dbSet));
+		dbSet.getATTransactionMap().delete(height);
 		
 		//DELETE TRANSACTIONS FROM FINAL MAP
-		dbSet.getTransactionFinalMap().delete(this.getHeight(dbSet));
+		dbSet.getTransactionFinalMap().delete(height);
 
 		// delete CHILDS - for proper making HEADERS in Controller.onMessage
 		dbSet.getChildMap().delete(this.signature);
+
+		// LAST FORGING BLOCK
+		if (this instanceof GenesisBlock ) {
+		} else {
+			// ORPHAN FORGING DATA
+			Integer prevHeight = this.creator.getForgingData(dbSet, height);
+			this.creator.delForgingData(dbSet, height);
+			this.creator.setLastForgingData(dbSet, prevHeight);
+		}
 
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
