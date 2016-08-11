@@ -47,10 +47,6 @@ public class MessageFactory {
 		return new PeersMessage(peers);
 	}
 	
-	public Message createHWeightMessage(int height, long weight)
-	{
-		return new HWeightMessage(height, weight);
-	}
 	public Message createHWeightMessage(Tuple2<Integer, Long> value)
 	{
 		return new HWeightMessage(value);

@@ -9,6 +9,7 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+import org.mapdb.Atomic.Var;
 import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.UnsignedBytes;
@@ -22,13 +23,19 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	
 	private Map<Integer,byte[]> heightIndex;
 	
-	private long fullWeight;
+	private Var<Long> fullWeightVar;
+	private Long fullWeight;
 	private int startedInForkHeight = 0;
 	
 	public HeightMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		fullWeight = 0;
+		
+		this.fullWeightVar = database.getAtomicVar("fullWeight");
+		this.fullWeight = this.fullWeightVar.get();
+		if (this.fullWeight == null)
+			this.fullWeight = 0L;
+		
 		//startedInForkHeight = 0;
 	}
 
@@ -75,9 +82,10 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 		return null;
 	}
 	
-	public long getFullWeight() {
+	public Long getFullWeight() {
 		return this.fullWeight;
 	}
+	
 	public int getStartedInForkHeight() {
 		return this.startedInForkHeight;
 	}
@@ -129,6 +137,12 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 		}
 		
 		fullWeight += value.b;
+		
+		if(this.fullWeightVar != null)
+		{
+			this.fullWeightVar.set(fullWeight);
+		}
+
 		
 		return super.set(key, value);
 	}

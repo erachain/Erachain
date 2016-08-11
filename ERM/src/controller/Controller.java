@@ -223,10 +223,11 @@ public class Controller extends Observable {
 		return this.blockChain.getHWeight(this.dbSet);
 	}
 
-	public void getSendMyHWeightToPeer (Peer peer) {
+	public void sendMyHWeightToPeer (Peer peer) {
 	
 		// SEND HEIGTH MESSAGE
-		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(getMyHWeight()));
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				getMyHWeight()));
 	}
 	
 	public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
@@ -435,14 +436,15 @@ public class Controller extends Observable {
 	        				random.nextInt( Controller.getInstance().getActivePeers().size() )
 	        				);
 	        			if(peer != null){
-	        				Controller.getInstance().getSendMyHWeightToPeer(peer);
+	        				Controller.getInstance().sendMyHWeightToPeer(peer);
 	        			}
 	        		}
 	        	}
 	        }
 		};
 		
-		this.timerPeerHeightUpdate.schedule(action, 5*60*1000, 5*60*1000);
+		this.timerPeerHeightUpdate.schedule(action, 
+				Block.GENERATING_MIN_BLOCK_TIME / 2, Block.GENERATING_MIN_BLOCK_TIME / 2);
 
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
@@ -736,9 +738,6 @@ public class Controller extends Observable {
 		if(this.dbSet.isStoped())
 			return;
 		
-		// GET HEIGHT
-		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(this.dbSet);
-
 		//if(NTP.getTime() >= Transaction.getPOWFIX_RELEASE())
 		if (true)
 		{
@@ -753,6 +752,8 @@ public class Controller extends Observable {
 				this.getBuildTimestamp() ));
 		}
 		
+		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(this.dbSet);
 		// SEND HEIGTH MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
 				HWeight));
