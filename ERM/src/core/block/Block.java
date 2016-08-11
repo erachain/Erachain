@@ -614,7 +614,9 @@ public class Block {
 	
 	public long getWinValue(DBSet dbSet)
 	{
-		return this.creator.calcWinValue(dbSet, this.getHeight(dbSet));
+		int height = this.getHeight(dbSet);
+		int previousForgingHeight = this.creator.getForgingData(dbSet, height);
+		return this.creator.calcWinValueHeight(dbSet, height, previousForgingHeight);
 	}
 
 

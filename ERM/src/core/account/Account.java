@@ -530,6 +530,9 @@ public class Account {
 	public long getWinValueHeight2(int heightThis, int heightStart)
 	{
 		int len = heightThis - heightStart;
+		if (len < 1)
+			len = 1;
+			
 		int MAX_LEN = 1000;
 		if (len < MAX_LEN ) {
 			return len * len;
@@ -579,14 +582,29 @@ public class Account {
 					* getWinValueHeight2(height, previousForgingHeight);
 		}
 
+		if (height < 10000)
+			win_value >>= 10;
+		else if (height < 100000)
+			win_value >>= 12;
+		else if (height < 1000000)
+			win_value >>= 14;
+		else
+			win_value >>= 16;
+		
 		return win_value;
 
 	}
 
 	public long calcWinValue(DBSet dbSet, int height)
 	{
+		int previousForgingHeight;
 		int lastHeight = this.getLastForgingData(dbSet);
-		int previousForgingHeight = this.getForgingData(dbSet, lastHeight);
+		if (lastHeight > height) {
+			previousForgingHeight = this.getForgingData(dbSet, height);			
+		} else {
+			previousForgingHeight = this.getForgingData(dbSet, lastHeight);
+
+		}
 		//if (lastHeight == previousForgingHeight)
 		//	previousForgingHeight -= 1;
 		return calcWinValueHeight(dbSet, height, previousForgingHeight);

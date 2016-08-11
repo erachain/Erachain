@@ -278,6 +278,7 @@ public class BlockGenerator extends Thread implements Observer
 						if (winned_value > max_winned_value) {
 							//this.winners.put(account, winned_value);
 							acc_winner = account;
+							max_winned_value = winned_value;
 						}
 					}
 				}
