@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.util.Arrays;
 import java.util.List;
  import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Ints;
 
@@ -46,9 +47,13 @@ public class MessageFactory {
 		return new PeersMessage(peers);
 	}
 	
-	public Message createHeightMessage(int height)
+	public Message createHWeightMessage(int height, long weight)
 	{
-		return new HeightMessage(height);
+		return new HWeightMessage(height, weight);
+	}
+	public Message createHWeightMessage(Tuple2<Integer, Long> value)
+	{
+		return new HWeightMessage(value);
 	}
 	
 	public Message createVersionMessage(String strVersion, long buildDateTime)
@@ -176,10 +181,10 @@ public class MessageFactory {
 			break;
 				
 		//HEIGHT
-		case Message.HEIGHT_TYPE:
+		case Message.HWEIGHT_TYPE:
 							
 			//CREATE HEIGHT FROM DATA
-			message = HeightMessage.parse(data);
+			message = HWeightMessage.parse(data);
 			break;
 			
 		//GETSIGNATURES

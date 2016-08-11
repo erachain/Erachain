@@ -347,15 +347,15 @@ public class SysTray implements Observer{
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-				currentHeight = Controller.getInstance().getHeight();
+				currentHeight = Controller.getInstance().getMyHWeight().a;
 				return;
 			}
 			networkStatus = "Wallet Synchronizing";
 			
-			syncProcent = 100 * currentHeight/Controller.getInstance().getHeight() + "%";
+			syncProcent = 100 * currentHeight/Controller.getInstance().getMyHWeight().a + "%";
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getHeight() + "/" + Controller.getInstance().getMaxPeerHeight();
+			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMyHWeight().a + "/" + Controller.getInstance().getMaxPeerHWeight().a;
 			setToolTipText(toolTipText);
 			
 		} else if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -363,17 +363,17 @@ public class SysTray implements Observer{
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{
-				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHeight() + "%";	
+				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight().a + "%";	
 			}
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMaxPeerHeight();
+			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight();
 			setToolTipText(toolTipText);
 			
 		} else {
 			if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
 				toolTipText += networkStatus + " " + syncProcent;
-				toolTipText += "\nHeight: " + Controller.getInstance().getHeight();
+				toolTipText += "\nHeight: " + Controller.getInstance().getMyHWeight().a;
 				setToolTipText(toolTipText);
 			}
 		}

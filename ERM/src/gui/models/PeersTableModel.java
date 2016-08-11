@@ -96,7 +96,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 				return peer.getAddress().getHostAddress();
 
 			case COLUMN_HEIGHT:
-				return Controller.getInstance().getHeightOfPeer(peer);
+				return Controller.getInstance().getHWeightOfPeer(peer);
 			
 			case COLUMN_PINGMC:
 				if(peer.getPing() > 1000000) {

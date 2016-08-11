@@ -3039,7 +3039,12 @@ public class BlockExplorer
 		byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
 		
 		//RETURN HEIGHT
-		return DBSet.getInstance().getHeightMap().get(lastBlockSignature);
+		return DBSet.getInstance().getHeightMap().getHeight(lastBlockSignature);
+	}
+	public Tuple2<Integer, Long> getHWeight() {
+		
+		//RETURN HEIGHT
+		return Controller.getInstance().getMyHWeight();
 	}
 	
 	public Block getLastBlock() 

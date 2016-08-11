@@ -582,7 +582,8 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			}
 			else
 			{
-				return Collections.min(db.getHeightMap().getValues()) + 1;
+				//return Collections.min(db.getHeightMap().getValues());
+				return db.getHeightMap().getStartedInForkHeight();
 			}
 		}
 		return 0;

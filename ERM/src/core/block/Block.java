@@ -125,10 +125,10 @@ public class Block {
 	{
 		int height = -1;
 		if(db.getHeightMap().contains(this.signature)) {
-			height = db.getHeightMap().get(this.signature);
+			height = db.getHeightMap().get(this.signature).a;
 		} else if (db.getHeightMap().contains(this.reference)) {
 			// get from parent
-			height = db.getHeightMap().get(this.reference) + 1;
+			height = db.getHeightMap().get(this.reference).a + 1;
 		}
 		
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
@@ -310,7 +310,7 @@ public class Block {
 	public int getHeight(DBSet db)
 	{
 		if(db.getHeightMap().contains(this.signature))
-			return db.getHeightMap().get(this.signature);
+			return db.getHeightMap().get(this.signature).a;
 		else
 		{
 			
@@ -319,7 +319,7 @@ public class Block {
 				return 1;
 				
 			if(db.getHeightMap().contains(this.reference))
-				return db.getHeightMap().get(this.reference) + 1;
+				return db.getHeightMap().get(this.reference).a + 1;
 			else
 				return -1;
 		}
@@ -612,7 +612,7 @@ public class Block {
 		}
 	}
 	
-	public long getWinValue(DBSet dbSet)
+	public int getWinValue(DBSet dbSet)
 	{
 		int height = this.getHeight(dbSet);
 		int previousForgingHeight = this.creator.getForgingData(dbSet, height);
@@ -898,12 +898,12 @@ public class Block {
 
 			//SET BLOCK HEIGHT
 			height = parent.getHeight(dbSet) + 1;
-			dbSet.getHeightMap().set(this, height);
+			dbSet.getHeightMap().set(this, height, this.getWinValue(dbSet));
 		}
 		else
 		{
 			//IF NO PARENT HEIGHT IS 1
-			dbSet.getHeightMap().set(this, 1);
+			dbSet.getHeightMap().set(this, 1, 0);
 		}
 
 		if (this instanceof GenesisBlock ) {

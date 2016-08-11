@@ -3,7 +3,9 @@ package core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
- import org.apache.log4j.Logger;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -60,6 +62,7 @@ public class BlockChain
 		return this.genesisBlock;
 	}
 	
+	/*
 	public int getHeight(DBSet dbSet) {
 		
 		//GET LAST BLOCK
@@ -67,6 +70,19 @@ public class BlockChain
 		
 		//RETURN HEIGHT
 		return dbSet.getHeightMap().get(lastBlockSignature);
+	}
+	*/
+	public Tuple2<Integer, Long> getHWeight(DBSet dbSet) {
+		
+		//GET LAST BLOCK
+		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+		
+		return new Tuple2<Integer, Long>(dbSet.getHeightMap().getHeight(lastBlockSignature),
+				dbSet.getHeightMap().getFullWeight());
+	}
+	public long getFullWeight(DBSet dbSet) {
+		
+		return dbSet.getHeightMap().getFullWeight();
 	}
 
 	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {

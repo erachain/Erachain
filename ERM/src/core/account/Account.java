@@ -540,7 +540,7 @@ public class Account {
 		return len * MAX_LEN;
 	}
 
-	public long calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)
+	public int calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)
 	{
 
 		/*
@@ -591,7 +591,7 @@ public class Account {
 		else
 			win_value >>= 16;
 		
-		return win_value;
+		return (int)win_value;
 
 	}
 

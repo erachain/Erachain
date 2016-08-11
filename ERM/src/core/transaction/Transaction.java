@@ -842,13 +842,13 @@ public abstract class Transaction {
 		}
 		
 		//CALCULATE CONFIRMATIONS
-		int lastBlockHeight = db.getHeightMap().get(db.getBlockMap().getLastBlockSignature());
+		int lastBlockHeight = db.getHeightMap().getHeight(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
 		Block block = this.getParent(db);
 		
 		//if (block == null)return 0;
 		
-		int transactionBlockHeight = db.getHeightMap().get(block);
+		int transactionBlockHeight = db.getHeightMap().getHeight(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;

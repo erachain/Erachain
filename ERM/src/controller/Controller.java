@@ -84,7 +84,8 @@ import network.Peer;
 import network.message.BlockMessage;
 import network.message.GetBlockMessage;
 import network.message.GetSignaturesMessage;
-import network.message.HeightMessage;
+import network.message.HWeightMessage;
+//import network.message.HeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
 import network.message.TransactionMessage;
@@ -131,7 +132,7 @@ public class Controller extends Observable {
 	private byte[] messageMagic;
 	private long toOfflineTime; 
 	
-	private Map<Peer, Integer> peerHeight;
+	private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
 
 	private Map<Peer, Pair<String, Long>> peersVersions;
 
@@ -218,27 +219,27 @@ public class Controller extends Observable {
 		return this.wallet.getSyncHeight();
 	}
 	
-	public void getSendMyHeightToPeer (Peer peer) {
+	public Tuple2<Integer, Long> getMyHWeight() {
+		return this.blockChain.getHWeight(this.dbSet);
+	}
+
+	public void getSendMyHWeightToPeer (Peer peer) {
 	
-		// GET HEIGHT
-		int height = this.blockChain.getHeight(this.dbSet);
-				
 		// SEND HEIGTH MESSAGE
-		peer.sendMessage(MessageFactory.getInstance().createHeightMessage(
-				height));
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(getMyHWeight()));
 	}
 	
-	public Map<Peer, Integer> getPeerHeights() {
-		return peerHeight;
+	public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
+		return peerHWeight;
 	}
 	
-	public Integer getHeightOfPeer(Peer peer) {
-		if(peerHeight!=null && peerHeight.containsKey(peer)){
-			return peerHeight.get(peer);
+	public Tuple2<Integer, Long> getHWeightOfPeer(Peer peer) {
+		if(peerHWeight!=null && peerHWeight.containsKey(peer)){
+			return peerHWeight.get(peer);
 		}
 		else
 		{
-			return 0;
+			return null;
 		}
 	}
 	
@@ -247,7 +248,7 @@ public class Controller extends Observable {
 	}
 	
 	public Pair<String, Long> getVersionOfPeer(Peer peer) {
-		if(peerHeight!=null && peersVersions.containsKey(peer)){
+		if(peerHWeight!=null && peersVersions.containsKey(peer)){
 			return peersVersions.get(peer);
 		}
 		else
@@ -306,7 +307,7 @@ public class Controller extends Observable {
 			}
 		}
 
-		this.peerHeight = new LinkedHashMap<Peer, Integer>(); // LINKED TO
+		this.peerHWeight = new LinkedHashMap<Peer, Tuple2<Integer, Long>>(); // LINKED TO
 																// PRESERVE
 																// ORDER WHEN
 																// SYNCHRONIZING
@@ -434,7 +435,7 @@ public class Controller extends Observable {
 	        				random.nextInt( Controller.getInstance().getActivePeers().size() )
 	        				);
 	        			if(peer != null){
-	        				Controller.getInstance().getSendMyHeightToPeer(peer);
+	        				Controller.getInstance().getSendMyHWeightToPeer(peer);
 	        			}
 	        		}
 	        	}
@@ -736,7 +737,7 @@ public class Controller extends Observable {
 			return;
 		
 		// GET HEIGHT
-		int height = this.blockChain.getHeight(this.dbSet);
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(this.dbSet);
 
 		//if(NTP.getTime() >= Transaction.getPOWFIX_RELEASE())
 		if (true)
@@ -753,8 +754,8 @@ public class Controller extends Observable {
 		}
 		
 		// SEND HEIGTH MESSAGE
-		peer.sendMessage(MessageFactory.getInstance().createHeightMessage(
-				height));
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				HWeight));
 		
 		if (this.status == STATUS_NO_CONNECTIONS) {
 			// UPDATE STATUS
@@ -802,13 +803,13 @@ public class Controller extends Observable {
 	}
 
 	public void onDisconnect(Peer peer) {
-		synchronized (this.peerHeight) {
+		synchronized (this.peerHWeight) {
 			
-			this.peerHeight.remove(peer);
+			this.peerHWeight.remove(peer);
 			
 			this.peersVersions.remove(peer);
 			
-			if (this.peerHeight.size() == 0) {
+			if (this.peerHWeight.size() == 0) {
 				
 				if(this.getToOfflineTime() == 0L) {
 					//SET START OFFLINE TIME
@@ -855,14 +856,28 @@ public class Controller extends Observable {
 
 				break;
 
+			/*
 			case Message.HEIGHT_TYPE:
 
 				HeightMessage heightMessage = (HeightMessage) message;
 
 				// ADD TO LIST
-				synchronized (this.peerHeight) {
-					this.peerHeight.put(heightMessage.getSender(),
+				synchronized (this.peerHWeight) {
+					this.peerHWeight.put(heightMessage.getSender(),
 							heightMessage.getHeight());
+				}
+
+				break;
+				*/
+
+			case Message.HWEIGHT_TYPE:
+
+				HWeightMessage hWeightMessage = (HWeightMessage) message;
+
+				// ADD TO LIST
+				synchronized (this.peerHWeight) {
+					this.peerHWeight.put(hWeightMessage.getSender(),
+							hWeightMessage.getHWeight());
 				}
 
 				break;
@@ -927,9 +942,11 @@ public class Controller extends Observable {
 				boolean isNewBlockValid = this.blockChain.isNewBlockValid(this.dbSet, block);
 				
 				if(isNewBlockValid)	{
-					synchronized (this.peerHeight) {
-						this.peerHeight.put(message.getSender(),
-								blockMessage.getHeight());
+					synchronized (this.peerHWeight) {
+						// PUT NEW HEIGHT and WEIGHT to PEER
+						this.peerHWeight.put(message.getSender(),
+								new Tuple2<Integer, Long>(blockMessage.getHeight(),
+										this.blockChain.getFullWeight(dbSet) + block.getWinValue(dbSet)));
 					}
 				} else {
 					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> new block not valid "
@@ -1057,25 +1074,31 @@ public class Controller extends Observable {
 	// SYNCHRONIZE
 
 	public boolean isUpToDate() {
-		if (this.peerHeight.size() == 0) {
+		if (this.peerHWeight.size() == 0) {
 			return true;
 		}
 
-		int maxPeerHeight = this.getMaxPeerHeight();
-		int chainHeight = this.blockChain.getHeight(this.dbSet);
-		return maxPeerHeight <= chainHeight;
+		long maxPeerWeight = this.getMaxPeerHWeight().b;
+		long chainWeight = this.blockChain.getHWeight(this.dbSet).b;
+		return maxPeerWeight <= chainWeight;
 	}
 	
 	public boolean isReadyForging() {
-		if (this.peerHeight.size() == 0) {
+		if (this.peerHWeight.size() == 0) {
 			return true;
 		}
 
-		int maxPeerHeight = this.getMaxPeerHeight();
-		int chainHeight = this.blockChain.getHeight(this.dbSet);
-		int diff = chainHeight - maxPeerHeight;
-		return diff >= 0 && diff < 2;
-		//return chainHeight == maxPeerHeight;
+		if (true) {
+			int maxPeerHeight = this.getMaxPeerHWeight().a;
+			int chainHeight = this.blockChain.getHWeight(this.dbSet).a;
+			int diff = chainHeight - maxPeerHeight;
+			return diff >= 0 && diff < 2;			
+		} else {
+			long maxPeerWeight = this.getMaxPeerHWeight().b;
+			long chainWeight = this.blockChain.getHWeight(this.dbSet).b;
+			long diff = chainWeight - maxPeerWeight;
+			return diff >= 0 && diff < 999;
+		}
 	}
 	
 	public boolean isNSUpToDate() {
@@ -1100,7 +1123,7 @@ public class Controller extends Observable {
 			// WHILE NOT UPTODATE
 			while (!this.isUpToDate()) {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
-				peer = this.getMaxHeightPeer();
+				peer = this.getMaxWeightPeer();
 				
 				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress());
 
@@ -1116,7 +1139,7 @@ public class Controller extends Observable {
 			}
 		}
 
-		if (this.peerHeight.size() == 0) {
+		if (this.peerHWeight.size() == 0) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
 
@@ -1137,24 +1160,22 @@ public class Controller extends Observable {
 		}
 	}
 
-	private Peer getMaxHeightPeer() {
+	private Peer getMaxWeightPeer() {
 		Peer highestPeer = null;
-		int height = 0;
+		long weight = 0;
 
 		try {
-			synchronized (this.peerHeight) {
-				for (Peer peer : this.peerHeight.keySet()) {
+			synchronized (this.peerHWeight) {
+				for (Peer peer : this.peerHWeight.keySet()) {
 					if (highestPeer == null && peer != null) {
 						highestPeer = peer;
 					} else {
 						// IF HEIGHT IS BIGGER
-						if (height < this.peerHeight.get(peer)) {
+						if (weight < this.peerHWeight.get(peer).b) {
 							highestPeer = peer;
-							height = this.peerHeight.get(peer);
-						}
-
-						// IF HEIGHT IS SAME
-						if (height == this.peerHeight.get(peer)) {
+							weight = this.peerHWeight.get(peer).b;
+						} else if (weight == this.peerHWeight.get(peer).b) {
+							// IF HEIGHT IS SAME
 							// CHECK IF PING OF PEER IS BETTER
 							if (peer.getPing() < highestPeer.getPing()) {
 								highestPeer = peer;
@@ -1170,14 +1191,17 @@ public class Controller extends Observable {
 		return highestPeer;
 	}
 
-	public int getMaxPeerHeight() {
+	public Tuple2<Integer, Long> getMaxPeerHWeight() {
+		
 		int height = 0;
+		long weight = 0;
 
 		try {
-			synchronized (this.peerHeight) {
-				for (Peer peer : this.peerHeight.keySet()) {
-					if (height < this.peerHeight.get(peer)) {
-						height = this.peerHeight.get(peer);
+			synchronized (this.peerHWeight) {
+				for (Peer peer : this.peerHWeight.keySet()) {
+					if (weight < this.peerHWeight.get(peer).b) {
+						height = this.peerHWeight.get(peer).a;
+						weight = this.peerHWeight.get(peer).b;
 					}
 				}
 			}
@@ -1185,7 +1209,7 @@ public class Controller extends Observable {
 			// PEER REMOVED WHILE ITERATING
 		}
 
-		return height;
+		return new Tuple2<Integer, Long>(height, weight);
 	}
 
 	// WALLET
@@ -1546,9 +1570,10 @@ public class Controller extends Observable {
 		return this.blockChain;
 	}
 
-	public int getHeight() {
+
+	public int getMyHeight() {
 		// need for TESTs
-		return this.blockChain != null? this.blockChain.getHeight(this.dbSet): -1;
+		return this.blockChain != null? this.blockChain.getHWeight(this.dbSet).a: -1;
 	}
 
 	public Block getLastBlock() {

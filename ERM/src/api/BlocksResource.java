@@ -225,7 +225,7 @@ public class BlocksResource
 	@Path("/height")
 	public static String getHeight() 
 	{
-		return String.valueOf(Controller.getInstance().getHeight());
+		return String.valueOf(Controller.getInstance().getMyHeight());
 	}
 	
 	@GET

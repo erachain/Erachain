@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import database.DBSet;
@@ -83,14 +84,15 @@ public class PeersResource
 	@Path("height")
 	public String getTest()
 	{
-		Map<Peer,Integer> peers = Controller.getInstance().getPeerHeights();
+		Map<Peer, Tuple2<Integer, Long>> peers = Controller.getInstance().getPeerHWeights();
 		JSONArray array = new JSONArray();
 		
-		for(Map.Entry<Peer, Integer> peer: peers.entrySet())
+		for(Map.Entry<Peer, Tuple2<Integer, Long>> peer: peers.entrySet())
 		{
 			JSONObject o = new JSONObject();
 			o.put("peer", peer.getKey().getAddress().getHostAddress());
-			o.put("height", peer.getValue());
+			o.put("height", peer.getValue().a);
+			o.put("weight", peer.getValue().b);
 			array.add(o);
 		}
 		
@@ -167,8 +169,8 @@ public class PeersResource
 			o.put("status", "known disconnected");
 		}
 		
-		if(Controller.getInstance().getPeerHeights().containsKey(peer)) {
-			o.put("height", Controller.getInstance().getHeightOfPeer(peer));
+		if(Controller.getInstance().getPeerHWeights().containsKey(peer)) {
+			o.put("height", Controller.getInstance().getHWeightOfPeer(peer));
 		}
 		if(Controller.getInstance().getPeersVersions().containsKey(peer)) {
 			o.put("version", Controller.getInstance().getVersionOfPeer(peer).getA());
