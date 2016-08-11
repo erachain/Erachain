@@ -15,6 +15,7 @@ import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
+import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
 
@@ -76,6 +77,9 @@ public class BlockChain
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+		String b58 = Base58.encode(lastBlockSignature);
+		if (lastBlockSignature == null)
+			return new Tuple2<Integer, Long>(1, 0L);
 		
 		return new Tuple2<Integer, Long>(dbSet.getHeightMap().getHeight(lastBlockSignature),
 				dbSet.getHeightMap().getFullWeight());
@@ -135,23 +139,25 @@ public class BlockChain
 			return false;
 		}
 		
-		/*
-		*/
-		//CHECK IF WE KNOW REFERENCE
-		if(dbSet.getBlockMap().contains(block.getReference()))
+		//CHECK IF WE KNOW THIS BLOCK
+		if(dbSet.getBlockMap().contains(block.getSignature()))
 		{
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB");
 			return false;
 		}
 		
-		//CHECK IF REFERENCE IS LASTBLOCK
-		byte[] lastSignature = dbSet.getBlockMap().getLastBlockSignature();
-		if(Arrays.equals(lastSignature, block.getReference()))
+		//CHECK IF REFERENCES EQUAL
+		// AND blocks in current TIME
+		Block lastBlock = this.getLastBlock(dbSet);
+		if(Arrays.equals(lastBlock.getReference(), block.getReference())
+				//&&  NTP.getTime() - 2 * Block.GENERATING_MIN_BLOCK_TIME < lastBlock.getTimestamp(dbSet)
+				)
 		{
-			// SELECT BEST BLOCK
-			Block knownLastBlock = dbSet.getBlockMap().get(lastSignature);
-			if (knownLastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)) {
-				knownLastBlock.orphan(dbSet);	
+			// TRY SELECT BEST BLOCK from NEW from PEER and LAST in DB
+			if (lastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)) {
+				//dbSet.getBlockMap().setProcessing(true);
+				lastBlock.orphan(dbSet);	
+				//dbSet.getBlockMap().setProcessing(false);
 				LOGGER.error("core.BlockChain.isNewBlockValid *** knownBlock orphan and newBlock taken!");
 			} else {
 				LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");

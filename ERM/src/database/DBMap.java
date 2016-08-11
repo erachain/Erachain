@@ -239,6 +239,7 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public boolean contains(T key)
 	{
+		
 		if(this.map.containsKey(key))
 		{
 			return true;

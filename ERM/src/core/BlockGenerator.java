@@ -181,15 +181,16 @@ public class BlockGenerator extends Thread implements Observer
 
 		while(true)
 		{
+			try 
+			{
+				Thread.sleep(3000);
+			} 
+			catch (InterruptedException e) 
+			{
+				LOGGER.error(e.getMessage(),e);
+			}
+
 			if(dbSet.isStoped()) {
-				try 
-				{
-					Thread.sleep(1000);
-				} 
-				catch (InterruptedException e) 
-				{
-					LOGGER.error(e.getMessage(),e);
-				}
 				continue;
 			}
 			
@@ -215,7 +216,8 @@ public class BlockGenerator extends Thread implements Observer
 				byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
-				if(this.solvingBlock == null || !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature))
+				if(this.solvingBlock == null
+						|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature))
 				{
 					//SET NEW BLOCK TO SOLVE
 					this.solvingBlock = dbSet.getBlockMap().getLastBlock();
@@ -300,28 +302,6 @@ public class BlockGenerator extends Thread implements Observer
 					//PASS BLOCK TO CONTROLLER
 					Controller.getInstance().newBlockGenerated(block);
 					
-				} else {
-					//SLEEP
-					try 
-					{
-						Thread.sleep(1000);
-					} 
-					catch (InterruptedException e) 
-					{
-						LOGGER.error(e.getMessage(),e);
-					}
-				}
-			}
-			else
-			{
-				//SLEEP
-				try 
-				{
-					Thread.sleep(1000);
-				} 
-				catch (InterruptedException e) 
-				{
-					LOGGER.error(e.getMessage(),e);
 				}
 			}
 		}

@@ -537,11 +537,11 @@ public class Account {
 		int MAX_LEN_2 = MAX_LEN * 60;
 		if (len < MAX_LEN ) {
 			//return (long)(len * Math.pow(len, 0.3));
-			return len;
+			return (long)Math.pow(len, 0.7);
 		} else if ( len < MAX_LEN_2 )
-			return MAX_LEN + (long)Math.pow(len - MAX_LEN, 0.5);
+			return (long)Math.pow(MAX_LEN, 0.7) + (long)Math.pow(len - MAX_LEN, 0.5);
 		//return (long)(len * Math.pow(MAX_LEN, 0.3));
-		return MAX_LEN_2;
+		return (long)Math.pow(MAX_LEN, 0.7) + (long)Math.pow(MAX_LEN_2 - MAX_LEN, 0.5);
 	}
 
 	public int calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)

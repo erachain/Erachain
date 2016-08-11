@@ -104,15 +104,21 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	}
 	public Integer getHeight(Block block)
 	{
-		return this.get(block.getSignature()).a;
+		if (this.contains(block.getSignature()))
+			return this.get(block.getSignature()).a;
+		return -1;
 	}
 	public Integer getHeight(byte[] signature)
 	{
-		return this.get(signature).a;
+		if (this.contains(signature))
+			return this.get(signature).a;
+		return -1;
 	}
 	public Integer getWeight(Block block)
 	{
-		return this.get(block.getSignature()).b;
+		if (this.contains(block.getSignature()))
+			return this.get(block.getSignature()).b;
+		return 0;
 	}
 	
 	public byte[] getBlockByHeight(int height)
@@ -120,10 +126,12 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 		return heightIndex.get(height);
 	}
 	
+	/*
 	public void set(Block block, int height, int weight)
 	{
 		this.set(block.getSignature(), new Tuple2<Integer, Integer>(height, weight));
 	}
+	*/
 	
 	public boolean set(byte[] key, Tuple2<Integer, Integer> value)
 	{

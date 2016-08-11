@@ -138,8 +138,11 @@ public class BlockMap extends DBMap<byte[], Block>
 		if(this.lastBlockVar != null)
 		{
 			this.lastBlockVar.set(this.lastBlockSignature);
-		}		
+		}
 		
+		return;
+		
+		/*
 		// SET TRUE LAST BLOCK
 		//byte[] b = dbSet.getHeightMap().getBlockByHeight(block.getHeight(dbSet) - Settings.CONFIRMS_TRUE);
 		//Block trueBlock = dbSet.getBlockMap().get(b);
@@ -149,7 +152,6 @@ public class BlockMap extends DBMap<byte[], Block>
 		if (parent == null)
 			return;
 
-		/*
 		int th = parent.getHeight(dbSet) - Settings.CONFIRMS_TRUE;
 
 		if (this.lastTrueBlockHeight < th)
@@ -200,22 +202,43 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 		this.processing = processing;
 	}
-	
-	public void add(Block block)
+		
+	public void set(Block block)
 	{
-		/*
-		DBSet dbSet = (DBSet)this.databaseSet;
-
-		if ( dbSet.getHeightMap().contains(block.getSignature()) ) {
-			assert(1 == 2);
-		}
-		*/
 		this.set(block.getSignature(), block);
 	}
-	
+	public boolean set(byte[] signature, Block block)
+	{
+		
+		DBSet dbSet = (DBSet)this.databaseSet;
+		
+		Block parent = block.getParent(dbSet);
+		if (parent != null) {
+			dbSet.getChildMap().set(parent, block);
+			dbSet.getHeightMap().set(signature,
+					new Tuple2<Integer, Integer>(block.getHeight(dbSet), block.getWinValue(dbSet)));
+		} else {
+			dbSet.getHeightMap().set(signature,
+					new Tuple2<Integer, Integer>(1, 0));
+			
+		}
+
+		
+		return super.set(signature, block);
+	}
+
 	public void delete(Block block)
 	{
 		this.delete(block.getSignature());
+	}
+	public void delete(byte[] signature)
+	{
+		DBSet dbSet = (DBSet)this.databaseSet;
+		
+		dbSet.getHeightMap().delete(signature);
+		dbSet.getChildMap().delete(signature);
+
+		super.delete(signature);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

@@ -695,10 +695,13 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
 			return false;			
 		}
+		
+		/* not need
 		if(this.getTimestamp(db) - this.getParent(db).getTimestamp(db) != GENERATING_MIN_BLOCK_TIME) {
-				LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid != GENERATING_MIN_BLOCK_TIME");
+				LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp PERIOD invalid != GENERATING_MIN_BLOCK_TIME");
 				return false;			
 			}
+			*/
 
 		/*
 		//CHECK IF GENERATING BALANCE IS CORRECT
@@ -889,12 +892,13 @@ public class Block {
 			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
 		}
 		
-		Block parent = this.getParent(dbSet);
 		int height = 1;
+		/*
+		Block parent = this.getParent(dbSet);
 		if(parent != null)
 		{
 			//SET AS CHILD OF PARENT
-			dbSet.getChildMap().set(parent, this);		
+			dbSet.getChildMap().set(parent, this);	
 
 			//SET BLOCK HEIGHT
 			height = parent.getHeight(dbSet) + 1;
@@ -905,9 +909,18 @@ public class Block {
 			//IF NO PARENT HEIGHT IS 1
 			dbSet.getHeightMap().set(this, 1, 0);
 		}
+		*/
+
+		//ADD TO DB
+		dbSet.getBlockMap().set(this);
+		//UPDATE LAST BLOCK
+		dbSet.getBlockMap().setLastBlock(this);
 
 		if (this instanceof GenesisBlock ) {
 		} else {
+			
+			height = dbSet.getHeightMap().getHeight(this);
+
 			// PROCESS FORGING DATA
 			Integer prevHeight = this.creator.getLastForgingData(dbSet);
 			this.creator.setForgingData(dbSet, height, prevHeight);
@@ -927,11 +940,6 @@ public class Block {
 			Controller.getInstance().blockchainSyncStatusUpdate(height);
 		}
 		
-		//ADD TO DB
-		dbSet.getBlockMap().add(this);
-
-		//UPDATE LAST BLOCK
-		dbSet.getBlockMap().setLastBlock(this);	
 	}
 
 	public void orphan(DBSet dbSet)
@@ -978,9 +986,11 @@ public class Block {
 		//DELETE TRANSACTIONS FROM FINAL MAP
 		dbSet.getTransactionFinalMap().delete(height);
 
+		/*
 		dbSet.getHeightMap().delete(this.signature);
 		// delete CHILDS - for proper making HEADERS in Controller.onMessage
 		dbSet.getChildMap().delete(this.signature);
+		*/
 
 		// LAST FORGING BLOCK
 		if (this instanceof GenesisBlock ) {
@@ -991,14 +1001,14 @@ public class Block {
 			this.creator.setLastForgingData(dbSet, prevHeight);
 		}
 
-		//DELETE BLOCK FROM DB
-		dbSet.getBlockMap().delete(this);
-
 		if (this.getParent(dbSet) != null) {
 			//SET PARENT AS LAST BLOCK
 			dbSet.getBlockMap().setLastBlock(this.getParent(dbSet));
 		}
-				
+
+		//DELETE BLOCK FROM DB
+		dbSet.getBlockMap().delete(this);
+
 		for(Transaction transaction: this.getTransactions())
 		{
 			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE

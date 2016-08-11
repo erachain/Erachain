@@ -394,7 +394,7 @@ public class Synchronizer
 			{
 				//PROCESS
 				dbSet.getBlockMap().setProcessing(true);
-				block.process(dbSet);		
+				block.process(dbSet);
 				dbSet.getBlockMap().setProcessing(false);
 				
 				return true;

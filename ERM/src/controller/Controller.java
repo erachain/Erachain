@@ -1127,7 +1127,8 @@ public class Controller extends Observable {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxWeightPeer();
 				
-				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress());
+				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+						+ getHWeightOfPeer(peer));
 
 				// SYNCHRONIZE FROM PEER
 				this.synchronizer.synchronize(dbSet, lastTrueBlockHeight, peer);
