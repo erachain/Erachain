@@ -32,7 +32,6 @@ public class BlockMap extends DBMap<byte[], Block>
 	
 	private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
-	private int lastTrueBlockHeight = 1; // checkpoint
 	
 	private Var<Boolean> processingVar;
 	private Boolean processing;
@@ -65,7 +64,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
 		
-		this.lastTrueBlockHeight = parent.getLastTrueBlockHeight();
+		//this.lastTrueBlockHeight = parent.getLastTrueBlockHeight();
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -135,12 +134,11 @@ public class BlockMap extends DBMap<byte[], Block>
 	public void setLastBlock(Block block) 
 	{
 		
+		this.lastBlockSignature = block.getSignature();
 		if(this.lastBlockVar != null)
 		{
-			this.lastBlockVar.set(block.getSignature());
-		}
-		
-		this.lastBlockSignature = block.getSignature();
+			this.lastBlockVar.set(this.lastBlockSignature);
+		}		
 		
 		// SET TRUE LAST BLOCK
 		//byte[] b = dbSet.getHeightMap().getBlockByHeight(block.getHeight(dbSet) - Settings.CONFIRMS_TRUE);
@@ -150,10 +148,18 @@ public class BlockMap extends DBMap<byte[], Block>
 		Block parent = block.getParent(dbSet);
 		if (parent == null)
 			return;
-		
+
+		/*
 		int th = parent.getHeight(dbSet) - Settings.CONFIRMS_TRUE;
+
 		if (this.lastTrueBlockHeight < th)
 			this.lastTrueBlockHeight = th;
+
+		if(this.lastTrueBlockHeightVar != null)
+		{
+			this.lastBlockVar.set(block.getSignature());
+		}
+		*/
 		
 	}
 	
@@ -167,11 +173,13 @@ public class BlockMap extends DBMap<byte[], Block>
 		return this.lastBlockSignature;
 	}
 	
+	/*
 	// checkpoint
 	public int getLastTrueBlockHeight()
 	{
 		return this.lastTrueBlockHeight;
 	}
+	*/
 	
 	public boolean isProcessing() 
 	{

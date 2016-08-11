@@ -57,7 +57,6 @@ public class SynchronizerTests {
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
-		BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 		BlockGenerator blockGenerator = new BlockGenerator(false);
 		List<Block> firstBlocks = new ArrayList<Block>();
 		for(int i=0; i<5; i++)
@@ -88,8 +87,6 @@ public class SynchronizerTests {
 		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
-
-		genBal = generator.getGeneratingBalance(databaseSet);
 
 		//FORK
 		DBSet fork = databaseSet.fork();	
@@ -199,7 +196,6 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			BigDecimal genBal = generator.getGeneratingBalance(databaseSet);
 			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
@@ -219,7 +215,6 @@ public class SynchronizerTests {
 		for(int i=0; i<10; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			BigDecimal genBal2 = generator.getGeneratingBalance(databaseSet);
 			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE

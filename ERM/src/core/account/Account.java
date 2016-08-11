@@ -52,11 +52,11 @@ public class Account {
 	protected String address;
 	
 	private byte[] lastBlockSignature;
-	private BigDecimal generatingBalance; //used  for forging balance
+	private long generatingBalance; //used  for forging balance
 	
 	protected Account()
 	{
-		this.generatingBalance = BigDecimal.ZERO.setScale(8);
+		this.generatingBalance = 0l;
 	}
 	
 	public Account(String address)
@@ -216,7 +216,7 @@ public class Account {
 	// take current balance
 	public void calculateGeneratingBalance(DBSet db)
 	{
-		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
+		long balance = this.getConfirmedBalance(ERM_KEY, db).setScale(0).longValue();
 		this.generatingBalance = balance;
 	}
 
@@ -281,12 +281,12 @@ public class Account {
 	}
 	*/
 	
-	public BigDecimal getGeneratingBalance()
+	public long getGeneratingBalance()
 	{
 		return this.getGeneratingBalance(DBSet.getInstance());
 	}
 	
-	public BigDecimal getGeneratingBalance(DBSet db)
+	public long getGeneratingBalance(DBSet db)
 	{	
 		//UPDATE
 		updateGeneratingBalance(db);
@@ -534,10 +534,14 @@ public class Account {
 			len = 1;
 			
 		int MAX_LEN = 1000;
+		int MAX_LEN_2 = MAX_LEN * 60;
 		if (len < MAX_LEN ) {
-			return len * len;
-		}
-		return len * MAX_LEN;
+			//return (long)(len * Math.pow(len, 0.3));
+			return len;
+		} else if ( len < MAX_LEN_2 )
+			return MAX_LEN + (long)Math.pow(len - MAX_LEN, 0.5);
+		//return (long)(len * Math.pow(MAX_LEN, 0.3));
+		return MAX_LEN_2;
 	}
 
 	public int calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)

@@ -326,7 +326,7 @@ public class AddressesResource {
 
 		}
 
-		return new Account(address).getGeneratingBalance().toPlainString();
+		return "" + new Account(address).getGeneratingBalance();
 	}
 
 	@GET

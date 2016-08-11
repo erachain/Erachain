@@ -145,10 +145,18 @@ public class BlockChain
 		}
 		
 		//CHECK IF REFERENCE IS LASTBLOCK
-		if(Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), block.getReference()))
+		byte[] lastSignature = dbSet.getBlockMap().getLastBlockSignature();
+		if(Arrays.equals(lastSignature, block.getReference()))
 		{
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");
-			return false;
+			// SELECT BEST BLOCK
+			Block knownLastBlock = dbSet.getBlockMap().get(lastSignature);
+			if (knownLastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)) {
+				knownLastBlock.orphan(dbSet);	
+				LOGGER.error("core.BlockChain.isNewBlockValid *** knownBlock orphan and newBlock taken!");
+			} else {
+				LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");
+				return false;
+			}
 		}
 		
 		return true;

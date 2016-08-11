@@ -1079,8 +1079,8 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		long maxPeerWeight = this.getMaxPeerHWeight().b;
-		long chainWeight = this.blockChain.getHWeight(this.dbSet).b;
+		long maxPeerWeight = this.getMaxPeerHWeight().a;
+		long chainWeight = this.blockChain.getHWeight(this.dbSet).a;
 		return maxPeerWeight <= chainWeight;
 	}
 	
@@ -1119,7 +1119,8 @@ public class Controller extends Observable {
 
 		Peer peer = null;
 		//Block lastBlock = getLastBlock();
-		int lastTrueBlockHeight = dbSet.getBlockMap().getLastTrueBlockHeight();
+		int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
+		
 		try {
 			// WHILE NOT UPTODATE
 			while (!this.isUpToDate()) {

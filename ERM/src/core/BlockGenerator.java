@@ -264,8 +264,8 @@ public class BlockGenerator extends Thread implements Observer
 										
 					for(PrivateKeyAccount account: knownAccounts)
 					{
-						BigDecimal generatingBalance = account.getGeneratingBalance();
-						if(generatingBalance.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) < 0)
+						long generatingBalance = account.getGeneratingBalance();
+						if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 							continue;
 						
 						//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY

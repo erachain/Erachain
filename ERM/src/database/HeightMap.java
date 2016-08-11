@@ -23,6 +23,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	
 	private Map<Integer,byte[]> heightIndex;
 	
+	// for saving in DB
 	private Var<Long> fullWeightVar;
 	private Long fullWeight;
 	private int startedInForkHeight = 0;

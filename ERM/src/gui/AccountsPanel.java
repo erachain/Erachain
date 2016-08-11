@@ -221,7 +221,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getGeneratingBalance().toPlainString());
+				StringSelection value = new StringSelection("" + account.getGeneratingBalance());
 			    clipboard.setContents(value, null);
 			}
 		});

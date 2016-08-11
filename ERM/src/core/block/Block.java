@@ -145,7 +145,7 @@ public class Block {
 
 	public long getGeneratingBalance(DBSet db)
 	{
-		return this.creator.getGeneratingBalance(db).longValue();
+		return this.creator.getGeneratingBalance(db);
 	}
 	public long getGeneratingBalance()
 	{
