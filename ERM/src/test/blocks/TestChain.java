@@ -93,7 +93,7 @@ public class TestChain {
 		init();
 
 		// CREATE BLOCKCHAIN
-		blockChain = new BlockChain();
+		blockChain = new BlockChain(dbSet);
 
 		Block block = Controller.getInstance().getBlockByHeight(dbSet, 2081);
 		byte[] blockSignature = block.getSignature();

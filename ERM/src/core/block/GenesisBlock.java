@@ -470,19 +470,19 @@ public class GenesisBlock extends Block{
 		return new Status(genesisGenerator, "RIGHTs", icon, image, "Rights");		
 	}
 	
+	
+	//GETTERS
+
 	@Override
 	public long getTimestamp(DBSet db)
 	{
 		return this.genesisTimestamp;
 	}
-
 	
 	public String getTestNetInfo() 
 	{
 		return this.testnetInfo;
 	}
-	
-	//GETTERS
 	
 	@Override
 	public Block getParent(DBSet db)

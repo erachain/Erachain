@@ -27,13 +27,19 @@ public class BlockChain
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
 	
-	public BlockChain()
+	private Block waitWinBuffer;
+	
+	// dbSet_in = db() - for test
+	public BlockChain(DBSet dbSet_in)
 	{	
 		//CREATE GENESIS BLOCK
 		genesisBlock = new GenesisBlock();
 		genesisTimestamp = genesisBlock.getTimestamp(null);
 		
-		DBSet dbSet = DBSet.getInstance();
+		DBSet dbSet = dbSet_in;
+		if (dbSet_in == null) {
+			dbSet = DBSet.getInstance();
+		}
 
 		if(Settings.getInstance().isTestnet()) {
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
@@ -44,7 +50,7 @@ public class BlockChain
 			)
 		// process genesis block
 		{
-			if(dbSet.getBlockMap().getLastBlockSignature() != null)
+			if(dbSet_in == null && dbSet.getBlockMap().getLastBlockSignature() != null)
 			{
 				LOGGER.info("reCreate Database...");	
 		
@@ -69,6 +75,44 @@ public class BlockChain
 		return this.genesisTimestamp + height * Block.GENERATING_MIN_BLOCK_TIME;
 	}
 
+	// BUFFER of BLOCK for WIN solving
+	public Block getWaitWinBuffer() {
+		return this.waitWinBuffer;
+	}
+	public void clearWaitWinBuffer() {
+		this.waitWinBuffer = null;
+	}
+	public Block popWaitWinBuffer() {
+		Block block = this.waitWinBuffer; 
+		this.waitWinBuffer = null;
+		return block;
+	}
+	
+	// SOLVE WON BLOCK
+	// 0 - unchanged;
+	// 1 - changed, need broadcasting;
+	// 2 - broadcasting + need update BlockMap;  
+	public Tuple2<Integer, Block> setWaitWinBuffer(DBSet dbSet, Block block) {
+		
+		if (this.waitWinBuffer != null)
+			if (Arrays.equals(block.getReference(), this.waitWinBuffer.getSignature())) {
+				// NEW BLOCK INCOMED - PULL CURRENT BLOCK in MAP
+				// TODO
+				this.waitWinBuffer = block;
+				return new Tuple2<Integer, Block>(2, block);
+			}
+		
+		
+		if (this.waitWinBuffer == null
+				|| block.getWinValue(dbSet) > this.waitWinBuffer.getWinValue(dbSet)) {
+
+			this.waitWinBuffer = block;
+			return new Tuple2<Integer, Block>(1, block);
+		}
+		
+		return new Tuple2<Integer, Block>(0, this.waitWinBuffer);
+	}
+	
 	public Tuple2<Integer, Long> getHWeight(DBSet dbSet) {
 		
 		//GET LAST BLOCK
@@ -150,7 +194,11 @@ public class BlockChain
 				)
 		{
 			// TRY SELECT BEST BLOCK from NEW from PEER and LAST in DB
-			if (lastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)) {
+			if (false && lastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)
+					&& !Arrays.equals(lastBlock.getSignature(), block.getSignature())
+					&& !Arrays.equals(this.genesisBlock.getSignature(), block.getSignature())
+					) {
+				//// TODO тут нельзя откаты делать - несинхранизированые записи и база с двойными записями получается
 				//dbSet.getBlockMap().setProcessing(true);
 				lastBlock.orphan(dbSet);	
 				//dbSet.getBlockMap().setProcessing(false);

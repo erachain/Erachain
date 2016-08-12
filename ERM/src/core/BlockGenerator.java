@@ -179,11 +179,14 @@ public class BlockGenerator extends Thread implements Observer
 
 		DBSet dbSet = DBSet.getInstance();
 
+		int i_wait = 0;
 		while(true)
 		{
+			i_wait++;
+			
 			try 
 			{
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 			} 
 			catch (InterruptedException e) 
 			{
@@ -217,8 +220,12 @@ public class BlockGenerator extends Thread implements Observer
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 				if(this.solvingBlock == null
-						|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature))
+						||  Controller.getInstance().getBlockChain().getWaitWinBuffer() == null
+						|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
+						)
 				{
+					
+					i_wait = 0;
 					//SET NEW BLOCK TO SOLVE
 					this.solvingBlock = dbSet.getBlockMap().getLastBlock();
 					this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
@@ -228,80 +235,84 @@ public class BlockGenerator extends Thread implements Observer
 					this.winners = new HashMap<PrivateKeyAccount, Long>();
 					
 					this.acc_winner = null;
-				}
 
-				/*
-				 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
-				 * значть их ХЭШ - 
-				 * тоже самое и AT записями поидее
-				 * и эти хэши закатываем уже в заголвок блока и подписываем
-				 * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
-				 * если победа случиласть то
-				 * далее сами трнзакции кладем в тело блока и закрываем его
-				 */
-				/*
-				 * нет не  так - вычисляеи победное значение и если оно выиграло то
-				 * к нему транзакции собираем
-				 * и время всегда одинаковое
-				 * 
-				 */
-				
-				//GENERATE NEW BLOCKS
-				List<Transaction> unconfirmedTransactions = null;
-				byte[] unconfirmedTransactionsHash = null;
-				long max_winned_value = 0;
-				long winned_value;
-
-				// TODO if empty TRNSACTIONS - longer time
-				long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
-						+ Block.GENERATING_MIN_BLOCK_TIME;
-				
-				if (newTimestamp + 3000 > NTP.getTime()) {
-					continue;
-				}
-				//PREVENT CONCURRENT MODIFY EXCEPTION
-				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-				synchronized(knownAccounts)
-				{
-										
-					for(PrivateKeyAccount account: knownAccounts)
+					/*
+					 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
+					 * значть их ХЭШ - 
+					 * тоже самое и AT записями поидее
+					 * и эти хэши закатываем уже в заголвок блока и подписываем
+					 * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
+					 * если победа случиласть то
+					 * далее сами трнзакции кладем в тело блока и закрываем его
+					 */
+					/*
+					 * нет не  так - вычисляеи победное значение и если оно выиграло то
+					 * к нему транзакции собираем
+					 * и время всегда одинаковое
+					 * 
+					 */
+					
+					//GENERATE NEW BLOCKS
+					List<Transaction> unconfirmedTransactions = null;
+					byte[] unconfirmedTransactionsHash = null;
+					long max_winned_value = 0;
+					long winned_value;
+	
+					// TODO if empty TRNSACTIONS - longer time
+					long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
+							+ Block.GENERATING_MIN_BLOCK_TIME;
+					
+					if (newTimestamp + 3000 > NTP.getTime()) {
+						continue;
+					}
+					//PREVENT CONCURRENT MODIFY EXCEPTION
+					List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+					synchronized(knownAccounts)
 					{
-						long generatingBalance = account.getGeneratingBalance();
-						if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
-							continue;
-						
-						//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
-						if(this.winners.containsKey(account))
-							continue;
-						
-						//GENERATE NEW BLOCK FOR USER
-						// already signed
-						winned_value = account.calcWinValue(dbSet, this.solvingBlockHeight + 1);
-						if (winned_value > max_winned_value) {
-							//this.winners.put(account, winned_value);
-							acc_winner = account;
-							max_winned_value = winned_value;
+											
+						for(PrivateKeyAccount account: knownAccounts)
+						{
+							long generatingBalance = account.getGeneratingBalance();
+							if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
+								continue;
+							
+							//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
+							if(this.winners.containsKey(account))
+								continue;
+							
+							//GENERATE NEW BLOCK FOR USER
+							// already signed
+							winned_value = account.calcWinValue(dbSet, this.solvingBlockHeight + 1);
+							if (winned_value > max_winned_value) {
+								//this.winners.put(account, winned_value);
+								acc_winner = account;
+								max_winned_value = winned_value;
+							}
 						}
 					}
-				}
-				
-				if(acc_winner != null)
-				{
 					
-					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
-					// CALCULATE HASH for that transactions
-					unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
-
-					//ADD TRANSACTIONS
-					//this.addUnconfirmedTransactions(dbSet, block);
-					Block block = generateNextBlock(dbSet, acc_winner, 
-							this.solvingBlock, unconfirmedTransactionsHash);
-					block.setTransactions(unconfirmedTransactions);
-					
-					//PASS BLOCK TO CONTROLLER
-					Controller.getInstance().newBlockGenerated(block);
-					
+					if(acc_winner != null)
+					{
+						
+						// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+						unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
+						// CALCULATE HASH for that transactions
+						unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
+	
+						//ADD TRANSACTIONS
+						//this.addUnconfirmedTransactions(dbSet, block);
+						Block block = generateNextBlock(dbSet, acc_winner, 
+								this.solvingBlock, unconfirmedTransactionsHash);
+						block.setTransactions(unconfirmedTransactions);
+						
+						//PASS BLOCK TO CONTROLLER
+						Controller.getInstance().newBlockGenerated(block);
+						
+					}
+				} else if ( i_wait > 4 ) {
+					i_wait = 0;
+					Controller.getInstance().flushNewBlockGenerated();
+					continue;
 				}
 			}
 		}

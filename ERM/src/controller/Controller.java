@@ -379,7 +379,7 @@ public class Controller extends Observable {
 		this.synchronizer = new Synchronizer();
 
 		// CREATE BLOCKCHAIN
-		this.blockChain = new BlockChain();
+		this.blockChain = new BlockChain(null);
 		
 		// START API SERVICE
 		if (Settings.getInstance().isRpcEnabled()) {
@@ -449,6 +449,11 @@ public class Controller extends Observable {
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
 		this.addObserver(this.dbSet);
+	}
+
+	// need for TESTS
+	public void initBlockChain(DBSet dbSet) {
+		this.blockChain = new BlockChain(dbSet);
 	}
 
 	/*
@@ -840,7 +845,7 @@ public class Controller extends Observable {
 	// SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
 	public void onMessage(Message message) {
 		Message response;
-		Block block;
+		Block newBlock;
 
 		synchronized (this) {
 			switch (message.getType()) {
@@ -920,12 +925,12 @@ public class Controller extends Observable {
 						+ Base58.encode(getBlockMessage.getSignature()));
 
 				// ASK BLOCK FROM BLOCKCHAIN
-				block = this.blockChain
+				newBlock = this.blockChain
 						.getBlock(this.dbSet, getBlockMessage.getSignature());
 
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(
-						block);
+						newBlock);
 				response.setId(message.getId());
 
 				// SEND RESPONSE BACK WITH SAME ID
@@ -938,20 +943,20 @@ public class Controller extends Observable {
 				BlockMessage blockMessage = (BlockMessage) message;
 
 				// ASK BLOCK FROM BLOCKCHAIN
-				block = blockMessage.getBlock();
+				newBlock = blockMessage.getBlock();
 
-				boolean isNewBlockValid = this.blockChain.isNewBlockValid(this.dbSet, block);
+				boolean isNewBlockValid = this.blockChain.isNewBlockValid(this.dbSet, newBlock);
 				
 				if(isNewBlockValid)	{
 					synchronized (this.peerHWeight) {
 						// PUT NEW HEIGHT and WEIGHT to PEER
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.blockChain.getFullWeight(dbSet) + block.getWinValue(dbSet)));
+										this.peerHWeight.get(message.getSender()).b + newBlock.getWinValue(dbSet)));
 					}
 				} else {
 					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> new block not valid "
-								+ Base58.encode(block.getSignature()));
+								+ Base58.encode(newBlock.getSignature()));
 				}
 					
 				if(this.isProcessingWalletSynchronize()) {
@@ -961,7 +966,8 @@ public class Controller extends Observable {
 				
 				// CHECK IF VALID
 				if (isNewBlockValid
-						&& this.synchronizer.process(this.dbSet, block)) {
+						&& this.newBlockGenerated(newBlock)) {
+					
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
 
 					// PROCESS
@@ -1613,14 +1619,41 @@ public class Controller extends Observable {
 
 	// FORGE
 
-	public void newBlockGenerated(Block newBlock) {
+	public boolean newBlockGenerated(Block newBlock) {
 
-		this.synchronizer.process(this.dbSet, newBlock);
+		boolean isValid = true;
+		
+		Tuple2<Integer, Block> result = this.blockChain.setWaitWinBuffer(dbSet, newBlock); 
+		if ( result.a > 1 ) {
+			this.blockChain.clearWaitWinBuffer();
+			// need input to BlockMap
+			isValid = this.synchronizer.process(this.dbSet, result.b);
+		}
 
-		// BROADCAST
-		this.broadcastBlock(newBlock);
+		if ( isValid && result.a > 0 )
+		{
+			// need to BROADCAST
+			this.broadcastBlock(result.b);
+		}
+		
+		return isValid;
 	}
 
+	// FLUSH BLOCK from win Buffer - ti MAP and NERWORK
+	public boolean flushNewBlockGenerated() {
+
+		Block newBlock = this.blockChain.popWaitWinBuffer();
+		if (newBlock == null)
+			return false;
+		
+		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
+		if (isValid)
+			this.broadcastBlock(newBlock);
+		
+		return isValid;
+	}
+
+	
 	public List<Transaction> getUnconfirmedTransactions() {
 		return this.blockGenerator.getUnconfirmedTransactions();
 	}

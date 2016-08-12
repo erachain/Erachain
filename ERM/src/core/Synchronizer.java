@@ -108,7 +108,7 @@ public class Synchronizer
 			int heigh = block.getHeight(fork);
 
 			//CHECK IF VALID
-			if(block.isValid(fork))
+			if(block.isValid(fork) && block.isSignatureValid())
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				block.process(fork);
@@ -140,7 +140,7 @@ public class Synchronizer
 			Map<String, byte[]> states = dbSet.getATStateMap().getStates( lastCommonBlock.getHeight(dbSet) );
 			
 			//HEIGHT TO ROLL BACK
-			int height = (int)(Math.round( lastCommonBlock.getHeight(dbSet)/AT_Constants.STATE_STORE_DISTANCE))
+			int height_AT = (int)(Math.round( lastCommonBlock.getHeight(dbSet)/AT_Constants.STATE_STORE_DISTANCE))
 					*AT_Constants.STATE_STORE_DISTANCE;
 
 			//GET LAST BLOCK
@@ -161,14 +161,17 @@ public class Synchronizer
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 
-			// NOT orphan GENESIS BLOCK
-			while ( lastBlock.getHeight(dbSet) >= height && lastBlock.getHeight(dbSet) > 1 )
+			// THEN orphan next AT_height blocks
+			//NOT orphan GENESIS BLOCK
+			while ( lastBlock.getHeight(dbSet) >= height_AT && lastBlock.getHeight(dbSet) > 1 )
 			{
-				lastBlock.orphan(dbSet);
 				if (lastBlock.getHeight(dbSet) == 1 || lastBlock.getParent(dbSet) == null)
 				{
 					break;
 				}
+				
+				lastBlock.orphan(dbSet);
+
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
@@ -181,12 +184,12 @@ public class Synchronizer
 				
 				at.setState( states.get( id ) );
 				
-				dbSet.getATMap().update( at , height );
+				dbSet.getATMap().update( at , height_AT );
 				
 			}
 
-			dbSet.getATMap().deleteAllAfterHeight( height );
-			dbSet.getATStateMap().deleteStatesAfter( height );
+			dbSet.getATMap().deleteAllAfterHeight( height_AT );
+			dbSet.getATStateMap().deleteStatesAfter( height_AT );
 
 		}
 		
@@ -386,7 +389,7 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!response.getBlock().isSignatureValid())
 		{
-			throw new Exception("*** Invalid block");
+			throw new Exception("*** Invalid block --signature");
 		}
 		
 		//ADD TO LIST
@@ -395,13 +398,13 @@ public class Synchronizer
 	
 	
 	//SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
-	public synchronized boolean process(DBSet dbSet, Block block) 
+	public synchronized boolean process(DBSet dbSet, Block block)
 	{
 		//CHECK IF WE ARE STILL PROCESSING BLOCKS
 		if(this.run)
 		{
 			//SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-			if(block.isValid(dbSet))
+			if(block.isValid(dbSet) && block.isSignatureValid())
 			{
 				//PROCESS
 				dbSet.getBlockMap().setProcessing(true);
@@ -418,6 +421,6 @@ public class Synchronizer
 	public void stop() {
 		
 		this.run = false;
-		this.process(DBSet.getInstance(), null);
+		//this.process(DBSet.getInstance(), null);
 	}
 }

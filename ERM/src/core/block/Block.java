@@ -592,23 +592,25 @@ public class Block {
 
 	public byte[] getProofHash()
 	{
-		if(this.version < 3)
-		{
-			return Crypto.getInstance().digest(this.signature);
-		}
-		else
-		{
-			//newSig = sha256(prevSig || pubKey)
-			byte[] data = Bytes.concat(this.reference, creator.getPublicKey());
+		//newSig = sha256(prevSig || pubKey)
+		byte[] data = Bytes.concat(this.reference, creator.getPublicKey());
 
-			return Crypto.getInstance().digest(data);
-		}
+		return Crypto.getInstance().digest(data);
 	}
 	
 	public int getWinValue(DBSet dbSet)
 	{
-		int height = this.getHeight(dbSet);
+		// get HEIGHT by its PARENT
+		int height = this.getParentHeight(dbSet) + 1;
+		// IF BLOCK in the MAP
 		int previousForgingHeight = this.creator.getForgingData(dbSet, height);
+		// IF BLOCK not inserted in MAP
+		int prevHeight = creator.getLastForgingData(dbSet);
+		if (previousForgingHeight < prevHeight && prevHeight < height) {
+			// select
+			previousForgingHeight = prevHeight;
+		}
+
 		return this.creator.calcWinValueHeight(dbSet, height, previousForgingHeight);
 	}
 
@@ -902,12 +904,14 @@ public class Block {
 		{
 			Controller.getInstance().blockchainSyncStatusUpdate(height);
 		}
+		//assert(1==2);
 		
 	}
 
 	public void orphan(DBSet dbSet)
 	{
 		int height = this.getHeight(dbSet);
+		assert(1==2);
 		
 		//ORPHAN AT TRANSACTIONS
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
