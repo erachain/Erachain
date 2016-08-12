@@ -307,7 +307,8 @@ public class Synchronizer
 		DBSet dbSet = DBSet.getInstance();
 		
 		Block block = dbSet.getBlockMap().getLastBlock();
-		int hh = block.getHeight(dbSet);
+		long myBlockWeight = block.getWinValue(dbSet);
+		int myBlockHeight = block.getHeight(dbSet);
 		
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
 		List<byte[]> headers = this.getBlockSignatures(block.getSignature(), peer);
@@ -326,7 +327,8 @@ public class Synchronizer
 		//CHECK IF NO HEADERS FOUND EVEN AFTER CHECKING WITH THE GENESISBLOCK
 		if(headers.size() == 0)
 		{
-			throw new Exception("Dishonest peer");
+			throw new Exception("Dishonest peer: my block[" + myBlockHeight + "] Weight: " + myBlockWeight
+					+ "\n -> headers.size() == 0");
 		}
 		
 		//FIND LAST COMMON BLOCK IN HEADERS

@@ -3019,20 +3019,7 @@ public class BlockExplorer
 		}
 
 	}
-	
-
-	
-	/*
-	public int getHeight() {
-		return  Controller.getInstance().getHeight();
-	}
-	
-	public Block getLastBlock() 
-	{
-		return  Controller.getInstance().getLastBlock();
-	}
-	*/
-	
+		
 	public int getHeight() {
 		
 		//GET LAST BLOCK

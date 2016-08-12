@@ -469,11 +469,13 @@ public class GenesisBlock extends Block{
 
 		return new Status(genesisGenerator, "RIGHTs", icon, image, "Rights");		
 	}
-
-	public long getGenesisTimestamp() 
+	
+	@Override
+	public long getTimestamp(DBSet db)
 	{
 		return this.genesisTimestamp;
 	}
+
 	
 	public String getTestNetInfo() 
 	{
@@ -510,7 +512,7 @@ public class GenesisBlock extends Block{
 		
 		
 		//WRITE TIMESTAMP
-		byte[] genesisTimestampBytes = Longs.toByteArray(this.getGenesisTimestamp());
+		byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);
 		genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
 		data = Bytes.concat(data, genesisTimestampBytes);
 		

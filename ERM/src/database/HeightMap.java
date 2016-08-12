@@ -141,7 +141,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 			fullWeight -= value_old.b;
 		}
 		
-		if (startedInForkHeight == 0) {
+		if (startedInForkHeight == 0 && this.parent != null) {
 			startedInForkHeight = value.a;
 		}
 		
@@ -154,5 +154,21 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 
 		
 		return super.set(key, value);
+	}
+
+	public void delete(byte[] key)
+	{
+		if (this.contains(key)) {
+			// sub old value from FULL
+			Tuple2<Integer, Integer> value_old = this.get(key);
+			fullWeight -= value_old.b;
+		}
+		
+		if(this.fullWeightVar != null)
+		{
+			this.fullWeightVar.set(fullWeight);
+		}
+		
+		super.delete(key);
 	}
 }

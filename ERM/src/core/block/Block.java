@@ -120,27 +120,30 @@ public class Block {
 		return this.signature;
 	}
 
-	// timestamp by Height
-	public long getTimestamp(DBSet db)
+	public int getHeight(DBSet db)
 	{
+
 		int height = -1;
-		if(db.getHeightMap().contains(this.signature)) {
+		if (this instanceof GenesisBlock) {
+			height = 1;
+		} else if(db.getHeightMap().contains(this.signature)) {
 			height = db.getHeightMap().get(this.signature).a;
 		} else if (db.getHeightMap().contains(this.reference)) {
 			// get from parent
 			height = db.getHeightMap().get(this.reference).a + 1;
 		}
 		
-		BlockChain blockChain = Controller.getInstance().getBlockChain();
-		GenesisBlock genesisBlock;
-		if (blockChain == null) {
-			genesisBlock = new GenesisBlock();
-		} else {
-			genesisBlock = blockChain.getGenesisBlock();
-		}
+		return height;
 
-		return (height - 1) * GENERATING_MIN_BLOCK_TIME
-				+ genesisBlock.getGenesisTimestamp();
+	}
+
+	public long getTimestamp(DBSet db)
+	{
+		int height = this.getHeight(db);
+		
+		BlockChain blockChain = Controller.getInstance().getBlockChain();
+
+		return blockChain.getTimestamp(height);
 	}
 
 	public long getGeneratingBalance(DBSet db)
@@ -305,24 +308,6 @@ public class Block {
 	public Block getChild(DBSet db)
 	{
 		return db.getChildMap().get(this);
-	}
-
-	public int getHeight(DBSet db)
-	{
-		if(db.getHeightMap().contains(this.signature))
-			return db.getHeightMap().get(this.signature).a;
-		else
-		{
-			
-			if (this.reference == null)
-				// GENESIS BLOCK !!! ???
-				return 1;
-				
-			if(db.getHeightMap().contains(this.reference))
-				return db.getHeightMap().get(this.reference).a + 1;
-			else
-				return -1;
-		}
 	}
 
 	/*
@@ -913,8 +898,6 @@ public class Block {
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
-		//UPDATE LAST BLOCK
-		dbSet.getBlockMap().setLastBlock(this);
 
 		if (this instanceof GenesisBlock ) {
 		} else {
@@ -999,11 +982,6 @@ public class Block {
 			Integer prevHeight = this.creator.getForgingData(dbSet, height);
 			this.creator.delForgingData(dbSet, height);
 			this.creator.setLastForgingData(dbSet, prevHeight);
-		}
-
-		if (this.getParent(dbSet) != null) {
-			//SET PARENT AS LAST BLOCK
-			dbSet.getBlockMap().setLastBlock(this.getParent(dbSet));
 		}
 
 		//DELETE BLOCK FROM DB

@@ -25,11 +25,14 @@ public class BlockChain
 	
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
+	private long genesisTimestamp;
 	
 	public BlockChain()
 	{	
 		//CREATE GENESIS BLOCK
 		genesisBlock = new GenesisBlock();
+		genesisTimestamp = genesisBlock.getTimestamp(null);
+		
 		DBSet dbSet = DBSet.getInstance();
 
 		if(Settings.getInstance().isTestnet()) {
@@ -37,8 +40,8 @@ public class BlockChain
 		}
 		
 		if(	!dbSet.getBlockMap().contains(genesisBlock.getSignature())
-			||
-			dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp(dbSet) != genesisBlock.getTimestamp(dbSet))
+			// not need now || dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp(dbSet) != genesisBlock.getTimestamp(dbSet)
+			)
 		// process genesis block
 		{
 			if(dbSet.getBlockMap().getLastBlockSignature() != null)
@@ -62,17 +65,10 @@ public class BlockChain
 	public GenesisBlock getGenesisBlock() {
 		return this.genesisBlock;
 	}
-	
-	/*
-	public int getHeight(DBSet dbSet) {
-		
-		//GET LAST BLOCK
-		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-		
-		//RETURN HEIGHT
-		return dbSet.getHeightMap().get(lastBlockSignature);
+	public long getTimestamp(int height) {
+		return this.genesisTimestamp + height * Block.GENERATING_MIN_BLOCK_TIME;
 	}
-	*/
+
 	public Tuple2<Integer, Long> getHWeight(DBSet dbSet) {
 		
 		//GET LAST BLOCK

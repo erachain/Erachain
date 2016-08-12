@@ -59,8 +59,6 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		super(parent);
 		
-		//this.lastBlockVar = parent.getLastBlockVar();
-
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
 		
@@ -131,10 +129,10 @@ public class BlockMap extends DBMap<byte[], Block>
 		return this.observableData;
 	}
 	
-	public void setLastBlock(Block block) 
+	private void setLastBlock(byte[] signature) 
 	{
 		
-		this.lastBlockSignature = block.getSignature();
+		this.lastBlockSignature = signature;
 		if(this.lastBlockVar != null)
 		{
 			this.lastBlockVar.set(this.lastBlockSignature);
@@ -209,6 +207,8 @@ public class BlockMap extends DBMap<byte[], Block>
 	}
 	public boolean set(byte[] signature, Block block)
 	{
+	
+		setLastBlock(signature);
 		
 		DBSet dbSet = (DBSet)this.databaseSet;
 		
@@ -229,18 +229,31 @@ public class BlockMap extends DBMap<byte[], Block>
 
 	public void delete(Block block)
 	{
-		this.delete(block.getSignature());
+		DBSet dbSet = (DBSet)this.databaseSet;
+
+		dbSet.getHeightMap().delete(block.getSignature());
+
+		byte[] parentSign = block.getReference();
+
+		if (parentSign != null && this.contains(parentSign)) {
+			
+			setLastBlock(parentSign);
+			
+			Block parent = this.get(parentSign);
+			dbSet.getChildMap().delete(parent.getSignature());
+		}
+		
+
+		// use SUPER.class only!
+		super.delete(block.getSignature());
 	}
+
 	public void delete(byte[] signature)
 	{
-		DBSet dbSet = (DBSet)this.databaseSet;
-		
-		dbSet.getHeightMap().delete(signature);
-		dbSet.getChildMap().delete(signature);
-
-		super.delete(signature);
+		Block block = super.get(signature);
+		this.delete(block);
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Collection<byte[]> getGeneratorBlocks(String address)
 	{
