@@ -533,8 +533,8 @@ public class Account {
 		if (len < 1)
 			len = 1;
 			
-		if (len < 10)
-			len += 10;
+		if (len < 20)
+			len += 20;
 		else
 			len *= 2;
 		
@@ -542,11 +542,11 @@ public class Account {
 		int MAX_LEN_2 = MAX_LEN * 100;
 		if (len < MAX_LEN ) {
 			//return (long)(len * Math.pow(len, 0.3));
-			return len;
+			return (long)Math.pow(len, 1.5);
 		} else if ( len < MAX_LEN_2 )
-			return MAX_LEN + (long)Math.pow(len - MAX_LEN, 0.7);
+			return (long)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
 		//return (long)(len * Math.pow(MAX_LEN, 0.3));
-		return MAX_LEN + (long)Math.pow(MAX_LEN_2 - MAX_LEN, 0.7);
+		return (long)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
 	}
 
 	public int calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)
@@ -592,13 +592,13 @@ public class Account {
 		}
 
 		if (height < 10000)
-			win_value >>= 12;
-		else if (height < 100000)
-			win_value >>= 15;
-		else if (height < 1000000)
-			win_value >>= 17;
-		else
 			win_value >>= 16;
+		else if (height < 100000)
+			win_value >>= 18;
+		else if (height < 1000000)
+			win_value >>= 20;
+		else
+			win_value >>= 22;
 		
 		return (int)win_value;
 

@@ -123,16 +123,24 @@ public class Block {
 	public int getHeight(DBSet db)
 	{
 
-		int height = -1;
-		if (this instanceof GenesisBlock) {
-			height = 1;
-		} else if(db.getHeightMap().contains(this.signature)) {
-			height = db.getHeightMap().get(this.signature).a;
-		} else if (db.getHeightMap().contains(this.reference)) {
-			// get from parent
-			height = db.getHeightMap().get(this.reference).a + 1;
-		}
+		if (this instanceof GenesisBlock
+				|| Arrays.equals(this.signature,
+						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
+			return 1;
 		
+		int height = db.getHeightMap().get(this.signature).a;		
+		return height;
+
+	}
+	public int getParentHeight(DBSet db)
+	{
+
+		if (this instanceof GenesisBlock
+				|| Arrays.equals(this.signature,
+						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
+			return 2;
+		
+		int height = db.getHeightMap().get(this.reference).a;		
 		return height;
 
 	}
@@ -878,37 +886,9 @@ public class Block {
 		}
 		
 		int height = 1;
-		/*
-		Block parent = this.getParent(dbSet);
-		if(parent != null)
-		{
-			//SET AS CHILD OF PARENT
-			dbSet.getChildMap().set(parent, this);	
-
-			//SET BLOCK HEIGHT
-			height = parent.getHeight(dbSet) + 1;
-			dbSet.getHeightMap().set(this, height, this.getWinValue(dbSet));
-		}
-		else
-		{
-			//IF NO PARENT HEIGHT IS 1
-			dbSet.getHeightMap().set(this, 1, 0);
-		}
-		*/
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
-
-		if (this instanceof GenesisBlock ) {
-		} else {
-			
-			height = dbSet.getHeightMap().getHeight(this);
-
-			// PROCESS FORGING DATA
-			Integer prevHeight = this.creator.getLastForgingData(dbSet);
-			this.creator.setForgingData(dbSet, height, prevHeight);
-			this.creator.setLastForgingData(dbSet, height);
-		}
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
@@ -969,20 +949,6 @@ public class Block {
 		//DELETE TRANSACTIONS FROM FINAL MAP
 		dbSet.getTransactionFinalMap().delete(height);
 
-		/*
-		dbSet.getHeightMap().delete(this.signature);
-		// delete CHILDS - for proper making HEADERS in Controller.onMessage
-		dbSet.getChildMap().delete(this.signature);
-		*/
-
-		// LAST FORGING BLOCK
-		if (this instanceof GenesisBlock ) {
-		} else {
-			// ORPHAN FORGING DATA
-			Integer prevHeight = this.creator.getForgingData(dbSet, height);
-			this.creator.delForgingData(dbSet, height);
-			this.creator.setLastForgingData(dbSet, prevHeight);
-		}
 
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);

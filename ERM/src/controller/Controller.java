@@ -1079,8 +1079,11 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		long maxPeerWeight = this.getMaxPeerHWeight().a;
-		long chainWeight = this.blockChain.getHWeight(this.dbSet).a;
+		long maxPeerWeight = this.getMaxPeerHWeight().b;
+		long chainWeight = this.blockChain.getHWeight(this.dbSet).b;
+		LOGGER.info("controller.Controller.isUpToDate getMaxPeerHWeight:" + maxPeerWeight
+				+ "<=" + chainWeight);
+
 		return maxPeerWeight <= chainWeight;
 	}
 	

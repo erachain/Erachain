@@ -17,6 +17,7 @@ import settings.Settings;
 import at.AT;
 import at.AT_API_Platform_Impl;
 import at.AT_Constants;
+import controller.Controller;
 import core.block.Block;
 import core.crypto.Base58;
 import core.transaction.Transaction;
@@ -219,6 +220,14 @@ public class Synchronizer
 		{
 			//GET NEXT 500 SIGNATURES
 			signatures = this.getBlockSignatures(common, BlockChain.MAX_SIGNATURES, peer);
+			if (signatures.size() == 0) {
+				//INVALID HEADERS
+				throw new Exception("HEADERS.size == 0 from peer on block " + peer
+						+ "\n on Common Block[" + common.getHeight(dbSet) + "]"
+						+ "[" + Base58.encode(common.getSignature()) + "]"
+						+ "\n and My Block full Weight: " + Controller.getInstance().getMyHWeight().a
+						+ "/" + Controller.getInstance().getMyHWeight().b);
+			}
 			
 			//CREATE BLOCK BUFFER
 			BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);

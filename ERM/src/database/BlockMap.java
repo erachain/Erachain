@@ -17,6 +17,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import database.serializer.BlockSerializer;
 import settings.Settings;
@@ -214,15 +215,24 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 		Block parent = block.getParent(dbSet);
 		if (parent != null) {
+
+			int height = parent.getHeight(dbSet) + 1;
 			dbSet.getChildMap().set(parent, block);
 			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(block.getHeight(dbSet), block.getWinValue(dbSet)));
+					new Tuple2<Integer, Integer>(height, block.getWinValue(dbSet)));
+			
+			//
+			// PROCESS FORGING DATA
+			PublicKeyAccount creator = block.getCreator();
+			Integer prevHeight = creator.getLastForgingData(dbSet);
+			creator.setForgingData(dbSet, height, prevHeight);
+			creator.setLastForgingData(dbSet, height);
+
 		} else {
 			dbSet.getHeightMap().set(signature,
 					new Tuple2<Integer, Integer>(1, 0));
 			
 		}
-
 		
 		return super.set(signature, block);
 	}
@@ -234,15 +244,22 @@ public class BlockMap extends DBMap<byte[], Block>
 		dbSet.getHeightMap().delete(block.getSignature());
 
 		byte[] parentSign = block.getReference();
+		Block parent = this.get(parentSign);
 
-		if (parentSign != null && this.contains(parentSign)) {
+		if (parent != null) {
 			
-			setLastBlock(parentSign);
+			this.setLastBlock(parentSign);
 			
-			Block parent = this.get(parentSign);
 			dbSet.getChildMap().delete(parent.getSignature());
-		}
 		
+			// ORPHAN FORGING DATA
+			int height = parent.getHeight(dbSet) + 1;
+			PublicKeyAccount creator = block.getCreator();
+			Integer prevHeight = creator.getForgingData(dbSet, height);
+			creator.delForgingData(dbSet, height);
+			creator.setLastForgingData(dbSet, prevHeight);
+
+		}
 
 		// use SUPER.class only!
 		super.delete(block.getSignature());

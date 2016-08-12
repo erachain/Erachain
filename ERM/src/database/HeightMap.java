@@ -80,7 +80,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	@Override
 	protected Tuple2<Integer, Integer> getDefaultValue() 
 	{
-		return null;
+		return new Tuple2<Integer, Integer>(-1,-1);
 	}
 	
 	public Long getFullWeight() {
