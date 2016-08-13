@@ -147,7 +147,7 @@ public class Block {
 
 	public long getTimestamp(DBSet db)
 	{
-		int height = this.getHeight(db);
+		int height = this.getParentHeight(db) + 1;
 		
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 
@@ -829,7 +829,9 @@ public class Block {
 				}
 	
 				//CHECK TIMESTAMP AND DEADLINE
-				if(transaction.getTimestamp() > timestampEnd || transaction.getDeadline() <= timestampBeg)
+				long transactionTimestamp = transaction.getTimestamp();
+				if( transactionTimestamp > timestampEnd
+						|| transaction.getDeadline() <= timestampBeg)
 				{
 					LOGGER.error("*** Block[" + this.getHeight(fork) + "].TX.timestamp invalid");
 					return false;

@@ -55,7 +55,7 @@ public class Settings {
 	public static final int CONFIRMS_TRUE = 333; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1470890481777L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1471114884777L; //1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC
