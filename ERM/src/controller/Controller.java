@@ -1102,7 +1102,8 @@ public class Controller extends Observable {
 			int maxPeerHeight = this.getMaxPeerHWeight().a;
 			int chainHeight = this.blockChain.getHWeight(false).a;
 			int diff = chainHeight - maxPeerHeight;
-			return diff >= 0 && diff < 2;			
+			//return diff >= 0 && diff < 2;
+			return diff >= 0;
 		} else {
 			long maxPeerWeight = this.getMaxPeerHWeight().b;
 			long chainWeight = this.blockChain.getHWeight(false).b;
