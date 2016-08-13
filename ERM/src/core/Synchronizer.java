@@ -228,8 +228,8 @@ public class Synchronizer
 				throw new Exception("HEADERS.size == 0 from peer on block " + peer
 						+ "\n on Common Block[" + common.getHeight(dbSet) + "]"
 						+ "[" + Base58.encode(common.getSignature()) + "]"
-						+ "\n and My Block full Weight: " + Controller.getInstance().getMyHWeight().a
-						+ "/" + Controller.getInstance().getMyHWeight().b);
+						+ "\n and My Block full Weight: " + Controller.getInstance().getMyHWeight(false).a
+						+ "/" + Controller.getInstance().getMyHWeight(false).b);
 			}
 			
 			//CREATE BLOCK BUFFER

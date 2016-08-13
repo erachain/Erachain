@@ -347,15 +347,15 @@ public class SysTray implements Observer{
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-				currentHeight = Controller.getInstance().getMyHWeight().a;
+				currentHeight = Controller.getInstance().getMyHWeight(false).a;
 				return;
 			}
 			networkStatus = "Wallet Synchronizing";
 			
-			syncProcent = 100 * currentHeight/Controller.getInstance().getMyHWeight().a + "%";
+			syncProcent = 100 * currentHeight/Controller.getInstance().getMyHWeight(false).a + "%";
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMyHWeight().a + "/" + Controller.getInstance().getMaxPeerHWeight().a;
+			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight().a;
 			setToolTipText(toolTipText);
 			
 		} else if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -373,7 +373,7 @@ public class SysTray implements Observer{
 		} else {
 			if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
 				toolTipText += networkStatus + " " + syncProcent;
-				toolTipText += "\nHeight: " + Controller.getInstance().getMyHWeight().a;
+				toolTipText += "\nHeight: " + Controller.getInstance().getMyHWeight(false).a;
 				setToolTipText(toolTipText);
 			}
 		}

@@ -3032,7 +3032,7 @@ public class BlockExplorer
 	public Tuple2<Integer, Long> getHWeight() {
 		
 		//RETURN HEIGHT
-		return Controller.getInstance().getMyHWeight();
+		return Controller.getInstance().getMyHWeight(false);
 	}
 	
 	public Block getLastBlock() 

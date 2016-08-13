@@ -100,7 +100,7 @@ public class TestChain {
 		
 		// 	test controller.Controller.onMessage(Message) -> GET_SIGNATURES_TYPE
 		List<byte[]> headers = blockChain
-				.getSignatures(dbSet, blockSignature);
+				.getSignatures(blockSignature);
 		
 		assertEquals(30, headers.size());
 

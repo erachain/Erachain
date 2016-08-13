@@ -40,9 +40,9 @@ public class NetworkStatus extends JLabel implements Observer
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent mEvt) {
 				if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-					setToolTipText(Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight().a);
+					setToolTipText(Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a);
 				} else if( Controller.getInstance().getWalletSyncHeight() > 0 ) {
-					setToolTipText(Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight().a + "/" + Controller.getInstance().getMaxPeerHWeight());
+					setToolTipText(Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight());
 				} else {
 					setToolTipText(Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight().a);
 				}
@@ -69,12 +69,12 @@ public class NetworkStatus extends JLabel implements Observer
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-				currentHeight = Controller.getInstance().getMyHWeight().a;
+				currentHeight = Controller.getInstance().getMyHWeight(false).a;
 				return;
 			}
 			
 			this.setIcon(walletSynchronizingIcon);
-			this.setText(Lang.getInstance().translate("Wallet Synchronizing")+" " + 100 * currentHeight/Controller.getInstance().getMyHWeight().a + "%");
+			this.setText(Lang.getInstance().translate("Wallet Synchronizing")+" " + 100 * currentHeight/Controller.getInstance().getMyHWeight(false).a + "%");
 		}
 		
 		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)

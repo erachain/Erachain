@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import ntp.NTP;
@@ -173,8 +174,9 @@ public class BlockGenerator extends Thread implements Observer
 	public void run()
 	{
 
+		Controller ctrl = Controller.getInstance();
 
-		if(!Controller.getInstance().doesWalletExists())
+		if(!ctrl.doesWalletExists())
 			return;
 
 		DBSet dbSet = DBSet.getInstance();
@@ -182,7 +184,6 @@ public class BlockGenerator extends Thread implements Observer
 		int i_wait = 0;
 		while(true)
 		{
-			i_wait++;
 			
 			try 
 			{
@@ -196,22 +197,24 @@ public class BlockGenerator extends Thread implements Observer
 			if(dbSet.isStoped()) {
 				continue;
 			}
-			
-			//CHECK IF WE ARE UPTODATE
-			if(!Controller.getInstance().isUpToDate() && !Controller.getInstance().isProcessingWalletSynchronize())
+
+			i_wait++;
+
+			//CHECK IF WE ARE UP TO DATE
+			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
 			{
-				Controller.getInstance().update();
+				ctrl.update();
 			}
 			
 			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
 			syncForgingStatus();
-			if(forgingStatus == ForgingStatus.FORGING && Controller.getInstance().isReadyForging())
+			if(forgingStatus == ForgingStatus.FORGING && ctrl.isReadyForging())
 			{
 				
 				//GET LAST BLOCK
 				// TODO lastBlock error
 				// TEST DB for last block - some time error raised
-				Block lastBlock = Controller.getInstance().getLastBlock();
+				Block lastBlock = ctrl.getLastBlock();
 				if (lastBlock == null) {
 					return;
 				}
@@ -220,7 +223,7 @@ public class BlockGenerator extends Thread implements Observer
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 				if(this.solvingBlock == null
-						||  Controller.getInstance().getBlockChain().getWaitWinBuffer() == null
+						||  ctrl.getBlockChain().getWaitWinBuffer() == null
 						|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 						)
 				{
@@ -306,12 +309,16 @@ public class BlockGenerator extends Thread implements Observer
 						block.setTransactions(unconfirmedTransactions);
 						
 						//PASS BLOCK TO CONTROLLER
-						Controller.getInstance().newBlockGenerated(block);
+						///ctrl.newBlockGenerated(block);
+						if (ctrl.getBlockChain().setWaitWinBuffer(block)) {
+							// need to BROADCAST
+							ctrl.broadcastBlock(block, null);
+						}
 						
 					}
 				} else if ( i_wait > 4 ) {
 					i_wait = 0;
-					Controller.getInstance().flushNewBlockGenerated();
+					ctrl.flushNewBlockGenerated();
 					continue;
 				}
 			}

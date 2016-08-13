@@ -290,7 +290,7 @@ public class Network extends Observable implements ConnectionCallback {
 				Peer peer = this.connectedPeers.get(i);
 				
 				//EXCLUDE PEERS
-				if(peer != null && !exclude.contains(peer))
+				if(peer != null && (exclude == null || !exclude.contains(peer)))
 				{
 					peer.sendMessage(message);
 				}
