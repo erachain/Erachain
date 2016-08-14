@@ -945,9 +945,9 @@ public class Controller extends Observable {
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();
 
-				boolean isNewBlockValid = this.blockChain.isNewBlockValid(newBlock);
+				int isNewBlockValid = this.blockChain.isNewBlockValid(newBlock);
 				
-				if(isNewBlockValid)	{
+				if(isNewBlockValid == 0)	{
 					/*
 					 *  not need - it is for WIN BUFFER BLOCK
 					synchronized (this.peerHWeight) {
@@ -957,6 +957,13 @@ public class Controller extends Observable {
 										this.peerHWeight.get(message.getSender()).b + newBlock.getWinValue(dbSet)));
 					}
 					 */
+				} else if (isNewBlockValid == 4) {
+					// TRY get new chain from this peer
+					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> wait update() -- "
+							+ this.peerHWeight.get(blockMessage.getSender()));
+					//update();
+					
+					break;
 				} else {
 					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> new block not valid "
 								+ Base58.encode(newBlock.getSignature()));
@@ -968,7 +975,7 @@ public class Controller extends Observable {
 				}
 				
 				// CHECK IF VALID
-				if (isNewBlockValid
+				if (isNewBlockValid == 0
 						&& this.getBlockChain().setWaitWinBuffer(newBlock)) {
 					
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));

@@ -18,7 +18,10 @@ import utils.ObserverMessage;
 import controller.Controller;
 import core.BlockGenerator;
 import core.account.Account;
+import core.block.Block;
+import core.block.GenesisBlock;
 import core.transaction.Transaction;
+import database.DBSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -45,25 +48,39 @@ public class ForgingStatus extends JLabel implements Observer {
 			public void mouseEntered(MouseEvent mEvt) {
 				if(Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING)
 				{
-					BigDecimal totalBalance = BigDecimal.ZERO.setScale(8);
 		           	
+					long genBalance = 0;
+					long winBalance = 0;
+					Account winAccount = null;
+					int height = Controller.getInstance().getMyHeight();
+					DBSet dbSet = DBSet.getInstance();
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
-			        	totalBalance = totalBalance.add(account.getConfirmedBalance(Transaction.RIGHTS_KEY));
+		            	long g_balance = account.getConfirmedBalance(Transaction.RIGHTS_KEY).longValue();
+		            	if (g_balance < GenesisBlock.MIN_GENERATING_BALANCE) {
+		            		continue;
+		            	}
+		            	long w_balance = account.calcWinValue(dbSet, height);
+		            	if (w_balance > winBalance) {
+		            		genBalance = g_balance;
+		            		winBalance = w_balance;
+		            		winAccount = account;
+		            	}
 			        }
-			        long totalBalanceInt = totalBalance.longValue();
 		            
 			        String timeForge = "";
-			        if(totalBalanceInt>0)
+			        if(winAccount != null)
 			        {
-			        	timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
+			        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
+			        	timeForge = genBalance + " " + winBalance + " " + winAccount.getAddress();
+			        	
 			        }
 			        else
 			        {
 			        	timeForge = Lang.getInstance().translate("infinity");
 			        }
 			        
-		            setToolTipText(Lang.getInstance().translate("Approx time to find the block: %timeForge%.").replace("%timeForge%", timeForge));
+		            setToolTipText(Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge));
 				}
 				else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_DISABLED && Controller.getInstance().getStatus() == Controller.STATUS_OK) 
 				{

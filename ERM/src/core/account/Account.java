@@ -606,14 +606,30 @@ public class Account {
 
 	public long calcWinValue(DBSet dbSet, int height)
 	{
+		
+		/*
 		int previousForgingHeight;
 		int lastHeight = this.getLastForgingData(dbSet);
 		if (lastHeight > height) {
 			previousForgingHeight = this.getForgingData(dbSet, height);			
 		} else {
 			previousForgingHeight = this.getForgingData(dbSet, lastHeight);
-
 		}
+		*/
+
+		// LAST HEIGHT for this Height
+		int previousForgingHeight = this.getForgingData(dbSet, height);
+		// LAST 
+		int lastHeight = this.getLastForgingData(dbSet);
+		// IF BLOCK not inserted in MAP
+		//int lastHeight = creator.getLastForgingData(dbSet);
+		if (lastHeight <= height) {
+			previousForgingHeight = lastHeight;
+		} else if (previousForgingHeight < lastHeight) {
+			// select
+			previousForgingHeight = lastHeight;
+		}
+
 		//if (lastHeight == previousForgingHeight)
 		//	previousForgingHeight -= 1;
 		return calcWinValueHeight(dbSet, height, previousForgingHeight);

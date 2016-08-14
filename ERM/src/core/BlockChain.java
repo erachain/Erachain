@@ -99,6 +99,11 @@ public class BlockChain
 				|| block.getWinValue(dbSet) > this.waitWinBuffer.getWinValue(dbSet)) {
 
 			this.waitWinBuffer = block;
+
+			LOGGER.error("setWaitWinBuffer - Block win value: "
+					+ block.getWinValue(dbSet)
+					+ " - creator winValue:" + block.getCreator().calcWinValue(dbSet, block.getHeight(dbSet)));
+
 			return true;
 		}
 		
@@ -173,33 +178,33 @@ public class BlockChain
 		return dbSet.getBlockMap().get(header);
 	}
 
-	public boolean isNewBlockValid(Block block) {
+	public int isNewBlockValid(Block block) {
 		
 		//CHECK IF NOT GENESIS
 		if(block instanceof GenesisBlock)
 		{
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> as GenesisBlock");
-			return false;
+			return 1;
 		}
 		
 		//CHECK IF SIGNATURE IS VALID
 		if(!block.isSignatureValid())
 		{
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> signature");
-			return false;
+			return 2;
 		}
 		
 		//CHECK IF WE KNOW THIS BLOCK
 		if(dbSet.getBlockMap().contains(block.getSignature()))
 		{
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB");
-			return false;
+			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB #" + block.getHeight(dbSet));
+			return 3;
 		}
 
 		Block lastBlock = this.getLastBlock();
 		if(!Arrays.equals(lastBlock.getSignature(), block.getReference())) {
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
-			return false;
+			return 4;
 		}
 
 		/*
@@ -228,7 +233,7 @@ public class BlockChain
 		}
 		 */
 		
-		return true;
+		return 0;
 	}
 	
 	public Pair<Block, List<Transaction>> scanTransactions(Block block, int blockLimit, int transactionLimit, int type, int service, Account account) 

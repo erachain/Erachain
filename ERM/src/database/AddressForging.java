@@ -51,7 +51,7 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 	@Override
 	protected Integer getDefaultValue() 
 	{
-		return 1;
+		return -1;
 	}
 	
 	@Override

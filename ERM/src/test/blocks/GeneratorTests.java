@@ -109,8 +109,10 @@ public class GeneratorTests {
 				generator = generator1;
 			else if (i < 30)
 				generator = generator2;
-			else if (i < 100)
+			else if (i < 40)
 				generator = generator3;
+			else if (i < 100)
+				generator = generator1;
 			else
 				generator = generator4;
 			
@@ -128,39 +130,137 @@ public class GeneratorTests {
 			if (!newBlock.isValid(dbSet))
 				assertEquals(true, newBlock.isValid(dbSet));
 			
+			height = Controller.getInstance().getMyHeight();
+			assertEquals(height, i + 1);
+
+			if (i == 0) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 1) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 2) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(15716, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 9) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(23803, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 10) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(25024, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 11) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 12) {
+				assertEquals(1571, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 29) {
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+				assertEquals(2018, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 30) {
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+				assertEquals(2124, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 31) {
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 39) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(6729, generator1.calcWinValue(dbSet, height));
+			}
+			else if (i == 40) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(7080, generator1.calcWinValue(dbSet, height));
+			}
+			else if (i == 41) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+			}
+			else if (i == 42) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(439, generator1.calcWinValue(dbSet, height));
+			}
+
+			
 			//PROCESS NEW BLOCK
 			newBlock.process(dbSet);
 			
 			height = newBlock.getHeight(dbSet);
+			assertEquals(height, i + 2);
 			
 			if (i == 0) {
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
 				assertEquals(1464, newBlock.getWinValue(dbSet));
 				assertEquals(14648, generator2.calcWinValue(dbSet, height));
 			}
 			else if (i == 1) {
-				assertEquals(1000, newBlock.getWinValue(dbSet));
-				assertEquals(40000, generator2.calcWinValue(dbSet, height));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(1464, newBlock.getWinValue(dbSet));
+				assertEquals(15716, generator2.calcWinValue(dbSet, height));
 			}
 			else if (i == 2) {
-				assertEquals(1000, newBlock.getWinValue(dbSet));
-				assertEquals(90000, generator2.calcWinValue(dbSet, height));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(1464, newBlock.getWinValue(dbSet));
+				assertEquals(16784, generator2.calcWinValue(dbSet, height));
 			}
 			else if (i == 9) {
-				assertEquals(1000, generator1.calcWinValue(dbSet, height));
-				assertEquals(1000, newBlock.getWinValue(dbSet));
-				assertEquals(1000000, generator2.calcWinValue(dbSet, height));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(1464, newBlock.getWinValue(dbSet));
+				assertEquals(25024, generator2.calcWinValue(dbSet, height));
 			}
 			else if (i == 10) {
-				assertEquals(4000, generator1.calcWinValue(dbSet, height));
-				// GENERATOR 2
-				assertEquals(1210000, newBlock.getWinValue(dbSet));
-				assertEquals(1210000, generator2.calcWinValue(dbSet, height));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+				assertEquals(25024, newBlock.getWinValue(dbSet));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
 			}
 			else if (i == 11) {
-				assertEquals(9000, generator1.calcWinValue(dbSet, height));
-				// GENERATOR 2
-				assertEquals(10000, newBlock.getWinValue(dbSet));
-				assertEquals(10000, generator2.calcWinValue(dbSet, height));
+				assertEquals(1571, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, newBlock.getWinValue(dbSet));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 12) {
+				assertEquals(1678, generator1.calcWinValue(dbSet, height));
+				assertEquals(14648, newBlock.getWinValue(dbSet));
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+			}
+			else if (i == 29) {
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+				assertEquals(14648, newBlock.getWinValue(dbSet));
+				assertEquals(2124, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 30) {
+				assertEquals(14648, generator2.calcWinValue(dbSet, height));
+				assertEquals(2124, newBlock.getWinValue(dbSet));
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 31) {
+				assertEquals(15716, generator2.calcWinValue(dbSet, height));
+				assertEquals(439, newBlock.getWinValue(dbSet));
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+			}
+			else if (i == 39) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(439, newBlock.getWinValue(dbSet));
+				assertEquals(7080, generator1.calcWinValue(dbSet, height));
+			}
+			else if (i == 40) {
+				assertEquals(439, generator3.calcWinValue(dbSet, height));
+				assertEquals(7080, newBlock.getWinValue(dbSet));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
+			}
+			else if (i == 41) {
+				assertEquals(471, generator3.calcWinValue(dbSet, height));
+				assertEquals(1464, newBlock.getWinValue(dbSet));
+				assertEquals(1464, generator1.calcWinValue(dbSet, height));
 			}
 			
 			//LAST BLOCK IS NEW BLOCK

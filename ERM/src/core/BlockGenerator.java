@@ -180,14 +180,23 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 
 		DBSet dbSet = DBSet.getInstance();
+		boolean isGenesisStart = false;
 
-		int i_wait = 0;
+		int wait_interval_run = 2000;
+		int wait_interval = wait_interval_run;
 		while(true)
 		{
 			
+			// try solve and flush new block from Win Buffer			
+			Block waitWin = ctrl.getBlockChain().getWaitWinBuffer();
+			if (waitWin != null
+					&& waitWin.getTimestamp(dbSet) + 20000 < NTP.getTime()) {
+				ctrl.flushNewBlockGenerated();
+			}
+
 			try 
 			{
-				Thread.sleep(2000);
+				Thread.sleep(wait_interval);
 			} 
 			catch (InterruptedException e) 
 			{
@@ -197,8 +206,6 @@ public class BlockGenerator extends Thread implements Observer
 			if(dbSet.isStoped()) {
 				continue;
 			}
-
-			i_wait++;
 
 			//CHECK IF WE ARE UP TO DATE
 			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
@@ -228,7 +235,6 @@ public class BlockGenerator extends Thread implements Observer
 						)
 				{
 					
-					i_wait = 0;
 					//SET NEW BLOCK TO SOLVE
 					this.solvingBlock = dbSet.getBlockMap().getLastBlock();
 					this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
@@ -265,14 +271,23 @@ public class BlockGenerator extends Thread implements Observer
 					long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
 							+ Block.GENERATING_MIN_BLOCK_TIME;
 					
+					
 					if (newTimestamp + 3000 > NTP.getTime()) {
+						wait_interval = wait_interval_run;
 						continue;
+					} else if (newTimestamp + 2* Block.GENERATING_MIN_BLOCK_TIME < NTP.getTime()
+							&& isGenesisStart) {
+						// QUICK MAKE CHAIN
+						wait_interval = 200;
 					}
+
 					//PREVENT CONCURRENT MODIFY EXCEPTION
 					List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 					synchronized(knownAccounts)
 					{
-											
+
+						int height = Controller.getInstance().getMyHeight();
+						
 						for(PrivateKeyAccount account: knownAccounts)
 						{
 							/*
@@ -287,11 +302,15 @@ public class BlockGenerator extends Thread implements Observer
 							
 							//GENERATE NEW BLOCK FOR USER
 							// already signed
-							winned_value = account.calcWinValue(dbSet, this.solvingBlockHeight + 1);
+							winned_value = account.calcWinValue(dbSet, height);
 							if (winned_value > max_winned_value) {
 								//this.winners.put(account, winned_value);
 								acc_winner = account;
 								max_winned_value = winned_value;
+								
+								if (account.getAddress().equals("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz")) {
+									isGenesisStart = true;
+								}
 							}
 						}
 					}
@@ -299,6 +318,9 @@ public class BlockGenerator extends Thread implements Observer
 					if(acc_winner != null)
 					{
 						
+						LOGGER.error("core.BlockGenerator.run() - selected account: "
+								+ max_winned_value + " " + acc_winner.getAddress());
+
 						// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 						unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
 						// CALCULATE HASH for that transactions
@@ -318,10 +340,6 @@ public class BlockGenerator extends Thread implements Observer
 						}
 						
 					}
-				} else if ( i_wait > 4 ) {
-					i_wait = 0;
-					ctrl.flushNewBlockGenerated();
-					continue;
 				}
 			}
 		}

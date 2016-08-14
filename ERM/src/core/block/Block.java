@@ -604,12 +604,16 @@ public class Block {
 		int height = this.getParentHeight(dbSet) + 1;
 		// IF BLOCK in the MAP
 		int previousForgingHeight = this.creator.getForgingData(dbSet, height);
-		// IF BLOCK not inserted in MAP
-		int prevHeight = creator.getLastForgingData(dbSet);
-		if (previousForgingHeight < prevHeight && prevHeight < height) {
-			// select
-			previousForgingHeight = prevHeight;
+		if (previousForgingHeight == -1) {
+			// IF BLOCK not inserted in MAP
+			previousForgingHeight = creator.getLastForgingData(dbSet);			
 		}
+		if (previousForgingHeight == height) {
+			// previous block is GENESIS
+			previousForgingHeight = 1;
+			// and get previous height
+		}
+		height--;
 
 		return this.creator.calcWinValueHeight(dbSet, height, previousForgingHeight);
 	}

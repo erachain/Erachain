@@ -328,7 +328,8 @@ public class Synchronizer
 		while(headers.size() == 0 && block.getHeight(dbSet) > 1)
 		{
 			//GO 500 BLOCKS BACK
-			for(int i=0; i<BlockChain.MAX_SIGNATURES && block.getHeight(dbSet) > 1; i++)
+			for(int i=0; i<BlockChain.MAX_SIGNATURES
+					&& block.getHeight(dbSet) > 1; i++)
 			{
 				block = block.getParent(dbSet);
 			}
