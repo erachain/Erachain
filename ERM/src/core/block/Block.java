@@ -138,7 +138,7 @@ public class Block {
 		if (this instanceof GenesisBlock
 				|| Arrays.equals(this.signature,
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
-			return 2;
+			return 0;
 		
 		int height = db.getHeightMap().get(this.reference).a;		
 		return height;
@@ -917,7 +917,6 @@ public class Block {
 	public void orphan(DBSet dbSet)
 	{
 		int height = this.getHeight(dbSet);
-		assert(1==2);
 		
 		//ORPHAN AT TRANSACTIONS
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);

@@ -77,6 +77,10 @@ public class MessageFactory {
 		return new GetBlockMessage(header);
 	}
 	
+	public Message createWinBlockMessage(Block block)
+	{
+		return new BlockWinMessage(block);
+	}
 	public Message createBlockMessage(Block block)
 	{
 		return new BlockMessage(block);
@@ -203,6 +207,13 @@ public class MessageFactory {
 			//CREATE MESSAGE FROM DATA
 			message = GetBlockMessage.parse(data);
 			break;	
+
+			//BLOCK
+		case Message.WIN_BLOCK_TYPE:
+												
+			//CREATE MESSAGE FROM DATA
+			message = BlockWinMessage.parse(data);
+			break;		
 				
 		//BLOCK
 		case Message.BLOCK_TYPE:

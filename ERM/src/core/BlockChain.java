@@ -206,32 +206,6 @@ public class BlockChain
 			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
 			return 4;
 		}
-
-		/*
-		 * 
-		 * 
-		//CHECK IF REFERENCES EQUAL
-		// AND blocks in current TIME
-		if(Arrays.equals(lastBlock.getReference(), block.getReference())
-				//&&  NTP.getTime() - 2 * Block.GENERATING_MIN_BLOCK_TIME < lastBlock.getTimestamp(dbSet)
-				)
-		{
-			// TRY SELECT BEST BLOCK from NEW from PEER and LAST in DB
-			if (false && lastBlock.getWinValue(dbSet) < block.getWinValue(dbSet)
-					&& !Arrays.equals(lastBlock.getSignature(), block.getSignature())
-					&& !Arrays.equals(this.genesisBlock.getSignature(), block.getSignature())
-					) {
-				//// TODO тут нельзя откаты делать - несинхранизированые записи и база с двойными записями получается
-				//dbSet.getBlockMap().setProcessing(true);
-				lastBlock.orphan(dbSet);	
-				//dbSet.getBlockMap().setProcessing(false);
-				LOGGER.error("core.BlockChain.isNewBlockValid *** knownBlock orphan and newBlock taken!");
-			} else {
-				LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> last ref same");
-				return false;
-			}
-		}
-		 */
 		
 		return 0;
 	}

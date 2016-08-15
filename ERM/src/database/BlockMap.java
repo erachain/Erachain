@@ -267,7 +267,7 @@ public class BlockMap extends DBMap<byte[], Block>
 
 	public void delete(byte[] signature)
 	{
-		Block block = super.get(signature);
+		Block block = this.get(signature);
 		this.delete(block);
 	}
 

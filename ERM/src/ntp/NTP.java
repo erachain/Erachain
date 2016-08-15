@@ -1,7 +1,8 @@
 package ntp;
 
 import java.net.InetAddress;
- import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
+import java.sql.Timestamp;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
@@ -18,6 +19,16 @@ public final class NTP
 	private static long offset = 0;
    
 	static Logger LOGGER = Logger.getLogger(NTP.class.getName());
+
+	/*
+	public static long getTime()
+	{
+		getTime_old();
+		java.util.Date date= new java.util.Date();
+		return new Timestamp(date.getTime()).getTime() + offset;
+		
+	}
+	*/
 
 	public static long getTime()
 	{

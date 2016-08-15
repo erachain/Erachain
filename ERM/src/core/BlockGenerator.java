@@ -192,10 +192,18 @@ public class BlockGenerator extends Thread implements Observer
 			Block waitWin = ctrl.getBlockChain().getWaitWinBuffer();
 			if (waitWin != null
 					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
-				ctrl.flushNewBlockGenerated();
+
+				// start new SOLVE rof WIN Blocks
+				this.solvingBlock = null;
 				
-				wait_interval = Block.GENERATING_MIN_BLOCK_TIME
-						- wait_interval_flush - wait_interval_run;
+				// FLUSH WINER to DB MAP
+				ctrl.flushNewBlockGenerated();
+
+				if (isGenesisStart) {
+					wait_interval = 100;
+				} else {
+					wait_interval = Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush;
+				}
 				continue;
 			}
 
@@ -212,14 +220,22 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 
+
 			//CHECK IF WE ARE UP TO DATE
 			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
 			{
-				ctrl.update();
+				if (ctrl.getStatus() == ctrl.STATUS_SYNCHRONIZING) {
+					// IF already in sync...
+					wait_interval = wait_interval_run;
+					continue;
+				} else {
+					ctrl.update();
+				}
 			}
 			
 			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
 			syncForgingStatus();
+
 			if(forgingStatus == ForgingStatus.FORGING && ctrl.isReadyForging())
 			{
 				
@@ -235,7 +251,6 @@ public class BlockGenerator extends Thread implements Observer
 						
 				//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 				if(this.solvingBlock == null
-						||  ctrl.getBlockChain().getWaitWinBuffer() == null
 						|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 						)
 				{
@@ -277,7 +292,7 @@ public class BlockGenerator extends Thread implements Observer
 							+ Block.GENERATING_MIN_BLOCK_TIME;
 					
 					
-					if (newTimestamp + 3000 > NTP.getTime()) {
+					if (newTimestamp > NTP.getTime()) {
 						wait_interval = wait_interval_run;
 						continue;
 					} else if (newTimestamp + 2* Block.GENERATING_MIN_BLOCK_TIME < NTP.getTime()
@@ -341,7 +356,7 @@ public class BlockGenerator extends Thread implements Observer
 						///ctrl.newBlockGenerated(block);
 						if (ctrl.getBlockChain().setWaitWinBuffer(block)) {
 							// need to BROADCAST
-							ctrl.broadcastBlock(block, null);
+							ctrl.broadcastWinBlock(block, null);
 						}
 						
 					}

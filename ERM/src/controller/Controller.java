@@ -82,6 +82,7 @@ import lang.Lang;
 import network.Network;
 import network.Peer;
 import network.message.BlockMessage;
+import network.message.BlockWinMessage;
 import network.message.GetBlockMessage;
 import network.message.GetSignaturesMessage;
 import network.message.HWeightMessage;
@@ -892,11 +893,14 @@ public class Controller extends Observable {
 
 				GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
 
+				// ASK SIGNATURES FROM BLOCKCHAIN
+				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
+
+				/*
+				 * for core.Synchronizer.synchronize(DBSet, Block, List<Block>)
 				LOGGER.error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
 						+ Base58.encode(getHeadersMessage.getParent()));
 
-				// ASK SIGNATURES FROM BLOCKCHAIN
-				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
 
 				LOGGER.error("this.blockChain.getSignatures.size() -> "
 						+ headers.size());
@@ -906,6 +910,7 @@ public class Controller extends Observable {
 				LOGGER.error("this.blockChain.getSignatures.get(headers.size()-1) -> "
 						+ Base58.encode( headers.get(headers.size()-1) ));
 				}
+				*/
 				
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createHeadersMessage(
@@ -921,8 +926,11 @@ public class Controller extends Observable {
 
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
+				/*
+				 * for core.Synchronizer.synchronize(DBSet, Block, List<Block>)
 				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature() "
 						+ Base58.encode(getBlockMessage.getSignature()));
+						*/
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
@@ -938,7 +946,47 @@ public class Controller extends Observable {
 
 				break;
 
+			case Message.WIN_BLOCK_TYPE:
+
+				if (this.status != STATUS_OK)
+					break;
+				
+				BlockWinMessage blockWinMessage = (BlockWinMessage) message;
+
+				// ASK BLOCK FROM BLOCKCHAIN
+				newBlock = blockWinMessage.getBlock();
+
+				int isNewWinBlockValid = this.blockChain.isNewBlockValid(newBlock);
+				
+				if(isNewWinBlockValid == 0)	{
+				} else if (isNewWinBlockValid == 4) {
+					// TRY get new chain from this peer
+					LOGGER.error("controller.Controller.onMessage WIN_BLOCK_TYPE -> wait update() -- "
+							+ this.peerHWeight.get(blockWinMessage.getSender()));
+				} else {
+					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
+								+ Base58.encode(newBlock.getSignature()));
+				}
+
+				// CHECK IF VALID
+				if (isNewWinBlockValid == 0
+						&& this.getBlockChain().setWaitWinBuffer(newBlock)) {
+					
+					LOGGER.info(Lang.getInstance().translate("received new valid WIN Block"));
+
+					// BROADCAST
+					List<Peer> excludes = new ArrayList<Peer>();
+					excludes.add(message.getSender());
+					this.network.broadcast(message, excludes);
+
+				} 
+
+				break;
+
 			case Message.BLOCK_TYPE:
+
+				if (this.status != STATUS_OK)
+					break;
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
@@ -948,25 +996,16 @@ public class Controller extends Observable {
 				int isNewBlockValid = this.blockChain.isNewBlockValid(newBlock);
 				
 				if(isNewBlockValid == 0)	{
-					/*
-					 *  not need - it is for WIN BUFFER BLOCK
+					
 					synchronized (this.peerHWeight) {
-						// PUT NEW HEIGHT and WEIGHT to PEER
+						//this.peerHeight.put(message.getSender(),
+						//		blockMessage.getHeight());
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
 										this.peerHWeight.get(message.getSender()).b + newBlock.getWinValue(dbSet)));
+
+						
 					}
-					 */
-				} else if (isNewBlockValid == 4) {
-					// TRY get new chain from this peer
-					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> wait update() -- "
-							+ this.peerHWeight.get(blockMessage.getSender()));
-					//update();
-					
-					break;
-				} else {
-					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> new block not valid "
-								+ Base58.encode(newBlock.getSignature()));
 				}
 					
 				if(this.isProcessingWalletSynchronize()) {
@@ -976,26 +1015,16 @@ public class Controller extends Observable {
 				
 				// CHECK IF VALID
 				if (isNewBlockValid == 0
-						&& this.getBlockChain().setWaitWinBuffer(newBlock)) {
-					
+						&& this.synchronizer.process(dbSet, newBlock)) {
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
-
-					// PROCESS
-					// this.synchronizer.process(block);
 
 					// BROADCAST
 					List<Peer> excludes = new ArrayList<Peer>();
 					excludes.add(message.getSender());
 					this.network.broadcast(message, excludes);
 
-					// UPDATE ALL PEER HEIGHTS TO OUR HEIGHT
-					/*
-					 * synchronized(this.peerHeight) { for(Peer peer:
-					 * this.peerHeight.keySet()) { this.peerHeight.put(peer,
-					 * this.blockChain.getHeight()); } }
-					 */
 				} 
-
+				
 				break;
 
 			case Message.TRANSACTION_TYPE:
@@ -1064,6 +1093,14 @@ public class Controller extends Observable {
 		this.network.deleteObserver(o);
 	}
 
+	public void broadcastWinBlock(Block newBlock, List<Peer> excludes) {
+
+		// CREATE MESSAGE
+		Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(message, excludes);
+	}
 	public void broadcastBlock(Block newBlock, List<Peer> excludes) {
 
 		// CREATE MESSAGE
@@ -1125,6 +1162,10 @@ public class Controller extends Observable {
 
 	public void update() {
 		// UPDATE STATUS
+		
+		if (this.status == STATUS_SYNCHRONIZING)
+			return;
+		
 		this.status = STATUS_SYNCHRONIZING;
 
 		// NOTIFY
@@ -1649,8 +1690,12 @@ public class Controller extends Observable {
 			return false;
 		
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
-		if (isValid)
+		if (isValid) {
+			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block"
+					+ newBlock.getWinValue(dbSet) + " " + newBlock.getCreator().getAddress());
+
 			this.broadcastBlock(newBlock, null);
+		}
 		
 		return isValid;
 	}

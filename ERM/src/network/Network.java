@@ -217,7 +217,10 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 		
 		//ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
-		if(message.getType() == Message.TRANSACTION_TYPE || message.getType() == Message.BLOCK_TYPE)
+		if(message.getType() == Message.TRANSACTION_TYPE
+				|| message.getType() == Message.BLOCK_TYPE
+				|| message.getType() == Message.WIN_BLOCK_TYPE
+				)
 		{
 			synchronized(this.handledMessages)
 			{
