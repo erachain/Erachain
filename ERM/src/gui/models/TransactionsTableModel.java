@@ -86,7 +86,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			{
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(transaction.getTimestamp());
+				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
+				return transaction.viewTimestamp() + " " + transaction.getTimestamp() / 1000;
 				
 			case COLUMN_TYPE:
 				

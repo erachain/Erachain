@@ -183,6 +183,7 @@ public class BlockGenerator extends Thread implements Observer
 		boolean isGenesisStart = false;
 
 		int wait_interval_run = 2000;
+		int wait_interval_flush = 20000;
 		int wait_interval = wait_interval_run;
 		while(true)
 		{
@@ -190,8 +191,12 @@ public class BlockGenerator extends Thread implements Observer
 			// try solve and flush new block from Win Buffer			
 			Block waitWin = ctrl.getBlockChain().getWaitWinBuffer();
 			if (waitWin != null
-					&& waitWin.getTimestamp(dbSet) + 20000 < NTP.getTime()) {
+					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
 				ctrl.flushNewBlockGenerated();
+				
+				wait_interval = Block.GENERATING_MIN_BLOCK_TIME
+						- wait_interval_flush - wait_interval_run;
+				continue;
 			}
 
 			try 

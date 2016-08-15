@@ -88,7 +88,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(block.getTimestamp(DBSet.getInstance()));
+				return DateTimeFormat.timestamptoString(block.getTimestamp(DBSet.getInstance())) + " " + block.getTimestamp(DBSet.getInstance()) / 1000;
 				
 			case COLUMN_GENERATOR:
 				

@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
 import settings.Settings;
+import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.PlaySound;
@@ -154,7 +155,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_TIMESTAMP:
 				
-				return transaction.viewTimestamp();
+				//return DateTimeFormat.timestamptoString(transaction.viewTimestamp()) + " " + transaction.getTimestamp();
+				return transaction.viewTimestamp() + " " + transaction.getTimestamp() / 1000;
 				
 			case COLUMN_TYPE:
 				

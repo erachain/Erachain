@@ -582,11 +582,17 @@ public class Account {
 			}
 
 		}
+		
+		// TODO начальные блоки тоже списывает переводы
+		// если сделать перевод со счета то не правильно пересчитывает
 		// blockNo, forgingAmount, ...
 		//Integer previousForgingBlockHeightThis = this.getForgingData(dbSet, height);
 		if (previousForgingHeight > 1) {
 			// IF exist previous forged BLOCK
 			//
+			
+			// TODO - на любой HEIGT не пашет потому что берет последний баланс а не на тут дату
+			// поидее надо запоминать этот баланс в блоке и в базе данных чтобы потом не считать
 			win_value += (this.getConfirmedBalance(ERM_KEY, dbSet).longValue() - incomed_amount)
 					* getWinValueHeight2(height, previousForgingHeight);
 		}
