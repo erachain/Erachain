@@ -202,7 +202,7 @@ public class BlockGenerator extends Thread implements Observer
 				if (isGenesisStart) {
 					wait_interval = 100;
 				} else {
-					wait_interval = Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush;
+					wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush) / 2;
 				}
 				continue;
 			}
@@ -284,8 +284,8 @@ public class BlockGenerator extends Thread implements Observer
 					//GENERATE NEW BLOCKS
 					List<Transaction> unconfirmedTransactions = null;
 					byte[] unconfirmedTransactionsHash = null;
-					long max_winned_value = 0;
-					long winned_value;
+					int max_winned_value = 0;
+					int winned_value;
 	
 					// TODO if empty TRNSACTIONS - longer time
 					long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
@@ -316,13 +316,13 @@ public class BlockGenerator extends Thread implements Observer
 								continue;
 								*/
 
-							long generatingBalance = account.getGeneratingBalance();
+							int generatingBalance = Block.calcGeneratingBalance(dbSet, account, height);
 							if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 								continue;
 							
 							//GENERATE NEW BLOCK FOR USER
 							// already signed
-							winned_value = account.calcWinValue(dbSet, height);
+							winned_value = Block.calcWinValue(dbSet, account, height, generatingBalance);
 							if (winned_value > max_winned_value) {
 								//this.winners.put(account, winned_value);
 								acc_winner = account;
@@ -383,6 +383,7 @@ public class BlockGenerator extends Thread implements Observer
 		//CREATE NEW BLOCK
 		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 				transactionsHash, atBytes);
+		newBlock.setGeneratingBalance(newBlock.calcGeneratingBalance(dbSet));
 		newBlock.sign(account);
 		
 		return newBlock;

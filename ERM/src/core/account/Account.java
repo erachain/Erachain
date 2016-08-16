@@ -51,12 +51,12 @@ public class Account {
 
 	protected String address;
 	
-	private byte[] lastBlockSignature;
-	private long generatingBalance; //used  for forging balance
+	//private byte[] lastBlockSignature;
+	//private long generatingBalance; //used  for forging balance
 	
 	protected Account()
 	{
-		this.generatingBalance = 0l;
+		//this.generatingBalance = 0l;
 	}
 	
 	public Account(String address)
@@ -194,6 +194,7 @@ public class Account {
 		return balance;
 	}
 	
+	/*
 	private void updateGeneratingBalance(DBSet db)
 	{
 		//CHECK IF WE NEED TO RECALCULATE
@@ -220,7 +221,6 @@ public class Account {
 		this.generatingBalance = balance;
 	}
 
-	/*
 	// balance FOR generation
 	public void calculateGeneratingBalance_old(DBSet db)
 	{
@@ -280,21 +280,7 @@ public class Account {
 		
 	}
 	*/
-	
-	public long getGeneratingBalance()
-	{
-		return this.getGeneratingBalance(DBSet.getInstance());
-	}
-	
-	public long getGeneratingBalance(DBSet db)
-	{	
-		//UPDATE
-		updateGeneratingBalance(db);
-		
-		//RETURN
-		return this.generatingBalance;
-	}
-	
+
 	//REFERENCE
 	
 	public Long getLastReference()
@@ -527,102 +513,11 @@ public class Account {
 		db.getAddressForging().setLast(this.address, prevHeight);
 	}
 	
-	public long getWinValueHeight2(int heightThis, int heightStart)
-	{
-		int len = heightThis - heightStart;
-		if (len < 1)
-			len = 1;
-			
-		if (len < 20)
-			len += 20;
-		else
-			len *= 2;
-		
-		int MAX_LEN = 333;
-		int MAX_LEN_2 = MAX_LEN * 100;
-		if (len < MAX_LEN ) {
-			//return (long)(len * Math.pow(len, 0.3));
-			return (long)Math.pow(len, 1.5);
-		} else if ( len < MAX_LEN_2 )
-			return (long)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
-		//return (long)(len * Math.pow(MAX_LEN, 0.3));
-		return (long)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
-	}
 
-	public int calcWinValueHeight(DBSet dbSet, int height, int previousForgingHeight)
-	{
-
-		/*
-		findTransactionsKeys(String address, String sender, String recipient,
-				final int minHeight, final int maxHeight,
-				int type, final int service,
-				boolean desc, int offset, int limit)
-				*/
-		
-		long incomed_amount = 0l;
-		long win_value = 0l;
-		long amount;
-		//List<Transaction> txs = dbSet.getTransactionFinalMap()
-		//		.getTransactionsByTypeAndAddress(this.address, (int)ERM_KEY, 0);
-		
-		List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, address, previousForgingHeight,
-				0, 0, 0, false, 0, 0);
-
-		
-		for(Transaction transaction: txs)
-		{
-			
-			if ( transaction.getAssetKey() == ERM_KEY
-					// || transaction.getRecipientAccounts().contains(this.address)
-					) {
-				amount = transaction.getAmount().longValue();
-				incomed_amount += amount;
-				
-				win_value += getWinValueHeight2(height, transaction.getBlockHeight(dbSet)) * amount;
-			}
-
-		}
-		
-		// TODO начальные блоки тоже списывает переводы
-		// если сделать перевод со счета то не правильно пересчитывает
-		// blockNo, forgingAmount, ...
-		//Integer previousForgingBlockHeightThis = this.getForgingData(dbSet, height);
-		if (previousForgingHeight > 1) {
-			// IF exist previous forged BLOCK
-			//
-			
-			// TODO - на любой HEIGT не пашет потому что берет последний баланс а не на тут дату
-			// поидее надо запоминать этот баланс в блоке и в базе данных чтобы потом не считать
-			win_value += (this.getConfirmedBalance(ERM_KEY, dbSet).longValue() - incomed_amount)
-					* getWinValueHeight2(height, previousForgingHeight);
-		}
-
-		if (height < 10000)
-			win_value >>= 16;
-		else if (height < 100000)
-			win_value >>= 18;
-		else if (height < 1000000)
-			win_value >>= 20;
-		else
-			win_value >>= 22;
-		
-		return (int)win_value;
-
-	}
-
-	public long calcWinValue(DBSet dbSet, int height)
+	/*
+	public int getPreviousForgingHeight(DBSet dbSet, int height)
 	{
 		
-		/*
-		int previousForgingHeight;
-		int lastHeight = this.getLastForgingData(dbSet);
-		if (lastHeight > height) {
-			previousForgingHeight = this.getForgingData(dbSet, height);			
-		} else {
-			previousForgingHeight = this.getForgingData(dbSet, lastHeight);
-		}
-		*/
-
 		// LAST HEIGHT for this Height
 		int previousForgingHeight = this.getForgingData(dbSet, height);
 		// LAST 
@@ -638,6 +533,8 @@ public class Account {
 
 		//if (lastHeight == previousForgingHeight)
 		//	previousForgingHeight -= 1;
-		return calcWinValueHeight(dbSet, height, previousForgingHeight);
+		return previousForgingHeight;
 	}
+	*/
+
 }

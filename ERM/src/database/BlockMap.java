@@ -219,7 +219,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			int height = parent.getHeight(dbSet) + 1;
 			dbSet.getChildMap().set(parent, block);
 			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(height, block.getWinValue(dbSet)));
+					new Tuple2<Integer, Integer>(height, block.calcWinValue(dbSet)));
 			
 			//
 			// PROCESS FORGING DATA

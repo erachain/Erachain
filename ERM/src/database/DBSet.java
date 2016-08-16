@@ -22,6 +22,7 @@ public class DBSet implements Observer, IDB {
 	private static final int ACTIONS_BEFORE_COMMIT = 10000;
 	
 	private static DBSet instance;
+	private DBSet parent;
 	
 	private AddressForging addressForging;
 	private ItemAssetBalanceMap assetBalanceMap;
@@ -195,6 +196,7 @@ public class DBSet implements Observer, IDB {
 	
 	protected DBSet(DBSet parent)
 	{
+		this.parent = parent;
 		this.addressForging = new AddressForging(parent.addressForging);
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
@@ -312,6 +314,10 @@ public class DBSet implements Observer, IDB {
 		this.atMap.reset();
 		this.atStateMap.reset();
 		this.atTransactionMap.reset();
+	}
+	
+	public DBSet getParent() {
+		return this.parent;
 	}
 	
 	public AddressForging getAddressForging() 

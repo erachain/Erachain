@@ -90,18 +90,18 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		});	
 		
 		//BALANCE INDEX
-		NavigableSet<Tuple2<Long, Tuple2<String, String>>> balanceIndex = database.createTreeSet("blocks_index_balance")
+		NavigableSet<Tuple2<Integer, Tuple2<String, String>>> balanceIndex = database.createTreeSet("blocks_index_balance")
 				.comparator(Fun.COMPARATOR)
 				.makeOrGet();
 		
-		NavigableSet<Tuple2<Long, Tuple2<String, String>>> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
+		NavigableSet<Tuple2<Integer, Tuple2<String, String>>> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
 				.comparator(new ReverseComparator(Fun.COMPARATOR))
 				.makeOrGet();
 		
-		createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Long, Tuple2<String, String>, Block>() {
+		createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Tuple2<String, String>, Block>() {
 		   	@Override
-		    public Long run(Tuple2<String, String> key, Block value) {
-		   		return value.getGeneratingBalance(DBSet.getInstance());
+		    public Integer run(Tuple2<String, String> key, Block value) {
+		   		return value.getGeneratingBalance();
 		    }
 		});
 		

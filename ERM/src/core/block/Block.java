@@ -52,7 +52,7 @@ public class Block {
 	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
-	//public static final int GENERATING_BALANCE_LENGTH = 8;
+	public static final int GENERATING_BALANCE_LENGTH = 4;
 	public static final int CREATOR_LENGTH = Crypto.HASH_LENGTH;
 	public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
 	public static final int REFERENCE_LENGTH = SIGNATURE_LENGTH;
@@ -60,7 +60,7 @@ public class Block {
 	private static final int TRANSACTIONS_COUNT_LENGTH = 4;
 	private static final int TRANSACTION_SIZE_LENGTH = 4;
 	public static final int AT_BYTES_LENGTH = 4;
-	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
+	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + GENERATING_BALANCE_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
@@ -69,7 +69,7 @@ public class Block {
 	protected int version;
 	protected byte[] reference;
 	//protected long timestamp;
-	//protected long generatingBalance;
+	protected int generatingBalance; // only for DB MAP
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
@@ -85,12 +85,13 @@ public class Block {
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] transactionsHash, byte[] atBytes)
 	{
 		this.version = version;
 		this.reference = reference;
 		//this.timestamp = timestamp;
 		this.creator = creator;
+		this.generatingBalance = generatingBalance;
 
 		this.transactionsHash = transactionsHash;
 
@@ -100,11 +101,10 @@ public class Block {
 	}
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] signature, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] signature, byte[] transactionsHash, byte[] atBytes)
 	{
-		this(version, reference, creator, transactionsHash, atBytes);
+		this(version, reference, creator, generatingBalance, transactionsHash, atBytes);
 		this.signature = signature;
-
 	}
 
 	
@@ -154,13 +154,44 @@ public class Block {
 		return blockChain.getTimestamp(height);
 	}
 
-	public long getGeneratingBalance(DBSet db)
+	// balance on creator account when making this block
+	// TODO isValid
+	public int getGeneratingBalance()
 	{
-		return this.creator.getGeneratingBalance(db);
+		return this.generatingBalance;
 	}
-	public long getGeneratingBalance()
+	public void setGeneratingBalance(int generatingBalance)
 	{
-		return getGeneratingBalance(DBSet.getInstance());
+		this.generatingBalance = generatingBalance;
+	}
+	
+	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
+	// MABE used only in isValid and in Block Generator
+	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int parentHeight)
+	{
+		
+		//int parentHeight = this.getParentHeight(dbSet);
+		int incomed_amount = 0;
+		int amount;
+		
+		List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
+				getPreviousForgingHeight(dbSet, creator, parentHeight + 1) + 1, parentHeight,
+				0, 0, false, 0, 0);
+		
+		for(Transaction transaction: txs)
+		{
+			
+			if ( transaction.getAssetKey() == Transaction.RIGHTS_KEY) {
+				amount = (int)transaction.getAmount().longValue();
+				incomed_amount += amount;
+			}
+		}
+		
+		return (int)creator.getConfirmedBalance(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
+	}
+	public int calcGeneratingBalance(DBSet dbSet)
+	{
+		 return calcGeneratingBalance(dbSet, this.creator, this.getParentHeight(dbSet));
 	}
 
 	public byte[] getReference()
@@ -376,22 +407,19 @@ public class Block {
 		byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
 		position += REFERENCE_LENGTH;
 
-		/*
-		//READ GENERATING BALANCE
-		byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
-		long generatingBalance = Longs.fromByteArray(generatingBalanceBytes);
-		position += GENERATING_BALANCE_LENGTH;
-		*/
-
 		//READ GENERATOR
 		byte[] generatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount generator = new PublicKeyAccount(generatorBytes);
 		position += CREATOR_LENGTH;
 
+		//READ GENERATING BALANCE
+		byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
+		int generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
+		position += GENERATING_BALANCE_LENGTH;
+
 		//READ TRANSACTION SIGNATURE
 		byte[] transactionsHash =  Arrays.copyOfRange(data, position, position + TRANSACTIONS_HASH_LENGTH);
 		position += TRANSACTIONS_HASH_LENGTH;
-
 
 		//READ GENERATOR SIGNATURE
 		byte[] signature =  Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
@@ -414,12 +442,12 @@ public class Block {
 	
 			//long atFeesL = Longs.fromByteArray(atFees);
 
-			block = new Block(version, reference, generator, signature, transactionsHash, atBytes); //, atFeesL);
+			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, atBytes); //, atFeesL);
 		}
 		else
 		{
 			// GENESIS BLOCK version = 1
-			block = new Block(version, reference, generator, signature, transactionsHash, new byte[0]);
+			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, new byte[0]);
 		}
 
 		//READ TRANSACTIONS COUNT
@@ -445,10 +473,9 @@ public class Block {
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DBSet.getInstance()));
-		//block.put("generatingBalance", this.generatingBalance);
-		block.put("winValue", this.getWinValue(DBSet.getInstance()));
+		block.put("generatingBalance", this.generatingBalance);
+		block.put("winValue", this.calcWinValue(DBSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
-		block.put("creatorGeneratingBalance", this.creator.getGeneratingBalance());
 		block.put("fee", this.getTotalFee().toPlainString());
 		block.put("transactionsHash", Base58.encode(this.transactionsHash));
 		block.put("signature", Base58.encode(this.signature));
@@ -497,16 +524,14 @@ public class Block {
 		byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
 
-		/*
-		//WRITE GENERATING BALANCE
-		byte[] baseTargetBytes = Longs.toByteArray(this.generatingBalance);
-		baseTargetBytes = Bytes.ensureCapacity(baseTargetBytes, GENERATING_BALANCE_LENGTH, 0);
-		data = Bytes.concat(data,baseTargetBytes);
-		*/
-
 		//WRITE GENERATOR
 		byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
+
+		//WRITE GENERATING BALANCE
+		byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
+		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
+		data = Bytes.concat(data, generatingBalanceBytes);
 
 		//WRITE TRANSACTIONS HASH
 		data = Bytes.concat(data, this.transactionsHash);
@@ -597,13 +622,13 @@ public class Block {
 
 		return Crypto.getInstance().digest(data);
 	}
-	
-	public int getWinValue(DBSet dbSet)
-	{
-		// get HEIGHT by its PARENT
-		int height = this.getParentHeight(dbSet) + 1;
+
+	public static int getPreviousForgingHeight(DBSet dbSet, Account creator, int height) {
+		
+		//height = height > 0? height: this.getParentHeight(dbSet) + 1;
+
 		// IF BLOCK in the MAP
-		int previousForgingHeight = this.creator.getForgingData(dbSet, height);
+		int previousForgingHeight = creator.getForgingData(dbSet, height);
 		if (previousForgingHeight == -1) {
 			// IF BLOCK not inserted in MAP
 			previousForgingHeight = creator.getLastForgingData(dbSet);			
@@ -613,11 +638,62 @@ public class Block {
 			previousForgingHeight = 1;
 			// and get previous height
 		}
-		height--;
+		if ( previousForgingHeight < 1)
+			// NOT use genesis transactions
+			previousForgingHeight = 1;
+		
+		return previousForgingHeight;
 
-		return this.creator.calcWinValueHeight(dbSet, height, previousForgingHeight);
+	}
+	private static int getWinValueHeight2(int heightThis, int heightStart)
+	{
+		int len = heightThis - heightStart;
+		if (len < 1)
+			len = 1;
+			
+		if (len < 20)
+			len += 20;
+		else
+			len *= 2;
+		
+		int MAX_LEN = 333;
+		int MAX_LEN_2 = MAX_LEN * 100;
+		if (len < MAX_LEN ) {
+			//return (long)(len * Math.pow(len, 0.3));
+			return (int)Math.pow(len, 1.5);
+		} else if ( len < MAX_LEN_2 )
+			return (int)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
+		//return (long)(len * Math.pow(MAX_LEN, 0.3));
+		return (int)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
 	}
 
+	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
+	// because: creator.getLastForgingData(dbSet);
+	public static int calcWinValue(DBSet dbSet, Account account, int height, int generatingBalance)
+	{
+		//int height = this.getParentHeight(dbSet) + 1;
+
+		int previousForgingHeight = getPreviousForgingHeight(dbSet, account, height);
+				
+		int win_value = generatingBalance * getWinValueHeight2(height, previousForgingHeight);
+
+		if (height < 10000)
+			win_value >>= 16;
+		else if (height < 100000)
+			win_value >>= 18;
+		else if (height < 1000000)
+			win_value >>= 20;
+		else
+			win_value >>= 22;
+		
+		return win_value;
+
+	}
+	
+	public int calcWinValue(DBSet dbSet)
+	{
+		return calcWinValue(dbSet, this.creator, this.getParentHeight(dbSet) + 1, this.generatingBalance);
+	}
 
 	//VALIDATE
 
@@ -722,6 +798,13 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeight(db) + "].version AT invalid");
 			return false;
 		}
+		
+		int generatingBalance = calcGeneratingBalance(db);
+		if (this.generatingBalance != generatingBalance) {
+			LOGGER.error("*** Block[" + this.getHeight(db) + "].generatingBalance invalid");
+			return false;
+		}
+			
 
 		/*
 		//CREATE TARGET

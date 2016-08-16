@@ -210,6 +210,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 		});
 		menu.add(copyConfirmedBalance);
 		
+		/*
 		JMenuItem copyGeneratingBalance = new JMenuItem(Lang.getInstance().translate("Copy Generating Balance"));
 		copyGeneratingBalance.addActionListener(new ActionListener()
 		{
@@ -226,6 +227,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 			}
 		});
 		menu.add(copyGeneratingBalance);
+		*/
 
 		menu.addSeparator();
 		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));

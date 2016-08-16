@@ -73,7 +73,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, genesisGenerator, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, genesisGenerator, 0, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		Account recipient;
@@ -491,9 +491,9 @@ public class GenesisBlock extends Block{
 		return null;
 	}
 	@Override
-	public long getGeneratingBalance(DBSet db)
+	public int getGeneratingBalance()
 	{
-		return 0l;
+		return 0;
 	}
 
 	

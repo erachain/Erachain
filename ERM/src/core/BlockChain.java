@@ -96,13 +96,12 @@ public class BlockChain
 	public boolean setWaitWinBuffer(Block block) {
 				
 		if (this.waitWinBuffer == null
-				|| block.getWinValue(dbSet) > this.waitWinBuffer.getWinValue(dbSet)) {
+				|| block.calcWinValue(dbSet) > this.waitWinBuffer.calcWinValue(dbSet)) {
 
 			this.waitWinBuffer = block;
 
-			LOGGER.error("setWaitWinBuffer - Block win value: "
-					+ block.getWinValue(dbSet)
-					+ " - creator winValue:" + block.getCreator().calcWinValue(dbSet, block.getHeight(dbSet)));
+			LOGGER.error("setWaitWinBuffer - WIN value: "
+					+ block.calcWinValue(dbSet));
 
 			return true;
 		}
@@ -122,7 +121,7 @@ public class BlockChain
 		if (withWinBuffer && this.waitWinBuffer != null) {
 			// with WIN BUFFER BLOCK
 			height = 1;
-			weight = this.waitWinBuffer.getWinValue(dbSet);
+			weight = this.waitWinBuffer.calcWinValue(dbSet);
 		} else {
 			height = 0;
 			weight = 0l;				

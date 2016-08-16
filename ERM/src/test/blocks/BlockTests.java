@@ -16,6 +16,8 @@ import ntp.NTP;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
+import core.BlockChain;
 import core.BlockGenerator;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -60,7 +62,11 @@ public class BlockTests
 	static Logger LOGGER = Logger.getLogger(BlockTests.class.getName());
 
 	private void init() {
-		//gb = new GenesisBlock();
+
+		Controller.getInstance().initBlockChain(db);
+		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
+		gbTransactions = gb.getTransactions();
+
 		generator.setLastReference(gb.getTimestamp(db), db);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), db); // need for payments
@@ -76,8 +82,6 @@ public class BlockTests
 	@Test
 	public void validateSignatureGenesisBlock()
 	{
-
-		gb = new GenesisBlock();
 
 		//CHECK IF SIGNATURE VALID
 		LOGGER.info("getGeneratorSignature " + gb.getSignature().length
@@ -164,9 +168,6 @@ public class BlockTests
 		//CHECK FEE
 		assertEquals(gb.getTotalFee(), parsedBlock.getTotalFee());	
 
-		//CHECK TIMESTAMP
-		assertEquals(gb.getTimestamp(db), parsedBlock.getTimestamp(db));
-
 		//CHECK TRANSACTION COUNT
 		assertEquals(gb.getTransactionCount(), parsedBlock.getTransactionCount());
 
@@ -227,10 +228,10 @@ public class BlockTests
 
 		int height = genesisBlock.getHeight(db) + 1;
 		Integer forgingData = recipient1.getForgingData(db, height);
-		assertEquals(1, (int)forgingData);
+		assertEquals(-1, (int)forgingData);
 
 		forgingData = recipient2.getForgingData(db, height);
-		assertEquals(1, (int)forgingData);
+		assertEquals(-1, (int)forgingData);
 
 		//ORPHAN BLOCK
 		genesisBlock.orphan(db);
@@ -332,12 +333,8 @@ public class BlockTests
 	@Test
 	public void validateBlock()
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		//DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-						
-		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(db);
+		init();
+		gb.process(db);
 						
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -381,7 +378,7 @@ public class BlockTests
 		assertEquals(false, invalidBlock.isValid(db));
 						
 		//ADD INVALID TRANSACTION
-		invalidBlock = BlockGenerator.generateNextBlock(db, generator, genesisBlock, transactionsHash);
+		invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp(db);
 		Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, generator.getLastReference(db));
@@ -398,7 +395,7 @@ public class BlockTests
 		assertEquals(false, invalidBlock.isValid(db));
 		
 		//ADD GENESIS TRANSACTION
-		invalidBlock = BlockGenerator.generateNextBlock(db, generator, genesisBlock, transactionsHash);
+		invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
 		
 		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), newBlock.getTimestamp());
 		transaction = new GenesisIssueAssetTransaction(GenesisBlock.makeAsset(Transaction.RIGHTS_KEY));
@@ -415,12 +412,8 @@ public class BlockTests
 	@Test
 	public void parseBlock()
 	{
-		//CREATE EMPTY MEMORY DATABASE
-		//DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-								
-		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(db);
+		init();
+		gb.process(db);
 								
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -430,7 +423,7 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getTimestamp(db), db);
+		generator.setLastReference(gb.getTimestamp(db), db);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 
@@ -523,9 +516,8 @@ public class BlockTests
 	public void processBlock()
 	{
 										
-		//PROCESS GENESISBLOCK
-		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(db);
+		init();
+		gb.process(db);
 										
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -535,7 +527,7 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS for generate
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(genesisBlock.getTimestamp(db), db);
+		generator.setLastReference(gb.getTimestamp(db), db);
 		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1000).setScale(8), db);
 								
@@ -611,7 +603,7 @@ public class BlockTests
 	public void orphanBlock()
 	{
 										
-		//PROCESS GENESISBLOCK
+		init();
 		gb.process(db);
 										
 		//CREATE KNOWN ACCOUNT

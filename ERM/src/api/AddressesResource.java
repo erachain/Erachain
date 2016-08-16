@@ -26,6 +26,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -326,7 +327,8 @@ public class AddressesResource {
 
 		}
 
-		return "" + new Account(address).getGeneratingBalance();
+		return "" + Block.calcGeneratingBalance(DBSet.getInstance(),
+				new Account(address), Controller.getInstance().getMyHeight());
 	}
 
 	@GET

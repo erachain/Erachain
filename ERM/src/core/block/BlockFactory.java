@@ -27,10 +27,10 @@ public class BlockFactory {
 		return Block.parse(data);
 	}
 
-	// not signed
+	// not signed and not getGeneratingBalance
 	public Block create(int version, byte[] reference, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
 	{		
-		return new Block(version, reference, generator, unconfirmedTransactionsHash, atBytes);
+		return new Block(version, reference, generator, 0, unconfirmedTransactionsHash, atBytes);
 	}
 	
 }

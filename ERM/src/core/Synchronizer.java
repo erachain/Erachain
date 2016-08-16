@@ -49,7 +49,7 @@ public class Synchronizer
 		if(lastCommonBlock != null)
 		{
 			//GET STATES TO RESTORE
-			Map<String, byte[]> states = fork.getATStateMap().getStates( lastCommonBlock.getHeight(fork) );
+			Map<String, byte[]> states = fork.getParent().getATStateMap().getStates( lastCommonBlock.getHeight(fork) );
 			
 			//HEIGHT TO ROLL BACK
 	//		originalHeight = lastCommonBlock.getHeight();
@@ -62,10 +62,6 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				if (lastBlock.getHeight(fork) == 1 || lastBlock.getParent(fork) == null)
-				{
-					break;
-				}
 				lastBlock.orphan(fork);
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
@@ -115,11 +111,13 @@ public class Synchronizer
 			}
 			else
 			{
-				AT_API_Platform_Impl.getInstance().setDBSet( fork );
+				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
 			}
 		}
+
+		AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 	}
 
 	// process new BLOCKS to DB and orphan DB
@@ -131,8 +129,6 @@ public class Synchronizer
 		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks);	
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
-
-		AT_API_Platform_Impl.getInstance().setDBSet( dbSet );
 		
 		if(lastCommonBlock != null)
 		{
@@ -149,11 +145,6 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				if (lastBlock.getHeight(dbSet) == 1 || lastBlock.getParent(dbSet) == null)
-				{
-					break;
-				}
-
 				//ADD ORPHANED TRANSACTIONS
 				orphanedTransactions.addAll(lastBlock.getTransactions());
 				
@@ -165,14 +156,8 @@ public class Synchronizer
 			//NOT orphan GENESIS BLOCK
 			while ( lastBlock.getHeight(dbSet) >= height_AT && lastBlock.getHeight(dbSet) > 1 )
 			{
-				if (lastBlock.getHeight(dbSet) == 1 || lastBlock.getParent(dbSet) == null)
-				{
-					break;
-				}
-				
-				lastBlock.orphan(dbSet);
-
 				orphanedTransactions.addAll(lastBlock.getTransactions());
+				lastBlock.orphan(dbSet);
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 			
@@ -205,7 +190,7 @@ public class Synchronizer
 	
 	public void synchronize(DBSet dbSet, int lastTrueBlockHeight, Peer peer) throws Exception
 	{
-		LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer.getAddress().getHostAddress() + " - " + peer.getPing());
+		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":" + peer.getAddress().getHostAddress() + " - " + peer.getPing());
 		
 		//FIND LAST COMMON BLOCK
 		Block common =  this.findLastCommonBlock(peer);
@@ -215,7 +200,7 @@ public class Synchronizer
 			// MAX orhpan CHAIN LEN
 			throw new Exception("Dishonest peer on TRUE block > CONFIRMS_TRUE " + common.getHeight(dbSet));
 
-		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
+		LOGGER.error("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
 		//CHECK COMMON BLOCK EXISTS
 		List<byte[]> signatures;
@@ -263,7 +248,7 @@ public class Synchronizer
 			List<Block> blocks = this.getBlocks(signatures, peer);
 							
 			//SYNCHRONIZE BLOCKS
-			LOGGER.info("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
+			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER
@@ -297,7 +282,7 @@ public class Synchronizer
 	private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception
 	{
 
-		LOGGER.info("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " + Base58.encode(header));
+		LOGGER.error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " + Base58.encode(header));
 
 		///CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetHeadersMessage(header);
@@ -319,7 +304,7 @@ public class Synchronizer
 		DBSet dbSet = DBSet.getInstance();
 		
 		Block block = dbSet.getBlockMap().getLastBlock();
-		long myBlockWeight = block.getWinValue(dbSet);
+		long myBlockWeight = block.calcWinValue(dbSet);
 		int myBlockHeight = block.getHeight(dbSet);
 		
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED

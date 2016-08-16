@@ -950,6 +950,11 @@ public class Controller extends Observable {
 
 				if (this.status != STATUS_OK)
 					break;
+
+				if(this.isProcessingWalletSynchronize()) {
+					
+					break;
+				}
 				
 				BlockWinMessage blockWinMessage = (BlockWinMessage) message;
 
@@ -958,28 +963,25 @@ public class Controller extends Observable {
 
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(newBlock);
 				
+				// CHECK IF VALID
 				if(isNewWinBlockValid == 0)	{
-				} else if (isNewWinBlockValid == 4) {
-					// TRY get new chain from this peer
-					LOGGER.error("controller.Controller.onMessage WIN_BLOCK_TYPE -> wait update() -- "
-							+ this.peerHWeight.get(blockWinMessage.getSender()));
+					if (blockChain.setWaitWinBuffer(newBlock)) {
+						// IF IT WIN
+						
+						LOGGER.info(Lang.getInstance().translate("received new valid WIN Block")
+								+ " for Height: " + this.getMyHeight());
+		
+						// BROADCAST
+						List<Peer> excludes = new ArrayList<Peer>();
+						excludes.add(message.getSender());
+						this.network.broadcast(message, excludes);
+					}
 				} else {
 					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
-								+ Base58.encode(newBlock.getSignature()));
+							+ " for Height: " + this.getMyHeight()
+							+ " code: " + isNewWinBlockValid
+							+ " " + Base58.encode(newBlock.getSignature()));
 				}
-
-				// CHECK IF VALID
-				if (isNewWinBlockValid == 0
-						&& this.getBlockChain().setWaitWinBuffer(newBlock)) {
-					
-					LOGGER.info(Lang.getInstance().translate("received new valid WIN Block"));
-
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes);
-
-				} 
 
 				break;
 
@@ -998,16 +1000,14 @@ public class Controller extends Observable {
 				if(isNewBlockValid == 0)	{
 					
 					synchronized (this.peerHWeight) {
-						//this.peerHeight.put(message.getSender(),
-						//		blockMessage.getHeight());
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.peerHWeight.get(message.getSender()).b + newBlock.getWinValue(dbSet)));
+										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValue(dbSet)));
 
 						
 					}
 				}
-					
+				
 				if(this.isProcessingWalletSynchronize()) {
 					
 					break;
@@ -1016,6 +1016,7 @@ public class Controller extends Observable {
 				// CHECK IF VALID
 				if (isNewBlockValid == 0
 						&& this.synchronizer.process(dbSet, newBlock)) {
+					
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
 
 					// BROADCAST
@@ -1659,7 +1660,7 @@ public class Controller extends Observable {
 	}
 
 	public long getNextBlockGeneratingBalance(Block block) {
-		return block.getWinValue(this.dbSet);
+		return block.getGeneratingBalance();
 	}
 	public long getNextBlockGeneratingBalance() {
 		Block block = this.dbSet.getBlockMap().getLastBlock();
@@ -1692,7 +1693,7 @@ public class Controller extends Observable {
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
 			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block"
-					+ newBlock.getWinValue(dbSet) + " " + newBlock.getCreator().getAddress());
+					+ newBlock.calcWinValue(dbSet) + " " + newBlock.getCreator().getAddress());
 
 			this.broadcastBlock(newBlock, null);
 		}

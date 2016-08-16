@@ -56,11 +56,11 @@ public class ForgingStatus extends JLabel implements Observer {
 					DBSet dbSet = DBSet.getInstance();
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
-		            	long g_balance = account.getConfirmedBalance(Transaction.RIGHTS_KEY).longValue();
+		            	int g_balance = (int)account.getConfirmedBalance(Transaction.RIGHTS_KEY).longValue();
 		            	if (g_balance < GenesisBlock.MIN_GENERATING_BALANCE) {
 		            		continue;
 		            	}
-		            	long w_balance = account.calcWinValue(dbSet, height);
+		            	int w_balance = Block.calcWinValue(dbSet, account, height, g_balance);
 		            	if (w_balance > winBalance) {
 		            		genBalance = g_balance;
 		            		winBalance = w_balance;
