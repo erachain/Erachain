@@ -25,6 +25,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 	public static final int COLUMN_FEE = 5;
 	
 	private SortableList<byte[], Block> blocks;
+	private long winValue = 0l;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator", "Generating Balance", "Transactions", "Fee"});
 	
@@ -78,8 +79,14 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			switch(column)
 			{
 			case COLUMN_HEIGHT:
+
+				if (row == 0) {
+					return block.getHeight(DBSet.getInstance())
+							+ " " + Controller.getInstance().getBlockChain().getFullWeight();
+					
+				}
 				
-				return block.getHeight(DBSet.getInstance());
+				return block.getHeight(DBSet.getInstance()) + " " + winValue;
 				
 			case COLUMN_TIMESTAMP:
 				

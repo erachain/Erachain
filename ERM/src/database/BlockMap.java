@@ -63,7 +63,6 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
 		
-		//this.lastTrueBlockHeight = parent.getLastTrueBlockHeight();
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})

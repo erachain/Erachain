@@ -68,6 +68,7 @@ public class Block {
 
 	protected int version;
 	protected byte[] reference;
+	int height_process;
 	//protected long timestamp;
 	protected int generatingBalance; // only for DB MAP
 	protected PublicKeyAccount creator;
@@ -165,25 +166,59 @@ public class Block {
 		this.generatingBalance = generatingBalance;
 	}
 	
+	public static int getPreviousForgingHeightForIncomes(DBSet dbSet, Account creator, int height) {
+		
+		//height = height > 0? height: this.getParentHeight(dbSet) + 1;
+
+		// IF BLOCK in the MAP
+		int previousForgingHeight = creator.getForgingData(dbSet, height);
+		if (previousForgingHeight == -1) {
+			// IF BLOCK not inserted in MAP
+			previousForgingHeight = creator.getLastForgingData(dbSet);			
+			if (previousForgingHeight == -1) {
+				// if it is first payment to this account
+				return height;
+			}
+		}
+
+		/*
+		if (previousForgingHeight == height) {
+			// previous block is GENESIS
+			previousForgingHeight = 1;
+			// and get previous height
+		}
+
+		if ( previousForgingHeight < 2)
+			// NOT use genesis transactions
+			previousForgingHeight = 2;
+		*/
+		
+		return previousForgingHeight;
+
+	}
+
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int parentHeight)
 	{
 		
-		//int parentHeight = this.getParentHeight(dbSet);
 		int incomed_amount = 0;
 		int amount;
 		
-		List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
-				getPreviousForgingHeight(dbSet, creator, parentHeight + 1) + 1, parentHeight,
-				0, 0, false, 0, 0);
-		
-		for(Transaction transaction: txs)
-		{
+		int previousForgingHeight = getPreviousForgingHeightForIncomes(dbSet, creator, parentHeight + 1) + 1;
+		if (previousForgingHeight <= parentHeight) {
 			
-			if ( transaction.getAssetKey() == Transaction.RIGHTS_KEY) {
-				amount = (int)transaction.getAmount().longValue();
-				incomed_amount += amount;
+			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
+					previousForgingHeight, parentHeight,
+					0, 0, false, 0, 0);
+			
+			for(Transaction transaction: txs)
+			{
+				
+				if ( transaction.getAssetKey() == Transaction.RIGHTS_KEY) {
+					amount = (int)transaction.getAmount().longValue();
+					incomed_amount += amount;
+				}
 			}
 		}
 		
@@ -623,16 +658,15 @@ public class Block {
 		return Crypto.getInstance().digest(data);
 	}
 
-	public static int getPreviousForgingHeight(DBSet dbSet, Account creator, int height) {
+	public static int getPreviousForgingHeightForCalcWin(DBSet dbSet, Account creator, int height) {
 		
-		//height = height > 0? height: this.getParentHeight(dbSet) + 1;
-
 		// IF BLOCK in the MAP
 		int previousForgingHeight = creator.getForgingData(dbSet, height);
 		if (previousForgingHeight == -1) {
 			// IF BLOCK not inserted in MAP
 			previousForgingHeight = creator.getLastForgingData(dbSet);			
 		}
+
 		if (previousForgingHeight == height) {
 			// previous block is GENESIS
 			previousForgingHeight = 1;
@@ -645,7 +679,8 @@ public class Block {
 		return previousForgingHeight;
 
 	}
-	private static int getWinValueHeight2(int heightThis, int heightStart)
+
+	private static long getWinValueHeight2(int heightThis, int heightStart)
 	{
 		int len = heightThis - heightStart;
 		if (len < 1)
@@ -660,11 +695,11 @@ public class Block {
 		int MAX_LEN_2 = MAX_LEN * 100;
 		if (len < MAX_LEN ) {
 			//return (long)(len * Math.pow(len, 0.3));
-			return (int)Math.pow(len, 1.5);
+			return (long)Math.pow(len, 1.5);
 		} else if ( len < MAX_LEN_2 )
-			return (int)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
+			return (long)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
 		//return (long)(len * Math.pow(MAX_LEN, 0.3));
-		return (int)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
+		return (long)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
 	}
 
 	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
@@ -673,20 +708,22 @@ public class Block {
 	{
 		//int height = this.getParentHeight(dbSet) + 1;
 
-		int previousForgingHeight = getPreviousForgingHeight(dbSet, account, height);
-				
-		int win_value = generatingBalance * getWinValueHeight2(height, previousForgingHeight);
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, account, height);
+		
+		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight);
+
+		long win_value = generatingBalance * winValueHeight2;
 
 		if (height < 10000)
-			win_value >>= 16;
-		else if (height < 100000)
 			win_value >>= 18;
-		else if (height < 1000000)
+		else if (height < 100000)
 			win_value >>= 20;
-		else
+		else if (height < 1000000)
 			win_value >>= 22;
+		else
+			win_value >>= 24;
 		
-		return win_value;
+		return (int)win_value;
 
 	}
 	
@@ -976,24 +1013,36 @@ public class Block {
 			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
 		}
 		
-		int height = 1;
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
+		
+		this.height_process = dbSet.getHeightMap().getHeight(this.signature);
+
+		if (!dbSet.isFork()) {
+			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
+			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dbSet) + 1)
+					+ "] SET new last Height: " + lastHeight
+					+ " getHeightMap().getHeight: " + this.height_process);
+		}
+
+		BlockChain blockChain = Controller.getInstance().getBlockChain();
+		if (blockChain != null) {
+			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_SIGNATURES);
+		}
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
 		for(Transaction transaction: this.getTransactions())
 		{
-			dbSet.getTransactionFinalMap().add( height, seq, transaction);
+			dbSet.getTransactionFinalMap().add( height_process, seq, transaction);
 			seq++;
 		}
 
-		if(height % Settings.BLOCK_MAX_SIGNATURES == 0) 
+		if(height_process % Settings.BLOCK_MAX_SIGNATURES == 0) 
 		{
-			Controller.getInstance().blockchainSyncStatusUpdate(height);
+			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
-		//assert(1==2);
 		
 	}
 
@@ -1044,6 +1093,14 @@ public class Block {
 
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
+		
+		int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
+		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + (this.getParentHeight(dbSet) + 1)
+				+ "] DELETE -> new last Height: " + lastHeight
+				+ (dbSet.isFork()?" in FORK!": ""));
+
+		
+		this.height_process = -1;
 
 		for(Transaction transaction: this.getTransactions())
 		{

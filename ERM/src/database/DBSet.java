@@ -320,6 +320,10 @@ public class DBSet implements Observer, IDB {
 		return this.parent;
 	}
 	
+	public boolean isFork() {
+		return this.parent != null;
+	}
+	
 	public AddressForging getAddressForging() 
 	{
 		return this.addressForging;

@@ -1178,7 +1178,8 @@ public class Controller extends Observable {
 
 		Peer peer = null;
 		//Block lastBlock = getLastBlock();
-		int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
+		//int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
+		int checkPointHeight = this.getBlockChain().getCheckPoint();
 		
 		try {
 			// WHILE NOT UPTODATE
@@ -1190,7 +1191,7 @@ public class Controller extends Observable {
 						+ getHWeightOfPeer(peer));
 
 				// SYNCHRONIZE FROM PEER
-				this.synchronizer.synchronize(dbSet, lastTrueBlockHeight, peer);
+				this.synchronizer.synchronize(dbSet, checkPointHeight, peer);
 			} while (!this.isUpToDate());
 			
 		} catch (Exception e) {
@@ -1692,7 +1693,8 @@ public class Controller extends Observable {
 		
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
-			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block"
+			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
+					+ (newBlock.getParentHeight(dbSet) + 1)
 					+ newBlock.calcWinValue(dbSet) + " " + newBlock.getCreator().getAddress());
 
 			this.broadcastBlock(newBlock, null);
@@ -2122,7 +2124,7 @@ public class Controller extends Observable {
 	*/
 	
 	public Block getBlockByHeight(DBSet db, int parseInt) {
-		byte[] b = db.getHeightMap().getBlockByHeight(parseInt);
+		byte[] b = db.getHeightMap().getBlockSignatureByHeight(parseInt);
 		return db.getBlockMap().get(b);
 	}
 	public Block getBlockByHeight(int parseInt) {

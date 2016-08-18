@@ -25,7 +25,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	
 	// for saving in DB
 	private Var<Long> fullWeightVar;
-	private Long fullWeight;
+	private Long fullWeight = 0l;
 	private int startedInForkHeight = 0;
 	
 	public HeightMap(DBSet databaseSet, DB database)
@@ -121,7 +121,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 		return 0;
 	}
 	
-	public byte[] getBlockByHeight(int height)
+	public byte[] getBlockSignatureByHeight(int height)
 	{
 		return heightIndex.get(height);
 	}

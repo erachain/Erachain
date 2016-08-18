@@ -28,6 +28,8 @@ public class BlockChain
 	private long genesisTimestamp;
 	
 	private Block waitWinBuffer;
+	private int checkPoint = 1;
+
 	
 	private DBSet dbSet;
 	
@@ -110,6 +112,13 @@ public class BlockChain
 	}
 	
 	// 
+	public int getHeight() {
+		
+		//GET LAST BLOCK
+		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+		return dbSet.getHeightMap().getHeight(lastBlockSignature);
+	}
+
 	public Tuple2<Integer, Long> getHWeight(boolean withWinBuffer) {
 		
 		//GET LAST BLOCK
@@ -141,6 +150,16 @@ public class BlockChain
 	public long getFullWeight() {
 		
 		return dbSet.getHeightMap().getFullWeight();
+	}
+
+	public int getCheckPoint() {
+		
+		return this.checkPoint;
+	}
+	public void setCheckPoint(int checkPoint) {
+		
+		if (checkPoint > 1)
+			this.checkPoint = checkPoint;
 	}
 
 	public List<byte[]> getSignatures(byte[] parent) {
