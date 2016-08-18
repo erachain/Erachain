@@ -304,40 +304,6 @@ public class Synchronizer
 
 		return response.getSignatures();
 	}
-
-	private static int minimalSteep = 10;
-	private Tuple2<byte[], List<byte[]>> findHeaders2(DBSet dbSet, Peer peer, int minHeight, int maxHeight) throws Exception
-	{
-
-		int steepHeight = (maxHeight - minHeight) / 2;
-				
-		byte[] signature = dbSet.getHeightMap().getBlockSignatureByHeight(minHeight + steepHeight);
-		List<byte[]> headers = this.getBlockSignatures(signature, peer);
-		
-		boolean isFound = headers.size() == 0;
-		
-		if (steepHeight < minimalSteep) {
-			// STOP RECURSION
-			if (isFound)
-				return new Tuple2<byte[], List<byte[]>>(signature, headers);
-			else
-				return null;
-		}
-
-		Tuple2<byte[], List<byte[]>> result;
-		if (isFound) {
-			result = findHeaders2(dbSet, peer, 
-					maxHeight - steepHeight, maxHeight);
-		} else {
-			result = findHeaders2(dbSet, peer, 
-					minHeight, maxHeight - steepHeight);
-		}
-		
-		if (result == null)
-			return new Tuple2<byte[], List<byte[]>>(signature, headers);
-		else
-			return result;
-	}
 	
 	private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, byte[] lastBlockSignature, int checkPointHeight) throws Exception
 	{
@@ -350,31 +316,59 @@ public class Synchronizer
 			return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
 		}
 
-		int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
+		
+		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
+		int maxChainHeight = dbSet.getHeightMap().getHeight(lastBlockSignature);
+		if (maxChainHeight < checkPointHeight)
+			maxChainHeight = checkPointHeight;
 
 		LOGGER.error("core.Synchronizer.findLastCommonBlock(Peer) for: "
-				+ " getBlockMap().getLastBlock: " + myChainHeight
+				+ " getBlockMap().getLastBlock: " + maxChainHeight
 				+ "to minHeight: " + checkPointHeight);
 
 		// try get check point block from peer
-		Block checkPointHeightCommonBlock = this.getBlock(dbSet.getHeightMap().getBlockSignatureByHeight(checkPointHeight), peer);
+		// GENESIS block nake ERROR in network.Peer.sendMessage(Message) -> this.out.write(message.toBytes());
+		// TODO fix it error
+		byte[] checkPointHeightSignature;
+		Block checkPointHeightCommonBlock;
+		if (checkPointHeight == 1) {
+			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock();						
+			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
+		} else {
+			checkPointHeightSignature = dbSet.getHeightMap().getBlockSignatureByHeight(checkPointHeight);
+			checkPointHeightCommonBlock = this.getBlock(checkPointHeightSignature, peer);			
+		}
 
-		if (checkPointHeightCommonBlock == null) {
+		if (checkPointHeightSignature == null) {
 			throw new Exception("Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found");			
 		}
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
-		 Tuple2<byte[], List<byte[]>> result = findHeaders2(dbSet, peer, checkPointHeight, myChainHeight);		
+		int steep = 16;
+		do {
+			maxChainHeight -= steep;
+			if (maxChainHeight < checkPointHeight) {
+				maxChainHeight = checkPointHeight;
+				lastBlockSignature = checkPointHeightCommonBlock.getSignature();
+			} else {
+				lastBlockSignature = dbSet.getHeightMap().getBlockSignatureByHeight(maxChainHeight);				
+			}
+				
+			headers = this.getBlockSignatures(lastBlockSignature, peer);
+			if (headers.size() > 0)
+				break;
+			// x2
+			steep <<= 1;
+			
+		} while ( maxChainHeight > checkPointHeight && headers.size() == 0);
 
 		// CLEAR head of common headers
-		byte[] commonBlockSignature = result.a;
-		headers = result.b;
 		while (dbSet.getBlockMap().contains(headers.get(0))) {
-			 commonBlockSignature = headers.remove(0);
+			lastBlockSignature = headers.remove(0);
 		}
 		
-		return new  Tuple2<byte[], List<byte[]>>(commonBlockSignature, headers);
+		return new  Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
 	}
 
 	private List<Block> getBlocks(List<byte[]> signatures, Peer peer) throws Exception {

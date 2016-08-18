@@ -926,15 +926,14 @@ public class Controller extends Observable {
 
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-				/*
-				 * for core.Synchronizer.synchronize(DBSet, Block, List<Block>)
 				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature() "
 						+ Base58.encode(getBlockMessage.getSignature()));
-						*/
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
 						.getBlock(getBlockMessage.getSignature());
+
+				LOGGER.error("onMessage -> get block: " + newBlock.toString());
 
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(

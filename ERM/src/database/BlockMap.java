@@ -139,28 +139,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		}
 		
 		return;
-		
-		/*
-		// SET TRUE LAST BLOCK
-		//byte[] b = dbSet.getHeightMap().getBlockByHeight(block.getHeight(dbSet) - Settings.CONFIRMS_TRUE);
-		//Block trueBlock = dbSet.getBlockMap().get(b);
-		DBSet dbSet = (DBSet)this.databaseSet;
-		// TAKE getHeight from PARENT, !child getHeight = null
-		Block parent = block.getParent(dbSet);
-		if (parent == null)
-			return;
-
-		int th = parent.getHeight(dbSet) - Settings.CONFIRMS_TRUE;
-
-		if (this.lastTrueBlockHeight < th)
-			this.lastTrueBlockHeight = th;
-
-		if(this.lastTrueBlockHeightVar != null)
-		{
-			this.lastBlockVar.set(block.getSignature());
-		}
-		*/
-		
+				
 	}
 	
 	public Block getLastBlock()
@@ -172,15 +151,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		return this.lastBlockSignature;
 	}
-	
-	/*
-	// checkpoint
-	public int getLastTrueBlockHeight()
-	{
-		return this.lastTrueBlockHeight;
-	}
-	*/
-	
+		
 	public boolean isProcessing() 
 	{
 		if(this.processing != null)

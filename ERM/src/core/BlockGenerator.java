@@ -196,6 +196,13 @@ public class BlockGenerator extends Thread implements Observer
 				// start new SOLVE rof WIN Blocks
 				this.solvingBlock = null;
 				
+				syncForgingStatus();
+				if(forgingStatus != ForgingStatus.FORGING) {
+					// IF now not forging - clear old win block
+					ctrl.getBlockChain().clearWaitWinBuffer();
+					continue;
+				}
+				
 				// FLUSH WINER to DB MAP
 				ctrl.flushNewBlockGenerated();
 

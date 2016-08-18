@@ -47,7 +47,7 @@ import utils.SysTray;
 
 public class GenesisBlock extends Block{
 	
-	private static int genesisVersion = 1;
+	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
 	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;

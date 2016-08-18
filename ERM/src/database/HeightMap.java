@@ -14,6 +14,7 @@ import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import controller.Controller;
 import core.block.Block;
 
 // block.signature -> Height, (int)Weight
@@ -123,6 +124,13 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	
 	public byte[] getBlockSignatureByHeight(int height)
 	{
+		/* 1 - not must be used here!
+		if (height == 1) {
+			// GENESIS BLOCK !
+			return Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
+		}
+		*/
+		
 		return heightIndex.get(height);
 	}
 	

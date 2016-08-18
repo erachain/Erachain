@@ -164,21 +164,21 @@ public class BlockChain
 
 	public List<byte[]> getSignatures(byte[] parent) {
 		
-		//LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
+		LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
 		//CHECK IF BLOCK EXISTS
 		if(dbSet.getBlockMap().contains(parent))
 		{
-			Block parentBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
+			Block childBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
 			
 			int counter = 0;
-			while(parentBlock != null && counter < MAX_SIGNATURES)
+			while(childBlock != null && counter < MAX_SIGNATURES)
 			{
-				headers.add(parentBlock.getSignature());
+				headers.add(childBlock.getSignature());
 				
-				parentBlock = parentBlock.getChild(dbSet);
+				childBlock = childBlock.getChild(dbSet);
 				
 				counter ++;
 			}
