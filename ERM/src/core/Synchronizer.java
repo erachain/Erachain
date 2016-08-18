@@ -368,15 +368,10 @@ public class Synchronizer
 		 Tuple2<byte[], List<byte[]>> result = findHeaders2(dbSet, peer, checkPointHeight, myChainHeight);		
 
 		// CLEAR head of common headers
-		int i = 0;
 		byte[] commonBlockSignature = result.a;
-		for (byte[] signature: result.b) {
-			if (dbSet.getBlockMap().get(signature) == null) {
-				headers = headers.subList(i, headers.size()-1);
-				break;
-			}
-			i++;
-			commonBlockSignature = signature;
+		headers = result.b;
+		while (dbSet.getBlockMap().contains(headers.get(0))) {
+			 commonBlockSignature = headers.remove(0);
 		}
 		
 		return new  Tuple2<byte[], List<byte[]>>(commonBlockSignature, headers);
