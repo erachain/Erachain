@@ -190,7 +190,8 @@ public class BlockGenerator extends Thread implements Observer
 			
 			// try solve and flush new block from Win Buffer			
 			Block waitWin = ctrl.getBlockChain().getWaitWinBuffer();
-			if (waitWin != null
+			if (!dbSet.getBlockMap().isProcessing() // NOT core.Synchronizer.process(DBSet, Block)
+					&& waitWin != null
 					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
 
 				// start new SOLVE rof WIN Blocks
@@ -224,10 +225,13 @@ public class BlockGenerator extends Thread implements Observer
 				LOGGER.error(e.getMessage(),e);
 			}
 
-			if(dbSet.isStoped()) {
+			if(dbSet.isStoped()
+					|| dbSet.getBlockMap().isProcessing() // core.Synchronizer.process(DBSet, Block)
+					) {
 				continue;
 			}
 
+			syncForgingStatus();
 
 			//CHECK IF WE ARE UP TO DATE
 			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
@@ -264,6 +268,7 @@ public class BlockGenerator extends Thread implements Observer
 					
 			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 			if(this.solvingBlock == null
+					|| waitWin == null
 					|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 					)
 			{

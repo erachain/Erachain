@@ -1,4 +1,5 @@
 package database;
+import java.util.Arrays;
 // 30/03
 import java.util.Collection;
 import java.util.HashMap;
@@ -129,7 +130,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		return this.observableData;
 	}
 	
-	private void setLastBlock(byte[] signature) 
+	private void setLastBlockSignature(byte[] signature) 
 	{
 		
 		this.lastBlockSignature = signature;
@@ -179,7 +180,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	public boolean set(byte[] signature, Block block)
 	{
 	
-		setLastBlock(signature);
+		this.setLastBlockSignature(signature);
 		
 		DBSet dbSet = (DBSet)this.databaseSet;
 		
@@ -211,6 +212,11 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		DBSet dbSet = (DBSet)this.databaseSet;
 
+		if (!Arrays.equals(this.getLastBlockSignature(), block.getSignature())) {
+			Long rr = null;
+			rr +=1;
+		}
+
 		dbSet.getHeightMap().delete(block.getSignature());
 
 		byte[] parentSign = block.getReference();
@@ -218,7 +224,7 @@ public class BlockMap extends DBMap<byte[], Block>
 
 		if (parent != null) {
 			
-			this.setLastBlock(parentSign);
+			this.setLastBlockSignature(parentSign);
 			
 			dbSet.getChildMap().delete(parent.getSignature());
 		

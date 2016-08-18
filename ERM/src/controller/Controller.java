@@ -1146,7 +1146,6 @@ public class Controller extends Observable {
 			int maxPeerHeight = this.getMaxPeerHWeight().a;
 			int chainHeight = this.blockChain.getHWeight(false).a;
 			int diff = chainHeight - maxPeerHeight;
-			//return diff >= 0 && diff < 2;
 			return diff >= 0;
 		} else {
 			long maxPeerWeight = this.getMaxPeerHWeight().b;
@@ -1690,6 +1689,12 @@ public class Controller extends Observable {
 		if (newBlock == null)
 			return false;
 		
+		// if last block is changed by core.Synchronizer.process(DBSet, Block)
+		// clear this win block
+		if (!Arrays.equals(dbSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+			return false;
+		}
+				
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
 			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
