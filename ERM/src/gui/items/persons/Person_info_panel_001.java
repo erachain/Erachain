@@ -188,6 +188,9 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(birthday_jTextField, gridBagConstraints);
 
+        
+        
+        
         jLabel5.setText(Lang.getInstance().translate("Deathday")+":");
         jLabel5.setAlignmentY(0.2F);
         jLabel5.setAutoscrolls(true);
@@ -200,8 +203,11 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
 
         deathday_jTextField.setEditable(false);
         Long end = person.getDeathday();
-        if (end == null || end <= person.getBirthday())
+        if (end == null || end <= person.getBirthday()){
         	deathday_jTextField.setText( "-");
+        deathday_jTextField.setVisible(false);
+        jLabel5.setVisible(false);
+        }
         else
         	deathday_jTextField.setText( new Date (end)+"");
         
