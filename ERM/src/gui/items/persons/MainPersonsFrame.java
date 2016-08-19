@@ -88,6 +88,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		search_Person_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
 		search_Person_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
 		
+		// not show My filter
+		search_Person_SplitPanel.searth_My_JCheckBox_LeftPanel.setVisible(false);
 		
 		//CREATE TABLE
 		this.tableModelPersons = new TableModelPersons();
@@ -370,6 +372,10 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		my_Person_SplitPanel.button2_ToolBar_LeftPanel.setVisible(false);
 		my_Person_SplitPanel.jButton1_jToolBar_RightPanel.setVisible(false);
 		my_Person_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
+		
+
+		// not show My filter
+		my_Person_SplitPanel.searth_My_JCheckBox_LeftPanel.setVisible(false);
 		
 		//TABLE
 		 personsModel = new WalletItemPersonsTableModel();

@@ -6,6 +6,8 @@ import lang.Lang;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -13,17 +15,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.MaskFormatter;
+
+import com.toedter.calendar.JDateChooser;
+
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
@@ -35,12 +46,14 @@ import gui.transaction.OnDealClick;
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel 
 {
+	
+	private  MaskFormatter AccFormat;
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
-	private javax.swing.JFormattedTextField txtBirthday;
-	private javax.swing.JFormattedTextField txtDeathday;
+	private JDateChooser txtBirthday;
+	private JDateChooser txtDeathday;
 	private JButton iconButton;
 	@SuppressWarnings("rawtypes")
 	private JComboBox txtGender;
@@ -82,11 +95,82 @@ public class IssuePersonPanel extends JPanel
 
 		
 		initComponents();
-		jLabel_Title.setText("");
-		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
+		initLabelsText();
+		
 		cbxFrom.setModel(new AccountsComboBoxModel());
-      	jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
-       	txtName.setText("");
+      
+		
+		
+		txtName.setText("");
+	// проверка на код
+		txtName.addFocusListener(new FocusListener(){
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				if (txtName.getText().getBytes().length<2) {
+					
+					JOptionPane.showMessageDialog(null, Lang.getInstance().translate("the name must be longer than 2 characters"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+					txtName.requestFocus();
+				}
+				
+			}
+			
+			
+			
+		});
+      	
+
+		
+        
+    	
+    	String[] items = {
+      			Lang.getInstance().translate("Male"),
+      			Lang.getInstance().translate("Female"),
+      			Lang.getInstance().translate("-")
+        	};	
+       	txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(items));
+       	
+       	
+       	
+       	
+      // 	txtBirthday.setText("1970-12-08");
+       	
+       
+       	
+       	
+       	
+
+       	
+       	
+  //     	txtDeathday.setText("0000-00-00");
+       	
+       	
+       	
+       	
+       	
+       	txtRace.setText("-");
+       	this.txtBirthLatitude.setText("45.123");
+       	this.txtBirthLongitude.setText("12.123");
+       	this.txtHeight.setText("170");
+       	this.txtFeePow.setText("0");
+ // issue buton
+       	this.issueButton.setText(Lang.getInstance().translate("Issue"));
+        this.issueButton.setPreferredSize(new Dimension(120, 30));
+        this.issueButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick();
+		    }
+		});
+ // add icin
         iconButton.setText(Lang.getInstance().translate("Add Image")+ "...");
         iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -101,60 +185,9 @@ public class IssuePersonPanel extends JPanel
 			}
         });
         
-    	jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
-    	jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
-
-    	String[] items = {
-      			Lang.getInstance().translate("Male"),
-      			Lang.getInstance().translate("Female"),
-      			Lang.getInstance().translate("-")
-        	};	
-       	txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(items));
-       	jLabel_Born.setText(Lang.getInstance().translate("Birthday") + ":");
-
-      	txtBirthday.setText("1970-12-08");
-      	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
-      		
-      	txtDeathday.setText("0000-00-00");
-
-      	jLabel_Race.setText(Lang.getInstance().translate("Race") + ":");
-
-      	txtRace.setText("-");
-
-      	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Birth Latitude") + ":");
- 
-      	this.txtBirthLatitude.setText("45.123");
-  
-      	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Birth Longitude") + ":");
-  
-      	this.txtBirthLongitude.setText("12.123");
- 
-      	jLabel_SkinColor.setText(Lang.getInstance().translate("Skin Color") + ":");
-  
-      	jLabel_EyeColor.setText(Lang.getInstance().translate("Eye Color") + ":");
- 
-      jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
-  
-      jLabel_Height.setText(Lang.getInstance().translate("Height") + ":");
- 
-      	this.txtHeight.setText("170");
-
-    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
- 
-      	this.txtFeePow = new JTextField();
-      	this.txtFeePow.setText("0");
-  
-        this.issueButton.setText(Lang.getInstance().translate("Issue"));
         
-        this.issueButton.setPreferredSize(new Dimension(120, 30));
-        this.issueButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick();
-		    }
-		});
- 
+        
+        
         this.setVisible(true);
         
         
@@ -162,6 +195,8 @@ public class IssuePersonPanel extends JPanel
         
         
 	}
+	
+	
 	
     @SuppressWarnings("resource")
 	private static byte[] getBytesFromFile(File file) throws IOException {
@@ -182,6 +217,26 @@ public class IssuePersonPanel extends JPanel
         }
         is.close();
         return bytes;
+    }
+    
+    private void initLabelsText(){
+    	
+    	jLabel_Title.setText("");
+		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":")	;
+		jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
+		jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
+    	jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
+     	jLabel_Born.setText(Lang.getInstance().translate("Birthday") + ":");
+    	jLabel_SkinColor.setText(Lang.getInstance().translate("Skin Color") + ":");
+    	jLabel_EyeColor.setText(Lang.getInstance().translate("Eye Color") + ":");
+    	jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
+        jLabel_Height.setText(Lang.getInstance().translate("Height") + ":");
+        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+    	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Birth Longitude") + ":");
+    	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Birth Latitude") + ":");
+    	jLabel_Race.setText(Lang.getInstance().translate("Race") + ":");
+    	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
+    	
     }
 	
 	protected void addimage() {
@@ -242,6 +297,7 @@ public class IssuePersonPanel extends JPanel
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	public void onIssueClick()
 	{
 		//DISABLE
@@ -292,26 +348,32 @@ public class IssuePersonPanel extends JPanel
 			
 			//READ FEE POW
 			feePow = Integer.parseInt(this.txtFeePow.getText());
+			
+			String b = this.txtFeePow.getText();
 
 			//READ GENDER
 			parse++;
 			gender = (byte) (this.txtGender.getSelectedIndex());
 			
 			parse++;
-		
-			String str = this.txtBirthday.getText();
+			  Date date = this.txtBirthday.getCalendar().getTime();
+			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate()+1);
 			if (str.length() < 11) str = str + " 00:00:00";
 			birthday = Timestamp.valueOf(str).getTime();
-
+try{
 			parse++;
-			str = this.txtDeathday.getText();
-			if (str.equals("0000-00-00")) {
-				deathday = birthday -1;
-			} else {
+			date = this.txtDeathday.getCalendar().getTime();
+			//str = this.txtDeathday.getDate().toString();
+			str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate()+1);
+			
 				if (str.length() < 11) str = str + " 00:00:00";
 				deathday = Timestamp.valueOf(str).getTime();
-			}
-
+			
+}
+catch(Exception e3){
+	deathday = birthday -1;
+	
+}
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			
@@ -375,11 +437,11 @@ public class IssuePersonPanel extends JPanel
 		
 			
 			
-			txtFeePow.setText("");
+			txtFeePow.setText("0");
 			txtName.setText("");
 			txtareaDescription.setText("");
-			txtBirthday.setText("0000-00-00");
-			txtDeathday.setText("0000-00-00");
+			//txtBirthday.setText("0000-00-00");
+			//txtDeathday.setText("0000-00-00");
 			
 			txtGender.setSelectedIndex(2);
 			txtRace.setText("");
@@ -407,7 +469,7 @@ public class IssuePersonPanel extends JPanel
 	}
 
                              
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -445,8 +507,8 @@ public class IssuePersonPanel extends JPanel
         issueButton = new javax.swing.JButton();
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
-        txtBirthday = new javax.swing.JFormattedTextField();
-        txtDeathday = new javax.swing.JFormattedTextField();
+        txtBirthday =  new JDateChooser();
+        txtDeathday = new JDateChooser();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -753,7 +815,25 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.1;
         add(txtGender, gridBagConstraints);
 
-        txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+     /*     
+        try {
+			AccFormat = new MaskFormatter("****-**-**");
+			AccFormat.setValidCharacters("1,2,3,4,5,6,7,8,9,0");
+	     //   AccFormat.setPlaceholder("yyyy-mm-dd");
+	        AccFormat.setPlaceholderCharacter('_');
+	      //  AccFormat.setOverwriteMode(true);
+	        
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+        JFormattedTextField txtBirthday = new JFormattedTextField(AccFormat);    
+    */    
+         
+        txtBirthday.setDateFormatString("yyyy-MM-dd");
+        
+   //     txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
@@ -761,14 +841,14 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add(txtBirthday, gridBagConstraints);
+        add( txtBirthday, gridBagConstraints);
 
-        txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
-        txtDeathday.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+  //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+  //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
+ //           public void actionPerformed(java.awt.event.ActionEvent evt) {
  //               txtDeathdayActionPerformed(evt);
-            }
-        });
+ //           }
+ //       });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 6;

@@ -132,6 +132,9 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		}
 		
 		//CHECK IF LIST UPDATED
+		
+		int a = message.getType();
+		
 		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE)
 		{
 			this.fireTableDataChanged();

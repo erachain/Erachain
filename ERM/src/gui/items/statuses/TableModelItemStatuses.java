@@ -126,9 +126,9 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 			
 			this.fireTableDataChanged();
 		}
-		
+		int a = message.getType();
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE)
+		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE || message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE )
 		{
 			this.fireTableDataChanged();
 		}
