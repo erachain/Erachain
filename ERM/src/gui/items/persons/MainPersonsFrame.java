@@ -153,8 +153,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		search_Person_SplitPanel.setRowHeightFormat(true);
 	
 		// select row table persons as html	
-		Person_Info info = new Person_Info(); 
-		info.setFocusable(false);
+	//	Person_Info info = new Person_Info(); 
+//		info.setFocusable(false);
 	
 		//		
 		// Event LISTENER		
@@ -455,8 +455,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		my_Person_SplitPanel.setRowHeightFormat(true);
 				
 		// select row table persons	
-		Person_Info info1 = new Person_Info();
-		info1.setFocusable(false);
+	//	Person_Info info1 = new Person_Info();
+	//	info1.setFocusable(false);
 		// JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info1)); 
 		 
 		// EVENTS on CURSOR
