@@ -849,6 +849,8 @@ catch(Exception e3){
  //               txtDeathdayActionPerformed(evt);
  //           }
  //       });
+        
+        txtDeathday.setDateFormatString("yyyy-MM-dd");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 6;
