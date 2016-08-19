@@ -3,6 +3,8 @@ package gui.items.persons;
 import java.awt.Dimension;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.util.Date;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -15,6 +17,7 @@ import javax.swing.event.DocumentListener;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import com.toedter.calendar.JDateChooser;
 
 import controller.Controller;
 import core.account.Account;
@@ -114,9 +117,34 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jButton_SetStatus.setText(Lang.getInstance().translate("Set status"));
 		    jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
-	            			(StatusCls)jComboBox_Status.getSelectedItem(),
-	            			jFormattedTextField_fromDate, jFormattedTextField_toDate, jFeeTxt);
+	            	
+	            	
+	            	 Date date = jFormattedTextField_fromDate.getCalendar().getTime();
+		     			String str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+		     			
+		     			String str_jFormattedTextField_toDate;
+			     			
+			     	try{
+			     				 date = jFormattedTextField_toDate.getCalendar().getTime();
+					     		 str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+			     				
+			     	}
+			     	catch(Exception e3){
+			     		str_jFormattedTextField_toDate = "3000-12-31";
+			     		
+			     	}   			
+			     			
+			     			
+		            	
+		            	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
+		            			(StatusCls)jComboBox_Status.getSelectedItem(),
+		            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
 	            }
 	        });
 		
@@ -132,8 +160,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        info.show_001(person);
 	        info.setFocusable(false);
 	        jLabel_PersonInfo.setViewportView( info);
-	        jFormattedTextField_fromDate.setText("0000-00-00");
-		    jFormattedTextField_toDate.setText("0000-00-00");
+	        jFormattedTextField_fromDate.setDateFormatString("yyyy-MM-dd");
+		    jFormattedTextField_toDate.setDateFormatString("yyyy-MM-dd");
 		    jPar1Txt.setText("");
 		    jPar2Txt.setText("");
 		    jADataTxt.setText("");
@@ -201,7 +229,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	public void onGoClick(
 			PersonCls person, JButton Button_Confirm,
 			Account creator, StatusCls status,
-			JTextField fromDateTxt, JTextField toDateTxt, JTextField feePowTxt)
+			String str_jFormattedTextField_fromDate, String str_jFormattedTextField_toDate, JTextField feePowTxt)
 	{
 
     	if (!OnDealClick.proccess1(Button_Confirm)) return;
@@ -225,7 +253,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			
 			//READ FROM DATE
 			parse++;
-			String str = fromDateTxt.getText();
+			String str = str_jFormattedTextField_fromDate;
 			if (str.equals("0000-00-00")) 
 				fromDate = Long.MIN_VALUE;
 			else {
@@ -235,7 +263,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 			//READ TO DATE
 			parse++;
-			str = toDateTxt.getText();
+			str = str_jFormattedTextField_toDate;
 			if (str.equals("0000-00-00")) 
 				toDate = Long.MAX_VALUE;
 			else {
@@ -336,9 +364,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         jLabel_Status = new javax.swing.JLabel();
         jComboBox_Status = new javax.swing.JComboBox<>();
         jLabel_Data_From = new javax.swing.JLabel();
-        jFormattedTextField_fromDate = new javax.swing.JFormattedTextField();
+        jFormattedTextField_fromDate = new JDateChooser();// new javax.swing.JFormattedTextField();
         jLabel_Data_To = new javax.swing.JLabel();
-        jFormattedTextField_toDate = new javax.swing.JFormattedTextField();
+        jFormattedTextField_toDate = new JDateChooser();// new javax.swing.JFormattedTextField();
         jLabel_Param1 = new javax.swing.JLabel();
         jPar1Txt = new javax.swing.JTextField();
         jLabel_Param2 = new javax.swing.JLabel();
@@ -410,7 +438,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gridBagConstraints.insets = new java.awt.Insets(22, 16, 0, 0);
         getContentPane().add(jLabel_Data_From, gridBagConstraints);
 
-        jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+ //       jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField_fromDate.setName(""); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -431,14 +459,14 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gridBagConstraints.insets = new java.awt.Insets(22, 0, 0, 0);
         getContentPane().add(jLabel_Data_To, gridBagConstraints);
 
-        jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+    //    jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField_toDate.setName(""); // NOI18N
-        jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextField_toDateActionPerformed(evt);
-            }
-        });
+  //      jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
+  //          public void actionPerformed(java.awt.event.ActionEvent evt) {
+  //              jFormattedTextField_toDateActionPerformed(evt);
+  //          }
+  //      });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 8;
@@ -651,8 +679,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        jLabel_RecordInfo = new javax.swing.JScrollPane();
 
 	        jComboBox_YourAddress = new javax.swing.JComboBox<>();
-	        jFormattedTextField_fromDate = new javax.swing.JFormattedTextField();
-	        jFormattedTextField_toDate = new javax.swing.JFormattedTextField();
+	        jFormattedTextField_fromDate = new JDateChooser();// new javax.swing.JFormattedTextField();
+	        jFormattedTextField_toDate = new JDateChooser();//new javax.swing.JFormattedTextField();
 	        jPar1Txt = new javax.swing.JFormattedTextField();
 	        jPar2Txt = new javax.swing.JFormattedTextField();
 	        jADataTxt = new javax.swing.JFormattedTextField();
@@ -761,21 +789,21 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("From Date")+":"),
 	        		gridBagConstraints);
 
-	        try {
-	            jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-##-##")));
-	        } catch (java.text.ParseException ex) {
-	            ex.printStackTrace();
-	        }
-	        jFormattedTextField_fromDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	//        try {
+	//            jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-##-##")));
+	//        } catch (java.text.ParseException ex) {
+	//            ex.printStackTrace();
+	//        }
+	  //      jFormattedTextField_fromDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_fromDate.setToolTipText("0000-00-00 - set to MIN");
 	        jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_fromDate.setText("0000-00-00"); // NOI18N
+	        jFormattedTextField_fromDate.setDateFormatString("yyyy-MM-dd"); // NOI18N
 	        jFormattedTextField_fromDate.setPreferredSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_fromDate.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jFormattedTextField_fromDateActionPerformed(evt);
-	            }
-	        });
+	    //    jFormattedTextField_fromDate.addActionListener(new java.awt.event.ActionListener() {
+	     //       public void actionPerformed(java.awt.event.ActionEvent evt) {
+	   //             jFormattedTextField_fromDateActionPerformed(evt);
+	  //          }
+	  //      });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 14;
@@ -791,22 +819,22 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("To Date")+":"),
 	        		gridBagConstraints);
 
-	        try {
-	        	jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
-	        			new javax.swing.text.MaskFormatter("####-##-##")));
-	        } catch (java.text.ParseException ex) {
-	            ex.printStackTrace();
-	        }
-	        jFormattedTextField_toDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	//        try {
+	//        	jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+	//        			new javax.swing.text.MaskFormatter("####-##-##")));
+	//        } catch (java.text.ParseException ex) {
+	//            ex.printStackTrace();
+	//        }
+	  //      jFormattedTextField_toDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_toDate.setToolTipText("0000-00-00 - set to MAX");
 	        jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_toDate.setText("0000-00-00"); // NOI18N
+	        jFormattedTextField_toDate.setDateFormatString("yyyy-MM-dd"); // NOI18N
 	        jFormattedTextField_toDate.setPreferredSize(new java.awt.Dimension(100, 20));
-	        jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jFormattedTextField_toDateActionPerformed(evt);
-	            }
-	        });
+	    //    jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
+	    //        public void actionPerformed(java.awt.event.ActionEvent evt) {
+	    //            jFormattedTextField_toDateActionPerformed(evt);
+	   //         }
+	   //     });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 14;
@@ -972,9 +1000,17 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        jButton_SetStatus.setToolTipText("");
 	        jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	
+	            	
+	            	 Date date = jFormattedTextField_fromDate.getCalendar().getTime();
+	     			String str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+	     			
+	     			 date = jFormattedTextField_toDate.getCalendar().getTime();
+		     			String str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+	            	
 	            	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
 	            			(StatusCls)jComboBox_Status.getSelectedItem(),
-	            			jFormattedTextField_fromDate, jFormattedTextField_toDate, jFeeTxt);
+	            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
 	            }
 	        });
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1029,8 +1065,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 //	    private javax.swing.JTextField jADataTxt;
 	    private javax.swing.JTextField jParentRecTxt;
 	    private javax.swing.JTextField jFeeTxt;
-	    private javax.swing.JFormattedTextField jFormattedTextField_fromDate;
-	    private javax.swing.JFormattedTextField jFormattedTextField_toDate;
+	    private JDateChooser jFormattedTextField_fromDate;
+	    private JDateChooser jFormattedTextField_toDate;
 	//    private javax.swing.JScrollPane jLabel_PersonInfo;
 	    private javax.swing.JScrollPane jLabel_RecordInfo;
 	    // End of variables declaration                   
