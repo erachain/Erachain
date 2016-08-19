@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -7,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
@@ -34,6 +36,7 @@ import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
 import gui.items.assets.IssueAssetPanel;
+import gui.items.assets.TableModelItemAssets;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -335,6 +338,26 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			
 		});
 		
+		
+		// hand cursor  for Favorite column
+		personsTable.addMouseMotionListener(new MouseMotionListener() {
+		    public void mouseMoved(MouseEvent e) {
+		       
+		        if(personsTable.columnAtPoint(e.getPoint())==tableModelPersons.COLUMN_FAVORITE)
+		        {
+		     
+		        	personsTable.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		        } else {
+		        	personsTable.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		        }
+		    }
+
+		    public void mouseDragged(MouseEvent e) {
+		    }
+		});
+		
+		
+		
 	 
 		//////////////////////////////////////	
 		// MY PERSONS
@@ -588,6 +611,24 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			
 			
 		});
+		
+		// hand cursor  for Favorite column
+		table.addMouseMotionListener(new MouseMotionListener() {
+		    public void mouseMoved(MouseEvent e) {
+		       
+		        if(table.columnAtPoint(e.getPoint())==personsModel.COLUMN_FAVORITE)
+		        {
+		     
+		        	table.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		        } else {
+		        	table.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		        }
+		    }
+
+		    public void mouseDragged(MouseEvent e) {
+		    }
+		});
+		
 		
 		
 		

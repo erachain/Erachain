@@ -500,8 +500,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(key_jLabel, gridBagConstraints);
 
      //   iconLabel.setEditable(false);
-        iconLabel.setText(Lang.getInstance().translate("Key")+":" + person.getKey()+"");
-   
+     //   iconLabel.setText(Lang.getInstance().translate("Key")+":" + person.getKey()+"");
+        iconLabel.setIcon(new ImageIcon(person.getImage()));
         
         
         
@@ -532,8 +532,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
     //    .setIcon(ii);
         */
         
-      key_jLabel.setIcon(new ImageIcon(person.getImage()));;
-       
+   //   key_jLabel.setIcon(new ImageIcon(person.getImage()));;
+      key_jLabel.setText(Lang.getInstance().translate("Key")+":" + person.getKey()+"");
        
        //ImageIcon ii = new ImageIcon(person.getImage());
      //  key_jLabel.setIcon(new ImageIcon(ii.getImage().getScaledInstance(100, 100, ii.getImage().SCALE_DEFAULT)));

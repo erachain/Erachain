@@ -87,10 +87,10 @@ public class IssuePersonPanel extends JPanel
 		cbxFrom.setModel(new AccountsComboBoxModel());
       	jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
        	txtName.setText("");
-        iconButton.setText(Lang.getInstance().translate("Add Image..."));
-        iconButton.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        iconButton.setText(Lang.getInstance().translate("Add Image")+ "...");
+        iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        iconButton.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        iconButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
         iconButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         iconButton.addActionListener(new ActionListener(){
 
