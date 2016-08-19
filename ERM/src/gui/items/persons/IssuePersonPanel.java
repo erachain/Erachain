@@ -3,12 +3,7 @@ package gui.items.persons;
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
-
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -17,30 +12,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-//import java.math.BigDecimal;
 import java.sql.*;
-import java.text.ParseException;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
-//import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.MaskFormatter;
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
@@ -50,15 +33,14 @@ import core.transaction.Transaction;
 import gui.transaction.OnDealClick;
 
 @SuppressWarnings("serial")
-public class IssuePersonPanel extends JPanel //JDialog //JFrame
+public class IssuePersonPanel extends JPanel 
 {
 	private JComboBox<Account> cbxFrom;
 	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
-	private JTextField txtBirthday;
-	private JTextField txtDeathday;
-	private JLabel iconLabel;
+	private javax.swing.JFormattedTextField txtBirthday;
+	private javax.swing.JFormattedTextField txtDeathday;
 	private JButton iconButton;
 	@SuppressWarnings("rawtypes")
 	private JComboBox txtGender;
@@ -69,293 +51,102 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	private JTextField txtEyeColor;
 	private JTextField txtHairСolor;
 	private JTextField txtHeight;
-	private JButton issueButton;
+    private javax.swing.JButton issueButton;
+    private javax.swing.JLabel jLabel_Fee;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabel_Account;
+    private javax.swing.JLabel jLabel_BirthLatitude;
+    private javax.swing.JLabel jLabel_BirthLongitude;
+    private javax.swing.JLabel jLabel_Born;
+    private javax.swing.JLabel jLabel_Dead;
+    private javax.swing.JLabel jLabel_Description;
+    private javax.swing.JLabel jLabel_EyeColor;
+    private javax.swing.JLabel jLabel_Gender;
+    private javax.swing.JLabel jLabel_HairСolor;
+    private javax.swing.JLabel jLabel_Height;
+    private javax.swing.JLabel jLabel_Name;
+    private javax.swing.JLabel jLabel_Race;
+    private javax.swing.JLabel jLabel_SkinColor;
+    private javax.swing.JLabel jLabel_Title;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+  
+    // End of variables declaration
 	
 	private byte[] imgButes;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public IssuePersonPanel()
 	{
-//		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Person"));
+
 		
-		String colorText ="ff0000"; // цвет текста в форме
-		
-		//CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		/*
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		*/
-		
-	//	this.setVisible(true);
-//		this.setModal(true);
-	//	this.setMaximizable(true);
-//		this.setTitle(Lang.getInstance().translate("Issue Person"));
-	//	this.setClosable(true);
-//		this.setResizable(true);
-		setPreferredSize(new Dimension(800, 600));
-	//	this.setLocation(50, 20);
-		
-		
-		//LAYOUT
-		this.setLayout(new GridBagLayout());
-		
-		//PADDING
-//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		//LABEL GBC
-		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(5,5,5,5);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
-		labelGBC.gridx = 0;
-		
-		//COMBOBOX GBC
-		GridBagConstraints cbxGBC = new GridBagConstraints();
-		cbxGBC.insets = new Insets(5,5,5,5);
-		cbxGBC.fill = GridBagConstraints.NONE;  
-		cbxGBC.anchor = GridBagConstraints.NORTHWEST;
-		cbxGBC.weightx = 0;	
-		cbxGBC.gridx = 1;	
-		
-		//TEXTFIELD GBC
-		GridBagConstraints txtGBC = new GridBagConstraints();
-		txtGBC.insets = new Insets(5,5,5,5);
-		txtGBC.fill = GridBagConstraints.HORIZONTAL;  
-		txtGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtGBC.weightx = 1;	
-		txtGBC.gridwidth = 2;
-		txtGBC.gridx = 1;		
-		
-		//BUTTON GBC
-		GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,5,5,5);
-		buttonGBC.fill = GridBagConstraints.NONE;  
-		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-		buttonGBC.gridwidth = 2;
-		buttonGBC.gridx = 0;		
-		
-		int gridy = 0;
-		//LABEL FROM
-		labelGBC.gridy = gridy;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-		this.add(fromLabel, labelGBC);
-		
-		//COMBOBOX FROM
-		txtGBC.gridy = gridy++;
-		this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.cbxFrom, txtGBC);
-        
-        //LABEL NAME
-      	labelGBC.gridy = gridy;
-      	JLabel nameLabel = new JLabel("<HTML><p style=':#" + colorText +"'>" +Lang.getInstance().translate("Name") + ": </p></html>");
-      	this.add(nameLabel, labelGBC);
-      		
-      	//TXT NAME
-      	txtGBC.gridy = gridy++;
-      	this.txtName = new JTextField();
-        this.add(this.txtName, txtGBC);
-        
-      
-        // кнопка загрузки изображения
-        labelGBC.gridy = gridy;
-        iconButton = new JButton(Lang.getInstance().translate("Add Image..."));
-        this.add(iconButton, labelGBC);
-        
+		initComponents();
+		jLabel_Title.setText("");
+		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
+		cbxFrom.setModel(new AccountsComboBoxModel());
+      	jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
+       	txtName.setText("");
+        iconButton.setText(Lang.getInstance().translate("Add Image..."));
         iconButton.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         iconButton.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         iconButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        
-        
         iconButton.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 			addimage();
-				
-				
 			}
-        	
-        	
-        	
         });
         
-        
-        //LABEL DESCRIPTION
-      	labelGBC.gridy = gridy;
-      	labelGBC.gridx = 1;
-      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-      	this.add(descriptionLabel, labelGBC);
-      		
-      	//TXTAREA DESCRIPTION
-      	txtGBC.gridy = gridy++;
-      	txtGBC.gridx = 2;
-      	this.txtareaDescription = new JTextArea();
-       	
-      	this.txtareaDescription.setRows(4);
-      	this.txtareaDescription.setLineWrap(true);
-      	this.txtareaDescription.setColumns(20);
-      //	this.txtareaDescription.setBorder(this.txtName.getBorder());
+    	jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
+    	jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
 
-      	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
-     // 	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-    //  	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      	this.add(scrollDescription, txtGBC);
-      	      	
-      	//LABEL GENDER
-      	labelGBC.gridy = gridy;
-      	labelGBC.gridx =0;
-      	JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");
-      	this.add(genderLabel, labelGBC);
-      	
-      	
-      	String[] items = {
+    	String[] items = {
       			Lang.getInstance().translate("Male"),
       			Lang.getInstance().translate("Female"),
       			Lang.getInstance().translate("-")
         	};	
-      	//TXT GENDER
-      	txtGBC.gridy = gridy++;
-      	txtGBC.gridx=1;
-      	//this.txtGender = new JTextField();
-      	txtGender = new JComboBox(items);
-      	//this.txtGender.setText("1");
-        this.add(this.txtGender, txtGBC);
-        
-        
-        
-        //LABEL Birthday
-      	labelGBC.gridy = gridy;
-      	JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
-      	this.add(birthdayLabel, labelGBC);
+       	txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(items));
+       	jLabel_Born.setText(Lang.getInstance().translate("Birthday") + ":");
+
+      	txtBirthday.setText("1970-12-08");
+      	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
       		
-      	//TXT Birthday
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthday = new JTextField();
-      	// Маска ввода
-      	MaskFormatter mf1 = null;
-      	try {
-			 mf1 = new MaskFormatter("####-##-##");
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-      	this.txtBirthday = new JFormattedTextField(mf1); 
-      	this.txtBirthday.setText("1970-12-08");
-        this.add(this.txtBirthday, txtGBC);
-        
-        //LABEL DEATHDAY
-      	labelGBC.gridy = gridy;
-      	this.add(new JLabel(Lang.getInstance().translate("Deathday") + ":"), labelGBC);
-      		
-      	//TXT DEATHDAY
-      	txtGBC.gridy = gridy++;
-      	this.txtDeathday = new JTextField();
-      	this.txtDeathday = new JFormattedTextField(mf1); 
-      	this.txtDeathday.setText("0000-00-00");
-        this.add(this.txtDeathday, txtGBC);
-        
-        //LABEL RACE
-      	labelGBC.gridy = gridy;
-      	JLabel raceLabel = new JLabel(Lang.getInstance().translate("Race") + ":");
-      	this.add(raceLabel, labelGBC);
-      		
-      	//TXT RACE
-      	txtGBC.gridy = gridy++;
-      	this.txtRace = new JTextField();
-      	this.txtRace.setText("-");
-        this.add(this.txtRace, txtGBC);
-      	
-        //LABEL birthLatitude
-      	labelGBC.gridy = gridy;
-      	JLabel birthLatitudeLabel = new JLabel(Lang.getInstance().translate("Birth Latitude") + ":");
-      	this.add(birthLatitudeLabel, labelGBC);
-      		
-      	//TXT birthLatitude
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthLatitude = new JTextField();
+      	txtDeathday.setText("0000-00-00");
+
+      	jLabel_Race.setText(Lang.getInstance().translate("Race") + ":");
+
+      	txtRace.setText("-");
+
+      	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Birth Latitude") + ":");
+ 
       	this.txtBirthLatitude.setText("45.123");
-        this.add(this.txtBirthLatitude, txtGBC);
-      	
-        //LABEL birthLongitude
-      	labelGBC.gridy = gridy;
-      	JLabel birthLongitudeLabel = new JLabel(Lang.getInstance().translate("Birth Longitude") + ":");
-      	this.add(birthLongitudeLabel, labelGBC);
-      		
-      	//TXT birthLongitude
-      	txtGBC.gridy = gridy++;
-      	this.txtBirthLongitude = new JTextField();
+  
+      	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Birth Longitude") + ":");
+  
       	this.txtBirthLongitude.setText("12.123");
-        this.add(this.txtBirthLongitude, txtGBC);
-
-        //LABEL skinColor
-      	labelGBC.gridy = gridy;
-      	JLabel skinColorLabel = new JLabel(Lang.getInstance().translate("Skin Color") + ":");
-      	this.add(skinColorLabel, labelGBC);
-      		
-      	//TXT skinColor
-      	txtGBC.gridy = gridy++;
-      	this.txtSkinColor = new JTextField();
-      	this.txtSkinColor.setText("");
-        this.add(this.txtSkinColor, txtGBC);
-
-        //LABEL eyeColor
-      	labelGBC.gridy = gridy;
-      	JLabel eyeColorLabel = new JLabel(Lang.getInstance().translate("Eye Color") + ":");
-      	this.add(eyeColorLabel, labelGBC);
-      		
-      	//TXT eyeColor
-      	txtGBC.gridy = gridy++;
-      	this.txtEyeColor = new JTextField();
-      	this.txtEyeColor.setText("");
-        this.add(this.txtEyeColor, txtGBC);
-
-        //LABEL hairСolor
-      	labelGBC.gridy = gridy;
-      	JLabel hairСolorLabel = new JLabel(Lang.getInstance().translate("Hair Сolor") + ":");
-      	this.add(hairСolorLabel, labelGBC);
-      		
-      	//TXT hairСolor
-      	txtGBC.gridy = gridy++;
-      	this.txtHairСolor = new JTextField();
-      	this.txtHairСolor.setText("");
-        this.add(this.txtHairСolor, txtGBC);
-
-        //LABEL height
-      	labelGBC.gridy = gridy;
-      	JLabel heightLabel = new JLabel(Lang.getInstance().translate("Height") + ":");
-      	this.add(heightLabel, labelGBC);
-      		
-      	//TXT height
-      	txtGBC.gridy = gridy++;
-      	this.txtHeight = new JTextField();
+ 
+      	jLabel_SkinColor.setText(Lang.getInstance().translate("Skin Color") + ":");
+  
+      	jLabel_EyeColor.setText(Lang.getInstance().translate("Eye Color") + ":");
+ 
+      jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
+  
+      jLabel_Height.setText(Lang.getInstance().translate("Height") + ":");
+ 
       	this.txtHeight.setText("170");
-        this.add(this.txtHeight, txtGBC);
 
-        //LABEL FEE POW
-      	labelGBC.gridy = gridy;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
-      	this.add(feeLabel, labelGBC);
-      		
-      	//TXT FEE
-      	txtGBC.gridy = gridy++;
+    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+ 
       	this.txtFeePow = new JTextField();
       	this.txtFeePow.setText("0");
-        this.add(this.txtFeePow, txtGBC);
-		           
-        //BUTTON Register
-        buttonGBC.gridy = gridy;
-        this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
+  
+        this.issueButton.setText(Lang.getInstance().translate("Issue"));
+        
+        this.issueButton.setPreferredSize(new Dimension(120, 30));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -363,12 +154,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		        onIssueClick();
 		    }
 		});
-    	this.add(this.issueButton, buttonGBC);
-        
-        //PACK
-	//	this.pack();
-    //    this.setResizable(false);
-     //   this.setLocationRelativeTo(null);
+ 
         this.setVisible(true);
         
         
@@ -377,7 +163,8 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
         
 	}
 	
-    private static byte[] getBytesFromFile(File file) throws IOException {
+    @SuppressWarnings("resource")
+	private static byte[] getBytesFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
         long length = file.length();
         if (length > Integer.MAX_VALUE) {
@@ -403,19 +190,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		
 		// открыть диалог для файла
 		JFileChooser chooser = new JFileChooser();
-		/*
-	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
-	    // under the demo/jfc directory in the JDK.
-		final String[][] FILTERS = {{"png", "File (*.png)"},
-                {"jpg" , "File(*.jpg)"}};	
 		
-		
-		 for (int i = 0; i < FILTERS[0].length; i++) {
-				FileFilterExt eff = new FileFilterExt(FILTERS[i][0], 
-						                              FILTERS[i][1]);
-				chooser.addChoosableFileFilter(eff);
-         }
-		*/
 		
 		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
                  "Image", "png", "jpg");
@@ -426,9 +201,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	       System.out.println("You chose to open this file: " +
 	            chooser.getSelectedFile().getName());
 	    
-	//       String a = chooser.getSelectedFile().getName();
-	//       String b = chooser.getSelectedFile().getPath();
-	//       String c = chooser.getSelectedFile().getAbsolutePath();
+	
 	       
 	       File file = new File(chooser.getSelectedFile().getPath());
 // если размер больше 30к то не вставляем	       
@@ -463,13 +236,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 	       
 	    }
 		
-		// прочитать
-		
-		// преобразовать в bloom
-		
-		// вывести на экран в кнопку
-		
-		
+	
 		
 		
 		
@@ -520,7 +287,6 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		float birthLatitude = 0;
 		float birthLongitude = 0;
 		int height = 0;
-		Blob[] imgBlob;
 		try
 		{
 			
@@ -532,8 +298,7 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 			gender = (byte) (this.txtGender.getSelectedIndex());
 			
 			parse++;
-			//birthday = Long.parseLong(this.txtBirthday.getText());
-			// 1970-08-12 03:05:07
+		
 			String str = this.txtBirthday.getText();
 			if (str.length() < 11) str = str + " 00:00:00";
 			birthday = Timestamp.valueOf(str).getTime();
@@ -640,6 +405,380 @@ public class IssuePersonPanel extends JPanel //JDialog //JFrame
 		//ENABLE
 		this.issueButton.setEnabled(true);
 	}
+
+                             
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jLabel_Gender = new javax.swing.JLabel();
+        jLabel_Born = new javax.swing.JLabel();
+        jLabel_Dead = new javax.swing.JLabel();
+        jLabel_Race = new javax.swing.JLabel();
+        txtRace = new javax.swing.JTextField();
+        jLabel_SkinColor = new javax.swing.JLabel();
+        txtSkinColor = new javax.swing.JTextField();
+        jLabel_EyeColor = new javax.swing.JLabel();
+        txtEyeColor = new javax.swing.JTextField();
+        jLabel_HairСolor = new javax.swing.JLabel();
+        txtHairСolor = new javax.swing.JTextField();
+        jLabel_Height = new javax.swing.JLabel();
+        txtHeight = new javax.swing.JTextField();
+        jLabel_BirthLatitude = new javax.swing.JLabel();
+        txtBirthLatitude = new javax.swing.JTextField();
+        jLabel_BirthLongitude = new javax.swing.JLabel();
+        txtBirthLongitude = new javax.swing.JTextField();
+        jLabel_Fee = new javax.swing.JLabel();
+        txtFeePow = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        iconButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtareaDescription = new javax.swing.JTextArea();
+        txtName = new javax.swing.JTextField();
+        jLabel_Name = new javax.swing.JLabel();
+        jLabel_Account = new javax.swing.JLabel();
+        jLabel_Description = new javax.swing.JLabel();
+        cbxFrom = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        issueButton = new javax.swing.JButton();
+        jLabel_Title = new javax.swing.JLabel();
+        txtGender = new javax.swing.JComboBox<>();
+        txtBirthday = new javax.swing.JFormattedTextField();
+        txtDeathday = new javax.swing.JFormattedTextField();
+
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[] {0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0};
+        setLayout(layout);
+
+        jLabel_Gender.setText("Pol");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_Gender, gridBagConstraints);
+
+        jLabel_Born.setText("born");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_Born, gridBagConstraints);
+
+        jLabel_Dead.setText("Dead");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabel_Dead, gridBagConstraints);
+
+        jLabel_Race.setText("Race");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabel_Race, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(txtRace, gridBagConstraints);
+
+        jLabel_SkinColor.setText("SkinColor");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_SkinColor, gridBagConstraints);
+
+        txtSkinColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+ //               txtSkinColorActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        add(txtSkinColor, gridBagConstraints);
+
+        jLabel_EyeColor.setText("EyeColor");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabel_EyeColor, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(txtEyeColor, gridBagConstraints);
+
+        jLabel_HairСolor.setText("HairСolor");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_HairСolor, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        add(txtHairСolor, gridBagConstraints);
+
+        jLabel_Height.setText("Height");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabel_Height, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(txtHeight, gridBagConstraints);
+
+        jLabel_BirthLatitude.setText("BirthLatitude");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_BirthLatitude, gridBagConstraints);
+
+        txtBirthLatitude.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+   //             txtBirthLatitudeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        add(txtBirthLatitude, gridBagConstraints);
+
+        jLabel_BirthLongitude.setText("BirthLongitude");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabel_BirthLongitude, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(txtBirthLongitude, gridBagConstraints);
+
+        jLabel_Fee.setText("Fee");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        add(jLabel_Fee, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
+        add(txtFeePow, gridBagConstraints);
+
+        java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
+        jPanel1Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        jPanel1Layout.rowHeights = new int[] {0, 4, 0, 4, 0};
+        jPanel1.setLayout(jPanel1Layout);
+
+        iconButton.setText("Add image");
+        iconButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+     //           iconButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.05;
+        jPanel1.add(iconButton, gridBagConstraints);
+
+        txtareaDescription.setColumns(20);
+        txtareaDescription.setRows(5);
+        jScrollPane1.setViewportView(txtareaDescription);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.2;
+        jPanel1.add(jScrollPane1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 1.1;
+        jPanel1.add(txtName, gridBagConstraints);
+
+        jLabel_Name.setText("Name");
+        jLabel_Name.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        jPanel1.add(jLabel_Name, gridBagConstraints);
+
+        jLabel_Account.setText("Account");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
+        jPanel1.add(jLabel_Account, gridBagConstraints);
+
+        jLabel_Description.setText("Description");
+        jLabel_Description.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        jPanel1.add(jLabel_Description, gridBagConstraints);
+
+   //     cbxFrom.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        jPanel1.add(cbxFrom, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(10, 18, 0, 16);
+        add(jPanel1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.2;
+        add(jLabel9, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        issueButton.setText("jButton1");
+        jPanel2.add(issueButton, new java.awt.GridBagConstraints());
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridwidth = 15;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(jPanel2, gridBagConstraints);
+
+        jLabel_Title.setText("jLabel8");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 13;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
+        add(jLabel_Title, gridBagConstraints);
+
+        txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        add(txtGender, gridBagConstraints);
+
+        txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        add(txtBirthday, gridBagConstraints);
+
+        txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+        txtDeathday.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+ //               txtDeathdayActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        add(txtDeathday, gridBagConstraints);
+    }// </editor-fold>                        
+
 }
 // Фильтр выбора файлов определенного типа
 class FileFilterExt extends javax.swing.filechooser.FileFilter 
@@ -669,5 +808,10 @@ class FileFilterExt extends javax.swing.filechooser.FileFilter
 	public String getDescription() {
 		return description;
 	}
+	
+	
+	
+	
+	
 }
 

@@ -139,13 +139,24 @@ public class Search_Notes_Tab extends Split_Panel {
 			}
 
 			public void onChange() {
-
+				RowFilter filter;
 	// GET VALUE
 				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-
-	// SET FILTER
 				tableModelNotes.fireTableDataChanged();
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+				
+				 if (searth_My_JCheckBox_LeftPanel.isSelected()) {
+			            
+			            filter = RowFilter.regexFilter("true",tableModelNotes.COLUMN_FAVORITE);
+						 	            
+			        }else{
+			        	filter = RowFilter.regexFilter("false",tableModelNotes.COLUMN_FAVORITE);
+			        }
+				 ((DefaultRowSorter) sorter).setRowFilter(filter);
+				
+	// SET FILTER
+				
+				 filter = RowFilter.regexFilter(".*" + search + ".*", tableModelNotes.COLUMN_NAME);
+				 
 				((DefaultRowSorter) sorter).setRowFilter(filter);
 				tableModelNotes.fireTableDataChanged();
 								

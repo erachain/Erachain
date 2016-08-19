@@ -2,6 +2,7 @@ package gui.items.statuses;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.List;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JInternalFrame;
@@ -120,37 +122,36 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		RowSorter sorter =   new TableRowSorter(this.tableModelItemStatuses);
 		statusesTable.setRowSorter(sorter);	
 		// UPDATE FILTER ON TEXT CHANGE
+		
+		
+		search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.addActionListener( new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				onChange( search_Status_SplitPanel, sorter);
+				
+			}
+			
+		});
+		
 			
 		search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener()
 		{
 			
 			public void changedUpdate(DocumentEvent e) {
-				onChange();
+				onChange( search_Status_SplitPanel, sorter);
 			}
 
 			public void removeUpdate(DocumentEvent e) {
-				onChange();
+				onChange(search_Status_SplitPanel, sorter);
 			}
 
 			public void insertUpdate(DocumentEvent e) {
-				onChange();
+				onChange(search_Status_SplitPanel, sorter);
 			}
 
-			public void onChange() {
-
-				// GET VALUE
-				String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
-
-			 	// SET FILTER
-				//		tableModelStatuses.getSortableList().setFilter(search);
-				tableModelItemStatuses.fireTableDataChanged();
-				
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter) sorter).setRowFilter(filter);
-				
-				tableModelItemStatuses.fireTableDataChanged();
-				
-			}
+		
 		});
 		
 		// set video			
@@ -453,7 +454,17 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		//	addrColumn.setCellRenderer(new Renderer_Left());
 			
 			
-			
+
+			my_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.addActionListener( new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					onChange( my_Status_SplitPanel, sorter1);
+					
+				}
+				
+			});
 				
 			
 			//CREATE SEARCH FIELD
@@ -462,32 +473,18 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			// UPDATE FILTER ON TEXT CHANGE
 			txtSearch.getDocument().addDocumentListener(new DocumentListener() {
 				public void changedUpdate(DocumentEvent e) {
-					onChange();
+					onChange(my_Status_SplitPanel, sorter1);
 				}
 			
 				public void removeUpdate(DocumentEvent e) {
-					onChange();
+					onChange(my_Status_SplitPanel, sorter1);
 				}
 			
 				public void insertUpdate(DocumentEvent e) {
-					onChange();
+					onChange(my_Status_SplitPanel, sorter1);
 				}
 			
-				public void onChange() {
 			
-					// GET VALUE
-					String search = txtSearch.getText();
-			
-				 	// SET FILTER
-			//		tableModelStatuses.getSortableList().setFilter(search);
-					statusesModel.fireTableDataChanged();
-					
-					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-					((DefaultRowSorter) sorter1).setRowFilter(filter);
-					
-					statusesModel.fireTableDataChanged();
-					
-				}
 			});
 			
 			
@@ -603,6 +600,43 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 
 		}
 		}
+	
+	public void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
+		// filter
+						// GET VALUE
+						String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
+
+					 	String isFavorite;
+						// SET FILTER
+						//		tableModelStatuses.getSortableList().setFilter(search);
+						
+					 	RowFilter<Object,Object> fooBarFilter;
+						tableModelItemStatuses.fireTableDataChanged();
+						
+						if (search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected()) {
+							
+							ArrayList<RowFilter<Object, Object>> filters = new ArrayList<RowFilter<Object,Object>>(2);
+							   filters.add(RowFilter.regexFilter(".*" + search + ".*", tableModelItemStatuses.COLUMN_NAME));
+							   filters.add(RowFilter.regexFilter(".*true*",tableModelItemStatuses.COLUMN_FAVORITE));
+							    fooBarFilter = RowFilter.andFilter(filters);	
+													
+						} else {
+							
+							fooBarFilter  = RowFilter.regexFilter(".*" + search + ".*", tableModelItemStatuses.COLUMN_NAME);	
+						}
+						
+						
+						   
+						   
+						   
+						   
+						   
+						((DefaultRowSorter) sorter).setRowFilter(fooBarFilter);
+						
+						tableModelItemStatuses.fireTableDataChanged();
+					//	String a = search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected().get.getText();
+					//	a = a+ " ";
+					}
 	
 	
 }

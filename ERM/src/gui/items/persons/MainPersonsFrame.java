@@ -592,7 +592,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		
 		
-		// issue Assets
+		// issue Person
 		
 		   JScrollPane Issue_Person_Panel = new JScrollPane();
 		  Issue_Person_Panel.setName(Lang.getInstance().translate("Issue Person"));

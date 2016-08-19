@@ -13,6 +13,8 @@ import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.table.TableModel;
 
 /**
@@ -123,6 +125,15 @@ public class Split_Panel extends javax.swing.JPanel {
         toolBar_LeftPanel.add(button2_ToolBar_LeftPanel);
         button2_ToolBar_LeftPanel.getAccessibleContext().setAccessibleDescription("");
 
+       
+        
+        
+        
+        
+        
+        
+        
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -132,7 +143,18 @@ public class Split_Panel extends javax.swing.JPanel {
 
         searchToolBar_LeftPanel.setFloatable(false);
         searchToolBar_LeftPanel.setRollover(true);
-
+        
+        
+        searth_My_JCheckBox_LeftPanel = new JCheckBox();
+        searth_My_JCheckBox_LeftPanel.setText("My ");
+        searchToolBar_LeftPanel.add(searth_My_JCheckBox_LeftPanel);
+        
+        searth_Favorite_JCheckBox_LeftPanel = new JCheckBox();
+        searth_Favorite_JCheckBox_LeftPanel.setText("Favorite ");
+        searchToolBar_LeftPanel.add(searth_Favorite_JCheckBox_LeftPanel);
+        
+        
+        
         searthLabel_SearchToolBar_LeftPanel.setText("  Search:   ");
         searthLabel_SearchToolBar_LeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabel_SearchToolBar_LeftPanel);
@@ -320,6 +342,8 @@ public class Split_Panel extends javax.swing.JPanel {
     public javax.swing.JToolBar searchToolBar_LeftPanel;
     public javax.swing.JLabel searthLabel_SearchToolBar_LeftPanel;
     public javax.swing.JToolBar toolBar_LeftPanel;
+    public JCheckBox searth_My_JCheckBox_LeftPanel;
+    public JCheckBox searth_Favorite_JCheckBox_LeftPanel;
     // End of variables declaration                   
 }
 

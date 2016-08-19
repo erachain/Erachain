@@ -44,7 +44,7 @@ public class MainNotesFrame extends Main_Internal_Frame{
 
 public MainNotesFrame(){
 // not show buttons main Toolbar
-	this.setTitle(Lang.getInstance().translate("Assets"));
+	this.setTitle(Lang.getInstance().translate("Notes"));
 	this.jButton2_jToolBar.setVisible(false);
 	this.jButton3_jToolBar.setVisible(false);
 	this.jButton1_jToolBar.setVisible(false);
