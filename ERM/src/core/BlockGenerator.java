@@ -175,6 +175,7 @@ public class BlockGenerator extends Thread implements Observer
 	{
 
 		Controller ctrl = Controller.getInstance();
+		BlockChain bchain = ctrl.getBlockChain();
 
 		if(!ctrl.doesWalletExists())
 			return;
@@ -182,14 +183,15 @@ public class BlockGenerator extends Thread implements Observer
 		DBSet dbSet = DBSet.getInstance();
 		boolean isGenesisStart = false;
 
-		int wait_interval_run = 2000;
-		int wait_interval_flush = 20000;
+		int wait_interval_run = 1000;
+		int wait_interval_flush = 25000;
+		int wait_interval_run_gen = wait_interval_flush / 2;
 		int wait_interval = wait_interval_run;
 		while(true)
 		{
 			
 			// try solve and flush new block from Win Buffer			
-			Block waitWin = ctrl.getBlockChain().getWaitWinBuffer();
+			Block waitWin = bchain.getWaitWinBuffer();
 			if (!dbSet.getBlockMap().isProcessing() // NOT core.Synchronizer.process(DBSet, Block)
 					&& waitWin != null
 					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
@@ -197,10 +199,13 @@ public class BlockGenerator extends Thread implements Observer
 				// start new SOLVE rof WIN Blocks
 				this.solvingBlock = null;
 				
+				// set random time waiting for send
+				wait_interval_run_gen = (int) ((Math.random() * (wait_interval_flush - 5000)));
+				
 				syncForgingStatus();
 				if(forgingStatus != ForgingStatus.FORGING) {
 					// IF now not forging - clear old win block
-					ctrl.getBlockChain().clearWaitWinBuffer();
+					bchain.clearWaitWinBuffer();
 					continue;
 				}
 				
@@ -256,33 +261,38 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 				
-			//GET LAST BLOCK
-			// TODO lastBlock error
-			// TEST DB for last block - some time error raised
-			Block lastBlock = ctrl.getLastBlock();
-			if (lastBlock == null) {
-				return;
-			}
-			
 			byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-					
+			long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp();
+			
 			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 			if(this.solvingBlock == null
 					|| waitWin == null
 					|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 					)
 			{
+				// MAKE RANDOM time for minimize load to network
+				if (newTimestamp + wait_interval_run_gen > NTP.getTime()
+						//&& !isGenesisStart
+						) {
+					wait_interval = wait_interval_run;
+					continue;
+				} 
+				
+				if (isGenesisStart) {
+					// QUICK MAKE CHAIN
+					wait_interval = 200;
+				}
 				
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
 				this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
-				
+
 				//RESET BLOCKS
 				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
 				this.winners = new HashMap<PrivateKeyAccount, Long>();
 				
 				this.acc_winner = null;
-
+				
 				/*
 				 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
 				 * значть их ХЭШ - 
@@ -298,25 +308,12 @@ public class BlockGenerator extends Thread implements Observer
 				 * и время всегда одинаковое
 				 * 
 				 */
-				
+
 				//GENERATE NEW BLOCKS
 				List<Transaction> unconfirmedTransactions = null;
 				byte[] unconfirmedTransactionsHash = null;
 				int max_winned_value = 0;
-				int winned_value;
-
-				// TODO if empty TRNSACTIONS - longer time
-				long newTimestamp = this.solvingBlock.getTimestamp(dbSet)
-						+ Block.GENERATING_MIN_BLOCK_TIME;
-				
-				
-				if (newTimestamp > NTP.getTime()) {
-					wait_interval = wait_interval_run;
-					continue;
-				} else if (isGenesisStart) {
-					// QUICK MAKE CHAIN
-					wait_interval = 200;
-				}
+				int winned_value;				
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
@@ -371,7 +368,7 @@ public class BlockGenerator extends Thread implements Observer
 					
 					//PASS BLOCK TO CONTROLLER
 					///ctrl.newBlockGenerated(block);
-					if (ctrl.getBlockChain().setWaitWinBuffer(block)) {
+					if (bchain.setWaitWinBuffer(block)) {
 						// need to BROADCAST
 						ctrl.broadcastWinBlock(block, null);
 					}

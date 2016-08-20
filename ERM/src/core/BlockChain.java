@@ -78,6 +78,9 @@ public class BlockChain
 	public long getTimestamp(int height) {
 		return this.genesisTimestamp + height * Block.GENERATING_MIN_BLOCK_TIME;
 	}
+	public long getTimestamp() {
+		return this.genesisTimestamp + getHeight() * Block.GENERATING_MIN_BLOCK_TIME;
+	}
 
 	// BUFFER of BLOCK for WIN solving
 	public Block getWaitWinBuffer() {

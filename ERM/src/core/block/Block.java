@@ -1019,12 +1019,14 @@ public class Block {
 		
 		this.height_process = dbSet.getHeightMap().getHeight(this.signature);
 
+		/*
 		if (!dbSet.isFork()) {
 			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
 			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dbSet) + 1)
 					+ "] SET new last Height: " + lastHeight
 					+ " getHeightMap().getHeight: " + this.height_process);
 		}
+		*/
 
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 		if (blockChain != null) {

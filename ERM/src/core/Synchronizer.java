@@ -61,10 +61,12 @@ public class Synchronizer
 			Block lastBlock = fork.getBlockMap().getLastBlock();
 			
 			int lastHeight = lastBlock.getHeight(fork);
+			/*
 			LOGGER.error("*** core.Synchronizer.checkNewBlocks - lastBlock["
 					+ lastHeight + "]"
 					+ " search common block in FORK"
 					+ " in mainDB: " + lastBlock.getHeight(fork.getParent()));
+					*/
 
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
@@ -77,9 +79,11 @@ public class Synchronizer
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 
+			/*
 			LOGGER.error("*** core.Synchronizer.checkNewBlocks - lastBlock["
 					+ lastHeight + "]"
 					+ " run AT_TRANSACTION in FORK");
+					*/
 
 			// AT_TRANSACTION - not from GENESIS BLOCK
 			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 1)
@@ -205,8 +209,10 @@ public class Synchronizer
 	
 	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer) throws Exception
 	{
+		/*
 		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
 					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());
+					*/
 
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 				
@@ -253,7 +259,9 @@ public class Synchronizer
 			List<Block> blocks = this.getBlocks(signatures.b, peer);
 							
 			//SYNCHRONIZE BLOCKS
+			/*
 			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
+			*/
 			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER
@@ -289,7 +297,9 @@ public class Synchronizer
 	private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception
 	{
 
+		/*
 		LOGGER.error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " + Base58.encode(header));
+		*/
 
 		///CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetHeadersMessage(header);

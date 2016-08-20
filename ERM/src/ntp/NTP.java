@@ -33,7 +33,8 @@ public final class NTP
 	public static long getTime()
 	{
 		//CHECK IF OFFSET NEEDS TO BE UPDATED
-		if(System.currentTimeMillis() > lastUpdate + TIME_TILL_UPDATE)
+		// NOT NEED NOW - random offset is GOOD now 
+		if(false && System.currentTimeMillis() > lastUpdate + TIME_TILL_UPDATE)
 		{
 			updateOffSet();
 			lastUpdate = System.currentTimeMillis();
