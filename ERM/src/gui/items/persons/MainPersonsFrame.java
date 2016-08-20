@@ -1,18 +1,29 @@
 package gui.items.persons;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 import javax.swing.DefaultRowSorter;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -44,11 +55,22 @@ import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 
+
 public class MainPersonsFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 2717571093561259483L;
 
 	private TableModelPersons tableModelPersons;
 	private WalletItemPersonsTableModel personsModel;
+	Split_Panel search_Person_SplitPanel;
+	
+// для всплывающего меню	
+	 private JPopupMenu mouseMenu;
+     private JPanel imagePanel;
+     private GridLayout grid;
+     
+     Menu_Search_Person aaa;
+	
+	
 	
 	public MainPersonsFrame(){
 	
@@ -78,7 +100,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		// ALL PERSONS
 		///////////////////////
 		
-		Split_Panel search_Person_SplitPanel = new Split_Panel();
+		search_Person_SplitPanel = new Split_Panel();
 		search_Person_SplitPanel.setName(Lang.getInstance().translate("Search Persons"));
 		search_Person_SplitPanel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 		
@@ -296,12 +318,13 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		// DOUBLE CLICK EVENT
 		
+		
 		personsTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				Point p = e.getPoint();
 				int row = personsTable.rowAtPoint(p);
-				personsTable.setRowSelectionInterval(row, row);
+	//			personsTable.setRowSelectionInterval(row, row);
 				
 				if(e.getClickCount() == 2)
 				{
@@ -311,35 +334,54 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 					
 				}
 			
-				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+			//	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+					if( e.getButton() == e.BUTTON1)
 				{
 					
 					if (personsTable.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
 						row = personsTable.convertRowIndexToModel(row);
 						PersonCls asset = tableModelPersons.getPerson(row);
 						favorite_all( personsTable);	
-						
-						
-						
 					}
-					
-					
+// выводим меню всплывающее
+				aaa.setLocation(e.getXOnScreen(), e.getYOnScreen());
+			    aaa.setVisible(true);		
 				}
-			
-			
-			
-			
-			
-			
 			}
-			
-			
-			
-			
-			
-			
-		});
+			});
 		
+		
+		
+		
+		
+		
+		
+	
+
+		aaa  = new Menu_Search_Person();
+		
+    	//aaa.setSize(80, 120);
+    	aaa.setVisible(false);
+    	aaa.jButton1.setText(Lang.getInstance().translate("Set Status"));
+    	aaa.jButton2.setText(Lang.getInstance().translate("Confirm"));
+    	aaa.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+    	aaa.jButton4.setVisible(false);
+
+		
+		
+    	aaa.addWindowFocusListener(new WindowFocusListener(){
+			@Override
+			public void windowGainedFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void windowLostFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				aaa.setVisible(false);
+			}
+    	});
+    	
+ 
 		
 		// hand cursor  for Favorite column
 		personsTable.addMouseMotionListener(new MouseMotionListener() {
@@ -353,12 +395,11 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		        	personsTable.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		        }
 		    }
-
 		    public void mouseDragged(MouseEvent e) {
 		    }
 		});
 		
-		
+	
 		
 	 
 		//////////////////////////////////////	
