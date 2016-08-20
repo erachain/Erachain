@@ -507,8 +507,8 @@ catch(Exception e3){
         issueButton = new javax.swing.JButton();
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
-        txtBirthday =  new JDateChooser();
-        txtDeathday = new JDateChooser();
+        txtBirthday =  new JDateChooser("yyyy-MM-dd","####-##-##", '_');
+        txtDeathday = new JDateChooser("yyyy-MM-dd","####-##-##", '_');
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -832,6 +832,7 @@ catch(Exception e3){
     */    
          
         txtBirthday.setDateFormatString("yyyy-MM-dd");
+      
         
    //     txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         gridBagConstraints = new java.awt.GridBagConstraints();
