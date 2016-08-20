@@ -80,8 +80,8 @@ public class R_SetStatusToItem extends Transaction {
 		this.beg_date = beg_date;		
 		if (end_date == null || end_date == 0) end_date = Long.MAX_VALUE;
 		this.end_date = end_date;
-		this.value_1 = (byte)value_1;
-		this.value_2 = (byte)value_2;
+		this.value_1 = value_1;
+		this.value_2 = value_2;
 		
 		if (data_1 != null && data_1.length == 0)
 			data_1 = null;
@@ -249,6 +249,11 @@ public class R_SetStatusToItem extends Transaction {
 	// value 1, value 2, data_1, data_2, parent_ref as (int, int), description, 
 	public static Tuple6<Long, Long, byte[], byte[], Long, byte[]> unpackData(byte[] data_add)
 	{
+		
+		if (data_add.length == 0) {
+			// in Sertify Person = null
+			return null;
+		}
 		
 		int position = 0;
 		

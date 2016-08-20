@@ -151,10 +151,13 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 			this.add(new JLabel(Lang.getInstance().translate("Description") + ":"), labelGBC);
 			//DATA
 			++detailGBC.gridy;
-			JTextField statusAData = new JTextField(new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")));
-			statusAData.setEditable(false);
-			MenuPopupUtil.installContextMenu(statusAData);
-			this.add(statusAData, detailGBC);
+			JTextArea descrData = new JTextArea(new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")));
+			descrData.setRows(4);
+			descrData.setBorder(statusName.getBorder());
+			descrData.setEditable(false);
+			MenuPopupUtil.installContextMenu(descrData);
+			this.add(descrData, detailGBC);
+
 		}
 
 		// //// ITEM
@@ -173,7 +176,7 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 		
 		//LABEL DESCRIPTION
 		++labelGBC.gridy;
-		JLabel itemDescriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+		JLabel itemDescriptionLabel = new JLabel(Lang.getInstance().translate("Item Description") + ":");
 		this.add(itemDescriptionLabel, labelGBC);
 				
 		//DESCRIPTION

@@ -363,11 +363,9 @@ public class Synchronizer
 			
 		} while ( maxChainHeight > checkPointHeight && headers.size() == 0);
 
-		if (headers.size() > 0) {
-			// CLEAR head of common headers
-			while (dbSet.getBlockMap().contains(headers.get(0))) {
-				lastBlockSignature = headers.remove(0);
-			}
+		// CLEAR head of common headers
+		while (headers.size() > 0 && dbSet.getBlockMap().contains(headers.get(0))) {
+			lastBlockSignature = headers.remove(0);
 		}
 		
 		return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);

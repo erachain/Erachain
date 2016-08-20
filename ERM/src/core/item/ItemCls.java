@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple6;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -292,14 +293,23 @@ public abstract class ItemCls {
 		return (key<0?"?:":key + "." + this.typeBytes[0] + " ") + this.name  
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
+	
+	
 	public String toString(DBSet db, byte[] data) {
 		String str = this.toString(db);
-		if (str.contains("%1"))
-			str = str.replace("%1", "" + data[0]);
-		if (str.contains("%2"))
-			str = str.replace("%2", "" + data[1]);
-		if (str.contains("%D"))
-			str = str.replace("%D", new String(new String(Arrays.copyOfRange(data, 10, data.length), Charset.forName("UTF-8"))));
+		
+		Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = core.transaction.R_SetStatusToItem.unpackData(data);
+		
+		if (str.contains("%1") && tuple.a != null)
+			str = str.replace("%1", tuple.a.toString());
+		if (str.contains("%2") && tuple.b != null)
+			str = str.replace("%2", tuple.b.toString());
+		if (str.contains("%3") && tuple.c != null)
+			str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+		if (str.contains("%4") && tuple.d != null)
+			str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+		if (str.contains("%D") && tuple.f != null)
+			str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
 		
 		return str;
 	}
