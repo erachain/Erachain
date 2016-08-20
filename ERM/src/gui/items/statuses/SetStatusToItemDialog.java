@@ -109,15 +109,15 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		PrivateKeyAccount authenticator = Controller.getInstance().getPrivateKeyAccountByAddress(creator.getAddress());
 
 		int version = 0;
-		int value_1 = 0;
-		int value_2 = 0;
+		long value_1 = 0;
+		long value_2 = 0;
 		byte[] data = null;
 		long refParent = 0l;
 
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
 				feePow, status.getKey(), 
 				status, fromDate, toDate,
-				value_1, value_2, data, refParent
+				value_1, value_2, null, null,refParent, data
 				);
 		
 		//CHECK VALIDATE MESSAGE

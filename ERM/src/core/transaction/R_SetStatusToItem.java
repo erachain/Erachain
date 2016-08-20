@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
+import org.mapdb.Fun.Tuple6;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -41,6 +42,7 @@ public class R_SetStatusToItem extends Transaction {
 	private static final byte TYPE_ID = (byte)Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Status";
 	private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
+	private static final int VALUE_LENGTH = 8; // one year + 256 days max
 	private static final int REF_LENGTH = 8;
 	private static final int ITEM_TYPE_LENGTH = 1;
 	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
@@ -52,19 +54,22 @@ public class R_SetStatusToItem extends Transaction {
 	protected Long itemKey; // ITEM KEY
 	protected long beg_date;
 	protected long end_date = Long.MAX_VALUE;
-	protected byte value_1; // first any value
-	protected byte value_2; // second any value
-	protected byte[] data; // addition data
+	protected long value_1; // first any value
+	protected long value_2; // second any value
+	protected byte[] data_1; // addition data
+	protected byte[] data_2; // addition data
+	protected byte[] description; // addition data
 	protected long ref_to_parent; // reference to parent record as int + int (block height + record sequence number)
 	
-	private static final int SELF_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + ITEM_TYPE_LENGTH + KEY_LENGTH;
+	// DESCRIPTION as tail
+	private static final int SELF_LENGTH = 2*DATE_LENGTH + KEY_LENGTH + ITEM_TYPE_LENGTH + KEY_LENGTH;
 	
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
 
@@ -77,39 +82,54 @@ public class R_SetStatusToItem extends Transaction {
 		this.end_date = end_date;
 		this.value_1 = (byte)value_1;
 		this.value_2 = (byte)value_2;
-		this.data = data;
-		this.ref_to_parent = ref_to_parent;
 		
+		if (data_1 != null && data_1.length == 0)
+			data_1 = null;
+		this.data_1 = data_1;
+		
+		if (data_2 != null && data_2.length == 0)
+			data_2 = null;
+		this.data_2 = data_2;
+		
+		this.ref_to_parent = ref_to_parent;
+
+		if (description != null && description.length == 0)
+			description = null;
+		this.description = description;
+				
 		// make parameters
-		this.typeBytes[3] = (byte)((value_1 == 0?0:1)
+		this.typeBytes[3] = (byte)(
+					  (value_1 == 0?0:1)
 					| (value_2 == 0?0:2)
-					| (data == null?0:4)
-					| (ref_to_parent == 0l?0:8)
+					| (data_1 == null?0:4)
+					| (data_2 == null?0:8)
+					| (ref_to_parent == 0l?0:16)
+					| (description == null?0:32)
 					);
 	}
 
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date,
-				value_1, value_2, data, ref_to_parent,
+				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				timestamp, reference);
 	}
 	// set default date
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
 			long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
-				Long.MIN_VALUE, Long.MAX_VALUE, 0, 0, null, 0L, timestamp, reference);
+				Long.MIN_VALUE, Long.MAX_VALUE, 0l, 0l, null, null, 0L, null, timestamp, reference);
 	}
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date,
-				value_1, value_2, data, ref_to_parent,
+				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				timestamp, reference);
 		this.signature = signature;
 		this.calcFee();
@@ -117,32 +137,32 @@ public class R_SetStatusToItem extends Transaction {
 	// as pack
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			byte[] signature) {
 		this(typeBytes, creator, (byte)0, key, itemType, itemKey,
 				beg_date, end_date,
-				value_1, value_2, data, ref_to_parent,
+				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				0l, null);
 		this.signature = signature;
 	}
 	public R_SetStatusToItem(PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, 0, 0}, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date,
-				value_1, value_2, data, ref_to_parent,
+				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				timestamp, reference);
 	}
 
 	// as pack
 	public R_SetStatusToItem(PublicKeyAccount creator, long key, int itemType, long itemKey,
 			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long ref_to_parent,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
 			byte[] signature) {
 		this(new byte[]{TYPE_ID, (byte)0, (byte)0, 0}, creator, (byte)0, key, itemType, itemKey,
 				beg_date, end_date,
-				value_1, value_2, data, ref_to_parent,
+				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				0l, null);
 	}
 	
@@ -173,29 +193,114 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.end_date;
 	}
-	public int getValue1()
+	public long getValue1()
 	{
 		return this.value_1;
 	}
-	public int getValue2()
+	public long getValue2()
 	{
 		return this.value_2;
 	}
-	public byte[] getData()
+	public byte[] getData1()
 	{
-		return this.data;
+		return this.data_1;
 	}
-	// value 1, value 2, data, parent_ref as (int, int)
-	public Tuple5<Byte, Byte, byte[], Integer, Integer> getUnpakedData()
+	public byte[] getData2()
 	{
-		// Unpack data from DB
-		return new Tuple5<Byte, Byte, byte[], Integer, Integer>(
-				this.data[0], data[1],
-				Arrays.copyOfRange(this.data, 10, this.data.length),
-				Ints.fromByteArray(Arrays.copyOfRange(this.data, 2, 6)),
-				Ints.fromByteArray(Arrays.copyOfRange(this.data, 6, 10))
+		return this.data_2;
+	}
+	public byte[] getDescription()
+	{
+		return this.description;
+	}
+
+	
+	// pack values for DB
+	public byte[] packData()
+	{
+		byte[] add_data = new byte[0];
+		add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_1));
+		add_data = Bytes.concat(add_data, Longs.toByteArray(this.value_2));
+		
+		if (this.data_1 != null) {
+			byte len1 = (byte)this.data_1.length;
+			add_data = Bytes.concat(add_data, new byte[]{len1});
+			add_data = Bytes.concat(add_data, data_1);
+		} else {
+			add_data = Bytes.concat(add_data, new byte[]{0});			
+		}
+		if (this.data_2 != null) {
+			byte len2 = (byte)this.data_2.length;
+			add_data = Bytes.concat(add_data, new byte[]{len2});
+			add_data = Bytes.concat(add_data, data_2);
+		} else {
+			add_data = Bytes.concat(add_data, new byte[]{0});			
+		}
+
+		add_data = Bytes.concat(add_data, Longs.toByteArray(this.ref_to_parent));
+		
+		if (this.description != null && this.description.length > 0)
+			add_data = Bytes.concat(add_data, this.description);
+		
+		return add_data;
+	}
+
+	// Unpack data from DB
+	// value 1, value 2, data_1, data_2, parent_ref as (int, int), description, 
+	public static Tuple6<Long, Long, byte[], byte[], Long, byte[]> unpackData(byte[] data_add)
+	{
+		
+		int position = 0;
+		
+		byte[] value_1Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
+		long value_1 = Longs.fromByteArray(value_1Bytes);
+		position += VALUE_LENGTH;
+
+		byte[] value_2Bytes = Arrays.copyOfRange(data_add, position, position + VALUE_LENGTH);
+		long value_2 = Longs.fromByteArray(value_2Bytes);
+		position += VALUE_LENGTH;
+
+		//READ DATA 1 SIZE
+		byte[] data_1SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
+		int data_1Size = Byte.toUnsignedInt(data_1SizeBytes[0]);	
+		position += 1;
+		
+		//READ ADDITIONAL DATA 1
+		byte[] data_1 = null;
+		if (data_1Size > 0) {
+			data_1 = Arrays.copyOfRange(data_add, position, position + data_1Size);
+			position += data_1Size;
+		}
+
+		//READ DATA 2 SIZE
+		byte[] data_2SizeBytes = Arrays.copyOfRange(data_add, position, position + 1);
+		int data_2Size = Byte.toUnsignedInt(data_2SizeBytes[0]);	
+		position += 1;
+		
+		//READ ADDITIONAL DATA 2
+		byte[] data_2 = null;
+		if (data_2Size > 0) {
+			data_2 = Arrays.copyOfRange(data_add, position, position + data_2Size);
+			position += data_2Size;
+		}
+
+		// READ REFFERENCE TO PARENT RECORD
+		byte[] ref_to_recordBytes = Arrays.copyOfRange(data_add, position, position + REF_LENGTH);
+		long ref_to_parent = Longs.fromByteArray(ref_to_recordBytes);	
+		position += REF_LENGTH;
+
+		//READ ADDITIONAL DATA
+		byte[] description = null;
+		if (position > data_add.length)
+			description = Arrays.copyOfRange(data_add, position, data_add.length);
+		
+
+		return new Tuple6<Long, Long, byte[], byte[], Long, byte[]>(
+				value_1, value_2, data_1, data_2,
+				ref_to_parent, description
 				);
 	}
+
 
 	public long getRefParent()
 	{
@@ -247,8 +352,12 @@ public class R_SetStatusToItem extends Transaction {
 		if (this.value_2 != 0)
 			transaction.put("value2", this.value_2);
 		
-		if (this.data != null)
-			transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+		if (this.data_1 != null)
+			transaction.put("data1", new String(this.data_1, Charset.forName("UTF-8")));
+		if (this.data_2 != null)
+			transaction.put("data2", new String(this.data_2, Charset.forName("UTF-8")));
+		if (this.description != null)
+			transaction.put("description", new String(this.description, Charset.forName("UTF-8")));
 		
 		if (this.ref_to_parent != 0l)
 			transaction.put("ref_parent", this.ref_to_parent);
@@ -333,49 +442,73 @@ public class R_SetStatusToItem extends Transaction {
 		Long end_date = Longs.fromByteArray(end_dateBytes);	
 		position += DATE_LENGTH;
 
-		byte value_1 = 0;
+		long value_1 = 0l;
 		if ( (typeBytes[3] & 1) > 0 ) {
 			// READ VALUE 1
-			byte[] value_1Bytes = Arrays.copyOfRange(data, position, position + 1);
-			value_1 = value_1Bytes[0];
-			position += 1;
+			byte[] value_1Bytes = Arrays.copyOfRange(data, position, position + VALUE_LENGTH);
+			value_1 = Longs.fromByteArray(value_1Bytes);
+			position += VALUE_LENGTH;
 		}
 
-		byte value_2 = 0;
+		long value_2 = 0l;
 		if ( (typeBytes[3] & 2) > 0 ) {
 			// READ VALUE 2
-			byte[] value_2Bytes = Arrays.copyOfRange(data, position, position + 1);
-			value_2 = value_2Bytes[0];
-			position += 1;
+			byte[] value_2Bytes = Arrays.copyOfRange(data, position, position + VALUE_LENGTH);
+			value_2 = Longs.fromByteArray(value_2Bytes);
+			position += VALUE_LENGTH;
 		}
 
-		byte[] additonalData = null;
+		byte[] data_1 = null;
 		if ( (typeBytes[3] & 4) > 0 ) {
 			//READ DATA SIZE
-			byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
-			int dataSize = Ints.fromByteArray(dataSizeBytes);	
-			position += DATA_SIZE_LENGTH;
+			byte[] data_1SizeBytes = Arrays.copyOfRange(data, position, position + 1);
+			int data_1Size = Byte.toUnsignedInt(data_1SizeBytes[0]);	
+			position += 1;
 			
-			//READ ADDITIONAL DATA
-			additonalData = Arrays.copyOfRange(data, position, position + dataSize);
-			position += dataSize;
+			//READ ADDITIONAL DATA 1
+			data_1 = Arrays.copyOfRange(data, position, position + data_1Size);
+			position += data_1Size;
+		}
+
+		byte[] data_2 = null;
+		if ( (typeBytes[3] & 8) > 0 ) {
+			//READ DATA SIZE
+			byte[] data_2SizeBytes = Arrays.copyOfRange(data, position, position + 1);
+			int data_2Size = Byte.toUnsignedInt(data_2SizeBytes[0]);	
+			position += 1;
+			
+			//READ ADDITIONAL DATA 2
+			data_2 = Arrays.copyOfRange(data, position, position + data_2Size);
+			position += data_2Size;
 		}
 
 		long ref_to_parent = 0;
-		if ( (typeBytes[3] & 8) > 0 ) {
+		if ( (typeBytes[3] & 16) > 0 ) {
 			// READ REFFERENCE TO PARENT RECORD
 			byte[] ref_to_recordBytes = Arrays.copyOfRange(data, position, position + REF_LENGTH);
 			ref_to_parent = Longs.fromByteArray(ref_to_recordBytes);	
 			position += REF_LENGTH;
 		}
 
+		byte[] additonalData = null;
+		if ( (typeBytes[3] & 32) > 0 ) {
+			//READ DATA SIZE
+			//byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+			//int dataSize = Ints.fromByteArray(dataSizeBytes);	
+			//position += DATA_SIZE_LENGTH;
+			
+			//READ ADDITIONAL DATA
+			additonalData = Arrays.copyOfRange(data, position, data.length);
+			//position += dataSize;
+		}
+
 		if (!asPack) {
 			return new R_SetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
-					beg_date, end_date, value_1, value_2, additonalData, ref_to_parent,
+					beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
 					timestamp, reference, signature);
 		} else {
 			return new R_SetStatusToItem(typeBytes, creator, key, itemType, itemKey,
-					beg_date, end_date, value_1, value_2, additonalData, ref_to_parent,
+					beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
 					signature);
 		}
 
@@ -409,25 +542,29 @@ public class R_SetStatusToItem extends Transaction {
 
 		// WRITE VALUE 1
 		if (this.value_1 != 0) {
-			byte[] value_1Bytes = new byte[1];
-			value_1Bytes[0] = this.value_1;
-			data = Bytes.concat(data, value_1Bytes);
+			data = Bytes.concat(data, Longs.toByteArray(this.value_1));
 		}
 
 		// WRITE VALUE 2
 		if (this.value_2 != 0) {
-			byte[] value_2Bytes = new byte[1];
-			value_2Bytes[0] = this.value_2;
-			data = Bytes.concat(data, value_2Bytes);
+			data = Bytes.concat(data, Longs.toByteArray(this.value_2));
 		}
 
-		if (this.data != null) {
-			//WRITE DATA SIZE
-			byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-			data = Bytes.concat(data, dataSizeBytes);
+		if (this.data_1 != null) {
+			//WRITE DATA 1 SIZE
+			byte[] data_1SizeBytes = new byte[]{(byte)this.data_1.length};
+			data = Bytes.concat(data, data_1SizeBytes);
 	
 			//WRITE DATA
-			data = Bytes.concat(data, this.data);
+			data = Bytes.concat(data, this.data_1);
+		}
+		if (this.data_2 != null) {
+			//WRITE DATA 2 SIZE
+			byte[] data_2SizeBytes = new byte[]{(byte)this.data_2.length};
+			data = Bytes.concat(data, data_2SizeBytes);
+	
+			//WRITE DATA
+			data = Bytes.concat(data, this.data_2);
 		}
 
 		//WRITE REFFERENCE TO PARENT
@@ -435,6 +572,15 @@ public class R_SetStatusToItem extends Transaction {
 			byte[] ref_to_parentBytes = Longs.toByteArray(this.ref_to_parent);
 			ref_to_parentBytes = Bytes.ensureCapacity(ref_to_parentBytes, REF_LENGTH, 0);
 			data = Bytes.concat(data, ref_to_parentBytes);
+		}
+
+		if (this.description != null) {
+			//WRITE DATA SIZE
+			//byte[] dataSizeBytes = Ints.toByteArray(this.description.length);
+			//data = Bytes.concat(data, dataSizeBytes);
+	
+			//WRITE DATA
+			data = Bytes.concat(data, this.description);
 		}
 
 		return data;
@@ -445,10 +591,12 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		// not include note reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
-		len += (this.value_1 == 0? 0: 1)
-				+ (this.value_2 == 0? 0: 1)
-				+ (this.data == null? 0: 4 + this.data.length)
-				+ (this.ref_to_parent == 0? 0: REF_LENGTH);
+		len +=    (this.value_1 == 0? 0: VALUE_LENGTH)
+				+ (this.value_2 == 0? 0: VALUE_LENGTH)
+				+ (this.data_1 == null? 0: 1 + this.data_1.length)
+				+ (this.data_2 == null? 0: 1 + this.data_2.length)
+				+ (this.ref_to_parent == 0? 0: REF_LENGTH)
+				+ (this.description == null? 0: this.description.length);
 		return len;
 	}
 
@@ -458,10 +606,26 @@ public class R_SetStatusToItem extends Transaction {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
-	
-		if (this.data != null ) {
+
+		if (this.data_1 != null ) {
 			//CHECK DATA SIZE
-			if(data.length > 4000)
+			if(data_1.length > 255)
+			{
+				return INVALID_DATA_LENGTH;
+			}
+		}
+
+		if (this.data_2 != null ) {
+			//CHECK DATA SIZE
+			if(data_2.length > 255)
+			{
+				return INVALID_DATA_LENGTH;
+			}
+		}
+
+		if (this.description != null ) {
+			//CHECK DATA SIZE
+			if(description.length > 4000)
 			{
 				return INVALID_DATA_LENGTH;
 			}
@@ -514,19 +678,13 @@ public class R_SetStatusToItem extends Transaction {
 		super.process(db, asPack);
 		
 		// pack additional data
-		byte[] a_data = new byte[]{this.value_1, this.value_2};
-		a_data = Bytes.concat(a_data, Longs.toByteArray(this.ref_to_parent));
-		if (this.data != null && this.data.length > 0)
-			a_data = Bytes.concat(a_data, this.data);
-		
-		//Block block = db.getBlockMap().getLastBlock();
-		//int blockIndex = block.getHeight(db);
-		//int transactionIndex = block.getTransactionIndex(signature);
+		byte[] add_data = packData();
 
-		Tuple5<Long, Long, byte[], Integer, Integer> itemP = new Tuple5<Long, Long, byte[], Integer, Integer>
+		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
+				new Tuple5<Long, Long, byte[], Integer, Integer>
 				(
 					beg_date, end_date,
-					a_data,
+					add_data,
 					this.getBlockHeight(db), this.getSeqNo(db)
 				);
 

@@ -106,14 +106,26 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 			this.add(statusValue2, detailGBC);
 		}
 
-		if (setStatusToItem.getData() != null) {
+		if (setStatusToItem.getData1() != null) {
 
 			//LABEL ADDITION DATA
 			++labelGBC.gridy;
-			this.add(new JLabel(Lang.getInstance().translate("DATA") + ":"), labelGBC);
+			this.add(new JLabel(Lang.getInstance().translate("DATA") + " 1:"), labelGBC);
 			//DATA
 			++detailGBC.gridy;
-			JTextField statusAData = new JTextField(new String(setStatusToItem.getData(), Charset.forName("UTF-8")));
+			JTextField statusAData = new JTextField(new String(setStatusToItem.getData1(), Charset.forName("UTF-8")));
+			statusAData.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusAData);
+			this.add(statusAData, detailGBC);
+		}
+		if (setStatusToItem.getData2() != null) {
+
+			//LABEL ADDITION DATA
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("DATA") + " 2:"), labelGBC);
+			//DATA
+			++detailGBC.gridy;
+			JTextField statusAData = new JTextField(new String(setStatusToItem.getData2(), Charset.forName("UTF-8")));
 			statusAData.setEditable(false);
 			MenuPopupUtil.installContextMenu(statusAData);
 			this.add(statusAData, detailGBC);
@@ -130,6 +142,19 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 			statusRefParent.setEditable(false);
 			MenuPopupUtil.installContextMenu(statusRefParent);
 			this.add(statusRefParent, detailGBC);
+		}
+		
+		if (setStatusToItem.getDescription() != null) {
+
+			//LABEL ADDITION DATA
+			++labelGBC.gridy;
+			this.add(new JLabel(Lang.getInstance().translate("Description") + ":"), labelGBC);
+			//DATA
+			++detailGBC.gridy;
+			JTextField statusAData = new JTextField(new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")));
+			statusAData.setEditable(false);
+			MenuPopupUtil.installContextMenu(statusAData);
+			this.add(statusAData, detailGBC);
 		}
 
 		// //// ITEM

@@ -515,6 +515,8 @@ public class TransactionCreator
 		return afterCreate(record, asPack);
 	}
 
+	/*
+	// version 1
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
 			Long beg_date, Long end_date,
@@ -531,6 +533,30 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
 				beg_date, end_date, value_1, value_2, data, refParent,
+				timestamp, creator.getLastReference(this.fork));
+		record.sign(creator, asPack);
+			
+		return afterCreate(record, asPack);
+	}
+	*/
+	
+	// version 2
+	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
+			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
+			Long beg_date, Long end_date,
+			long value_1, long value_2, byte[] data_1, byte[] data_2, long refParent, byte[] descr
+			) {
+		
+		this.checkUpdate();
+		
+		Transaction record;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE SERTIFY PERSON TRANSACTION
+		//int version = 5; // without user sign
+		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
+				beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			

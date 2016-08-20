@@ -50,7 +50,7 @@ public class PersonSetStatusDialog extends JDialog {
 	
 	
 	 // Variables declaration - do not modify                     
-    private javax.swing.JTextField jADataTxt;
+    private javax.swing.JTextField jAData1Txt;
     private javax.swing.JTextField jAData2Txt;
 //    private javax.swing.JButton jButton_Cansel;
 //    private javax.swing.JButton jButton_SetStatus;
@@ -164,7 +164,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jFormattedTextField_toDate.setDateFormatString("yyyy-MM-dd");
 		    jPar1Txt.setText("");
 		    jPar2Txt.setText("");
-		    jADataTxt.setText("");
+		    jAData1Txt.setText("");
 		    jAData2Txt.setText("");
 		    jFeeTxt.setText("0");
 		    jParentRecTxt.setText("0");
@@ -240,11 +240,16 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     	int feePow = 0;
     	int parse = 0;
 
-    	int value_1 = 0;
-		int value_2 = 0;
-		byte[] data = jADataTxt.getText().length()==0? null:
-			jADataTxt.getText().getBytes( Charset.forName("UTF-8") );
+    	long value_1 = 0l;
+		long value_2 = 0l;
+		byte[] data_1 = jAData1Txt.getText().length()==0? null:
+			jAData1Txt.getText().getBytes( Charset.forName("UTF-8") );
+		byte[] data_2 = jAData2Txt.getText().length()==0? null:
+			jAData2Txt.getText().getBytes( Charset.forName("UTF-8") );
 		long refParent = 0l;
+
+		byte[] description = jTextArea_Description.getText().length()==0? null:
+			jTextArea_Description.getText().getBytes( Charset.forName("UTF-8") );
 
     	try {
 
@@ -274,14 +279,14 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			//READ VALUE 1
 			parse++;
 			if (jPar1Txt.getText().length() > 0) {
-				value_1 = Integer.parseInt(jPar1Txt.getText());
+				value_1 = Long.parseLong(jPar1Txt.getText());
 				assert(value_1 >=0);
 			}
 
 			//READ VALUE 2
 			parse++;
 			if (jPar2Txt.getText().length() > 0) {
-				value_2 = Integer.parseInt(jPar2Txt.getText());
+				value_2 = Long.parseLong(jPar2Txt.getText());
 				assert(value_2 >=0);
 			}
 
@@ -331,7 +336,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
 				feePow, status.getKey(), 
 				person, fromDate, toDate,
-				value_1, value_2, data, refParent
+				value_1, value_2, data_1, data_2, refParent, description
 				);
 		
 		//CHECK VALIDATE MESSAGE
@@ -372,7 +377,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         jLabel_Param2 = new javax.swing.JLabel();
         jPar2Txt = new javax.swing.JTextField();
         jLabel_Addition1 = new javax.swing.JLabel();
-        jADataTxt = new javax.swing.JTextField();
+        jAData1Txt = new javax.swing.JTextField();
         jLabel_Addition2 = new javax.swing.JLabel();
         jAData2Txt = new javax.swing.JTextField();
         jLabel_Parent_record = new javax.swing.JLabel();
@@ -521,7 +526,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gridBagConstraints.insets = new java.awt.Insets(17, 16, 0, 0);
         getContentPane().add(jLabel_Addition1, gridBagConstraints);
 
-        jADataTxt.setText("jTextField3");
+        jAData1Txt.setText("jTextField3");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 14;
@@ -529,7 +534,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(17, 0, 0, 19);
-        getContentPane().add(jADataTxt, gridBagConstraints);
+        getContentPane().add(jAData1Txt, gridBagConstraints);
 
         jLabel_Addition2.setText("jLabel9");
         gridBagConstraints = new java.awt.GridBagConstraints();

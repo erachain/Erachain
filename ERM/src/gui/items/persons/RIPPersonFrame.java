@@ -312,7 +312,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 				feePow, StatusCls.ALIVE_KEY, person,
 				//endDate, Long.MAX_VALUE,
 				null, endDate,
-				value_1, value_2, data, refParent
+				value_1, value_2, null, null,refParent, data
 				);
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {

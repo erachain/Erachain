@@ -102,7 +102,11 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db),
 				to_date, birthDay + 1000,
-				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
+				45646533, 987978972,
+				"teasdsdst TEST".getBytes(Charset.forName("UTF-8")),
+				"teasdskkj kjh kj EST".getBytes(Charset.forName("UTF-8")),
+				0l,
+				"DESCRIPTION".getBytes(Charset.forName("UTF-8")),
 				timestamp, maker.getLastReference(db));
 		timestamp += 100;
 
@@ -126,7 +130,7 @@ public class TestRecSetStatusToItem {
 		//INVALID SIGNATURE
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db), to_date, null,
-				3, 2, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l,
+				323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
 				timestamp, maker.getLastReference(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
@@ -231,7 +235,11 @@ public class TestRecSetStatusToItem {
 		to_date = timestamp + 1234L * 84600000L;
 		R_SetStatusToItem setStatusTransaction_2 = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db), to_date, null,
-				3, 2, "test TEST".getBytes(Charset.forName("UTF-8")), 0l,
+				234354, 546567,
+				"wersdfsdfsdftest TEST".getBytes(Charset.forName("UTF-8")),
+				"test TEST".getBytes(Charset.forName("UTF-8")),
+				0l,
+				"tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
 				timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, false);
