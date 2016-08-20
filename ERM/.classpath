@@ -107,6 +107,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Qora/libs/sourceandjavadoc/mapdb-1.0.7-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ERMbase/lib/jcalendar-1.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/org"/>
+	<classpathentry kind="lib" path="libs/jcalendar-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
