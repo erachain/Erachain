@@ -17,8 +17,9 @@ public class Menu_Search_Person extends JDialog {
 	 private void initComponents() {
 		 
 		 setUndecorated(true);
-			
+			setSize(250, 150);
 			setAlwaysOnTop(true);
+			setResizable(true);
 
 	        jButton1 = new javax.swing.JButton();
 	        jButton2 = new javax.swing.JButton();
@@ -26,7 +27,7 @@ public class Menu_Search_Person extends JDialog {
 	        jButton4 = new javax.swing.JButton();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	        setAlwaysOnTop(true);
+	       
 	        getContentPane().setLayout(new java.awt.GridLayout(0, 1));
 
 	        jButton1.setText("jButton1");
