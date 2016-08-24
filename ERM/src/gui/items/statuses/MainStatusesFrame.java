@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultRowSorter;
@@ -34,12 +36,17 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
+import gui.RunMenu;
 import gui.Split_Panel;
 import gui.items.assets.AssetFrame;
 import gui.items.assets.TableModelItemAssets;
+import gui.items.persons.MainPersonsFrame;
+import gui.items.persons.PersonConfirmDialog;
+import gui.items.persons.PersonSetStatusDialog;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -50,6 +57,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 1L;
 	private TableModelItemStatuses tableModelItemStatuses;
 	final JTable statusesTable ;
+	
+	RunMenu Search_run_menu;
 
 	
 	public MainStatusesFrame(){
@@ -191,7 +200,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			
 		search_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
 		// MENU
-						
+	/*					
 		JPopupMenu all_Statuses_Table_menu = new JPopupMenu();
 		
 		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
@@ -215,7 +224,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			}
 		});
 		all_Statuses_Table_menu.add(details);
-		*/
+		*
 
 		JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
 		confirm_Menu.addActionListener(new ActionListener() {
@@ -226,7 +235,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 
 				StatusCls status = tableModelStatuses.getStatus(row);
 				new StatusFrame(status);
-				*/
+				*
 				// открываем диалоговое окно ввода данных для подтверждения персоны 
 				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
 
@@ -264,18 +273,20 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		all_Statuses_Table_menu.add(setStatus_Menu);
 
 		statusesTable.setComponentPopupMenu(all_Statuses_Table_menu);
-		
+	*/	
 		statusesTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				Point p = e.getPoint();
 				int row = statusesTable.rowAtPoint(p);
 				statusesTable.setRowSelectionInterval(row, row);
+				row = statusesTable.convertRowIndexToModel(row);
+				StatusCls status = tableModelItemStatuses.getStatus(row);
 				
 				if(e.getClickCount() == 2)
 				{
-					row = statusesTable.convertRowIndexToModel(row);
-					StatusCls status = tableModelItemStatuses.getStatus(row);
+		//			row = statusesTable.convertRowIndexToModel(row);
+		//			StatusCls status = tableModelItemStatuses.getStatus(row);
 		//			new StatusFrame(status);
 					
 				}
@@ -283,15 +294,26 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 				{
 					
 					if (statusesTable.getSelectedColumn() == tableModelItemStatuses.COLUMN_FAVORITE){
-						row = statusesTable.convertRowIndexToModel(row);
-						StatusCls status = tableModelItemStatuses.getStatus(row);
-						favorite_set( statusesTable);	
+						
+		//				favorite_set( statusesTable);	
 						
 						
 						
 					}
+// выводим меню всплывающее
 					
 					
+					
+					if(Controller.getInstance().isItemFavorite(status))
+					{
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+				    Search_run_menu.setVisible(true);		
 				}
 				
 				
@@ -300,7 +322,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 				
 			}
 		});
-		
+	/*	
 		// hand cursor  for Favorite column
 		statusesTable.addMouseMotionListener(new MouseMotionListener() {
 		    public void mouseMoved(MouseEvent e) {
@@ -320,8 +342,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		    }
 		});
 		
-		
-		
+	*/	
+	/*	
 		all_Statuses_Table_menu.addPopupMenuListener(new PopupMenuListener(){
 
 			@Override
@@ -368,6 +390,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 					});	
 					this.add(this.favoritesButton, labelGBC);
 					*/
+		/*
 				} else {
 					
 					favorite.setVisible(false);
@@ -397,6 +420,95 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		all_Statuses_Table_menu.addSeparator();
 		
 		all_Statuses_Table_menu.add(favorite);
+	*/	
+		
+		
+
+		Search_run_menu = new RunMenu();
+		Dimension dim = new Dimension(180,70);
+    	Search_run_menu.setSize(dim);
+    	Search_run_menu.setPreferredSize(dim);
+    	Search_run_menu.setVisible(false);
+    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
+   // 	aaa.jButton1.setBorderPainted(false);
+    	Search_run_menu.jButton1.setFocusPainted(true);
+   	Search_run_menu.jButton1.setFocusCycleRoot(true);
+   
+   	
+    	Search_run_menu.jButton1.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+   // TODO Auto-generated method stub
+  			StatusCls status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
+
+			SetStatusToItemDialog fm = new SetStatusToItemDialog(MainStatusesFrame.this, status);	
+			}
+    		    	
+    	});
+    	   	
+    	
+    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
+  //  	aaa.jButton2.setBorderPainted(false);
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
+    	Search_run_menu.jButton2.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+   // TODO Auto-generated method stub
+    //		PersonCls person = tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow()));
+   // 		PersonConfirmDialog fm = new PersonConfirmDialog(MainPersonsFrame.this,  tableModelPersons.getPerson(personsTable.convertRowIndexToModel(personsTable.getSelectedRow())));		
+    		}
+    		    	
+    	});
+  //  	aaa.jButton3.setBorderPainted(false);
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
+    	Search_run_menu.jButton3.addActionListener(new ActionListener(){
+// вычисляем устанавливаем\ сбрасываем флажек выбранные
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				int row = statusesTable.getSelectedRow();
+				
+				row = statusesTable.convertRowIndexToModel(row);
+				StatusCls status = tableModelItemStatuses.getStatus(row);
+				favorite_set( statusesTable);	
+				
+				if(Controller.getInstance().isItemFavorite(status))
+				{
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+				}
+				else
+				{
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+				}
+			
+			
+			}
+    	
+    	});
+   
+    	Search_run_menu.pack();
+		
+		
+    	Search_run_menu.addWindowFocusListener(new WindowFocusListener(){
+			@Override
+			public void windowGainedFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void windowLostFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				Search_run_menu.setVisible(false);
+			}
+    	});
+    	
+		
+		
+		
+		
+		
+		
+		
 	 
 			
 	// My statuses		
