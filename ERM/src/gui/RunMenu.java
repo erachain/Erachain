@@ -1,15 +1,15 @@
-package gui.items.persons;
+package gui;
 
 import javax.swing.JDialog;
 
-public class Menu_Search_Person extends JDialog {
+public class RunMenu extends JDialog {
 	// Variables declaration - do not modify                     
     public javax.swing.JButton jButton1;
     public javax.swing.JButton jButton2;
     public javax.swing.JButton jButton3;
     public javax.swing.JButton jButton4;
     // End of variables declaration  
-	 public Menu_Search_Person() {
+	 public RunMenu() {
 	        
 	        initComponents();
 	    }
@@ -17,7 +17,7 @@ public class Menu_Search_Person extends JDialog {
 	 private void initComponents() {
 		 
 		 setUndecorated(true);
-			setSize(250, 150);
+	//		setSize(250, 150);
 			setAlwaysOnTop(true);
 			setResizable(true);
 
@@ -33,16 +33,16 @@ public class Menu_Search_Person extends JDialog {
 	        jButton1.setText("jButton1");
 	        getContentPane().add(jButton1);
 
-	        jButton2.setText("jButton2");
-	        getContentPane().add(jButton2);
+	 //       jButton2.setText("jButton2");
+	 //       getContentPane().add(jButton2);
 
-	        jButton3.setText("jButton3");
-	        getContentPane().add(jButton3);
+	  //      jButton3.setText("jButton3");
+	 //       getContentPane().add(jButton3);
 
-	        jButton4.setText("jButton4");
-	        getContentPane().add(jButton4);
-
-	        pack();
+	 //       jButton4.setText("jButton4");
+	 //       getContentPane().add(jButton4);
+	        setVisible(false); 
+	     //   pack();
 	    }// </
 
 

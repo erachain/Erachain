@@ -45,6 +45,7 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
+import gui.RunMenu;
 import gui.Split_Panel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
@@ -68,7 +69,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
      private JPanel imagePanel;
      private GridLayout grid;
      
-     Menu_Search_Person aaa;
+     RunMenu Search_run_menu;
+     RunMenu my_run_menu;
 	
 	
 	
@@ -216,7 +218,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				
 			}
 		});
-		
+	/*	
 		all_Persons_Table_menu.addPopupMenuListener(new PopupMenuListener(){
 
 			@Override
@@ -261,9 +263,9 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 						}
 					});	
 					this.add(this.favoritesButton, labelGBC);
-					*/
+					
 				
-			
+			///*
 			
 			
 			
@@ -315,7 +317,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		all_Persons_Table_menu.add(setStatus_Menu);
 	
 		personsTable.setComponentPopupMenu(all_Persons_Table_menu);
-		
+*/		
 		// DOUBLE CLICK EVENT
 		
 		
@@ -351,14 +353,17 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 					
 					if(Controller.getInstance().isItemFavorite(person))
 					{
-						aaa.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
 					}
 					else
 					{
-						aaa.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 					}
-				aaa.setLocation(e.getXOnScreen(), e.getYOnScreen());
-			    aaa.setVisible(true);		
+				Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+			    Search_run_menu.setVisible(true);		
+		    
+			    
+			
 				}
 			}
 			});
@@ -371,15 +376,18 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 	
 
-		aaa  = new Menu_Search_Person();
-		
-    	aaa.setSize(150, 120);
-    	aaa.setVisible(false);
-    	aaa.jButton1.setText(Lang.getInstance().translate("Set Status"));
+		Search_run_menu  = new RunMenu();
+		Dimension dim = new Dimension(180,70);
+    	Search_run_menu.setSize(dim);
+    	Search_run_menu.setPreferredSize(dim);
+    	Search_run_menu.setVisible(false);
+    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
    // 	aaa.jButton1.setBorderPainted(false);
-    	aaa.jButton1.setFocusPainted(true);
-   	aaa.jButton1.setFocusCycleRoot(true);
-    	aaa.jButton1.addActionListener(new ActionListener(){
+    	Search_run_menu.jButton1.setFocusPainted(true);
+   	Search_run_menu.jButton1.setFocusCycleRoot(true);
+   
+   	
+    	Search_run_menu.jButton1.addActionListener(new ActionListener(){
   		@Override
     	public void actionPerformed(ActionEvent e) {
    // TODO Auto-generated method stub
@@ -390,9 +398,10 @@ public class MainPersonsFrame extends Main_Internal_Frame{
     	});
     	   	
     	
-    	aaa.jButton2.setText(Lang.getInstance().translate("Confirm"));
+    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
   //  	aaa.jButton2.setBorderPainted(false);
-    	aaa.jButton2.addActionListener(new ActionListener(){
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
+    	Search_run_menu.jButton2.addActionListener(new ActionListener(){
   		@Override
     	public void actionPerformed(ActionEvent e) {
    // TODO Auto-generated method stub
@@ -402,7 +411,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
     		    	
     	});
   //  	aaa.jButton3.setBorderPainted(false);
-    	aaa.jButton3.addActionListener(new ActionListener(){
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
+    	Search_run_menu.jButton3.addActionListener(new ActionListener(){
 // вычисляем устанавливаем\ сбрасываем флажек выбранные
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -411,29 +421,24 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				int row = personsTable.getSelectedRow();
 				row = personsTable.convertRowIndexToModel(row);
 				PersonCls person = tableModelPersons.getPerson(row);	
-				
-//выводим меню всплывающее
-				
-				
-				
 				if(Controller.getInstance().isItemFavorite(person))
 				{
-					aaa.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
 				}
 				else
 				{
-					aaa.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 				}
 			
 			
 			}
     	
     	});
-    	aaa.jButton4.setVisible(false);
-
+   
+    	Search_run_menu.pack();
 		
 		
-    	aaa.addWindowFocusListener(new WindowFocusListener(){
+    	Search_run_menu.addWindowFocusListener(new WindowFocusListener(){
 			@Override
 			public void windowGainedFocus(WindowEvent arg0) {
 				// TODO Auto-generated method stub
@@ -441,12 +446,12 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			@Override
 			public void windowLostFocus(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				aaa.setVisible(false);
+				Search_run_menu.setVisible(false);
 			}
     	});
     	
  
-		
+/*		
 		// hand cursor  for Favorite column
 		personsTable.addMouseMotionListener(new MouseMotionListener() {
 		    public void mouseMoved(MouseEvent e) {
@@ -463,7 +468,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		    }
 		});
 		
-	
+*/	
 		
 	 
 		//////////////////////////////////////	
@@ -595,7 +600,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		//my_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
 	
 		
-	
+	/*
 
 		//////////////////////////
 		// MENU
@@ -637,6 +642,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				
 				//IF ASSET CONFIRMED AND NOT ERM
 				
+				
 					favorite.setVisible(true);
 					//CHECK IF FAVORITES
 					if(Controller.getInstance().isItemFavorite(asset))
@@ -657,7 +663,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 						}
 					});	
 					this.add(this.favoritesButton, labelGBC);
-					*/
+				//	//*
 				
 			
 			
@@ -674,10 +680,11 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		
 		table.setComponentPopupMenu(my_Persons_Table_menu);
-		
+		*/
 		
 	
 	// DOUBLE CLICK EVENT
+		
 		
 		table.addMouseListener(new MouseAdapter() {
 			@Override
@@ -685,11 +692,12 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				Point p = e.getPoint();
 				int row = table.rowAtPoint(p);
 	//			table.setRowSelectionInterval(row, row);
+				row = table.convertRowIndexToModel(row);
+				PersonCls person = personsModel.getItem(row);
 				
 				if(e.getClickCount() == 2)
 				{
-					row = table.convertRowIndexToModel(row);
-					PersonCls person = personsModel.getItem(row);
+					;
 		//			new PersonFrame(person);
 					
 				}
@@ -697,15 +705,27 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
 				{
 					
+				/*
 					if (table.getSelectedColumn() == WalletItemPersonsTableModel.COLUMN_FAVORITE){
-						row = table.convertRowIndexToModel(row);
-						PersonCls asset = personsModel.getItem(row);
+				//		row = table.convertRowIndexToModel(row);
+				//		PersonCls asset = personsModel.getItem(row);
 						favorite_my( table);	
 						
 						
 						
 					}
+				*/
 					
+					if(Controller.getInstance().isItemFavorite(person))
+					{
+						my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					my_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+					my_run_menu.setVisible(true);	
 					
 				}
 			
@@ -722,6 +742,13 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			
 			
 		});
+		
+		
+		
+		
+		
+	/*	
+		
 		
 		// hand cursor  for Favorite column
 		table.addMouseMotionListener(new MouseMotionListener() {
@@ -740,6 +767,58 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		    }
 		});
 		
+	*/	
+		my_run_menu  = new RunMenu();
+		Dimension dim1 = new Dimension(180,25);
+		my_run_menu.setSize(dim1);
+		my_run_menu.setPreferredSize(dim1);
+		my_run_menu.setVisible(false);
+	//	my_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
+   // 	aaa.jButton1.setBorderPainted(false);
+		my_run_menu.jButton1.setFocusPainted(true);
+		my_run_menu.jButton1.setFocusCycleRoot(true);
+   
+   	
+	    	   	
+		my_run_menu.jButton1.addActionListener(new ActionListener(){
+			// вычисляем устанавливаем\ сбрасываем флажек выбранные
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							favorite_my( table);
+							int row = table.getSelectedRow();
+							row = table.convertRowIndexToModel(row);
+							PersonCls person = personsModel.getItem(row);
+							if(Controller.getInstance().isItemFavorite(person))
+							{
+								my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
+							}
+							else
+							{
+								my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
+							}
+						
+						
+						}
+			    	
+			    	});
+		
+		
+		my_run_menu.pack();
+		
+		
+		my_run_menu.addWindowFocusListener(new WindowFocusListener(){
+			@Override
+			public void windowGainedFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void windowLostFocus(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				my_run_menu.setVisible(false);
+			}
+    	});
+    	
 		
 		
 		
@@ -795,20 +874,20 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		int row = personsTable.getSelectedRow();
 		row = personsTable.convertRowIndexToModel(row);
 
-		PersonCls asset = tableModelPersons.getPerson(row);
+		PersonCls person = tableModelPersons.getPerson(row);
 		//new AssetPairSelect(asset.getKey());
 
 		
 			//CHECK IF FAVORITES
-			if(Controller.getInstance().isItemFavorite(asset))
+			if(Controller.getInstance().isItemFavorite(person))
 			{
 				
-				Controller.getInstance().removeItemFavorite(asset);
+				Controller.getInstance().removeItemFavorite(person);
 			}
 			else
 			{
 				
-				Controller.getInstance().addItemFavorite(asset);
+				Controller.getInstance().addItemFavorite(person);
 			}
 				
 
@@ -819,20 +898,20 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		int row = table.getSelectedRow();
 		row = table.convertRowIndexToModel(row);
 
-		PersonCls asset = personsModel.getItem(row);
+		PersonCls person = personsModel.getItem(row);
 		//new AssetPairSelect(asset.getKey());
 
 		
 			//CHECK IF FAVORITES
-			if(Controller.getInstance().isItemFavorite(asset))
+			if(Controller.getInstance().isItemFavorite(person))
 			{
 				
-				Controller.getInstance().removeItemFavorite(asset);
+				Controller.getInstance().removeItemFavorite(person);
 			}
 			else
 			{
 				
-				Controller.getInstance().addItemFavorite(asset);
+				Controller.getInstance().addItemFavorite(person);
 			}
 				
 
