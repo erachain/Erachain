@@ -2,12 +2,15 @@ package gui;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Image;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 
 import javax.persistence.Column;
 import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 public class Table_Formats {
 
@@ -48,6 +51,8 @@ public class Table_Formats {
 			    {
 			        int rowHeight = table .getRowHeight();
 			        int roww =0;
+			        int rowww =0;
+			        int n = 0;
 			     //   JLabel label = new JLabel("Test label");
 			     //   Graphics g = label.getGraphics();
 			     //   FontMetrics fm = g.getFontMetrics();
@@ -65,13 +70,32 @@ public class Table_Formats {
 			        	// Component comp = table .prepareRenderer(table .getCellRenderer(row, column), row, column);
 			           // rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
 			        	// читаем данные из ячейки таблицы 
-			        	String a = table.getModel().getValueAt(row, column).toString();
+			        	// надо проверить тип данных и в зависимости от него делать ширину.....
+			        	TableModel model = table.getModel();
+			        	String a = model.getValueAt(row, column).toString();
 			        	if (a ==null || a =="") a=" ";
 			        	// читаем фонт ячейки таблицы
 			        	
+			        	if (model.getColumnClass(column) ==String.class){
+			        	  FontMetrics fontMetrics = table.getFontMetrics(ff);
+			        	 // String a1 = table.getModel().getValueAt(row, column).toString();
+			              double textWidth = fontMetrics.stringWidth( a + fontMetrics.stringWidth("w"));
+			              double textHeight = fontMetrics.getHeight();
+			              double componentWidth = table.getColumnModel().getColumn(column).getWidth();
+			              double componentHeight = (textWidth * textHeight) / componentWidth;
+			              n = (int) (componentHeight / textHeight) + 1;
+			        	}
+			        	if ((model.getColumnClass(column) ==Image.class)){
+			       	 //??????????????????	
+			        		
+			        		
+			        		
+			        	}
 			        	
-			        	
-			        	
+			              rowww = Math.max(rowww, n);
+			              
+			      /*        
+			              
 			        	// вычисляем длину текста в пикселях
 			        	 TextLayout tl1 = new TextLayout(a, ff, new FontRenderContext(null, true, true)); 
 			        	 Rectangle2D ss = tl1.getBounds();
@@ -94,11 +118,11 @@ public class Table_Formats {
 			        	   
 			        	   
 			        	   roww = Math.max(roww, roww1);
-			        	  
+			        */	  
 			        	 
 			        }
 
-			        table .setRowHeight(table.convertRowIndexToModel(row), rowHeight * roww);
+			        table .setRowHeight(table.convertRowIndexToModel(row), rowHeight * rowww);
 			    }
 			
 			

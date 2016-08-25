@@ -53,9 +53,7 @@ public class Split_Panel extends javax.swing.JPanel {
 
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
-			// TODO Auto-generated method stub
-		PropertyChangeEvent prop = arg0;	
-		if (arg0.getPropertyName() == "width") 		new Table_Formats().Table_Row_Auto_Height(jTable_jScrollPanel_LeftPanel); //Table_Render("333" + arg0.getSource().toString(), pair_Panel.jTable_jScrollPanel_LeftPanel);
+			if (arg0.getPropertyName() == "width") 		new Table_Formats().Table_Row_Auto_Height(jTable_jScrollPanel_LeftPanel); //Table_Render("333" + arg0.getSource().toString(), pair_Panel.jTable_jScrollPanel_LeftPanel);
 		
 	//	arg0.getSource().
 		//System.out.println();

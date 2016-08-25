@@ -47,7 +47,7 @@ public class PersonConfirmDialog extends JDialog  {
 	//private static final long serialVersionUID = 1L;
 	private static final long serialVersionUID = 2717571093561259483L;
 
-	public PersonConfirmDialog(JComponent  apers, PersonCls person) {
+	public PersonConfirmDialog( PersonCls person) {
 		super();
 	
 		

@@ -85,7 +85,7 @@ public class PersonSetStatusDialog extends JDialog {
 	
 	
 
-	public PersonSetStatusDialog(JComponent  apers, PersonCls person) {
+	public PersonSetStatusDialog( PersonCls person) {
 		super();
 	
 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
