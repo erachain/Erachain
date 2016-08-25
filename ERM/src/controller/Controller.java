@@ -926,14 +926,15 @@ public class Controller extends Observable {
 
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
-				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature() "
-						+ Base58.encode(getBlockMessage.getSignature()));
+				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+						+ " form PEER: " + getBlockMessage.getSender().toString()
+						+ " sign: " + Base58.encode(getBlockMessage.getSignature()));
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
 						.getBlock(getBlockMessage.getSignature());
 
-				LOGGER.error("onMessage -> get block: " + newBlock.toString());
+				LOGGER.error("responce: " + newBlock.toString());
 
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(
@@ -1186,7 +1187,7 @@ public class Controller extends Observable {
 				peer = this.getMaxWeightPeer();
 				
 				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-						+ getHWeightOfPeer(peer));
+						+ " WH: " + getHWeightOfPeer(peer));
 
 				// SYNCHRONIZE FROM PEER
 				this.synchronizer.synchronize(dbSet, checkPointHeight, peer);
