@@ -157,6 +157,10 @@ public class BlockChain
 
 	public int getCheckPoint() {
 		
+		int checkPoint = getHeight() - BlockChain.MAX_SIGNATURES; 
+		if ( checkPoint > this.checkPoint)
+			this.checkPoint = checkPoint;
+		
 		return this.checkPoint;
 	}
 	public void setCheckPoint(int checkPoint) {

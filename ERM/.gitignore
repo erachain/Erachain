@@ -6,6 +6,7 @@
 /ERM.iml
 *.iml
 
+ERM.jar
 log.txt
 log.txt.*
 peers.json
