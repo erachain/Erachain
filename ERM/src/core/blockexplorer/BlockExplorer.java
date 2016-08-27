@@ -1338,6 +1338,7 @@ public class BlockExplorer
 			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getGeneratingBalance());
 			blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
 			blockJSON.put("transactionCount", block.getTransactionCount());
 			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));

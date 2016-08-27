@@ -99,7 +99,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			case COLUMN_BASETARGET:
 				
 				return block.getGeneratingBalance() + " "
-						+ block.calcWinValue(DBSet.getInstance());
+						+ block.calcWinValueTargeted(DBSet.getInstance());
 				
 			case COLUMN_TRANSACTIONS:
 				

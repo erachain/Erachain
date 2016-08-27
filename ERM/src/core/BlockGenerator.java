@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -81,6 +82,7 @@ public class BlockGenerator extends Thread implements Observer
 	//private Map<PrivateKeyAccount, Block> blocks;
 	private Map<PrivateKeyAccount, Long> winners;
 	private PrivateKeyAccount acc_winner;
+	private List<Block> lastBlocksForTarget;
 	private Block solvingBlock;
 	private int solvingBlockHeight;
 	private List<PrivateKeyAccount> cachedAccounts;
@@ -184,7 +186,7 @@ public class BlockGenerator extends Thread implements Observer
 		boolean isGenesisStart = false;
 
 		int wait_interval_run = 1000;
-		int wait_interval_flush = 25000;
+		int wait_interval_flush = 60000;
 		int wait_interval_run_gen = wait_interval_flush / 2;
 		int wait_interval = wait_interval_run;
 		while(true)
@@ -200,7 +202,7 @@ public class BlockGenerator extends Thread implements Observer
 				this.solvingBlock = null;
 				
 				// set random time waiting for send
-				wait_interval_run_gen = (int) ((Math.random() * (wait_interval_flush - 5000)));
+				wait_interval_run_gen = 5000 + (int) ((Math.random() * (wait_interval_flush - 10000)));
 				
 				syncForgingStatus();
 				if(forgingStatus != ForgingStatus.FORGING) {
@@ -286,6 +288,9 @@ public class BlockGenerator extends Thread implements Observer
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
 				this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
+				
+				
+				this.lastBlocksForTarget = bchain.getLastBlocksForTarget();
 
 				//RESET BLOCKS
 				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
@@ -312,15 +317,16 @@ public class BlockGenerator extends Thread implements Observer
 				//GENERATE NEW BLOCKS
 				List<Transaction> unconfirmedTransactions = null;
 				byte[] unconfirmedTransactionsHash = null;
-				int max_winned_value = 0;
-				int winned_value;				
+				long max_winned_value = 0;
+				long winned_value;				
+				int height = ctrl.getMyHeight();
+				long min_target = bchain.getTarget() >>1;
+
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 				synchronized(knownAccounts)
 				{
-
-					int height = Controller.getInstance().getMyHeight();
 					
 					for(PrivateKeyAccount account: knownAccounts)
 					{
@@ -333,10 +339,30 @@ public class BlockGenerator extends Thread implements Observer
 						int generatingBalance = Block.calcGeneratingBalance(dbSet, account, height);
 						if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 							continue;
-						
+
+						// test repeated win account
+						boolean repeated = false;
+						int i = 0;
+						for (Block testBlock: this.lastBlocksForTarget) {
+							i++;
+							if (testBlock.getCreator().equals(account)) {
+								repeated = true;
+								break;
+							} else if ( i > bchain.REPEAT_WIN)
+								break;
+						}
+						if (repeated) {
+							continue;
+						}
+
 						//GENERATE NEW BLOCK FOR USER
 						// already signed
 						winned_value = Block.calcWinValue(dbSet, account, height, generatingBalance);
+						
+						// not use small values
+						if (height > 100 && min_target > winned_value)
+							continue;
+						
 						if (winned_value > max_winned_value) {
 							//this.winners.put(account, winned_value);
 							acc_winner = account;
@@ -384,7 +410,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		int version = parentBlock.getNextBlockVersion(dbSet);
 		byte[] atBytes;
-		if ( version > 1 )
+		if ( version > 0 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
 					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );

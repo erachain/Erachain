@@ -104,7 +104,7 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.14.01";
+	private String version = "2.15.01";
 	private String buildTime = "2016-05-18 12:12:12 UTC";
 	private long buildTimestamp;
 	
@@ -1002,7 +1002,7 @@ public class Controller extends Observable {
 					synchronized (this.peerHWeight) {
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValue(dbSet)));
+										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValueTargeted(dbSet)));
 
 						
 					}
@@ -1700,7 +1700,7 @@ public class Controller extends Observable {
 		if (isValid) {
 			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
 					+ (newBlock.getParentHeight(dbSet) + 1)
-					+ newBlock.calcWinValue(dbSet) + " " + newBlock.getCreator().getAddress());
+					+ newBlock.calcWinValueTargeted(dbSet) + " " + newBlock.getCreator().getAddress());
 
 			this.broadcastBlock(newBlock, null);
 		}

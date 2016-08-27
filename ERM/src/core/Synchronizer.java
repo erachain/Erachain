@@ -371,12 +371,16 @@ public class Synchronizer
 			// x2
 			steep <<= 1;
 			
-		} while ( maxChainHeight > checkPointHeight && headers.size() == 0);
+		} while ( maxChainHeight > checkPointHeight && headers.isEmpty());
 
 		// CLEAR head of common headers
-		while (headers.size() > 0 && dbSet.getBlockMap().contains(headers.get(0))) {
+		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignature = headers.remove(0);
 		}
+		if (headers.isEmpty()) {				
+			throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
+		}
+
 		
 		return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
 	}

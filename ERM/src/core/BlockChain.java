@@ -22,10 +22,14 @@ import utils.Pair;
 public class BlockChain
 {
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
+	public static final int TARGET_COUNT = 100;
+	public static final int REPEAT_WIN = 5;
 	
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
+	private List<Block> lastBlocksForTarget;
+
 	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
@@ -133,7 +137,7 @@ public class BlockChain
 		if (withWinBuffer && this.waitWinBuffer != null) {
 			// with WIN BUFFER BLOCK
 			height = 1;
-			weight = this.waitWinBuffer.calcWinValue(dbSet);
+			weight = this.waitWinBuffer.calcWinValueTargeted(dbSet);
 		} else {
 			height = 0;
 			weight = 0l;				
@@ -305,4 +309,50 @@ public class BlockChain
 	{	
 		return dbSet.getBlockMap().getLastBlock();
 	}
+
+	// get last blocks for target
+	public List<Block> getLastBlocksForTarget() 
+	{	
+
+		Block last = dbSet.getBlockMap().getLastBlock();
+		
+		if (this.lastBlocksForTarget != null
+				&& Arrays.equals(this.lastBlocksForTarget.get(0).getSignature(), last.getSignature())) {
+			return this.lastBlocksForTarget;
+		}
+		
+		List<Block> list =  new ArrayList<Block>();
+
+		if (last == null) {
+			return list;
+		}
+
+		for (int i=0; i < TARGET_COUNT && last != null; i++) {
+			list.add(last);
+			last = last.getParent(dbSet);
+		}
+		
+		return list;
+	}
+
+	// calc Target by last blocks in chain
+	public long getTarget() 
+	{	
+		
+		long target = 0;
+		
+		List<Block> lastBlocks = this.getLastBlocksForTarget();
+		if (lastBlocks.isEmpty())
+			return Block.GENESIS_WIN_VALUE;
+		
+		for (Block block: lastBlocks)
+		{			
+			target += block.calcWinValue(dbSet);
+		}
+		target /= lastBlocks.size();
+		
+		return target;
+	}
+
+	
 }

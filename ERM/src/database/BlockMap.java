@@ -138,9 +138,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		{
 			this.lastBlockVar.set(this.lastBlockSignature);
 		}
-		
-		return;
-				
+						
 	}
 	
 	public Block getLastBlock()
@@ -179,18 +177,20 @@ public class BlockMap extends DBMap<byte[], Block>
 	}
 	public boolean set(byte[] signature, Block block)
 	{
-	
-		this.setLastBlockSignature(signature);
-		
+			
 		DBSet dbSet = (DBSet)this.databaseSet;
-		
-		Block parent = block.getParent(dbSet);
-		if (parent != null) {
 
+		// calc before insert record
+		int win_value = block.calcWinValueTargeted(dbSet);
+				
+		// THEN all other record add to DB
+
+		Block parent = this.get(block.getReference());
+		if (parent != null) {
 			int height = parent.getHeight(dbSet) + 1;
 			dbSet.getChildMap().set(parent, block);
 			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(height, block.calcWinValue(dbSet)));
+					new Tuple2<Integer, Integer>(height, win_value));
 			
 			//
 			// PROCESS FORGING DATA
@@ -201,11 +201,14 @@ public class BlockMap extends DBMap<byte[], Block>
 
 		} else {
 			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(1, 0));
+					new Tuple2<Integer, Integer>(1, Block.GENESIS_WIN_VALUE));
 			
 		}
-		
+
+		this.setLastBlockSignature(signature);
+
 		return super.set(signature, block);
+		
 	}
 
 	public void delete(Block block)

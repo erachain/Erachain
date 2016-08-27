@@ -49,12 +49,12 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
-	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 12L; // starting max volume for generating	
+	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 10L; // starting max volume for generating	
 	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
 	public static final long MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 60;
+	public static final int GENERATING_MIN_BLOCK_TIME = 180;
 	public static final int GENERATING_MAX_BLOCK_TIME = 600;
 	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 
@@ -73,9 +73,10 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, genesisGenerator, 0, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, genesisGenerator, Settings.GENERAL_ERMO_BALANCE / 10, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
+		
 		Account recipient;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
