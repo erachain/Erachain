@@ -114,7 +114,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return null;
 		
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 	}

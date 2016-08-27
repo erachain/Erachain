@@ -88,10 +88,6 @@ public class Synchronizer
 			// AT_TRANSACTION - not from GENESIS BLOCK
 			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 1)
 			{
-				if (lastBlock.getHeight(fork) == 1 || lastBlock.getParent(fork) == null)
-				{
-					break;
-				}
 				newBlocks.add( 0 , lastBlock );
 				//Block tempBlock = fork.getBlockMap().getLastBlock();
 				lastBlock.orphan(fork);
@@ -120,7 +116,7 @@ public class Synchronizer
 		//VALIDATE THE NEW BLOCKS
 		for(Block block: newBlocks)
 		{
-			int heigh = block.getHeight(fork);
+			int heigh = block.getParentHeight(fork);
 
 			//CHECK IF VALID
 			if(block.isValid(fork) && block.isSignatureValid())

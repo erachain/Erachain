@@ -1142,7 +1142,7 @@ public class Block {
 		dbSet.getBlockMap().delete(this);
 		
 		int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
-		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + lastHeightThis
+		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
 				+ "] DELETE -> new last Height: " + lastHeight
 				+ (dbSet.isFork()?" in FORK!": ""));
 
