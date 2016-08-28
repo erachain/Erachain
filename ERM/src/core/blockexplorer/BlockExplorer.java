@@ -1337,7 +1337,7 @@ public class BlockExplorer
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
 			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getGeneratingBalance());
-			blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
+			//blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
 			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
 			blockJSON.put("transactionCount", block.getTransactionCount());
 			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));

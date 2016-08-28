@@ -232,32 +232,13 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
-		
-		/*
+
 		if (this.key == Transaction.RIGHTS_KEY) {
-			// update forging balances and last generated block
-			Tuple3<Integer, Integer, TreeSet<String>> value = null;
-			AddressForging a_f = db.getAddressForging();
-			String recipient = this.recipient.getAddress();
-			if (a_f.contains(recipient)) {
-				value = a_f.get(this.recipient);
-				TreeSet<String> aList = value.c;
-				aList.add(recipient);
-				value = new Tuple3<Integer, Integer, TreeSet<String>>(
-						0, // last block
-						value.b + this.amount.intValue(),
-						aList);		
-			} else {
-				TreeSet<String> aList = new TreeSet<String>();
-				aList.add(recipient);
-				value = new Tuple3<Integer, Integer, TreeSet<String>>(
-						0, // last block
-						this.amount.intValue(),
-						aList);
-			}
-			a_f.set(recipient, value);
+			// PROCESS FORGING DATA
+			this.recipient.setForgingData(db, 1, 1); // need foe select GENESIS data from R_Send records in block.orphan
+			this.recipient.setLastForgingData(db, 1);
 		}
-		*/
+
 	}
 
 	@Override
@@ -269,17 +250,6 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
-		
-		/*
-		if (this.key == Transaction.RIGHTS_KEY) {
-			// update forging balances and last generated block
-			AddressForging a_f = db.getAddressForging();
-			String recipient = this.recipient.getAddress();
-			if (a_f.contains(recipient)) {
-				a_f.delete(recipient);
-			}
-		}
-		*/
 
 	}
 

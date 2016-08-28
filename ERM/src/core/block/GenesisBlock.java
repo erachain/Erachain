@@ -49,9 +49,9 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
-	public final static long GENESIS_GENERATING_BALANCE = Settings.GENERAL_ERMO_BALANCE * 10L; // starting max volume for generating	
-	public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
-	public static final long MIN_GENERATING_BALANCE = 100;
+	public final static int GENESIS_GENERATING_BALANCE = Settings.GENESIS_ERMO; // starting max volume for generating	
+	//public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
+	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
 	public static final int GENERATING_MIN_BLOCK_TIME = 180;
@@ -73,7 +73,7 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, genesisGenerator, Settings.GENERAL_ERMO_BALANCE / 10, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, genesisGenerator, Settings.GENERAL_ERMO_BALANCE, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		
@@ -430,7 +430,7 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)AssetCls.FEE_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 99999999L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 1000L, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:
 			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:

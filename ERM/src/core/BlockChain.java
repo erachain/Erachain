@@ -323,11 +323,11 @@ public class BlockChain
 		
 		List<Block> list =  new ArrayList<Block>();
 
-		if (last == null) {
+		if (last == null || last.getVersion() == 0) {
 			return list;
 		}
 
-		for (int i=0; i < TARGET_COUNT && last != null; i++) {
+		for (int i=0; i < TARGET_COUNT && last.getVersion() > 0; i++) {
 			list.add(last);
 			last = last.getParent(dbSet);
 		}
@@ -342,8 +342,8 @@ public class BlockChain
 		long target = 0;
 		
 		List<Block> lastBlocks = this.getLastBlocksForTarget();
-		if (lastBlocks.isEmpty())
-			return Block.GENESIS_WIN_VALUE;
+		if (lastBlocks == null || lastBlocks.isEmpty())
+			return 0l;
 		
 		for (Block block: lastBlocks)
 		{			

@@ -53,6 +53,8 @@ public class ForgingStatus extends JLabel implements Observer {
 					long winBalance = 0;
 					Account winAccount = null;
 					int height = Controller.getInstance().getMyHeight();
+					long target = Controller.getInstance().getBlockChain().getTarget();
+
 					DBSet dbSet = DBSet.getInstance();
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
@@ -60,7 +62,7 @@ public class ForgingStatus extends JLabel implements Observer {
 		            	if (g_balance < GenesisBlock.MIN_GENERATING_BALANCE) {
 		            		continue;
 		            	}
-		            	long w_balance = Block.calcWinValue(dbSet, account, height, g_balance);
+		            	long w_balance = 1000 * Block.calcWinValue(dbSet, account, height, g_balance) / target;
 		            	if (w_balance > winBalance) {
 		            		genBalance = g_balance;
 		            		winBalance = w_balance;

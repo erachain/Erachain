@@ -513,7 +513,7 @@ public class Block {
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DBSet.getInstance()));
 		block.put("generatingBalance", this.generatingBalance);
-		block.put("winValue", this.calcWinValue(DBSet.getInstance()));
+		//block.put("winValue", this.calcWinValue(DBSet.getInstance()));
 		block.put("winValueTargeted", this.calcWinValueTargeted(DBSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
@@ -672,44 +672,32 @@ public class Block {
 			previousForgingHeight = creator.getLastForgingData(dbSet);			
 		}
 
-		if (previousForgingHeight == height) {
-			// previous block is GENESIS
-			previousForgingHeight = 1;
-			// and get previous height
-		}
 		if ( previousForgingHeight < 1)
 			// NOT use genesis transactions
-			previousForgingHeight = 1;
+			previousForgingHeight = 2;
 		
 		return previousForgingHeight;
 
 	}
 
-	private static long getWinValueHeight2(int heightThis, int heightStart)
+	private static long getWinValueHeight2(int heightThis, int heightStart, int generatingBalance)
 	{
 		int len = heightThis - heightStart;
 		if (len < 5)
-			len = 5;
+			return 5;
 			
-		/*
-		if (len < 20)
-			len += 20;
-		else
-			len *= 2;
+		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / generatingBalance;
 		
-		int MAX_LEN = 333;
-		int MAX_LEN_2 = MAX_LEN * 100;
-		if (len < MAX_LEN ) {
-			//return (long)(len * Math.pow(len, 0.3));
-			return (long)Math.pow(len, 1.5);
-		} else if ( len < MAX_LEN_2 )
-			return (long)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
-		//return (long)(len * Math.pow(MAX_LEN, 0.3));
-		return (long)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
-		*/
-		if (len > 3000) {
-			
-			len = (int) (Math.pow((double)len / 3000.0, 0.7) * 3000.0 + 1);
+		if (times < 100) {
+			if (len > times * 7)
+				return times * 7;
+		} else if (times < 1000) {
+			if (len > times * 5)
+				return times * 5;
+		} else {			
+			if (len > times * 3) {
+				return times * 3;			
+			}
 		}
 		
 		return len;
@@ -723,7 +711,7 @@ public class Block {
 
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, account, height);
 		
-		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight);
+		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight, generatingBalance);
 
 		long win_value = generatingBalance * winValueHeight2 / 1000;
 
@@ -750,21 +738,45 @@ public class Block {
 		}
 
 		int height = this.getParentHeight(dbSet) + 1;
-		if (height == 1)
-			return GENESIS_WIN_VALUE;
 		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
+
+	public long getTarget(DBSet dbSet)
+	{
+		
+		BlockChain blockChain = Controller.getInstance().getBlockChain();
+		
+		long win_value = 0;
+		Block parent = this.getParent(dbSet);
+		int i = 0;
+		
+		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
+		{
+			i++;
+			win_value += parent.calcWinValue(dbSet);
+			
+			parent = parent.getParent(dbSet);
+		}
+		
+		if (i == 0) {
+			return this.calcWinValue(dbSet);
+		}
+		
+		return win_value / i;
+		
+	}
+
 	public int calcWinValueTargeted(DBSet dbSet)
 	{
 		
 		if (this.version == 0) {
-			// GENESIS
+			// GENESIS - getBlockChain = null
 			return 1000;
 		}
 		
-		long win_value = calcWinValue(dbSet, this.creator, this.getParentHeight(dbSet) + 1, this.generatingBalance);
-		long target = Controller.getInstance().getBlockChain().getTarget();
+		long win_value = this.calcWinValue(dbSet);
+		long target = this.getTarget(dbSet);
 		return (int)(1000 * win_value / target);
 	}
 

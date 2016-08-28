@@ -321,25 +321,12 @@ public abstract class TransactionAmount extends Transaction {
 				}
 			}
 
-			/*
-			if (this.key == Transaction.RIGHTS_KEY) {
-				// update forging balances and last generated block
-				AddressForging a_f = db.getAddressForging();
-				String creator = this.creator.getAddress();
-				Tuple3<Integer, Integer, TreeSet<String>> value = a_f.get(creator);
-
-				// for recipient
-				TreeSet<String> aList = value.c;
-				aList.add(this.recipient.getAddress());
-				
-				value = new Tuple3<Integer, Integer, TreeSet<String>>(
-						value.a, // same last block
-						value.b, // same forging balance
-						aList); // update list of account for recalculate FORGING balance late
-				a_f.set(creator, value);
+			if (this.key == Transaction.RIGHTS_KEY
+					&& this.recipient.getLastForgingData(db) == -1) {
+				// update last forging block if it not exist
+				int blockHeight = this.getParent(db).getHeight(db) + 1;
+				this.recipient.setLastForgingData(db, blockHeight);
 			}
-			*/
-
 		}
 	}
 
@@ -365,6 +352,15 @@ public abstract class TransactionAmount extends Transaction {
 					}	
 				}
 			}
+
+			if (this.key == Transaction.RIGHTS_KEY) {
+				int blockHeight = this.getParent(db).getHeight(db) + 1;
+				if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
+					// if it is first payment ERMO - reset last forging BLOCK
+					this.recipient.setLastForgingData(db, -1);
+				}
+			}
+
 		}
 	}
 
