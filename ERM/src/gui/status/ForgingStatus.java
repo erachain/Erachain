@@ -60,7 +60,7 @@ public class ForgingStatus extends JLabel implements Observer {
 		            	if (g_balance < GenesisBlock.MIN_GENERATING_BALANCE) {
 		            		continue;
 		            	}
-		            	int w_balance = Block.calcWinValue(dbSet, account, height, g_balance);
+		            	long w_balance = Block.calcWinValue(dbSet, account, height, g_balance);
 		            	if (w_balance > winBalance) {
 		            		genBalance = g_balance;
 		            		winBalance = w_balance;

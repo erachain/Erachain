@@ -50,6 +50,8 @@ public class Block {
 
 	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
 	
+	public static final int GENESIS_WIN_VALUE = 1000;
+	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
 	public static final int GENERATING_BALANCE_LENGTH = 4;
@@ -133,6 +135,8 @@ public class Block {
 		return height;
 
 	}
+	
+	// TODO - on orphan = -1 for parent on resolve new chain
 	public int getParentHeight(DBSet db)
 	{
 
@@ -141,7 +145,7 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 0;
 		
-		int height = db.getHeightMap().get(this.reference).a;		
+		int height = db.getHeightMap().get(this.reference).a;
 		return height;
 
 	}
@@ -462,7 +466,7 @@ public class Block {
  
 		//CREATE BLOCK
 		Block block;
-		if(version > 1)
+		if(version > 0)
 		{
 			//ADD ATs BYTES
 			byte[] atBytesCountBytes = Arrays.copyOfRange(data, position, position + AT_BYTES_LENGTH);
@@ -481,7 +485,7 @@ public class Block {
 		}
 		else
 		{
-			// GENESIS BLOCK version = 1
+			// GENESIS BLOCK version = 0
 			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, new byte[0]);
 		}
 
@@ -510,6 +514,7 @@ public class Block {
 		block.put("timestamp", this.getTimestamp(DBSet.getInstance()));
 		block.put("generatingBalance", this.generatingBalance);
 		block.put("winValue", this.calcWinValue(DBSet.getInstance()));
+		block.put("winValueTargeted", this.calcWinValueTargeted(DBSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
 		block.put("transactionsHash", Base58.encode(this.transactionsHash));
@@ -580,7 +585,7 @@ public class Block {
 		data = Bytes.concat(data, this.signature);
 
 		//ADD ATs BYTES
-		if(this.version > 1)
+		if(this.version > 0)
 		{
 			if (atBytes!=null)
 			{
@@ -633,7 +638,7 @@ public class Block {
 
 		int length = BASE_LENGTH;
 
-		if(this.version >= 2)
+		if(this.version > 0)
 		{
 			length += AT_LENGTH;
 			if (this.atBytes!=null)
@@ -683,9 +688,10 @@ public class Block {
 	private static long getWinValueHeight2(int heightThis, int heightStart)
 	{
 		int len = heightThis - heightStart;
-		if (len < 1)
-			len = 1;
+		if (len < 5)
+			len = 5;
 			
+		/*
 		if (len < 20)
 			len += 20;
 		else
@@ -700,11 +706,18 @@ public class Block {
 			return (long)Math.pow(MAX_LEN, 1.5) + (len - MAX_LEN);
 		//return (long)(len * Math.pow(MAX_LEN, 0.3));
 		return (long)Math.pow(MAX_LEN, 1.5) + (MAX_LEN_2 - MAX_LEN);
+		*/
+		if (len > 3000) {
+			
+			len = (int) (Math.pow((double)len / 3000.0, 0.7) * 3000.0 + 1);
+		}
+		
+		return len;
 	}
 
 	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
 	// because: creator.getLastForgingData(dbSet);
-	public static int calcWinValue(DBSet dbSet, Account account, int height, int generatingBalance)
+	public static long calcWinValue(DBSet dbSet, Account account, int height, int generatingBalance)
 	{
 		//int height = this.getParentHeight(dbSet) + 1;
 
@@ -712,9 +725,10 @@ public class Block {
 		
 		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight);
 
-		long win_value = generatingBalance * winValueHeight2;
+		long win_value = generatingBalance * winValueHeight2 / 1000;
 
-		if (height < 10000)
+		/*
+		if (height < 100)
 			win_value >>= 18;
 		else if (height < 100000)
 			win_value >>= 20;
@@ -722,14 +736,36 @@ public class Block {
 			win_value >>= 22;
 		else
 			win_value >>= 24;
+		*/
 		
-		return (int)win_value;
+		return win_value;
 
 	}
 	
-	public int calcWinValue(DBSet dbSet)
+	public long calcWinValue(DBSet dbSet)
 	{
-		return calcWinValue(dbSet, this.creator, this.getParentHeight(dbSet) + 1, this.generatingBalance);
+		if (this.version == 0) {
+			// GENESIS
+			return 1000;
+		}
+
+		int height = this.getParentHeight(dbSet) + 1;
+		if (height == 1)
+			return GENESIS_WIN_VALUE;
+		
+		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
+	}
+	public int calcWinValueTargeted(DBSet dbSet)
+	{
+		
+		if (this.version == 0) {
+			// GENESIS
+			return 1000;
+		}
+		
+		long win_value = calcWinValue(dbSet, this.creator, this.getParentHeight(dbSet) + 1, this.generatingBalance);
+		long target = Controller.getInstance().getBlockChain().getTarget();
+		return (int)(1000 * win_value / target);
 	}
 
 	//VALIDATE
@@ -753,7 +789,7 @@ public class Block {
 	public int getNextBlockVersion(DBSet db)
 	{
 
-		return 3;
+		return 1;
 		
 		/*
 		int height = getHeight(db);
@@ -830,7 +866,7 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeight(db) + "].version invalid");
 			return false;
 		}
-		if(this.version < 2 && (this.atBytes.length > 0)) // || this.atFees != 0))
+		if(this.version < 1 && (this.atBytes.length > 0)) // || this.atFees != 0))
 		{
 			LOGGER.error("*** Block[" + this.getHeight(db) + "].version AT invalid");
 			return false;
@@ -842,6 +878,14 @@ public class Block {
 			return false;
 		}
 			
+		// TEST repeated win for CREATOR
+		Block testBlock = this.getParent(db);
+		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
+			if (testBlock.getCreator().equals(this.creator)) {
+				LOGGER.error("*** Block[" + this.getHeight(db) + "] REPEATED WIN invalid");
+				return false;
+			}
+		}
 
 		/*
 		//CREATE TARGET
@@ -1092,12 +1136,13 @@ public class Block {
 		//DELETE TRANSACTIONS FROM FINAL MAP
 		dbSet.getTransactionFinalMap().delete(height);
 
+		int lastHeightThis = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
 
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
 		
 		int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
-		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + (this.getParentHeight(dbSet) + 1)
+		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
 				+ "] DELETE -> new last Height: " + lastHeight
 				+ (dbSet.isFork()?" in FORK!": ""));
 

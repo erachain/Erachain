@@ -99,7 +99,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			case COLUMN_BASETARGET:
 				
 				return block.getGeneratingBalance() + " "
-						+ block.calcWinValue(DBSet.getInstance());
+						+ block.calcWinValueTargeted(DBSet.getInstance());
 				
 			case COLUMN_TRANSACTIONS:
 				
@@ -114,7 +114,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return null;
 		
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 	}
