@@ -330,37 +330,9 @@ public class BlockGenerator extends Thread implements Observer
 					
 					for(PrivateKeyAccount account: knownAccounts)
 					{
-						/*
-						//CHECK IF BLOCK FROM USER ALREADY EXISTS USE MAP ACCOUNT BLOCK EASY
-						if(this.winners.containsKey(account))
-							continue;
-							*/
-
-						int generatingBalance = Block.calcGeneratingBalance(dbSet, account, height);
-						if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
-							continue;
-
-						// test repeated win account
-						boolean repeated = false;
-						int i = 0;
-						for (Block testBlock: this.lastBlocksForTarget) {
-							i++;
-							if (testBlock.getCreator().equals(account)) {
-								repeated = true;
-								break;
-							} else if ( i > bchain.REPEAT_WIN)
-								break;
-						}
-						if (repeated) {
-							continue;
-						}
-
-						//GENERATE NEW BLOCK FOR USER
-						// already signed
-						winned_value = Block.calcWinValue(dbSet, account, height, generatingBalance);
 						
-						// not use small values
-						if (height > 100 && min_target > winned_value)
+						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height, min_target);
+						if(winned_value == 0l)
 							continue;
 						
 						if (winned_value > max_winned_value) {
@@ -378,6 +350,13 @@ public class BlockGenerator extends Thread implements Observer
 				if(acc_winner != null)
 				{
 					
+					syncForgingStatus();
+					if(forgingStatus != ForgingStatus.FORGING) {
+						this.solvingBlock = null;
+						bchain.clearWaitWinBuffer();
+						continue;
+					}
+
 					LOGGER.error("core.BlockGenerator.run() - selected account: "
 							+ max_winned_value + " " + acc_winner.getAddress());
 

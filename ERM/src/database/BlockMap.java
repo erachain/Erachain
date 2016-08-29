@@ -218,7 +218,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			Long rr = null;
 			rr +=1;
 		}
-
+		
 		dbSet.getHeightMap().delete(block.getSignature());
 
 		byte[] parentSign = block.getReference();
