@@ -81,7 +81,8 @@ public class Settings {
 	private static final String DEFAULT_WALLET_DIR = "wallet";
 	
 	// RIGHTs 
-	public static final int GENERAL_ERMO_BALANCE = 1000000;
+	public static final int GENESIS_ERMO = 10000000;
+	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERMO * 10;
 	public static final int MAJOR_ERMO_BALANCE = 33000;
 	public static final int MINOR_ERMO_BALANCE = 100;
 	

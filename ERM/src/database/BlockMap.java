@@ -185,8 +185,12 @@ public class BlockMap extends DBMap<byte[], Block>
 				
 		// THEN all other record add to DB
 
-		Block parent = this.get(block.getReference());
-		if (parent != null) {
+		if (block.getVersion() == 0) {
+			// GENESIS block
+			dbSet.getHeightMap().set(signature,
+					new Tuple2<Integer, Integer>(1, Block.GENESIS_WIN_VALUE));
+		} else {
+			Block parent = this.get(block.getReference());
 			int height = parent.getHeight(dbSet) + 1;
 			dbSet.getChildMap().set(parent, block);
 			dbSet.getHeightMap().set(signature,
@@ -198,11 +202,6 @@ public class BlockMap extends DBMap<byte[], Block>
 			Integer prevHeight = creator.getLastForgingData(dbSet);
 			creator.setForgingData(dbSet, height, prevHeight);
 			creator.setLastForgingData(dbSet, height);
-
-		} else {
-			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(1, Block.GENESIS_WIN_VALUE));
-			
 		}
 
 		this.setLastBlockSignature(signature);

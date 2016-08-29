@@ -320,7 +320,7 @@ public class BlockGenerator extends Thread implements Observer
 				long max_winned_value = 0;
 				long winned_value;				
 				int height = ctrl.getMyHeight();
-				long min_target = bchain.getTarget() >>1;
+				long min_target = bchain.getTarget() >>2;
 
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
@@ -554,21 +554,6 @@ public class BlockGenerator extends Thread implements Observer
 	}
 	*/
 	
-	private static long minMaxBalance(long generatingBalance)
-	{
-		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
-		{
-			return GenesisBlock.MIN_GENERATING_BALANCE;
-		}
-		
-		if(generatingBalance > GenesisBlock.MAX_GENERATING_BALANCE)
-		{
-			return GenesisBlock.MAX_GENERATING_BALANCE;
-		}
-		
-		return generatingBalance;
-	}
-
 	@Override
 	public void update(Observable arg0, Object arg1) {
 	ObserverMessage message = (ObserverMessage) arg1;
