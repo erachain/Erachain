@@ -14,8 +14,10 @@ import org.mapdb.Fun.Tuple3;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -324,8 +326,11 @@ public abstract class TransactionAmount extends Transaction {
 			if (this.key == Transaction.RIGHTS_KEY
 					&& this.recipient.getLastForgingData(db) == -1) {
 				// update last forging block if it not exist
-				int blockHeight = this.getParent(db).getHeight(db) + 1;
-				this.recipient.setLastForgingData(db, blockHeight);
+				Block block = this.getParent(db);
+				if (block != null) {
+					int blockHeight = block.getParentHeight(db) + 1;
+					this.recipient.setLastForgingData(db, blockHeight);
+				}
 			}
 		}
 	}
@@ -354,10 +359,13 @@ public abstract class TransactionAmount extends Transaction {
 			}
 
 			if (this.key == Transaction.RIGHTS_KEY) {
-				int blockHeight = this.getParent(db).getHeight(db) + 1;
-				if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
-					// if it is first payment ERMO - reset last forging BLOCK
-					this.recipient.setLastForgingData(db, -1);
+				Block block = this.getParent(db);
+				if (block != null) {
+					int blockHeight = block.getParentHeight(db) + 1;
+					if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
+						// if it is first payment ERMO - reset last forging BLOCK
+						this.recipient.setLastForgingData(db, -1);
+					}
 				}
 			}
 
