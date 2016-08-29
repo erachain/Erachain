@@ -150,6 +150,14 @@ public class Block {
 
 	}
 
+	public int getHeightByParent(DBSet db)
+	{
+		
+		int height = getParentHeight(db) + 1;
+		return height;
+
+	}
+
 	public long getTimestamp(DBSet db)
 	{
 		int height = this.getParentHeight(db) + 1;
@@ -172,8 +180,6 @@ public class Block {
 	
 	public static int getPreviousForgingHeightForIncomes(DBSet dbSet, Account creator, int height) {
 		
-		//height = height > 0? height: this.getParentHeight(dbSet) + 1;
-
 		// IF BLOCK in the MAP
 		int previousForgingHeight = creator.getForgingData(dbSet, height);
 		if (previousForgingHeight == -1) {
@@ -184,18 +190,6 @@ public class Block {
 				return height;
 			}
 		}
-
-		/*
-		if (previousForgingHeight == height) {
-			// previous block is GENESIS
-			previousForgingHeight = 1;
-			// and get previous height
-		}
-
-		if ( previousForgingHeight < 2)
-			// NOT use genesis transactions
-			previousForgingHeight = 2;
-		*/
 		
 		return previousForgingHeight;
 
@@ -203,17 +197,21 @@ public class Block {
 
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
-	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int parentHeight)
+	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
 	{
 		
 		int incomed_amount = 0;
 		int amount;
 		
-		int previousForgingHeight = getPreviousForgingHeightForIncomes(dbSet, creator, parentHeight + 1) + 1;
-		if (previousForgingHeight <= parentHeight) {
+		int previousForgingHeight = getPreviousForgingHeightForIncomes(dbSet, creator, height);
+		if (previousForgingHeight < 2)
+			// NOT use GENESIS BLOCK
+			previousForgingHeight = 2;
+		
+		if (previousForgingHeight <= height) {
 			
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
-					previousForgingHeight, parentHeight,
+					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
 			for(Transaction transaction: txs)
@@ -228,9 +226,10 @@ public class Block {
 		
 		return (int)creator.getConfirmedBalance(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
 	}
+	
 	public int calcGeneratingBalance(DBSet dbSet)
 	{
-		 return calcGeneratingBalance(dbSet, this.creator, this.getParentHeight(dbSet));
+		 return calcGeneratingBalance(dbSet, this.creator, this.getHeightByParent(dbSet));
 	}
 
 	public byte[] getReference()
@@ -683,8 +682,8 @@ public class Block {
 	private static long getWinValueHeight2(int heightThis, int heightStart, int generatingBalance)
 	{
 		int len = heightThis - heightStart;
-		if (len < 5)
-			return 5;
+		if (len < 1)
+			return 1;
 			
 		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / generatingBalance;
 		
@@ -758,10 +757,10 @@ public class Block {
 		}
 		
 		if (i == 0) {
-			return this.calcWinValue(dbSet) / 1000;
+			return this.calcWinValue(dbSet);
 		}
 		
-		return win_value / i / 1000;
+		return win_value / i;
 		
 	}
 
@@ -775,7 +774,7 @@ public class Block {
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
-		return (int)(win_value / target);
+		return (int)(1000 * win_value / target);
 	}
 
 	//VALIDATE

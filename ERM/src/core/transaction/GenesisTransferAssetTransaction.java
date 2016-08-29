@@ -235,7 +235,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 		if (this.key == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
-			this.recipient.setForgingData(db, 1, 1); // need foe select GENESIS data from R_Send records in block.orphan
+			// this.recipient.setForgingData(db, 1, 1); // need for select GENESIS data from R_Send records in block.orphan
 			this.recipient.setLastForgingData(db, 1);
 		}
 

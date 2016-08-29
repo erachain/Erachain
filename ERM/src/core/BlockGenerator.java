@@ -331,7 +331,7 @@ public class BlockGenerator extends Thread implements Observer
 					for(PrivateKeyAccount account: knownAccounts)
 					{
 						
-						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height, min_target);
+						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height + 1, min_target);
 						if(winned_value == 0l)
 							continue;
 						

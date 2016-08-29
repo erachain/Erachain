@@ -54,13 +54,13 @@ public class ForgingStatus extends JLabel implements Observer {
 					long winBalance = 0;
 					Account winAccount = null;
 					BlockChain bchain = Controller.getInstance().getBlockChain();
-					int height = bchain.getHeight() + 1;
+					int newHeight = bchain.getHeight() + 1;
 					long target = bchain.getTarget();
 
 					DBSet dbSet = DBSet.getInstance();
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
-		            	long win_value = account.calcWinValue(dbSet, bchain, null, height, 0l);
+		            	long win_value = account.calcWinValue(dbSet, bchain, null, newHeight, 0l);
 		            	if (win_value > winBalance) {
 		            		winBalance = win_value;
 		            		winAccount = account;
@@ -71,7 +71,7 @@ public class ForgingStatus extends JLabel implements Observer {
 			        if(winAccount != null)
 			        {
 			        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
-			        	timeForge = (winBalance / target) + " " + winAccount.getAddress();
+			        	timeForge = (1000 * winBalance / target) + " " + winAccount.getAddress();
 			        	
 			        }
 			        else

@@ -351,7 +351,7 @@ public class BlockChain
 		}
 		target /= lastBlocks.size();
 		
-		return target / 1000;
+		return target;
 	}
 
 	
