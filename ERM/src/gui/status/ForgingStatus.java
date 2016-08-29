@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import javax.swing.ToolTipManager;
 import utils.GUIUtils;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.BlockChain;
 import core.BlockGenerator;
 import core.account.Account;
 import core.block.Block;
@@ -49,23 +51,18 @@ public class ForgingStatus extends JLabel implements Observer {
 				if(Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING)
 				{
 		           	
-					long genBalance = 0;
 					long winBalance = 0;
 					Account winAccount = null;
-					int height = Controller.getInstance().getMyHeight();
-					long target = Controller.getInstance().getBlockChain().getTarget();
+					BlockChain bchain = Controller.getInstance().getBlockChain();
+					int height = bchain.getHeight() + 1;
+					long target = bchain.getTarget();
 
 					DBSet dbSet = DBSet.getInstance();
 		            for(Account account: Controller.getInstance().getAccounts())
 			        {
-		            	int g_balance = (int)account.getConfirmedBalance(Transaction.RIGHTS_KEY).longValue();
-		            	if (g_balance < GenesisBlock.MIN_GENERATING_BALANCE) {
-		            		continue;
-		            	}
-		            	long w_balance = 1000 * Block.calcWinValue(dbSet, account, height, g_balance) / target;
-		            	if (w_balance > winBalance) {
-		            		genBalance = g_balance;
-		            		winBalance = w_balance;
+		            	long win_value = account.calcWinValue(dbSet, bchain, null, height, 0l);
+		            	if (win_value > winBalance) {
+		            		winBalance = win_value;
 		            		winAccount = account;
 		            	}
 			        }
@@ -74,7 +71,7 @@ public class ForgingStatus extends JLabel implements Observer {
 			        if(winAccount != null)
 			        {
 			        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
-			        	timeForge = genBalance + " " + winBalance + " " + winAccount.getAddress();
+			        	timeForge = (winBalance / target) + " " + winAccount.getAddress();
 			        	
 			        }
 			        else

@@ -21,6 +21,7 @@ import database.Item_Map;
 import database.DBSet;
 import database.NameMap;
 import controller.Controller;
+import core.BlockChain;
 //import core.account.PublicKeyAccount;
 import core.BlockGenerator;
 import core.block.Block;
@@ -513,28 +514,39 @@ public class Account {
 		db.getAddressForging().setLast(this.address, prevHeight);
 	}
 	
-
-	/*
-	public int getPreviousForgingHeight(DBSet dbSet, int height)
-	{
+	// calc WIN_VALUE for ACCOUNT in HEIGHT
+	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long min_target) {
 		
-		// LAST HEIGHT for this Height
-		int previousForgingHeight = this.getForgingData(dbSet, height);
-		// LAST 
-		int lastHeight = this.getLastForgingData(dbSet);
-		// IF BLOCK not inserted in MAP
-		//int lastHeight = creator.getLastForgingData(dbSet);
-		if (lastHeight <= height) {
-			previousForgingHeight = lastHeight;
-		} else if (previousForgingHeight < lastHeight) {
-			// select
-			previousForgingHeight = lastHeight;
+		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
+		
+		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
+			return 0l;
+		
+		if (lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
+			// test repeated win account
+			int i = 0;
+			for (Block testBlock: lastBlocksForTarget) {
+				i++;
+				if (testBlock.getCreator().equals(this)) {
+					return 0l;
+				} else if ( i > bchain.REPEAT_WIN)
+					break;
+			}
 		}
 
-		//if (lastHeight == previousForgingHeight)
-		//	previousForgingHeight -= 1;
-		return previousForgingHeight;
+		// if new block in DB - get next height
+		if (this.getForgingData(dbSet, height) != -1) {
+			height++;
+		}
+		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
+		
+		// not use small values
+		if (height > 100 && min_target > winned_value)
+			return 0l;
+
+		return winned_value;
+		
 	}
-	*/
+	
 
 }

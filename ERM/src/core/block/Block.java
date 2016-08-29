@@ -672,7 +672,7 @@ public class Block {
 			previousForgingHeight = creator.getLastForgingData(dbSet);			
 		}
 
-		if ( previousForgingHeight < 1)
+		if ( previousForgingHeight < 2)
 			// NOT use genesis transactions
 			previousForgingHeight = 2;
 		
@@ -713,18 +713,16 @@ public class Block {
 		
 		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight, generatingBalance);
 
-		long win_value = generatingBalance * winValueHeight2 / 1000;
+		long win_value = generatingBalance * winValueHeight2;
 
-		/*
 		if (height < 100)
-			win_value >>= 18;
+			win_value >>= 10;
 		else if (height < 100000)
-			win_value >>= 20;
+			win_value >>= 11;
 		else if (height < 1000000)
-			win_value >>= 22;
+			win_value >>= 12;
 		else
-			win_value >>= 24;
-		*/
+			win_value >>= 13;
 		
 		return win_value;
 
@@ -760,10 +758,10 @@ public class Block {
 		}
 		
 		if (i == 0) {
-			return this.calcWinValue(dbSet);
+			return this.calcWinValue(dbSet) / 1000;
 		}
 		
-		return win_value / i;
+		return win_value / i / 1000;
 		
 	}
 
@@ -777,7 +775,7 @@ public class Block {
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
-		return (int)(1000 * win_value / target);
+		return (int)(win_value / target);
 	}
 
 	//VALIDATE
