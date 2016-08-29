@@ -241,7 +241,7 @@ public class IssueNotePanel extends JPanel
 			{
 			case Transaction.VALIDATE_OK:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			//	this.dispose();
 				
 				
@@ -400,7 +400,7 @@ public class IssueNotePanel extends JPanel
 
 	 //       jLabel_Issue_Note.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 	        jLabel_Issue_Note.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	        jLabel_Issue_Note.setText(Lang.getInstance().translate("Issue Note"));
+	        jLabel_Issue_Note.setText(Lang.getInstance().translate("Issue Template"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;

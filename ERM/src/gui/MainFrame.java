@@ -139,7 +139,7 @@ private JFrame parent;
 		
 		
 		JButton button41_MainToolBar = new JButton();
-		button41_MainToolBar.setText(Lang.getInstance().translate("Notes"));
+		button41_MainToolBar.setText(Lang.getInstance().translate("Templates"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
 		button41_MainToolBar.setFocusable(false);
 		button41_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

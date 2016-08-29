@@ -44,15 +44,15 @@ public class MainNotesFrame extends Main_Internal_Frame{
 
 public MainNotesFrame(){
 // not show buttons main Toolbar
-	this.setTitle(Lang.getInstance().translate("Notes"));
+	this.setTitle(Lang.getInstance().translate("Templates"));
 	this.jButton2_jToolBar.setVisible(false);
 	this.jButton3_jToolBar.setVisible(false);
 	this.jButton1_jToolBar.setVisible(false);
 	this.jToolBar.setVisible(false);
-// buttun1
-	this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Assets"));
+
+
 // status panel
-	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with notes"));
+	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Templates"));
 	this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -70,14 +70,14 @@ public MainNotesFrame(){
 
 	 
 	// search Assets
-		  Search_Notes_Tab search_Notes_SplitPanel = new Search_Notes_Tab();
-		  search_Notes_SplitPanel.jScrollPane_jPanel_RightPanel.setBorder(null);
+		  Search_Notes_Tab search_Templates_SplitPanel = new Search_Notes_Tab();
+		  search_Templates_SplitPanel.jScrollPane_jPanel_RightPanel.setBorder(null);
 		
 		// Asset_Info info1 = new Asset_Info();
 		
 			
 			// обработка изменения положения курсора в таблице
-		  search_Notes_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+		  search_Templates_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 					@SuppressWarnings({ "unused" })
 					@Override
 						public void valueChanged(ListSelectionEvent arg0) {
@@ -88,8 +88,8 @@ public MainNotesFrame(){
 							SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 			//создаем объект персоны
 							UnionCls union;
-							if (search_Notes_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
-								 TableModel tableModelOrder = search_Notes_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+							if (search_Templates_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+								 TableModel tableModelOrder = search_Templates_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
 					//			Object asset = tableModelOrder..get.getAsset(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Orders_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 							//	info1.show_Asset_002((AssetCls) asset);
 								
@@ -137,8 +137,8 @@ public MainNotesFrame(){
 	
 				
 			// issue Assets
-				 IssueNotePanel Issue_Note_SplitPanel = new IssueNotePanel();
-				 Issue_Note_SplitPanel.setName(Lang.getInstance().translate("Issue Note"));
+				 IssueNotePanel Issue_Template_SplitPanel = new IssueNotePanel();
+				 Issue_Template_SplitPanel.setName(Lang.getInstance().translate("Issue Template"));
 						
 				
 			
@@ -154,8 +154,8 @@ public MainNotesFrame(){
 	
 	
 	
-	this.jTabbedPane.add(search_Notes_SplitPanel);
-	this.jTabbedPane.add(Issue_Note_SplitPanel);	
+	this.jTabbedPane.add(search_Templates_SplitPanel);
+	this.jTabbedPane.add(Issue_Template_SplitPanel);	
 	this.pack();
 	this.setSize(800,600);
 	this.setMaximizable(true);
@@ -169,7 +169,7 @@ public MainNotesFrame(){
 	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	
 //	my_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-	search_Notes_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	search_Templates_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 
 	
 	}
