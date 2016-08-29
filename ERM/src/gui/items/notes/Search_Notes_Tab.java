@@ -38,6 +38,8 @@ import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
@@ -46,9 +48,12 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
+import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
+import gui.items.persons.Person_info_panel_001;
+
 import gui.items.unions.TableModelUnions;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -173,7 +178,10 @@ public class Search_Notes_Tab extends Split_Panel {
 // изменение высоты строки при изменении ширины  
 		
 		this.setRowHeightFormat(true);
-	  
+	
+		// Event LISTENER		
+					jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+		
 		
 		
 		
@@ -419,4 +427,18 @@ if(note.getKey() >= NoteCls.INITIAL_FAVORITES)
 
 }
 }
+
+// listener select row	 
+class search_listener implements ListSelectionListener  {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			NoteCls note = null;
+			if (notesTable.getSelectedRow() >= 0 ) note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
+			Info_Notes info_Note = new Info_Notes(note);
+			info_Note.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+			jScrollPane_jPanel_RightPanel.setViewportView(info_Note);
+		}
+	}
+
+
 }

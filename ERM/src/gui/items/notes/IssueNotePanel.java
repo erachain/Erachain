@@ -42,14 +42,14 @@ import core.transaction.Transaction;
 @SuppressWarnings("serial")
 public class IssueNotePanel extends JPanel
 {
-	private JComboBox<Account> cbxFrom;
-	private JTextField txtScale;
-	private JTextField txtFeePow;
-	private JTextField txtName;
-	private JTextArea txtareaDescription;
-	private JTextField txtQuantity;
-	private JCheckBox chkDivisible;
-	private JButton issueButton;
+	private JComboBox<Account> jComboBox_Account_Creator;
+//	private JTextField txtScale;
+//	private JTextField jTextField_Fee;
+//	private JTextField jTextField_Title;
+//	private JTextArea jTextArea_Content;
+//	private JTextField txtQuantity;
+//	private JCheckBox chkDivisible;
+	//private JButton jButton_Create;
 
 	public IssueNotePanel()
 	{
@@ -59,13 +59,10 @@ public class IssueNotePanel extends JPanel
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-//		this.setIconImages(icons);
 		
+		this.jComboBox_Account_Creator = new JComboBox<Account>(new AccountsComboBoxModel());
+		initComponents();
+/*		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
@@ -112,8 +109,10 @@ public class IssueNotePanel extends JPanel
 		
 		//COMBOBOX FROM
 		txtGBC.gridy = 0;
-		this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.cbxFrom, txtGBC);
+		*/
+		
+      /* 
+		this.add(this.jComboBox_Account_Creator, txtGBC);
         
         //LABEL NAME
       	labelGBC.gridy = 1;
@@ -122,8 +121,8 @@ public class IssueNotePanel extends JPanel
       		
       	//TXT NAME
       	txtGBC.gridy = 1;
-      	this.txtName = new JTextField();
-        this.add(this.txtName, txtGBC);
+      	this.jTextField_Title = new JTextField();
+        this.add(this.jTextField_Title, txtGBC);
         
         //LABEL DESCRIPTION
       	labelGBC.gridy = 2;
@@ -132,13 +131,13 @@ public class IssueNotePanel extends JPanel
       		
       	//TXTAREA DESCRIPTION
       	txtGBC.gridy = 2;
-      	this.txtareaDescription = new JTextArea();
+      	this.jTextArea_Content = new JTextArea();
        	
-      	this.txtareaDescription.setRows(6);
-      	this.txtareaDescription.setColumns(20);
-      	this.txtareaDescription.setBorder(this.txtName.getBorder());
+      	this.jTextArea_Content.setRows(6);
+      	this.jTextArea_Content.setColumns(20);
+      	this.jTextArea_Content.setBorder(this.jTextField_Title.getBorder());
 
-      	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
+      	JScrollPane scrollDescription = new JScrollPane(this.jTextArea_Content);
       	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
       	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(scrollDescription, txtGBC);
@@ -150,32 +149,7 @@ public class IssueNotePanel extends JPanel
       	this.add(quantityLabel, labelGBC);
       		
       	//TXT QUANTITY
-      	txtGBC.gridy = 3;
-      	this.txtQuantity = new JTextField();
-      	this.txtQuantity.setText("9999999");
-        this.add(this.txtQuantity, txtGBC);
-        
-        //LABEL SCALE
-      	labelGBC.gridy = 4;
-      	JLabel scaleLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-      	this.add(scaleLabel, labelGBC);
-      		
-      	//TXT SCALE
-      	txtGBC.gridy = 4;
-      	this.txtScale = new JTextField();
-      	this.txtScale.setText("2");
-        this.add(this.txtScale, txtGBC);
-
-        //LABEL DIVISIBLE
-      	labelGBC.gridy = 5;
-      	JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
-      	this.add(divisibleLabel, labelGBC);
-      		
-      	//CHECKBOX DIVISIBLE
-      	txtGBC.gridy = 5;
-      	this.chkDivisible = new JCheckBox();
-      	this.chkDivisible.setSelected(true);
-      	this.add(this.chkDivisible, txtGBC);
+  
       	
         //LABEL FEE POW
       	labelGBC.gridy = 6;
@@ -184,23 +158,16 @@ public class IssueNotePanel extends JPanel
       		
       	//TXT FEE
       	txtGBC.gridy = 6;
-      	this.txtFeePow = new JTextField();
-      	this.txtFeePow.setText("0");
-        this.add(this.txtFeePow, txtGBC);
+      	this.jTextField_Fee = new JTextField();
+      	this.jTextField_Fee.setText("0");
+        this.add(this.jTextField_Fee, txtGBC);
 		           
         //BUTTON Register
         buttonGBC.gridy = 7;
-        this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
-        this.issueButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick();
-		    }
-		});
-    	this.add(this.issueButton, buttonGBC);
-        
+        this.jButton_Create = new JButton(Lang.getInstance().translate("Issue"));
+        this.jButton_Create.setPreferredSize(new Dimension(100, 25));
+       
+ */       
         //PACK
 //		this.pack();
  //       this.setResizable(false);
@@ -211,7 +178,7 @@ public class IssueNotePanel extends JPanel
 	public void onIssueClick()
 	{
 		//DISABLE
-		this.issueButton.setEnabled(false);
+		this.jButton_Create.setEnabled(false);
 	
 		//CHECK IF NETWORK OK
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
@@ -220,7 +187,7 @@ public class IssueNotePanel extends JPanel
 			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			//ENABLE
-			this.issueButton.setEnabled(true);
+			this.jButton_Create.setEnabled(true);
 			
 			return;
 		}
@@ -236,14 +203,14 @@ public class IssueNotePanel extends JPanel
 				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
-				this.issueButton.setEnabled(true);
+				this.jButton_Create.setEnabled(true);
 				
 				return;
 			}
 		}
 		
 		//READ CREATOR
-		Account sender = (Account) this.cbxFrom.getSelectedItem();
+		Account sender = (Account) this.jComboBox_Account_Creator.getSelectedItem();
 		
 		long parse = 0;
 		int feePow = 0;
@@ -251,7 +218,7 @@ public class IssueNotePanel extends JPanel
 		{
 			
 			//READ FEE POW
-			feePow = Integer.parseInt(this.txtFeePow.getText());
+			feePow = Integer.parseInt(this.jTextField_Fee.getText());
 		}
 		catch(Exception e)
 		{
@@ -267,7 +234,7 @@ public class IssueNotePanel extends JPanel
 						
 			//CREATE NOTE
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueNote(creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow);
+			Pair<Transaction, Integer> result = Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(), feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())
@@ -309,6 +276,226 @@ public class IssueNotePanel extends JPanel
 			}
 		
 		//ENABLE
-		this.issueButton.setEnabled(true);
+		this.jButton_Create.setEnabled(true);
 	}
+	   private void initComponents() {
+	        java.awt.GridBagConstraints gridBagConstraints;
+
+	        jLabel_Title = new javax.swing.JLabel();
+	        jLabel_Content = new javax.swing.JLabel();
+	        jTextField_Title = new javax.swing.JTextField();
+	        jScrollPane1 = new javax.swing.JScrollPane();
+	        jTextArea_Content = new javax.swing.JTextArea();
+	        jLabel_Fee = new javax.swing.JLabel();
+	        jLabel_Account_Creator = new javax.swing.JLabel();
+	    //    jComboBox_Account_Creator = new javax.swing.JComboBox<>();
+	        jTextField_Fee = new javax.swing.JTextField();
+	        jLabel_Template = new javax.swing.JLabel();
+	        jLabel_Issue_Note = new javax.swing.JLabel();
+	        jComboBox_Template = new javax.swing.JComboBox<>();
+	        jCheckBox_Encrypted = new javax.swing.JCheckBox();
+	        jButton_Create = new javax.swing.JButton();
+	        jLabel_auto_saze = new javax.swing.JLabel();
+
+	        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+	        layout.columnWidths = new int[] {0, 8, 0, 8, 0, 8, 0, 8, 0};
+	        layout.rowHeights = new int[] {0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0};
+	        setLayout(layout);
+
+	        jLabel_Title.setText(Lang.getInstance().translate("Title")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 4;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+	        add(jLabel_Title, gridBagConstraints);
+
+	        jLabel_Content.setText(Lang.getInstance().translate("Content")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 8;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+	        add(jLabel_Content, gridBagConstraints);
+
+	        jTextField_Title.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jTextField_TitleActionPerformed(evt);
+	            }
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 4;
+	        gridBagConstraints.gridwidth = 7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+	        add(jTextField_Title, gridBagConstraints);
+
+	        jTextArea_Content.setColumns(20);
+	  //      jTextArea_Content.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+	        jTextArea_Content.setLineWrap(true);
+	        jTextArea_Content.setRows(18);
+	        jTextArea_Content.setAlignmentY(1.0F);
+	        jScrollPane1.setViewportView(jTextArea_Content);
+
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 8;
+	        gridBagConstraints.gridwidth = 7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.weighty = 0.7;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+	        add(jScrollPane1, gridBagConstraints);
+
+	        jLabel_Fee.setText(Lang.getInstance().translate("Fee")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+	        add(jLabel_Fee, gridBagConstraints);
+
+	        jLabel_Account_Creator.setText(Lang.getInstance().translate("Account Creator")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 2;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+	        add(jLabel_Account_Creator, gridBagConstraints);
+
+	       
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 2;
+	        gridBagConstraints.gridwidth = 7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+	        add(jComboBox_Account_Creator, gridBagConstraints);
+
+	        jTextField_Fee.setToolTipText("");
+	        jTextField_Fee.setMaximumSize(new java.awt.Dimension(80, 20));
+	        jTextField_Fee.setMinimumSize(new java.awt.Dimension(80, 20));
+	        jTextField_Fee.setName(""); // NOI18N
+	        jTextField_Fee.setPreferredSize(new java.awt.Dimension(80, 20));
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        add(jTextField_Fee, gridBagConstraints);
+
+	        jLabel_Template.setText(Lang.getInstance().translate("Template")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 6;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+	 //       add(jLabel_Template, gridBagConstraints);
+
+	 //       jLabel_Issue_Note.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+	        jLabel_Issue_Note.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+	        jLabel_Issue_Note.setText(Lang.getInstance().translate("Issue Note"));
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 0;
+	        gridBagConstraints.gridwidth = 9;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(12, 15, 0, 15);
+	        add(jLabel_Issue_Note, gridBagConstraints);
+
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 6;
+	        gridBagConstraints.gridwidth = 7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+	  //      add(jComboBox_Template, gridBagConstraints);
+
+	        jCheckBox_Encrypted.setText(Lang.getInstance().translate("Encrypted"));
+	        jCheckBox_Encrypted.setToolTipText("");
+	        jCheckBox_Encrypted.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jCheckBox_EncryptedActionPerformed(evt);
+	            }
+	        });
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 10;
+	        gridBagConstraints.gridwidth = 5;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        add(jCheckBox_Encrypted, gridBagConstraints);
+
+	        jButton_Create.setText(Lang.getInstance().translate("Create"));
+	        jButton_Create.setPreferredSize(new java.awt.Dimension(90, 28));
+	        jButton_Create.setRequestFocusEnabled(false);
+	        jButton_Create.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	 onIssueClick();
+	            }
+	        });
+	        
+	        
+	        
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 6;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
+	        add(jButton_Create, gridBagConstraints);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 16;
+	        gridBagConstraints.gridwidth = 5;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.weighty = 0.3;
+	        add(jLabel_auto_saze, gridBagConstraints);
+	    }// </editor-fold>                        
+
+	    private void jComboBox_Account_CreatorActionPerformed(java.awt.event.ActionEvent evt) {                                                          
+	        // TODO add your handling code here:
+	    }                                                         
+
+	    private void jTextField_TitleActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+	        // TODO add your handling code here:
+	    }                                                
+
+	    private void jButton_CreateActionPerformed(java.awt.event.ActionEvent evt) {                                               
+	        // TODO add your handling code here:
+	    }                                              
+
+	    private void jCheckBox_EncryptedActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+	        // TODO add your handling code here:
+	    }                                                   
+
+
+	    // Variables declaration - do not modify                     
+	    private javax.swing.JButton jButton_Create;
+	    private javax.swing.JCheckBox jCheckBox_Encrypted;
+	//    private javax.swing.JComboBox<String> jComboBox_Account_Creator;
+	    private javax.swing.JComboBox<String> jComboBox_Template;
+	    private javax.swing.JLabel jLabel_Account_Creator;
+	    private javax.swing.JLabel jLabel_Content;
+	    private javax.swing.JLabel jLabel_Fee;
+	    private javax.swing.JLabel jLabel_Issue_Note;
+	    private javax.swing.JLabel jLabel_Template;
+	    private javax.swing.JLabel jLabel_Title;
+	    private javax.swing.JLabel jLabel_auto_saze;
+	    private javax.swing.JScrollPane jScrollPane1;
+	    private javax.swing.JTextArea jTextArea_Content;
+	    private javax.swing.JTextField jTextField_Fee;
+	    private javax.swing.JTextField jTextField_Title;
 }

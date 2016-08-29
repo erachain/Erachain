@@ -245,7 +245,7 @@ public class Split_Panel extends javax.swing.JPanel {
         jScrollPane_jPanel_RightPanel.setWheelScrollingEnabled(false);
         jScrollPane_jPanel_RightPanel.setFocusable(false);
 
-        jLabel2.setText("jLabel");
+        jLabel2.setText(" ");
         jLabel2.setToolTipText("");
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());

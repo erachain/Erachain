@@ -169,7 +169,7 @@ public MainNotesFrame(){
 	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	
 //	my_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-	search_Notes_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	search_Notes_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 
 	
 	}
