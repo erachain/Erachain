@@ -22,7 +22,7 @@ public abstract class NoteCls extends ItemCls {
 	protected static final int SAMPLE = 2;
 	protected static final int PAPER = 3;
 
-	public static final int INITIAL_FAVORITES = 3;
+	public static final int INITIAL_FAVORITES = 0;
 
 	public NoteCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
 	{

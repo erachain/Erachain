@@ -1,6 +1,6 @@
 package gui;
 
-public class Start {
+public class Start_gui {
 
 	 public static void main(String[] args) throws Exception {
         
