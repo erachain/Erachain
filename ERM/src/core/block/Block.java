@@ -872,7 +872,7 @@ public class Block {
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].reference invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].reference invalid");
 			return false;
 		}
 
@@ -884,26 +884,26 @@ public class Block {
 			if(true & (this.timestamp - 500 > NTP.getTime()
 					|| this.timestamp < this.getParent(db).timestamp))
 			{
-				LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp invalid");
+				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp invalid");
 				return false;
 			}
 	
 			//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
 			if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
 			{
-				LOGGER.error("*** Block[" + this.getHeight(db) + "].timestamp % 1000 invalid");
+				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp % 1000 invalid");
 				return false;
 			}
 		}
 		 */
 		if(this.getTimestamp(db) - 3000 > NTP.getTime()) {
-			LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
 			return false;			
 		}
 		
 		/* not need
 		if(this.getTimestamp(db) - this.getParent(db).getTimestamp(db) != GENERATING_MIN_BLOCK_TIME) {
-				LOGGER.error("*** Block[" + this.getHeight(db) + ":" + Base58.encode(this.signature) + "].timestamp PERIOD invalid != GENERATING_MIN_BLOCK_TIME");
+				LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp PERIOD invalid != GENERATING_MIN_BLOCK_TIME");
 				return false;			
 			}
 			*/
@@ -912,7 +912,7 @@ public class Block {
 		//CHECK IF GENERATING BALANCE IS CORRECT
 		if(this.generatingBalance != BlockGenerator.getNextBlockGeneratingBalance(db, this.getParent(db)))
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].generatingBalance invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid");
 			return false;
 		}
 		*/
@@ -920,18 +920,18 @@ public class Block {
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].version invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version invalid");
 			return false;
 		}
 		if(this.version < 1 && (this.atBytes.length > 0)) // || this.atFees != 0))
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].version AT invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version AT invalid");
 			return false;
 		}
 		
 		int generatingBalance = calcGeneratingBalance(db);
 		if (this.generatingBalance != generatingBalance) {
-			LOGGER.error("*** Block[" + this.getHeight(db) + "].generatingBalance invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid");
 			return false;
 		}
 			
@@ -939,7 +939,7 @@ public class Block {
 		Block testBlock = this.getParent(db);
 		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
 			if (testBlock.getCreator().equals(this.creator)) {
-				LOGGER.error("*** Block[" + this.getHeight(db) + "] REPEATED WIN invalid");
+				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
 				return false;
 			}
 		}
@@ -969,7 +969,7 @@ public class Block {
 		//CHECK IF HASH LOWER THEN TARGET (blockchain total hash - "chain length")
 		if(hashValue.compareTo(target) >= 0)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db)
+			LOGGER.error("*** Block[" + this.getHeightByParent(db)
 					+ "].target is invalid!. " + "guesses: " + guesses
 					+ "\nhash >= target:\n" + hashValue.toString() + "\n" + target.toString());
 			return false;
@@ -978,7 +978,7 @@ public class Block {
 		//CHECK IF FIRST BLOCK OF USER	
 		if(hashValue.compareTo(lowerTarget) < 0)
 		{
-			LOGGER.error("*** Block[" + this.getHeight(db)
+			LOGGER.error("*** Block[" + this.getHeightByParent(db)
 				+ "].lowerTarget invalid!. " + "guesses: " + guesses
 				+ "\nhash < lower:\n" + hashValue.toString() + "\n" + lowerTarget.toString());
 			return false;
@@ -1020,7 +1020,7 @@ public class Block {
 				
 				if(!transaction.isSignatureValid()) {
 					// 
-					LOGGER.error("*** Block[" + this.getHeight(fork)
+					LOGGER.error("*** Block[" + this.getHeightByParent(fork)
 					+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 					+ transaction.viewFullTypeName() + "]"
 					+ "invalid code: " + transaction.isValid(fork, null));
@@ -1040,13 +1040,13 @@ public class Block {
 					DeployATTransaction atTx = (DeployATTransaction)transaction;
 					if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 					{
-						LOGGER.error("*** Block[" + this.getHeight(fork) + "].atTx invalid");
+						LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].atTx invalid");
 						return false;
 					}
 				}
 				else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 				{
-					LOGGER.error("*** Block[" + this.getHeight(fork)
+					LOGGER.error("*** Block[" + this.getHeightByParent(fork)
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
 						+ "invalid code: " + transaction.isValid(fork, null));
@@ -1058,19 +1058,26 @@ public class Block {
 				if( transactionTimestamp > timestampEnd
 						|| transaction.getDeadline() <= timestampBeg)
 				{
-					LOGGER.error("*** Block[" + this.getHeight(fork) + "].TX.timestamp invalid");
+					LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].TX.timestamp invalid");
 					return false;
 				}
 	
-				//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-				transaction.process(fork, false);
+				
+				try{
+					//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
+					transaction.process(fork, false);
+					
+				} catch (Exception e) {
+                    LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].TX.process ERROR", e);
+                    return false;                    
+				}
 				
 				transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
 			}
 			
 			transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
 			if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-				LOGGER.error("*** Block[" + this.getHeight(fork) + "].digest(transactionsSignatures) invalid");
+				LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].digest(transactionsSignatures) invalid");
 				return false;
 			}
 		}
@@ -1081,6 +1088,7 @@ public class Block {
 
 	//PROCESS/ORPHAN
 
+	// TODO - make it trownable
 	public void process(DBSet dbSet)
 	{	
 		//PROCESS TRANSACTIONS

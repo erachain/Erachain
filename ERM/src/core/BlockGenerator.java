@@ -456,11 +456,13 @@ public class BlockGenerator extends Thread implements Observer
 								break;
 							}
 						}
-					}catch(Exception e){
-                        LOGGER.error(e.getMessage(),e);
-                        //REMOVE FROM LIST
+					} catch (Exception e) {
                         orderedTransactions.remove(transaction);
                         transactionProcessed = true;
+
+                        LOGGER.error(e.getMessage(), e);
+                        //REMOVE FROM LIST
+
                         break;                    
 					}
 				}

@@ -846,15 +846,14 @@ public abstract class Transaction {
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
 		Block block = this.getParent(db);
 		
-		//if (block == null)return 0;
+		if (block == null)return 0;
 		
 		int transactionBlockHeight = db.getHeightMap().getHeight(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;
 
-		}catch(Exception e)
-		{
+		} catch(Exception e) {
 			LOGGER.error(e.getMessage(),e);
 			return 0;
 		}
