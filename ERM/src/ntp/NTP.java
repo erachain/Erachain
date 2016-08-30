@@ -30,17 +30,20 @@ public final class NTP
 	}
 	*/
 
+	// TODO - if offset is GREAT!
 	public static long getTime()
 	{
 		//CHECK IF OFFSET NEEDS TO BE UPDATED
 		// NOT NEED NOW - random offset is GOOD now 
-		if(false && System.currentTimeMillis() > lastUpdate + TIME_TILL_UPDATE)
+		if(System.currentTimeMillis() > lastUpdate + TIME_TILL_UPDATE)
 		{
 			updateOffSet();
 			lastUpdate = System.currentTimeMillis();
 			
-			//LOG OFFSET
-			LOGGER.info(Lang.getInstance().translate("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
+			if (offset != 0l) {
+				//LOG OFFSET
+				LOGGER.info(Lang.getInstance().translate("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
+			}
 		}
 	   
 		//CALCULATE CORRECTED TIME
@@ -65,9 +68,12 @@ public final class NTP
 			info.computeDetails();
            
 			//UPDATE OFFSET
-			if(info.getOffset() != null)
+			Long offsetResult = info.getOffset();
+			if(offsetResult != null 
+					&& (offsetResult < -30000 || offsetResult > 30000))
 			{
-				offset = info.getOffset();
+				// and add random Nonce for generate BLOCK
+				offset = offsetResult + (int)(Math.random() * 20000) * (int)Math.signum((float)offsetResult);
 			} 
 		} 
 		catch (Exception e) 

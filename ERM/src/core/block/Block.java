@@ -869,6 +869,7 @@ public class Block {
 	public boolean isValid(DBSet db)
 	{
 		
+		int height = this.getHeightByParent(db);
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
@@ -896,8 +897,11 @@ public class Block {
 			}
 		}
 		 */
-		if(this.getTimestamp(db) - 3000 > NTP.getTime()) {
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()");
+		
+		// TODO - show it to USER
+		if(this.getTimestamp(db) - 60000 > NTP.getTime()) {
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
+					+ " this.getTimestamp(db):" + this.getTimestamp(db) + " > NTP.getTime():" + NTP.getTime());
 			return false;			
 		}
 		
@@ -943,6 +947,14 @@ public class Block {
 				return false;
 			}
 		}
+		
+		// TODO
+		/*
+		if (!BlockChain.isGoodWinForTarget(height, winned_value, target)) {
+			return 0l;
+		}
+		*/
+
 
 		/*
 		//CREATE TARGET

@@ -320,8 +320,7 @@ public class BlockGenerator extends Thread implements Observer
 				long max_winned_value = 0;
 				long winned_value;				
 				int height = ctrl.getMyHeight();
-				long min_target = bchain.getTarget() >>2;
-
+				long target = bchain.getTarget();
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
@@ -331,7 +330,7 @@ public class BlockGenerator extends Thread implements Observer
 					for(PrivateKeyAccount account: knownAccounts)
 					{
 						
-						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height + 1, min_target);
+						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height + 1, target);
 						if(winned_value == 0l)
 							continue;
 						

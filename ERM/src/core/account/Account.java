@@ -515,7 +515,7 @@ public class Account {
 	}
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long min_target) {
+	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
 		
@@ -541,8 +541,9 @@ public class Account {
 		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
 		
 		// not use small values
-		if (height > 100 && min_target > winned_value)
+		if (!bchain.isGoodWinForTarget(height, winned_value, target)) {
 			return 0l;
+		}
 
 		return winned_value;
 		
