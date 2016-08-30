@@ -92,6 +92,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		this.setTitle(Lang.getInstance().translate("Persons"));
 		this.jToolBar.setVisible(false);
 	
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Persons"));
 	
 		///////////////////////
 		// ALL PERSONS

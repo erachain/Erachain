@@ -147,7 +147,7 @@ import gui.models.Renderer_Boolean;
 			this.setRowHeightFormat(false);
 			 
 			// EVENTS on CURSOR
-			my_Statements_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
+			this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			
 			my_Statements_table.addMouseListener(new My_Mouse());
 			my_run_menu  = new RunMenu();
@@ -271,17 +271,21 @@ import gui.models.Renderer_Boolean;
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				
-				PersonCls person = null;
-				if (my_Statements_table.getSelectedRow() >= 0 )person = my_PersonsModel.getItem(my_Statements_table.convertRowIndexToModel(my_Statements_table.getSelectedRow()));
+				 
+				Object statement=null;
+				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+					
+					statement = jTable_jScrollPanel_LeftPanel.getValueAt(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()), 1);
+				}
 				//info1.show_001(person);
-				
+				System.out.println(statement);
 				// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
 				//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
 				////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 				
-				Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
-				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				//Person_info_panel_001 info_panel = new Person_info_panel_001(statement, false);
+				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				//jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 			}
 			
 		}
