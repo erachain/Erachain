@@ -764,6 +764,54 @@ public class Block {
 		
 	}
 
+	public int calcWinValueTargeted2(long win_value, long target)
+	{
+		long diff = win_value - target;
+		if (diff < 0)
+			return (int)(1000 * win_value / target);
+
+		diff <<= 3; // x8
+		long delta = diff / target;
+		long diffNew;
+		
+		if (delta < 1) {
+			// diff is same
+			diffNew = diff;
+		} else {
+			diffNew = target >>3;
+		}
+
+		if (delta < 8) {
+			// diff is same
+			diffNew += diff >>3;
+		} else {
+			diffNew += target >>9;
+		}
+		
+		if (delta < 16) {
+			// diff is same
+			diffNew += diff>>5;
+		} else {
+			diffNew += target >>12;
+		}
+
+		if (delta < 32) {
+			// diff is same
+			diffNew += diff>>7;
+		} else {
+			diffNew += target >>15;
+		}
+
+		if (delta < 64) {
+			// diff is same
+			diffNew += diff>>9;
+		} else {
+			diffNew += target >>18;
+		}
+		
+		return (int)(1000 * (target + diffNew) / target);
+
+	}
 	public int calcWinValueTargeted(DBSet dbSet)
 	{
 		

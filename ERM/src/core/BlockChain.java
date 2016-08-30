@@ -335,6 +335,7 @@ public class BlockChain
 		return list;
 	}
 
+	
 	// calc Target by last blocks in chain
 	public long getTarget() 
 	{	
