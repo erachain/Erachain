@@ -69,11 +69,9 @@ public final class NTP
            
 			//UPDATE OFFSET
 			Long offsetResult = info.getOffset();
-			if(offsetResult != null 
-					&& (offsetResult < -30000 || offsetResult > 30000))
+			if(offsetResult != null )
 			{
-				// and add random Nonce for generate BLOCK
-				offset = offsetResult + (int)(Math.random() * 20000) * (int)Math.signum((float)offsetResult);
+				offset = offsetResult;
 			} 
 		} 
 		catch (Exception e) 
