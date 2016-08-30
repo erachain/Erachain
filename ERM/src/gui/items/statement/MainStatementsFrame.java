@@ -1,4 +1,4 @@
-package gui.items.persons;
+package gui.items.statement;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -53,6 +53,8 @@ import gui.RunMenu;
 import gui.Split_Panel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
+import gui.items.persons.Persons_My_SplitPanel;
+import gui.items.persons.Persons_Search_SplitPanel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -61,18 +63,18 @@ import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 
 
-public class MainPersonsFrame extends Main_Internal_Frame{
+public class MainStatementsFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 2717571093561259483L;
 
-	private TableModelPersons tableModelPersons;
+//	private TableModelPersons tableModelPersons;
 	private WalletItemPersonsTableModel personsModel;
-	Split_Panel search_Person_SplitPanel;
+	Split_Panel search_Statements_SplitPanel;
 	JTable personsTable;
 	RowSorter search_Sorter;
 	JTable table_My;
 	TableRowSorter sorter_My;
 	
-	Split_Panel my_Person_SplitPanel;
+	Split_Panel my_Statements_SplitPanel;
 	
 // для всплывающего меню	
 	 private JPopupMenu mouseMenu;
@@ -86,40 +88,39 @@ public class MainPersonsFrame extends Main_Internal_Frame{
      int alpha_int;
 	
 	
-	public MainPersonsFrame(){
+	public MainStatementsFrame(){
 	
 		// not show buttons main Toolbar
-		this.setTitle(Lang.getInstance().translate("Persons"));
+		this.setTitle(Lang.getInstance().translate("Statements"));
 		this.jToolBar.setVisible(false);
 	
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Persons"));
-	
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Statements"));
 		///////////////////////
-		// ALL PERSONS
+		// ALL StatementS
 		///////////////////////
 		
-		search_Person_SplitPanel = new Persons_Search_SplitPanel();
+		search_Statements_SplitPanel = new Statements_Search_SplitPanel();
 		
 	 
 		//////////////////////////////////////	
-		// MY PERSONS
+		// MY StatementS
 		//////////////////////////////////////
-		my_Person_SplitPanel = new Persons_My_SplitPanel();
+		my_Statements_SplitPanel = new Statements_My_SplitPanel();
 	
 		
 // issue Person
-		  JScrollPane Issue_Person_Panel = new JScrollPane();
-		  Issue_Person_Panel.setName(Lang.getInstance().translate("Issue Person"));
-		  Issue_Person_Panel.add(new IssuePersonPanel());
-		  Issue_Person_Panel.setViewportView(new IssuePersonPanel());
+		  JScrollPane Issue_Statement_Panel = new JScrollPane();
+		  Issue_Statement_Panel.setName(Lang.getInstance().translate("Issue Statement"));
+		  Issue_Statement_Panel.add(new Issue_Statement_Panel(null, null));
+		  Issue_Statement_Panel.setViewportView(new Issue_Statement_Panel(null, null));
 	
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 		
-		this.jTabbedPane.add(my_Person_SplitPanel);
+		this.jTabbedPane.add(my_Statements_SplitPanel);
 		
-		this.jTabbedPane.add(search_Person_SplitPanel);
-		this.jTabbedPane.add(Issue_Person_Panel);
+		this.jTabbedPane.add(search_Statements_SplitPanel);
+		this.jTabbedPane.add(Issue_Statement_Panel);
 		
 		this.pack();
 		//	this.setSize(800,600);
@@ -134,8 +135,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 	    this.setVisible(true);
 	    Dimension size = MainFrame.desktopPane.getSize();
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-	    search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-	 	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	    search_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	 	my_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	}
 
 // set favorine My
@@ -244,9 +245,9 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
 			////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 			
-			Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
-			info_panel.setPreferredSize(new Dimension(search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().width-50,search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().height-50));
-			my_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+	//		Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+	//		info_panel.setPreferredSize(new Dimension(search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().width-50,search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().height-50));
+	//		my_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 		}
 		
 	}
@@ -266,7 +267,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 	
 		public void onChange() {
 			// GET VALUE
-			String search = my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
+			String search = my_Statements_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
 			// SET FILTER
 			personsModel.fireTableDataChanged();
 		

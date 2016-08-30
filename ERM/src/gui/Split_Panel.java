@@ -17,6 +17,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.table.TableModel;
 
+import lang.Lang;
+
 /**
  *
  * @author Саша
@@ -144,16 +146,16 @@ public class Split_Panel extends javax.swing.JPanel {
         
         
         searth_My_JCheckBox_LeftPanel = new JCheckBox();
-        searth_My_JCheckBox_LeftPanel.setText("My ");
+        searth_My_JCheckBox_LeftPanel.setText(Lang.getInstance().translate("My")+" ");
         searchToolBar_LeftPanel.add(searth_My_JCheckBox_LeftPanel);
         
         searth_Favorite_JCheckBox_LeftPanel = new JCheckBox();
-        searth_Favorite_JCheckBox_LeftPanel.setText("Favorite ");
+        searth_Favorite_JCheckBox_LeftPanel.setText(Lang.getInstance().translate("Favorite")+" ");
         searchToolBar_LeftPanel.add(searth_Favorite_JCheckBox_LeftPanel);
         
         
         
-        searthLabel_SearchToolBar_LeftPanel.setText("  Search:   ");
+        searthLabel_SearchToolBar_LeftPanel.setText("    "+ Lang.getInstance().translate("Search")+":   ");
         searthLabel_SearchToolBar_LeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabel_SearchToolBar_LeftPanel);
 

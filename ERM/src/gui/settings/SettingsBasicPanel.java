@@ -422,9 +422,10 @@ public class SettingsBasicPanel extends JPanel
 	        				
 	        				String stringFromInternet = "";
 	        				try {
-	        					String url = Lang.translationsUrl +  "available.json";
+	        					 String url = Lang.translationsUrl +  "available.json";
 
 	        					URL u = new URL(url);
+	        						        					
 	        					InputStream in = u.openStream();
 	        					stringFromInternet = IOUtils.toString(in, Charsets.UTF_8);
 	        				} catch (Exception e1) {

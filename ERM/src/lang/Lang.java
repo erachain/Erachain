@@ -18,7 +18,7 @@ import settings.Settings;
 
 public class Lang {
 												
-	public static final String translationsUrl = "https://raw.githubusercontent.com/icreator/ERMbase_public/master/ERM/languages/";
+	public static final String translationsUrl =  "https://raw.githubusercontent.com/icreator/ERMbase_public/master/";//"https://raw.githubusercontent.com/Qoracoin/translations/master/0.26.0";
 	
 	private static final Logger LOGGER = Logger.getLogger(Lang.class);
 	private static Lang instance;

@@ -23,7 +23,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 	
 	private SortableList<Tuple2<String, String>, StatusCls> statuses;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
 	
 	public WalletItemStatusesTableModel()
 	{

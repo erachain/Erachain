@@ -319,7 +319,7 @@ public class Search_Notes_Tab extends Split_Panel {
 	//		new AssetPairSelect(asset.getKey(), "","");
 		}
 	});
-	 nameSalesMenu.add(excahge);
+//	 nameSalesMenu.add(excahge);
 	
 	
 	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
@@ -333,11 +333,11 @@ public class Search_Notes_Tab extends Split_Panel {
 		}
 	});
 	
-	nameSalesMenu.addSeparator();
-	nameSalesMenu.add(buy);
+//	nameSalesMenu.addSeparator();
+//	nameSalesMenu.add(buy);
 	
-	nameSalesMenu.add(sell);
-	nameSalesMenu.addSeparator();
+//	nameSalesMenu.add(sell);
+//	nameSalesMenu.addSeparator();
 	
 	nameSalesMenu.add(favorite);
 

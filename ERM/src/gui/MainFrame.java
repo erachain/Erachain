@@ -26,6 +26,7 @@ import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
 import gui.items.notes.MainNotesFrame;
 import gui.items.persons.MainPersonsFrame;
+import gui.items.statement.MainStatementsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
 import gui.records.RecordsFrame;
@@ -83,7 +84,11 @@ private JFrame parent;
 		    }
 		});
 		Toolbar_Main.add(button1_MainToolBar);
-			
+		
+		
+		
+		
+		
 			
 		JButton button2_MainToolBar = new JButton();
 		button2_MainToolBar.setText(Lang.getInstance().translate("Persons"));
@@ -98,7 +103,35 @@ private JFrame parent;
        	});
        	Toolbar_Main.add(button2_MainToolBar);
 			
-		JButton button3_MainToolBar = new JButton();
+		
+       	JButton button_Statements_MainToolBar = new JButton();
+       	button_Statements_MainToolBar.setText(Lang.getInstance().translate("Statements"));
+		    //    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+       	button_Statements_MainToolBar.setFocusable(false);
+       	button_Statements_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+       	button_Statements_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+       	button_Statements_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+       		public void actionPerformed(java.awt.event.ActionEvent evt) {
+       			gui.Menu.selectOrAdd( new MainStatementsFrame(), MainFrame.desktopPane.getAllFrames());
+       		}
+       	});
+       	
+       	
+       	Toolbar_Main.add(button_Statements_MainToolBar);
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	
+       	JButton button3_MainToolBar = new JButton();
 		button3_MainToolBar.setText(Lang.getInstance().translate("Assets"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
 		button3_MainToolBar.setFocusable(false);

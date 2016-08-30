@@ -353,7 +353,7 @@ public class Menu extends JMenuBar
         		new VouchRecordDialog();
         	}
         });
-        dealsMenu.add(dealsMenuVouchRecord);
+     //   dealsMenu.add(dealsMenuVouchRecord);
         
         JMenuItem dealsMenuSignNote = new JMenuItem(Lang.getInstance().translate("Statement"));
         dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statement record"));
@@ -366,7 +366,7 @@ public class Menu extends JMenuBar
         		selectOrAdd(new Sign_Frame(null, null), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        dealsMenu.add(dealsMenuSignNote);
+    //    dealsMenu.add(dealsMenuSignNote);
 
         // Imprints menu
         JMenuItem imprintsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
@@ -409,7 +409,7 @@ public class Menu extends JMenuBar
         	}
         });
         statusesMenu.add(allStatusesMenu);  
-        statusesMenu.addSeparator();
+ //       statusesMenu.addSeparator();
         
         JMenuItem assignStatusMenu = new JMenuItem(Lang.getInstance().translate("Assign"));
         assignStatusMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Assign Status"));
@@ -423,8 +423,8 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        statusesMenu.add(assignStatusMenu);  
-        statusesMenu.addSeparator();
+    //    statusesMenu.add(assignStatusMenu);  
+    //    statusesMenu.addSeparator();
 
         
         JMenuItem issueStatusesMenu = new JMenuItem(Lang.getInstance().translate("New"));
@@ -446,7 +446,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        statusesMenu.add(issueStatusesMenu);  
+   //     statusesMenu.add(issueStatusesMenu);  
 
         ///// UNIONS
         JMenuItem allUnionsMenu = new JMenuItem(Lang.getInstance().translate("All Unions"));
@@ -463,7 +463,7 @@ public class Menu extends JMenuBar
         	}
         });
         unionsMenu.add(allUnionsMenu);
-        statusesMenu.addSeparator();
+        unionsMenu.addSeparator();
         
         // issue Person menu
         JMenuItem issueUnionMenu = new JMenuItem(Lang.getInstance().translate("Establish"));
@@ -497,7 +497,7 @@ public class Menu extends JMenuBar
         	}
         });
         assetsMenu.add(allAssetsMenu);  
-        statusesMenu.addSeparator();
+        assetsMenu.addSeparator();
 
         // issue asset menu
         JMenuItem issueAssetMenu = new JMenuItem(Lang.getInstance().translate("Issue asset"));
