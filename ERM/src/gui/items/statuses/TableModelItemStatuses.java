@@ -21,7 +21,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 
 	private SortableList<Long, StatusCls> statuses;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Issuer", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	
 	public TableModelItemStatuses()
 	{

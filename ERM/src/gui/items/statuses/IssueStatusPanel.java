@@ -121,7 +121,7 @@ public class IssueStatusPanel extends JPanel
 		JLabel jLabel1 = new JLabel();
 		jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(Lang.getInstance().translate("Issue Status"));
+        jLabel1.setText(Lang.getInstance().translate("Create Status"));
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -180,7 +180,7 @@ public class IssueStatusPanel extends JPanel
       	      	
         //LABEL FEE POW
       	labelGBC.gridy = gridy;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power (0..6)") + ":");
+      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power")+" (0..6)" + ":");
       	this.add(feeLabel, labelGBC);
       		
       	//TXT FEE POW

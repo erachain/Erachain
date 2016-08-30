@@ -283,7 +283,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        gridBagConstraints.gridy = 14;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee Power (0..6)")+":"),
+	        getContentPane().add(new javax.swing.JLabel(Lang.getInstance().translate("Fee Power")+" (0..6)"+":"),
 	        		gridBagConstraints);
 
 	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
@@ -316,7 +316,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
 	        getContentPane().add(jButton_Cansel, gridBagConstraints);
 
-	        jButton_SetStatus.setText(Lang.getInstance().translate("Set status"));
+	        jButton_SetStatus.setText(Lang.getInstance().translate("Set Status"));
 	        jButton_SetStatus.setToolTipText("");
 	        jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {

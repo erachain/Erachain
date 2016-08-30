@@ -124,8 +124,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	
 		favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 		favoriteColumn.setMinWidth(50);
-		favoriteColumn.setMaxWidth(50);
-		favoriteColumn.setPreferredWidth(50);//.setWidth(30);
+		favoriteColumn.setMaxWidth(90);
+		favoriteColumn.setPreferredWidth(90);//.setWidth(30);
 		//	statusesTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
 		//Sorter
 		RowSorter sorter =   new TableRowSorter(this.tableModelItemStatuses);
@@ -425,7 +425,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		
 
 		Search_run_menu = new RunMenu();
-		Dimension dim = new Dimension(180,70);
+		Dimension dim = new Dimension(180,50);
     	Search_run_menu.setSize(dim);
     	Search_run_menu.setPreferredSize(dim);
     	Search_run_menu.setVisible(false);
@@ -446,7 +446,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
     		    	
     	});
     	   	
-    	
+   /* 	
     	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
   //  	aaa.jButton2.setBorderPainted(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
@@ -459,6 +459,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
     		}
     		    	
     	});
+    	
+    	*/
   //  	aaa.jButton3.setBorderPainted(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
     	Search_run_menu.jButton3.addActionListener(new ActionListener(){
@@ -544,8 +546,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 			confirmedColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 			confirmedColumn.setMinWidth(50);
-			confirmedColumn.setMaxWidth(50);
-			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
+			confirmedColumn.setMaxWidth(90);
+			confirmedColumn.setPreferredWidth(90);//.setWidth(30);
 			
 			
 			//CHECKBOX FOR FAVORITE
@@ -553,8 +555,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 			favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 			favoriteColumn.setMinWidth(50);
-			favoriteColumn.setMaxWidth(50);
-			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
+			favoriteColumn.setMaxWidth(90);
+			favoriteColumn.setPreferredWidth(90);//.setWidth(30);
 			
 		//	TableColumn keyColumn = table.getColumnModel().getColumn(WalletItemStatusesTableModel.COLUMN_KEY);
 		//	keyColumn.setCellRenderer(new Renderer_Right());
@@ -646,7 +648,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	// issue status
 			
 		 JPanel issuePanel = new IssueStatusPanel();
-		 issuePanel.setName(Lang.getInstance().translate("Issue Status"));	
+		 issuePanel.setName(Lang.getInstance().translate("Create Status"));	
 			
 	
 		this.jTabbedPane.add(my_Status_SplitPanel);
