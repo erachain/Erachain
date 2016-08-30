@@ -54,7 +54,7 @@ public Block getBlockByHeight(int parseInt) {
 
 	public KK_Map(KK_Map parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 
 	

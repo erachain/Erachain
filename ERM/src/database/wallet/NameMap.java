@@ -45,7 +45,7 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name>
 
 	public NameMap(NameMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

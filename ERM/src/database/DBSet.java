@@ -196,6 +196,10 @@ public class DBSet implements Observer, IDB {
 	
 	protected DBSet(DBSet parent)
 	{
+		
+		
+		//DB database = DBMaker.newMemoryDB().make();
+
 		this.parent = parent;
 		this.addressForging = new AddressForging(parent.addressForging);
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
@@ -214,8 +218,8 @@ public class DBSet implements Observer, IDB {
 		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
 
 		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
-		this.blockMap = new BlockMap(parent.blockMap);
-		this.childMap = new ChildMap(this.blockMap, parent.childMap);
+		this.blockMap = new BlockMap(parent.blockMap, this);
+		this.childMap = new ChildMap(parent.childMap, this);
 		this.heightMap = new HeightMap(parent.heightMap);
 		this.referenceMap = new ReferenceMap(parent.referenceMap);
 		this.peerMap = new PeerMap(parent.peerMap);
@@ -230,7 +234,7 @@ public class DBSet implements Observer, IDB {
 		this.localDataMap = new LocalDataMap(parent.localDataMap);
 		this.blogPostMap = new BlogPostMap(parent.blogPostMap);
 		this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-		this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this.blockMap, parent.transactionRef_BlockRef_Map);
+		this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(parent.transactionRef_BlockRef_Map, this);
 		this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
 		this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
@@ -631,6 +635,7 @@ public class DBSet implements Observer, IDB {
 	{
 		if(this.database != null)
 		{
+			// THIS IS not FORK
 			if(!this.database.isClosed())
 			{
 				this.database.commit();

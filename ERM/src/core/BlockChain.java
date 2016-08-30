@@ -359,10 +359,10 @@ public class BlockChain
 		// not use small values
 		if (height < 100) {}
 		else if (height < 10000) {
-			if ((target<<2) > winned_value)
+			if ((target>>2) > winned_value)
 				return false;
 		} else {
-			if ((target<<1) > winned_value)
+			if ((target>>1) > winned_value)
 				return false;
 		}
 		

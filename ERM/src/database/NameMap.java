@@ -20,7 +20,7 @@ public class NameMap extends DBMap<String, Name>
 
 	public NameMap(NameMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

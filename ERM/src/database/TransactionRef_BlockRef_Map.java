@@ -19,18 +19,18 @@ public class TransactionRef_BlockRef_Map extends DBMap<byte[], byte[]>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
-	private BlockMap blockMap;
+	//private BlockMap blockMap;
 	
 	public TransactionRef_BlockRef_Map(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		this.blockMap = databaseSet.getBlockMap();
+		//this.blockMap = databaseSet.getBlockMap();
 	}
 
-	public TransactionRef_BlockRef_Map(BlockMap blockMap, TransactionRef_BlockRef_Map parent) 
+	public TransactionRef_BlockRef_Map(TransactionRef_BlockRef_Map parent, DBSet dbSet) 
 	{
-		super(parent);
-		this.blockMap = blockMap;
+		super(parent, dbSet);
+		//this.blockMap = blockMap;
 	}
 	
 	protected void createIndexes(DB database){}
@@ -72,7 +72,8 @@ public class TransactionRef_BlockRef_Map extends DBMap<byte[], byte[]>
 			return null;
 		}
 		
-		return this.blockMap.get(bs);
+		DBSet dbSet = (DBSet)this.databaseSet;
+		return dbSet.getBlockMap().get(bs);
 	}
 	
 	public void set(Transaction child, Block parent)

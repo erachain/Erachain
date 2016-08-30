@@ -23,7 +23,7 @@ public class DeployATMap extends DBMap<byte[], Long>
 
 	public DeployATMap(DeployATMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

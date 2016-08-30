@@ -43,7 +43,7 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 
 	public HeightMap(HeightMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 		fullWeight = parent.getFullWeight();
 		//startedInForkHeight
 	}

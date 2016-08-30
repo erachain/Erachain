@@ -24,7 +24,7 @@ public class CancelSellNameMap extends DBMap<byte[], BigDecimal>
 
 	public CancelSellNameMap(CancelSellNameMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

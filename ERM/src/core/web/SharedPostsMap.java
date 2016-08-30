@@ -21,7 +21,7 @@ public class SharedPostsMap extends DBMap<byte[], List<String>> {
 	}
 
 	public SharedPostsMap(DBMap<byte[], List<String>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	@Override

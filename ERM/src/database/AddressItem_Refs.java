@@ -36,7 +36,7 @@ public class AddressItem_Refs extends DBMap<Tuple2<byte[], Long>, byte[]>
 
 	public AddressItem_Refs(AddressItem_Refs parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

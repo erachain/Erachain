@@ -34,7 +34,7 @@ public class NameExchangeMap extends DBMap<String, BigDecimal>
 
 	public NameExchangeMap(NameExchangeMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

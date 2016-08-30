@@ -33,7 +33,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 
 	public AddressPersonMap(AddressPersonMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

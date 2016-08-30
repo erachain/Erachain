@@ -42,9 +42,9 @@ public class KKN_Map extends DBMap<
 
 	}
 
-	public KKN_Map(KKN_Map parent) 
+	public KKN_Map(KKN_Map parent, DBSet dbSet) 
 	{
-		super(parent);
+		super(parent, dbSet);
 	}
 
 	

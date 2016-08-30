@@ -46,7 +46,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 
 	public OrderMap(OrderMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 
 	}
 

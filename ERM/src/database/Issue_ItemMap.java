@@ -27,7 +27,7 @@ public class Issue_ItemMap extends DBMap<byte[], Long>
 
 	public Issue_ItemMap(Issue_ItemMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

@@ -19,7 +19,7 @@ public class OrphanNameStorageMap extends DBMap<byte[], Map<String, String>> {
 	}
 
 	public OrphanNameStorageMap(DBMap<byte[], Map<String, String>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	@Override

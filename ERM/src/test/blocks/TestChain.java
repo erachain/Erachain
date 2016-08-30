@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import controller.Controller;
 import core.BlockChain;
+import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -93,7 +94,7 @@ public class TestChain {
 		init();
 
 		// CREATE BLOCKCHAIN
-		blockChain = new BlockChain(dbSet);
+		blockChain = Controller.getInstance().getBlockChain();
 
 		Block block = Controller.getInstance().getBlockByHeight(dbSet, 2081);
 		byte[] blockSignature = block.getSignature();
@@ -103,6 +104,37 @@ public class TestChain {
 				.getSignatures(blockSignature);
 		
 		assertEquals(30, headers.size());
+
+		
+	}
+
+	
+	@Test
+	public void orphan_db()
+	{
+		
+		init();
+
+		// GET BLOCKCHAIN
+		Controller.getInstance().initBlockChain(dbSet);
+		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
+		blockChain = Controller.getInstance().getBlockChain();
+
+		Block block = blockChain.getLastBlock();
+		int height = block.getHeight(dbSet);
+		Account creator = block.getCreator();
+		int forging = creator.getForgingData(dbSet, height);
+		int lastForging = creator.getLastForgingData(dbSet);
+
+		DBSet fork = dbSet.fork();
+		
+		block.orphan(fork);
+
+		int forging_o = creator.getForgingData(dbSet, height);
+		int lastForging_o = creator.getLastForgingData(dbSet);
+		int height_0 = block.getHeight(dbSet);
+
+		assertEquals(1, forging);
 
 		
 	}

@@ -51,12 +51,12 @@ public abstract class DBMap<T, U> extends Observable {
 	    this.createIndexes(database);
 	}
 	
-	public DBMap(DBMap<T, U> parent)
+	public DBMap(DBMap<T, U> parent, DBSet dbSet)
 	{
 
-		this.databaseSet = parent.databaseSet;
-
 		this.parent = parent;
+		
+		this.databaseSet = dbSet;
 	    
 	    //OPEN MAP
 	    this.map = this.getMemoryMap();
@@ -150,8 +150,10 @@ public abstract class DBMap<T, U> extends Observable {
 			}
 			
 			//COMMIT
-			if(this.databaseSet != null)
+			//if(this.databaseSet != null)
+			if(this.parent == null)
 			{
+				// IT IS NOT FORK
 				if(!(this.databaseSet instanceof WalletDatabase && Controller.getInstance().isProcessingWalletSynchronize()))
 				{
 					this.databaseSet.commit();
@@ -226,8 +228,10 @@ public abstract class DBMap<T, U> extends Observable {
 			}
 			
 			//COMMIT
-			if(this.databaseSet != null)
+			//if(this.databaseSet != null)
+			if(this.parent == null)
 			{
+				// IT IS NOT FORK
 				this.databaseSet.commit();
 			}
 		}

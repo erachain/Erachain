@@ -39,7 +39,7 @@ public class VouchRecordMap extends DBMap<Tuple2<Integer, Integer>, Tuple2<BigDe
 
 	public VouchRecordMap(VouchRecordMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database)

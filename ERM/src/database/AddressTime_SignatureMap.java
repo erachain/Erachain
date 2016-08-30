@@ -22,7 +22,7 @@ public class AddressTime_SignatureMap extends DBMap<Tuple2<String, Long>, byte[]
 
 	public AddressTime_SignatureMap(AddressTime_SignatureMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

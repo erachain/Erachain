@@ -29,7 +29,7 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 
 	public AddressForging(AddressForging parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

@@ -42,7 +42,7 @@ public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, BigDecimal>
 
 	public ItemAssetBalanceMap(ItemAssetBalanceMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

@@ -44,7 +44,7 @@ public class ATTransactionMap extends DBMap< Tuple2<Integer, Integer> ,  AT_Tran
 
 	public ATTransactionMap(ATTransactionMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 
 	}
 	
@@ -264,10 +264,5 @@ public class ATTransactionMap extends DBMap< Tuple2<Integer, Integer> ,  AT_Tran
 		}
 		return null;
 	}
-	
 
-	
-	
-
-	
 }

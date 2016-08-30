@@ -32,7 +32,7 @@ public class ATStateMap extends DBMap< Tuple2<Integer, String> ,  byte[] > {
 	
 	public ATStateMap( ATStateMap parent )
 	{
-		super(parent);
+		super(parent, null);
 	}
 
 	protected void createIndexes(DB database) {}

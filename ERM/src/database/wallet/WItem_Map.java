@@ -56,7 +56,7 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
 
 	public WItem_Map(WItem_Map parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	//@SuppressWarnings({ "unchecked", "rawtypes" })

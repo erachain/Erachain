@@ -45,7 +45,7 @@ public class TransactionMap extends DBMap<byte[], Transaction> implements Observ
 
 	public TransactionMap(TransactionMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

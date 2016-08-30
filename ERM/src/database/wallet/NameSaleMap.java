@@ -46,7 +46,7 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
 
 	public NameSaleMap(NameSaleMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

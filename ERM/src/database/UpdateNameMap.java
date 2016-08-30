@@ -25,7 +25,7 @@ public class UpdateNameMap extends DBMap<byte[], Name>
 
 	public UpdateNameMap(UpdateNameMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

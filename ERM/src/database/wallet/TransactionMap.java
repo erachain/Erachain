@@ -47,7 +47,7 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction>
 
 	public TransactionMap(TransactionMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

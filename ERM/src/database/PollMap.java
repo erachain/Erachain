@@ -26,7 +26,7 @@ public class PollMap extends DBMap<String, Poll>
 
 	public PollMap(PollMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database)

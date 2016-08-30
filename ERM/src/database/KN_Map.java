@@ -43,7 +43,7 @@ public class KN_Map extends DBMap<
 
 	public KN_Map(KN_Map parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 
 	

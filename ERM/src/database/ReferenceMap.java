@@ -22,7 +22,7 @@ public class ReferenceMap extends DBMap<String, Long>
 
 	public ReferenceMap(ReferenceMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

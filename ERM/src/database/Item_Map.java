@@ -43,7 +43,7 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	
 	public Item_Map(Item_Map parent) 
 	{
-		super(parent);
+		super(parent, null);
 		
 		this.key = parent.getKey();
 	}

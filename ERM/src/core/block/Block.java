@@ -1171,6 +1171,11 @@ public class Block {
 
 	public void orphan(DBSet dbSet)
 	{
+
+		int i=0;
+		if (Controller.getInstance().isAddressIsMine(this.getCreator().getAddress())) {
+			i++;
+		}
 		int height = this.getHeight(dbSet);
 		
 		//ORPHAN AT TRANSACTIONS

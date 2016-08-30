@@ -21,7 +21,7 @@ public class CommentPostMap extends DBMap<byte[], byte[]> {
 	}
 
 	public CommentPostMap(DBMap<byte[], byte[]> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	@Override

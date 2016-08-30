@@ -58,7 +58,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 
 	public TransactionFinalMap(TransactionFinalMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database)

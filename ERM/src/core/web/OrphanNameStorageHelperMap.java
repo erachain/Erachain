@@ -20,7 +20,7 @@ public class OrphanNameStorageHelperMap extends DBMap<String, List<byte[]>> {
 	}
 
 	public OrphanNameStorageHelperMap(DBMap<String, List<byte[]>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 

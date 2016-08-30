@@ -926,15 +926,19 @@ public class Controller extends Observable {
 
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
+				/*
 				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
 						+ " form PEER: " + getBlockMessage.getSender().toString()
 						+ " sign: " + Base58.encode(getBlockMessage.getSignature()));
+						*/
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
 						.getBlock(getBlockMessage.getSignature());
 
+				/*
 				LOGGER.error("responce: " + newBlock.toString());
+				*/
 
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(
@@ -968,8 +972,10 @@ public class Controller extends Observable {
 					if (blockChain.setWaitWinBuffer(newBlock)) {
 						// IF IT WIN
 						
+						/*
 						LOGGER.info(Lang.getInstance().translate("received new valid WIN Block")
 								+ " for Height: " + this.getMyHeight());
+								*/
 		
 						// BROADCAST
 						List<Peer> excludes = new ArrayList<Peer>();
@@ -996,18 +1002,7 @@ public class Controller extends Observable {
 				newBlock = blockMessage.getBlock();
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(newBlock);
-				
-				if(isNewBlockValid == 0)	{
-					
-					synchronized (this.peerHWeight) {
-						this.peerHWeight.put(message.getSender(),
-								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValueTargeted(dbSet)));
-
-						
-					}
-				}
-				
+								
 				if(this.isProcessingWalletSynchronize()) {
 					
 					break;
@@ -1017,7 +1012,17 @@ public class Controller extends Observable {
 				if (isNewBlockValid == 0
 						&& this.synchronizer.process(dbSet, newBlock)) {
 					
+						
+					synchronized (this.peerHWeight) {
+						this.peerHWeight.put(message.getSender(),
+								new Tuple2<Integer, Long>(blockMessage.getHeight(),
+										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValueTargeted(dbSet)));
+						
+					}
+
+					/*
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
+					*/
 
 					// BROADCAST
 					List<Peer> excludes = new ArrayList<Peer>();

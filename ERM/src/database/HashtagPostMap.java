@@ -20,7 +20,7 @@ public class HashtagPostMap extends DBMap<String, List<byte[]>> {
 	}
 	
 	public HashtagPostMap(DBMap<String, List<byte[]>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 

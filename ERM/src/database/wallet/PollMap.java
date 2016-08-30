@@ -45,7 +45,7 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll>
 
 	public PollMap(PollMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

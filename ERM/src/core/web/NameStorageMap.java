@@ -22,7 +22,7 @@ public class NameStorageMap extends DBMap<String, Map<String, String>> {
 	}
 
 	public NameStorageMap(DBMap<String, Map<String, String>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	@Override

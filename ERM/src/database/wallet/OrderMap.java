@@ -33,7 +33,7 @@ public class OrderMap extends DBMap<Tuple2<String, BigInteger>, Order>
 
 	public OrderMap(OrderMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 
 	}
 

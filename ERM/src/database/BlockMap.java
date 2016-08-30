@@ -57,10 +57,10 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.processing = this.processingVar.get();
 	}
 
-	public BlockMap(BlockMap parent) 
+	public BlockMap(BlockMap parent, DBSet dbSet) 
 	{
-		super(parent);
-		
+		super(parent, dbSet);
+				
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.processing = parent.isProcessing();
 		

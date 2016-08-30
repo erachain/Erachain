@@ -23,7 +23,7 @@ public class VoteOnPollMap extends DBMap<byte[], Integer>
 
 	public VoteOnPollMap(VoteOnPollMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

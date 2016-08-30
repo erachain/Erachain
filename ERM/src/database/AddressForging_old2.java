@@ -29,7 +29,7 @@ public class AddressForging_old2 extends DBMap<String, Tuple3<Integer, Integer, 
 
 	public AddressForging_old2(AddressForging_old2 parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

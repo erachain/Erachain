@@ -25,7 +25,7 @@ public class CancelOrderMap extends DBMap<byte[], Order>
 
 	public CancelOrderMap(CancelOrderMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

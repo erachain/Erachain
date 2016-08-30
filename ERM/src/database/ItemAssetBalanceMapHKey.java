@@ -36,7 +36,7 @@ public class ItemAssetBalanceMapHKey extends DBMap<Tuple2<String, byte[]>, BigDe
 
 	public ItemAssetBalanceMapHKey(ItemAssetBalanceMapHKey parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

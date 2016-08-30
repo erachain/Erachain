@@ -21,7 +21,7 @@ public class BlogPostMap extends DBMap<String, List<byte[]>> {
 	}
 
 	public BlogPostMap(DBMap<String, List<byte[]>> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	@Override
@@ -81,7 +81,5 @@ public class BlogPostMap extends DBMap<String, List<byte[]>> {
 		}
 
 	}
-	
-	
 
 }

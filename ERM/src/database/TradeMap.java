@@ -45,7 +45,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 
 	public TradeMap(TradeMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 
 	}
 

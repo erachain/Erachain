@@ -50,7 +50,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 
 	public BlockMap(BlockMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

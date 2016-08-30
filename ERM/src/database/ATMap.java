@@ -48,7 +48,7 @@ public class ATMap extends DBMap<String, AT>
 
 	public ATMap(ATMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 		this.parentATMap = parent;
 
 	}

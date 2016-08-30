@@ -17,7 +17,7 @@ public class LocalDataMap extends DBMap<String, String> {
 	}
 
 	public LocalDataMap(DBMap<String,String> parent) {
-		super(parent);
+		super(parent, null);
 	}
 
 	

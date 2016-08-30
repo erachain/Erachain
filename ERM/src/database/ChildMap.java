@@ -16,18 +16,18 @@ public class ChildMap extends DBMap<byte[], byte[]>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
-	private BlockMap blockMap;
+	//private BlockMap blockMap;
 	
 	public ChildMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		this.blockMap = databaseSet.getBlockMap();
+		//this.blockMap = databaseSet.getBlockMap();
 	}
 
-	public ChildMap(BlockMap blockMap, ChildMap parent) 
+	// dbSet - current DBSet for access to others Maps
+	public ChildMap(ChildMap parent, DBSet dbSet) 
 	{
-		super(parent);
-		this.blockMap = blockMap;
+		super(parent, dbSet);
 	}
 	
 	protected void createIndexes(DB database){}
@@ -64,7 +64,8 @@ public class ChildMap extends DBMap<byte[], byte[]>
 	{
 		if(this.contains(parent.getSignature()))
 		{
-			return this.blockMap.get(this.get(parent.getSignature()));
+			DBSet dbSet = (DBSet)(this.databaseSet); 
+			return dbSet.getBlockMap().get(this.get(parent.getSignature()));
 		}
 		
 		return null;

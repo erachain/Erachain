@@ -41,7 +41,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 
 	public PeerMap(PeerMap parent) 
 	{
-		super(parent);
+		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}
