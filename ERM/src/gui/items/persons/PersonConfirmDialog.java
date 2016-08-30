@@ -308,7 +308,7 @@ public class PersonConfirmDialog extends JDialog  {
 	    this.add(new JButton("Button #9"), c);
     
 	    */
-	    setPreferredSize(new Dimension(500, 600));
+//	    setPreferredSize(new Dimension(500, 600));
 		//PACK
 		this.pack();
         this.setResizable(false);
@@ -497,9 +497,9 @@ public class PersonConfirmDialog extends JDialog  {
 	        jLabel_Title = new javax.swing.JLabel();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	        setMinimumSize(new java.awt.Dimension(650, 23));
+	        setMinimumSize(new java.awt.Dimension(800, 600));
 	        setModal(true);
-	        setPreferredSize(new java.awt.Dimension(700, 600));
+	        setPreferredSize(new java.awt.Dimension(800, 600));
 	        addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
 	            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
 	                formAncestorMoved(evt);
@@ -674,6 +674,7 @@ public class PersonConfirmDialog extends JDialog  {
 
 
 	        jLabel_addDays.setText(Lang.getInstance().translate("Add Days") +":");
+	
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 14;
@@ -762,19 +763,24 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
 	        getContentPane().add(jButton_Confirm, gridBagConstraints);
 
-	        jLabel_addDays_Check.setText("'.' =2 year, '+' =MAX days, '-' =unconfirm");
+	        jLabel_addDays_Check.setText("<html>'.' =2 "+ Lang.getInstance().translate("year")+",<br> '+' ="+ Lang.getInstance().translate("MAX days")+",<br> '-' ="+Lang.getInstance().translate("Unconfirmed")+"</HTML>");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
 	        getContentPane().add(jLabel_addDays_Check, gridBagConstraints);
+
 
 	        jLabel_Fee_Check.setText("0..6");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 16;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-	        getContentPane().add(jLabel_Fee_Check, gridBagConstraints);
+	   //     getContentPane().add(jLabel_Fee_Check, gridBagConstraints);
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;

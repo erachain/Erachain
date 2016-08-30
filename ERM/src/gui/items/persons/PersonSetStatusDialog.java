@@ -99,14 +99,14 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jLabel_Addition2.setText(Lang.getInstance().translate("Additional")+"2:");
 		    jLabel_Address.setText(Lang.getInstance().translate("Your Address")+":");
 		    jLabel_Data_From.setText(Lang.getInstance().translate("From Date")+":");
-		    jLabel_Data_To.setText(Lang.getInstance().translate("To Date")+":");
+		    jLabel_Data_To.setText(" "+Lang.getInstance().translate("To Date")+":");
 		    jLabel_Param1.setText(Lang.getInstance().translate("Parameter")+" 1:");
 		    jLabel_Param2.setText(Lang.getInstance().translate("Parameter")+" 2:");
-		    jLabel_Parent_record.setText(Lang.getInstance().translate("Parent Record")+":");
+		    jLabel_Parent_record.setText(Lang.getInstance().translate("Parent Records")+":");
 		    jLabel_Status.setText(Lang.getInstance().translate("Status")+":");
 		    jLabel_Title.setText(Lang.getInstance().translate("Information about the person")+":");
 		    jLabel__Description.setText(Lang.getInstance().translate("Description")+":");;
-		    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power (0..6)")+":");
+		    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power")+ " (0..6):");
 		    jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));    
 		    jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,7 +114,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	            }
 	        });
 		
-		    jButton_SetStatus.setText(Lang.getInstance().translate("Set status"));
+		    jButton_SetStatus.setText(Lang.getInstance().translate("Set Status"));
 		    jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	
@@ -211,7 +211,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jParentRecTxt.getText());
 		if (record == null) {
-			infoPanel.show_mess(Lang.getInstance().translate("Error - use 1233-321."));
+			infoPanel.show_mess(Lang.getInstance().translate("Error")+" - use 1233-321.");
 	        jLabel_RecordInfo.setViewportView(infoPanel);
 			return record;
 		}
