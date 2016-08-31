@@ -32,7 +32,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_ADDRESS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
-	
+	long key_person_table;
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","To Date"}); //, "Data"});
@@ -41,7 +41,8 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public PersonAccountsModel(long person_Key)
 	{
 		Controller.getInstance().addWalletListener(this);
-		addresses = DBSet.getInstance().getPersonAddressMap().getItems(person_Key);
+		key_person_table = person_Key;
+		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 	}
 
 	
@@ -159,8 +160,9 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		}
 		*/
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
+		if( message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 		{
+			addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 			this.fireTableDataChanged();
 		}	
 	}

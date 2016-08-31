@@ -148,7 +148,7 @@ public class RecordsPanel extends  JPanel // JPanel
 		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		
 		// show	
-	//	record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);
+		record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);
 		record_stpit.jTable_jScrollPanel_LeftPanel = transactionsTable;
 		record_stpit.jScrollPanel_LeftPanel.setViewportView(record_stpit.jTable_jScrollPanel_LeftPanel);
 		

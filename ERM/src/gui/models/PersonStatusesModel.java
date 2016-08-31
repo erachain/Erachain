@@ -44,12 +44,14 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	String to_date_str;
 	Long dte;
 	ItemStatusMap statusesMap;
+	long status_this;
 	
 	public PersonStatusesModel(long person_Key)
 	{
+		status_this = person_Key;
 		Controller.getInstance().addWalletListener(this);
 	//	addresses = DBSet.getInstance().getPersonAddressMap().getItems(person_Key);
-		statuses= DBSet.getInstance().getPersonStatusMap().get(person_Key);
+		statuses= DBSet.getInstance().getPersonStatusMap().get(status_this);
 		statusesMap = DBSet.getInstance().getItemStatusMap();
 	}
 
@@ -181,9 +183,11 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE
 				|| message.getType() == ObserverMessage.REMOVE_STATUS_TYPE
 				|| message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
-				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
+				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE
+				|| message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
-			this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
+			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
+			statuses= DBSet.getInstance().getPersonStatusMap().get(status_this);
 			this.fireTableDataChanged();
 		}	
 	}
