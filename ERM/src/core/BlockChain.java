@@ -206,6 +206,11 @@ public class BlockChain
 
 		return dbSet.getBlockMap().get(header);
 	}
+	public Block getBlock(int height) {
+
+		byte[] signature = dbSet.getHeightMap().getBlockSignatureByHeight(height);
+		return dbSet.getBlockMap().get(signature);
+	}
 
 	public int isNewBlockValid(Block block) {
 		

@@ -33,7 +33,9 @@ import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
 import database.AddressPersonMap;
+import database.DBMap;
 import database.DBSet;
+import database.HeightMap;
 import ntp.NTP;
 import database.ItemAssetMap;
 import database.KKPersonStatusMap;
@@ -138,4 +140,42 @@ public class TestChain {
 
 		
 	}
+
+	
+	@Test
+	public void find_wrong_win_walue_db()
+	{
+		
+		init();
+
+		// GET BLOCKCHAIN
+		Controller.getInstance().initBlockChain(dbSet);
+		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
+		blockChain = Controller.getInstance().getBlockChain();
+		HeightMap dbHeight = dbSet.getHeightMap();
+
+		Block block;
+		long totalWin = 0l;
+		int i = 1;
+		while (i <= blockChain.getHeight()) {
+			block = blockChain.getBlock(i);
+			int win_value = block.calcWinValueTargeted(dbSet);
+			int www = dbHeight.getWeight(block);
+			if (www != win_value) {
+				//assertEquals(www, win_value);
+				int diff = www - win_value;
+				i = i + 1 - 1;
+			}
+			totalWin += win_value;
+			i++;
+		}
+		
+		long realWeight = blockChain.getFullWeight();
+		int diff = (int)(realWeight - totalWin);
+		assertEquals(0, diff);
+		
+		assertEquals(realWeight, totalWin);
+		
+	}
+
 }
