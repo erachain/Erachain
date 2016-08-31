@@ -351,11 +351,18 @@ public class BlockChain
 		if (lastBlocks == null || lastBlocks.isEmpty())
 			return 0l;
 		
+		long win_value;
+		int size = 0;
 		for (Block block: lastBlocks)
-		{			
-			target += block.calcWinValue(dbSet);
+		{
+			win_value = block.calcWinValue(dbSet);
+			if (size < 20 || win_value < target<<5) {
+				// NOT USE BIG values
+				target += block.calcWinValue(dbSet);
+				size++;
+			}
 		}
-		target /= lastBlocks.size();
+		target /= size;
 		
 		return target;
 	}
