@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
 import gui.items.notes.MainNotesFrame;
@@ -81,14 +82,13 @@ private JFrame parent;
 		button1_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 		button1_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
+			//	gui.Menu.selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames()); // old panel
+				gui.Menu.selectOrAdd( new Main_Accounts_Frame(), MainFrame.desktopPane.getAllFrames());
 		    }
 		});
 		Toolbar_Main.add(button1_MainToolBar);
 		
-		
-		
-		
+			
 		
 			
 		JButton button2_MainToolBar = new JButton();

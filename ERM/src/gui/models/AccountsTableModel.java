@@ -29,7 +29,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private List<PublicKeyAccount> publicKeyAccounts;
-	private AssetCls asset = null;
+	private AssetCls asset;
 	
 	public AccountsTableModel()
 	{
@@ -37,6 +37,14 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		Controller.getInstance().addWalletListener(this);
 		Controller.getInstance().addObserver(this);
 	}
+	
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	   }
+	   
+	
+	
 	
 	public Account getAccount(int row)
 	{

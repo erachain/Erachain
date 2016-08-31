@@ -1,7 +1,9 @@
-package gui;
+package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsTableModel;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -45,10 +47,11 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-
+import gui.Gui;
+import gui.Menu;
 import gui.Send_Frame;
 @SuppressWarnings("serial")
-public class AccountsPanel extends JPanel implements ItemListener
+public class Accounts_Panel extends JPanel implements ItemListener
 
 
 //JInternalFrame
@@ -59,7 +62,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 	private AccountsTableModel tableModel;
 
 	@SuppressWarnings("unchecked")
-	public AccountsPanel()
+	public Accounts_Panel()
 	{
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
@@ -107,7 +110,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 		//TABLE
 		tableModel = new AccountsTableModel();
 		// start data in model
-				tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
+		tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
 		final JTable table = Gui.createSortableTable(tableModel, 1);
 		
 		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
@@ -115,13 +118,17 @@ public class AccountsPanel extends JPanel implements ItemListener
 		sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
 		sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 		
+		// render
+		table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+		
 		//ON FAVORITES CHANGE
 		cbxFavorites.addItemListener(this);
 		
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
 		
-		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
 		sendAsset.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -299,12 +306,15 @@ public class AccountsPanel extends JPanel implements ItemListener
 	
 	public static AssetCls getAsset()
 	{
+		AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+		if (asset==null) return (AssetCls) cbxFavorites.getItemAt(0);
 		return (AssetCls) cbxFavorites.getSelectedItem();
 	}
 	
 	@Override
 	public void itemStateChanged(ItemEvent e) 
 	{
+		
 		if(e.getStateChange() == ItemEvent.SELECTED) 
 		{		
 			AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();

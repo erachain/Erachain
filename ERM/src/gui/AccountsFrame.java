@@ -67,7 +67,7 @@ public class AccountsFrame extends JInternalFrame{
 				
 		getContentPane().add(tb2, BorderLayout.NORTH);
 		
-	    AccountsPanel accountsPanel = new AccountsPanel(parent);
+	    AccountsPanel accountsPanel = new AccountsPanel();
         getContentPane().add(accountsPanel, BorderLayout.CENTER);
 		accountsPanel.setSelectionFavoriteItem();  
 
