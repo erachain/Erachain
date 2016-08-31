@@ -17,6 +17,7 @@ import lang.Lang;
 public class Main_Accounts_Frame extends Main_Internal_Frame {
 	
 	My_Accounts_SplitPanel my_Accounts_SplitPanel;
+	Search_Accounts_SplitPanel search_Accounts;
 	
 	public Main_Accounts_Frame(){
 		
@@ -41,9 +42,13 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
 		
 		//this.jToolBar.setFloatable(true);
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Accounts"));
-	
+	// MY Accounts
 		my_Accounts_SplitPanel = new My_Accounts_SplitPanel();
 		this.jTabbedPane.add(my_Accounts_SplitPanel);
+		
+	// Search Accounts
+		search_Accounts = new Search_Accounts_SplitPanel();
+		this.jTabbedPane.add(search_Accounts);
 	
 	
 	
@@ -62,7 +67,7 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
     Dimension size = MainFrame.desktopPane.getSize();
     this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
     my_Accounts_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
- //	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+    search_Accounts.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	
 	
 	}

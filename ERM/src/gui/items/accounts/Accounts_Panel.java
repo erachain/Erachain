@@ -1,6 +1,7 @@
 package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
+import gui.items.persons.PersonSetStatusDialog;
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -139,7 +140,9 @@ public class Accounts_Panel extends JPanel implements ItemListener
 				AssetCls asset = getAsset();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				Menu.selectOrAdd( new Send_Frame(asset, account), null);
+				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
+				
+				Account_Send_Dialog fm = new Account_Send_Dialog(asset, account); 
 
 				/*
 				JInternalFrame frame = new JInternalFrame();
