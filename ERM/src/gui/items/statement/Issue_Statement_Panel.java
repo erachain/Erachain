@@ -204,15 +204,15 @@ public class Issue_Statement_Panel extends JPanel
       	
       	this.add(messageLabel, labelMessageGBC);
       	
-      	/*
 		//LABEL ISTEXT
 		GridBagConstraints labelIsTextGBC = new GridBagConstraints();
-		labelIsTextGBC.gridy = gridy++;
 		labelIsTextGBC.insets = new Insets(5,5,5,5);
 		labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelIsTextGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelIsTextGBC.weightx = 0;	
-		labelIsTextGBC.gridx = 0;     
+		labelIsTextGBC.gridx = 4;
+		labelIsTextGBC.gridx = 0;
+		labelIsTextGBC.gridy = gridy;
 
 		final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
       	isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -226,12 +226,12 @@ public class Issue_Statement_Panel extends JPanel
 		isChkTextGBC.anchor = GridBagConstraints.NORTHWEST;
 		isChkTextGBC.weightx = 0;	
 		isChkTextGBC.gridx = 1;
-		isChkTextGBC.gridy = gridy;
+		isChkTextGBC.gridy = gridy++;
         
 		isText = new JCheckBox();
         isText.setSelected(true);
         this.add(isText, isChkTextGBC);
-*/
+
         //LABEL ENCRYPTED
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
 		labelEncGBC.insets = new Insets(5,5,5,5);
@@ -476,6 +476,8 @@ public class Issue_Statement_Panel extends JPanel
 			boolean encryptMessage = encrypted.isSelected();			
 			byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
 			
+			//READ NOTE
+			parsing = 5;
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			NoteCls note = (NoteCls) this.cbxFavorites.getSelectedItem();
 			long key = note.getKey(); 
@@ -515,6 +517,11 @@ public class Issue_Statement_Panel extends JPanel
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
+			case Transaction.ITEM_NOTE_NOT_EXIST:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;	
+
 			default:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -535,6 +542,11 @@ public class Issue_Statement_Panel extends JPanel
 			case 2:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+
+			case 5:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 			}
 		}

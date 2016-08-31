@@ -1,5 +1,5 @@
 package gui.items.statement;
-// 30/03
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -40,7 +40,6 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
-import core.transaction.R_Send;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
@@ -59,6 +58,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 	
 	private static final Logger LOGGER = Logger
 			.getLogger(Statements_Table_Model.class);
+	
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
@@ -89,7 +89,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 		List<Transaction> transactions = new ArrayList<Transaction>();
 
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);//.SEND_ASSET_TRANSACTION)
+			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
 			{
 				transactions.add(transaction);
 			}
@@ -377,7 +377,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
 				for (MessageBuf messageBuf : messageBufs) {
-					if(Arrays.equals(((R_Send) message.getValue()).getSignature(), messageBuf.getSignature()))
+					if(Arrays.equals(((R_SignNote) message.getValue()).getSignature(), messageBuf.getSignature()))
 					{
 						is = true;
 						break;

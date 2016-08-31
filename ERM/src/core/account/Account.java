@@ -534,10 +534,13 @@ public class Account {
 			}
 		}
 
+		/*
 		// if new block in DB - get next height
 		if (this.getForgingData(dbSet, height) != -1) {
 			height++;
 		}
+		*/
+		
 		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
 		
 		// not use small values

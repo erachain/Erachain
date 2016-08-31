@@ -327,13 +327,12 @@ public abstract class TransactionAmount extends Transaction {
 					&& this.recipient.getLastForgingData(db) == -1) {
 				// update last forging block if it not exist
 				// if exist - it not need - incomes will be negate from forging balance
-				Block block = this.getParent(db);
-				if (block != null) {
-					// get height by PARENT block
-					int blockHeight = block.getParentHeight(db) + 1;
-					//this.recipient.setForgingData(db, -1, blockHeight);
-					this.recipient.setLastForgingData(db, blockHeight);
-				}
+
+				// it is stil unconfirmed!!!  Block block = this.getParent(db);
+
+				// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
+				int blockHeight = Controller.getInstance().getBlockChain().getHeight() + 2;
+				this.recipient.setLastForgingData(db, blockHeight);
 			}
 		}
 	}
@@ -362,14 +361,13 @@ public abstract class TransactionAmount extends Transaction {
 			}
 
 			if (this.key == Transaction.RIGHTS_KEY) {
-				Block block = this.getParent(db);
-				if (block != null) {
-					int blockHeight = block.getParentHeight(db) + 1;
-					if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
-						// if it is first payment ERMO - reset last forging BLOCK
-						//this.recipient.delForgingData(db, blockHeight);
-						this.recipient.setLastForgingData(db, -1);
-					}
+				
+				// Parent BLOCK is still in MAP!
+				int blockHeight = Controller.getInstance().getBlockChain().getHeight();
+				if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
+					// if it is first payment ERMO - reset last forging BLOCK
+					//this.recipient.delForgingData(db, blockHeight);
+					this.recipient.setLastForgingData(db, -1);
 				}
 			}
 

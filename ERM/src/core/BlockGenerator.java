@@ -319,7 +319,7 @@ public class BlockGenerator extends Thread implements Observer
 				byte[] unconfirmedTransactionsHash = null;
 				long max_winned_value = 0;
 				long winned_value;				
-				int height = ctrl.getMyHeight();
+				int height = bchain.getHeight() + 1;
 				long target = bchain.getTarget();
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
@@ -330,7 +330,7 @@ public class BlockGenerator extends Thread implements Observer
 					for(PrivateKeyAccount account: knownAccounts)
 					{
 						
-						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height + 1, target);
+						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height, target);
 						if(winned_value == 0l)
 							continue;
 						

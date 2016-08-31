@@ -178,23 +178,6 @@ public class Block {
 		this.generatingBalance = generatingBalance;
 	}
 	
-	public static int getPreviousForgingHeightForIncomes(DBSet dbSet, Account creator, int height) {
-		
-		// IF BLOCK in the MAP
-		int previousForgingHeight = creator.getForgingData(dbSet, height);
-		if (previousForgingHeight == -1) {
-			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dbSet);			
-			if (previousForgingHeight == -1) {
-				// if it is first payment to this account
-				return height;
-			}
-		}
-		
-		return previousForgingHeight;
-
-	}
-
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
@@ -203,11 +186,10 @@ public class Block {
 		int incomed_amount = 0;
 		int amount;
 		
-		int previousForgingHeight = getPreviousForgingHeightForIncomes(dbSet, creator, height);
-		if (previousForgingHeight < 2)
-			// NOT use GENESIS BLOCK
-			previousForgingHeight = 2;
-		
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
+		if (previousForgingHeight == -1)
+			return 0;
+				
 		if (previousForgingHeight <= height) {
 			
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
@@ -662,6 +644,25 @@ public class Block {
 		return Crypto.getInstance().digest(data);
 	}
 
+	/*
+	public static int getPreviousForgingHeightForIncomes(DBSet dbSet, Account creator, int height) {
+		
+		// IF BLOCK in the MAP
+		int previousForgingHeight = creator.getForgingData(dbSet, height);
+		if (previousForgingHeight == -1) {
+			// IF BLOCK not inserted in MAP
+			previousForgingHeight = creator.getLastForgingData(dbSet);
+			if (previousForgingHeight == -1) {
+				// if it is first payment to this account
+				return height;
+			}
+		}
+		
+		return previousForgingHeight;
+
+	}
+	*/
+
 	public static int getPreviousForgingHeightForCalcWin(DBSet dbSet, Account creator, int height) {
 		
 		// IF BLOCK in the MAP
@@ -670,10 +671,10 @@ public class Block {
 			// IF BLOCK not inserted in MAP
 			previousForgingHeight = creator.getLastForgingData(dbSet);			
 		}
-
-		if ( previousForgingHeight < 2)
-			// NOT use genesis transactions
-			previousForgingHeight = 2;
+		
+		if (previousForgingHeight > height) {
+			return height;
+		}
 		
 		return previousForgingHeight;
 
@@ -709,6 +710,8 @@ public class Block {
 		//int height = this.getParentHeight(dbSet) + 1;
 
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, account, height);
+		if (previousForgingHeight == -1)
+			return 0l;
 		
 		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight, generatingBalance);
 
@@ -734,7 +737,7 @@ public class Block {
 			return 1000;
 		}
 
-		int height = this.getParentHeight(dbSet) + 1;
+		int height = this.getHeightByParent(dbSet);
 		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
