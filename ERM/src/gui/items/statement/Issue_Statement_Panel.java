@@ -146,7 +146,7 @@ public class Issue_Statement_Panel extends JPanel
 		labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelDetailsGBC.weightx = 0;	
 		labelDetailsGBC.gridx = 0;
-      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Note Body") + ":");
+      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Statement Body") + ":");
       	this.add(recDetailsLabel, labelDetailsGBC);
         
       	//RECEIVER DETAILS 
@@ -270,7 +270,7 @@ public class Issue_Statement_Panel extends JPanel
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
 		labelFromGBC.gridy = gridy;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From") + ":");
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
 		
