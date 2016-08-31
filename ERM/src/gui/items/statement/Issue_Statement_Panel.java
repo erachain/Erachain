@@ -91,8 +91,38 @@ public class Issue_Statement_Panel extends JPanel
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		int gridy = 0;
-		//NOTE FAVORITES
+		
 		GridBagConstraints favoritesGBC = new GridBagConstraints();
+		favoritesGBC.insets = new Insets(5, 5, 5, 5);
+		favoritesGBC.fill = GridBagConstraints.BOTH;  
+		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
+		favoritesGBC.weightx = 1;
+		favoritesGBC.gridwidth = 5;
+		favoritesGBC.gridx = 0;	
+		favoritesGBC.gridy = gridy++;	
+		JLabel label_Title = new JLabel(Lang.getInstance().translate("Issue Statement"));
+		label_Title.setHorizontalAlignment(SwingConstants.CENTER);
+      	this.add(label_Title, favoritesGBC);
+		
+		
+		
+		
+	//	GridBagConstraints favoritesGBC = new GridBagConstraints();
+		favoritesGBC.insets = new Insets(5, 5, 5, 5);
+		favoritesGBC.fill = GridBagConstraints.BOTH;  
+		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
+		//favoritesGBC.weightx = 1;
+		//favoritesGBC.gridwidth = 5;
+		favoritesGBC.gridx = 0;	
+		favoritesGBC.gridy = gridy++;	
+		JLabel label_Templates = new JLabel(Lang.getInstance().translate("Select Template") + ":");
+      	this.add(label_Templates, favoritesGBC);
+		
+		
+		
+		
+		//NOTE FAVORITES
+	//	GridBagConstraints favoritesGBC = new GridBagConstraints();
 		favoritesGBC.insets = new Insets(5, 5, 5, 5);
 		favoritesGBC.fill = GridBagConstraints.BOTH;  
 		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
@@ -187,7 +217,7 @@ public class Issue_Statement_Panel extends JPanel
 		final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
       	isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
       	this.add(isTextLabel, labelIsTextGBC);
-     	*/
+     	
       	
         //TEXT ISTEXT
 		GridBagConstraints isChkTextGBC = new GridBagConstraints();
@@ -201,7 +231,7 @@ public class Issue_Statement_Panel extends JPanel
 		isText = new JCheckBox();
         isText.setSelected(true);
         this.add(isText, isChkTextGBC);
-
+*/
         //LABEL ENCRYPTED
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
 		labelEncGBC.insets = new Insets(5,5,5,5);
@@ -209,11 +239,11 @@ public class Issue_Statement_Panel extends JPanel
 		labelEncGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelEncGBC.weightx = 0;	
 		labelEncGBC.gridx = 4;
-		labelEncGBC.gridx = 2;
-		labelEncGBC.gridy = 5;
+		labelEncGBC.gridx = 0;
+		labelEncGBC.gridy = gridy;
 		
 		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
-		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		//encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.add(encLabel, labelEncGBC);
 		
         //ENCRYPTED CHECKBOX
@@ -222,8 +252,8 @@ public class Issue_Statement_Panel extends JPanel
 		ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;   
 		ChkEncGBC.anchor = GridBagConstraints.NORTHWEST;
 		ChkEncGBC.weightx = 0;	
-		ChkEncGBC.gridx = 3;
-		ChkEncGBC.gridy = 5;
+		ChkEncGBC.gridx = 1;
+		ChkEncGBC.gridy = gridy++;
 		
 		encrypted = new JCheckBox();
 		encrypted.setSelected(true);
@@ -239,7 +269,7 @@ public class Issue_Statement_Panel extends JPanel
 		labelFromGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
-		labelFromGBC.gridy = gridy++;
+		labelFromGBC.gridy = gridy;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
@@ -252,7 +282,7 @@ public class Issue_Statement_Panel extends JPanel
 		cbxFromGBC.anchor = GridBagConstraints.NORTHWEST;
 		cbxFromGBC.weightx = 0;	
 		cbxFromGBC.gridx = 1;
-		cbxFromGBC.gridy = gridy;
+		cbxFromGBC.gridy = gridy++;
 		
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
@@ -262,7 +292,7 @@ public class Issue_Statement_Panel extends JPanel
     	//LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();
 		feelabelGBC.anchor = GridBagConstraints.NORTHWEST;
-		feelabelGBC.gridy = gridy++;
+		feelabelGBC.gridy = gridy;
 		feelabelGBC.insets = new Insets(5,5,5,5);
 		feelabelGBC.fill = GridBagConstraints.HORIZONTAL;
 		feelabelGBC.weightx = 0;	
@@ -277,8 +307,8 @@ public class Issue_Statement_Panel extends JPanel
 		feetxtGBC.fill = GridBagConstraints.BOTH;
 		feetxtGBC.insets = new Insets(5, 5, 5, 5);
 		feetxtGBC.anchor = GridBagConstraints.NORTH;
-		feetxtGBC.gridx = 3;	
-		feetxtGBC.gridy = gridy;
+		feetxtGBC.gridx = 1;	
+		feetxtGBC.gridy = gridy++;
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
@@ -288,11 +318,11 @@ public class Issue_Statement_Panel extends JPanel
 
         //BUTTON SEND
         GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,5,5,5);
+		buttonGBC.insets = new Insets(15,5,5,5);
 		buttonGBC.fill = GridBagConstraints.HORIZONTAL;  
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
 		buttonGBC.gridx = 0;
-		buttonGBC.gridy = 11;
+		buttonGBC.gridy = gridy;
         
 		sendButton = new JButton(Lang.getInstance().translate("Sign and Send"));
         sendButton.setPreferredSize(new Dimension(160, 25));
@@ -307,14 +337,15 @@ public class Issue_Statement_Panel extends JPanel
 
         //BUTTON PACK
         GridBagConstraints buttonPBC = new GridBagConstraints();
-        buttonPBC.insets = new Insets(5,5,5,5);
+        buttonPBC.insets = new Insets(15,5,5,5);
         buttonPBC.fill = GridBagConstraints.HORIZONTAL;  
         buttonPBC.anchor = GridBagConstraints.NORTHEAST;
-        buttonPBC.gridx = 4;
-        buttonPBC.gridy = 11;
+        buttonPBC.gridx = 2;
+        buttonPBC.gridy = gridy;
 
 		packButton = new JButton(Lang.getInstance().translate("Sign and Pack"));
 		packButton.setPreferredSize(new Dimension(160, 25));
+		packButton.setSize(new Dimension(160, 25));
 		packButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

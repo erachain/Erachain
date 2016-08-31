@@ -51,7 +51,7 @@ public class Table_Formats {
 			    {
 			        int rowHeight = table .getRowHeight();
 			        int roww =0;
-			        int rowww =0;
+			        int rowww =1;
 			        int n = 0;
 			     //   JLabel label = new JLabel("Test label");
 			     //   Graphics g = label.getGraphics();
