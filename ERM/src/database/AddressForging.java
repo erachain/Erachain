@@ -66,7 +66,9 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 	}	
 	public void set(String address, int height, int previosHeight) 
 	{
-		this.set(new Tuple2<String, Integer>(address, height), previosHeight);
+		// TODO some error here 
+		if (height > previosHeight)
+			this.set(new Tuple2<String, Integer>(address, height), previosHeight);
 	}	
 	public void delete(String address, int height) 
 	{

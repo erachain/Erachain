@@ -156,6 +156,8 @@ public class TestChain {
 		blockChain = Controller.getInstance().getBlockChain();
 		HeightMap dbHeight = dbSet.getHeightMap();
 
+		int lastH = 0;
+		
 		Block block;
 		long totalWin = 0l;
 		int i = 1;
@@ -167,6 +169,13 @@ public class TestChain {
 				//assertEquals(www, win_value);
 				int diff = www - win_value;
 				i = i + 1 - 1;
+				win_value = block.calcWinValueTargeted(dbSet);
+				lastH = block.getCreator().getForgingData(dbSet, i);
+				int h_i = lastH - 1;
+				do {
+					lastH = block.getCreator().getForgingData(dbSet, h_i--);
+				} while (lastH == -1);
+				lastH = block.getCreator().getForgingData(dbSet, i+1);
 			}
 			totalWin += win_value;
 			i++;
