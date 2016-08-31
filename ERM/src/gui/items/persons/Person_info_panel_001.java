@@ -418,6 +418,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         		to_Date_Column1.setPreferredWidth(120);//.setWidth(30);
         
        // jTable1.setPreferredSize(new java.awt.Dimension(100, 64));
+        
         jScrollPane1.setViewportView(jTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

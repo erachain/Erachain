@@ -183,6 +183,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 				|| message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
 				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
 		{
+			this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			this.fireTableDataChanged();
 		}	
 	}
