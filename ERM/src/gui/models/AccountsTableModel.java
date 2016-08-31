@@ -30,6 +30,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;
+	private Account account;
 	
 	public AccountsTableModel()
 	{
@@ -76,7 +77,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	@Override
 	public int getRowCount() 
 	{
-		 return this.publicKeyAccounts.size();
+		
+		return this.publicKeyAccounts.size();
 	}
 
 	@Override
@@ -87,7 +89,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
-		Account account = this.publicKeyAccounts.get(row);
+		 account = this.publicKeyAccounts.get(row);
 		
 		switch(column)
 		{
@@ -156,9 +158,14 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			
 			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 			{
+	// обновляем данные
+				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				this.fireTableDataChanged();
 			}
 		}
+	
+		
+	
 	}
 
 	public BigDecimal getTotalBalance() 
