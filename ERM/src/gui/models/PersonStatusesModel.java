@@ -176,8 +176,12 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			this.fireTableDataChanged();
 		}
 		
+		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE)
+		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE
+				|| message.getType() == ObserverMessage.REMOVE_STATUS_TYPE
+				|| message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
+				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	

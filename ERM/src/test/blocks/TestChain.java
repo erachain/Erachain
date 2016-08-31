@@ -141,7 +141,9 @@ public class TestChain {
 		
 	}
 
-	
+	//
+	// TEST WIN_VALUE and TOTAL WEIGHT for CHAIN id DB
+	//
 	@Test
 	public void find_wrong_win_walue_db()
 	{

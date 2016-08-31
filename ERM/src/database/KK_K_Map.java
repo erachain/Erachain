@@ -56,7 +56,7 @@ public class KK_K_Map extends DBMap<
 	{
 		//OPEN MAP
 		BTreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map =  database.createTreeMap(name)
-				.keySerializer(BTreeKeySerializer.BASIC)
+				.keySerializer(BTreeKeySerializer.TUPLE2)
 				.counterEnable()
 				.makeOrGet();
 				

@@ -23,6 +23,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -490,7 +491,7 @@ public abstract class Transaction {
 	// reference in Map - or as signatire or as BlockHeight + seqNo
 	public byte[] getDBRef(DBSet db)
 	{
-		if(this.getConfirmations(db) < 500)
+		if(this.getConfirmations(db) < BlockChain.MAX_SIGNATURES)
 		{
 			// soft or hard confirmations
 			return this.signature;

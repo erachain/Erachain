@@ -16,7 +16,7 @@ import database.serializer.ItemSerializer;
 
 public class AddressStatement_Refs extends AddressItem_Refs 
 {
-	static final String NAME = "address_statement";
+	static final String NAME = "statement";
 	
 	public AddressStatement_Refs(DBSet databaseSet, DB database)
 	{

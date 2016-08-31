@@ -45,9 +45,10 @@ public class AddressItem_Refs extends DBMap<Tuple2<byte[], Long>, byte[]>
 	protected Map<Tuple2<byte[], Long>, byte[]> getMap(DB database) 
 	{
 		//OPEN MAP
-		return database.createTreeMap(this.name + "_refs")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
+		return database.createTreeMap("address_" + this.name + "_refs")
+				.keySerializer(BTreeKeySerializer.TUPLE2)
+				//.comparator(UnsignedBytes.lexicographicalComparator())
+				.counterEnable()
 				.makeOrGet();
 	}
 
