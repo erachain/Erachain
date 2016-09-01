@@ -51,6 +51,7 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	
 	public long getKey()
 	{
+		
 		return this.key;
 	}
 

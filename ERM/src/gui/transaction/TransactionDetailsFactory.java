@@ -305,7 +305,7 @@ public class TransactionDetailsFactory
 			
 			GenesisTransferAssetTransaction genesisTransferAssetTransaction = (GenesisTransferAssetTransaction) transaction;
 			
-			GenesisTransferAssetDetailsFrame genesisTransferAssetDetailsFrame =    new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);
+			GenesisTransferAssetDetailsFrame genesisTransferAssetDetailsFrame = new GenesisTransferAssetDetailsFrame(genesisTransferAssetTransaction);
 			gridBagConstraints.gridy = genesisTransferAssetDetailsFrame.labelGBC.gridy+1; 
 			genesisTransferAssetDetailsFrame. add(jLabel9, gridBagConstraints);
 			

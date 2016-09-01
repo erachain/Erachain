@@ -114,7 +114,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			Transaction transaction = data.getB();
 			//creator = transaction.getCreator();
 			String itemName = "";
-			if (transaction instanceof TransactionAmount && transaction.getKey() >=0)
+			if (transaction instanceof TransactionAmount && transaction.getAbsKey() >0)
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
@@ -124,7 +124,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
 				//recipient = transGen.getRecipient();				
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getKey());
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
 				itemName = item.toString();
 				creator_address = transGen.getRecipient().getAddress();
 			} else if ( transaction instanceof Issue_ItemRecord)

@@ -55,7 +55,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame
 		//ASSET
 		++detailGBC.gridy;
 		JTextField asset = new JTextField(String.valueOf(Controller.getInstance()
-				.getAsset(assetTransfer.getKey()).toString()));
+				.getAsset(assetTransfer.getAbsKey()).toString()));
 		asset.setEditable(false);
 		MenuPopupUtil.installContextMenu(asset);
 		this.add(asset, detailGBC);	
