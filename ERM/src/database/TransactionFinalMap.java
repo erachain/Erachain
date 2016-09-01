@@ -29,6 +29,7 @@ import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
 import utils.BlExpUnit;
+import utils.ObserverMessage;
 
 // block.id + tx.ID in this block -> transaction
 // ++ sender_txs
@@ -51,9 +52,9 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 	{
 		super(databaseSet, database);
 		
-		/*this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);*/
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);
 	}
 
 	public TransactionFinalMap(TransactionFinalMap parent) 

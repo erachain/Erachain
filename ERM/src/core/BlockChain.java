@@ -342,6 +342,7 @@ public class BlockChain
 
 	
 	// calc Target by last blocks in chain
+	// ignore BIG win_values
 	public long getTarget() 
 	{	
 		
@@ -356,15 +357,14 @@ public class BlockChain
 		for (Block block: lastBlocks)
 		{
 			win_value = block.calcWinValue(dbSet);
-			if (size < 20 || win_value < target<<5) {
+			if (size > 20 && win_value > target<<2) {
 				// NOT USE BIG values
-				target += block.calcWinValue(dbSet);
-				size++;
+				win_value = target<<2;
 			}
+			target += win_value;
+			size++;
 		}
-		target /= size;
-		
-		return target;
+		return target /= size;
 	}
 
 	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 

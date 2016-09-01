@@ -435,6 +435,7 @@ public class R_SignNote extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
+	/*
 	public void process(DBSet db, boolean asPack) {
 
 		//UPDATE SENDER
@@ -453,6 +454,7 @@ public class R_SignNote extends Transaction {
 		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
 
 	}
+	*/
 
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
