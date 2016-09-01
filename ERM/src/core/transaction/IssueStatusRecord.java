@@ -73,7 +73,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
-		BigDecimal balERM = this.creator.getConfirmedBalance(RIGHTS_KEY, db);
+		BigDecimal balERM = this.creator.getBalanceUSR(RIGHTS_KEY, db);
 		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
 		{
 			return Transaction.NOT_ENOUGH_RIGHTS;

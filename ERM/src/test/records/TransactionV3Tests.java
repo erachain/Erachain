@@ -67,8 +67,8 @@ public class TransactionV3Tests {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setConfirmedBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
-		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
+		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 	}
 
@@ -95,9 +95,9 @@ public class TransactionV3Tests {
 		
 		messageTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getConfirmedBalance(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getConfirmedBalance(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
 		int dd = messageTransactionV3.getDataLength(false);
@@ -150,7 +150,7 @@ public class TransactionV3Tests {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
+		maker.setBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
@@ -177,11 +177,11 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getConfirmedBalance(61l, db));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getConfirmedBalance(61l, db));
-		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getConfirmedBalance(61l, db));
-		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getConfirmedBalance(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSR(61l, db));
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 		
@@ -228,7 +228,7 @@ public class TransactionV3Tests {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.setConfirmedBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
+		maker.setBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 				
@@ -252,8 +252,8 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getConfirmedBalance(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSR(61l, db));
 
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);

@@ -188,7 +188,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				long key = cbxFavorites.getItemAt(cbxFavorites.getSelectedIndex()).getKey();
-				StringSelection value = new StringSelection(account.getConfirmedBalance(key).toPlainString());
+				StringSelection value = new StringSelection(account.getBalanceUSE(key).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -206,7 +206,7 @@ public class AccountsPanel extends JPanel implements ItemListener
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getConfirmedBalance(Transaction.FEE_KEY).toPlainString());
+				StringSelection value = new StringSelection(account.getBalanceUSE(Transaction.FEE_KEY).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});

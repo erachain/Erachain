@@ -2,6 +2,8 @@ package webserver.wrapper;
 
 import java.math.BigDecimal;
 
+import org.mapdb.Fun.Tuple3;
+
 import core.account.Account;
 import core.transaction.Transaction;
 
@@ -13,17 +15,17 @@ import core.transaction.Transaction;
 public class WebAccount {
 	
 	private final String address;
-	private final BigDecimal balance;
+	private final Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
 	private String stringRepresentation;
 
 	public WebAccount(Account account) {
 		
 		address = account.getAddress();
-		balance = account.getBalance(0, Transaction.FEE_KEY);
+		balance = account.getConfBalance3(0, Transaction.FEE_KEY);
 		stringRepresentation = account.toString();
 	}
 
-	public BigDecimal getUnconfirmedBalance() {
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance() {
 		return balance;
 	}
 

@@ -169,7 +169,7 @@ public class AT extends AT_Machine_State {
 	public JSONObject toJSON()
 	{
 		JSONObject atJSON = new JSONObject();
-		atJSON.put("accountBalance", new Account(Base58.encode(getId())).getConfirmedBalance(Transaction.FEE_KEY).toPlainString() );
+		atJSON.put("accountBalance", new Account(Base58.encode(getId())).getBalanceUSE(Transaction.FEE_KEY).toPlainString() );
 		atJSON.put("name", this.name);
 		atJSON.put("description", description);
 		atJSON.put("type", type);

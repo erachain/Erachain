@@ -82,6 +82,12 @@ public abstract class TransactionAmount extends Transaction {
 	{
 		return this.key;
 	}
+	public long getAbsKey()
+	{
+		if (this.key < 0)
+			return -this.key;
+		return this.key;
+	}
 	public long getAssetKey()
 	{
 		return this.key;
@@ -276,7 +282,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (this.key != FEE_KEY || this.amount == null) {
 			// CHECK FEE
-			if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+			if(this.creator.getBalanceUSR(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
@@ -286,12 +292,12 @@ public abstract class TransactionAmount extends Transaction {
 					&& asset.getCreator().getAddress().equals(this.creator.getAddress());
 
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-			if(!unLimited && this.amount != null && this.creator.getConfirmedBalance(this.key, db).compareTo(this.amount) == -1)
+			if(!unLimited && this.amount != null && this.creator.getBalanceUSR(this.key, db).compareTo(this.amount) == -1)
 			{
 				return NO_BALANCE;
 			}
 		} else {
-			if(this.creator.getConfirmedBalance(FEE_KEY, db)
+			if(this.creator.getBalanceUSR(FEE_KEY, db)
 					.compareTo( this.amount.add(this.fee) ) == -1)
 			{
 				return NO_BALANCE;
@@ -307,9 +313,9 @@ public abstract class TransactionAmount extends Transaction {
 						
 		if (this.amount != null) {
 			//UPDATE SENDER
-			this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).subtract(this.amount), db);
+			this.creator.setBalance(this.key, this.creator.getBalanceUSR(this.key, db).subtract(this.amount), db);
 			//UPDATE RECIPIENT
-			this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
+			this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).add(this.amount), db);
 			
 			if (!asPack) {
 	
@@ -343,10 +349,10 @@ public abstract class TransactionAmount extends Transaction {
 		
 		if (this.amount != null) {
 			//UPDATE SENDER
-			this.creator.setConfirmedBalance(this.key, this.creator.getConfirmedBalance(this.key, db).add(this.amount), db);
+			this.creator.setBalance(this.key, this.creator.getBalanceUSR(this.key, db).add(this.amount), db);
 			
 			//UPDATE RECIPIENT
-			this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
+			this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).subtract(this.amount), db);
 			
 			if (!asPack) {
 				

@@ -21,6 +21,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.account.Account;
@@ -371,7 +372,7 @@ public class AddressesResource {
 		}
 
 		return DBSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
-				.toPlainString();
+				.toString();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -386,13 +387,13 @@ public class AddressesResource {
 
 		}
 
-		SortableList<Tuple2<String, Long>, BigDecimal> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject assetsBalancesJSON = new JSONObject();
 		
-		for (Pair<Tuple2<String, Long>, BigDecimal> assetsBalance : assetsBalances) 	
+		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
 		{
-			assetsBalancesJSON.put(assetsBalance.getA().b, assetsBalance.getB().toPlainString());
+			assetsBalancesJSON.put(assetsBalance.getA().b, assetsBalance.getB().toString());
 		}
 		
 		return assetsBalancesJSON.toJSONString();
@@ -411,7 +412,7 @@ public class AddressesResource {
 					Transaction.INVALID_ADDRESS);
 		}
 
-		return new Account(address).getBalance(confirmations, Transaction.FEE_KEY).toPlainString();
+		return new Account(address).getConfBalance3(confirmations, Transaction.FEE_KEY).toString();
 	}
 
 	@SuppressWarnings("unchecked")

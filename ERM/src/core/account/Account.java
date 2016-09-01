@@ -76,10 +76,14 @@ public class Account {
 	
 	//BALANCE
 	
-	// GET
+	// GET in_OWN or in_RENT if key <0
 	public BigDecimal getUnconfirmedBalance(long key)
 	{
 		return Controller.getInstance().getUnconfirmedBalance(this, key);
+	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(long key)
+	{
+		return Controller.getInstance().getUnconfirmedBalance3(this, key);
 	}
 	/*
 	public BigDecimal getConfirmedBalance()
@@ -91,15 +95,49 @@ public class Account {
 		return db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY);
 	}
 	*/
-	public BigDecimal getConfirmedBalance(long key)
+	public BigDecimal getBalanceUSE(long key)
 	{
-		return this.getConfirmedBalance(key, DBSet.getInstance());
+		return this.getBalanceUSR(key, DBSet.getInstance());
+	}	
+	public BigDecimal getBalanceUSR(long key, DBSet db)
+	{
+		if (key < 0)
+			key = -key;
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		return balance.a.add(balance.b);
 	}
 	
-	public BigDecimal getConfirmedBalance(long key, DBSet db)
+	public BigDecimal getBalance(long key)
+	{
+		return this.getBalance(key, DBSet.getInstance());
+	}	
+	public BigDecimal getBalance(long key, DBSet db)
+	{
+		int type = 1; // OWN
+		if (key < 0) {
+			type = 2; // RENT
+			key = -key;
+		}
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		
+		if (type == 1)
+			return balance.a;
+		else if (type == 2)
+			return balance.b;
+		else
+			return balance.c;
+	}
+	
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance3(long key)
+	{
+		return this.getBalance3(key, DBSet.getInstance());
+	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance3(long key, DBSet db)
 	{
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
+
+	
 	/*
 	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int end_date, DBSet db)
 	{
@@ -120,17 +158,27 @@ public class Account {
 	}
 	*/
 	//
-	public void setConfirmedBalance(long key, BigDecimal amount)
+	public void setBalance(long key, BigDecimal balance)
 	{
-		this.setConfirmedBalance(key, amount, DBSet.getInstance());
+		this.setBalance(key, balance, DBSet.getInstance());
 	}
 
-	public void setConfirmedBalance(long key, BigDecimal amount, DBSet db)
+	// TODO in_OWN in_RENT on_HOLD
+	public void setBalance(long key, BigDecimal balance, DBSet db)
 	{
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = db.getAssetBalanceMap().get(getAddress(), key); 
 		//UPDATE BALANCE IN DB
-		db.getAssetBalanceMap().set(getAddress(), key, amount);
+		if (key > 0) {
+			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance, value.b, value.c);
+		} else {
+			// SET RENT balance
+			key = -key;
+			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, balance, value.c);
+		}
+		db.getAssetBalanceMap().set(getAddress(), key, value);
 	}
 
+	
 	// STATUS
 	/*
 	public void setConfirmedPersonStatus(long personKey, long statusKey, Integer days)
@@ -146,36 +194,30 @@ public class Account {
 	*/
 
 	
-	public BigDecimal getBalance(int confirmations, long key)
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getConfBalance3(int confirmations, long key)
 	{
-		return this.getBalance(confirmations, key, DBSet.getInstance());
+		return this.getConfBalance3(confirmations, key, DBSet.getInstance());
 	}
-	/*
-	public BigDecimal getBalance(int confirmations)
-	{
-		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
-	}
-	public BigDecimal getBalance(int confirmations, DBSet db)
-	{
-		return this.getBalance(confirmations, FEE_KEY, DBSet.getInstance());
-	}
-	*/
-	public BigDecimal getBalance(int confirmations, long key, DBSet db)
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getConfBalance3(int confirmations, long key, DBSet db)
 	{
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance(key);
+			return this.getUnconfirmedBalance3(key);
 		}
 		
 		//IF 1 CONFIRMATION
 		if(confirmations == 1)
 		{
-			return this.getConfirmedBalance(key, db);
+			return this.getBalance3(key, db);
 		}
 		
 		//GO TO PARENT BLOCK 10
-		BigDecimal balance = this.getConfirmedBalance(key, db);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.getBalance3(key, db);
+		BigDecimal own = balance.a;
+		BigDecimal rent = balance.b;
+		BigDecimal hold = balance.c;
+		
 		Block block = db.getBlockMap().getLastBlock();
 		
 		for(int i=1; i<confirmations && block != null && block instanceof Block; i++)
@@ -184,15 +226,22 @@ public class Account {
 			{
 				if(transaction.isInvolved(this))
 				{
-					balance = balance.subtract(transaction.getAmount(this));
+					if (transaction.getType() == Transaction.HOLD_ASSET_TRANSACTION) {
+						
+					} else if (transaction.getKey() > 0) {
+						own = own.subtract(transaction.getAmount(this));
+					} else {
+						rent = own.subtract(transaction.getAmount(this));						
+					}
+					
 				}
 			}
 				
 			block = block.getParent(db);
 		}
-		
+
 		//RETURN
-		return balance;
+		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold) ;
 	}
 	
 	/*
@@ -334,7 +383,7 @@ public class Account {
 			else if (personRes.a == 0) personStr = "[++]" + personStr;
 			else if (personRes.a == 1) personStr = "[+]" + personStr;
 		}
-		return " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
+		return " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 				+ " " + addressStr + " " + personStr;
 	}
 	
@@ -355,8 +404,8 @@ public class Account {
 			else if (personRes.a == 0) personStr = "[++]" + personStr;
 			else if (personRes.a == 1) personStr = "[+]" + personStr;
 		}
-		return NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getConfirmedBalance(FEE_KEY)) + "}"
+		return NumberAsString.getInstance().numberAsString(this.getBalanceUSE(key))
+				+ " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 				+ " " + addressStr + " " + personStr;
 	}
 	

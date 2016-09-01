@@ -7,6 +7,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.account.Account;
@@ -56,10 +57,13 @@ public class ItemsFavorites_not implements Observer{
 		List<Long> favoritesUpadate = new ArrayList<Long>();
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
+			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balancesList = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
 			
-			for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
-				if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {
+			for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance : balancesList) {
+				if(balance.getB().a.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().b.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().c.compareTo(BigDecimal.ZERO) != 0
+						) {
 					if(!favoritesUpadate.contains(balance.getA().b)){
 						favoritesUpadate.add(balance.getA().b);
 					}

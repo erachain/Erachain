@@ -104,7 +104,7 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 		
 		case COLUMN_AT_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(new Account(Base58.encode(at.getId())).getConfirmedBalance(Transaction.FEE_KEY));
+			return NumberAsString.getInstance().numberAsString(new Account(Base58.encode(at.getId())).getBalanceUSE(Transaction.FEE_KEY));
 		
 		case COLUMN_AT_SECRET:
 			

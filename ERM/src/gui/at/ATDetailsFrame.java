@@ -131,7 +131,7 @@ public class ATDetailsFrame extends JFrame {
 
 		//QUANTITY
 		detailGBC.gridy = 5;
-		JTextField txtQuantity = new JTextField(new Account(Base58.encode(at.getId())).getConfirmedBalance(Transaction.FEE_KEY).toPlainString());
+		JTextField txtQuantity = new JTextField(new Account(Base58.encode(at.getId())).getBalanceUSE(Transaction.FEE_KEY).toPlainString());
 		txtQuantity.setEditable(false);
 		this.add(txtQuantity, detailGBC);		
 

@@ -292,7 +292,7 @@ public class TransactionsResource {
 			}
 			
 			//CHECK FOR TYPE
-			int type = -1;
+			int type = 0;
 			try
 			{
 				 type = ((Long) jsonObject.get("type")).intValue();

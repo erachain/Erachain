@@ -51,7 +51,7 @@ public class Issue_ItemMap extends DBMap<byte[], Long>
 	@Override
 	protected Long getDefaultValue() 
 	{
-		return -1l;
+		return 0l;
 	}
 	
 	@Override

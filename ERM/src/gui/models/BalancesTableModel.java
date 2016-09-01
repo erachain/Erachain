@@ -7,6 +7,7 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -24,7 +25,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 	
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance"});
-	private SortableList<Tuple2<String, Long>, BigDecimal> balances;
+	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	
 	public BalancesTableModel(long key)
 	{
@@ -69,7 +70,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
-		Pair<Tuple2<String, Long>, BigDecimal> aRow = this.balances.get(row);
+		Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> aRow = this.balances.get(row);
 		Account account = new Account(aRow.getA().a);
 		
 		switch(column)
@@ -80,7 +81,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 			
 		case COLUMN_BALANCE:
 			
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.key));
+			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
 		}
 		
 		return null;

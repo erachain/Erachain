@@ -249,7 +249,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			}
 
 			// CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-			if (this.creator.getConfirmedBalance(payment.getAsset(), fork)
+			if (this.creator.getBalanceUSR(payment.getAsset(), fork)
 					.compareTo(payment.getAmount()) == -1) {
 				return NO_BALANCE;
 			}

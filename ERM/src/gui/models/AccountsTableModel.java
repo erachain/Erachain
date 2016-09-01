@@ -7,6 +7,8 @@ import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.mapdb.Fun.Tuple3;
+
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import controller.Controller;
@@ -89,7 +91,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
-		 account = this.publicKeyAccounts.get(row);
+		account = this.publicKeyAccounts.get(row);
+		
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
+		String str;
 		
 		switch(column)
 		{
@@ -97,14 +103,20 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return account.asPerson();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance())));			
+			balance = account.getBalance3(this.asset.getKey(DBSet.getInstance()));
+			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
+			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()))
-					.subtract(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance()))));
+			balance = account.getBalance3(this.asset.getKey(DBSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance3(this.asset.getKey(DBSet.getInstance()));
+			str = NumberAsString.getInstance().numberAsString(balance.a.subtract(unconfBalance.a))
+					+ "/" + balance.b.subtract(unconfBalance.b).toPlainString()
+					+ "/" + balance.c.subtract(unconfBalance.c).toPlainString();
+			return str;
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getConfirmedBalance(Transaction.FEE_KEY));
+			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
 			
 			
 		/*	
@@ -176,11 +188,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		{
 			if(this.asset == null)
 			{
-				totalBalance = totalBalance.add(account.getConfirmedBalance(Transaction.FEE_KEY));
+				totalBalance = totalBalance.add(account.getBalanceUSE(Transaction.FEE_KEY));
 			}
 			else
 			{
-				totalBalance = totalBalance.add(account.getConfirmedBalance(this.asset.getKey(DBSet.getInstance())));
+				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DBSet.getInstance())));
 			}
 		}
 		

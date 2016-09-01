@@ -391,7 +391,7 @@ public class NameStorageResource {
 								Transaction.CREATOR_NOT_OWNER);
 					}
 					
-					if (account.getBalance(1, Transaction.FEE_KEY, DBSet.getInstance()).compareTo(
+					if (account.getBalance(Transaction.FEE_KEY, DBSet.getInstance()).compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.NO_BALANCE);

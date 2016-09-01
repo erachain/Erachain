@@ -39,7 +39,7 @@ private static ControllerWebResource instance = new ControllerWebResource();
 		for (Name name : myNames) {
 			if(Boolean.valueOf(removeZeroBalance))
 			{
-				if (name.getOwner().getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) > 0) {
+				if (name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) > 0) {
 					results.add(new WebName(name));
 				}
 				
@@ -63,7 +63,7 @@ private static ControllerWebResource instance = new ControllerWebResource();
 			for (Account account : realAccs) {
 				if(Boolean.valueOf(removeZeroBalance))
 				{
-					if (account.getBalance(0, Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) > 0) {
+					if (account.getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) > 0) {
 						results.add(new WebAccount(account));
 					}
 				}else

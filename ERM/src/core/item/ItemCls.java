@@ -60,7 +60,7 @@ public abstract class ItemCls {
 	protected Account creator;
 	protected String name;
 	protected String description;
-	protected long key = -1;
+	protected long key = 0;
 	protected byte[] reference = null; // this is signature of issued record
 	protected byte[] icon;
 	protected byte[] image;
@@ -177,7 +177,7 @@ public abstract class ItemCls {
 		return this.key;
 	}
 	public void resetKey() {
-		this.key = -1;
+		this.key = 0;
 	}
 	
 	public static ItemCls getItem(DBSet db, int type, long key) {
@@ -372,17 +372,7 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		//int mapSize = dbMap.size();
-		//LOGGER.info("GENESIS MAP SIZE: " + assetMap.size());
-		long key = 0L;
-		//if (mapSize == 0) { // it is ERROR when FORK a DB - new FORK.size() = 0
-		if (false && dbMap.getKey() == -1) {
-			// initial map set
-			//key = 0L;
-			//dbMap.set(this);
-		} else {
-			key = dbMap.add(this);
-		}
+		long key = dbMap.add(this);
 		
 		//SET ORPHAN DATA
 		this.getDBIssueMap(db).set(this.reference, key);

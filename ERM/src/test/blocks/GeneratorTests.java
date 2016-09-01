@@ -94,7 +94,7 @@ public class GeneratorTests {
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
-		assertEquals(1000000, generator1.getConfirmedBalance(ERM_KEY, dbSet).longValue());
+		assertEquals(1000000, generator1.getBalanceUSR(ERM_KEY, dbSet).longValue());
 		
 		//GENERATE 2000 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -358,7 +358,7 @@ public class GeneratorTests {
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
-		assertEquals(1000000, generator1.getConfirmedBalance(ERM_KEY, dbSet).longValue());
+		assertEquals(1000000, generator1.getBalanceUSR(ERM_KEY, dbSet).longValue());
 		
 		TreeMap<Integer, Tuple2<Integer, Long>> buffer = new TreeMap();
 
@@ -580,8 +580,8 @@ public class GeneratorTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
+		generator.setBalance(FEE_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
 
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator(false);
@@ -641,8 +641,8 @@ public class GeneratorTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(100000).setScale(8), dbSet);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
+		generator.setBalance(FEE_KEY, BigDecimal.valueOf(100000).setScale(8), dbSet);
 
 				
 		//GENERATE NEXT BLOCK

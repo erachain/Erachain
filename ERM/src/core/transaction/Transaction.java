@@ -166,13 +166,20 @@ public abstract class Transaction {
 	public static final int ISSUE_STATUS_TRANSACTION = 25;
 	public static final int ISSUE_UNION_TRANSACTION = 26;
 	public static final int ISSUE_STATEMENT_TRANSACTION = 27;
-	// USE ITEMS
+
+	// SEND ASSET
 	public static final int SEND_ASSET_TRANSACTION = 31;
-	public static final int SIGN_NOTE_TRANSACTION = 32;
-	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 33;
-	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 34;
-	public static final int SET_UNION_TO_ITEM_TRANSACTION = 35;
-	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 36;
+	// RENT ASSET
+	public static final int RENT_ASSET_TRANSACTION = 32;
+	// HOLD ASSET
+	public static final int HOLD_ASSET_TRANSACTION = 33;
+	
+	// OTHER
+	public static final int SIGN_NOTE_TRANSACTION = 35;
+	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 36;
+	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
+	public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
+	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
 	// confirms other transactions
 	public static final int VOUCH_TRANSACTION = 40;
 	// exchange of assets
@@ -375,7 +382,7 @@ public abstract class Transaction {
 	}
 	*/
 	public long getKey() {
-		return -1;
+		return 0l;
 	}
 
 	public BigDecimal getAmount() {
@@ -414,7 +421,7 @@ public abstract class Transaction {
 
 	public long getAssetKey()
 	{
-		return -1l;
+		return 0l;
 	}
 	
 	public byte[] getSignature()
@@ -739,7 +746,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getConfirmedBalance(FEE_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getBalanceUSR(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -758,7 +765,7 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db)
+				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSR(FEE_KEY, db)
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
@@ -774,7 +781,7 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setConfirmedBalance(FEE_KEY, this.creator.getConfirmedBalance(FEE_KEY, db).add(this.fee), db);
+				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSR(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
 				if (this.isReferenced() )

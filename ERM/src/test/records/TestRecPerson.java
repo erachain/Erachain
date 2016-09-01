@@ -131,8 +131,8 @@ public class TestRecPerson {
 		genesis_certify.process(db, false);
 		
 		certifier.setLastReference(last_ref, db);
-		certifier.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
-		certifier.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		certifier.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
+		certifier.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -209,7 +209,7 @@ public class TestRecPerson {
 		issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastReference(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		userAccount1.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
 
 	}
@@ -353,8 +353,8 @@ public class TestRecPerson {
 		LOGGER.info("person KEY: " + person.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).subtract(issuePersonTransaction.getFee()).setScale(8), certifier.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(issuePersonTransaction.getFee()).setScale(8), certifier.getBalanceUSR(FEE_KEY, db));
 		
 		//CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssuePersonMap().get(issuePersonTransaction);
@@ -371,8 +371,8 @@ public class TestRecPerson {
 		issuePersonTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSR(FEE_KEY, db));
 		
 		//CHECK PERSON EXISTS ISSUER
 		assertEquals(false, db.getItemPersonMap().contains(personKey));
@@ -419,11 +419,11 @@ public class TestRecPerson {
 		personalizeRecord_0.calcFee();
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		userAccount1.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
-		userAccount1.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
+		userAccount1.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
@@ -600,11 +600,11 @@ public class TestRecPerson {
 		
 		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
 		
-		BigDecimal erm_amount = certifier.getConfirmedBalance(ERM_KEY,db);
-		BigDecimal oil_amount = certifier.getConfirmedBalance(FEE_KEY, db);
+		BigDecimal erm_amount = certifier.getBalanceUSR(ERM_KEY,db);
+		BigDecimal oil_amount = certifier.getBalanceUSR(FEE_KEY, db);
 		
-		BigDecimal erm_amount_user = userAccount1.getConfirmedBalance(ERM_KEY, db);
-		BigDecimal oil_amount_user = userAccount1.getConfirmedBalance(FEE_KEY, db);
+		BigDecimal erm_amount_user = userAccount1.getBalanceUSR(ERM_KEY, db);
+		BigDecimal oil_amount_user = userAccount1.getBalanceUSR(FEE_KEY, db);
 		
 		//// PROCESS /////
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
@@ -613,18 +613,18 @@ public class TestRecPerson {
 		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
 		
 		//CHECK BALANCE SENDER
-		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, db));
+		assertEquals(erm_amount, certifier.getBalanceUSR(ERM_KEY, db));
 		// CHECK FEE BALANCE - FEE - GIFT
 		assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPubKeys.getFee()),
-				certifier.getConfirmedBalance(FEE_KEY, db));
+				certifier.getBalanceUSR(FEE_KEY, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BG_ZERO, userAccount1.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(BG_ZERO, userAccount1.getBalanceUSR(ERM_KEY, db));
+		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(FEE_KEY, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(r_SertifyPubKeys.getTimestamp(), certifier.getLastReference(db));
@@ -683,16 +683,16 @@ public class TestRecPerson {
 		r_SertifyPubKeys.orphan(db, false);
 
 		//CHECK BALANCE SENDER
-		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(oil_amount, certifier.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(erm_amount, certifier.getBalanceUSR(ERM_KEY, db));
+		assertEquals(oil_amount, certifier.getBalanceUSR(FEE_KEY, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(erm_amount_user, userAccount1.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(oil_amount_user, userAccount1.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(ERM_KEY, db));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(erm_amount_user, userAccount1.getBalanceUSR(ERM_KEY, db));
+		assertEquals(oil_amount_user, userAccount1.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(FEE_KEY, db));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(ERM_KEY, db));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(FEE_KEY, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(db));
@@ -803,11 +803,11 @@ public class TestRecPerson {
 		
 		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
 		
-		BigDecimal erm_amount = certifier.getConfirmedBalance(ERM_KEY,db);
-		BigDecimal oil_amount = certifier.getConfirmedBalance(FEE_KEY, db);
+		BigDecimal erm_amount = certifier.getBalanceUSR(ERM_KEY,db);
+		BigDecimal oil_amount = certifier.getBalanceUSR(FEE_KEY, db);
 		
-		BigDecimal erm_amount_user = userAccount1.getConfirmedBalance(ERM_KEY, db);
-		BigDecimal oil_amount_user = userAccount1.getConfirmedBalance(FEE_KEY, db);
+		BigDecimal erm_amount_user = userAccount1.getBalanceUSR(ERM_KEY, db);
+		BigDecimal oil_amount_user = userAccount1.getBalanceUSR(FEE_KEY, db);
 		
 		last_ref = certifier.getLastReference(db);
 		
@@ -828,23 +828,23 @@ public class TestRecPerson {
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		//CHECK BALANCE SENDER
-		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, db));
+		assertEquals(erm_amount, certifier.getBalanceUSR(ERM_KEY, db));
 		// CHECK FEE BALANCE - FEE - GIFT
 		assertEquals(oil_amount,
-				certifier.getConfirmedBalance(FEE_KEY, db));
+				certifier.getBalanceUSR(FEE_KEY, db));
 
 		// INN FORK
 		//CHECK BALANCE SENDER
-		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, fork));
+		assertEquals(erm_amount, certifier.getBalanceUSR(ERM_KEY, fork));
 		// CHECK FEE BALANCE - FEE - GIFT
 		assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPubKeys.getFee()),
-				certifier.getConfirmedBalance(FEE_KEY, fork));
+				certifier.getBalanceUSR(FEE_KEY, fork));
 
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BG_ZERO, userAccount1.getConfirmedBalance(ERM_KEY, db));
+		assertEquals(BG_ZERO, userAccount1.getBalanceUSR(ERM_KEY, db));
 		// in FORK
 		//CHECK BALANCE RECIPIENT
-		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getConfirmedBalance(FEE_KEY, fork));
+		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getBalanceUSR(FEE_KEY, fork));
 
 		//CHECK REFERENCE SENDER
 		assertEquals(last_ref, certifier.getLastReference(db));
@@ -919,16 +919,16 @@ public class TestRecPerson {
 		r_SertifyPubKeys.orphan(fork, false);
 
 		//CHECK BALANCE SENDER
-		assertEquals(erm_amount, certifier.getConfirmedBalance(ERM_KEY, fork));
-		assertEquals(oil_amount, certifier.getConfirmedBalance(FEE_KEY, fork));
+		assertEquals(erm_amount, certifier.getBalanceUSR(ERM_KEY, fork));
+		assertEquals(oil_amount, certifier.getBalanceUSR(FEE_KEY, fork));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(erm_amount_user, userAccount1.getConfirmedBalance(ERM_KEY, fork));
-		assertEquals(oil_amount_user, userAccount1.getConfirmedBalance(FEE_KEY, fork));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(ERM_KEY, fork));
-		assertEquals(BG_ZERO, userAccount2.getConfirmedBalance(FEE_KEY, fork));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(ERM_KEY, fork));
-		assertEquals(BG_ZERO, userAccount3.getConfirmedBalance(FEE_KEY, fork));
+		assertEquals(erm_amount_user, userAccount1.getBalanceUSR(ERM_KEY, fork));
+		assertEquals(oil_amount_user, userAccount1.getBalanceUSR(FEE_KEY, fork));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(ERM_KEY, fork));
+		assertEquals(BG_ZERO, userAccount2.getBalanceUSR(FEE_KEY, fork));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(ERM_KEY, fork));
+		assertEquals(BG_ZERO, userAccount3.getBalanceUSR(FEE_KEY, fork));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));

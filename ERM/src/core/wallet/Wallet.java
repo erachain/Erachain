@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -188,7 +189,13 @@ public class Wallet extends Observable implements Observer
 	//}
 	public BigDecimal getUnconfirmedBalance(Account account, long key)
 	{
+		
 		return this.database.getAccountMap().getUnconfirmedBalance(account, key);
+	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(Account account, long key)
+	{
+		
+		return this.database.getAccountMap().getUnconfirmedBalance3(account, key);
 	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
@@ -603,7 +610,7 @@ public class Wallet extends Observable implements Observer
 			for(Tuple2<Account, Long> account_asset: accounts_assets)
 			{
 				this.database.getAccountMap().update(
-						account_asset.a, account_asset.b, account_asset.a.getConfirmedBalance(account_asset.b));
+						account_asset.a, account_asset.b, account_asset.a.getBalance3(account_asset.b));
 			}
 		}
 
@@ -1028,7 +1035,7 @@ public class Wallet extends Observable implements Observer
 		// TODO: fee doubled?
 		long key = transaction.getAssetKey();
 		BigDecimal fee = asOrphan?BigDecimal.ZERO.subtract(transaction.getFee(account)):transaction.getFee(account);
-		if (key >= 0)
+		if (key != 0)
 		{
 			// ASSET TRANSFERED + FEE
 			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account, key);

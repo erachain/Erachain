@@ -9,6 +9,7 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -33,10 +34,10 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Asset","key Asset", "Balance"});
 	// balances;
-	private SortableList<Tuple2<String, Long>, BigDecimal> balances;
-	Pair<Tuple2<String, Long>, BigDecimal> balance;
+	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
+	Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance;
 	Object tab_Balances;
-	private ArrayList<Pair<Account, Pair<Long,BigDecimal>>> table_balance ;
+	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance ;
 	Tuple2<Long,String> asset;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -59,7 +60,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 			}
 		}
 		
-		((SortableList<Tuple2<String, Long>, BigDecimal>) this.balances).registerObserver();
+		((SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.balances).registerObserver();
 	}
 	
 	

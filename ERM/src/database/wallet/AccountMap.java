@@ -13,6 +13,7 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.UnsignedBytes;
 
@@ -27,7 +28,7 @@ public class AccountMap extends Observable {
 	private static final String ADDRESS_ASSETS = "address_assets";
 	private static final String ADDRESSES = "addresses";
 	
-	private Map<Tuple2<String, Long>, BigDecimal> assetsBalanceMap;
+	private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
 	private Set<byte[]> publickKeys;
 	
 	//private List<Account> accounts;
@@ -177,27 +178,55 @@ public class AccountMap extends Observable {
 		return null;
 	}
 
+	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalanceNull() {
+		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8));
+	}
+	
+	
 	private BigDecimal getUnconfirmedBalance(String address, Long key) 
 	{
 		
-		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
-		if(this.assetsBalanceMap.containsKey(k))
-		{
-			return this.assetsBalanceMap.get(k);
+		int type = 1; // OWN
+		if (key < 0) {
+			type = 2; // RENT
+			key = -key;
 		}
 		
-		return null;
+		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
+		
+		if(!this.assetsBalanceMap.containsKey(k))
+			return BigDecimal.ZERO.setScale(8);
+
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.assetsBalanceMap.get(k);
+		if (type == 1)
+			return value.a;
+		else if (type == 2)
+			return value.b;
+		else
+			return value.c;
 	}
-	// IF account+key not found in wallet - take from common confirmed balance map
 	public BigDecimal getUnconfirmedBalance(Account account, Long key) 
 	{		
-		BigDecimal balance = getUnconfirmedBalance(account.getAddress(), key);
-		if (balance == null) {
-			balance = account.getConfirmedBalance(key);
-			this.update(account, key, balance);
+		return getUnconfirmedBalance(account.getAddress(), key);
+	}
+
+	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(String address, Long key) 
+	{
+		
+		if (key < 0) {
+			key = -key;
 		}
 		
-		return balance;
+		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
+		
+		if(!this.assetsBalanceMap.containsKey(k))
+			return getUnconfirmedBalanceNull();
+
+		return this.assetsBalanceMap.get(k);
+	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal>  getUnconfirmedBalance3(Account account, Long key) 
+	{		
+		return getUnconfirmedBalance3(account.getAddress(), key);
 	}
 
 	/*
@@ -230,9 +259,39 @@ public class AccountMap extends Observable {
 		}
 	}
 	
-	public void update(Account account, long key, BigDecimal unconfirmedBalance) 
+	public void update(Account account, long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfirmedBalance) 
 	{		
 		this.assetsBalanceMap.put(new Tuple2<String, Long>(account.getAddress(), key), unconfirmedBalance);	
+		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+		
+	}
+	public void update(Account account, long key, BigDecimal unconfirmedBalance) 
+	{		
+		int type = 1; // OWN
+		if (key < 0) {
+			type = 2; // RENT
+			key = -key;
+		}
+
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> value;
+
+		Tuple2<String, Long> k = new Tuple2<String, Long>(account.getAddress(), key);
+		if(!this.assetsBalanceMap.containsKey(k)) {
+			value =	new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8));
+		} else {
+			value = this.assetsBalanceMap.get(k);
+		}
+		
+		if (type == 1)
+			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(unconfirmedBalance, value.b, value.c);
+		else if (type == 2)
+			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, unconfirmedBalance, value.c);
+		else
+			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, value.b, unconfirmedBalance);
+
+			
+		this.assetsBalanceMap.put(k, value);	
 		
 		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 		
@@ -243,7 +302,7 @@ public class AccountMap extends Observable {
 	{
 
 		// TODO - its work?
-		Map<Tuple2<String, Long>, BigDecimal> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
+		Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
 		//BTreeMap keys = ((BTreeMap) this.assetsBalanceMap).subMap(
 				Fun.t2(account.getAddress(), null),
 				Fun.t2(account.getAddress(), Fun.HI()));

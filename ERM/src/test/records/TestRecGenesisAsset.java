@@ -244,13 +244,13 @@ public class TestRecGenesisAsset {
 		genesisIssueAssetTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getConfirmedBalance(key,db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSR(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
 		assertEquals(false, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).longValue());
+		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.longValue());
 				
 		//CHECK REFERENCE SENDER
 		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
@@ -295,7 +295,7 @@ public class TestRecGenesisAsset {
 		assetTransfer.process(db, false);
 
 		//CREATE VALID ASSET TRANSFER
-		maker.setConfirmedBalance(1, BigDecimal.valueOf(100).setScale(8), db);
+		maker.setBalance(1, BigDecimal.valueOf(100).setScale(8), db);
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -411,7 +411,7 @@ public class TestRecGenesisAsset {
 		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(amoSend, recipient.getConfirmedBalance(key, db));
+		assertEquals(amoSend, recipient.getBalanceUSR(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -444,7 +444,7 @@ public class TestRecGenesisAsset {
 		//assertEquals(total, maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getConfirmedBalance(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER

@@ -206,7 +206,7 @@ public class Block {
 			}
 		}
 		
-		return (int)creator.getConfirmedBalance(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
+		return (int)creator.getBalanceUSR(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
 	}
 	
 	public int calcGeneratingBalance(DBSet dbSet)
@@ -1105,7 +1105,7 @@ public class Block {
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
+			this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
 		}
 		
 
@@ -1164,14 +1164,14 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setConfirmedBalance(Transaction.FEE_KEY,  recipient.getConfirmedBalance(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalanceUSR(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
 				if ( recipient.getLastReference(dbSet) != null)
 				{
 					recipient.removeReference(dbSet);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setConfirmedBalance(Transaction.FEE_KEY,  sender.getConfirmedBalance(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			sender.setBalance(Transaction.FEE_KEY,  sender.getBalanceUSR(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
 
 		}
 
@@ -1183,7 +1183,7 @@ public class Block {
 		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
 		{
 			//UPDATE GENERATOR BALANCE WITH FEE
-			this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, dbSet).subtract(blockFee), dbSet);
+			this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, dbSet).subtract(blockFee), dbSet);
 		}
 
 		//DELETE AT TRANSACTIONS FROM DB

@@ -94,7 +94,7 @@ public class PollOption {
 		
 		for(Account voter: this.voters)
 		{
-			votes = votes.add(voter.getConfirmedBalance(assetKey));
+			votes = votes.add(voter.getBalanceUSE(assetKey));
 		}
 		
 		return votes;

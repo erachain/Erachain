@@ -66,8 +66,8 @@ public class TestRecStatus {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
-		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
+		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		statusMap = db.getItemStatusMap();
 		mapSize = statusMap.size();
 

@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.account.Account;
@@ -35,7 +36,7 @@ public class PayDividendFrame extends JFrame
 	private AssetCls asset;
 	private JTextField txtAsset;
 	private JTextField txtAccount;
-	private JComboBox<Pair<Tuple2<String, Long>, BigDecimal>> cbxAssetToPay;
+	private JComboBox<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> cbxAssetToPay;
 	private JTextField txtAmount;
 	private JTextField txtHolders;
 	private JButton generateButton;
@@ -125,7 +126,8 @@ public class PayDividendFrame extends JFrame
       		
       	//CBX ASSET TO PAY
       	txtGBC.gridy = 2;
-      	this.cbxAssetToPay = new JComboBox<Pair<Tuple2<String, Long>, BigDecimal>>(new BalancesComboBoxModel(asset.getCreator()));
+      	this.cbxAssetToPay = new JComboBox<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>
+      		(new BalancesComboBoxModel(asset.getCreator()));
       	this.cbxAssetToPay.setRenderer(new BalanceRenderer());
         this.add(this.cbxAssetToPay, txtGBC);
       	
@@ -186,11 +188,11 @@ public class PayDividendFrame extends JFrame
 			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(8);
 			
 			//ASSET TO PAY
-			long assetKey = ((Pair<Tuple2<String, Long>, BigDecimal>) this.cbxAssetToPay.getSelectedItem()).getA().b;
+			long assetKey = ((Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.cbxAssetToPay.getSelectedItem()).getA().b;
 			AssetCls assetToPay = Controller.getInstance().getAsset(assetKey);
 			
 			//BALANCES
-			SortableList<Tuple2<String, Long>, BigDecimal> balances = Controller.getInstance().getBalances(this.asset.getKey());
+			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances = Controller.getInstance().getBalances(this.asset.getKey());
 			
 			//GET ACCOUNTS AND THEIR TOTAL BALANCE
 			List<Account> accounts = new ArrayList<Account>();
@@ -200,7 +202,7 @@ public class PayDividendFrame extends JFrame
 				Account account = new Account(balances.get(i).getA().a);
 				accounts.add(account);
 				
-				total = total.add(balances.get(i).getB());
+				total = total.add(balances.get(i).getB().a);
 			}
 			
 			//CREATE PAYMENTS
@@ -208,7 +210,7 @@ public class PayDividendFrame extends JFrame
 			for(Account account: accounts)
 			{
 				//CALCULATE PERCENTAGE OF TOTAL
-				BigDecimal percentage = account.getConfirmedBalance(this.asset.getKey()).divide(total, 8, RoundingMode.DOWN);
+				BigDecimal percentage = account.getBalanceUSE(this.asset.getKey()).divide(total, 8, RoundingMode.DOWN);
 				
 				//CALCULATE AMOUNT
 				BigDecimal accountAmount = amount.multiply(percentage);

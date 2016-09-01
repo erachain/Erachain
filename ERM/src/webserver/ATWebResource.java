@@ -191,7 +191,7 @@ public class ATWebResource {
 	public String getABalance(String atId)
 	{
 		Account acc = new Account(atId);
-		return acc.getConfirmedBalance(Transaction.FEE_KEY).toPlainString();
+		return acc.getBalanceUSE(Transaction.FEE_KEY).toPlainString();
 	}
 	
 	public String getMessage(R_Send tx)

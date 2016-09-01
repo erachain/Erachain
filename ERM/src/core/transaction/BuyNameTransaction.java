@@ -221,7 +221,7 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(1, Transaction.FEE_KEY, db).compareTo(this.nameSale.getAmount()) == -1)
+		if(this.creator.getBalance(Transaction.FEE_KEY, db).compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
 		}
@@ -256,11 +256,11 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
-		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
-		this.seller.setConfirmedBalance(Transaction.FEE_KEY, this.seller.getConfirmedBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSR(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 						
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		name = new Name(this.creator, name.getName(), name.getValue());
@@ -276,10 +276,10 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
-		this.creator.setConfirmedBalance(Transaction.FEE_KEY, this.creator.getConfirmedBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
-		this.seller.setConfirmedBalance(Transaction.FEE_KEY, this.seller.getConfirmedBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSR(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		Name name = this.nameSale.getName(db);

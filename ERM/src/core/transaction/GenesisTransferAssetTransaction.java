@@ -68,6 +68,12 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		return this.key;
 	}
+	public long getAbsKey()
+	{
+		if (this.key < 0)
+			return -this.key;
+		return this.key;
+	}
 	public long getAssetKey()
 	{
 		return this.key;
@@ -228,12 +234,12 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).add(this.amount), db);
+		this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
 
-		if (this.key == Transaction.RIGHTS_KEY) {
+		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
 			// SKIP Genesis Block
 			this.recipient.setLastForgingData(db, 2);
@@ -246,7 +252,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.key, this.recipient.getConfirmedBalance(this.key, db).subtract(this.amount), db);
+		this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).subtract(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);

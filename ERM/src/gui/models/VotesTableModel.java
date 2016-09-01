@@ -69,7 +69,7 @@ public class VotesTableModel extends AbstractTableModel
 			
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(vote.getA().getConfirmedBalance(asset.getKey(DBSet.getInstance())));
+			return NumberAsString.getInstance().numberAsString(vote.getA().getBalanceUSE(asset.getKey(DBSet.getInstance())));
 			
 		}
 		

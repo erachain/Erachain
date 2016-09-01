@@ -642,7 +642,7 @@ public class TransactionCreator
 				//PROCESS IN FORK
 				transaction.process(this.fork, asPack);
 				
-				// if it ISSUE - reset key to -1
+				// if it ISSUE - reset key
 				if (transaction instanceof Issue_ItemRecord) {
 					Issue_ItemRecord issueItem = (Issue_ItemRecord)transaction;
 					issueItem.getItem().resetKey();

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
 
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -98,8 +99,8 @@ public class DatabaseTests {
 		genesis_certify.process(dbSet, false);
 		
 		maker.setLastReference(last_ref, dbSet);
-		maker.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), dbSet);
-		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		maker.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), dbSet);
+		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -144,7 +145,7 @@ public class DatabaseTests {
 		//assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 		
 		//SET BALANCE
-		dbSet.getAssetBalanceMap().set("test", 1L, BigDecimal.ONE);
+		dbSet.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));
@@ -153,7 +154,7 @@ public class DatabaseTests {
 		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//SET BALANCE IN FORK
-		fork.getAssetBalanceMap().set("test", 1L, BigDecimal.TEN);
+		fork.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));
@@ -165,7 +166,7 @@ public class DatabaseTests {
 		DBSet fork2 = fork.fork();
 		
 		//SET BALANCE IN FORK2
-		fork2.getAssetBalanceMap().set("test", 1L, BigDecimal.ZERO);
+		fork2.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));

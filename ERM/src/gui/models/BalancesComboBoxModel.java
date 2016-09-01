@@ -7,6 +7,7 @@ import java.util.Observer;
 import javax.swing.DefaultComboBoxModel;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import utils.ObserverMessage;
 import utils.Pair;
@@ -15,9 +16,9 @@ import core.account.Account;
 import database.SortableList;
 
 @SuppressWarnings("serial")
-public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, BigDecimal>> implements Observer {
+public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> implements Observer {
 
-	private SortableList<Tuple2<String, Long>, BigDecimal> balances;
+	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 
 	public BalancesComboBoxModel(Account account)
 	{

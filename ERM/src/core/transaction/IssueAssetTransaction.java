@@ -240,7 +240,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.process(db, asPack);
 										
 		//ADD ASSETS TO OWNER
-		this.creator.setConfirmedBalance(this.getItem().getKey(db),
+		this.creator.setBalance(this.getItem().getKey(db),
 				new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(8), db);
 		
 
@@ -253,7 +253,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.orphan(db, asPack);
 
 		//REMOVE ASSETS FROM OWNER
-		this.creator.setConfirmedBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(8), db);
+		this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(8), db);
 	}
 
 	/*

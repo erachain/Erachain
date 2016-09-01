@@ -53,7 +53,7 @@ public class SynchronizerTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
 		
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -86,7 +86,7 @@ public class SynchronizerTests {
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
 
 		//FORK
 		DBSet fork = databaseSet.fork();	
@@ -170,10 +170,10 @@ public class SynchronizerTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
-		generator.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
-		generator.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet2);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator.setBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet);
+		generator.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
+		generator.setBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), databaseSet2);
 
 		
 		//CREATE KNOWN ACCOUNT 2
@@ -186,8 +186,8 @@ public class SynchronizerTests {
 		//GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
-		generator2.setConfirmedBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
+		generator2.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet);
+		generator2.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), databaseSet2);
 		
 		
 		//GENERATE 5 NEXT BLOCKS

@@ -1363,6 +1363,9 @@ public class Controller extends Observable {
 	public BigDecimal getUnconfirmedBalance(Account account, long key) {
 		return this.wallet.getUnconfirmedBalance(account, key);
 	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(Account account, long key) {
+		return this.wallet.getUnconfirmedBalance3(account, key);
+	}
 
 	public void addWalletListener(Observer o) {
 		this.wallet.addObserver(o);
@@ -1720,11 +1723,11 @@ public class Controller extends Observable {
 
 	// BALANCES
 
-	public SortableList<Tuple2<String, Long>, BigDecimal> getBalances(long key) {
+	public SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getBalances(long key) {
 		return this.dbSet.getAssetBalanceMap().getBalancesSortableList(key);
 	}
 
-	public SortableList<Tuple2<String, Long>, BigDecimal> getBalances(
+	public SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getBalances(
 			Account account) {
 		return this.dbSet.getAssetBalanceMap()
 				.getBalancesSortableList(account);

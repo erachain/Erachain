@@ -91,7 +91,7 @@ public class BlockExplorerTest {
 				LOGGER.error(block.getHeight(DBSet.getInstance()));
 			}
 			
-			balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(1, Transaction.FEE_KEY, databaseSet)));
+			balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(Transaction.FEE_KEY, databaseSet)));
 			
 			block = block.getChild(DBSet.getInstance());
 			
@@ -194,7 +194,7 @@ public class BlockExplorerTest {
 				
 				System.out.print("(" + key + ") " + " BlockExplorerBalance: " + blockExplorerBalance);
 				
-				BigDecimal nativeBalance = account.getConfirmedBalance(key);
+				BigDecimal nativeBalance = account.getBalanceUSE(key);
 				
 				System.out.print("; NantiveBalance: " + nativeBalance);
 				

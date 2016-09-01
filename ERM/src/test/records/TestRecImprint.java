@@ -73,7 +73,7 @@ public class TestRecImprint {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setConfirmedBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		imprint = new Imprint(maker, name_total, icon, image, "");
 

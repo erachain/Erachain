@@ -243,13 +243,13 @@ public class BlogBlackWhiteList {
 		if (removeZeroBalance) {
 			for (Name name : resultingNames) {
 				// No balance account not shown
-				if (name.getOwner().getBalance(0, FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
+				if (name.getOwner().getConfBalance3(0, FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
 					resultingNames.remove(name);
 				}
 			}
 
 			for (Account account : resultingAccounts) {
-				if (account.getBalance(0, FEE_KEY).compareTo(BigDecimal.ZERO) <= 0) {
+				if (account.getConfBalance3(0, FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
 					resultingAccounts.remove(account);
 				}
 			}

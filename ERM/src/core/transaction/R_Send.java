@@ -205,7 +205,7 @@ public class R_Send extends TransactionAmount {
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;
 		
-		long key = -1;
+		long key = 0;
 		BigDecimal amount = null;
 		if (typeBytes[1] >= 0) {
 			// IF here is AMOUNT

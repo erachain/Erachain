@@ -118,18 +118,18 @@ public class Payment {
 	public void process(PublicKeyAccount sender, DBSet db) 
 	{
 		//UPDATE SENDER
-		sender.setConfirmedBalance(this.asset, sender.getConfirmedBalance(this.asset, db).subtract(this.amount), db);
+		sender.setBalance(this.asset, sender.getBalanceUSR(this.asset, db).subtract(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.asset, this.recipient.getConfirmedBalance(this.asset, db).add(this.amount), db);	
+		this.recipient.setBalance(this.asset, this.recipient.getBalanceUSR(this.asset, db).add(this.amount), db);	
 	}	
 	
 	public void orphan(PublicKeyAccount sender, DBSet db) 
 	{
 		//UPDATE SENDER
-		sender.setConfirmedBalance(this.asset, sender.getConfirmedBalance(this.asset, db).add(this.amount), db);
+		sender.setBalance(this.asset, sender.getBalanceUSR(this.asset, db).add(this.amount), db);
 						
 		//UPDATE RECIPIENT
-		this.recipient.setConfirmedBalance(this.asset, this.recipient.getConfirmedBalance(this.asset, db).subtract(this.amount), db);	
+		this.recipient.setBalance(this.asset, this.recipient.getBalanceUSR(this.asset, db).subtract(this.amount), db);	
 	}
 }
