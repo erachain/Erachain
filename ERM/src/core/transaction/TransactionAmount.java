@@ -82,12 +82,6 @@ public abstract class TransactionAmount extends Transaction {
 	{
 		return this.key;
 	}
-	public long getAbsKey()
-	{
-		if (this.key < 0)
-			return -this.key;
-		return this.key;
-	}
 	public long getAssetKey()
 	{
 		return this.key;

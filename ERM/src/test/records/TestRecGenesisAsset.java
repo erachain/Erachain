@@ -50,7 +50,7 @@ public class TestRecGenesisAsset {
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 	AssetCls asset;
-	long key = -1l;
+	long key = 0l;
 	GenesisIssueAssetTransaction genesisIssueAssetTransaction;
 	
 	private void initIssue(boolean toProcess) {
@@ -264,11 +264,12 @@ public class TestRecGenesisAsset {
 	public void validateSignatureGenesisTransferAssetTransaction() 
 	{
 		
-		initIssue(false);
+		initIssue(true);
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-		
+		System.out.println("key" + key);
+
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 		//assetTransfer.sign(sender);
@@ -455,4 +456,99 @@ public class TestRecGenesisAsset {
 		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));
 	}
 	
+	@Test
+	public void processGenesisTransferAssetTransaction3()
+	{
+
+		initIssue(true);
+		
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
+		//assertEquals(total, amoSend);
+		
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total, maker.getConfirmedBalance(key, db));
+			
+		Account owner = new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL");
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+			
+		//CREATE ASSET TRANSFER
+		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, -key, amoSend, owner);
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
+
+		/// PARSE
+		byte[] rawGenesisTransferAsset = assetTransfer.toBytes(true, null);
+		
+		//CHECK DATALENGTH
+		assertEquals(rawGenesisTransferAsset.length, assetTransfer.getDataLength(false));
+		
+		try 
+		{	
+			//PARSE FROM BYTES
+			GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset, releaserReference);
+			System.out.println(" 1: " + parsedAssetTransfer.getKey() );
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedAssetTransfer instanceof GenesisTransferAssetTransaction);
+			
+			//CHECK SIGNATURE
+			assertEquals(true, Arrays.equals(assetTransfer.getSignature(), parsedAssetTransfer.getSignature()));
+			
+			//CHECK KEY
+			assertEquals(assetTransfer.getKey(), parsedAssetTransfer.getKey());	
+			
+			//CHECK AMOUNT SENDER
+			assertEquals(assetTransfer.getAmount(maker), parsedAssetTransfer.getAmount(maker));	
+			
+			//CHECK AMOUNT RECIPIENT
+			assertEquals(assetTransfer.getAmount(recipient), parsedAssetTransfer.getAmount(recipient));	
+
+			//CHECK A
+			GenesisTransferAssetTransaction aaa = (GenesisTransferAssetTransaction)assetTransfer;
+			assertEquals(true, aaa.getOwner().equals(parsedAssetTransfer.getOwner()));	
+
+		}
+		catch (Exception e) 
+		{
+			fail("Exception while parsing transaction. " + e);
+		}
+
+		// assetTransfer.sign(sender); // not  NEED
+		assetTransfer.process(db, false);
+		
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
+				
+		//CHECK BALANCE RECIPIENT
+		assertEquals(amoSend, recipient.getBalance(-key, db));
+		System.out.println(" 1: " + recipient.getBalance3(key, db) );
+
+		assertEquals(BigDecimal.ZERO.subtract(amoSend), owner.getBalance(-key, db));
+
+		/* not NEED
+		//CHECK REFERENCE SENDER
+		assertEquals(true, Arrays.equals(assetTransfer.getSignature(), sender.getLastReference(databaseSet)));
+		*/
+		
+		//CHECK REFERENCE RECIPIENT
+		assertEquals(assetTransfer.getTimestamp(), recipient.getLastReference(db));
+
+		///////////////////////////
+		////////////////////////////
+		assetTransfer.orphan(db, false);
+		
+		//CHECK BALANCE SENDER - null
+		//assertEquals(total, maker.getConfirmedBalance(key, db));
+				
+		//CHECK BALANCE RECIPIENT
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalance(-key, db));
+		System.out.println(" 1: " + recipient.getBalance3(key, db) );
+
+		assertEquals(BigDecimal.ZERO.setScale(8), owner.getBalance(key, db));
+
+		//CHECK REFERENCE RECIPIENT
+		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));
+	}
+	
+
 }

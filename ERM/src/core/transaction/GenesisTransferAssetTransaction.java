@@ -35,9 +35,11 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	private static final byte TYPE_ID = (byte)Transaction.GENESIS_SEND_ASSET_TRANSACTION;
 	private static final String NAME_ID = "GENESIS Send Asset";
 	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
+	private static final int OWNER_LENGTH = RECIPIENT_LENGTH;
 	private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
+	private Account owner;
 	private Account recipient;
 	private BigDecimal amount;
 	private long key;
@@ -48,12 +50,24 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.key = key;
+		if (key >= 0)
+			this.generateSignature();
+	}
+	// RENT
+	public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account owner) 
+	{
+		this(recipient, key, amount);
+		this.owner = owner;
 		this.generateSignature();
 	}
 	
 	//GETTERS/SETTERS
 	//public static String getName() { return NAME; }
 
+	public Account getOwner()
+	{
+		return this.owner;
+	}
 	public Account getRecipient()
 	{
 		return this.recipient;
@@ -66,12 +80,6 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	
 	public long getKey()
 	{
-		return this.key;
-	}
-	public long getAbsKey()
-	{
-		if (this.key < 0)
-			return -this.key;
 		return this.key;
 	}
 	public long getAssetKey()
@@ -120,6 +128,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		JSONObject transaction = super.toJson();
 				
 		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
+		if (this.owner != null)
+			transaction.put("owner", this.owner.getAddress());
+		
 		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("asset", this.key);
 		transaction.put("amount", this.amount.toPlainString());
@@ -155,11 +166,17 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
 		position += AMOUNT_LENGTH;
-				
-		// READ SIGNATURE
-		// SIGNATURE not need - its calculated on fly
 
-		return new GenesisTransferAssetTransaction(recipient, key, amount);	
+		if (key < 0) {
+			//READ OWNER
+			byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+			Account owner = new Account(Base58.encode(ownerBytes));
+			position += OWNER_LENGTH;
+			return new GenesisTransferAssetTransaction(recipient, key, amount, owner);	
+		} else {
+			return new GenesisTransferAssetTransaction(recipient, key, amount);
+		}
+
 	}	
 	
 	@Override
@@ -183,14 +200,19 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
 		amountBytes = Bytes.concat(fill, amountBytes);
 		data = Bytes.concat(data, amountBytes);
-				
+
+		if (key < 0) {
+			//WRITE OWNER
+			data = Bytes.concat(data, Base58.decode(this.owner.getAddress()));
+		}
+
 		return data;
 	}
 
 	@Override
 	public int getDataLength(boolean asPack) 
 	{
-		return BASE_LENGTH;
+		return BASE_LENGTH + (this.key<0?OWNER_LENGTH:0);
 	}
 
 
@@ -232,9 +254,10 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	@Override
 	public void process(DBSet db, boolean asPack) 
 	{
-						
-		//UPDATE RECIPIENT
-		this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).add(this.amount), db);
+
+		long key = this.key;
+		//UPDATE RECIPIENT OWN or RENT
+		this.recipient.setBalance(key, this.recipient.getBalance(key, db).add(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
@@ -245,21 +268,29 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			this.recipient.setLastForgingData(db, 2);
 		}
 
+		if (key < 0) {
+			this.owner.setBalance(key, this.owner.getBalance(key, db).subtract(this.amount), db);			
+		}
 	}
 
 	@Override
 	public void orphan(DBSet db, boolean asPack) 
 	{
-						
+			
+		long key = this.key;
 		//UPDATE RECIPIENT
-		this.recipient.setBalance(this.key, this.recipient.getBalanceUSR(this.key, db).subtract(this.amount), db);
+		this.recipient.setBalance(key, this.recipient.getBalance(key, db).subtract(this.amount), db);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
 
-		if (this.key == Transaction.RIGHTS_KEY) {
+		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// ORPHAN FORGING DATA
 			this.recipient.setLastForgingData(db, -1);
+		}
+
+		if (key < 0) {
+			this.owner.setBalance(key, this.owner.getBalance(key, db).add(this.amount), db);			
 		}
 
 	}
@@ -280,7 +311,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		String address = account.getAddress();
 		
-		if(address.equals(recipient.getAddress()))
+		if(address.equals(recipient.getAddress())
+				|| owner != null && address.equals(owner.getAddress()))
 		{
 			return true;
 		}

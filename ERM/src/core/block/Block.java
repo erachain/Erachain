@@ -173,9 +173,9 @@ public class Block {
 	{
 		return this.generatingBalance;
 	}
-	public void setGeneratingBalance(int generatingBalance)
+	public void setGeneratingBalance(DBSet dbSet)
 	{
-		this.generatingBalance = generatingBalance;
+		this.generatingBalance = this.calcGeneratingBalance(dbSet);
 	}
 	
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
@@ -199,13 +199,14 @@ public class Block {
 			for(Transaction transaction: txs)
 			{
 				
-				if ( transaction.getAssetKey() == Transaction.RIGHTS_KEY) {
+				if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY) {
 					amount = (int)transaction.getAmount().longValue();
 					incomed_amount += amount;
 				}
 			}
 		}
 		
+		// OWN + RENT balance - in USE
 		return (int)creator.getBalanceUSR(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
 	}
 	
@@ -717,12 +718,18 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
-		if (height < 100)
-			win_value >>= 10;
+		if (height < 40)
+			win_value >>= 6;
+		else if (height < 100)
+			win_value >>= 7;
+		else if (height < 1000)
+			win_value >>= 8;
+		else if (height < 3000)
+			win_value >>= 9;
 		else if (height < 100000)
-			win_value >>= 11;
+			win_value >>= 10;
 		else if (height < 1000000)
-			win_value >>= 12;
+			win_value >>= 11;
 		else
 			win_value >>= 13;
 		
@@ -1197,10 +1204,12 @@ public class Block {
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
 		
-		int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
-		LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
-				+ "] DELETE -> new last Height: " + lastHeight
-				+ (dbSet.isFork()?" in FORK!": ""));
+		if (height > 1) {
+			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
+			LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
+					+ "] DELETE -> new last Height: " + lastHeight
+					+ (dbSet.isFork()?" in FORK!": ""));
+		}
 
 		
 		this.height_process = -1;

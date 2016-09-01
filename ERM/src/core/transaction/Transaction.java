@@ -384,6 +384,13 @@ public abstract class Transaction {
 	public long getKey() {
 		return 0l;
 	}
+	public long getAbsKey()
+	{
+		long key = this.getKey();
+		if (key < 0)
+			return -key;
+		return key;
+	}
 
 	public BigDecimal getAmount() {
 		return BigDecimal.ZERO;

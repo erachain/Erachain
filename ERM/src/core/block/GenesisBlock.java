@@ -180,7 +180,7 @@ public class GenesisBlock extends Block{
 							"-", "-", "-", (int) 188, icon, image, "-")),
 
 					////
-					Arrays.asList(1, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
+					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
 							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
@@ -211,8 +211,8 @@ public class GenesisBlock extends Block{
 							"Попилин, Максим Александрович", "1984-08-10", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
-					Arrays.asList(1000, new PersonHuman(new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"),
-							"Кузьмин, Павел Иванович", "1970-12-08", null,
+					Arrays.asList(1000, new PersonHuman(new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r"),
+							"в аренду", "1970-12-08", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
 					Arrays.asList(1000, new PersonHuman(new Account("7JWNnyeiti3X7MYo83kDJVw15PLR7VqUjb"),
@@ -235,6 +235,10 @@ public class GenesisBlock extends Block{
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					Arrays.asList(100, new PersonHuman(new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo"),
+							"неизвестный участник", "1966-08-21",  null,
+							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
+							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
+					Arrays.asList(100, new PersonHuman(new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd"),
 							"неизвестный участник", "1966-08-21",  null,
 							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-"))
@@ -314,6 +318,8 @@ public class GenesisBlock extends Block{
 
 			}
 
+			// IN RENT
+			Account rentOwner = new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz");
 			for(List<Object> item: majorGenesisUsers)
 			{
 				
@@ -327,7 +333,7 @@ public class GenesisBlock extends Block{
 
 				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff)).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY, bdAmount0, rentOwner));
 
 				bdAmount1 = new BigDecimal("0.001").setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
@@ -491,11 +497,13 @@ public class GenesisBlock extends Block{
 		//PARENT DOES NOT EXIST
 		return null;
 	}
+	/*
 	@Override
 	public int getGeneratingBalance()
 	{
 		return 0;
 	}
+	*/
 
 	
 	public byte[] generateHeadHash()
