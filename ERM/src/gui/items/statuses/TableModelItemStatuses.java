@@ -113,7 +113,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+	//	System.out.println("message:"+message.getType()+"  value:"+ message.getValue());
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_STATUS_TYPE)
 		{			
@@ -130,6 +130,9 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE || message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE )
 		{
+			
+			
+			this.statuses = (SortableList<Long, StatusCls>) message.getValue();
 			this.fireTableDataChanged();
 		}
 	}

@@ -341,6 +341,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 
 		ObserverMessage message = (ObserverMessage) arg;
 		
+//		System.out.println("1111:   ");
 		
 		
 		if( message.getType() == ObserverMessage.WALLET_STATUS )
@@ -352,11 +353,11 @@ public class Statements_Table_Model extends JTable implements Observer{
 				cryptoCloseAll();
 			}
 		}
-		
-		if( message.getType() == ObserverMessage.NETWORK_STATUS || (int)message.getValue() == Controller.STATUS_OK ) {
+//		System.out.println("22222:   ");
+	/*	if( message.getType() == ObserverMessage.NETWORK_STATUS || (int)message.getValue() == Controller.STATUS_OK ) {
 			this.repaint();
 		}
-		
+		System.out.println("33333:   ");
 		if( message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE
 				|| message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
 		{
@@ -366,13 +367,19 @@ public class Statements_Table_Model extends JTable implements Observer{
 			} 
 		}
 		
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		*/
+//		System.out.println("44444:   "+message.getType());
+		
+		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)//.LIST_TRANSACTION_TYPE)
 		{		
 			boolean is;
 			
-			System.out.println(((Transaction) message.getValue()).getType());
+			System.out.println(message.getType());
 			
 			if(((Transaction) message.getValue()).getType() == Transaction.SIGN_NOTE_TRANSACTION) //.SEND_ASSET_TRANSACTION)
+				
+				
+				
 			{
 				is = false;
 				for ( int i = messageBufs.size()-1; i >= 0; i-- )
@@ -402,6 +409,10 @@ public class Statements_Table_Model extends JTable implements Observer{
 					this.repaint();
 				}			
 			}
+			
+			
+			this.repaint();
+		
 		}
 	}
 
