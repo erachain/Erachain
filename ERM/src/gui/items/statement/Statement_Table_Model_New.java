@@ -222,7 +222,7 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 			case COLUMN_CREATOR:
 				
 				
-				return transaction.getCreator();
+				return transaction.getCreator().toString();
 			}
 			
 			return null;

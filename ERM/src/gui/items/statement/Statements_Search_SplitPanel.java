@@ -97,7 +97,7 @@ import gui.models.Renderer_Boolean;
 			search_Table_Model = new Statement_Table_Model_New();
 			search_Table = new JTable(this.search_Table_Model);
 			TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
+	//		columnModel.getColumn(0).setMaxWidth((100));
 		
 	//Custom renderer for the String column;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
