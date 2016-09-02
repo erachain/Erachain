@@ -111,7 +111,13 @@ public class Statements_Table_Model extends JTable implements Observer{
 			if(!is)
 			{
 				
-				addMessage(messageBufs.size(),(R_SignNote)messagetx);
+			
+			try{	R_SignNote i = (R_SignNote)messagetx;
+				addMessage(messageBufs.size(),i);
+				}
+			catch ( Exception e ){
+				
+			}
 			}
 		}
 				

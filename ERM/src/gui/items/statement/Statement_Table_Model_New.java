@@ -14,6 +14,11 @@ import utils.NumberAsString;
 
 public class Statement_Table_Model_New extends AbstractTableModel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	List<Transaction> transactions;
 
 	public static final int COLUMN_TIMESTAMP = 0;
@@ -27,8 +32,8 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 	
 	
 	public Statement_Table_Model_New(){
-		transactions = new ArrayList<Transaction>();
-		transactions.addAll(DBSet.getInstance().getTransactionMap().getTransactions());
+	//	transactions = new ArrayList<Transaction>();
+		transactions=DBSet.getInstance().getTransactionMap().getTransactions();
 		int a = 1;
 	}
 	

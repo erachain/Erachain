@@ -1,10 +1,12 @@
 package gui.items.other;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -50,6 +52,9 @@ public class other_Panel extends javax.swing.JPanel {
          this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
          this.jTable_Peers.setDefaultRenderer(Tuple2.class, new Renderer_Left()); // set renderer
          this.jTable_Peers.setEnabled(false);
+         
+         
+      
          
          
     // all block table
@@ -339,4 +344,16 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
     private javax.swing.JTable jTable_My_Block;
     private javax.swing.JTable jTable_My_Records;
     private javax.swing.JTable jTable_Peers;         
+
+
+
+    /**
+     * Добавляет в стандартный рендерер ячейки таблицы черезстрочную подсветку
+     * @param renderer рендерер
+     * @param row строка
+     * @param column столбец
+     * @return новый рендерер
+     */
+   
+
 }

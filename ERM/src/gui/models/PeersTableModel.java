@@ -1,4 +1,5 @@
 package gui.models;
+import java.awt.Component;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -6,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import controller.Controller;
 import database.DBSet;
@@ -166,4 +168,10 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		Controller.getInstance().removeActivePeersObserver(this);
 		
 	}
+	
+	 
+
+	
+	
+	
 }

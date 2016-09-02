@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -98,6 +99,8 @@ public class RecordsPanel extends  JPanel // JPanel
 		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+		
+		this.transactionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 		TableColumn column_Size = this.transactionsTable.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_SIZE);
 		column_Size.setMinWidth(50);
