@@ -85,6 +85,7 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 		
 		//INCREMENT KEY
 		this.key++;
+		item.setKey(key);
 		
 		//INSERT WITH NEW KEY
 		this.set(this.key, item);

@@ -168,13 +168,16 @@ public abstract class ItemCls {
 		return this.key;
 	}
 	public long resolveKey(DBSet db) {
-		if (this.key <0 // & this.reference != null
+		if (this.key == 0 // & this.reference != null
 				) {
 			if (this.getDBIssueMap(db).contains(this.reference)) {
 				this.key = this.getDBIssueMap(db).get(this.reference);
 			}
 		}
 		return this.key;
+	}
+	public void setKey(long key) {
+		this.key = key;
 	}
 	public void resetKey() {
 		this.key = 0;
@@ -368,7 +371,7 @@ public abstract class ItemCls {
 		return itemJSON;
 	}
 
-	public long insertToMap(DBSet db)
+	public void insertToMap(DBSet db)
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
@@ -376,9 +379,9 @@ public abstract class ItemCls {
 		
 		//SET ORPHAN DATA
 		this.getDBIssueMap(db).set(this.reference, key);
-		this.key = key;
+		//this.key = key;
 		
-		return key;
+		//return key;
 		
 	}
 	

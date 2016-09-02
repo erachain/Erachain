@@ -144,15 +144,7 @@ public abstract class AddressItem_Refs extends Transaction
 		if (this.item.getReference() == null) this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
-		long key = this.item.insertToMap(db);
-		
-		/*
-		LOGGER.error("*** ISSUE +++ Block[" + this.getBlockHeight(db) + "].TX.IssueItem [" + this.viewFullTypeName() + "\n"
-				+ "keys: " + this.item.getDBMap(db).getKeys().toString() + "\n"
-				+ "values: " + this.item.getDBMap(db).getValues().toString());
-		LOGGER.error(" +++ " + this.item.toString(db) + "\n"
-				);
-		*/
+		this.item.insertToMap(db);
 
 	}
 

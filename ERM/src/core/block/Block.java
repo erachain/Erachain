@@ -728,10 +728,8 @@ public class Block {
 			win_value >>= 9;
 		else if (height < 100000)
 			win_value >>= 10;
-		else if (height < 1000000)
-			win_value >>= 11;
 		else
-			win_value >>= 13;
+			win_value >>= 11;
 		
 		return win_value;
 
