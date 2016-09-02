@@ -110,7 +110,11 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         Dimension size = MainFrame.desktopPane.getSize();
         //this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	    //split_generated_Block.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-        this.jSplitPane2.setDividerLocation((int)((size.getHeight()-100)*.15));
+        int splitP2_Div_LOC = (int)((size.getHeight()-100)*.15);
+        if (splitP2_Div_LOC <90) splitP2_Div_LOC =90;
+     //   splitP2_Div_LOC =90;
+        this.jSplitPane2.setDividerLocation(splitP2_Div_LOC);
+        
         this.jSplitPane3.setDividerLocation((int)((size.getHeight()-100)*.4));
         this.jSplitPane5.setDividerLocation((int)((size.getWidth()-100)*.5));
        

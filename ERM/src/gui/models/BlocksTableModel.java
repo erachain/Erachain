@@ -68,7 +68,8 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return 0;
 		}
 		
-		if (!is_Select_Last_100_Block) return blocks.size();
+		if (!is_Select_Last_100_Block || blocks.size()<100) return blocks.size();
+		
 		return 100; //blocks.size();
 	}
 
