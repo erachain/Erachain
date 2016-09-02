@@ -45,7 +45,8 @@ package gui.items.statement;
 	import javax.swing.table.TableRowSorter;
 
 	import controller.Controller;
-	import core.item.assets.AssetCls;
+import core.account.PublicKeyAccount;
+import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 	import gui.MainFrame;
 	import gui.Main_Internal_Frame;
@@ -101,13 +102,16 @@ import gui.models.Renderer_Boolean;
 	//Custom renderer for the String column;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 			search_Table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
-		
+			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left()); // set renderer
+			
+/*		
 	//CHECKBOX FOR FAVORITE
 			TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
 			favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
 			favoriteColumn.setMinWidth(50);
 			favoriteColumn.setMaxWidth(50);
 			favoriteColumn.setPreferredWidth(50);
+*/
 	//Sorter
 //			 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
 //			search_Table.setRowSorter(search_Sorter);	
@@ -362,6 +366,10 @@ import gui.models.Renderer_Boolean;
 			}
 		};
 		
+		
+//		@Override
+//		 public void setRowHeightFormat(boolean format){
+//		}
 	}
 
 

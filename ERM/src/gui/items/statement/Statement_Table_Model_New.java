@@ -1,5 +1,6 @@
 package gui.items.statement;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,10 +15,12 @@ import org.json.simple.JSONArray;
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
 import core.transaction.R_SignNote;
+import core.transaction.R_SignStatement;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -38,14 +41,16 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 	ArrayList<Transaction> db_transactions;
 
 	public static final int COLUMN_TIMESTAMP = 0;
-	public static final int COLUMN_TYPE = 1;
-	public static final int COLUMN_AMOUNT = 2;
-	public static final int COLUMN_FEE = 3;
-	public static final int COLUMN_CREATOR = 4;
+//	public static final int COLUMN_TYPE = 1;
+	public static final int COLUMN_CREATOR = 1;
+	public static final int COLUMN_BODY = 2;
+//	public static final int COLUMN_AMOUNT = 2;
+//	public static final int COLUMN_FEE = 3;
+
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", AssetCls.FEE_NAME, "Creator"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement"});//, AssetCls.FEE_NAME});
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	
@@ -143,6 +148,13 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 	
 	}
 	
+	// set class
+	
+		public Class<? extends Object> getColumnClass(int c) {     // set column type
+			       return getValueAt(0, c).getClass();
+			   }
+	
+	
 	@Override
 	public int getColumnCount() {
 		// TODO Auto-generated method stub
@@ -173,27 +185,42 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 			
 			Transaction transaction = this.transactions.get(row);
 			
+			
+			R_SignNote i;
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
 				
 				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp() + " " + transaction.getTimestamp() / 1000;
+				return transaction.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 				
-			case COLUMN_TYPE:
+		/*	case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
 				return Lang.getInstance().translate(transaction.viewTypeName());
+		*/
 				
-			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
 				
-			case COLUMN_FEE:
+			case	 COLUMN_BODY:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getFee());	
+				
+				
+				 i = (R_SignNote)transaction;
+				
+				return new String( i.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
+				
+				
+	//		case COLUMN_AMOUNT:
+				
+	//			return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
+				
+	//		case COLUMN_FEE:
+				
+	//			return NumberAsString.getInstance().numberAsString(transaction.getFee());	
 			
 			case COLUMN_CREATOR:
+				
 				
 				return transaction.getCreator();
 			}
