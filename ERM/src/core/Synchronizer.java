@@ -116,7 +116,7 @@ public class Synchronizer
 		//VALIDATE THE NEW BLOCKS
 		for(Block block: newBlocks)
 		{
-			int heigh = block.getParentHeight(fork);
+			int heigh = block.getHeightByParent(fork);
 
 			//CHECK IF VALID
 			if(block.isValid(fork) && block.isSignatureValid())

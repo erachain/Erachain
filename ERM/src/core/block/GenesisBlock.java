@@ -49,7 +49,7 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
-	public final static int GENESIS_GENERATING_BALANCE = Settings.GENESIS_ERMO; // starting max volume for generating	
+	public final static int GENESIS_GENERATING_BALANCE = Settings.GENESIS_ERMO_TOTAL; // starting max volume for generating	
 	//public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
@@ -132,63 +132,63 @@ public class GenesisBlock extends Block{
 
 			/////////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
-					Arrays.asList(1, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
+					Arrays.asList(11, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
+							"-", "1966-08-21", null, 
+							(byte)10, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, icon, image, "-")),
+					Arrays.asList(10, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
+					Arrays.asList(10, new PersonHuman(new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB"),
-							"-", "1966-08-21", null, 
-							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7GnLzZmiDkSzjKWxkQqjQs2KMUkz7kMFc8"),
-							"-", "1966-08-21", null, 
-							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-")),
-
-					Arrays.asList(1, new PersonHuman(new Account("76DXrQKfyQmvraQTVUp4rDrUUjwQQagBA8"),
-							"-", "1966-08-21", null, 
-							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7BvNfm966RwMq8Dna58475cQpvRd7XaWt7"),
-							"-", "1966-08-21", null, 
-							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R"),
-							"-", "1966-08-21", null, 
-							(byte)1, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12"),
+					Arrays.asList(10, new PersonHuman(new Account("7GnLzZmiDkSzjKWxkQqjQs2KMUkz7kMFc8"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
 
-					Arrays.asList(1, new PersonHuman(new Account("7D7GCcPQXMMT7HEDBQ93pTwDfrUWj4GjgE"),
+					Arrays.asList(10, new PersonHuman(new Account("76DXrQKfyQmvraQTVUp4rDrUUjwQQagBA8"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("7RAyLF4t35UudD3Ko1svUe9mTnpDj6hrM9"),
+					Arrays.asList(10, new PersonHuman(new Account("7BvNfm966RwMq8Dna58475cQpvRd7XaWt7"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
-					Arrays.asList(1, new PersonHuman(new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"),
+					Arrays.asList(10, new PersonHuman(new Account("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, icon, image, "-")),
+					Arrays.asList(10, new PersonHuman(new Account("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, icon, image, "-")),
+
+					Arrays.asList(10, new PersonHuman(new Account("7D7GCcPQXMMT7HEDBQ93pTwDfrUWj4GjgE"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, icon, image, "-")),
+					Arrays.asList(10, new PersonHuman(new Account("7RAyLF4t35UudD3Ko1svUe9mTnpDj6hrM9"),
+							"-", "1966-08-21", null, 
+							(byte)1, "-", (float)0.0, (float)0.0,
+							"-", "-", "-", (int) 188, icon, image, "-")),
+					Arrays.asList(10, new PersonHuman(new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"),
 							"-", "1966-08-21", null, 
 							(byte)1, "-", (float)0.0, (float)0.0,
 							"-", "-", "-", (int) 188, icon, image, "-")),
 
 					////
-					Arrays.asList(1, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
+					Arrays.asList(10, new PersonHuman(new Account("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"),
 							"Ермолаев, Дмитрий Сергеевич", "1966-08-21", null, 
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
-					Arrays.asList(1, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
+					Arrays.asList(10, new PersonHuman(new Account("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"),
 							"Ермолаев, Александр Сергеевич", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, icon, image, "школа: г.Уссурийск №6, институт: г.Владивосток ДВПИ")),
-					Arrays.asList(1, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
+					Arrays.asList(10, new PersonHuman(new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz"),
 							"Скорняков, Александр Викторович", "1963-08-21", null,
 							(byte)1, "европеец-славянин", (float)1.1330, (float)13.9224,
 							"белый", "серо-зеленый", "светло-коричневый", (int) 188, icon, image, "-"))
@@ -296,6 +296,7 @@ public class GenesisBlock extends Block{
 			//long i = 0;
 			int pick;
 
+			int nonce = 0;
 			for(List<Object> item: generalGenesisUsers)
 			{
 				
@@ -307,11 +308,12 @@ public class GenesisBlock extends Block{
 				//CREATE ISSUE PERSON TRANSACTION
 				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
-				bdAmount0 = new BigDecimal(Math.round(pick * generalKoeff0)).setScale(8);
+				bdAmount0 = new BigDecimal(Math.round(pick * generalKoeff0) - nonce++).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
-				bdAmount1 = new BigDecimal(Math.round(pick * generalKoeff1)).setScale(8);
+				//bdAmount1 = new BigDecimal(Math.round(pick * generalKoeff1)).setScale(8);
+				bdAmount1 = BigDecimal.ONE.setScale(8);
 				//bal1 = bal1.add(bdAmount1).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
@@ -331,7 +333,7 @@ public class GenesisBlock extends Block{
 				//CREATE ISSUE PERSON TRANSACTION
 				//this.addTransaction(new GenesisIssuePersonRecord(user));
 
-				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff)).setScale(8);
+				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff) - nonce++).setScale(8);
 				//bal0 = bal0.add(bdAmount0).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY, bdAmount0, rentOwner));
 

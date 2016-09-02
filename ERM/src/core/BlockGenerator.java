@@ -339,7 +339,7 @@ public class BlockGenerator extends Thread implements Observer
 							acc_winner = account;
 							max_winned_value = winned_value;
 							
-							if (account.getAddress().equals("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz")) {
+							if (account.getAddress().equals("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ")) {
 								isGenesisStart = true;
 							}
 						}

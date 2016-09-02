@@ -234,8 +234,11 @@ public class BlockMap extends DBMap<byte[], Block>
 			int height = parent.getHeight(dbSet) + 1;
 			PublicKeyAccount creator = block.getCreator();
 			Integer prevHeight = creator.getForgingData(dbSet, height);
-			creator.delForgingData(dbSet, height);
-			creator.setLastForgingData(dbSet, prevHeight);
+			if (prevHeight > 1) {
+				// INITIAL forging DATA no need remove!
+				creator.delForgingData(dbSet, height);
+				creator.setLastForgingData(dbSet, prevHeight);
+			}
 
 		}
 

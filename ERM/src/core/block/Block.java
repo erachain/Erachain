@@ -718,6 +718,7 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
+		/*
 		if (height < 40)
 			win_value >>= 6;
 		else if (height < 100)
@@ -730,6 +731,8 @@ public class Block {
 			win_value >>= 10;
 		else
 			win_value >>= 11;
+			*/
+		win_value >>= 10;
 		
 		return win_value;
 
@@ -914,7 +917,8 @@ public class Block {
 		
 		int generatingBalance = calcGeneratingBalance(db);
 		if (this.generatingBalance != generatingBalance) {
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid");
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid this.generatingBalance: " + this.generatingBalance
+					+ " != calcGeneratingBalance(db): " + calcGeneratingBalance(db));
 			return false;
 		}
 			
