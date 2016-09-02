@@ -36,6 +36,11 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 		Controller.getInstance().addObserver(this);
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? null : item.getClass();
+    }
+	
 	@Override
 	public SortableList<byte[], Block> getSortableList() {
 		return this.blocks;

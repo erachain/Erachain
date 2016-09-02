@@ -69,7 +69,7 @@ import gui.models.Renderer_Boolean;
 	
 		private static final long serialVersionUID = 2717571093561259483L;
 
-		private TableModelPersons search_Table_Model;
+		private Statement_Table_Model_New search_Table_Model;
 		private JTable search_Table;
 		private RowSorter<TableModelPersons> search_Sorter;
 		private RunMenu Search_run_menu;
@@ -93,7 +93,7 @@ import gui.models.Renderer_Boolean;
 			searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
 	//CREATE TABLE
-			search_Table_Model = new TableModelPersons();
+			search_Table_Model = new Statement_Table_Model_New();
 			search_Table = new JTable(this.search_Table_Model);
 			TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
@@ -109,8 +109,8 @@ import gui.models.Renderer_Boolean;
 			favoriteColumn.setMaxWidth(50);
 			favoriteColumn.setPreferredWidth(50);
 	//Sorter
-			 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
-			search_Table.setRowSorter(search_Sorter);	
+//			 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
+//			search_Table.setRowSorter(search_Sorter);	
 		
 	// UPDATE FILTER ON TEXT CHANGE
 			searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener( new search_tab_filter());
@@ -177,8 +177,8 @@ import gui.models.Renderer_Boolean;
 	  		@Override
 	    	public void actionPerformed(ActionEvent e) {
 	   
-	  		  	@SuppressWarnings("unused")
-				PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));	
+	 // 		  	@SuppressWarnings("unused")
+	//			PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));	
 	    	}});
 	    	   	
 	    	
@@ -191,8 +191,8 @@ import gui.models.Renderer_Boolean;
 	    	public void actionPerformed(ActionEvent e) {
 	   
 	  
-	    		@SuppressWarnings("unused")
-				PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
+	    //		@SuppressWarnings("unused")
+		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
 	    		}});
 	 
 	    	Search_run_menu.jButton3.setContentAreaFilled(false);
@@ -203,6 +203,8 @@ import gui.models.Renderer_Boolean;
 	// вычисляем устанавливаем\ сбрасываем флажек выбранные
 				@Override
 				public void actionPerformed(ActionEvent e) {
+				/*
+					
 					favorite_all(search_Table);
 					alpha = 200;
 					int row = search_Table.getSelectedRow();
@@ -216,7 +218,7 @@ import gui.models.Renderer_Boolean;
 					{
 						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 					}
-				
+				*/
 				
 				}
 	    	
@@ -236,7 +238,7 @@ import gui.models.Renderer_Boolean;
 		void favorite_all(JTable personsTable){
 			int row = personsTable.getSelectedRow();
 			row = personsTable.convertRowIndexToModel(row);
-
+/*
 			PersonCls person = search_Table_Model.getPerson(row);
 			//new AssetPairSelect(asset.getKey());
 
@@ -255,7 +257,7 @@ import gui.models.Renderer_Boolean;
 					
 
 				personsTable.repaint();
-
+*/
 		}
 	
 	// filter search
@@ -294,12 +296,12 @@ import gui.models.Renderer_Boolean;
 		 class search_listener implements ListSelectionListener  {
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
-					PersonCls person = null;
+		/*			PersonCls person = null;
 					if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
 					Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-				}
+		*/		}
 			}
 	// mouse listener		
 		class  search_Mouse extends MouseAdapter {
@@ -321,7 +323,7 @@ import gui.models.Renderer_Boolean;
 					
 					
 					row = search_Table.convertRowIndexToModel(row);
-					PersonCls person = search_Table_Model.getPerson(row);	
+			/*		PersonCls person = search_Table_Model.getPerson(row);	
 	//выводим меню всплывающее
 					if(Controller.getInstance().isItemFavorite(person))
 					{
@@ -337,7 +339,7 @@ import gui.models.Renderer_Boolean;
 				    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
 				    Search_run_menu.repaint();
 			        Search_run_menu.setVisible(true);		
-		    
+		   */ 
 			    
 			
 				}

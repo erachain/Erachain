@@ -1,6 +1,7 @@
 package gui.items.other;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
@@ -38,12 +39,39 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 	    Dimension size = MainFrame.desktopPane.getSize();
 	   
 		
+		this.setTitle(Lang.getInstance().translate("Other"));
+		
+		other_Panel other_panel = new other_Panel();
+		
+		jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        getContentPane().add(other_panel, gridBagConstraints);
+        
+        jTabbedPane.setVisible(false);
+        
+        this.jToolBar.setVisible(false);
+		
+ 
+        
+       
+        
+        
+     
 		
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Other"));
-		// My block
+		
+ // отключаем все что ниже  		
+		
+	/*	// My block
 		Generated_Blocks_Panel split_generated_Block = new Generated_Blocks_Panel();
 		this.jTabbedPane.add(split_generated_Block);
-		this.jToolBar.setVisible(false);
+		
 		this.setTitle(Lang.getInstance().translate("Other"));
 		
 
@@ -67,14 +95,14 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 				CoreRowSorter sorter = new CoreRowSorter(blocksTableModel, indexes);
 				blocksTable.setRowSorter(sorter);
 	/*	
-		//ADD BLOCK TABLE
+	/*	//ADD BLOCK TABLE
 				split_ALL_Block.jTable_jScrollPanel_LeftPanel =	blocksTable;
 				split_ALL_Block.jScrollPanel_LeftPanel.setViewportView(split_ALL_Block.jTable_jScrollPanel_LeftPanel);
 				split_ALL_Block.setRowHeightFormat(true);
 				
 		this.jTabbedPane.addTab(Lang.getInstance().translate("All Blocks"), split_ALL_Block);
 		*/
-		this.jTabbedPane.addTab(Lang.getInstance().translate("All Blocks"), new JScrollPane(blocksTable));
+/*		this.jTabbedPane.addTab(Lang.getInstance().translate("All Blocks"), new JScrollPane(blocksTable));
 		
 // Peers
 		
@@ -144,7 +172,19 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 				this.jTabbedPane.addTab(Lang.getInstance().translate("Transactions"), split_Transaction);
 		
 		
+	
+				
+				// other
+				
+				this.jTabbedPane.addTab(Lang.getInstance().translate("Other"), new other_Panel());
+				
 		
+				  split_generated_Block.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+		    split_Peers.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	    split_Transaction.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+		*
+		*/			
+				
 		
 		
 		this.pack();
@@ -156,19 +196,18 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 		this.setLocation(20, 20);
 		//CLOSE
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-	    this.setResizable(true);
+	  
 	    
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-	    split_generated_Block.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	  
 	
-	    split_Peers.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-	    split_Transaction.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	
 	    
 	    this.setVisible(true);
 	    
 	    
 	   
-		
+	
 	    
 	    
 	    

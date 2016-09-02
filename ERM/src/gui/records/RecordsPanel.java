@@ -94,7 +94,7 @@ public class RecordsPanel extends  JPanel // JPanel
 		//Custom renderer for the String column;
 		//RenderingHints.
 		this.transactionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		//this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
@@ -143,6 +143,8 @@ public class RecordsPanel extends  JPanel // JPanel
 		Split_Panel record_stpit = new Split_Panel();
 		record_stpit.toolBar_LeftPanel.setVisible(false);
 		record_stpit.jToolBar_RightPanel.setVisible(false);
+		record_stpit.searchToolBar_LeftPanel.setVisible(false);
+		
 		Dimension size = MainFrame.desktopPane.getSize();
 		this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));

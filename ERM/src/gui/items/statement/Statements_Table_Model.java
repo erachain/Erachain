@@ -374,7 +374,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 		{		
 			boolean is;
 			
-			System.out.println(message.getType());
+	//		System.out.println(message.getType());
 			
 			if(((Transaction) message.getValue()).getType() == Transaction.SIGN_NOTE_TRANSACTION) //.SEND_ASSET_TRANSACTION)
 				
@@ -793,8 +793,8 @@ public class Statements_Table_Model extends JTable implements Observer{
 				}
 				amountStr = "<font" + fontSize + ">"
 						+ Lang.getInstance().translate("Amount") + ": "
-						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>"
-						+ Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance()) + ". ";
+						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>";
+				//		+ Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance()) + ". ";
 			}
 			
 		

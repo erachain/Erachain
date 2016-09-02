@@ -41,6 +41,11 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 		return this.blocks;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? null : item.getClass();
+    }
+	
 	@Override
 	public int getColumnCount() 
 	{

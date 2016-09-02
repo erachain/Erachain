@@ -201,7 +201,7 @@ private JFrame parent;
 			}
 		});
 		Toolbar_Main.add(button6_MainToolBar);
-		        	
+	/*	        	
 		JButton button7_MainToolBar = new JButton();
 		button7_MainToolBar.setText(Lang.getInstance().translate("Records"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -214,7 +214,7 @@ private JFrame parent;
 			}
 		});
 		Toolbar_Main.add(button7_MainToolBar);
-		
+	*/	
 		JButton button8_MainToolBar = new JButton();
 		button8_MainToolBar.setText(Lang.getInstance().translate("Other"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
