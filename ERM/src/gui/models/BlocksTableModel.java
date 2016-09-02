@@ -26,14 +26,16 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 	
 	private SortableList<byte[], Block> blocks;
 	private long winValue = 0l;
+	private boolean is_Select_Last_100_Block;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator", "Generating Balance", "Transactions", "Fee"});
 	
 	static Logger LOGGER = Logger.getLogger(BlocksTableModel.class.getName());
 
-	public BlocksTableModel()
+	public BlocksTableModel(boolean select_Last_100)
 	{
 		Controller.getInstance().addObserver(this);
+		is_Select_Last_100_Block = select_Last_100;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -66,12 +68,15 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return 0;
 		}
 		
-		return blocks.size();
+		if (!is_Select_Last_100_Block) return blocks.size();
+		return 100; //blocks.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column)
 	{
+		
+		//if(row >100)return null;
 		try {
 			
 			if(blocks == null || blocks.size() - 1 < row)

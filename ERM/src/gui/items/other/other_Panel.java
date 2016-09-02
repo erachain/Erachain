@@ -53,7 +53,7 @@ public class other_Panel extends javax.swing.JPanel {
          
          
     // all block table
-         this.All_Blocks_TableModel = new BlocksTableModel();
+         this.All_Blocks_TableModel = new BlocksTableModel(true);
 		this.jTable_All_Block = new JTable(this.All_Blocks_TableModel);
 		 this.jTable_All_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
          this.jTable_All_Block.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
@@ -97,10 +97,10 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		this.record_Panel = new RecordsPanel();
         initComponents();
         
-        this.jLabel_All_Block.setText(Lang.getInstance().translate("All Blocks"));
+        this.jLabel_All_Block.setText(Lang.getInstance().translate("Last 100 blocks"));
         this.jLabel_Peer_Title.setText(Lang.getInstance().translate("Peers"));
-        this.jLabel_Transaction_Title.setText(Lang.getInstance().translate("Transactions"));
-        this.jLabel_My_Block_Title.setText(Lang.getInstance().translate("Generated Blocks"));
+        this.jLabel_Transaction_Title.setText(Lang.getInstance().translate("My Transactions"));
+        this.jLabel_My_Block_Title.setText(Lang.getInstance().translate("My Generated Blocks"));
         
         Dimension size = MainFrame.desktopPane.getSize();
         //this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));

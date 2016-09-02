@@ -82,7 +82,7 @@ public class DebugTabPane extends JTabbedPane{
 		this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable)); 
 	           
 		//BLOCKS TABLE MODEL
-		this.blocksTableModel = new BlocksTableModel();
+		this.blocksTableModel = new BlocksTableModel(false);
 		JTable blocksTable = new JTable(this.blocksTableModel);
 		
 		//BLOCKS SORTER
