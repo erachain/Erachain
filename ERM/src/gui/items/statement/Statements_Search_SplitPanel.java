@@ -32,7 +32,8 @@ package gui.items.statement;
 	import javax.swing.JScrollPane;
 	import javax.swing.JTable;
 	import javax.swing.JTextField;
-	import javax.swing.RowFilter;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 	import javax.swing.RowSorter;
 	import javax.swing.event.DocumentEvent;
 	import javax.swing.event.DocumentListener;
@@ -103,6 +104,8 @@ import gui.models.Renderer_Boolean;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 			search_Table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left()); // set renderer
+			
+			 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 			
 /*		
 	//CHECKBOX FOR FAVORITE

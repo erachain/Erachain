@@ -137,7 +137,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE)
+		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 			this.fireTableDataChanged();

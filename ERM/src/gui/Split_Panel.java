@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 
 import lang.Lang;
@@ -36,7 +37,7 @@ public class Split_Panel extends javax.swing.JPanel {
         initComponents();
 
 
-        
+        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
         
         
      
