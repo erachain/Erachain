@@ -71,39 +71,47 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		{
 			return null;
 		}
-		
-		AssetCls asset = this.assets.get(row).getB();
-		
-		switch(column)
+
+		try
 		{
-		case COLUMN_KEY:
+			AssetCls asset = this.assets.get(row).getB();
 			
-			return asset.getKey(DBSet.getInstance());
-		
-		case COLUMN_NAME:
+			switch(column)
+			{
+			case COLUMN_KEY:
+				
+				return asset.getKey(DBSet.getInstance());
 			
-			return asset.getName();
-		
-		case COLUMN_ADDRESS:
+			case COLUMN_NAME:
+				
+				return asset.getName();
 			
-			return asset.getCreator().asPerson();
-			
-		case COLUMN_AMOUNT:
-			
-			return asset.getQuantity();
-			
-		case COLUMN_DIVISIBLE:
-			
-			return asset.isDivisible();
-			
-		case COLUMN_CONFIRMED:
-			
-			return asset.isConfirmed();
-			
-		case COLUMN_FAVORITE:
-			
-			return asset.isFavorite();
+			case COLUMN_ADDRESS:
+				
+				return asset.getCreator().asPerson();
+				
+			case COLUMN_AMOUNT:
+				
+				return asset.getQuantity();
+				
+			case COLUMN_DIVISIBLE:
+				
+				return asset.isDivisible();
+				
+			case COLUMN_CONFIRMED:
+				
+				return asset.isConfirmed();
+				
+			case COLUMN_FAVORITE:
+				
+				return asset.isFavorite();
+			}
 		}
+		catch(Exception e)
+		{
+			//GUI ERROR
+		}
+
 		
 		return null;
 	}
