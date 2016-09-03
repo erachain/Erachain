@@ -6,11 +6,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Stack;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.json.simple.JSONArray;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
@@ -28,17 +33,17 @@ import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
 import network.Peer;
 import utils.NumberAsString;
+import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statement_Table_Model_New extends AbstractTableModel {
+public class Statements_Table_Model_New extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	List<Transaction> transactions;
-	ArrayList<Transaction> db_transactions;
+	
 
 	public static final int COLUMN_TIMESTAMP = 0;
 //	public static final int COLUMN_TYPE = 1;
@@ -46,7 +51,7 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 	public static final int COLUMN_BODY = 2;
 //	public static final int COLUMN_AMOUNT = 2;
 //	public static final int COLUMN_FEE = 3;
-
+	List<Transaction> transactions;
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
@@ -54,11 +59,10 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	
-	public Statement_Table_Model_New(){
+	public Statements_Table_Model_New(){
 	//	transactions = new ArrayList<Transaction>();
 		
-		db_transactions = new ArrayList<Transaction>();
-		transactions = new ArrayList<Transaction>();
+	
 /*
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
@@ -92,9 +96,10 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 			//CREATE GENESIS BLOCK
 		//	genesisBlock = new GenesisBlock();
 		//	genesisTimestamp = genesisBlock.getTimestamp(null);
-			
-			
-		// база данных	
+		transactions = new ArrayList<Transaction>();
+		Controller.getInstance().addObserver(this);	
+		transactions = read_Statement();	
+/*		// база данных	
 				DBSet dbSet = DBSet.getInstance();
 		// читаем все блоки
 			SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
@@ -108,10 +113,10 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 				for (Transaction transaction:db_transactions){
 		// если ноте то пишем в transactions			
 				 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	transactions.add(transaction);	
-					
+				
 				}
 			}
-			
+*/				
 		
 	//	this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
 	
@@ -232,5 +237,86 @@ public class Statement_Table_Model_New extends AbstractTableModel {
 			return null;
 		}
 	}
+	
+	
+	@Override
+	public void update(Observable o, Object arg) 
+	{	
+		try
+		{
+			this.syncUpdate(o, arg);
+		}
+		catch(Exception e)
+		{
+			//GUI ERROR
+		}
+	}
+	
+	public synchronized void syncUpdate(Observable o, Object arg)
+	{
+		ObserverMessage message = (ObserverMessage) arg;
+//		System.out.println( message.getType());
+		
+		//CHECK IF NEW LIST
+		if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
+		{
+			if(this.transactions == null)
+			{
+			//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
+			//	this.statusesMap .registerObserver();
+				//this.imprints.sort(PollMap.NAME_INDEX);
+				transactions = read_Statement();
+			}
+			
+			this.fireTableDataChanged();
+		}
+		
+		
+		//CHECK IF LIST UPDATED
+		if( //message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
+			//	||
+				message.getType() == ObserverMessage.ADD_BLOCK_TYPE 
+		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE
+		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
+		//		|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
+				
+				)
+		{
+			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
+			transactions = read_Statement();
+			this.fireTableDataChanged();
+		}	
+	}	
+	
+	
+	private List<Transaction> read_Statement(){
+		List<Transaction> tran;
+		ArrayList<Transaction> db_transactions;
+		db_transactions = new ArrayList<Transaction>();
+		tran = new ArrayList<Transaction>();
+		// база данных	
+		DBSet dbSet = DBSet.getInstance();
+// читаем все блоки
+	SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+// проходим по блокам
+	for(Pair<byte[], Block> list: lists)
+	{
+		
+// читаем транзакции из блока
+		db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
+// проходим по транзакциям
+		for (Transaction transaction:db_transactions){
+// если ноте то пишем в transactions			
+		 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	tran.add(transaction);	
+		
+		
+		}
+		
+	}
+	return tran;
+	
+	}
+	
+	
 
 }
