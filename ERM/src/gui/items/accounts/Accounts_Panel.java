@@ -148,7 +148,47 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			}
 		});
 		menu.add(sendAsset);
-		
+
+		JMenuItem holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
+		holdAsset.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+				Account account = tableModel.getAccount(row);
+        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
+				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
+				
+				 new Account_Take_Hold_Dialog(asset, account); 
+						
+			}
+		});
+		menu.add(holdAsset);
+
+		menu.addSeparator();  
+
+		JMenuItem lend_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Lend"));
+		lend_Debt_Asset.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+				Account account = tableModel.getAccount(row);
+        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
+				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
+				
+				 new Account_Lend_Dialog(asset, account); 
+						
+			}
+		});
+		menu.add(lend_Debt_Asset);
+
 		
 		JMenuItem repay_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
 		repay_Debt_Asset.addActionListener(new ActionListener()
@@ -168,26 +208,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			}
 		});
 		menu.add(repay_Debt_Asset);
-		
-		JMenuItem lend_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Lend"));
-		lend_Debt_Asset.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
 				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
-        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-				
-				 new Account_Lend_Dialog(asset, account); 
-						
-			}
-		});
-		menu.add(lend_Debt_Asset);
-		
 		JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
 		confiscate_Debt_Asset.addActionListener(new ActionListener()
 		{

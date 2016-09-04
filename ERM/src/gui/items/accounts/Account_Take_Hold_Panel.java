@@ -64,24 +64,23 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Panel
+public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 {
 	//private final MessagesTableModel messagesTableModel;
    
 	
-	public Account_Confiscate_Debt_Panel(AssetCls asset, Account account)
+	public Account_Take_Hold_Panel(AssetCls asset, Account account)
 	{
 		String a;	
 	if (asset == null) a = "";	
 	else a = asset.getName();
 	
-	jTextArea_Title.setText(Lang.getInstance().translate("If You want to confiscate in debt issued asset %asset%, fill in this form").replace("%asset%", a));
+	jTextArea_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
 	
 //	icon.setIcon(null);	
 	
-	toLabel.setText(Lang.getInstance().translate("Debtor Account") + ":");
-  	recDetailsLabel.setText(Lang.getInstance().translate("Debtor Details") + ":");
-
+	toLabel.setText(Lang.getInstance().translate("Vendor Account") + ":");
+  	recDetailsLabel.setText(Lang.getInstance().translate("Vendor Details") + ":");
 	
 		
 		
@@ -328,7 +327,7 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
-				-key, BigDecimal.ZERO.subtract(amount).setScale(8),
+				key, BigDecimal.ZERO.subtract(amount).setScale(8),
 				messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 		

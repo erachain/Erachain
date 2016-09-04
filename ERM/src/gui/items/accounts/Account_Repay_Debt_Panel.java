@@ -76,9 +76,12 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 	else a = asset.getName();
 	
 	jTextArea_Title.setText(Lang.getInstance().translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", a));
-//	icon.setIcon(null);	
+
+	//	icon.setIcon(null);	
 		
-		
+	toLabel.setText(Lang.getInstance().translate("Lender Account") + ":");
+  	recDetailsLabel.setText(Lang.getInstance().translate("Lender Details") + ":");
+
 		
 // favorite combo box	
 		cbxFavorites.setModel(new AssetsComboBoxModel());
@@ -321,7 +324,9 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 		}
 
 		//CREATE TX MESSAGE
-		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key, amount, messageBytes, isTextByte, encrypted);
+		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+				-key, amount,
+				messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 		
 		//CHECK VALIDATE MESSAGE

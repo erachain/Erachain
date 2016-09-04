@@ -86,6 +86,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 	public JLabel icon;
 	public JTextArea jTextArea_Title;
 	public JLabel toLabel;
+	public JLabel recDetailsLabel;
 	
 	public Class_Account_Transaction_Panel()
 	{
@@ -230,7 +231,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelDetailsGBC.weightx = 0;	
 		labelDetailsGBC.gridx = 0;
-      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
+      	recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
       	this.add(recDetailsLabel, labelDetailsGBC);
         
       	//RECEIVER DETAILS 
