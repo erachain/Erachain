@@ -117,7 +117,7 @@ public class TransactionDatabase extends Observable implements Observer {
 			this.transactionMap.put(transaction.getSignature(), transaction.toBytes(true, null));
 			
 			//COMMIT
-			if(this.databaseSet != null)
+			if(this.parent == null)
 			{
 				this.databaseSet.commit();
 			}
@@ -134,7 +134,7 @@ public class TransactionDatabase extends Observable implements Observer {
 		this.transactionMap.remove(transaction.getSignature());
 		
 		//COMMIT
-		if(this.databaseSet != null)
+		if(this.parent == null)
 		{
 			this.databaseSet.commit();
 		}		

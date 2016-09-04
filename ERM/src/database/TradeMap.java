@@ -76,7 +76,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 				.makeOrGet();
 		
 		//CHECK IF NOT MEMORY DATABASE
-		if(databaseSet != null)
+		if(parent == null)
 		{
 			//PAIR KEY
 			this.pairKeyMap = database.createTreeMap("trades_key_pair")
@@ -89,7 +89,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 				@Override
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Trade value) 
 				{
-					Order order = value.getInitiatorOrder((DBSet) databaseSet);
+					Order order = value.getInitiatorOrder(getDBSet());
 					long have = order.getHave();
 					long want = order.getWant();	
 					String pairKey;
@@ -117,7 +117,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 				@Override
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Trade value) 
 				{
-					Order order = value.getInitiatorOrder((DBSet) databaseSet);
+					Order order = value.getInitiatorOrder(getDBSet());
 					
 					long want = order.getWant();	
 					String wantKey;
@@ -138,7 +138,7 @@ public class TradeMap extends DBMap<Tuple2<BigInteger, BigInteger>, Trade>
 				@Override
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Trade value) 
 				{
-					Order order = value.getInitiatorOrder((DBSet) databaseSet);
+					Order order = value.getInitiatorOrder(getDBSet());
 					
 					long have = order.getHave();	
 					String haveKey;

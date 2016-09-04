@@ -82,7 +82,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		createIndex(HEIGHT_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Integer, byte[], Block>() {
 		   	@Override
 		    public Integer run(byte[] key, Block value) {
-		   		return value.getHeight((DBSet)BlockMap.this.databaseSet);
+		   		return value.getHeight(getDBSet());
 		    }
 		});
 		
@@ -178,7 +178,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	public boolean set(byte[] signature, Block block)
 	{
 			
-		DBSet dbSet = (DBSet)this.databaseSet;
+		DBSet dbSet = getDBSet();
 
 		// calc before insert record
 		int win_value = block.calcWinValueTargeted(dbSet);
@@ -212,7 +212,7 @@ public class BlockMap extends DBMap<byte[], Block>
 
 	public void delete(Block block)
 	{
-		DBSet dbSet = (DBSet)this.databaseSet;
+		DBSet dbSet = getDBSet();
 
 		if (!Arrays.equals(this.getLastBlockSignature(), block.getSignature())) {
 			Long rr = null;

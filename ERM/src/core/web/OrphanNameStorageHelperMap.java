@@ -15,8 +15,8 @@ public class OrphanNameStorageHelperMap extends DBMap<String, List<byte[]>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public OrphanNameStorageHelperMap(DBSet databaseSet, DB database) {
-		super(databaseSet, database);
+	public OrphanNameStorageHelperMap(DBSet dbSet, DB database) {
+		super(dbSet, database);
 	}
 
 	public OrphanNameStorageHelperMap(DBMap<String, List<byte[]>> parent) {

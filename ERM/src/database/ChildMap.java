@@ -21,7 +21,6 @@ public class ChildMap extends DBMap<byte[], byte[]>
 	public ChildMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		//this.blockMap = databaseSet.getBlockMap();
 	}
 
 	// dbSet - current DBSet for access to others Maps
@@ -64,8 +63,7 @@ public class ChildMap extends DBMap<byte[], byte[]>
 	{
 		if(this.contains(parent.getSignature()))
 		{
-			DBSet dbSet = (DBSet)(this.databaseSet); 
-			return dbSet.getBlockMap().get(this.get(parent.getSignature()));
+			return getDBSet().getBlockMap().get(this.get(parent.getSignature()));
 		}
 		
 		return null;

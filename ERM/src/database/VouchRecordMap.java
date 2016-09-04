@@ -23,7 +23,7 @@ import org.mapdb.Fun.Tuple2;
 
 //import database.serializer.TransactionSerializer;
 
-// vouched record -> ERMO balabce + List of vouchers records
+// vouched record (BlockNo, RecNo) -> ERMO balabce + List of vouchers records
 public class VouchRecordMap extends DBMap<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

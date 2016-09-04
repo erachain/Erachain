@@ -16,8 +16,8 @@ public class SharedPostsMap extends DBMap<byte[], List<String>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public SharedPostsMap(DBSet databaseSet, DB database) {
-		super(databaseSet, database);
+	public SharedPostsMap(DBSet dbSet, DB database) {
+		super(dbSet, database);
 	}
 
 	public SharedPostsMap(DBMap<byte[], List<String>> parent) {

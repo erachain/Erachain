@@ -62,6 +62,11 @@ public abstract class DBMap<T, U> extends Observable {
 	    this.map = this.getMemoryMap();
 	    this.deleted = new ArrayList<T>();
 	}
+
+	public DBSet getDBSet()
+	{		
+		return (DBSet) this.databaseSet;
+	}
 	
 	protected abstract Map<T, U> getMap(DB database);
 	

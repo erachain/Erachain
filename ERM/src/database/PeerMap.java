@@ -454,7 +454,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			this.peersMap.put(peer.getAddress().getAddress(), BYTE_BLACKLISTED);
 				
 			//COMMIT
-			if(this.databaseSet != null)
+			if(this.parent == null)
 			{
 				this.databaseSet.commit();
 			}

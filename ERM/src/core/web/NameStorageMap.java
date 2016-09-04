@@ -17,8 +17,8 @@ public class NameStorageMap extends DBMap<String, Map<String, String>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public NameStorageMap(DBSet databaseSet, DB database) {
-		super(databaseSet, database);
+	public NameStorageMap(DBSet dbSet, DB database) {
+		super(dbSet, database);
 	}
 
 	public NameStorageMap(DBMap<String, Map<String, String>> parent) {
