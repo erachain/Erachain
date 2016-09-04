@@ -214,7 +214,7 @@ public class DatabaseTests {
 
 		init();
 						
-		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 50000l, (byte) 2, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dbSet));
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(dbSet, false);

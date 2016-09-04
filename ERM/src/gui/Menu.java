@@ -574,7 +574,9 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        assetsMenu.add(allAssetsMenu);  
+        assetsMenu.add(allAssetsMenu);
+        
+        /*
         assetsMenu.addSeparator();
 
         // issue asset menu
@@ -591,7 +593,8 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        assetsMenu.add(issueAssetMenu);  
+        assetsMenu.add(issueAssetMenu);
+        */  
 
         
 	}

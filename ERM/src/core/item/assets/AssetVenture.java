@@ -40,9 +40,9 @@ public class AssetVenture extends AssetCls {
 	{
 		this(new byte[]{(byte)TYPE_ID, (byte)props}, creator, name, icon, image, description, quantity, scale, divisible);
 	}
-	public AssetVenture(Account creator, String name, byte[] icon, byte[] image, String description, long quantity, byte scale, boolean divisible)
+	public AssetVenture(Account creator, String name, byte[] icon, byte[] image, String description, boolean movable, long quantity, byte scale, boolean divisible)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)0}, creator, name, icon, image, description, quantity, scale, divisible);
+		this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, creator, name, icon, image, description, quantity, scale, divisible);
 	}
 
 	//GETTERS/SETTERS

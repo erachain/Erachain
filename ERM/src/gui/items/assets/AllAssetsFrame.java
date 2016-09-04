@@ -95,6 +95,10 @@ public class AllAssetsFrame extends JFrame{
 		this.tableModelItemAssets = new TableModelItemAssets();
 		final JTable assetsTable = new JTable(this.tableModelItemAssets);
 		
+		//CHECKBOX FOR MOVABLE
+		TableColumn movableColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_MOVABLE);
+		movableColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
+
 		//CHECKBOX FOR DIVISIBLE
 		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);
 		divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));

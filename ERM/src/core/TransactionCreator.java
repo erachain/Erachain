@@ -257,7 +257,7 @@ public class TransactionCreator
 	}
 	
 	
-	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, long quantity, byte scale, boolean divisible, int feePow) 
+	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, boolean movable, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		// all unconfirmed records insert in FORK for calc last account REFERENCE 
@@ -266,7 +266,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		AssetCls asset = new AssetVenture(creator, name, icon, image, description, quantity, scale, divisible);
+		AssetCls asset = new AssetVenture(creator, name, icon, image, description, movable, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));

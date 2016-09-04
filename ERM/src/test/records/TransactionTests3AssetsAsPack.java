@@ -69,7 +69,7 @@ public class TransactionTests3AssetsAsPack {
 		maker.setLastReference(gb.getTimestamp(db), db);
 		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
-		asset = new AssetVenture(maker, "a", icon, image, "a", 50000l, (byte) 2, true);
+		asset = new AssetVenture(maker, "a", icon, image, "a", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
 
 		releaserReference = maker.getLastReference(db);

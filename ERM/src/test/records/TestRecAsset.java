@@ -75,7 +75,7 @@ public class TestRecAsset {
 		
 		maker_1.setLastReference(gb.getTimestamp(db), db);
 		
-		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 50000l, (byte) 2, true);
+		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
 
 
@@ -626,7 +626,7 @@ public class TestRecAsset {
 		assertEquals(Transaction.INVALID_REFERENCE, messageTransaction.isValid(db, releaserReference));	
 
 		// NOT DIVISIBLE
-		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", 0l, (byte) 0, false);
+		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", false, 0l, (byte) 0, false);
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp++, maker.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));	
 		issueAssetTransaction.sign(maker, false);

@@ -104,12 +104,12 @@ public class OrderTestsMy
 		accountB.setBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
 		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), db);
 
-    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 50000L, (byte)2, true);
+    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", false, 50000L, (byte)2, true);
 		issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		issueAssetTransaction.process(db, false);
     	keyA = issueAssetTransaction.getAssetKey(db);
 
-    	assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 50000L, (byte)2, true);
+    	assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", false, 50000L, (byte)2, true);
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
 		issueAssetTransaction.process(db, false);
     	keyB = issueAssetTransaction.getAssetKey(db);
@@ -177,7 +177,7 @@ public class OrderTestsMy
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(db, releaserReference));
 		
-    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "DATACHAINS.world", icon, image, "This is the simulated ERM asset.", 100000L, (byte)0, false);
+    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "DATACHAINS.world", icon, image, "This is the simulated ERM asset.", false, 100000L, (byte)0, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		issueAssetTransaction.process(db, false);
     	keyA = assetA.getKey(db);
@@ -599,7 +599,7 @@ public class OrderTestsMy
 		
 		init();
 		//CREATE ASSET
-		assetA = new AssetVenture(accountA, "a", icon, image, "a", 50000l, (byte) 8, false);
+		assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
@@ -607,7 +607,7 @@ public class OrderTestsMy
 				
 
 		//CREATE ASSET
-		assetB = new AssetVenture(accountB, "b", icon, image, "b", 50000l, (byte) 8, true);
+		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
@@ -701,14 +701,14 @@ public class OrderTestsMy
 		init();
 
 		//CREATE ASSET
-		assetA = new AssetVenture(accountA, "a", icon, image, "a", 50000l, (byte) 8, true);
+		assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 50000l, (byte) 8, true);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		issueAssetTransaction.process(db, false);
 				
 		//CREATE ASSET
-		assetB = new AssetVenture(accountB, "b", icon, image, "b", 50000l, (byte) 8, false);
+		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
@@ -809,14 +809,14 @@ public class OrderTestsMy
 		init();
 
 		//CREATE ASSET
-		assetA = new AssetVenture(accountA, "a", icon, image, "a", 100l, (byte) 0, false);
+		assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 100l, (byte) 0, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		issueAssetTransaction.process(db, false);
 				
 		//CREATE ASSET
-		assetB = new AssetVenture(accountB, "b", icon, image, "b", 1000000l, (byte) 8, true);
+		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
@@ -970,14 +970,14 @@ public class OrderTestsMy
 		init();
 
 		//CREATE ASSET
-		assetA = new AssetVenture(accountA, "a", icon, image, "a", 100l, (byte) 0, false);
+		assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 100l, (byte) 0, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		issueAssetTransaction.process(db, false);
 				
 		//CREATE ASSET
-		assetB = new AssetVenture(accountB, "b", icon, image, "b", 1000000l, (byte) 8, true);
+		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
@@ -1123,14 +1123,14 @@ public class OrderTestsMy
 	public void init_Sell_noDiv_Div() {
 		
 		//CREATE ASSET
-		assetA = new AssetVenture(accountA, "a", icon, image, "a", 100l, (byte) 0, false);
+		assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 100l, (byte) 0, false);
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		issueAssetTransaction.process(db, false);
 				
 		//CREATE ASSET
-		assetB = new AssetVenture(accountB, "b", icon, image, "b", 1000000l, (byte) 8, true);
+		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
@@ -1232,14 +1232,14 @@ public class OrderTestsMy
 		init();
 		
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", 50000l, (byte)2, false);
+		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 50000l, (byte)2, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		issueAssetTransaction.process(db, false);
 		
 		//CREATE ASSET
-		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", 50000l, (byte)8, false);
+		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte)8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
@@ -1342,7 +1342,7 @@ public class OrderTestsMy
 
 		init();
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
@@ -1351,7 +1351,7 @@ public class OrderTestsMy
 		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
 		//CREATE ASSET
-		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", 50000l, (byte) 8, true);
+		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
@@ -1450,7 +1450,7 @@ public class OrderTestsMy
 		init();
 		
 		//CREATE ASSET
-		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", 50000l, (byte) 8, true);
+		AssetCls assetA = new AssetVenture(accountA, "a", icon, image, "a", false, 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
@@ -1461,7 +1461,7 @@ public class OrderTestsMy
 		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 
 		//CREATE ASSET
-		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", 50000l, (byte) 8, true);
+		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));

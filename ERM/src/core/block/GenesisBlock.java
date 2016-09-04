@@ -438,15 +438,15 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)AssetCls.FEE_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 1000L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, false, 1000L, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, false, 0L, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0L, (byte)8, true);
 		case (int)AssetCls.DEAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, 0L, (byte)8, true);
+			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0L, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, GENESIS_GENERATING_BALANCE, (byte)0, true);
+		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 

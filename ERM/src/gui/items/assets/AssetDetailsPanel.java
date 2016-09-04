@@ -115,7 +115,19 @@ public class AssetDetailsPanel extends JPanel {
 			this.add(new JLabel(personStr), detailGBC);
 
 		}
-		
+
+		//LABEL DIVISIBLE
+		labelGBC.gridy = ++gridy;
+		this.add(new JLabel(Lang.getInstance().translate("Movable") + ":"), labelGBC);
+		           
+		//DIVISIBLE
+		detailGBC.gridy = gridy;
+		JCheckBox chkMovable = new JCheckBox();
+		chkMovable.setSelected(asset.isMovable());
+		chkMovable.setEnabled(false);
+		this.add(chkMovable, detailGBC);	
+				
+
 		//LABEL QUANTITY
 		labelGBC.gridy = ++gridy;
 		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
@@ -129,7 +141,7 @@ public class AssetDetailsPanel extends JPanel {
 		
 		//LABEL DIVISIBLE
 		labelGBC.gridy = ++gridy;
-		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
+		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divis-ible") + ":");
 		this.add(divisibleLabel, labelGBC);
 		           
 		//DIVISIBLE

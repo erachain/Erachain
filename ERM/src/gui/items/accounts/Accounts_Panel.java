@@ -234,7 +234,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		
 		
 		
-		
 		menu.addSeparator();
 
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));

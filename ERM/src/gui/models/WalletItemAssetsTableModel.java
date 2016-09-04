@@ -18,14 +18,15 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_AMOUNT = 3;
-	public static final int COLUMN_DIVISIBLE = 4;
-	public static final int COLUMN_CONFIRMED = 5;
-	public static final int COLUMN_FAVORITE = 6;
+	public static final int COLUMN_MOVABLE = 3;
+	public static final int COLUMN_AMOUNT = 4;
+	public static final int COLUMN_DIVISIBLE = 5;
+	public static final int COLUMN_CONFIRMED = 6;
+	public static final int COLUMN_FAVORITE = 7;
 	
 	private SortableList<Tuple2<String, String>, AssetCls> assets;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Confirmed", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Movable", "Quantity", "Divisible", "Confirmed", "Favorite"});
 	
 	public WalletItemAssetsTableModel()
 	{
@@ -89,6 +90,10 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 			case COLUMN_ADDRESS:
 				
 				return asset.getCreator().asPerson();
+				
+			case COLUMN_MOVABLE:
+				
+				return asset.isMovable();
 				
 			case COLUMN_AMOUNT:
 				

@@ -267,7 +267,7 @@ public class TestRec_Send {
 		init();
 		
 		//ADD ERM ASSET
-		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
+		AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", false, 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(assetReference);
 		db.getItemAssetMap().set(61l, aTFundingAsset);
     	
@@ -351,7 +351,7 @@ public class TestRec_Send {
 
 		init();
 		
-		AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 250000000L, (byte) 2, true);
+		AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", false, 250000000L, (byte) 2, true);
 		aTFundingAsset.setReference(gb.getSignature());
 		db.getItemAssetMap().set(61l, aTFundingAsset);
 

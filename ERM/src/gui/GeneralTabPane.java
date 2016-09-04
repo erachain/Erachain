@@ -60,9 +60,11 @@ public class GeneralTabPane extends JTabbedPane{
 
         this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
         
+        
         //IMPRINTS
-        this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
+        //this.addTab(Lang.getInstance().translate("Imprints"), new ImprintsPanel());
 
+        /*
         //NOTES
         //this.addTab(Lang.getInstance().translate("Persons"), new PersonsPanel());
 
@@ -72,7 +74,8 @@ public class GeneralTabPane extends JTabbedPane{
         		//);
 
         //ASSETS
-        this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());        
+        this.addTab(Lang.getInstance().translate("Assets"), new AssetsPanel());
+        */        
 
         //NAMING
         //this.addTab(Lang.getInstance().translate("Naming service"), new NamingServicePanel());      

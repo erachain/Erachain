@@ -101,6 +101,11 @@ public class My_Assets_Tab extends Split_Panel {
 	column2.setMinWidth(50);
 	column2.setMaxWidth(1000);
 	column2.setPreferredWidth(50);
+	// column #1
+	TableColumn columnM = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_MOVABLE);//.COLUMN_CONFIRMED);
+	columnM.setMinWidth(50);
+	columnM.setMaxWidth(1000);
+	columnM.setPreferredWidth(50);
 		// column #1
 		TableColumn column3 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_DIVISIBLE);//.COLUMN_CONFIRMED);
 		column3.setMinWidth(50);

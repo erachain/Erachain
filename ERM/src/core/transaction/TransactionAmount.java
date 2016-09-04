@@ -231,11 +231,13 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
+		/*
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount != null && this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
+		*/
 
 		/* very SLOW - db.fork() !!
 		//REMOVE FEE
@@ -258,7 +260,11 @@ public abstract class TransactionAmount extends Transaction {
 		*/
 
 		//CHECK IF AMOUNT IS DIVISIBLE
-		AssetCls asset = (AssetCls)db.getItemAssetMap().get(this.key);
+		long absKey = this.key;
+		if (absKey < 0)
+			absKey = -absKey;
+		
+		AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
 		if (asset == null) {
 			return ASSET_DOES_NOT_EXIST;
 		}
@@ -274,7 +280,9 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 
-		if (this.key != FEE_KEY || this.amount == null) {
+		if (this.key < 0)
+			
+		if (absKey != FEE_KEY || this.amount == null) {
 			// CHECK FEE
 			if(this.creator.getBalanceUSR(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
@@ -282,7 +290,9 @@ public abstract class TransactionAmount extends Transaction {
 			}
 
 			// if asset is unlimited and me is creator of this asset 
-			boolean unLimited = asset.getQuantity().equals(0l)
+			boolean unLimited = 
+					absKey > AssetCls.DEAL_KEY // not genesis asset!
+					&& asset.getQuantity().equals(0l)
 					&& asset.getCreator().getAddress().equals(this.creator.getAddress());
 
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE

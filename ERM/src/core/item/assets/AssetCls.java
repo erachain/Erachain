@@ -52,10 +52,11 @@ public abstract class AssetCls extends ItemCls {
 	{
 		super(typeBytes, creator, name, icon, image, description);
 	}
-	public AssetCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public AssetCls(int type, byte pars, Account creator, String name, byte[] icon, byte[] image, String description)
 	{
 		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
+		this.typeBytes[1] = pars;
 	}
 
 	//GETTERS/SETTERS
@@ -73,6 +74,13 @@ public abstract class AssetCls extends ItemCls {
 		return db.getIssueAssetMap();
 	}
 
+	public boolean isMovable() {
+		return (this.typeBytes[1] & (byte)1) > 0;
+	}
+	public void setMovable(boolean movable) {
+		this.typeBytes[1] = (byte)(this.typeBytes[1] & (movable?1:0));
+	}
+	
 	public Long getQuantity() {
 		return 1l;
 	}
@@ -84,9 +92,11 @@ public abstract class AssetCls extends ItemCls {
 		return 8;
 	}
 
+	/*
 	public byte[] toBytes(boolean includeReference)
 	{
 		return super.toBytes(includeReference);
 	}
+	*/
 	
 }

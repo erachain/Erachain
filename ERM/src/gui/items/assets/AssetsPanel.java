@@ -63,7 +63,11 @@ public class AssetsPanel extends JPanel
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
 		table.setRowSorter(sorter);
-				
+
+		//CHECKBOX FOR MOVABLE
+		TableColumn movableColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_MOVABLE);
+		movableColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+
 		//CHECKBOX FOR DIVISIBLE
 		TableColumn divisibleColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_DIVISIBLE);
 		divisibleColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));

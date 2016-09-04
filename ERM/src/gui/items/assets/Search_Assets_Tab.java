@@ -91,25 +91,30 @@ public class Search_Assets_Tab extends Split_Panel {
 	assetsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 	assetsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
 	assetsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-	// column #1
+		// column #1
 		TableColumn column1 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column1.setMinWidth(50);
 		column1.setMaxWidth(1000);
 		column1.setPreferredWidth(50);
 		// column #1
-				TableColumn column2 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-				column2.setMinWidth(50);
-				column2.setMaxWidth(1000);
-				column2.setPreferredWidth(50);
-				// column #1
-				TableColumn column3 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-				column3.setMinWidth(50);
-				column3.setMaxWidth(1000);
-				column3.setPreferredWidth(50);
-				TableColumn column4 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_I_OWNER);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-				column4.setMinWidth(60);
-				column4.setMaxWidth(1000);
-				column4.setPreferredWidth(60);
+		TableColumn columnM = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_MOVABLE);
+		columnM.setMinWidth(50);
+		columnM.setMaxWidth(1000);
+		columnM.setPreferredWidth(50);
+		// column #1
+		TableColumn column2 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+		column2.setMinWidth(50);
+		column2.setMaxWidth(1000);
+		column2.setPreferredWidth(50);
+		// column #1
+		TableColumn column3 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+		column3.setMinWidth(50);
+		column3.setMaxWidth(1000);
+		column3.setPreferredWidth(50);
+		TableColumn column4 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_I_OWNER);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+		column4.setMinWidth(60);
+		column4.setMaxWidth(1000);
+		column4.setPreferredWidth(60);
 								
 				
 				

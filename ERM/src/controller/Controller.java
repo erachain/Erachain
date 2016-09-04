@@ -1963,12 +1963,12 @@ public class Controller extends Observable {
 	}
 	
 	public Pair<Transaction, Integer> issueAsset(PrivateKeyAccount creator,
-			String name, String description, long quantity, byte scale, boolean divisible,
+			String name, String description, boolean movable, long quantity, byte scale, boolean divisible,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueAssetTransaction(creator,
-					name, description, quantity, scale, divisible, feePow);
+					name, description, movable, quantity, scale, divisible, feePow);
 		}
 	}
 

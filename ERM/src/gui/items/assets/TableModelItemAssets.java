@@ -17,14 +17,15 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_AMOUNT = 3;
-	public static final int COLUMN_DIVISIBLE = 4;
-	public static final int COLUMN_FAVORITE = 5;
-	public static final int COLUMN_I_OWNER = 6;
+	public static final int COLUMN_MOVABLE = 3;
+	public static final int COLUMN_AMOUNT = 4;
+	public static final int COLUMN_DIVISIBLE = 5;
+	public static final int COLUMN_FAVORITE = 6;
+	public static final int COLUMN_I_OWNER = 7;
 
 	private SortableList<Long, AssetCls> assets;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible", "Favorite", "I Owner"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Movable", "Quantity", "Divisible", "Favorite", "I Owner"});
 	
 	public TableModelItemAssets()
 	{
@@ -89,6 +90,10 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 			
 			return asset.getCreator().asPerson();
 			
+		case COLUMN_MOVABLE:
+			
+			return asset.isMovable();
+
 		case COLUMN_AMOUNT:
 			
 			return NumberAsString.getInstance().numberAsString(asset.getQuantity());

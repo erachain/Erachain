@@ -144,6 +144,15 @@ public abstract class ItemCls {
 		return this.typeBytes;
 	}
 
+	public byte getProps()
+	{
+		return this.typeBytes[1];
+	}
+	public void setProps(byte props)
+	{
+		this.typeBytes[1] = props;
+	}
+
 	public Account getCreator() {
 		return this.creator;
 	}

@@ -48,6 +48,7 @@ public class IssueAssetPanel extends JPanel
 	private JTextField txtFeePow;
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
+	private JCheckBox chkMovable;
 	private JTextField txtQuantity;
 	private JCheckBox chkDivisible;
 	private JButton issueButton;
@@ -58,6 +59,8 @@ public class IssueAssetPanel extends JPanel
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		int gridy = 0;
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -80,7 +83,7 @@ public class IssueAssetPanel extends JPanel
 	        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 	        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 0;
+	        //gridBagConstraints.gridy = gridy;
 	        gridBagConstraints.gridwidth = 3;
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -128,9 +131,10 @@ public class IssueAssetPanel extends JPanel
 		//labelGBC.gridy = 0;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		
+		gridy += 2;
 		gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(fromLabel, gridBagConstraints);
@@ -140,7 +144,7 @@ public class IssueAssetPanel extends JPanel
 		//COMBOBOX FROM
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -153,10 +157,10 @@ public class IssueAssetPanel extends JPanel
       
       	
       	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-      	
+      	gridy += 2;
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 0;
-         gridBagConstraints.gridy = 4;
+         //gridBagConstraints.gridy = gridy;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
          add(nameLabel, gridBagConstraints);
@@ -170,7 +174,7 @@ public class IssueAssetPanel extends JPanel
       	this.txtName = new JTextField();
       	gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        //gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -182,11 +186,12 @@ public class IssueAssetPanel extends JPanel
   //    	labelGBC.gridy = 2;
       	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
       	
+      	gridy += 2;
       	descriptionLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
       	descriptionLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(descriptionLabel, gridBagConstraints);
@@ -216,7 +221,7 @@ public class IssueAssetPanel extends JPanel
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        //gridBagConstraints.gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -230,13 +235,42 @@ public class IssueAssetPanel extends JPanel
     //  	this.add(scrollDescription, txtGBC);
       	
       	
+
+        //LABEL MOVABLE
+   //   	labelGBC.gridy = 5;
+      	gridy++;
+      	JLabel movableLabel = new JLabel(Lang.getInstance().translate("Movable") + ":");
+      	gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        //gridBagConstraints.gridy = gridy;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
+        add(movableLabel, gridBagConstraints);
+      	
+      	
+     // 	this.add(divisibleLabel, labelGBC);
+      		
+      	//CHECKBOX MOVABLE
+    //  	txtGBC.gridy = 5;
+      	this.chkMovable = new JCheckBox();
+      	this.chkMovable.setSelected(true);
+      	
+      	 gridBagConstraints = new java.awt.GridBagConstraints();
+         gridBagConstraints.gridx = 2;
+         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
+         add(this.chkMovable, gridBagConstraints);
+
+
+        
       	//LABEL QUANTITY
       //	labelGBC.gridy = 3;
       	JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
-      	
+
+      	gridy++;
       	gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(quantityLabel, gridBagConstraints);
@@ -250,7 +284,7 @@ public class IssueAssetPanel extends JPanel
       	this.txtQuantity.setText("0");
       	
       	 gridBagConstraints.gridx = 2;
-         gridBagConstraints.gridy = 8;
+         //gridBagConstraints.gridy = 8;
          gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
@@ -264,9 +298,10 @@ public class IssueAssetPanel extends JPanel
     //  	labelGBC.gridy = 4;
       	JLabel scaleLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
       	
+      	gridy +=2;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(scaleLabel, gridBagConstraints);
@@ -281,7 +316,7 @@ public class IssueAssetPanel extends JPanel
       	
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 2;
-         gridBagConstraints.gridy = 10;
+         //gridBagConstraints.gridy = 10;
          gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
@@ -291,10 +326,11 @@ public class IssueAssetPanel extends JPanel
 
         //LABEL DIVISIBLE
    //   	labelGBC.gridy = 5;
+       	gridy +=2;
       	JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
       	gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
         add(divisibleLabel, gridBagConstraints);
@@ -309,7 +345,7 @@ public class IssueAssetPanel extends JPanel
       	
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 2;
-         gridBagConstraints.gridy = 12;
+         //gridBagConstraints.gridy = 12;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
          add(this.chkDivisible, gridBagConstraints);
@@ -319,10 +355,11 @@ public class IssueAssetPanel extends JPanel
       	
         //LABEL FEE POW
     //  	labelGBC.gridy = 6;
+       	gridy +=2;
       	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 0;
-         gridBagConstraints.gridy = 14;
+         //gridBagConstraints.gridy = gridy;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
          add(feeLabel, gridBagConstraints);
@@ -335,7 +372,7 @@ public class IssueAssetPanel extends JPanel
       	this.txtFeePow.setText("0");
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 2;
-         gridBagConstraints.gridy = 14;
+         //gridBagConstraints.gridy = 14;
          gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
@@ -355,9 +392,10 @@ public class IssueAssetPanel extends JPanel
 		    }
 		});
     	
+      	gridy +=2;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 15);
         add(this.issueButton, gridBagConstraints);
@@ -365,10 +403,11 @@ public class IssueAssetPanel extends JPanel
         
         
        JLabel jLabel9 = new JLabel();
+     	gridy +=2;
 		jLabel9.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
+        //gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -435,7 +474,7 @@ public class IssueAssetPanel extends JPanel
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), quantity, scale, this.chkDivisible.isSelected(), feePow);
+			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())
