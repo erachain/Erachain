@@ -242,7 +242,7 @@ public class R_Vouch extends Transaction {
 		
 		
 		if (!this.creator.isPerson(db))
-			if (this.creator.getBalanceUSR(Transaction.RIGHTS_KEY, db).compareTo(BigDecimal.TEN) <= 0)
+			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db).compareTo(BigDecimal.TEN) <= 0)
 				return Transaction.NOT_ENOUGH_RIGHTS;
 
 
@@ -263,7 +263,7 @@ public class R_Vouch extends Transaction {
 
 		// update value
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew;
-		BigDecimal amount = this.creator.getBalanceUSR(Transaction.RIGHTS_KEY, db);
+		BigDecimal amount = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db);
 		List<Tuple2<Integer, Integer>> listNew;
 		if (value == null) {
 			listNew = new ArrayList<Tuple2<Integer, Integer>>();
@@ -302,7 +302,7 @@ public class R_Vouch extends Transaction {
 		
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew =
 				new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
-					value.a.subtract(this.creator.getBalanceUSR(Transaction.RIGHTS_KEY, db)),
+					value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)),
 					listNew
 					);
 		db.getVouchRecordMap().set(recordKey, valueNew);

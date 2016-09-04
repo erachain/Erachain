@@ -95,9 +95,9 @@ public class TransactionV3Tests {
 		
 		messageTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
 		int dd = messageTransactionV3.getDataLength(false);
@@ -177,11 +177,11 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSE(61l, db));
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 		
@@ -252,8 +252,8 @@ public class TransactionV3Tests {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSE(61l, db));
 
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);

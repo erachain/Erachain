@@ -142,7 +142,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 
 
 		
-		BigDecimal balERM = this.creator.getBalanceUSR(RIGHTS_KEY, db);
+		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
 		if ( this.creator.isPerson(db) )
 		{
 			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )

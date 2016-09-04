@@ -89,7 +89,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		// CHECH MAKER IS PERSON?
 		if (!this.creator.isPerson(db)
 				// OR RIGHTS_KEY ENOUGHT
-				&& this.creator.getBalanceUSR(Transaction.RIGHTS_KEY, db)
+				&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
 						.compareTo(new BigDecimal(1000)) < 0)
 			
 			return Transaction.ACCOUNT_NOT_PERSONALIZED;

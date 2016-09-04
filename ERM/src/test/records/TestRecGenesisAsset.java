@@ -244,7 +244,7 @@ public class TestRecGenesisAsset {
 		genesisIssueAssetTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSR(key,db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
 		assertEquals(false, db.getItemAssetMap().contains(key));
@@ -412,7 +412,7 @@ public class TestRecGenesisAsset {
 		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(amoSend, recipient.getBalanceUSR(key, db));
+		assertEquals(amoSend, recipient.getBalanceUSE(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -445,7 +445,7 @@ public class TestRecGenesisAsset {
 		//assertEquals(total, maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		/* not NEED
 		//CHECK REFERENCE SENDER

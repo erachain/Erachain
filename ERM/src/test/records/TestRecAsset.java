@@ -12,7 +12,10 @@ import java.util.List;
 import ntp.NTP;
 
 import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
@@ -49,6 +52,8 @@ public class TestRecAsset {
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
 	private GenesisBlock gb;
+	private BlockChain bchain;
+	Controller cntrl;
 	
 	//CREATE KNOWN ACCOUNT
 	byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
@@ -60,14 +65,21 @@ public class TestRecAsset {
 	PrivateKeyAccount maker_1 = new PrivateKeyAccount(privateKey_1);
 	
 	AssetCls asset;
-	long key = -1;
+	AssetCls assetMovable;
+	long key = 0;
 
+	R_Send rsend;
+	Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3;
+	
 	// INIT ASSETS
 	private void init() {
 		
 		db = DBSet.createEmptyDatabaseSet();
-		gb = new GenesisBlock();
-		gb.process(db);
+		cntrl = Controller.getInstance();
+		cntrl.initBlockChain(db);
+		bchain = cntrl.getBlockChain();
+		gb = bchain.getGenesisBlock();
+		//gb.process(db);
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
@@ -78,6 +90,7 @@ public class TestRecAsset {
 		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
 
+		assetMovable = new AssetVenture(maker, "movable", icon, image, "...", true, 50000l, (byte) 2, true);
 
 	}
 	
@@ -215,7 +228,7 @@ public class TestRecAsset {
 		LOGGER.info("asset KEY: " + asset.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getBalanceUSR(asset.getKey(db), db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getBalanceUSE(asset.getKey(db), db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
@@ -245,13 +258,13 @@ public class TestRecAsset {
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(db, false);
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
-		assertEquals(new BigDecimal(1).setScale(8), maker.getBalanceUSR(key,db));
+		assertEquals(new BigDecimal(1).setScale(8), maker.getBalanceUSE(key,db));
 		assertEquals((long)issueAssetTransaction.getTimestamp(), (long)maker.getLastReference(db));
 		
 		issueAssetTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSR(key,db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
 		assertEquals(false, db.getItemAssetMap().contains(key));
@@ -313,7 +326,7 @@ public class TestRecAsset {
 		issueAssetTransaction.process(db, false);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -457,11 +470,11 @@ public class TestRecAsset {
 		assetTransfer.process(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(assetTransfer.getTimestamp(), maker.getLastReference(db));
@@ -489,10 +502,10 @@ public class TestRecAsset {
 		assetTransfer.orphan(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(assetTransfer.getReference(), maker.getLastReference(db));
@@ -558,7 +571,7 @@ public class TestRecAsset {
 		issueMessageTransaction.process(db, false);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -599,7 +612,7 @@ public class TestRecAsset {
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertEquals(Transaction.NEGATIVE_AMOUNT, messageTransaction.isValid(db, releaserReference));	
+		assertEquals(Transaction.NOT_MOVABLE_ASSET, messageTransaction.isValid(db, releaserReference));	
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(8),
@@ -633,7 +646,7 @@ public class TestRecAsset {
 		issueAssetTransaction.process(db, false);
 		Long key_1 = issueAssetTransaction.getAssetKey(db);
 		assertEquals((long)key+1, (long)key_1);
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSR(key_1, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(key_1, db));
 
 		BigDecimal amo = BigDecimal.TEN.setScale(8);
 		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
@@ -645,7 +658,7 @@ public class TestRecAsset {
 		messageTransaction.process(db, false);
 						
 		//CHECK IF UNLIMITED ASSET TRANSFERED with no balance
-		assertEquals(BigDecimal.ZERO.subtract(amo), maker.getBalanceUSR(key_1, db));
+		assertEquals(BigDecimal.ZERO.subtract(amo), maker.getBalanceUSE(key_1, db));
 
 		// TRY INVALID SEND FRON NOT CREATOR
 		
@@ -656,7 +669,7 @@ public class TestRecAsset {
 		assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(db, releaserReference));	
 						
 		//CHECK IF UNLIMITED ASSET TRANSFERED with no balance
-		assertEquals(BigDecimal.ZERO.setScale(8), maker_1.getBalanceUSR(key_1, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), maker_1.getBalanceUSE(key_1, db));
 
 }
 	
@@ -759,11 +772,11 @@ public class TestRecAsset {
 		messageTransaction.process(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(messageTransaction.getTimestamp(), maker.getLastReference(db));
@@ -793,17 +806,221 @@ public class TestRecAsset {
 		messageTransaction.orphan(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSR(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(messageTransaction.getReference(), maker.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertNotEquals(messageTransaction.getTimestamp(), recipient.getLastReference(db));
+	}
+
+	/////////////////////////////////////////////
+	////////////
+	@Test
+	public void validate_R_Send_Movable_Asset() 
+	{	
+		
+		init();
+						
+		//CREATE ISSUE ASSET TRANSACTION
+		IssueAssetTransaction issueMessageTransaction = new IssueAssetTransaction(maker, assetMovable, FEE_POWER, timestamp++, maker.getLastReference(db));
+		assertEquals(Transaction.VALIDATE_OK, issueMessageTransaction.isValid(db, releaserReference));
+
+		issueMessageTransaction.sign(maker, false);
+		issueMessageTransaction.process(db, false);
+		long key = assetMovable.getKey(db);
+		
+		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
+		assertEquals(new BigDecimal(assetMovable.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		
+		//CREATE SIGNATURE
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+		
+		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.NO_HOLD_BALANCE, rsend.isValid(db, releaserReference));	
+
+		//CREATE VALID ASSET TRANSFER
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+
+		//CHECK IF ASSET TRANSFER IS VALID
+		assertEquals(Transaction.VALIDATE_OK, rsend.isValid(db, releaserReference));
+		
+		rsend.sign(maker, false);
+		rsend.process(db, false);
+		
+		//NOW IT WILL BE vaLID
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.VALIDATE_OK, rsend.isValid(db, releaserReference));	
+		
+		timestamp ++;
+		
+		//CREATE VALID ASSET TRANSFER
+		//maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+
+		//CHECK IF ASSET TRANSFER IS VALID
+		assertEquals(Transaction.VALIDATE_OK, rsend.isValid(db, releaserReference));			
+				
+		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.NO_HOLD_BALANCE, rsend.isValid(db, releaserReference));	
+
+		
+		
+		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
+		rsend = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, rsend.isValid(db, releaserReference));	
+
+		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
+		rsend = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.NO_BALANCE, rsend.isValid(db, releaserReference));	
+
+		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, -123L);
+						
+		//CHECK IF ASSET TRANSFER IS INVALID
+		assertEquals(Transaction.INVALID_REFERENCE, rsend.isValid(db, releaserReference));	
+
+		// NOT DIVISIBLE
+		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", false, 0l, (byte) 0, false);
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp++, maker.getLastReference(db));
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));	
+		issueAssetTransaction.sign(maker, false);
+		issueAssetTransaction.process(db, false);
+		Long key_1 = issueAssetTransaction.getAssetKey(db);
+		assertEquals((long)key+1, (long)key_1);
+		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(key_1, db));
+
+		BigDecimal amo = BigDecimal.TEN.setScale(8);
+		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
+		rsend = new R_Send(maker, FEE_POWER, recipient, key_1,
+				amo,
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		assertEquals(Transaction.VALIDATE_OK, rsend.isValid(db, releaserReference));	
+		rsend.process(db, false);
+						
+		//CHECK IF UNLIMITED ASSET TRANSFERED with no balance
+		assertEquals(BigDecimal.ZERO.subtract(amo), maker.getBalanceUSE(key_1, db));
+
+		// TRY INVALID SEND FRON NOT CREATOR
+		
+		rsend = new R_Send(maker_1, FEE_POWER, recipient, key_1,
+				amo,
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker_1.getLastReference(db));
+		assertEquals(Transaction.NO_BALANCE, rsend.isValid(db, releaserReference));	
+						
+		//CHECK IF UNLIMITED ASSET TRANSFERED with no balance
+		assertEquals(BigDecimal.ZERO.setScale(8), maker_1.getBalanceUSE(key_1, db));
+
+	}
+
+	@Test
+	public void process_Movable_Asset()
+	{
+
+		init();
+		//CREATE ISSUE ASSET TRANSACTION
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, assetMovable, FEE_POWER, timestamp++, maker.getLastReference(db));
+		issueAssetTransaction.sign(maker, false);
+		issueAssetTransaction.process(db, false);
+
+		key = assetMovable.getKey(db);
+		
+		//CREATE SIGNATURE
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+		long timestamp = NTP.getTime();
+
+		// SET BALANCES
+		db.getAssetBalanceMap().set(maker.getAddress(), key, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+				BigDecimal.valueOf(20).setScale(8),
+				BigDecimal.valueOf(10).setScale(8),
+				BigDecimal.valueOf(0).setScale(8))
+				);
+		
+		//CREATE ASSET TRANSFER
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		assertEquals(rsend.isValid(db, releaserReference), Transaction.NO_BALANCE);
+
+		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(25).setScale(8),
+				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				timestamp++, maker.getLastReference(db));
+		assertEquals(rsend.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+
+		
+		rsend.sign(maker, false);
+		rsend.process(db, false);
+		
+		balance3 = maker.getBalance3(key, db);
+		
+		//CHECK BALANCE SENDER
+		
+		assertEquals(BigDecimal.valueOf(100).setScale(8), balance3.c);
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
+				
+		//CHECK BALANCE RECIPIENT
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSE(key, db));
+		
+		//CHECK REFERENCE SENDER
+		assertEquals(rsend.getTimestamp(), maker.getLastReference(db));
+		
+		//CHECK REFERENCE RECIPIENT
+		assertNotEquals(rsend.getTimestamp(), recipient.getLastReference(db));
+	
+		//////////////////////////////////////////////////
+		/// ORPHAN
+		/////////////////////////////////////////////////
+		rsend.orphan(db, false);
+		
+		//CHECK BALANCE SENDER
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
+				
+		//CHECK BALANCE RECIPIENT
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
+		
+		//CHECK REFERENCE SENDER
+		assertEquals(rsend.getReference(), maker.getLastReference(db));
+		
+		//CHECK REFERENCE RECIPIENT
+		assertNotEquals(rsend.getTimestamp(), recipient.getLastReference(db));
 	}
 
 	

@@ -97,9 +97,9 @@ public class Account {
 	*/
 	public BigDecimal getBalanceUSE(long key)
 	{
-		return this.getBalanceUSR(key, DBSet.getInstance());
+		return this.getBalanceUSE(key, DBSet.getInstance());
 	}	
-	public BigDecimal getBalanceUSR(long key, DBSet db)
+	public BigDecimal getBalanceUSE(long key, DBSet db)
 	{
 		if (key < 0)
 			key = -key;
@@ -177,6 +177,15 @@ public class Account {
 		}
 		db.getAssetBalanceMap().set(getAddress(), key, value);
 	}
+	
+	public void setBalance3(long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> balance, DBSet db)
+	{
+		if (key < 0)
+			key = -key;
+		
+		db.getAssetBalanceMap().set(getAddress(), key, balance);
+	}
+
 
 	
 	// STATUS

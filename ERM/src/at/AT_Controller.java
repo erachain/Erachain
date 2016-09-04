@@ -444,7 +444,7 @@ public abstract class AT_Controller {
 		{
 			String atId = Base58.encode( at.getId() );
 			Account account = new Account(atId);
-			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getBalanceUSR(Transaction.FEE_KEY, dbSet));
+			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getBalanceUSE(Transaction.FEE_KEY, dbSet));
 			//atLastState.put( atId ,  tempAtStates.get( atId ) );
 			dbSet.getATMap().update( at , blockHeight );
 			dbSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
@@ -547,14 +547,14 @@ public abstract class AT_Controller {
 					{
 						recipient.setLastReference(-1L, dbSet);
 					}
-					recipient.setBalance( Transaction.FEE_KEY, recipient.getBalanceUSR( Transaction.FEE_KEY, dbSet ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
+					recipient.setBalance( Transaction.FEE_KEY, recipient.getBalanceUSE( Transaction.FEE_KEY, dbSet ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
 				}
 				else
 				{
 					totalFees += tx.getAmount();
 				}
-				sender.setBalance( Transaction.FEE_KEY, sender.getBalanceUSR( Transaction.FEE_KEY, dbSet ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
-				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalanceUSR(Transaction.FEE_KEY, dbSet));
+				sender.setBalance( Transaction.FEE_KEY, sender.getBalanceUSE( Transaction.FEE_KEY, dbSet ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
+				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalanceUSE(Transaction.FEE_KEY, dbSet));
 			}
 
 		}
@@ -571,7 +571,7 @@ public abstract class AT_Controller {
 	{
 		Account account = new Account( Base58.encode( id ) );
 
-		BigDecimal balance = account.getBalanceUSR( Transaction.FEE_KEY, dbSet );
+		BigDecimal balance = account.getBalanceUSE( Transaction.FEE_KEY, dbSet );
 
 		byte[] balanceBytes = balance.unscaledValue().toByteArray();
 		byte[] fill = new byte[8 - balanceBytes.length];

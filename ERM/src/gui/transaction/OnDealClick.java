@@ -81,6 +81,13 @@ public class OnDealClick
 		case Transaction.NO_BALANCE:
 			mess = "No balance";
 			break;
+		case Transaction.NO_DEBT_BALANCE:
+			mess = "No debt balance";
+			break;
+		case Transaction.NO_HOLD_BALANCE:
+			mess = "No hold balance";
+			break;
+			
 		case Transaction.INVALID_REFERENCE:
 			mess = "Invalid reference";
 			break;
@@ -225,6 +232,9 @@ public class OnDealClick
 			break;
 		case Transaction.INVALID_TYPE_LENGTH:
 			mess = "Invalid type lenght";
+			break;
+		case Transaction.NOT_MOVABLE_ASSET:
+			mess = "Not movable asset";
 			break;
 						
 		case Transaction.INVALID_RAW_DATA:

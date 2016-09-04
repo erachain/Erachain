@@ -97,9 +97,9 @@ public class TestRec_Send {
 		
 		r_SendV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
 		int dd = r_SendV3.getDataLength(false);
@@ -142,9 +142,9 @@ public class TestRec_Send {
 		
 		r_SendV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(0).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(0).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
 		
 		rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
 		dd = r_SendV3.getDataLength(false);
@@ -160,7 +160,7 @@ public class TestRec_Send {
 		assertEquals(new String(r_SendV3.getData()), new String(messageTransactionV3_2.getData()));
 		assertEquals(r_SendV3.getCreator(), messageTransactionV3_2.getCreator());
 		assertEquals(r_SendV3.getRecipient(), messageTransactionV3_2.getRecipient());
-		assertEquals(-1, messageTransactionV3_2.getKey());
+		assertEquals(0, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
@@ -188,9 +188,9 @@ public class TestRec_Send {
 		
 		r_SendV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
 		
 		rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
 		dd = r_SendV3.getDataLength(false);
@@ -232,9 +232,9 @@ public class TestRec_Send {
 		
 		r_SendV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSR(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(0).setScale(8), recipient.getBalanceUSR(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(0).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
 		
 		rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
 		dd = r_SendV3.getDataLength(false);
@@ -251,7 +251,7 @@ public class TestRec_Send {
 		assertEquals(null,messageTransactionV3_2.getData());
 		assertEquals(r_SendV3.getCreator(), messageTransactionV3_2.getCreator());
 		assertEquals(r_SendV3.getRecipient(), messageTransactionV3_2.getRecipient());
-		assertEquals(-1, messageTransactionV3_2.getKey());
+		assertEquals(0, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
 		assertEquals(r_SendV3.isSignatureValid(), true);
@@ -314,11 +314,11 @@ public class TestRec_Send {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSR(61l, db));
-		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSE(61l, db));
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 		
@@ -389,8 +389,8 @@ public class TestRec_Send {
 		
 		arbitraryTransactionV3.process(db, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSR(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSR(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSE(61l, db));
 
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);

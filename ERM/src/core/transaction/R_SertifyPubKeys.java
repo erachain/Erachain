@@ -461,7 +461,7 @@ public class R_SertifyPubKeys extends Transaction {
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}
 
-		BigDecimal balERM = this.creator.getBalanceUSR(RIGHTS_KEY, db);
+		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
 		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
@@ -500,9 +500,9 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 		// send GIFT FEE_KEY
-		this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSR(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
+		this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);						
 		pkAccount.setBalance(Transaction.FEE_KEY, 
-				pkAccount.getBalanceUSR(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
+				pkAccount.getBalanceUSE(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);
 		
 		int add_day = this.add_day;
 		// set to time stamp of record
@@ -553,8 +553,8 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 		// BACK GIFT FEE_KEY
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
-		pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalanceUSR(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, db).add(GIFTED_FEE_AMOUNT), db);						
+		pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalanceUSE(Transaction.FEE_KEY, db).subtract(GIFTED_FEE_AMOUNT), db);
 						
 		//UPDATE RECIPIENT
 		String address;

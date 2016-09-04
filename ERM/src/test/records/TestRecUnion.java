@@ -321,8 +321,8 @@ public class TestRecUnion {
 		LOGGER.info("union KEY: " + union.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSR(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(8), certifier.getBalanceUSR(FEE_KEY, db));
+		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssueUnionMap().get(issueUnionTransaction);
@@ -339,8 +339,8 @@ public class TestRecUnion {
 		issueUnionTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSR(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSR(FEE_KEY, db));
+		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS ISSUER
 		assertEquals(false, db.getItemUnionMap().contains(unionKey));

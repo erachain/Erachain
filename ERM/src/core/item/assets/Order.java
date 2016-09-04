@@ -416,7 +416,7 @@ public class Order implements Comparable<Order> {
 	public void process(DBSet db, Transaction transaction) 
 	{
 		//REMOVE HAVE
-		this.creator.setBalance(this.have, this.creator.getBalanceUSR(this.have, db).subtract(this.amountHave), db);
+		this.creator.setBalance(this.have, this.creator.getBalanceUSE(this.have, db).subtract(this.amountHave), db);
 		
 		//ADD ORDER TO DATABASE
 		db.getOrderMap().add(this.copy());
@@ -565,7 +565,7 @@ public class Order implements Comparable<Order> {
 		db.getOrderMap().delete(this);	
 		
 		//REMOVE HAVE
-		this.creator.setBalance(this.have, this.creator.getBalanceUSR(this.have, db).add(this.amountHave), db);
+		this.creator.setBalance(this.have, this.creator.getBalanceUSE(this.have, db).add(this.amountHave), db);
 	}
 	
 	// TODO delete this

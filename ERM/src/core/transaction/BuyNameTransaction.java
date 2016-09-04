@@ -256,11 +256,11 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
-		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSR(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSE(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 						
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		name = new Name(this.creator, name.getName(), name.getValue());
@@ -276,10 +276,10 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSR(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER
-		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSR(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalanceUSE(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		Name name = this.nameSale.getName(db);

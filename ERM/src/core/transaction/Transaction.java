@@ -54,12 +54,13 @@ public abstract class Transaction {
 	public static final int INVALID_DATE = 14;
 	public static final int INVALID_CREATOR = 15; // for some reasons that creator is invalid (same as trade order)
 	public static final int INVALID_SIGNATURE = 16;
+	public static final int NO_DEBT_BALANCE = 17;
+	public static final int NO_HOLD_BALANCE = 18;
 	
 	public static final int NOT_ENOUGH_RIGHTS = 20;
 	public static final int ACCOUNT_NOT_PERSONALIZED = 21;
 	public static final int ACCOUNT_ALREADY_PERSONALIZED = 23;
 	public static final int TRANSACTION_DOES_NOT_EXIST = 24;
-	
 
 	// ASSETS
 	public static final int INVALID_QUANTITY = 30;
@@ -76,6 +77,7 @@ public abstract class Transaction {
 	public static final int INVALID_CREATION_BYTES = 41;
 	public static final int INVALID_TAGS_LENGTH = 42;
 	public static final int INVALID_TYPE_LENGTH = 43;
+	public static final int NOT_MOVABLE_ASSET = 44;
 
 	public static final int INVALID_NAME_LENGTH = 50;
 	public static final int INVALID_ICON_LENGTH = 51;
@@ -753,7 +755,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalanceUSR(FEE_KEY, db).compareTo(this.fee) == -1)
+		if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(this.fee) == -1)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -772,7 +774,7 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSR(FEE_KEY, db)
+				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db)
 						.subtract(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
@@ -788,7 +790,7 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSR(FEE_KEY, db).add(this.fee), db);
+				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db).add(this.fee), db);
 
 				//UPDATE REFERENCE OF SENDER
 				if (this.isReferenced() )

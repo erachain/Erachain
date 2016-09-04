@@ -301,7 +301,7 @@ public class R_SetUnionToItem extends Transaction {
 		if ( item == null )
 			return Transaction.ITEM_DOES_NOT_EXIST;
 		
-		BigDecimal balERM = this.creator.getBalanceUSR(RIGHTS_KEY, db);
+		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
 		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
