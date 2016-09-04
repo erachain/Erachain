@@ -76,13 +76,21 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 	else a = asset.getName();
 	
 	jTextArea_Title.setText(Lang.getInstance().translate("If You want to confiscate in debt issued asset %asset%, fill in this form").replace("%asset%", a));
+
+	
+	toLabel.setText(Lang.getInstance().translate("Account debtor"));	
+	
+	
 //	icon.setIcon(null);	
 		
 		
 		
 // favorite combo box	
 		cbxFavorites.setModel(new AssetsComboBoxModel());
-		if (asset != null) cbxFavorites.setSelectedItem(asset);
+		if (asset != null) {
+			cbxFavorites.setSelectedItem(asset);
+			cbxFavorites.setEnabled(false);//.setEditable(false);
+		}
 // accoutn ComboBox		
 		this.accountsModel = new AccountsComboBoxModel();
         this.cbxFrom.setModel(accountsModel);

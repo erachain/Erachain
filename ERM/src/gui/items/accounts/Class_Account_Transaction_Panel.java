@@ -85,6 +85,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 	public JLabel messageLabel;
 	public JLabel icon;
 	public JTextArea jTextArea_Title;
+	public JLabel toLabel;
 	
 	public Class_Account_Transaction_Panel()
 	{
@@ -141,6 +142,7 @@ jTextArea_Title.setBackground(this.getBackground());
 jTextArea_Title.setFocusCycleRoot(true);
 				
 jTextArea_Title.setText(Lang.getInstance().translate("Title"));
+jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
 				
 				this.add(jTextArea_Title, titlelabelGBC);
@@ -202,7 +204,7 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
 		labelToGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelToGBC.weightx = 0;	
 		labelToGBC.gridx = 0;
-		JLabel toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
+		toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
 		this.add(toLabel, labelToGBC);
       	
       	//TXT TO

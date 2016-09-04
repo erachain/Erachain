@@ -82,7 +82,10 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 		
 // favorite combo box	
 		cbxFavorites.setModel(new AssetsComboBoxModel());
-		if (asset != null) cbxFavorites.setSelectedItem(asset);
+		if (asset != null){
+			cbxFavorites.setEnabled(false);//.
+			cbxFavorites.setSelectedItem(asset);
+		}
 // accoutn ComboBox		
 		this.accountsModel = new AccountsComboBoxModel();
         this.cbxFrom.setModel(accountsModel);
