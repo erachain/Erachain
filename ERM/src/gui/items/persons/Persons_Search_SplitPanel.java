@@ -96,7 +96,7 @@ package gui.items.persons;
 		
 	//Custom renderer for the String column;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			search_Table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+			search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()))); // set renderer
 		
 	//CHECKBOX FOR FAVORITE
 			TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
@@ -114,7 +114,7 @@ package gui.items.persons;
 			jTable_jScrollPanel_LeftPanel.setModel(this.search_Table_Model);
 			jTable_jScrollPanel_LeftPanel = search_Table;
 			jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-			setRowHeightFormat(true);
+	//		setRowHeightFormat(true);
 	// Event LISTENER		
 			jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 		

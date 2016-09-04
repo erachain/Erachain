@@ -97,7 +97,7 @@
 			
 			//Custom renderer for the String column;
 			my_Person_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()))); // set renderer
 					
 					
 			my_Sorter = new TableRowSorter(my_PersonsModel);
@@ -128,7 +128,7 @@
 			this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
 			this.jTable_jScrollPanel_LeftPanel = my_Person_table;
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
-			this.setRowHeightFormat(true);
+	//		this.setRowHeightFormat(true);
 			 
 			// EVENTS on CURSOR
 			my_Person_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());

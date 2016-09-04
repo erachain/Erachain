@@ -144,7 +144,7 @@ import gui.models.Renderer_Boolean;
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
-			this.setRowHeightFormat(false);
+	//		this.setRowHeightFormat(false);
 			 
 			// EVENTS on CURSOR
 			this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());

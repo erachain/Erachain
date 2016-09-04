@@ -55,7 +55,7 @@ public Search_Imprints_Tab(){
 
 //Custom renderer for the String column;
 	imprintsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	imprintsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+	imprintsTable.setDefaultRenderer(String.class, new Renderer_Left(imprintsTable.getFontMetrics(imprintsTable.getFont()))); // set renderer
 	imprintsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 //CHECKBOX FOR FAVORITE
 //	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);

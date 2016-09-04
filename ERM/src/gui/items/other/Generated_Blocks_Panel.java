@@ -53,7 +53,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
 		sorter = new CoreRowSorter(blocksModel, indexes);
 		jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
 		jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-		setRowHeightFormat(true);
+	//	setRowHeightFormat(true);
 
        // this.addTab(Lang.getInstance().translate("Generated Blocks"), new JScrollPane(blocksTable));
 		

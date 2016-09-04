@@ -95,7 +95,7 @@ public class RecordsPanel extends  JPanel // JPanel
 		//Custom renderer for the String column;
 		//RenderingHints.
 		this.transactionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left(this.transactionsTable.getFontMetrics(this.transactionsTable.getFont()))); // set renderer
 		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
 		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer

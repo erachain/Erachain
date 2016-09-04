@@ -117,7 +117,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		columnModel.getColumn(0).setMaxWidth((100));
 		//Custom renderer for the String column;
 		statusesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		statusesTable.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+		statusesTable.setDefaultRenderer(String.class, new Renderer_Left(statusesTable.getFontMetrics(statusesTable.getFont()))); // set renderer
 		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelItemStatuses.COLUMN_FAVORITE);
 			
@@ -533,7 +533,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			
 			//Custom renderer for the String column;
 			table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+			table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()))); // set renderer
 			
 			
 			TableRowSorter sorter1 = new TableRowSorter(statusesModel);

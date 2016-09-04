@@ -137,7 +137,7 @@ public class AssetPairSelect extends JFrame{
 	  //Custom renderer for the String column;
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(pair_Panel.jTable_jScrollPanel_LeftPanel.getFontMetrics(pair_Panel.jTable_jScrollPanel_LeftPanel.getFont()))); // set renderer
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
 	    
@@ -175,7 +175,7 @@ public class AssetPairSelect extends JFrame{
 	    
 				// изменение высоты строки при изменении ширины  
 				
-				pair_Panel.setRowHeightFormat(true);
+		//		pair_Panel.setRowHeightFormat(true);
 	    
 
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().setPreferredSize(new Dimension(10, (int)(pair_Panel.jTable_jScrollPanel_LeftPanel .getTableHeader().getPreferredSize().getHeight()+6)));

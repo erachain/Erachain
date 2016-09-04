@@ -154,7 +154,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
                 
       //BALANCES
         holders_jTable1.setModel(new BalancesTableModel(imprint.getKey()));
-        holders_jTable1.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
+        holders_jTable1.setDefaultRenderer(String.class, new Renderer_Left(holders_jTable1.getFontMetrics(holders_jTable1.getFont()))); // set renderer
         holders_jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
         //CHECKBOX FOR FAVORITE
         		TableColumn to_Date_Column1 = holders_jTable1.getColumnModel().getColumn( BalancesTableModel.COLUMN_BALANCE);	

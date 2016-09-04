@@ -102,8 +102,8 @@ import gui.models.Renderer_Boolean;
 		
 	//Custom renderer for the String column;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			search_Table.setDefaultRenderer(String.class, new Renderer_Left()); // set renderer
-			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left()); // set renderer
+			search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()))); // set renderer
+			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()))); // set renderer
 			
 			 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 			
@@ -125,7 +125,7 @@ import gui.models.Renderer_Boolean;
 			jTable_jScrollPanel_LeftPanel.setModel(this.search_Table_Model);
 			jTable_jScrollPanel_LeftPanel = search_Table;
 			jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-			setRowHeightFormat(true);
+		//	setRowHeightFormat(true);
 	// Event LISTENER		
 			jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 		
