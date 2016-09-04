@@ -26,6 +26,9 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import gui.AccountsFrame;
 import gui.Send_Frame;
+import gui.items.accounts.Account_Confiscate_Debt_Dialog;
+import gui.items.accounts.Account_Lend_Dialog;
+import gui.items.accounts.Account_Repay_Debt_Dialog;
 import gui.items.assets.IssueAssetDialog;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
@@ -328,8 +331,8 @@ public class Menu extends JMenuBar
         personsMenu.addSeparator();  
         personsMenu.add(ripPersonMenu);  
 
-        // DEALS
-
+ // DEALS
+// Send
         JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
         dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
         dealsMenuSendMessage.addActionListener(new ActionListener()
@@ -340,8 +343,8 @@ public class Menu extends JMenuBar
         		selectOrAdd(new Send_Frame(null, null), MainFrame.desktopPane.getAllFrames());
         	}
         });
-        dealsMenu.add(dealsMenuSendMessage);
-        
+       dealsMenu.add(dealsMenuSendMessage);
+ //vouch       
         JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
         dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener()
@@ -353,7 +356,70 @@ public class Menu extends JMenuBar
         		new VouchRecordDialog();
         	}
         });
-     //   dealsMenu.add(dealsMenuVouchRecord);
+        dealsMenu.add(dealsMenuVouchRecord);
+
+
+        
+// Confiscate_Debt 
+        
+        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Confiscate_Debt.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		new Account_Confiscate_Debt_Dialog(null,null);
+        	}
+        });
+        dealsMenu.add(dealsMenu_Confiscate_Debt);
+        
+             
+        
+        
+        
+        
+        
+        
+  // Repay_Debt 
+        
+        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Repay_Debt.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		new Account_Repay_Debt_Dialog(null,null);
+        	}
+        });
+        dealsMenu.add(dealsMenu_Repay_Debt);
+        
+                 
+        
+        
+        
+  // to lend 
+        
+        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
+  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenuLend.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+        		new Account_Lend_Dialog(null,null);
+        	}
+        });
+        dealsMenu.add(dealsMenuLend);
+        
+           
+        
+        
+        
         
         JMenuItem dealsMenuSignNote = new JMenuItem(Lang.getInstance().translate("Statement"));
         dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statement record"));
