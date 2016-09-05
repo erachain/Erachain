@@ -67,7 +67,9 @@ import javax.swing.JLabel;
        // если для колонки установлен признай авто высоты то устанавливаем   
           if (column_auto_Height[column] || column_auto_Height[column]!=null)  rowww = Math.max(rowww, (int) (fontMetrics.stringWidth( value.toString()+"WW") / table.getColumnModel().getColumn(column).getWidth() +1));
           if(row1!=row){
-        	
+              
+        //	  System.out.println("row0"+row+" row1:"+row1+" hight:"+(int) (fontMetrics.getHeight() * rowww));
+        	  
         	  table.setRowHeight((row1), (int) (fontMetrics.getHeight() * rowww));
         	  rowww = 1;
         	  row1=row;
@@ -76,7 +78,8 @@ import javax.swing.JLabel;
         	  
           }
           
-          
+         
+        //  this.setSize(30, 100);
           
           
           

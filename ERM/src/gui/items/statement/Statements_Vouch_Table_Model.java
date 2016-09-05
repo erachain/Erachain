@@ -26,6 +26,7 @@ import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
 import core.transaction.R_SignNote;
 import core.transaction.R_SignStatement;
+import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -36,7 +37,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Table_Model_New extends AbstractTableModel implements Observer {
+public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -49,21 +50,22 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 //	public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
 	public static final int COLUMN_BODY = 2;
-	public static final int COLUMN_SIGNATURE = 3;
+//	public static final int COLUMN_AMOUNT = 2;
 //	public static final int COLUMN_FEE = 3;
 	List<Transaction> transactions;
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement","Signature"});//, AssetCls.FEE_NAME});
-	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator"});//, AssetCls.FEE_NAME});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
+	private String account;
 	
 	
-	public Statements_Table_Model_New(){
+	public Statements_Vouch_Table_Model(String acc){
 	//	transactions = new ArrayList<Transaction>();
 		
-	
+	account = acc;
 /*
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
@@ -99,7 +101,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 		//	genesisTimestamp = genesisBlock.getTimestamp(null);
 		transactions = new ArrayList<Transaction>();
 		Controller.getInstance().addObserver(this);	
-		transactions = read_Statement();	
+		transactions = read_Sign_Accoutns();	
 /*		// база данных	
 				DBSet dbSet = DBSet.getInstance();
 		// читаем все блоки
@@ -186,6 +188,17 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 		// TODO Auto-generated method stub
 		return transactions.size();
 	}
+	public String get_Account (){
+	
+		
+		
+		
+		
+		return null;
+		
+		
+		
+	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
@@ -200,8 +213,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 			Transaction transaction = this.transactions.get(row);
 			
 			
-			
-			 R_SignNote i = (R_SignNote)transaction;
+	//		R_Vouch i;
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
@@ -217,17 +229,14 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 				
 				
 				
-			case	 COLUMN_BODY:
+	//		case	 COLUMN_BODY:
 				
 				
 				
+	//			 i = (R_Vouch)transaction;
 				
+	//			return new String( i.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
 				
-				return new String( i.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
-				
-			case COLUMN_SIGNATURE:
-				
-				return new String(i.getSignature().toString());
 				
 	//		case COLUMN_AMOUNT:
 				
@@ -240,7 +249,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 			case COLUMN_CREATOR:
 				
 				
-				return transaction.getCreator().toString();
+				return (transaction.getCreator().toString());
 			}
 			
 			return null;
@@ -271,14 +280,14 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 //		System.out.println( message.getType());
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
+		if(message.getType() == ObserverMessage.ADD_STATEMENT_TYPE)
 		{
 			if(this.transactions == null)
 			{
 			//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			//	this.statusesMap .registerObserver();
 				//this.imprints.sort(PollMap.NAME_INDEX);
-				transactions = read_Statement();
+				transactions = read_Sign_Accoutns();
 			}
 			
 			this.fireTableDataChanged();
@@ -296,13 +305,13 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 				)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			transactions = read_Statement();
+			transactions = read_Sign_Accoutns();
 			this.fireTableDataChanged();
 		}	
 	}	
 	
 	
-	private List<Transaction> read_Statement(){
+	private List<Transaction> read_Sign_Accoutns(){
 		List<Transaction> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
@@ -320,7 +329,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 // проходим по транзакциям
 		for (Transaction transaction:db_transactions){
 // если ноте то пишем в transactions			
-		 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	tran.add(transaction);	
+		 if(transaction.getType() == Transaction.VOUCH_TRANSACTION  )	tran.add(transaction);	
 		
 		
 		}

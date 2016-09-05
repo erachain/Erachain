@@ -159,7 +159,7 @@ import gui.models.Renderer_Boolean;
 			});
 				   
 
-				timer.start();
+		//		timer.start();
 			
 			
 			
@@ -303,12 +303,13 @@ import gui.models.Renderer_Boolean;
 		 class search_listener implements ListSelectionListener  {
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
-		/*			PersonCls person = null;
-					if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
-					Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+					
+					Object statement_account = null;
+					if (search_Table.getSelectedRow() >= 0 ) statement_account = search_Table_Model.getValueAt(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()),1);
+					 Statement_Info info_panel = new Statement_Info(statement_account.toString());
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-		*/		}
+				}
 			}
 	// mouse listener		
 		class  search_Mouse extends MouseAdapter {
@@ -341,12 +342,12 @@ import gui.models.Renderer_Boolean;
 						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 					}
 		//			alpha = 255;
-					alpha_int = 5;
+			*/ 		alpha_int = 5;
 					Search_run_menu.setBackground(new Color(1,204,102,255));		
 				    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
 				    Search_run_menu.repaint();
 			        Search_run_menu.setVisible(true);		
-		   */ 
+		   
 			    
 			
 				}
