@@ -70,6 +70,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 	private DefaultTableModel messagesModel;
 	int width;
 	int fontHeight;
+	List<Transaction> transactions;
 	
 	public Statements_Table_Model()
 	{
@@ -86,7 +87,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 		topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
 		this.getColumn("").setCellRenderer( topRenderer );
 		
-		List<Transaction> transactions = new ArrayList<Transaction>();
+		transactions = new ArrayList<Transaction>();
 
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
@@ -322,7 +323,13 @@ public class Statements_Table_Model extends JTable implements Observer{
 	    return false;
 	}
 	 
+	
+	public Transaction get_Statement(int row){
+		
+		return transactions.get(row);
+	}
 
+	
 	@Override
 	public Object getValueAt(int row, int column)
 	{

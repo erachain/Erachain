@@ -175,6 +175,11 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 		return this.columnNames.length;
 	}
 	
+	public Transaction get_Statement(int row){
+		
+		return transactions.get(row);
+	}
+	
 	@Override
 	public String getColumnName(int index) 
 	{

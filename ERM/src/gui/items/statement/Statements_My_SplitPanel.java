@@ -48,7 +48,8 @@ import javax.swing.RowFilter;
 	import controller.Controller;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
-	import gui.MainFrame;
+import core.transaction.Transaction;
+import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
@@ -67,7 +68,7 @@ import gui.models.Renderer_Boolean;
 		private static final long serialVersionUID = 2717571093561259483L;
 
 		
-		private WalletItemPersonsTableModel my_PersonsModel;
+	
 		private JTable my_Statements_table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
@@ -91,8 +92,8 @@ import gui.models.Renderer_Boolean;
 			this.searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
 			//TABLE
-			my_PersonsModel = new WalletItemPersonsTableModel();
-			my_Statements_table =  new Statements_Table_Model(); //new JTable(my_PersonsModel);
+			
+			
 			
 			
 			my_Statements_table = new Statements_Table_Model();
@@ -138,7 +139,7 @@ import gui.models.Renderer_Boolean;
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/		// SET VIDEO			
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = new Statements_Table_Model(); //my_Statements_table;
+			this.jTable_jScrollPanel_LeftPanel = my_Statements_table; //my_Statements_table;
 			this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionBackground(new Color(209, 232, 255, 255));
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
@@ -176,7 +177,7 @@ import gui.models.Renderer_Boolean;
 		void favorite_my(JTable table){
 			int row = table.getSelectedRow();
 			row = table.convertRowIndexToModel(row);
-
+/*
 			PersonCls person = my_PersonsModel.getItem(row);
 			//new AssetPairSelect(asset.getKey());
 
@@ -195,7 +196,7 @@ import gui.models.Renderer_Boolean;
 					
 
 				table.repaint();
-
+*/
 		}
 
 		
@@ -219,7 +220,7 @@ import gui.models.Renderer_Boolean;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				favorite_my(my_Statements_table);
+	/*			favorite_my(my_Statements_table);
 				int row = my_Statements_table.getSelectedRow();
 				row = my_Statements_table.convertRowIndexToModel(row);
 				PersonCls person = my_PersonsModel.getItem(row);
@@ -232,7 +233,7 @@ import gui.models.Renderer_Boolean;
 					my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
 				}
 			
-			
+	*/		
 			}
 		
 		};
@@ -240,7 +241,7 @@ import gui.models.Renderer_Boolean;
 		class My_Mouse extends MouseAdapter {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				Point p = e.getPoint();
+		/*		Point p = e.getPoint();
 				int row = my_Statements_table.rowAtPoint(p);
 				row = my_Statements_table.convertRowIndexToModel(row);
 				PersonCls person = my_PersonsModel.getItem(row);
@@ -262,7 +263,7 @@ import gui.models.Renderer_Boolean;
 					my_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
 					my_run_menu.setVisible(true);	
 				}
-			}
+		*/	}
 		}
 
 		class My_Tab_Listener implements ListSelectionListener {
@@ -272,20 +273,11 @@ import gui.models.Renderer_Boolean;
 			public void valueChanged(ListSelectionEvent arg0) {
 				
 				 
-				Object statement=null;
-				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
-					
-					statement = jTable_jScrollPanel_LeftPanel.getValueAt(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()), 1);
-				}
-				//info1.show_001(person);
-				System.out.println(statement);
-				// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-				//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
-				////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-				
-				//Person_info_panel_001 info_panel = new Person_info_panel_001(statement, false);
-				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				//jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				Transaction statement = null;
+				if (my_Statements_table.getSelectedRow() >= 0 ) statement = ((Statements_Table_Model) my_Statements_table).get_Statement(my_Statements_table.convertRowIndexToModel(my_Statements_table.getSelectedRow()));
+				 Statement_Info info_panel = new Statement_Info(statement);
+				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 			}
 			
 		}
@@ -305,7 +297,7 @@ import gui.models.Renderer_Boolean;
 		
 			public void onChange() {
 				// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
+	/*			String search = searchTextField_SearchToolBar_LeftPanel.getText();
 				// SET FILTER
 				my_PersonsModel.fireTableDataChanged();
 			
@@ -313,7 +305,7 @@ import gui.models.Renderer_Boolean;
 				((DefaultRowSorter)  my_Sorter).setRowFilter(filter);
 					
 				my_PersonsModel.fireTableDataChanged();
-
+*/
 			}
 		}
 		

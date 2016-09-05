@@ -1,6 +1,12 @@
 package gui.items.statement;
 
+import java.nio.charset.Charset;
+
 import javax.swing.JTable;
+
+import core.transaction.R_SignNote;
+import core.transaction.Transaction;
+import lang.Lang;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,14 +22,21 @@ public class Statement_Info extends javax.swing.JPanel {
 
     /**
      * Creates new form Statement_Info
-     * @param account 
+     * @param statement 
      */
-    public Statement_Info(String account) {
+	 R_SignNote statement;
+	
+	
+    public Statement_Info(Transaction transaction) {
         initComponents();
         
-        Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(account);
+        Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(transaction.getCreator().getAddress());
         jTable_Sign = new JTable (table_sing_model);
         jScrollPane4.setViewportView(jTable_Sign);
+        statement = (R_SignNote)transaction;
+        jTextArea_Body.setText(new String( statement.getData(), Charset.forName("UTF-8") ));
+        jSplitPane1.setDividerLocation(350);//.setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
+       
     }
 
     /**
@@ -48,7 +61,7 @@ public class Statement_Info extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel_Title.setText("jLabel1");
+        jLabel_Title.setText(Lang.getInstance().translate("Statement"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -60,8 +73,7 @@ public class Statement_Info extends javax.swing.JPanel {
 
         jSplitPane1.setBorder(null);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPane1.setLastDividerLocation(0);
-
+       
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jTextArea_Body.setColumns(20);
@@ -80,7 +92,7 @@ public class Statement_Info extends javax.swing.JPanel {
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        jLabelTitlt_Table_Sign.setText("jLabel1");
+        jLabelTitlt_Table_Sign.setText(Lang.getInstance().translate("Signatures")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;

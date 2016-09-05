@@ -175,7 +175,7 @@ public class My_Notes_Tab extends Split_Panel {
 					
 					//	Table_Render("2", pair_Panel.jTable_jScrollPanel_LeftPanel);
 						
-				new Table_Formats().Table_Row_Auto_Height(table);
+		//		new Table_Formats().Table_Row_Auto_Height(table);
 						
 					}
 

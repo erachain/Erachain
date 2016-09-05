@@ -36,6 +36,7 @@ import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
 import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemImprintsTableModel;
@@ -88,7 +89,7 @@ public class My_Assets_Tab extends Split_Panel {
 	
 	//Custom renderer for the String column;
 	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()),assetsModel.get_Column_AutoHeight())); // set renderer
 	table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
 // column #1
@@ -175,7 +176,7 @@ public class My_Assets_Tab extends Split_Panel {
 					
 					//	Table_Render("2", pair_Panel.jTable_jScrollPanel_LeftPanel);
 						
-				new Table_Formats().Table_Row_Auto_Height(table);
+			//	new Table_Formats().Table_Row_Auto_Height(table);
 						
 					}
 

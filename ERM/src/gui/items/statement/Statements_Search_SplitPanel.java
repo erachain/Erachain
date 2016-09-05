@@ -49,7 +49,8 @@ import javax.swing.RowFilter;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
-	import gui.MainFrame;
+import core.transaction.Transaction;
+import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
@@ -171,7 +172,7 @@ import gui.models.Renderer_Boolean;
 		//	Search_run_menu.setBackground(new Color(0,204,102,255));
 		//	Dimension dim = new Dimension(180,70);
 	    //	Search_run_menu.setSize(dim);
-	    	Search_run_menu.setPreferredSize(new Dimension(180,70));
+	    	Search_run_menu.setPreferredSize(new Dimension(180,46));
 	    	Search_run_menu.setVisible(false);
 	    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
 	   // 	aaa.jButton1.setBorderPainted(false);
@@ -189,7 +190,7 @@ import gui.models.Renderer_Boolean;
 	    	}});
 	    	   	
 	    	
-	    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
+	    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Sign"));
 	    	Search_run_menu.jButton2.setContentAreaFilled(false);
 	    	Search_run_menu.jButton2.setOpaque(false);
 	    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
@@ -201,7 +202,7 @@ import gui.models.Renderer_Boolean;
 	    //		@SuppressWarnings("unused")
 		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
 	    		}});
-	 
+	 /*
 	    	Search_run_menu.jButton3.setContentAreaFilled(false);
 	  //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 	    	Search_run_menu.jButton3.setOpaque(false);
@@ -210,7 +211,7 @@ import gui.models.Renderer_Boolean;
 	// вычисляем устанавливаем\ сбрасываем флажек выбранные
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				/*
+				
 					
 					favorite_all(search_Table);
 					alpha = 200;
@@ -225,12 +226,12 @@ import gui.models.Renderer_Boolean;
 					{
 						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 					}
-				*/
+				
 				
 				}
 	    	
 	    	});
-	   
+	   */
 	    	Search_run_menu.pack();
 	    
 	    	Search_run_menu.addWindowFocusListener( new run_Menu_Search_Focus_Listener());
@@ -304,9 +305,10 @@ import gui.models.Renderer_Boolean;
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
 					
-					Object statement_account = null;
-					if (search_Table.getSelectedRow() >= 0 ) statement_account = search_Table_Model.getValueAt(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()),1);
-					 Statement_Info info_panel = new Statement_Info(statement_account.toString());
+				
+					Transaction statement = null;
+					if (search_Table.getSelectedRow() >= 0 ) statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+					 Statement_Info info_panel = new Statement_Info(statement);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				}

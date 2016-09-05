@@ -27,7 +27,7 @@ public class Table_Formats {
 	
 	
 	
-	public void Table_Row_Auto_Height(JTable table){
+	public void Table_Row_Auto_Height1(JTable table){
 		
 		//	if (st==st) return;
 			Font ff = table.getFont();
