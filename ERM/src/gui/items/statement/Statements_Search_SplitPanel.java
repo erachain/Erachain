@@ -102,8 +102,8 @@ import gui.models.Renderer_Boolean;
 		
 	//Custom renderer for the String column;
 			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()))); // set renderer
-			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()))); // set renderer
+			search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()),search_Table_Model.get_Column_AutoHeight())); // set renderer
+			search_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()),search_Table_Model.get_Column_AutoHeight())); // set renderer
 			
 			 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 			

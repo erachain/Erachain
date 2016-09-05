@@ -24,6 +24,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 	private SortableList<Tuple2<String, String>, StatusCls> statuses;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
 	public WalletItemStatusesTableModel()
 	{
@@ -40,6 +41,20 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		return this.statuses.get(row).getB();
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	    }
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	@Override
 	public int getColumnCount() 
 	{

@@ -80,7 +80,7 @@ public MainUnionsFrame (){
 		columnModel.getColumn(0).setMaxWidth((100));
 //Custom renderer for the String column;
 		unionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		unionsTable.setDefaultRenderer(String.class, new Renderer_Left(unionsTable.getFontMetrics(unionsTable.getFont()))); // set renderer
+		unionsTable.setDefaultRenderer(String.class, new Renderer_Left(unionsTable.getFontMetrics(unionsTable.getFont()),tableModelUnions.get_Column_AutoHeight())); // set renderer
 //CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = unionsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
 		favoriteColumn.setCellRenderer(new Renderer_Boolean());
@@ -194,7 +194,7 @@ public MainUnionsFrame (){
 	columnModel.getColumn(0).setMaxWidth((100));
 //Custom renderer for the String column;
 	tableUnion.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	tableUnion.setDefaultRenderer(String.class, new Renderer_Left(tableUnion.getFontMetrics(tableUnion.getFont()))); // set renderer
+	tableUnion.setDefaultRenderer(String.class, new Renderer_Left(tableUnion.getFontMetrics(tableUnion.getFont()),unionsModel.get_Column_AutoHeight())); // set renderer
 	TableRowSorter<WalletItemUnionsTableModel> sorter1 = new TableRowSorter<WalletItemUnionsTableModel>(unionsModel);
 	tableUnion.setRowSorter(sorter1);
 	tableUnion.getRowSorter();

@@ -35,6 +35,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 	private List<Peer> peers;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,false,false,false,false,false,false,false};
 	
 	public PeersTableModel()
 	{
@@ -60,6 +61,17 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		Object item = getValueAt(0, c);
 		return item==null? null : item.getClass();
     }
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	@Override
 	public int getColumnCount() 

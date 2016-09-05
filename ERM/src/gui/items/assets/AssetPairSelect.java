@@ -137,7 +137,7 @@ public class AssetPairSelect extends JFrame{
 	  //Custom renderer for the String column;
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(pair_Panel.jTable_jScrollPanel_LeftPanel.getFontMetrics(pair_Panel.jTable_jScrollPanel_LeftPanel.getFont()))); // set renderer
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(pair_Panel.jTable_jScrollPanel_LeftPanel.getFontMetrics(pair_Panel.jTable_jScrollPanel_LeftPanel.getFont()),assetPairSelectTableModel.get_Column_AutoHeight() )); // set renderer
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
 	    

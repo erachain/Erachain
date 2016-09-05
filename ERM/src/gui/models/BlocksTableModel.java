@@ -29,6 +29,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 	private boolean is_Select_Last_100_Block;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator", "Generating Balance", "Transactions", "Fee"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 	
 	static Logger LOGGER = Logger.getLogger(BlocksTableModel.class.getName());
 
@@ -42,6 +43,17 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 		Object item = getValueAt(0, c);
 		return item==null? null : item.getClass();
     }
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	@Override
 	public SortableList<byte[], Block> getSortableList() {

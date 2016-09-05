@@ -26,11 +26,23 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	private SortableList<Long, AssetCls> assets;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Movable", "Quantity", "Divisible", "Favorite", "I Owner"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false,false,false,false};
 	
 	public TableModelItemAssets()
 	{
 		Controller.getInstance().addObserver(this);
 	}
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	@Override
 	public SortableList<Long, AssetCls> getSortableList() 

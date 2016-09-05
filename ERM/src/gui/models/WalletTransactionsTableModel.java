@@ -47,6 +47,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{
 			"Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,true,true,true,true,false,false};
 
 	static Logger LOGGER = Logger.getLogger(WalletTransactionsTableModel.class.getName());
 
@@ -67,6 +68,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		Object o = getValueAt(0, c);
 		return o == null? null: o.getClass();
     }
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
 	
 	public Transaction getTransaction(int row)
 	{

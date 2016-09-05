@@ -104,7 +104,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		
 		// render
 		table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()))); // set renderer
+		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
 		
 		//ON FAVORITES CHANGE
 		cbxFavorites.addItemListener(new ItemListener(){

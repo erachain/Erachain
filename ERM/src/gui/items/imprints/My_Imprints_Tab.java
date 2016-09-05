@@ -60,7 +60,7 @@ public My_Imprints_Tab(){
 	column1.setPreferredWidth(50);
 //Custom renderer for the String column;
 	tableImprints.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	tableImprints.setDefaultRenderer(String.class, new Renderer_Left(tableImprints.getFontMetrics(tableImprints.getFont()))); // set renderer
+	tableImprints.setDefaultRenderer(String.class, new Renderer_Left(tableImprints.getFontMetrics(tableImprints.getFont()),imprintsModel.get_Column_AutoHeight())); // set renderer
 // set show			
 	jTable_jScrollPanel_LeftPanel.setModel(imprintsModel);
 	jTable_jScrollPanel_LeftPanel = tableImprints;

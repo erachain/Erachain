@@ -56,6 +56,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 //	private SortableList<byte[], Transaction> transactions;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement"});//, AssetCls.FEE_NAME});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	
@@ -159,7 +160,15 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 			       return getValueAt(0, c).getClass();
 			   }
 	
-	
+		// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
 	@Override
 	public int getColumnCount() {
 		// TODO Auto-generated method stub

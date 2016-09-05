@@ -23,12 +23,21 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 	private SortableList<Tuple2<String, String>, ImprintCls> imprints;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
 	public WalletItemImprintsTableModel()
 	{
 		Controller.getInstance().addWalletListener(this);
 	}
-	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
 	@Override
 	public SortableList<Tuple2<String, String>, ImprintCls> getSortableList() {
 		return this.imprints;

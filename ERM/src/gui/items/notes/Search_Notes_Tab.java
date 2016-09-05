@@ -100,7 +100,7 @@ public class Search_Notes_Tab extends Split_Panel {
 	
 	//Custom renderer for the String column;
 	notesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	notesTable.setDefaultRenderer(String.class, new Renderer_Left(notesTable.getFontMetrics(notesTable.getFont()))); // set renderer
+	notesTable.setDefaultRenderer(String.class, new Renderer_Left(notesTable.getFontMetrics(notesTable.getFont()),tableModelNotes.get_Column_AutoHeight())); // set renderer
 	notesTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 	// column #1
 		TableColumn column1 = notesTable.getColumnModel().getColumn(tableModelNotes.COLUMN_KEY);//.COLUMN_CONFIRMED);

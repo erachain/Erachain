@@ -30,6 +30,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	public static final int COLUMN_FEE_BALANCE = 3;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;
 	private Account account;
@@ -45,8 +46,15 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 	       return getValueAt(0, c).getClass();
 	   }
-	   
-	
+// читаем колонки которые изменяем высоту	   
+	public Boolean[] get_Column_AutoHeight(){
+		
+		return this.column_AutuHeight;
+	}
+// устанавливаем колонки которым изменить высоту	
+	public void set_get_Column_AutoHeight( Boolean[] arg0){
+		this.column_AutuHeight = arg0;	
+	}
 	
 	
 	public Account getAccount(int row)

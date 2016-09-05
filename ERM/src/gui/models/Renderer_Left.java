@@ -27,15 +27,17 @@ import javax.swing.JLabel;
         int row1=0;
         FontMetrics fontMetrics;
         int rowHeight;
+        Boolean[] column_auto_Height;
     
        //   FontMetrics fontMetrics = table.getFontMetrics(table.getFont()); 
-        public Renderer_Left(FontMetrics fontMetrics1){
+        public Renderer_Left(FontMetrics fontMetrics1, Boolean[] col_Auto_Height ){
         	fontMetrics=fontMetrics1;	
         	 setOpaque(true);
         	 setBackground(new Color(255, 255, 220));
         	 setVerticalAlignment(TOP);
         	 setHorizontalAlignment(JLabel.LEFT);//.RIGHT);
              setHorizontalTextPosition(JLabel.LEFT);//.RIGHT);
+             column_auto_Height = col_Auto_Height;
         }
         
         @Override
@@ -61,8 +63,11 @@ import javax.swing.JLabel;
          //  n = (int) (componentHeight / textHeight) + 1;
          //  n = (int) (fontMetrics.stringWidth( value.toString()) / table.getColumnModel().getColumn(column).getWidth() +1);
          //  if (n <1) n=1;
-           rowww = Math.max(rowww, (int) (fontMetrics.stringWidth( value.toString()+"WW") / table.getColumnModel().getColumn(column).getWidth() +1));
+   
+       // если для колонки установлен признай авто высоты то устанавливаем   
+          if (column_auto_Height[column] || column_auto_Height[column]!=null)  rowww = Math.max(rowww, (int) (fontMetrics.stringWidth( value.toString()+"WW") / table.getColumnModel().getColumn(column).getWidth() +1));
           if(row1!=row){
+        	
         	  table.setRowHeight((row1), (int) (fontMetrics.getHeight() * rowww));
         	  rowww = 1;
         	  row1=row;

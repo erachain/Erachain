@@ -28,6 +28,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	private SortableList<Tuple2<String, String>, Block> blocks;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator", "Generating Balance", "Transactions", "Fee"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 	
 	static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
 
@@ -45,6 +46,17 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 		Object item = getValueAt(0, c);
 		return item==null? null : item.getClass();
     }
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	@Override
 	public int getColumnCount() 

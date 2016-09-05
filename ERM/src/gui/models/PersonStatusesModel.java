@@ -40,6 +40,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","To Date"}); //, "Data"});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
 	String to_date_str;
 	Long dte;
@@ -67,7 +68,16 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		       return getValueAt(0, c).getClass();
 		   }
 		   
-
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	/*
 	public ImprintCls getItem(int row)
 	{

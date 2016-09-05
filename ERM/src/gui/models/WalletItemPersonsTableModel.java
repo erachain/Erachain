@@ -24,6 +24,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
 	public WalletItemPersonsTableModel()
 	{
@@ -34,6 +35,15 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
 		return this.persons;
 	}
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object item = getValueAt(0, c);

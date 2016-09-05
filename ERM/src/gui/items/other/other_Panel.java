@@ -49,8 +49,8 @@ public class other_Panel extends javax.swing.JPanel {
          this.jTable_Peers = new JTable(this.peersTableModel);
         
          this.jTable_Peers.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-         this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()))); // set renderer
-         this.jTable_Peers.setDefaultRenderer(Tuple2.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()))); // set renderer
+         this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
+         this.jTable_Peers.setDefaultRenderer(Tuple2.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
          this.jTable_Peers.setEnabled(false);
          
          
@@ -61,8 +61,8 @@ public class other_Panel extends javax.swing.JPanel {
          this.All_Blocks_TableModel = new BlocksTableModel(true);
 		this.jTable_All_Block = new JTable(this.All_Blocks_TableModel);
 		 this.jTable_All_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-         this.jTable_All_Block.setDefaultRenderer(String.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()))); // set renderer
-         this.jTable_All_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()))); // set renderer
+         this.jTable_All_Block.setDefaultRenderer(String.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
+         this.jTable_All_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
          this.jTable_All_Block.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
          this.jTable_All_Block.setEnabled(false);
 		
@@ -89,8 +89,8 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		jTable_My_Block.setRowSorter(sorter);
 		 this.jTable_My_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 		 this.jTable_My_Block.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-         this.jTable_My_Block.setDefaultRenderer(String.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()))); // set renderer
-         this.jTable_My_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()))); // set renderer
+         this.jTable_My_Block.setDefaultRenderer(String.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()),blocksModel.get_Column_AutoHeight())); // set renderer
+         this.jTable_My_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()),blocksModel.get_Column_AutoHeight())); // set renderer
          this.jTable_My_Block.setEnabled(false);
 		
 		

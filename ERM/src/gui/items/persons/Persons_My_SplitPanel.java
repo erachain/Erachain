@@ -97,7 +97,7 @@
 			
 			//Custom renderer for the String column;
 			my_Person_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()))); // set renderer
+			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()),my_PersonsModel.get_Column_AutoHeight())); // set renderer
 					
 					
 			my_Sorter = new TableRowSorter(my_PersonsModel);

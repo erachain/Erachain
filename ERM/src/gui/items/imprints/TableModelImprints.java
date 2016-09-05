@@ -19,7 +19,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	public static final int COLUMN_ADDRESS = 2;
 	//public static final int COLUMN_AMOUNT = 3;
 	//public static final int COLUMN_DIVISIBLE = 4;
-
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true};
 	private SortableList<Long, ImprintCls> imprints;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner"});//, "Quantity"});//, "Divisible"});
@@ -34,6 +34,17 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	{
 		return this.imprints;
 	}
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 	       return getValueAt(0, c).getClass();

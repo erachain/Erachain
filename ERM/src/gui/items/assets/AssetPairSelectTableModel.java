@@ -40,6 +40,8 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	public List<ItemCls> assets;
 	Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all; 
 	
+	private Boolean[] column_AutuHeight = new Boolean[]{false,true,false,false,false,false};
+	
 	public AssetPairSelectTableModel(long key, String action)
 	{
 		this.key = key;
@@ -68,6 +70,18 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		
 		
 	}
+	
+	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
+		
 	
 	@Override
 	public int getColumnCount() 

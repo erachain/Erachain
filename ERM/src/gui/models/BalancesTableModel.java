@@ -25,6 +25,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 	
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance"});
+	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	
 	public BalancesTableModel(long key)
@@ -40,7 +41,15 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 	       return getValueAt(0, c).getClass();
 	    }
 	
-	
+	// читаем колонки которые изменяем высоту	   
+		public Boolean[] get_Column_AutoHeight(){
+			
+			return this.column_AutuHeight;
+		}
+	// устанавливаем колонки которым изменить высоту	
+		public void set_get_Column_AutoHeight( Boolean[] arg0){
+			this.column_AutuHeight = arg0;	
+		}
 	
 	
 	
