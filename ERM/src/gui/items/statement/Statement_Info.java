@@ -9,6 +9,9 @@ import javax.swing.JTable;
 import org.mapdb.Fun.Tuple2;
 
 import core.account.PublicKeyAccount;
+import core.item.ItemCls;
+import core.item.notes.Note;
+import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -56,7 +59,9 @@ public class Statement_Info extends javax.swing.JPanel {
         
         jScrollPane4.setViewportView(jTable_Sign);
         statement = (R_SignNote)transaction;
-        jTextArea_Body.setText(new String( statement.getData(), Charset.forName("UTF-8") ));
+        NoteCls note = (NoteCls)ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+        jTextArea_Body.setText(note.getName() + "\n\n" + note.getDescription() + "\n\n" + new String( statement.getData(), Charset.forName("UTF-8") ));
+        
         jSplitPane1.setDividerLocation(350);//.setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
        
     }
