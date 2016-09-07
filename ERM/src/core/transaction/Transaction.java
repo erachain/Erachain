@@ -514,7 +514,12 @@ public abstract class Transaction {
 
 	public int getSeqNo(DBSet db)
 	{
-		return this.block.getTransactionSeq(this.signature);
+		Block block = this.getBlock(db);
+		if (block == null)
+			return -1;
+		
+		return block.getTransactionSeq(this.signature);
+		
 	}
 	
 	// reference in Map - or as signatire or as BlockHeight + seqNo
@@ -576,7 +581,11 @@ public abstract class Transaction {
 		return sub.length() > 0? viewTypeName() + ":" + sub: viewTypeName();
 	}
 	public String viewHeightSeq(DBSet db) {
-		return this.getBlockHeight(db) + "-" + this.getSeqNo(db);
+		int seq = this.getSeqNo(db);
+		if (seq <1)
+			return "???";
+		
+		return this.getBlockHeight(db) + "-" + seq;
 	}
 	public String viewAmount(Account account) {
 		return account==null?"": viewAmount(account.getAddress());

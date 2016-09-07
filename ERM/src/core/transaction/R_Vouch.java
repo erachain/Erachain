@@ -256,6 +256,9 @@ public class R_Vouch extends Transaction {
 
 		super.process(db, block, asPack);
 		
+		if (block == null)
+			return;
+		
 		// make key for vouching record
 		Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
 		// find value
