@@ -57,7 +57,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement","Data"});//, AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
@@ -225,11 +225,11 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 
 			case COLUMN_NOTE:
 				
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
 				
 			case COLUMN_BODY:				
 				
-				return new String( record.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
+				return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
 				
 				
 	//		case COLUMN_AMOUNT:

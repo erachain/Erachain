@@ -60,7 +60,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator"});//, AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Signatures"});//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	//private Transaction transaction;
