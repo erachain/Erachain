@@ -1060,7 +1060,7 @@ public class Block {
 				
 				try{
 					//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-					transaction.process(fork, false);
+					transaction.process(fork, this, false);
 					
 				} catch (Exception e) {
                     LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].TX.process ERROR", e);
@@ -1090,7 +1090,7 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//PROCESS
-			transaction.process(dbSet, false);
+			transaction.process(dbSet, this, false);
 
 			//SET PARENT
 			dbSet.getTransactionRef_BlockRef_Map().set(transaction, this);

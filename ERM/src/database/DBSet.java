@@ -8,6 +8,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import controller.Controller;
+import core.BlockChain;
 import core.item.ItemCls;
 //import core.item.ItemCls;
 import core.web.NameStorageMap;
@@ -23,6 +24,8 @@ public class DBSet implements Observer, IDB {
 	
 	private static DBSet instance;
 	private DBSet parent;
+	
+	private BlockChain bchain;
 	
 	private AddressForging addressForging;
 	private ItemAssetBalanceMap assetBalanceMap;
@@ -201,6 +204,8 @@ public class DBSet implements Observer, IDB {
 		//DB database = DBMaker.newMemoryDB().make();
 
 		this.parent = parent;
+		this.bchain = parent.bchain;
+		
 		this.addressForging = new AddressForging(parent.addressForging);
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
@@ -323,6 +328,15 @@ public class DBSet implements Observer, IDB {
 	public DBSet getParent() {
 		return this.parent;
 	}
+	
+	public BlockChain getBlockChain() {
+		return this.bchain;
+	}
+	
+	public void setBlockChain(BlockChain bchain) {
+		this.bchain = bchain;
+	}
+	
 	
 	public boolean isFork() {
 		return this.parent != null;

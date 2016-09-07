@@ -117,7 +117,7 @@ public class TransactionCreator
 			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK
 					&& transaction.isSignatureValid())
 			{
-				transaction.process(this.fork, false);
+				transaction.process(this.fork, null, false);
 			}
 			else
 			{
@@ -640,7 +640,7 @@ public class TransactionCreator
 
 			if (!asPack) {
 				//PROCESS IN FORK
-				transaction.process(this.fork, asPack);
+				transaction.process(this.fork, null, asPack);
 				
 				// if it ISSUE - reset key
 				if (transaction instanceof Issue_ItemRecord) {

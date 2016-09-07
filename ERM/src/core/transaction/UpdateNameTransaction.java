@@ -17,6 +17,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Crypto;
 import core.naming.Name;
 import database.ItemAssetBalanceMap;
@@ -212,10 +213,10 @@ public class UpdateNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, boolean asPack)
+	public void process(DBSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 							
 		//SET ORPHAN DATA
 		Name oldName = db.getNameMap().get(this.name.getName());

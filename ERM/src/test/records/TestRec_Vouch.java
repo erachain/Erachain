@@ -210,7 +210,7 @@ public class TestRec_Vouch {
 		block.addTransaction(vouchRecord);
 		block.process(db);
 		*/
-		vouchRecord.process(db, false);
+		vouchRecord.process(db, gb, false);
 
 		Tuple2<Integer, Integer> ggg = new Tuple2<Integer, Integer>(height, seq);
 

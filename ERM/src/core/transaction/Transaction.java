@@ -293,6 +293,7 @@ public abstract class Transaction {
 	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
+	protected Block block; // parent block
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected Long reference;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
@@ -482,26 +483,34 @@ public abstract class Transaction {
 		}
 	}
 
-	public Block getParent(DBSet db) {
+	public Block getBlock(DBSet db) {
 		
-		return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+		//return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+		return this.block;
 	}
 	
 	public int getBlockHeight(DBSet db)
 	{
 		if(this.isConfirmed(db))
 		{
-			return this.getParent(db).getHeight(db);
+			return this.getBlock(db).getHeight(db);
 		}
 		return -1;
 	}
+	
+	// get current or last
+	public int getBlockHeightByParent(DBSet db)
+	{
+
+		if (block != null)
+			return block.getHeightByParent(db);
+		
+		return -1;
+	}
+
 	public int getSeqNo(DBSet db)
 	{
-		if(this.isConfirmed(db))
-		{
-			return this.getParent(db).getTransactionSeq(this.signature);
-		}
-		return -1;
+		return this.getBlock(db).getTransactionSeq(this.signature);
 	}
 	
 	// reference in Map - or as signatire or as BlockHeight + seqNo
@@ -767,9 +776,11 @@ public abstract class Transaction {
 	//PROCESS/ORPHAN
 	
 	//public abstract void process(DBSet db);
-	public void process(DBSet db, boolean asPack)
+	public void process(DBSet db, Block block, boolean asPack)
 	{
 	
+		this.block = block;
+		
 		if (!asPack) {
 			this.calcFee();
 	
@@ -861,7 +872,7 @@ public abstract class Transaction {
 		//CALCULATE CONFIRMATIONS
 		int lastBlockHeight = db.getHeightMap().getHeight(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
-		Block block = this.getParent(db);
+		Block block = this.getBlock(db);
 		
 		if (block == null)return 0;
 		
@@ -882,7 +893,7 @@ public abstract class Transaction {
 		if(this.isConfirmed(db))
 		{
 			//return DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.getSignature()).getVersion();
-			return this.getParent(db).getVersion();
+			return this.getBlock(db).getVersion();
 		}
 		
 		// IF UNCONFIRMED

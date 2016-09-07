@@ -95,7 +95,7 @@ public class TestRec_Send {
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		r_SendV3.process(db, false);
+		r_SendV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
@@ -140,7 +140,7 @@ public class TestRec_Send {
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		r_SendV3.process(db, false);
+		r_SendV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
@@ -186,7 +186,7 @@ public class TestRec_Send {
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		r_SendV3.process(db, false);
+		r_SendV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
@@ -230,7 +230,7 @@ public class TestRec_Send {
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		r_SendV3.process(db, false);
+		r_SendV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
@@ -312,7 +312,7 @@ public class TestRec_Send {
 			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(db, false);
+		arbitraryTransactionV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSE(61l, db));
@@ -387,7 +387,7 @@ public class TestRec_Send {
 			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(db, false);
+		arbitraryTransactionV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSE(61l, db));

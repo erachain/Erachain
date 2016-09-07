@@ -70,27 +70,27 @@ public class GeneratorTests {
 		// AND WIN_DATA
 		Transaction transaction;
 		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(1000000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(10000000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(300000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(3000000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
@@ -303,58 +303,58 @@ public class GeneratorTests {
 		// AND WIN_DATA
 		Transaction transaction;
 		transaction = new GenesisTransferAssetTransaction(generator0, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE / 10).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE / 10).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE / 20).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.025).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.01).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.005).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator8, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator9, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.033).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		///////////////
 		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
@@ -601,7 +601,7 @@ public class GeneratorTests {
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB
-			payment.process(snapshot, false);
+			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
 			blockGenerator.addUnconfirmedTransaction(dbSet, payment, false);
@@ -668,7 +668,7 @@ public class GeneratorTests {
 			assertEquals(payment.isValid(snapshot, null), Transaction.VALIDATE_OK);
 		
 			//PROCESS IN DB
-			payment.process(snapshot, false);
+			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
 			blockGenerator.addUnconfirmedTransaction(dbSet, payment, false);
@@ -711,13 +711,13 @@ public class GeneratorTests {
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		Transaction transaction = new GenesisTransferAssetTransaction(userAccount1, ERM_KEY, BigDecimal.valueOf(100000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		transaction = new GenesisTransferAssetTransaction(userAccount1, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		transaction = new GenesisTransferAssetTransaction(userAccount2, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 		transaction = new GenesisTransferAssetTransaction(userAccount2, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
-		transaction.process(dbSet, false);
+		transaction.process(dbSet, genesisBlock, false);
 
 				
 		//GENERATE NEXT BLOCK

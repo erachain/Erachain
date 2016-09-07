@@ -19,6 +19,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 //import database.ItemItemMap;
@@ -135,10 +136,10 @@ public abstract class AddressItem_Refs extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, boolean asPack)
+	public void process(DBSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		// SET REFERENCE if not setted before (in Imprint it setted)
 		if (this.item.getReference() == null) this.item.setReference(this.signature);

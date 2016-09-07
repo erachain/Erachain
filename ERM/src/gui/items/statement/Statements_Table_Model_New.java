@@ -23,9 +23,10 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.R_SignNote;
-import core.transaction.R_SignStatement;
+//import core.transaction.R_SignStatement_old;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -48,14 +49,15 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 	public static final int COLUMN_TIMESTAMP = 0;
 //	public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
-	public static final int COLUMN_BODY = 2;
-	public static final int COLUMN_SIGNATURE = 3;
+	public static final int COLUMN_NOTE = 2;
+	public static final int COLUMN_BODY = 3;
+	//public static final int COLUMN_SIGNATURE = 3;
 //	public static final int COLUMN_FEE = 3;
 	List<Transaction> transactions;
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement","Signature"});//, AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Statement","Data"});//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
@@ -202,37 +204,33 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 				return null;
 			}
 			
-			Transaction transaction = this.transactions.get(row);
+			//Transaction transaction = (R_SignNote)this.transactions.get(row);
 			
 			
 			
-			 R_SignNote i = (R_SignNote)transaction;
+			R_SignNote record = (R_SignNote)this.transactions.get(row);
+			
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
 				
 				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
+				return record.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 				
 		/*	case COLUMN_TYPE:
 				
 				//return Lang.transactionTypes[transaction.getType()];
 				return Lang.getInstance().translate(transaction.viewTypeName());
 		*/
+
+			case COLUMN_NOTE:
 				
+				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
 				
+			case COLUMN_BODY:				
 				
-			case	 COLUMN_BODY:
+				return new String( record.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
 				
-				
-				
-				
-				
-				return new String( i.getData(), Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
-				
-			case COLUMN_SIGNATURE:
-				
-				return new String(i.getSignature().toString());
 				
 	//		case COLUMN_AMOUNT:
 				
@@ -245,7 +243,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 			case COLUMN_CREATOR:
 				
 				
-				return transaction.getCreator().toString();
+				return record.getCreator().asPerson();
 			}
 			
 			return null;

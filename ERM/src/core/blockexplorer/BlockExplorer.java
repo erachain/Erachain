@@ -1523,7 +1523,7 @@ public class BlockExplorer
 			transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
 			transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getParent(DBSet.getInstance()); 
+			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getBlock(DBSet.getInstance()); 
 			transactionDataJSON.put("height", parentBlock.getHeight(DBSet.getInstance()));
 			transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(DBSet.getInstance()) + 1 );
 
@@ -1696,7 +1696,7 @@ public class BlockExplorer
 
 			if(transaction.isConfirmed(db))
 			{
-				Block parent = transaction.getParent(DBSet.getInstance());
+				Block parent = transaction.getBlock(DBSet.getInstance());
 				transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
 				transactionDataJSON.put("blockHeight", parent.getHeight(DBSet.getInstance()));
 			}
@@ -2048,8 +2048,8 @@ public class BlockExplorer
 				
 				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 				
-				all.add( new BlExpUnit(txInitiator.getParent(DBSet.getInstance()).getHeight(DBSet.getInstance()),
-						txTarget.getParent(DBSet.getInstance()).getHeight(DBSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
+				all.add( new BlExpUnit(txInitiator.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()),
+						txTarget.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 			}
 			
 			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
@@ -2657,7 +2657,7 @@ public class BlockExplorer
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
-			all.add( new BlExpUnit( transaction.getParent(db).getHeight(db), transaction.getSeqNo(db), transaction));
+			all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
 
 			if(transaction instanceof CreateOrderTransaction)
 			{
@@ -2676,7 +2676,7 @@ public class BlockExplorer
 			
 			Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 			
-			all.add( new BlExpUnit(txInitiator.getParent(db).getHeight(db), txTarget.getParent(db).getHeight(db), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
+			all.add( new BlExpUnit(txInitiator.getBlock(db).getHeight(db), txTarget.getBlock(db).getHeight(db), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 		}
 
 		int size = all.size();

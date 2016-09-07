@@ -20,6 +20,7 @@ import com.google.common.base.Charsets;
 import api.BlogPostResource;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.naming.Name;
@@ -197,7 +198,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 	// PROCESS/ORPHAN
 	//@Override
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
 		
 		try {
@@ -219,7 +220,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 
 		// UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		// PROCESS PAYMENTS
 		for (Payment payment : this.getPayments()) {

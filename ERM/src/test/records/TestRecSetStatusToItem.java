@@ -94,7 +94,7 @@ public class TestRecSetStatusToItem {
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
-		issuePersonTransaction.process(db, false);
+		issuePersonTransaction.process(db, gb, false);
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey(db);
 
@@ -224,7 +224,7 @@ public class TestRecSetStatusToItem {
 
 		
 		setStatusTransaction.sign(maker, false);
-		setStatusTransaction.process(db, false);
+		setStatusTransaction.process(db, gb, false);
 				
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
@@ -242,7 +242,7 @@ public class TestRecSetStatusToItem {
 				"tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
 				timestamp+10, maker.getLastReference(db));
 		setStatusTransaction_2.sign(maker, false);
-		setStatusTransaction_2.process(db, false);
+		setStatusTransaction_2.process(db, gb, false);
 
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		endDate = statusDuration.a;

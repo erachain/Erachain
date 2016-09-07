@@ -142,7 +142,7 @@ public class TestRecUnion {
 
 		issueUnionTransaction.sign(certifier, false);
 		
-		issueUnionTransaction.process(db, false);
+		issueUnionTransaction.process(db, gb, false);
 		unionKey = union.getKey(db);
 
 		assertEquals( 1, unionKey);
@@ -238,7 +238,7 @@ public class TestRecUnion {
 		
 		// PARSE ISSEU UNION RECORD
 		issueUnionTransaction.sign(certifier, false);
-		issueUnionTransaction.process(db, false);
+		issueUnionTransaction.process(db, gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(true, null);
@@ -316,7 +316,7 @@ public class TestRecUnion {
 
 		issueUnionTransaction.sign(certifier, false);
 		
-		issueUnionTransaction.process(db, false);
+		issueUnionTransaction.process(db, gb, false);
 		
 		LOGGER.info("union KEY: " + union.getKey(db));
 		

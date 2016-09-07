@@ -20,6 +20,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import database.ItemAssetBalanceMap;
@@ -230,7 +231,7 @@ public class RecordReleasePack extends Transaction {
 				// transaction counter x100
 				return result + counter * 100;
 			//PROCESS PAYMENT IN FORK AS PACK
-			transaction.process(fork, true);
+			transaction.process(fork, this.block, true);
 			counter++;
 		}
 		
@@ -242,15 +243,15 @@ public class RecordReleasePack extends Transaction {
 	//PROCESS/ORPHAN
 	
 	//@Override
-	public void process(DBSet db, boolean asPack) 
+	public void process(DBSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		//PROCESS PAYMENTS
 		for(Transaction transaction: this.transactions)
 		{
-			transaction.process(db, true); // as Pack in body			
+			transaction.process(db, block, true); // as Pack in body			
 		}
 	}
 

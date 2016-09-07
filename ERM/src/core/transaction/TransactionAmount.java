@@ -346,9 +346,9 @@ public abstract class TransactionAmount extends Transaction {
 		return VALIDATE_OK;
 	}		
 
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		if (this.amount == null)
 			return;

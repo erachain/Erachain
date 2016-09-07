@@ -94,9 +94,9 @@ public class DatabaseTests {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-		genesis_issue_person.process(dbSet, false);
+		genesis_issue_person.process(dbSet, gb, false);
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
-		genesis_certify.process(dbSet, false);
+		genesis_certify.process(dbSet, gb, false);
 		
 		maker.setLastReference(last_ref, dbSet);
 		maker.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), dbSet);
@@ -118,15 +118,15 @@ public class DatabaseTests {
 		init();
 		
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, asPack);
+		issuePersonTransaction.process(dbSet, gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dbSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, asPack);
+		issuePersonTransaction.process(dbSet, gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dbSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, asPack);
+		issuePersonTransaction.process(dbSet, gb, asPack);
 		
 
 		//assertEquals(dbSet.getItemPersonMap().getKeys().toString(), "");
@@ -136,11 +136,11 @@ public class DatabaseTests {
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(fork));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(fork, asPack);
+		issuePersonTransaction.process(fork, gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(fork));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(fork, asPack);
+		issuePersonTransaction.process(fork, gb, asPack);
 
 		//assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 		
@@ -217,7 +217,7 @@ public class DatabaseTests {
 		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dbSet));
 		issueAssetTransaction.sign(maker, false);
-		issueAssetTransaction.process(dbSet, false);
+		issueAssetTransaction.process(dbSet, gb, false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
 		long key = asset.getKey(dbSet);

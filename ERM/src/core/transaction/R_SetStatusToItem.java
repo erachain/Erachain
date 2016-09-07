@@ -677,10 +677,10 @@ public class R_SetStatusToItem extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		// pack additional data
 		byte[] add_data = packData();

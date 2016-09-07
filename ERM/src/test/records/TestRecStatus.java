@@ -120,7 +120,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueStatusRecord.sign(maker, false);
-		issueStatusRecord.process(db, false);
+		issueStatusRecord.process(db, gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueStatusTransaction = issueStatusRecord.toBytes(true, null);
@@ -183,7 +183,7 @@ public class TestRecStatus {
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
 		
 		issueStatusRecord.sign(maker, false);
-		issueStatusRecord.process(db, false);
+		issueStatusRecord.process(db, gb, false);
 		
 		LOGGER.info("status KEY: " + status.getKey(db));
 				
@@ -194,7 +194,7 @@ public class TestRecStatus {
 		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueStatusTransaction_2.sign(maker, false);
-		issueStatusTransaction_2.process(db, false);
+		issueStatusTransaction_2.process(db, gb, false);
 		LOGGER.info("status_2 KEY: " + status_2.getKey(db));
 		issueStatusTransaction_2.orphan(db, false);
 		assertEquals(mapSize + 1, statusMap.size());

@@ -83,7 +83,7 @@ public class NameStorageTest {
 		// CHECK IF NAME REGISTRATION IS VALID
 		assertEquals(Transaction.VALIDATE_OK,
 				nameRegistration.isValid(databaseSet, releaserReference));
-		nameRegistration.process(databaseSet, false);
+		nameRegistration.process(databaseSet, null, false);
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 		
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -135,7 +135,7 @@ public class NameStorageTest {
 					timestamp, badSender.getLastReference(databaseSet));
 			
 			
-			arbitraryTransaction.process(databaseSet, false);
+			arbitraryTransaction.process(databaseSet, null, false);
 
 			// KEY IS STILL THERE!
 			assertEquals(
@@ -169,7 +169,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -189,7 +189,7 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// NEW KEY IS THERE!
 		assertEquals(
@@ -209,7 +209,7 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 		arbitraryTransaction.sign(sender, false);
 
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -239,7 +239,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		assertEquals(
 				"skerberus",
@@ -259,7 +259,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 		
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
@@ -280,7 +280,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -306,7 +306,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -331,7 +331,7 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -351,7 +351,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		assertEquals(
 				"a;b;c",
@@ -372,7 +372,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -399,7 +399,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction);
 
@@ -419,7 +419,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
 
-		arbitraryTransaction2.process(databaseSet, false);
+		arbitraryTransaction2.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction2);
 
@@ -462,7 +462,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction);
 
@@ -483,7 +483,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, false);
+		arbitraryTransaction2.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction2);
 
@@ -504,7 +504,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, false);
+		arbitraryTransaction3.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction3);
 
@@ -568,7 +568,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction);
 
@@ -589,7 +589,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, false);
+		arbitraryTransaction2.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction2);
 
@@ -610,7 +610,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, false);
+		arbitraryTransaction3.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction3);
 
@@ -691,7 +691,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, false);
+		arbitraryTransaction.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction);
 
@@ -712,7 +712,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, false);
+		arbitraryTransaction2.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction2);
 
@@ -733,7 +733,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastReference(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, false);
+		arbitraryTransaction3.process(databaseSet, null, false);
 
 		databaseSet.getTransactionMap().add(arbitraryTransaction3);
 

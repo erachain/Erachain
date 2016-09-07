@@ -148,10 +148,10 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DBSet db, boolean asPack) 
+	public void process(DBSet db, Block block, boolean asPack) 
 	{
 
-		Block block = new GenesisBlock();
+		//Block block = new GenesisBlock();
 		int blockIndex = block.getHeight(db);
 		int transactionIndex = block.getTransactionIndex(signature);
 		//UPDATE RECIPIENT

@@ -32,7 +32,6 @@ import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
-import database.TransactionFinalMap;
 import database.VouchRecordMap;
 import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
@@ -41,7 +40,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
+public class Statements_Vouch_Table_Model_kent extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -63,20 +62,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator"});//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
-	//private Transaction transaction;
-	private int blockNo;
-	private int recNo;
+	private String account;
 	
 	
-	
-	public Statements_Vouch_Table_Model(Transaction transaction){
+	public Statements_Vouch_Table_Model_kent(String acc){
 	//	transactions = new ArrayList<Transaction>();
 		
-		//transaction = transaction;
-		blockNo = transaction.getBlockHeight(DBSet.getInstance());
-		recNo = transaction.getSeqNo(DBSet.getInstance());
-
-		//Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(),));
+	account = acc;
 
 		
 	
@@ -321,22 +313,36 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	
 	
 	private List<Transaction> read_Sign_Accoutns(){
-		List<Transaction> tran = new ArrayList<Transaction>();
-		//ArrayList<Transaction> db_transactions;
-		//db_transactions = new ArrayList<Transaction>();
-		//tran = new ArrayList<Transaction>();
+		List<Transaction> tran;
+		ArrayList<Transaction> db_transactions;
+		db_transactions = new ArrayList<Transaction>();
+		tran = new ArrayList<Transaction>();
 		// база данных	
-		//DBSet dbSet = DBSet.getInstance();
-		TransactionFinalMap table = DBSet.getInstance().getTransactionFinalMap();
+		DBSet dbSet = DBSet.getInstance();
+// читаем все блоки
+	SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+// проходим по блокам
+	for(Pair<byte[], Block> list: lists)
+	{
 		
-		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
-
-		for(Tuple2<Integer, Integer> seq: signs.b)
-		{
-			 tran.add(table.getTransaction(seq.a, seq.b));
+// читаем транзакции из блока
+		db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
+// проходим по транзакциям
+		for (Transaction transaction:db_transactions){
+// если ноте то пишем в transactions			
+		 if(transaction.getType() == Transaction.VOUCH_TRANSACTION  )
+			 if (account.equalsIgnoreCase(transaction.getCreator().getAddress())){
+			 System.out.println("account:"+account+"%%%Trans_account:"+ transaction.getCreator().getAddress());
+				 tran.add(transaction);	
+			 }
+		
 		}
-		return tran;
+		
+	}
+	return tran;
 	
-	}	
+	}
+	
+	
 
 }

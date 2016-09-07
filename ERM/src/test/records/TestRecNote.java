@@ -98,7 +98,7 @@ public class TestRecNote {
 		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueNoteRecord.sign(maker, false);
 		if (process) {
-			issueNoteRecord.process(db, false);
+			issueNoteRecord.process(db, gb, false);
 			noteKey = note.getKey(db);
 		}
 	}
@@ -145,7 +145,7 @@ public class TestRecNote {
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, false);
+		issueNoteRecord.process(db, gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueNoteTransaction = issueNoteRecord.toBytes(true, null);
@@ -208,7 +208,7 @@ public class TestRecNote {
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
 		
 		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, false);
+		issueNoteRecord.process(db, gb, false);
 		int mapSize = noteMap.size();
 		
 		LOGGER.info("note KEY: " + note.getKey(db));
@@ -220,7 +220,7 @@ public class TestRecNote {
 		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueNoteTransaction_2.sign(maker, false);
-		issueNoteTransaction_2.process(db, false);
+		issueNoteTransaction_2.process(db, gb, false);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
 		issueNoteTransaction_2.orphan(db, false);
 		assertEquals(mapSize, noteMap.size());
@@ -244,7 +244,7 @@ public class TestRecNote {
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
 		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, false);
+		issueNoteRecord.process(db, gb, false);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
 		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));
 		
@@ -505,7 +505,7 @@ public class TestRecNote {
 		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(db, releaserReference));
 		
 		signNoteRecord.sign(maker, false);
-		signNoteRecord.process(db, false);
+		signNoteRecord.process(db, gb, false);
 							
 		//CHECK REFERENCE SENDER
 		assertEquals(signNoteRecord.getTimestamp(), maker.getLastReference(db));	

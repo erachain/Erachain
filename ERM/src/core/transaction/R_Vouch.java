@@ -252,9 +252,9 @@ public class R_Vouch extends Transaction {
 
 	
 	
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		// make key for vouching record
 		Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
@@ -272,7 +272,7 @@ public class R_Vouch extends Transaction {
 			amount = amount.add(value.a);
 		}
 		
-		listNew.add(new Tuple2<Integer, Integer>(this.getBlockHeight(db), this.getSeqNo(db)));
+		listNew.add(new Tuple2<Integer, Integer>(this.getBlockHeightByParent(db), this.getSeqNo(db)));
 		// for test only!!
 		//listNew.add(new Tuple2<Integer, Integer>(2, 2));
 		

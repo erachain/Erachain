@@ -18,6 +18,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.naming.Name;
 import core.naming.NameSale;
@@ -252,10 +253,10 @@ public class BuyNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, boolean asPack) 
+	public void process(DBSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
 		
 		//UPDATE SELLER

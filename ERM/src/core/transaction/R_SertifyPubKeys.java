@@ -476,16 +476,16 @@ public class R_SertifyPubKeys extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 
 		// Controller.getInstance().getHeight()
 		// TODO нужно сделать запись что данная транзакция принадлежит данному блоку чтобы в нем найти её номер
 		int transactionIndex = -1;
 		int blockIndex = -1;
-		Block block = this.getParent(db);// == null (((
+		//Block block = this.getBlock(db);// == null (((
 		if (block == null) {
 			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
 		} else {

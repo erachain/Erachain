@@ -17,6 +17,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.Order;
@@ -189,10 +190,10 @@ public class CancelOrderTransaction extends Transaction
 	}
 	
 	//@Override
-	public void process(DBSet db, boolean asPack) 
+	public void process(DBSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 				
 		Order order = db.getOrderMap().get(this.order);
 		process_it(db, order);

@@ -22,6 +22,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -123,7 +124,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//PROCESS/ORPHAN
 
 	@Override
-	public void process(DBSet db, boolean asPack)
+	public void process(DBSet db, Block block, boolean asPack)
 	{
 		
 		//INSERT INTO DATABASE

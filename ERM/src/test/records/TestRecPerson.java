@@ -126,9 +126,9 @@ public class TestRecPerson {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-		genesis_issue_person.process(db, false);
+		genesis_issue_person.process(db, gb, false);
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L);
-		genesis_certify.process(db, false);
+		genesis_certify.process(db, gb, false);
 		
 		certifier.setLastReference(last_ref, db);
 		certifier.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
@@ -158,7 +158,7 @@ public class TestRecPerson {
 
 		issuePersonTransaction.sign(certifier, false);
 		
-		issuePersonTransaction.process(db, false);
+		issuePersonTransaction.process(db, gb, false);
 		personKey = person.getKey(db);
 
 		// issue 1 genesis person in init() here
@@ -348,7 +348,7 @@ public class TestRecPerson {
 
 		issuePersonTransaction.sign(certifier, false);
 		
-		issuePersonTransaction.process(db, false);
+		issuePersonTransaction.process(db, gb, false);
 		
 		LOGGER.info("person KEY: " + person.getKey(db));
 		
@@ -609,7 +609,7 @@ public class TestRecPerson {
 		//// PROCESS /////
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, false);
+		r_SertifyPubKeys.process(db, gb, false);
 		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
 		
 		//CHECK BALANCE SENDER
@@ -731,7 +731,7 @@ public class TestRecPerson {
 				end_date, timestamp, certifier.getLastReference(db));
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, false);
+		r_SertifyPubKeys.process(db, gb, false);
 
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
@@ -748,7 +748,7 @@ public class TestRecPerson {
 				end_date2, timestamp, certifier.getLastReference(db));
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, false);
+		r_SertifyPubKeys.process(db, gb, false);
 
 		int abs_end_date2 = end_date2 + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
@@ -822,7 +822,7 @@ public class TestRecPerson {
 		KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
 
 		
-		r_SertifyPubKeys.process(fork, false);
+		r_SertifyPubKeys.process(fork, gb, false);
 		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
 		
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));

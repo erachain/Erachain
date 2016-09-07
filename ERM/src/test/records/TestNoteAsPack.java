@@ -107,7 +107,7 @@ public class TestNoteAsPack {
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note);
 		issueNoteRecord.sign(maker, asPack);
-		issueNoteRecord.process(db, asPack);
+		issueNoteRecord.process(db, gb, asPack);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueNoteTransaction = issueNoteRecord.toBytes(true, null);
@@ -162,7 +162,7 @@ public class TestNoteAsPack {
 		
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
 		Long makerReference = maker.getLastReference(db);
-		issueNoteRecord.process(db, asPack);
+		issueNoteRecord.process(db, gb, asPack);
 		
 		LOGGER.info("note KEY: " + note.getKey(db));
 				
@@ -173,7 +173,7 @@ public class TestNoteAsPack {
 		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2);
 		issueNoteTransaction_2.sign(maker, asPack);
-		issueNoteTransaction_2.process(db, asPack);
+		issueNoteTransaction_2.process(db, gb, asPack);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
 		issueNoteTransaction_2.orphan(db, asPack);
 		ItemNoteMap noteMap = db.getItemNoteMap();
@@ -200,7 +200,7 @@ public class TestNoteAsPack {
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note);
 		issueNoteRecord.sign(maker, asPack);
-		issueNoteRecord.process(db, asPack);
+		issueNoteRecord.process(db, gb, asPack);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
 		assertEquals((long)makerReference, (long)maker.getLastReference(db));
 		

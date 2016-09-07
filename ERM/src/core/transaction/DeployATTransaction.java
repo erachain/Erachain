@@ -23,6 +23,7 @@ import at.AT_Controller;
 import at.AT_Exception;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 
@@ -396,10 +397,10 @@ public class DeployATTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, boolean asPack) 
+	public void process(DBSet db, Block block, boolean asPack) 
 	{
 		//UPDATE ISSUER
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, db).subtract(this.amount), db);
 
 		//CREATE AT ID = ADDRESS
@@ -451,7 +452,7 @@ public class DeployATTransaction extends Transaction
 		bf.put( this.creator.getPublicKey() );
 		bf.put( this.creationBytes );
 		
-		bf.putInt( getParent(db).getHeight(db) );
+		bf.putInt( getBlock(db).getHeight(db) );
 
 		String atId = Crypto.getInstance().getATAddress( bf.array().clone() );
 

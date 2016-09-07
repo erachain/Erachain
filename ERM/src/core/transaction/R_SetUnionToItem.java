@@ -316,10 +316,10 @@ public class R_SetUnionToItem extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
 		// pack additional data
 		byte[] a_data = new byte[0];//this.value1;
@@ -332,7 +332,7 @@ public class R_SetUnionToItem extends Transaction {
 		(
 				beg_date, end_date,
 				a_data,
-				this.getBlockHeight(db), this.getSeqNo(db)
+				this.getBlockHeightByParent(db), this.getSeqNo(db)
 			);
 
 		// SET UNION to ITEM for DURATION

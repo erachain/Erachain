@@ -106,12 +106,12 @@ public class OrderTestsMy
 
     	assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", false, 50000L, (byte)2, true);
 		issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
     	keyA = issueAssetTransaction.getAssetKey(db);
 
     	assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", false, 50000L, (byte)2, true);
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
     	keyB = issueAssetTransaction.getAssetKey(db);
 
 		//CREATE ORDER TRANSACTION
@@ -179,7 +179,7 @@ public class OrderTestsMy
 		
     	assetA = new AssetVenture(new GenesisBlock().getCreator(), "DATACHAINS.world", icon, image, "This is the simulated ERM asset.", false, 100000L, (byte)0, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
     	keyA = assetA.getKey(db);
 
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
@@ -308,28 +308,28 @@ public class OrderTestsMy
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_A = orderCreation.getOrder();
 		orderID_A = order_A.getId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(300).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_D = orderCreation.getOrder();
 		orderID_D = order_D.getId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1400).setScale(8),BigDecimal.valueOf(200).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_C = orderCreation.getOrder();
 		orderID_C = order_C.getId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(130).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_B = orderCreation.getOrder();
 		orderID_B = order_B.getId();
 		
@@ -347,7 +347,7 @@ public class OrderTestsMy
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, 
 				BigDecimal.valueOf(120).setScale(8),BigDecimal.valueOf(595).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[]{5, 6});
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_E = reloadOrder(orderCreation.getOrder());
 		orderID_E = order_E.getId();
 
@@ -410,7 +410,7 @@ public class OrderTestsMy
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, 
 				BigDecimal.valueOf(260).setScale(8),BigDecimal.valueOf(1900).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[]{5, 6});
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_E = reloadOrder(orderCreation.getOrder());
 		orderID_E = order_E.getId();
 		
@@ -442,7 +442,7 @@ public class OrderTestsMy
 				amoHave, amoWant,
 				(byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		order_F = reloadOrder(orderCreation.getOrder());
 		orderID_F = order_F.getId();
 		
@@ -501,7 +501,7 @@ public class OrderTestsMy
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(100).setScale(8),BigDecimal.valueOf(1000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_A = createOrderTransaction.getOrder().getId();
 		
 		//CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
@@ -509,7 +509,7 @@ public class OrderTestsMy
 		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, 
 				BigDecimal.valueOf(4995).setScale(8),BigDecimal.valueOf(249.75).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[]{5, 6});
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_B = createOrderTransaction.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -553,7 +553,7 @@ public class OrderTestsMy
 				amoHave, amoWant,
 				(byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_C = createOrderTransaction.getOrder().getId();
 		
 		BigDecimal haveTaked = amoHave.multiply(orderB.getPriceCalcReverse()).setScale(8, RoundingMode.HALF_DOWN);
@@ -603,7 +603,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 
 		//CREATE ASSET
@@ -611,7 +611,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -621,7 +621,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_A = orderCreation.getOrder().getId();
 
 		//CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
@@ -630,7 +630,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(99.9).setScale(8),BigDecimal.valueOf(495).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_B = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -665,7 +665,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(99).setScale(8),BigDecimal.valueOf(19.8).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_C = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -705,14 +705,14 @@ public class OrderTestsMy
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		//CREATE ASSET
 		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -723,7 +723,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_A = orderCreation.getOrder().getId();
 		
 		//CREATE ORDER TWO (SELLING 200 B FOR PRICE OF 5)
@@ -732,7 +732,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(200).setScale(8),BigDecimal.valueOf(1000).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_B = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -767,7 +767,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(95.9).setScale(8),BigDecimal.valueOf(19).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_C = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -813,14 +813,14 @@ public class OrderTestsMy
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		//CREATE ASSET
 		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -832,7 +832,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(2).setScale(8), BigDecimal.valueOf(40000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_B = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _A  SELL 1A for 15000 = 15000
@@ -840,7 +840,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(15000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_A = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
@@ -848,7 +848,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(4).setScale(8), BigDecimal.valueOf(100000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_C = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _D (BUY) 30000 x 2 = 60000
@@ -856,7 +856,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(60000).setScale(8),BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_D = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -918,7 +918,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(56000).setScale(8),BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountB, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_E = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -974,14 +974,14 @@ public class OrderTestsMy
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		//CREATE ASSET
 		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -992,7 +992,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(15000.88).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_A = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _B  SELL 2A x 20000 = 40000
@@ -1000,7 +1000,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(2).setScale(8), BigDecimal.valueOf(40000.33).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_B = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
@@ -1008,7 +1008,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(4).setScale(8), BigDecimal.valueOf(100007).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_C = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _D (BUY) 30000 x 2 = 60000
@@ -1016,7 +1016,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(60003).setScale(8),BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_D = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1077,7 +1077,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(46000).setScale(8),BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountB, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_E = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1127,14 +1127,14 @@ public class OrderTestsMy
 				
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		//CREATE ASSET
 		assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 1000000l, (byte) 8, true);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		keyA = assetA.getKey(db);
 		keyB = assetB.getKey(db);
@@ -1146,7 +1146,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(30000).setScale(8), BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_A = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _B  SELL 2A x 20000 = 40000
@@ -1154,7 +1154,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(40000).setScale(8), BigDecimal.valueOf(2).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_B = orderCreation.getOrder().getId();
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
@@ -1162,7 +1162,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(100000).setScale(8), BigDecimal.valueOf(4).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_C = orderCreation.getOrder().getId();
 
 	}
@@ -1179,7 +1179,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1).setScale(8),BigDecimal.valueOf(15000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_D = orderCreation.getOrder().getId();
 
 		//CHECK BALANCES
@@ -1193,7 +1193,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(2).setScale(8),BigDecimal.valueOf(60000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_D = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1210,7 +1210,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(3).setScale(8), BigDecimal.valueOf(100000).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		orderID_E = orderCreation.getOrder().getId();
 
 		//CHECK BALANCES
@@ -1236,14 +1236,14 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte)8, false);
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -1254,7 +1254,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false); // need for Order.getID()
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_A = orderCreation.getOrder().getId();
 
 		
@@ -1264,7 +1264,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(5000).setScale(8), (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountB, false); // need for Order.getID()
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_B = orderCreation.getOrder().getId();
 		
 		
@@ -1300,7 +1300,7 @@ public class OrderTestsMy
 				BigDecimal.valueOf(24).setScale(8),BigDecimal.valueOf(4).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		orderCreation.sign(accountA, false); // need for Order.getID()
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID_C = orderCreation.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1346,7 +1346,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
 		
@@ -1355,7 +1355,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db), new byte[64]);
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -1364,14 +1364,14 @@ public class OrderTestsMy
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_A = createOrderTransaction.getOrder().getId();
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
 		createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(200).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_B = createOrderTransaction.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1398,7 +1398,7 @@ public class OrderTestsMy
 		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA,
 				BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(750).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[]{3, 4});
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(db, false);
+		createOrderTransaction.process(db, null, false);
 		BigInteger orderID_C = createOrderTransaction.getOrder().getId();
 		
 		//CHECK BALANCES
@@ -1454,7 +1454,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 				
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
@@ -1465,7 +1465,7 @@ public class OrderTestsMy
 		
 		//CREATE ISSUE ASSET TRANSACTION
 		issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte)0, System.currentTimeMillis(), accountB.getLastReference(db));
-		issueAssetTransaction.process(db, false);
+		issueAssetTransaction.process(db, null, false);
 		
 		long keyA = assetA.getKey(db);
 		long keyB = assetB.getKey(db);
@@ -1475,7 +1475,7 @@ public class OrderTestsMy
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(100).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork1), new byte[]{5,6});
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(fork1, false);
+		createOrderTransaction.process(fork1, null, false);
 		BigInteger orderID_A = createOrderTransaction.getOrder().getId();
 		
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
@@ -1483,7 +1483,7 @@ public class OrderTestsMy
 		createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
 				BigDecimal.valueOf(1000).setScale(8),BigDecimal.valueOf(200).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork2), new byte[]{1, 2});
 		createOrderTransaction.sign(accountA, false);
-		createOrderTransaction.process(fork2, false);
+		createOrderTransaction.process(fork2, null, false);
 		BigInteger orderID_B = createOrderTransaction.getOrder().getId();
 				
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
@@ -1491,7 +1491,7 @@ public class OrderTestsMy
 		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA,
 				BigDecimal.valueOf(150).setScale(8),BigDecimal.valueOf(750).setScale(8), (byte)0, System.currentTimeMillis(), accountA.getLastReference(fork3), new byte[]{3, 4});
 		createOrderTransaction.sign(accountB, false);
-		createOrderTransaction.process(fork3, false);
+		createOrderTransaction.process(fork3, null, false);
 		BigInteger orderID_C = createOrderTransaction.getOrder().getId();
 		
 		//ORPHAN ORDER THREE
@@ -1569,7 +1569,7 @@ public class OrderTestsMy
 				
 		//CREATE ORDER
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID = orderCreation.getOrder().getId();
 
 		//CREATE CANCEL ORDER
@@ -1617,7 +1617,7 @@ public class OrderTestsMy
 		
 		//CREATE ORDER
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID = orderCreation.getOrder().getId();
 
 		//CREATE CANCEL ORDER
@@ -1690,7 +1690,7 @@ public class OrderTestsMy
 		//CREATE ORDER
 		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(8), accountA.getBalanceUSE( keyA, db));
 		orderCreation.sign(accountA, false);
-		orderCreation.process(db, false);
+		orderCreation.process(db, null, false);
 		BigInteger orderID = orderCreation.getOrder().getId();
 
 		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
@@ -1702,7 +1702,7 @@ public class OrderTestsMy
 		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER, System.currentTimeMillis(), accountA.getLastReference(db));
 		cancelOrderTransaction.sign(accountA, false);
 		
-		cancelOrderTransaction.process(db, false);
+		cancelOrderTransaction.process(db, null, false);
 		
 		//CHECK BALANCE SENDER
 		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(8),

@@ -67,7 +67,7 @@ public class TestRecGenesisAsset {
 		genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
 		if (toProcess)
 		{ 
-			genesisIssueAssetTransaction.process(db, false);
+			genesisIssueAssetTransaction.process(db, gb, false);
 			key = asset.getKey(db);
 		}
 		
@@ -293,7 +293,7 @@ public class TestRecGenesisAsset {
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 
-		assetTransfer.process(db, false);
+		assetTransfer.process(db, gb, false);
 
 		//CREATE VALID ASSET TRANSFER
 		maker.setBalance(1, BigDecimal.valueOf(100).setScale(8), db);
@@ -406,7 +406,7 @@ public class TestRecGenesisAsset {
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
 		
 		// assetTransfer.sign(sender); // not  NEED
-		assetTransfer.process(db, false);
+		assetTransfer.process(db, gb, false);
 		
 		//CHECK BALANCE SENDER - null
 		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
@@ -438,7 +438,7 @@ public class TestRecGenesisAsset {
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
 		// assetTransfer.sign(sender); not NEED
-		assetTransfer.process(db, false);
+		assetTransfer.process(db, gb, false);
 		assetTransfer.orphan(db, false);
 		
 		//CHECK BALANCE SENDER - null
@@ -514,7 +514,7 @@ public class TestRecGenesisAsset {
 		}
 
 		// assetTransfer.sign(sender); // not  NEED
-		assetTransfer.process(db, false);
+		assetTransfer.process(db, gb, false);
 		
 		//CHECK BALANCE SENDER - null
 		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));

@@ -353,10 +353,10 @@ public class BlockTests
 		// need add VOLUME for generating new block - 0l asset!
 		transaction = new GenesisTransferAssetTransaction(generator,
 				ERM_KEY, BigDecimal.valueOf(100000).setScale(8));
-		transaction.process(db, false);
+		transaction.process(db, gb, false);
 		transaction = new GenesisTransferAssetTransaction(generator,
 				FEE_KEY, BigDecimal.valueOf(1000).setScale(8));
-		transaction.process(db, false);
+		transaction.process(db, gb, false);
 		
 		//GENERATE NEXT BLOCK
 		//BigDecimal genBal = generator.getGeneratingBalance(db);
@@ -545,7 +545,7 @@ public class BlockTests
 		payment1.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
 
-		payment1.process(fork, false);
+		payment1.process(fork, gb, false);
 		
 		transactions.add(payment1);
 				
