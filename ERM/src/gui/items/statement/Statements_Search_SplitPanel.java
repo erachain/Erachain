@@ -50,6 +50,7 @@ import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
@@ -65,7 +66,8 @@ import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
-	import lang.Lang;
+import gui.records.VouchRecordDialog;
+import lang.Lang;
 
 
 	public class Statements_Search_SplitPanel extends Split_Panel{
@@ -198,7 +200,13 @@ import gui.models.Renderer_Boolean;
 	  		@Override
 	    	public void actionPerformed(ActionEvent e) {
 	   
-	  
+	  			Transaction statement = null;
+				if (search_Table.getSelectedRow() >= 0 ) statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+				VouchRecordDialog vouch_panel = new VouchRecordDialog(statement.getBlockHeight(DBSet.getInstance()),statement.getSeqNo(DBSet.getInstance()));
+			//	info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+			//	jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+	  			
+	  			
 	    //		@SuppressWarnings("unused")
 		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
 	    		}});

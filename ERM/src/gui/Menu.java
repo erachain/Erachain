@@ -355,7 +355,7 @@ public class Menu extends JMenuBar
         	{
         		// 
         		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-        		new VouchRecordDialog();
+        		new VouchRecordDialog(null, null);
         	}
         });
         dealsMenu.add(dealsMenuVouchRecord);

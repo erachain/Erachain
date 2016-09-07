@@ -1,5 +1,6 @@
 package gui.items.statement;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.table.AbstractTableModel;
 
 import org.json.simple.JSONArray;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
@@ -30,6 +32,7 @@ import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
+import database.VouchRecordMap;
 import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
 import network.Peer;
@@ -66,18 +69,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	//	transactions = new ArrayList<Transaction>();
 		
 	account = acc;
-/*
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
-			{
-				transactions.add(transaction);
-			}
-		}
+
 		
-		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-		}
-	*/	
+	
+		
+	//	for (Account account : Controller.getInstance().getAccounts()) {
+	//		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
+	//	}
+		
 	//	Pair<Block, List<Transaction>> result = Controller.getInstance().scanTransactions(null, 0, 0, 0, 0, null);
 			
 	
@@ -151,13 +150,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		
 		
 	*/		
-		
-		int a = 10;
+	
 	
 	}
 	
 	// set class
 	
+	
+
 		public Class<? extends Object> getColumnClass(int c) {     // set column type
 			       return getValueAt(0, c).getClass();
 			   }
@@ -188,6 +188,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// TODO Auto-generated method stub
 		return transactions.size();
 	}
+	
 	public String get_Account (){
 	
 		
@@ -329,8 +330,11 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 // проходим по транзакциям
 		for (Transaction transaction:db_transactions){
 // если ноте то пишем в transactions			
-		 if(transaction.getType() == Transaction.VOUCH_TRANSACTION  )	tran.add(transaction);	
-		
+		 if(transaction.getType() == Transaction.VOUCH_TRANSACTION  )
+			 if (account.equalsIgnoreCase(transaction.getCreator().getAddress())){
+			 System.out.println("account:"+account+"%%%Trans_account:"+ transaction.getCreator().getAddress());
+				 tran.add(transaction);	
+			 }
 		
 		}
 		

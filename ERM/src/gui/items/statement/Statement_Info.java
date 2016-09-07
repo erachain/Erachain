@@ -1,11 +1,19 @@
 package gui.items.statement;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import javax.swing.JTable;
 
+import org.mapdb.Fun.Tuple2;
+
+import core.account.PublicKeyAccount;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
+import database.DBSet;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 /*
@@ -30,8 +38,22 @@ public class Statement_Info extends javax.swing.JPanel {
     public Statement_Info(Transaction transaction) {
         initComponents();
         
-        Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(transaction.getCreator().getAddress());
-        jTable_Sign = new JTable (table_sing_model);
+        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(transaction.getBlockHeight(DBSet.getInstance()),transaction.getSeqNo(DBSet.getInstance()));
+  	  
+        if (signs != null){
+  	    
+        
+       
+  	    	Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(transaction.getCreator().getAddress());
+  	        jTable_Sign = new JTable (table_sing_model);
+  	      jTable_Sign.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+  	    jTable_Sign.setDefaultRenderer(String.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
+  	  jTable_Sign.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
+			
+  	    	
+  	    }
+        
+        
         jScrollPane4.setViewportView(jTable_Sign);
         statement = (R_SignNote)transaction;
         jTextArea_Body.setText(new String( statement.getData(), Charset.forName("UTF-8") ));

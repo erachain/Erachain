@@ -40,11 +40,17 @@ public class VouchRecordDialog extends JDialog  {
 	private static Transaction record;
 	private static Record_Info infoPanel;
 
-	public VouchRecordDialog() {
+	public VouchRecordDialog(Integer block_No, Integer rec_No) {
 		super();
 		
 		initComponents();
-	
+		if (block_No != null && rec_No != null )	{
+			jTextField_recordID.setText(block_No.toString() +"-"+ rec_No.toString());
+			VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+			jTextField_recordID.enable(false);
+			
+			
+		}
 		setSize(400,300);
 			this.setTitle(Lang.getInstance().translate("Vouch Record"));
 			this.setResizable(true);
