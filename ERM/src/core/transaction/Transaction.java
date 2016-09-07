@@ -485,8 +485,12 @@ public abstract class Transaction {
 
 	public Block getBlock(DBSet db) {
 		
-		//return db.getTransactionRef_BlockRef_Map().getParent(this.signature);
-		return this.block;
+		if (block != null)
+			return block;
+		
+		block = db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+
+		return block;
 	}
 	
 	public int getBlockHeight(DBSet db)
@@ -510,7 +514,7 @@ public abstract class Transaction {
 
 	public int getSeqNo(DBSet db)
 	{
-		return this.getBlock(db).getTransactionSeq(this.signature);
+		return this.block.getTransactionSeq(this.signature);
 	}
 	
 	// reference in Map - or as signatire or as BlockHeight + seqNo
