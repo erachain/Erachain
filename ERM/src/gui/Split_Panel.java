@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 
@@ -38,6 +39,7 @@ public class Split_Panel extends javax.swing.JPanel {
 
 
         this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+    //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
         
         
      
@@ -189,7 +191,7 @@ public class Split_Panel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+  //      jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

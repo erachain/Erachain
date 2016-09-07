@@ -167,7 +167,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			case COLUMN_TIMESTAMP:
 				
 				//return DateTimeFormat.timestamptoString(transaction.viewTimestamp()) + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp() + " " + transaction.getTimestamp() / 1000;
+				return transaction.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 				
 			case COLUMN_TYPE:
 				
