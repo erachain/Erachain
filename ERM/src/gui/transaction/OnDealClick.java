@@ -186,6 +186,12 @@ public class OnDealClick
 		case Transaction.INVALID_DATA:
 			mess = "Invalid data";
 			break;
+		case Transaction.INVALID_URL_LENGTH:
+			mess = "Invalid URL length";
+			break;
+		case Transaction.INVALID_PARAMS_LENGTH:
+			mess = "Invalid parameters length";
+			break;
 		case Transaction.INVALID_SIGNATURE:
 			mess = "Invalid signature";
 			break;

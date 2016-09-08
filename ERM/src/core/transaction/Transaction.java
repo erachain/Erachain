@@ -112,22 +112,23 @@ public abstract class Transaction {
 
 	public static final int INVALID_DATA_LENGTH = 88;
 	public static final int INVALID_DATA = 89;
-		
+	public static final int INVALID_PARAMS_LENGTH = 90;
+	public static final int INVALID_URL_LENGTH = 91;
 
 	// ITEMS
-	public static final int INVALID_ITEM_VALUE = 90;
-	public static final int ITEM_DOES_NOT_EXIST = 91;
-	public static final int ITEM_ASSET_DOES_NOT_EXIST = 92;
-	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 93;
-	public static final int ITEM_NOTE_NOT_EXIST = 94;
-	public static final int ITEM_PERSON_NOT_EXIST = 95;
-	public static final int ITEM_STATUS_NOT_EXIST = 96;
-	public static final int ITEM_UNION_NOT_EXIST = 97;
-	public static final int ITEM_DOES_NOT_STATUSED = 98;
-	public static final int ITEM_DOES_NOT_UNITED = 99;
-	public static final int ITEM_DUPLICATE_KEY = 100;
+	public static final int INVALID_ITEM_VALUE = 100;
+	public static final int ITEM_DOES_NOT_EXIST = 101;
+	public static final int ITEM_ASSET_DOES_NOT_EXIST = 102;
+	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 103;
+	public static final int ITEM_NOTE_NOT_EXIST = 104;
+	public static final int ITEM_PERSON_NOT_EXIST = 105;
+	public static final int ITEM_STATUS_NOT_EXIST = 106;
+	public static final int ITEM_UNION_NOT_EXIST = 107;
+	public static final int ITEM_DOES_NOT_STATUSED = 108;
+	public static final int ITEM_DOES_NOT_UNITED = 109;
+	public static final int ITEM_DUPLICATE_KEY = 110;
 
-	public static final int AMOUNT_DIVISIBLE = 110;
+	public static final int AMOUNT_DIVISIBLE = 115;
 
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 120;
 	public static final int ITEM_PERSON_LONGITUDE_ERROR = 121;
@@ -182,13 +183,17 @@ public abstract class Transaction {
 	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
 	public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
 	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
+	
 	// confirms other transactions
 	public static final int VOUCH_TRANSACTION = 40;
+
+	public static final int HASHES_RECORD = 41;
+	
 	// exchange of assets
 	public static final int CREATE_ORDER_TRANSACTION = 50;
 	public static final int CANCEL_ORDER_TRANSACTION = 51;
 	// voting
-	public static final int CREATE_POLL_TRANSACTION =61;
+	public static final int CREATE_POLL_TRANSACTION = 61;
 	public static final int VOTE_ON_POLL_TRANSACTION = 62;
 	
 	public static final int RELEASE_PACK = 70;
