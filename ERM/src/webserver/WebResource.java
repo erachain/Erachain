@@ -170,7 +170,13 @@ public class WebResource {
 	@Path("index/blockexplorer.json")
 	@GET
 	public Response jsonQueryMain(@Context UriInfo info) {
-		Map output = BlockExplorer.getInstance().jsonQueryMain(info);
+		Map output = null;
+		try {
+			output = BlockExplorer.getInstance().jsonQueryMain(info);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")

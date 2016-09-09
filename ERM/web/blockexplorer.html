@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html style='height:100%'>
 	<head>
-	<title>Qora BlockExplorer</title>
+	<title>ERM BlockExplorer</title>
 	<link href="/index/libs/bootstrap/3/css/theme.css" rel="stylesheet">
     <script src="/index/libs/jquery/jquery.2.js"></script>
 	<script src="/index/libs/bootstrap/3/js/bootstrap.min.js"></script>
@@ -332,7 +332,7 @@ function aTs (data)
 		{
 			output += '<b>';
 		}
-		output += addCommas(data.aTs[key].accountBalance) + ' Qora';
+		output += addCommas(data.aTs[key].accountBalance) + ' ERM';
 		
 		output += '</table>';
 		
@@ -1026,7 +1026,7 @@ function mainQuery(data) {
 
 	output += lastBlock(data.lastBlock);
 	
-	try {
+	//try {
 	
 		if(data.type == 'standardAccount' || data.type == 'at')
 		{
@@ -1082,7 +1082,7 @@ function mainQuery(data) {
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			
 			output += '<br>';
-			output +='<font size="+1">Standard Account: <a href="?addr=' + data.address + '">' + data.address + '</a></font>';
+			output +='<font size="+1">Standard Account11: <a href="?addr=' + data.address + '">' + data.address + '</a></font>';
 			output += '<br><br>';
 			
 			if(data.countTx.hasOwnProperty('txsCount'))
@@ -1107,14 +1107,14 @@ function mainQuery(data) {
 					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=trades><a class=showOnly id=trades href=#>Trades: ' + data.countTx.tradesCount + '</a></div>\n';
 				}
 				
-				if(data.countTx.aTTxsCount > 0)
-				{
-					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=aTTxs><a class=showOnly id=aTTxs href=#>AT Transactions: ' + data.countTx.aTTxsCount + '</a></div>\n';
-				}
+//				if(data.countTx.aTTxsCount > 0)
+//				{
+//					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=aTTxs><a class=showOnly id=aTTxs href=#>AT Transactions: ' + data.countTx.aTTxsCount + '</a></div>\n';
+//				}
 				
 				if(data.countTx.blocksCount > 0)
 				{
-					output += '<div style="display:inline-block; padding-left: 20px; width: 500px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=blocks><a class=showOnly id=blocks href=#>Generated blocks: '+data.countTx.blocksCount + '</a>, including total fee: '+addCommas(data.totalBalance.totalGeneratedFee)+' Qora</div>';
+//					output += '<div style="display:inline-block; padding-left: 20px; width: 500px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=blocks><a class=showOnly id=blocks href=#>Generated blocks: '+data.countTx.blocksCount + '</a>, including total fee: '+addCommas(data.totalBalance.totalGeneratedFee)+' ERM</div>';
 				}
 
 				output += '<br>';
@@ -1124,9 +1124,9 @@ function mainQuery(data) {
 			}
 			
 			
-			output += '<br>Total Received: ' + addCommas(data.totalBalance.receivedQora) + ' Qora';
+//			output += '<br>Total Received: ' + addCommas(data.totalBalance.receivedERM) + ' ERM';
 			
-			output += '<br>Total Send: ' + addCommas(data.totalBalance.sendQora) + ' Qora'+'<br>';
+//			output += '<br>Total Send: ' + addCommas(data.totalBalance.sendERM) + ' ERM'+'<br>';
 			output += '<br>';
 
 			
@@ -1190,9 +1190,9 @@ function mainQuery(data) {
 				output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
 			}
 
-			output += '<br>Total Amount: '+ data.totalAmount + ' Qora';
-			output += '<br>Total AT Amount: '+ data.totalATAmount + ' Qora';
-			output += '<br>Total Fee: '+ data.totalFee + ' Qora';
+			output += '<br>Total Amount: '+ data.totalAmount + ' ERM';
+			output += '<br>Total AT Amount: '+ data.totalATAmount + ' ERM';
+			output += '<br>Total Fee: '+ data.totalFee + ' ERM';
 			
 			
 			output += '<br><br>';
@@ -1276,7 +1276,7 @@ function mainQuery(data) {
 			output += '<br><br><b>AT Type:</b> ' + data.at.type;
 			output += '<br><br><b>Description:</b> ' + htmlFilter(wordwrap(data.at.description, 80, '\n', true));
 			output += '<br><br><b>Tags:</b> ' + htmlFilter(wordwrap(data.at.tags, 80, '\n', true));
-			output += '<br><br><b>Min Activation Amount:</b> ' + data.at.minActivation + ' Qora';
+			output += '<br><br><b>Min Activation Amount:</b> ' + data.at.minActivation + ' ERM';
 			output += '<br><br><b>Dead:</b> ' + data.at.state.dead;
 			output += '<br><br><b>Frozen:</b> ' + data.at.state.frozen;
 			
@@ -1300,7 +1300,7 @@ function mainQuery(data) {
 				output += '<b>No</b>';
 			}
 			output += '</table>';
-			output += '<br><br><font size="+1"><b>Balance:</b> '+addCommas(data.at.accountBalance)+' Qora</font>';
+			output += '<br><br><font size="+1"><b>Balance:</b> '+addCommas(data.at.accountBalance)+' ERM</font>';
 			output += '<br><br>';
 		}						
 		
@@ -1373,7 +1373,7 @@ function mainQuery(data) {
 					{
 						output += '<td><font color="dimgray">'+data[i].block.generator+'</font></td>';
 					}
-					output += '<td>'+addCommas(data[i].block.fee)+' <font size="-2">Qora</font>'+'</td>';
+					output += '<td>'+addCommas(data[i].block.fee)+' <font size="-2">ERM</font>'+'</td>';
 					
 					if(data[i].hasOwnProperty('balance'))
 					{
@@ -1537,7 +1537,7 @@ function mainQuery(data) {
 					{
 						output += '<td rowspan=2><a href=?addr='+data[i].atTransaction.sender+'>'+data[i].atTransaction.sender+'</a></td>';
 					}
-					output += '<td>'+addCommas(data[i].atTransaction.amount)+' <font size="-2">Qora</font>';
+					output += '<td>'+addCommas(data[i].atTransaction.amount)+' <font size="-2">ERM</font>';
 					
 					if(data[i].atTransaction.recipient == data.address)
 					{
@@ -1616,8 +1616,8 @@ function mainQuery(data) {
 						
 						output += '<td>Genesis</td>';
 						
-						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">Qora</font>';
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						if(data[i].transaction.recipient == data.address)
 						{
@@ -1686,8 +1686,8 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.sender+'>'+data[i].transaction.sender+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">Qora</font>';
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						if(data[i].transaction.recipient == data.address)
 						{
@@ -1748,7 +1748,7 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.owner+'>'+data[i].transaction.owner+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font>';
 						
 						output += '<td colspan=2><b>';
 						if(data[i].transaction.сompressed)
@@ -1812,7 +1812,7 @@ function mainQuery(data) {
 						}
 						output += '<br><font color="e5e5e5">'+data[i].transaction.owner+'</font>';
 						
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font>';
 						
 						output += '<td colspan=2><b>New ';
 						if(data[i].transaction.сompressed)
@@ -1872,9 +1872,9 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.owner+'>'+data[i].transaction.owner+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
-						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+'">' + htmlFilter(data[i].transaction.name) + '</td>';
 						
@@ -1929,7 +1929,7 @@ function mainQuery(data) {
 							output += '<td><a href=?addr='+data[i].transaction.owner+'>'+data[i].transaction.owner+'</a></td>';
 						}
 						
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+'">' + htmlFilter(data[i].transaction.name) + '</td>';
 						
@@ -1994,8 +1994,8 @@ function mainQuery(data) {
 						
 						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+'">'+htmlFilter(data[i].transaction.name)+'</a></td>';
 						
-						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">Qora</font>';
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						if(data[i].transaction.buyer == data.address)
 						{
@@ -2056,7 +2056,7 @@ function mainQuery(data) {
 						{
 							output += '<td rowspan=2><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
-						output += '<td rowspan=2>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td rowspan=2>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 
 						output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.name) + '">'+htmlFilter(data[i].transaction.name)+'</a></td>';
 						
@@ -2121,7 +2121,7 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.poll) + '">'+htmlFilter(data[i].transaction.poll)+'</a></td>';
 						
@@ -2157,7 +2157,7 @@ function mainQuery(data) {
 						output += '<tr><td>';
 						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
-						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=150><b>Fee:</b> '+addCommas(data[i].transaction.fee) + ' <font size="-2">Qora</font>'+'</td>';
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=150><b>Fee:</b> '+addCommas(data[i].transaction.fee) + ' <font size="-2">ERM</font>'+'</td>';
 						output += '<td><b>Data Base58</b></td>';
 						if(data[i].hasOwnProperty('balance'))
 						{
@@ -2275,7 +2275,7 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td><b>Description:</b> '+htmlFilter(data[i].transaction.description)+'</td>';
 						
@@ -2344,7 +2344,7 @@ function mainQuery(data) {
 						output += '<td>'+addCommas(data[i].transaction.amount);
 						output += ' ' + getAssetNameMini(data[i].transaction.asset, data[i].transaction.assetName);
 						
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td>' + ' <a href=?asset='+data[i].transaction.asset+'>'+getAssetName(data[i].transaction.asset, data[i].transaction.assetName) + '</a>';
 						
@@ -2409,7 +2409,7 @@ function mainQuery(data) {
 							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
 						
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td>' + ' <a href=?asset='+data[i].transaction.order.have+'>'+getAssetName(data[i].transaction.order.have, data[i].transaction.haveName) + '</a>';
 						
@@ -2476,7 +2476,7 @@ function mainQuery(data) {
 							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
 						
-						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td>' + ' <a href=?asset='+data[i].transaction.orderSource.have+'>'+getAssetName(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName) + '</a>';
 						
@@ -2556,7 +2556,7 @@ function mainQuery(data) {
 							output += addCommas(assetsAmounts[key].amount)+' '+getAssetNameMini(key, assetsAmounts[key].assetName)+'<br>';
 						}
 						
-						output += 'fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += 'fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 
 						output += '<td>';
 						payments = data[i].transaction.payments;
@@ -2627,8 +2627,8 @@ function mainQuery(data) {
 						{
 							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
 						}
-						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">Qora</font>';
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						output += '<td><b>Name: </b>' + data[i].transaction.name;
 						if(data[i].transaction.atAddress == data.address)
@@ -2717,10 +2717,10 @@ function mainQuery(data) {
 						}
 						else
 						{
-							output += ' <font size="-2">Qora</font>'
+							output += ' <font size="-2">ERM</font>'
 						}
 						
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">Qora</font></td>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
 						
 						if(data[i].transaction.recipient == data.address)
 						{
@@ -2778,9 +2778,9 @@ function mainQuery(data) {
 			output +=  '</table>';
 		}
 
-	} catch(e) {
-		output += "<h1>ERROR<br>"+e+"</h1>";
-	}
+	//} catch(e) {
+	//	output += "<h1>ERROR<br>"+e+"</h1>";
+	//}
 	
 	return output;
 }
@@ -2813,7 +2813,7 @@ function pages(datapages, datastart, dataend, url, dataallOnOnePage)
 	
 	pages += '<table width="100%"><tr><td>Pages: ';
 	
-	if(datastart <  parseInt(datapages[0].replace( 'start_', '')))
+/*	if(datastart <  parseInt(datapages[0].replace( 'start_', '')))
 	{
 		var start;
 		for (var i = datapages.length/2-1; i >= 0 ; i--)
@@ -2826,7 +2826,7 @@ function pages(datapages, datastart, dataend, url, dataallOnOnePage)
 		}
 		pages += '<a class=without style="font-size: 15px;" href=' + url + '&start=' + start + '>«</a> ';
 	}
-	
+*/	
 	for (var i = 0; i < datapages.length/2; i++)
 	{
 		start = parseInt(datapages[i*2].replace( 'start_', ''));
@@ -2848,7 +2848,7 @@ function pages(datapages, datastart, dataend, url, dataallOnOnePage)
 		}
 	}
 	
-	if(dataend >  parseInt(datapages[datapages.length-1].replace( 'end_', '')))
+/* if(dataend >  parseInt(datapages[datapages.length-1].replace( 'end_', '')))
 	{
 		var start;
 		for (var i = 0; i < datapages.length/2; i++)
@@ -2861,7 +2861,7 @@ function pages(datapages, datastart, dataend, url, dataallOnOnePage)
 		}
 		pages += '<a class=without style="font-size: 15px;" href=' + url + '&start=' + start + '>»</a> ';
 	}
-	
+*/	
 	if(allOnOnePage)
 	{
 		pages += '&nbsp;<b><nobr>[All on one page]</nobr></b>';
@@ -3034,7 +3034,7 @@ function lastBlock(lastBlock)
 		return "";
 	
 	var output = '';
-	output += lastBlock.Label_Last_processed_block+': <a href=?block='+lastBlock.height+'>' + lastBlock.height + '</a>';
+	output += ': <a href=?block='+lastBlock.height+'>' + lastBlock.height + '</a>';
 	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp) + ' ago'+ ') ';
 	output += '<br><br>';
 	
@@ -3088,7 +3088,7 @@ function start() {
 	
 	params = parseUrlQuery();
 	
-	var title = 'Qora BlockExplorer';
+	var title = 'ERM BlockExplorer';
 	
 	if(params.hasOwnProperty('aTs'))
 	{
@@ -3398,7 +3398,7 @@ function start() {
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-          <button type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" class="navbar-toggle collapsed"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="/index/main.html" class="navbar-brand"><img src="img/logo_header.png" alt="" class="logo-header"></a>
+          <button type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" class="navbar-toggle collapsed"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="/index/main.html" class="navbar-brand"><!--<img src="img/logo_header.png" alt="" class="logo-header">--></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -3417,8 +3417,8 @@ function start() {
                       <div class="menu"><span class="glyphicon glyphicon-edit"></span><a href="/index/blog.html">Blog</a></div></a></div>
                   <div class="col-sm-4 col-xs-6"><a href="/index/namestorage.html">
                       <div class="menu"><span class="glyphicon glyphicon-file"></span><a href="/index/namestorage.html">NameStorage</a></div></a></div>
-					<div class="col-sm-4 col-xs-6"><a href="/index/hashtag.html?hashtag=qora">
-                      <div class="menu"><span class="glyphicon glyphicon-fire"></span><a href="/index/hashtag.html?hashtag=qora">Hashtag</a></div></a></div>
+					<div class="col-sm-4 col-xs-6"><a href="/index/hashtag.html?hashtag=ERM">
+                      <div class="menu"><span class="glyphicon glyphicon-fire"></span><a href="/index/hashtag.html?hashtag=ERM">Hashtag</a></div></a></div>
                 </div>
               </div>
             </div>
@@ -3473,7 +3473,7 @@ function start() {
 <table border="0" height=15% width="100%" cellspacing=0 cellpadding=0>
 <tr valign="bottom">
 <td align="center" style='padding-top:15px; padding-bottom:5px;'>
-<a href=http://qora.org><img border="0" src="img/logo_bottom.png"></a>
+<!--<a href=http://ERM.org><img border="0" src="img/logo_bottom.png"></a>-->
 </td>
 </tr>
 </table>

@@ -1,4 +1,5 @@
 package core.blockexplorer;
+import java.io.UnsupportedEncodingException;
 // 30/03 ++ asset - Trans_Amount
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -94,13 +95,13 @@ public class BlockExplorer
 	}
 
 
-	public Map jsonQueryMain(UriInfo info)
+	public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException
 	{		
 		Stopwatch stopwatchAll = new Stopwatch();
 
 		Map output = new LinkedHashMap();
 
-		try {
+	//	try {
 
 			if(info.getQueryParameters().containsKey("balance"))
 			{
@@ -393,12 +394,12 @@ public class BlockExplorer
 
 			output.put("queryTimeMs", stopwatchAll.elapsedTime());
 
-		} catch (Exception e1) {
+	/*	} catch (Exception e1) {
 			output = new LinkedHashMap();
 			output.put("error", e1.getLocalizedMessage());
 			output.put("help", jsonQueryHelp());
 			return output;
-		}
+		} */
 
 		output.put("error", "Not enough parameters.");
 		output.put("help", jsonQueryHelp());
@@ -2722,7 +2723,7 @@ public class BlockExplorer
 		for(Transaction transaction: block.getTransactions())
 		{
 			all.add(transaction);
-			txsTypeCount[transaction.getType()-1] ++;
+//			txsTypeCount[transaction.getType()-1] ++;
 		}
 
 		int txsCount = all.size();
