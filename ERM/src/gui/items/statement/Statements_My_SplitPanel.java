@@ -69,12 +69,13 @@ import gui.models.Renderer_Boolean;
 
 		
 	
-		private JTable my_Statements_table;
+	//	private JTable my_Statements_table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
+	     Statements_Table_Model_My my_Statements_Model;
 		
 		
 	public Statements_My_SplitPanel(){
@@ -95,13 +96,13 @@ import gui.models.Renderer_Boolean;
 			
 			
 			
-			
-			my_Statements_table = new Statements_Table_Model();
+			 my_Statements_Model = new  Statements_Table_Model_My();
+		//	my_Statements_table = new JTable(my_Statements_Model);// new Statements_Table_Model();
 	    	
-			my_Statements_table.setTableHeader(null);
-			my_Statements_table.setSelectionBackground(new Color(209, 232, 255, 255));
-			my_Statements_table.setEditingColumn(0);
-			my_Statements_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		//	my_Statements_table.setTableHeader(null);
+		//	my_Statements_table.setSelectionBackground(new Color(209, 232, 255, 255));
+		//	my_Statements_table.setEditingColumn(0);
+		//	my_Statements_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
 			
 		/*	
@@ -139,18 +140,25 @@ import gui.models.Renderer_Boolean;
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/		// SET VIDEO			
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = my_Statements_table; //my_Statements_table;
-			this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
+			this.jTable_jScrollPanel_LeftPanel = new JTable(my_Statements_Model); //my_Statements_table;
+			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionBackground(new Color(209, 232, 255, 255));
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
 	//		this.setRowHeightFormat(false);
+			
+			//Custom renderer for the String column;
+			this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+			this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_jScrollPanel_LeftPanel.getFontMetrics(this.jTable_jScrollPanel_LeftPanel.getFont()),my_Statements_Model.get_Column_AutoHeight())); // set renderer
+			
+			
 			 
 			// EVENTS on CURSOR
 			this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			
-			my_Statements_table.addMouseListener(new My_Mouse());
+			this.jTable_jScrollPanel_LeftPanel.addMouseListener(new My_Mouse());
 			my_run_menu  = new RunMenu();
 			Dimension dim1 = new Dimension(180,25);
 			my_run_menu.setSize(dim1);
@@ -274,7 +282,7 @@ import gui.models.Renderer_Boolean;
 				
 				 
 				Transaction statement = null;
-				if (my_Statements_table.getSelectedRow() >= 0 ) statement = ((Statements_Table_Model) my_Statements_table).get_Statement(my_Statements_table.convertRowIndexToModel(my_Statements_table.getSelectedRow()));
+				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ) statement =  my_Statements_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				 Statement_Info info_panel = new Statement_Info(statement);
 				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

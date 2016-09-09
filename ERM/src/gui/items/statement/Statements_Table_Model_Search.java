@@ -37,7 +37,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Table_Model_New extends AbstractTableModel implements Observer {
+public class Statements_Table_Model_Search extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -62,7 +62,7 @@ public class Statements_Table_Model_New extends AbstractTableModel implements Ob
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	
-	public Statements_Table_Model_New(){
+	public Statements_Table_Model_Search(){
 	//	transactions = new ArrayList<Transaction>();
 		
 	

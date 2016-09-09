@@ -74,7 +74,7 @@ import lang.Lang;
 	
 		private static final long serialVersionUID = 2717571093561259483L;
 
-		private Statements_Table_Model_New search_Table_Model;
+		private Statements_Table_Model_Search search_Table_Model;
 		private JTable search_Table;
 		private RowSorter<TableModelPersons> search_Sorter;
 		private RunMenu Search_run_menu;
@@ -98,7 +98,7 @@ import lang.Lang;
 			searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
 	//CREATE TABLE
-			search_Table_Model = new Statements_Table_Model_New();
+			search_Table_Model = new Statements_Table_Model_Search();
 			search_Table = new JTable(this.search_Table_Model);
 			TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 	//		columnModel.getColumn(0).setMaxWidth((100));
