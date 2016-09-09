@@ -142,7 +142,7 @@ public class BlockExplorer
 				}
 				else
 				{
-					output.putAll(jsonQueryTopRichest(Integer.valueOf((info.getQueryParameters().getFirst("top"))), 0l ));
+					output.putAll(jsonQueryTopRichest(Integer.valueOf((info.getQueryParameters().getFirst("top"))), 1l ));
 				}
 
 				output.put("assets", jsonQueryAssetsLite());
@@ -466,7 +466,7 @@ public class BlockExplorer
 
 		if (Crypto.getInstance().isValidAddress(query))
 		{
-			if(query.startsWith("Q"))
+			if(query.startsWith("7"))
 			{
 				i++;
 				foundList.put(i, "standardAccount");
@@ -492,7 +492,7 @@ public class BlockExplorer
 			
 			for (String string : strings) 
 			{
-				if (!string.startsWith("Q")) 
+				if (!string.startsWith("7")) 
 				{
 					isAddresses = false;
 					break;
@@ -1540,6 +1540,7 @@ public class BlockExplorer
 			Transaction transaction = (Transaction)unit;
 
 			transactionDataJSON = transaction.toJson();
+			//transactionDataJSON.put("ешьуыеф", GZIP.webDecompress(transactionDataJSON.get("value").toString()));	
 
 			if(transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION)
 			{
@@ -1613,6 +1614,10 @@ public class BlockExplorer
 				{
 					assetNames.setKey(((R_Send)unit).getKey());
 				}
+
+				//R_Send r_Send = (R_Send) transaction;
+				//transactionDataJSON.put("assetName", Controller.getInstance().getAsset( r_Send.getKey()).toString());
+				transactionDataJSON.put("assetName", assetNames.getMap().get(((R_Send)unit).getAbsKey()));
 				
 				if(((R_Send)unit).isEncrypted()){
 					transactionDataJSON.put("data", "encrypted");
@@ -1769,7 +1774,7 @@ public class BlockExplorer
 		TreeSet<BlExpUnit> all = new TreeSet<>();
 		String name = query;
 
-		int[] txsTypeCount = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		int[] txsTypeCount = new int[256];
 
 		Map output=new LinkedHashMap();
 
@@ -2070,7 +2075,7 @@ public class BlockExplorer
 		int txsCount = 0;
 		int totalBlocksGeneratedCount = 0;
 		BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO.setScale(8);
-		int[] txsTypeCount = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		int[] txsTypeCount = new int[256];
 		List<Map<String, Map<Long, BigDecimal>>> tXincomes = new ArrayList<>();
 		List<Map<Long, BigDecimal>> totalBalances = new ArrayList<>();
 		BigDecimal spentFee = BigDecimal.ZERO.setScale(8);
@@ -2702,7 +2707,7 @@ public class BlockExplorer
 
 		Map output=new LinkedHashMap();
 		List<Object> all = new ArrayList<Object>();
-		int[] txsTypeCount = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		int[] txsTypeCount = new int[256];
 		int aTTxsCount = 0;
 		Block block; 
 		AssetNames assetNames = new AssetNames();
@@ -2723,7 +2728,7 @@ public class BlockExplorer
 		for(Transaction transaction: block.getTransactions())
 		{
 			all.add(transaction);
-//			txsTypeCount[transaction.getType()-1] ++;
+			txsTypeCount[transaction.getType() - 1] ++;
 		}
 
 		int txsCount = all.size();
