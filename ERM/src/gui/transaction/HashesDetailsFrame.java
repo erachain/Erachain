@@ -73,13 +73,19 @@ public class HashesDetailsFrame extends Rec_DetailsFrame
 		JLabel hashesLabel = new JLabel(Lang.getInstance().translate("HASHES") + ":");
 		this.add(hashesLabel, labelGBC);
 				
-		//DESCRIPTION
+		//HASHES
 		++detailGBC.gridy;
 		JTextPane txtAreaHashes = new JTextPane();
 		txtAreaHashes.setContentType("text/html");
 		txtAreaHashes.setBackground(MainFrame.getFrames()[0].getBackground());
 
-		txtAreaHashes.setText(String.join(" ", r_Hashes.getHashesB58()));
+		txtAreaHashes.setText("<html>" + String.join("<br />", r_Hashes.getHashesB58()) + "</html>");
+		txtAreaHashes.setBorder(name.getBorder());
+		txtAreaHashes.setEditable(false);
+		//MenuPopupUtil.installContextMenu(txtAreaHashes);
+		this.add(txtAreaHashes, detailGBC);
+
+		//txtAreaHashes.setText(String.join(" ", r_Hashes.getHashesB58()));
 
         //PACK
 //		this.pack();

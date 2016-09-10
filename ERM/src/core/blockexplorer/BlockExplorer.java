@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -1553,9 +1555,8 @@ public class BlockExplorer
 				{
 					transactionDataJSON.put("compressed", false);
 				}
-			}
-
-			if(transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION)
+				
+			} else if(transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION)
 			{
 				if(transactionDataJSON.get("newValue").toString().startsWith("?gz!"))
 				{
@@ -1566,9 +1567,7 @@ public class BlockExplorer
 				{
 					transactionDataJSON.put("compressed", false);
 				}
-			}
-
-			if(transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) 
+			} else if(transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) 
 			{
 				BigInteger key = ((CancelOrderTransaction)unit).getOrder();
 				Order order;
@@ -1597,18 +1596,16 @@ public class BlockExplorer
 				orderJSON.put("price", order.getPriceCalc().toPlainString());
 
 				transactionDataJSON.put("orderSource", orderJSON);
-			}
-
-			if(transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) 
+			
+			} else if(transaction.getType() == Transaction.ISSUE_ASSET_TRANSACTION) 
 			{
 				long assetkey = ((IssueAssetTransaction) transaction).getItem().getKey();
 				
 				transactionDataJSON.put("asset", assetkey);
 				
 				transactionDataJSON.put("assetName", ((IssueAssetTransaction) transaction).getItem().getName());
-			}
-
-			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 
+			
+			} else if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) 
 			{
 				if (assetNames != null) 
 				{
@@ -1622,9 +1619,11 @@ public class BlockExplorer
 				if(((R_Send)unit).isEncrypted()){
 					transactionDataJSON.put("data", "encrypted");
 				}
-			}
 			
-			if(transaction.getType() == Transaction.MULTI_PAYMENT_TRANSACTION) 
+			} else if(transaction.getType() == Transaction.HASHES_RECORD) 
+			{
+			
+			} else if(transaction.getType() == Transaction.MULTI_PAYMENT_TRANSACTION) 
 			{
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
@@ -1650,9 +1649,8 @@ public class BlockExplorer
 				}
 
 				transactionDataJSON.put("amounts", amountOfAssetsJSON);
-			}
 			
-			if(transaction.getType() == Transaction.ARBITRARY_TRANSACTION) 
+			} else if(transaction.getType() == Transaction.ARBITRARY_TRANSACTION) 
 			{
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
@@ -1678,24 +1676,21 @@ public class BlockExplorer
 				}
 
 				transactionDataJSON.put("amounts", amountOfAssetsJSON);
-			}
-
-			if(transaction.getType() == Transaction.VOTE_ON_POLL_TRANSACTION) 
+			
+			} else if(transaction.getType() == Transaction.VOTE_ON_POLL_TRANSACTION) 
 			{
 				transactionDataJSON.put("optionString", 
 						Controller.getInstance().getPoll(((VoteOnPollTransaction)transaction).getPoll()).getOptions().get(((VoteOnPollTransaction)transaction).getOption()).getName()
 						);
-			}
-
-			if(transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) 
+			
+			} else if(transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) 
 			{
 				if (assetNames != null) {
 					assetNames.setKey(((CreateOrderTransaction)transaction).getOrder().getHave());
 					assetNames.setKey(((CreateOrderTransaction)transaction).getOrder().getWant());
 				}
-			}
-
-			if(transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) 
+			
+			} else if(transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) 
 			{
 				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount(DBSet.getInstance()).getAddress());
 			}

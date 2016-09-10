@@ -1027,6 +1027,7 @@ function mainQuery(data) {
 		"", ""];
 	transactionTypes[31] = "Send Record";
 	transactionTypes[21] = "Issue Asset Record";
+	transactionTypes[41] = "Hashes Record";
 
 	output += lastBlock(data.lastBlock);
 	
@@ -2275,6 +2276,8 @@ function mainQuery(data) {
 						
 					} else if(data[i].transaction.type == 31) // SEND_ASSET_TRANSACTION
 					{
+
+						////////////////////// MESSAGE ////////////////
 						output += '<table width="100%"><tr><td>';
 						
 						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
@@ -2342,6 +2345,95 @@ function mainQuery(data) {
 						{
 							output += '<td>'+printBalance(data[i].balance)+'</td>';
 						}
+						
+						output += '<td>'+data[i].transaction.isText+'</td>';
+						output += '<td>'+data[i].transaction.encrypted+'</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td rowspan=2>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr>';
+						
+						output += '<tr><td colspan=5><b>Message:</b> <pre>';
+						
+						if(!data[i].transaction.isText)
+						{
+							output += '<b>base58:</b> ';
+						}
+						
+						if(data[i].transaction.encrypted)
+						{
+							output += '<font color=red>encrypted</font>';
+						}
+						else
+						{
+							output += wordwrap(data[i].transaction.data, 120, '\n', true);
+						}
+												
+						output += '</pre></td>';
+						
+						output += '</table>';
+						
+						output += '</table><br>';
+					
+					
+					} else if(data[i].transaction.type == 41) // HASHES_RECORD
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + '>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
+
+						if(data[i].hasOwnProperty('data'))
+						{
+							output += '<td width=180><b>Description</b></td>';
+						}
+						output += '</tr>';
+						
+						
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/12_asset_transfer_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/12_asset_transfer_in.png>';
+						}
+						
+						output += '<br><font size="-2">Hashes Record</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td> fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font></td>';
+						
+						
 						output += '</tr></table>';
 						
 						output += '</table><br>';
@@ -2634,109 +2726,6 @@ function mainQuery(data) {
 						
 						output += '</table><br>';
 						
-					} else if(data[i].transaction.type == 17) // Message
-					{
-						output += '<table width="100%"><tr><td>';
-						
-						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
-						
-						output += '<tr><td><a href='+ urlstart + '#' + i + '>#' + i + '</a>&nbsp;&nbsp;';
-						
-						output += '<a href=?tx='+data[i].transaction.signature+'>'+data[i].transaction.signature+'</a></td>';
-						output += '<td align=right width=250>';
-						if(data[i].transaction.hasOwnProperty('blockHeight'))
-						{
-							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+'>'+data[i].transaction.blockHeight+'</a>';
-							output += ' / confirmations: '+data[i].transaction.confirmations;
-						}
-						output += '</td>';
-						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
-						
-						output += '<tr><td>';
-						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
-
-						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
-						output += '<td><b>Recipient</b></td><td><b>isText</b></td><td><b>Encrypted</b></td>';
-						if(data[i].hasOwnProperty('balance'))
-						{
-							output += '<td width=180><b>Balance</b></td>';
-						}
-						output += '</tr>';
-						output += '<tr><td align="center" valign="top" rowspan=2>';
-						
-						if(data[i].transaction.creator == data.address)
-						{
-							output += '<img src=img/17_message_out.png>';
-						}
-						else
-						{
-							output += '<img src=img/17_message_in.png>';
-						
-						}
-						output += '<br><font size="-2">Message</font></td>';
-							
-						if(data[i].transaction.creator == data.address)
-						{
-							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
-						}
-						else
-						{
-							output += '<td><a href=?addr='+data[i].transaction.creator+'>'+data[i].transaction.creator+'</a></td>';
-						}
-						
-						output += '<td>'+addCommas(data[i].transaction.amount);
-						
-						if(data[i].transaction.hasOwnProperty('asset'))
-						{
-							output += ' ' + getAssetNameMini(data[i].transaction.asset, data[i].transaction.assetName);
-						}
-						else
-						{
-							output += ' <font size="-2">ERM</font>'
-						}
-						
-						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
-						
-						if(data[i].transaction.recipient == data.address)
-						{
-							output += '<td><font color="dimgray">'+data[i].transaction.recipient+'</font></td>';
-						}
-						else
-						{
-							output += '<td><a href=?addr='+data[i].transaction.recipient+'>'+data[i].transaction.recipient+'</font></td>';
-						}
-						
-						output += '<td>'+data[i].transaction.isText+'</td>';
-						output += '<td>'+data[i].transaction.encrypted+'</td>';
-						
-						if(data[i].hasOwnProperty('balance'))
-						{
-							output += '<td rowspan=2>'+printBalance(data[i].balance)+'</td>';
-						}
-						output += '</tr>';
-						
-						output += '<tr><td colspan=5><b>Message:</b> <pre>';
-						
-						if(!data[i].transaction.isText)
-						{
-							output += '<b>base58:</b> ';
-						}
-						
-						if(data[i].transaction.encrypted)
-						{
-							output += '<font color=red>encrypted</font>';
-						}
-						else
-						{
-							output += wordwrap(data[i].transaction.data, 120, '\n', true);
-						}
-												
-						output += '</pre></td>';
-						
-						output += '</table>';
-						
-						output += '</table><br>';
-					
 					} else {
 						output += '<table width="100%"><tr><td>';
 						
