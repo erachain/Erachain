@@ -114,97 +114,45 @@ public class TestRecHash {
 		hashesRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
-		byte[] rawSignNoteRecord = hashesRecord.toBytes(true, null);
+		byte[] rawHashesRecord = hashesRecord.toBytes(true, null);
 		
 		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, hashesRecord.getDataLength(false));
+		assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(false));
 		
+		R_Hashes parsed = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			R_Hashes parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
-
-			//CHECK INSTANCE
-			assertEquals(true, parsed instanceof R_Hashes);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
-			
-			//CHECK OWNER
-			assertEquals(hashesRecord.getKey(), parsed.getKey());
-			
-			//CHECK NAME
-			assertEquals(true, Arrays.equals(hashesRecord.getData(), parsed.getData()));
-											
-			//CHECK FEE
-			assertEquals(hashesRecord.getFee(), parsed.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(hashesRecord.getReference(), parsed.getReference());	
-			
-			//CHECK TIMESTAMP
-			assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());				
-
-			//CHECK HASHES
-			assertEquals(true, Arrays.equals(hashesRecord.getHashes(), parsed.getHashes()));
+			parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawHashesRecord, releaserReference);
 		}
 		catch (Exception e) 
 		{
 			fail("Exception while parsing transaction. " + e);
 		}
 
+		//CHECK INSTANCE
+		assertEquals(true, parsed instanceof R_Hashes);
 		
-		// NOT DATA
-		data = null;
-		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+20, maker.getLastReference(db));
-		hashesRecord.sign(maker, asPack);
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
 		
-		//CONVERT TO BYTES
-		rawSignNoteRecord = hashesRecord.toBytes(true, null);
+		//CHECK ISSUER
+		assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
+					
+		//CHECK NAME
+		assertEquals(true, Arrays.equals(hashesRecord.getData(), parsed.getData()));
+										
+		//CHECK FEE
+		assertEquals(hashesRecord.getFee(), parsed.getFee());	
 		
-		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, hashesRecord.getDataLength(false));
+		//CHECK REFERENCE
+		assertEquals(hashesRecord.getReference(), parsed.getReference());	
 		
-		try 
-		{	
-			//PARSE FROM BYTES
-			R_Hashes parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+		//CHECK TIMESTAMP
+		assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());				
 
-			//CHECK INSTANCE
-			assertEquals(true, parsed instanceof R_Hashes);
-			
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
-			
-			//CHECK ISSUER
-			assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
-			
-			//CHECK OWNER
-			assertEquals(hashesRecord.getKey(), parsed.getKey());
-			
-			//CHECK NAME
-			assertEquals(null, parsed.getData());
-											
-			//CHECK FEE
-			assertEquals(hashesRecord.getFee(), parsed.getFee());	
-			
-			//CHECK REFERENCE
-			assertEquals(hashesRecord.getReference(), parsed.getReference());	
-			
-			//CHECK TIMESTAMP
-			assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());
-
-			//CHECK HASHES
-			assertEquals(true, Arrays.equals(hashesRecord.getHashes(), parsed.getHashes()));
-
-		}
-		catch (Exception e) 
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
+		//CHECK HASHES
+		assertEquals(true, Arrays.equals(hashesRecord.getHashes(), parsed.getHashes()));
 
 	}
 

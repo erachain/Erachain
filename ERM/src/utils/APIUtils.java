@@ -191,16 +191,20 @@ public class APIUtils {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String sender = (String) jsonObject.get("sender");
-			String feePowStr = (String) jsonObject.get("feePow");
 			String password = (String) jsonObject.get("password");
 
 			// PARSE FEE POWER
 			int feePow;
 			try {
-				feePow = Integer.parseInt(feePowStr);
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.INVALID_FEE_POWER);
+				feePow = (int)(long)jsonObject.get("feePow");
+			} catch (Exception e0) {
+				try {
+					String feePowStr = (String) jsonObject.get("feePow");
+					feePow = Integer.parseInt(feePowStr);
+				} catch (Exception e) {
+					throw ApiErrorFactory.getInstance().createError(
+							Transaction.INVALID_FEE_POWER);
+				}
 			}
 
 			// CHECK ADDRESS

@@ -102,13 +102,13 @@ public class TransactionFactory {
 			// PARSE MESSAGE TRANSACTION
 			return R_Send.Parse(data, releaserReference);
 			
-			/*
-		case Transaction.ACCOUNTING_TRANSACTION:
+		case Transaction.HASHES_RECORD:
 
 			
 				// PARSE ACCOUNTING TRANSACTION V3
-				return AccountingTransaction.Parse(Arrays.copyOfRange(data, 4, data.length));
+				return R_Hashes.Parse(data, releaserReference);
 				
+				/*
 		case Transaction.JSON_TRANSACTION:
 
 			

@@ -44,7 +44,7 @@ public class R_Hashes extends Transaction {
 	protected byte[] data;
 	protected byte[][] hashes;
 	
-	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
+	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + URL_SIZE_LENGTH;
 	
 	public R_Hashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
 		
@@ -211,14 +211,9 @@ public class R_Hashes extends Transaction {
 		
 		byte[] url = Arrays.copyOfRange(data, position, position + urlLength);
 		position += urlLength;
-		
-
-		//READ DATA SIZE
-		byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
-		int dataSize = Ints.fromByteArray(dataSizeBytes);	
-		position += DATA_SIZE_LENGTH;
 
 		//READ DATA
+		int dataSize = Ints.fromBytes((byte)0, (byte)0, typeBytes[2], typeBytes[3]);	
 		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
 		position += dataSize;
 		/*
@@ -255,9 +250,11 @@ public class R_Hashes extends Transaction {
 		//WRITE URL
 		data = Bytes.concat(data, this.url);
 	
+		/* it is in PRO1 + PROP2
 		//WRITE DATA SIZE
 		byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
 		data = Bytes.concat(data, dataSizeBytes);
+		*/
 
 		//WRITE DATA
 		data = Bytes.concat(data, this.data);
@@ -280,8 +277,8 @@ public class R_Hashes extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack) {
 
-		int add_len = URL_SIZE_LENGTH + this.url.length
-				+ DATA_SIZE_LENGTH + this.data.length
+		int add_len = this.url.length
+				+ this.data.length
 				+ this.hashes.length * HASH_LENGTH;
 		
 		if (asPack) {
@@ -300,7 +297,7 @@ public class R_Hashes extends Transaction {
 			return INVALID_URL_LENGTH;
 		}
 		
-		if(data.length > 4000)
+		if(data.length > 2 * Short.MAX_VALUE - 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}

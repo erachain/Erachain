@@ -1,17 +1,21 @@
 package core;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 //import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
@@ -45,6 +49,7 @@ import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
@@ -515,6 +520,37 @@ public class TransactionCreator
 		return afterCreate(record, asPack);
 	}
 
+	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
+			String urlStr, String dataStr, String hashesStr) {
+		
+		this.checkUpdate();
+		
+		Transaction messageTx;
+
+		long timestamp = NTP.getTime();
+		
+		byte[] url = urlStr.getBytes(StandardCharsets.UTF_8); 
+		byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
+		String[] hashes58;
+		if (hashesStr.length() > 30) {
+			hashes58 = hashesStr.split(" ");
+		} else {
+			hashes58 = new String[0];
+		}
+
+		byte[][] hashes = new byte[hashes58.length][32];
+		for (int i=0; i < hashes58.length; i++ ) {
+			hashes[i] = Bytes.ensureCapacity(Base58.decode(hashes58[i]), 32, 0);
+		}
+		
+		//CREATE MESSAGE TRANSACTION
+		messageTx = new R_Hashes(creator, (byte)feePow, url, data, hashes, timestamp, creator.getLastReference(this.fork));
+		messageTx.sign(creator, false);
+			
+		return afterCreate(messageTx, false);
+	}
+
+	
 	/*
 	// version 1
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,

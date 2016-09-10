@@ -547,8 +547,13 @@ public class ApiClient {
 				""
 			},
 			{
-				"POST message {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"message\": \"<message>\", \"amount\": \"<amount>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>}",
+				"POST rec_message {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"message\": \"<message>\", \"amount\": \"<amount>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>}",
 				"Send a message using the given data. \"istextmessage\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
+				""
+			},
+			{
+				"POST rec_hashes {\"sender\": \"<sender>\", \"url\": \"<url>\", \"data\": \"<data>\", \"hahses\": \"<hashes>\"}",
+				"Record HASHes. \"url\" link to files. \"data\" short description. \"hashes\" - String of HASHes delimited by \" \".",
 				""
 			},
 			{
