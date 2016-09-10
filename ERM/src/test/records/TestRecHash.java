@@ -132,27 +132,32 @@ public class TestRecHash {
 
 		//CHECK INSTANCE
 		assertEquals(true, parsed instanceof R_Hashes);
-		
-		//CHECK SIGNATURE
-		assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
-		
-		//CHECK ISSUER
-		assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
-					
-		//CHECK NAME
-		assertEquals(true, Arrays.equals(hashesRecord.getData(), parsed.getData()));
-										
-		//CHECK FEE
-		assertEquals(hashesRecord.getFee(), parsed.getFee());	
-		
-		//CHECK REFERENCE
-		assertEquals(hashesRecord.getReference(), parsed.getReference());	
-		
+
 		//CHECK TIMESTAMP
 		assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());				
 
+		//CHECK REFERENCE
+		assertEquals(hashesRecord.getReference(), parsed.getReference());	
+		
+		//CHECK ISSUER
+		assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
+
+		//CHECK FEE
+		assertEquals(hashesRecord.getFeePow(), parsed.getFeePow());			
+
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
+		
+
+		/////////////////////////////////
+		//CHECK URL
+		assertEquals(true, Arrays.equals(hashesRecord.getURL(), parsed.getURL()));
+
+		//CHECK NAME
+		assertEquals(true, Arrays.equals(hashesRecord.getData(), parsed.getData()));
+										
 		//CHECK HASHES
-		assertEquals(true, Arrays.equals(hashesRecord.getHashes(), parsed.getHashes()));
+		assertEquals(true, Arrays.equals(hashesRecord.getHashesB58(), parsed.getHashesB58()));
 
 	}
 

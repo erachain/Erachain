@@ -100,9 +100,11 @@ public class Rec_HashesResource {
 						ApiErrorFactory.ERROR_WALLET_LOCKED);
 			}
 
+			/*
 			if (true) {
 				return hashes;
 			}
+			*/
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.r_Hashes(maker, feePow,
 							url, data, hashes);

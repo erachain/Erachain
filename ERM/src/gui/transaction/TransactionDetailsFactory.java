@@ -26,6 +26,7 @@ import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
@@ -267,6 +268,14 @@ public class TransactionDetailsFactory
 			sertifyPubKeysDetailsFrame. add(jLabel9, gridBagConstraints);
 			
 			return sertifyPubKeysDetailsFrame;
+
+		case Transaction.HASHES_RECORD:
+			R_Hashes r_Hashes = (R_Hashes)transaction;
+			HashesDetailsFrame hashesDetailsFrame =   new HashesDetailsFrame(r_Hashes);
+			gridBagConstraints.gridy = hashesDetailsFrame.labelGBC.gridy+1; 
+			hashesDetailsFrame. add(jLabel9, gridBagConstraints);
+			
+			return hashesDetailsFrame;
 
 		case Transaction.ISSUE_IMPRINT_TRANSACTION:
 			

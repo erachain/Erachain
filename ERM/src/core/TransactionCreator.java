@@ -532,7 +532,7 @@ public class TransactionCreator
 		byte[] url = urlStr.getBytes(StandardCharsets.UTF_8); 
 		byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
 		String[] hashes58;
-		if (hashesStr.length() > 30) {
+		if (hashesStr.length() > 0) {
 			hashes58 = hashesStr.split(" ");
 		} else {
 			hashes58 = new String[0];
