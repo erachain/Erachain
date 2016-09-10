@@ -2432,9 +2432,22 @@ function mainQuery(data) {
 						}
 						
 						output += '<td> fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font></td>';
+
+						output += '</tr>';
+						output += '</table>';
+
+						output += '<tr><td width="100%">';
+						output += data[i].transaction.data;
+						output += '</td></tr>';
+
+						output += '<tr><td width="100%">';
 						
+						for (key in data[i].transaction.hashes) {
+							
+							output += ' <a trget="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + '">' + data[i].transaction.hashes[key] + '</a>';
+						}
 						
-						output += '</tr></table>';
+						output += '</td></tr>';
 						
 						output += '</table><br>';
 					
@@ -2776,16 +2789,7 @@ function mainQuery(data) {
 						output += '<br><font>' + data[i].transaction.record_type + '</font>';						
 						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font>';
 						output += '</td>';
-												
-						if(data[i].transaction.recipient == data.address)
-						{
-							output += '<td><font color="dimgray">'+data[i].transaction.recipient+'</font></td>';
-						}
-						else
-						{
-							output += '<td><a href=?addr='+data[i].transaction.recipient+'>'+data[i].transaction.recipient+'</font></td>';
-						}
-						
+																		
 						if(data[i].hasOwnProperty('balance'))
 						{
 							output += '<td>'+printBalance(data[i].balance)+'</td>';

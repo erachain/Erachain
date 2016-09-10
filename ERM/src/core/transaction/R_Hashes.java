@@ -15,6 +15,7 @@ import java.util.HashSet;
 //import org.apache.log4j.Logger;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple5;
 
@@ -138,7 +139,12 @@ public class R_Hashes extends Transaction {
 			//transaction.put("data", Base58.encode(this.data));
 		}
 
-			transaction.put("hashes", this.getHashesB58());
+	
+		JSONArray hashesArray = new JSONArray();
+		for (byte[] hash: this.hashes) {
+			hashesArray.add(Base58.encode(hash));
+		}
+		transaction.put("hashes", hashesArray);
 			
 		return transaction;	
 	}
