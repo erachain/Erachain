@@ -33,7 +33,6 @@ import database.DBSet;
 import database.HashesMap;
 
 
-
 public class R_Hashes extends Transaction {
 
 	private static final byte TYPE_ID = (byte) HASHES_RECORD;
@@ -121,7 +120,12 @@ public class R_Hashes extends Transaction {
 	{
 		return this.hashes;
 	}
-	
+
+	public static byte[] findRecord(DBSet db, byte[] hash) 
+	{
+		return db.getHashesMap().get(hash);
+	}
+
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -316,10 +320,17 @@ public class R_Hashes extends Transaction {
 		{
 			return INVALID_PARAMS_LENGTH;
 		}
-	
 
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		HashesMap map = db.getHashesMap();
+		for (byte[] hash: hashes) {
+			if (map.contains(hash)) {
+				return Transaction.ITEM_DUPLICATE_KEY;
+			}
+		}
+
 		
 		return Transaction.VALIDATE_OK;
 
