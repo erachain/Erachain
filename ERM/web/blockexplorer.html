@@ -2444,7 +2444,7 @@ function mainQuery(data) {
 						
 						for (key in data[i].transaction.hashes) {
 							
-							output += ' <a trget="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + '">' + data[i].transaction.hashes[key] + '</a>';
+							output += ' ' + key + ':<a target="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + '">' + data[i].transaction.hashes[key] + '</a>';
 						}
 						
 						output += '</td></tr>';
