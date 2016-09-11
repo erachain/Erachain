@@ -56,7 +56,7 @@ public class My_Assets_Tab extends Split_Panel {
 	{
 
 	
-	this.setName("My Assets");
+	this.setName(Lang.getInstance().translate("My Assets"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
 		button1_ToolBar_LeftPanel.setVisible(false);
