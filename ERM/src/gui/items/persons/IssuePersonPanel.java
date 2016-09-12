@@ -246,7 +246,8 @@ public class IssuePersonPanel extends JPanel
 		// открыть диалог для файла
 		JFileChooser chooser = new JFileChooser();
 		
-		
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setMultiSelectionEnabled(false);
 		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
                  "Image", "png", "jpg");
 		 chooser.setFileFilter(filter);

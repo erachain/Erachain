@@ -1,21 +1,37 @@
 package gui.items.imprints;
 
 import java.awt.Button;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.google.common.primitives.Longs;
 
 import controller.Controller;
 import core.account.Account;
@@ -59,7 +75,7 @@ public	Issue_Split_Panel(){
 	
 	// Right panel
 	//this.jToolBar_RightPanel.setSize(WIDTH, 200);
-	jButton2_jToolBar_RightPanel.setText(Lang.getInstance().translate("Get Hashs from File"));
+	jButton2_jToolBar_RightPanel.setText(Lang.getInstance().translate("Import Hashs"));
 	//jButton2_jToolBar_RightPanel.setSize(70, 30);
 	//jButton2_jToolBar_RightPanel.setPreferredSize(new Dimension(100,200));
 	
@@ -83,11 +99,29 @@ public	Issue_Split_Panel(){
 	
 	
 	jButton3_jToolBar_RightPanel = new JButton();
-	jButton3_jToolBar_RightPanel.setText(Lang.getInstance().translate("Create Hash from File"));
+	jButton3_jToolBar_RightPanel.setText(Lang.getInstance().translate("Create Hash"));
 	//jButton3_jToolBar_RightPanel.setFocusable(false);
 	jButton3_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 	jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+	jButton3_jToolBar_RightPanel.addActionListener(new ActionListener() {
+	// create Hashs
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    	Create_Hashs_from_Files();
+    	
+    }
+});
+	
+	
+	
+	
+	
+	
 	jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
+	
+	
+	
+	
 	
 	
 	jButton1_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
@@ -196,6 +230,70 @@ public void onIssueClick()
 	
 	//ENABLE
 	issue_Hash_Imprint.jButton.setEnabled(true);
+}
+
+
+protected void Create_Hashs_from_Files() {
+	// TODO Auto-generated method stub
+	
+	
+	// открыть диалог для файла
+	JFileChooser chooser = new JFileChooser();
+	
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	chooser.setMultiSelectionEnabled(true);
+//	 FileNameExtensionFilter filter = new FileNameExtensionFilter(
+//             "Image", "png", "jpg");
+//	 chooser.setFileFilter(filter);
+	 
+    int returnVal = chooser.showOpenDialog(getParent());
+    if(returnVal == JFileChooser.APPROVE_OPTION) {
+       System.out.println("You chose to open this file: " +
+            chooser.getSelectedFile().getName());
+    
+      File[] patchs = chooser.getSelectedFiles();
+     
+ //  идем по выбранным файлам      
+      for (File patch:patchs){
+      
+ //      File file = new File(chooser.getSelectedFile().getPath());
+//если размер больше 30к то не вставляем	       
+       System.out.println(patch);
+       
+      File file = new File (patch.getPath());
+   
+ // преобразуем в байты     
+      byte[] fileInArray = new byte[(int)file.length()];
+      FileInputStream f = null;
+	try {
+		f = new FileInputStream(patch.getPath());
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+      try {
+		f.read(fileInArray);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+ // кодируем в base58
+  // сюда надо вставить расчет Hash    
+    String hashes = file.getPath(); // Base58.encode(fileInArray);
+    table_Model.addRow(new Object[]{hashes});
+ 
+      
+      }
+       
+      
+      table_Model.fireTableDataChanged(); 
+       
+    }
+	
+
+	
+	
+	
 }
 
 
