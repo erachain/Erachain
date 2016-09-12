@@ -5,19 +5,29 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.transaction.Transaction;
+import gui.PasswordPane;
 import gui.Split_Panel;
 import lang.Lang;
+import utils.Pair;
 
 public class Issue_Split_Panel extends Split_Panel{
 	Table_Model_Issue_Hashes table_Model;
 	private JTable Table_Hash;
 	private JButton jButton3_jToolBar_RightPanel;
+	Issue_Hash_Imprint issue_Hash_Imprint;
 	
 public	Issue_Split_Panel(){
 
@@ -26,7 +36,21 @@ public	Issue_Split_Panel(){
 	this.toolBar_LeftPanel.setVisible(false);
 	this.searchToolBar_LeftPanel.setVisible(false);
 	this.jTable_jScrollPanel_LeftPanel.setVisible(false);	
-	this.jScrollPanel_LeftPanel.setViewportView(new Issue_Hash_Imprint());
+	 issue_Hash_Imprint  = new Issue_Hash_Imprint();
+	this.jScrollPanel_LeftPanel.setViewportView(issue_Hash_Imprint);
+    
+	issue_Hash_Imprint.jButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick();
+		    }
+		});
+
+   
+	
+	
+	
 	
 	// Right panel
 	//this.jToolBar_RightPanel.setSize(WIDTH, 200);
@@ -72,5 +96,94 @@ public	Issue_Split_Panel(){
 	
 	}
 	
+public void onIssueClick()
+{
+	//DISABLE
+	issue_Hash_Imprint.jButton.setEnabled(false);
+	
+
+	//CHECK IF NETWORK OK
+	if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+	{
+		//NETWORK NOT OK
+		JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		
+		//ENABLE
+		issue_Hash_Imprint.jButton.setEnabled(true);
+		
+		return;
+	}
+	
+	//CHECK IF WALLET UNLOCKED
+	if(!Controller.getInstance().isWalletUnlocked())
+	{
+		//ASK FOR PASSWORD
+		String password = PasswordPane.showUnlockWalletDialog(); 
+		if(!Controller.getInstance().unlockWallet(password))
+		{
+			//WRONG PASSWORD
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			issue_Hash_Imprint.jButton.setEnabled(true);
+			
+			return;
+		}
+	}
+	
+	//READ CREATOR
+	Account sender = (Account) issue_Hash_Imprint.jComboBox_Account.getSelectedItem();
+	
+	long parse = 0;
+	try
+	{
+		
+		//READ FEE POW
+		int feePow = Integer.parseInt(issue_Hash_Imprint.txtFeePow.getText());
+		// READ AMOUNT
+		//float amount = Float.parseFloat(this.txtAmount.getText());
+		
+		// NAME TOTAL
+		String url = issue_Hash_Imprint.jTextField_URL.getText().trim();
+
+		String description = issue_Hash_Imprint.jTextArea_Description.getText();
+		
+		List<String> hashes = this.table_Model.getValues();		
+
+		
+		//CREATE IMPRINT
+		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
+				String.join(" ", hashes));
+		
+		//CHECK VALIDATE MESSAGE
+		if (result.getB() == Transaction.VALIDATE_OK) {
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			//this.dispose();
+		}
+		else {
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+					+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		}
+
+	}
+	catch(Exception e)
+	{
+		if(parse == 0)
+		{
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	//ENABLE
+	issue_Hash_Imprint.jButton.setEnabled(true);
+}
+
+
+
 
 }

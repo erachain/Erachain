@@ -61,15 +61,16 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
      this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
      this.jButton.setText(Lang.getInstance().translate("Create"));
         
-     this.jButton.addActionListener(new ActionListener()
+  /*   this.jButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
 		        onIssueClick();
 		    }
 		});
-
+ */
     }
+   
 
 	public void onIssueClick()
 	{
@@ -308,19 +309,19 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify                     
-    private javax.swing.JButton jButton;
-    private javax.swing.JComboBox jComboBox_Account;
-	private javax.swing.JTextField txtFeePow;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel_Account;
-    private javax.swing.JLabel jLabel_Description;
-    private javax.swing.JLabel jLabel_Table_Hash;
-    private javax.swing.JLabel jLabel_Title;
-    private javax.swing.JLabel jLabel_URL;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable_Hash;
-    private javax.swing.JTextArea jTextArea_Description;
-    private javax.swing.JTextField jTextField_URL;
+    public javax.swing.JButton jButton;
+    public javax.swing.JComboBox jComboBox_Account;
+	public javax.swing.JTextField txtFeePow;
+    public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel jLabel_Account;
+    public javax.swing.JLabel jLabel_Description;
+    public javax.swing.JLabel jLabel_Table_Hash;
+    public javax.swing.JLabel jLabel_Title;
+    public javax.swing.JLabel jLabel_URL;
+    public javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JScrollPane jScrollPane2;
+    public javax.swing.JTable jTable_Hash;
+    public javax.swing.JTextArea jTextArea_Description;
+    public javax.swing.JTextField jTextField_URL;
     // End of variables declaration                   
 }
