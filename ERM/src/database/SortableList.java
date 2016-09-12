@@ -95,10 +95,14 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 		}
 		
 		//ITERATE UNTIL WE ARE AT THE POSITION
-		while(this.position < i)
+		while(this.position < i && this.iterator.hasNext())
 		{
 			this.iterator.next();
 			this.position++;
+		}
+		
+		if (!this.iterator.hasNext()) {
+			return null;
 		}
 		
 		//RETURN
@@ -140,6 +144,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 		this.lastValue = null;
 	}
 
+	/*
 	public void rescan() {
 		
 		this.size = db.size();
@@ -149,6 +154,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 		this.lastValue = null;
 		
 	}
+	*/
 
 
 	@Override

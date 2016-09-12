@@ -101,7 +101,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			
 			Pair<byte[], Block> data = this.blocks.get(row);
 			if (data == null || data.getB() == null) {
-				this.blocks.rescan();
+				//this.blocks.rescan();
 				//data = this.blocks.get(row);
 				return -1;
 			}
