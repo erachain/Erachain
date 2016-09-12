@@ -125,6 +125,28 @@ public class R_Hashes extends Transaction {
 	{
 		return db.getHashesMap().get(hash);
 	}
+	
+	// find twins before insert a record
+	public static List<String> findTwins(DBSet db, List<String> hashes58) 
+	{
+		List<String> twins = new ArrayList<String>();
+		for (String hash58: hashes58) {
+			if (db.getHashesMap().contains(Base58.decode(hash58))) {
+				twins.add(hash58);
+			}
+		}
+		return twins;
+	}
+	public static List<String> findTwins(DBSet db, String[] hashes58) 
+	{
+		List<String> twins = new ArrayList<String>();
+		for (String hash58: hashes58) {
+			if (db.getHashesMap().contains(Base58.decode(hash58))) {
+				twins.add(hash58);
+			}
+		}
+		return twins;
+	}
 
 
 	@SuppressWarnings("unchecked")

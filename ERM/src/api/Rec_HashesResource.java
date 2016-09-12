@@ -3,6 +3,7 @@ package api;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JFrame;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
@@ -28,6 +30,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.naming.Name;
+import core.transaction.R_Hashes;
 import core.transaction.Transaction;
 import database.DBSet;
 import lang.Lang;
@@ -106,6 +109,16 @@ public class Rec_HashesResource {
 				return hashes;
 			}
 			*/
+			
+			List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes.split(" "));
+			if (twins.size() > 0) {
+				JSONObject json_result = new JSONObject();
+				json_result.put("error", "twin hashes");
+				json_result.put("twins", new JSONArray().addAll(twins));
+				
+				return json_result.toJSONString();
+			}
+
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.r_Hashes(maker, feePow,
 							url, data, hashes);

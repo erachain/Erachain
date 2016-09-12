@@ -35,14 +35,14 @@ public class HashesMap extends DBMap<byte[], byte[]>
 		//OPEN MAP
 		return database.createTreeMap("hashes_keys")
 				.keySerializer(BTreeKeySerializer.BASIC)
-				//.comparator(UnsignedBytes.lexicographicalComparator())
+				.comparator(UnsignedBytes.lexicographicalComparator())
 				.makeOrGet();
 	}
 
 	@Override
 	protected Map<byte[], byte[]> getMemoryMap() 
 	{
-		return new TreeMap<byte[], byte[]>();
+		return new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override

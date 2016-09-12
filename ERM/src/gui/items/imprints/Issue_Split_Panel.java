@@ -135,37 +135,22 @@ public void onIssueClick()
 	Account sender = (Account) issue_Hash_Imprint.jComboBox_Account.getSelectedItem();
 	
 	long parse = 0;
+	int feePow = 0;
+	String url = "";
+	String description = "";
 	try
 	{
 		
 		//READ FEE POW
-		int feePow = Integer.parseInt(issue_Hash_Imprint.txtFeePow.getText());
+		feePow = Integer.parseInt(issue_Hash_Imprint.txtFeePow.getText());
 		// READ AMOUNT
 		//float amount = Float.parseFloat(this.txtAmount.getText());
 		
 		// NAME TOTAL
-		String url = issue_Hash_Imprint.jTextField_URL.getText().trim();
+		url = issue_Hash_Imprint.jTextField_URL.getText().trim();
 
-		String description = issue_Hash_Imprint.jTextArea_Description.getText();
+		description = issue_Hash_Imprint.jTextArea_Description.getText();
 		
-		List<String> hashes = this.table_Model.getValues();		
-
-		
-		//CREATE IMPRINT
-		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
-				String.join(" ", hashes));
-		
-		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-			//this.dispose();
-		}
-		else {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-					+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		}
-
 	}
 	catch(Exception e)
 	{
@@ -178,6 +163,24 @@ public void onIssueClick()
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
+		
+	List<String> hashes = this.table_Model.getValues();		
+
+	//CREATE IMPRINT
+	PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+	Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
+			String.join(" ", hashes));
+	
+	//CHECK VALIDATE MESSAGE
+	if (result.getB() == Transaction.VALIDATE_OK) {
+		JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+		//this.dispose();
+	}
+	else {
+		JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+				+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+	}
+
 	
 	//ENABLE
 	issue_Hash_Imprint.jButton.setEnabled(true);
