@@ -5,6 +5,13 @@ package gui.items.imprints;
  * and open the template in the editor.
  */
 
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+
+import core.account.Account;
+import gui.models.AccountsComboBoxModel;
+import lang.Lang;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -21,11 +28,24 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	Table_Model_Issue_Hashes table_Model;
 	/**
      * Creates new form Issue_Hash_Imprint
      */
     public Issue_Hash_Imprint() {
+    	 
         initComponents();
+        this.jLabel_Title.setText(Lang.getInstance().translate("Write Hashs to BlockChain"));
+        table_Model = new Table_Model_Issue_Hashes(new Object[] { Lang.getInstance().translate("Hash") + "32 bits" }, 0);
+        this.jTable_Hash.setModel(table_Model);
+     this.jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
+     this.jComboBox_Account.setModel(new AccountsComboBoxModel());
+     this.jLabel_URL.setText(Lang.getInstance().translate("URL") + ":");
+     this.jTextField_URL.setText("");
+     this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
+     this.jButton.setText(Lang.getInstance().translate("Create"));
+        
     }
 
     /**
@@ -121,7 +141,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 13, 0, 0);
         add(jLabel_Description, gridBagConstraints);
 
-        jTable_Hash.setModel(new javax.swing.table.DefaultTableModel(
+    /*    jTable_Hash.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -132,7 +152,9 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable_Hash);
+        
+        */
+    //    jScrollPane2.setViewportView(jTable_Hash);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -142,14 +164,14 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 13, 11, 10);
-        add(jScrollPane2, gridBagConstraints);
+  //      add(jScrollPane2, gridBagConstraints);
 
         jLabel_Table_Hash.setText("jLabel5");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new java.awt.Insets(10, 13, 0, 0);
-        add(jLabel_Table_Hash, gridBagConstraints);
+  //      add(jLabel_Table_Hash, gridBagConstraints);
 
         jButton.setText("jButton1");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -169,7 +191,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton;
-    private javax.swing.JComboBox<String> jComboBox_Account;
+    private javax.swing.JComboBox jComboBox_Account;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel_Account;
     private javax.swing.JLabel jLabel_Description;

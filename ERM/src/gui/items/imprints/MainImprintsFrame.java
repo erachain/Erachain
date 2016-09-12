@@ -39,8 +39,14 @@ public MainImprintsFrame(){
 	IssueImprintPanel issue_Imprint = new IssueImprintPanel();
 	this.jTabbedPane.add(issue_Imprint, Lang.getInstance().translate("Issue Imprint"));
 	
-	Issue_Hash_Imprint issue_Hash_Imprint = new Issue_Hash_Imprint();
-	this.jTabbedPane.add(issue_Hash_Imprint, Lang.getInstance().translate("Issue Hash Imprint"));
+	//Issue_Hash_Imprint issue_Hash_Imprint = new Issue_Hash_Imprint();
+	//this.jTabbedPane.add(issue_Hash_Imprint, Lang.getInstance().translate("Issue Hash Imprint"));
+	
+	
+	//Issue_Hash_Imprint_Panel issue_Hash_Imprint_Panel = new Issue_Hash_Imprint_Panel();
+	//this.jTabbedPane.add(issue_Hash_Imprint_Panel, Lang.getInstance().translate("Issue Hash Imprint"));
+	Issue_Split_Panel issue_Split_Panel = new Issue_Split_Panel();
+	this.jTabbedPane.add(issue_Split_Panel, Lang.getInstance().translate("Issue Hash Imprint"));
 	
 	
 	this.pack();
@@ -56,6 +62,7 @@ public MainImprintsFrame(){
 	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	search_Imprints_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Imprints_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));	
+	issue_Split_Panel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	
 	}
 
