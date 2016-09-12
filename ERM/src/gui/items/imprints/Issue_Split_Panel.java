@@ -14,10 +14,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.transaction.R_Hashes;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.PasswordPane;
 import gui.Split_Panel;
 import lang.Lang;
@@ -164,8 +169,15 @@ public void onIssueClick()
 		}
 	}
 		
-	List<String> hashes = this.table_Model.getValues();		
-
+	List<String> hashes = this.table_Model.getValues();
+	
+	List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
+	if (twins.size() > 0) {
+		JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Twin hashes: ") + twins.toString(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		issue_Hash_Imprint.jButton.setEnabled(true);
+		return;
+	}
+	
 	//CREATE IMPRINT
 	PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 	Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
