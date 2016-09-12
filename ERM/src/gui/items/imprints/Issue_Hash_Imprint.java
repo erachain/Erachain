@@ -5,6 +5,7 @@ package gui.items.imprints;
  * and open the template in the editor.
  */
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -297,11 +298,24 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         add(jLabel1, gridBagConstraints);
         
         //LABEL FEE POW
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 13, 0, 0);
       	this.add(new JLabel(Lang.getInstance().translate("Fee Power") + ":"), gridBagConstraints);
-      		
+      	
+      	
       	//TXT FEE
-      	this.txtFeePow = new JTextField();
+      	gridBagConstraints = new java.awt.GridBagConstraints();
+      	gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+      	
+        this.txtFeePow = new JTextField();
+        this.txtFeePow.setSize(80, 20);
+        this.txtFeePow.setMaximumSize(new Dimension(80,20));
+        this.txtFeePow.setPreferredSize(new Dimension(80,20));
       	this.txtFeePow.setText("0");
         this.add(this.txtFeePow, gridBagConstraints);
 
