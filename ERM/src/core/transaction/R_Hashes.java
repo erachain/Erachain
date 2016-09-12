@@ -25,11 +25,12 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
 //import database.BalanceMap;
 import database.DBSet;
-
+import database.HashesMap;
 
 
 public class R_Hashes extends Transaction {
@@ -119,7 +120,12 @@ public class R_Hashes extends Transaction {
 	{
 		return this.hashes;
 	}
-	
+
+	public static byte[] findRecord(DBSet db, byte[] hash) 
+	{
+		return db.getHashesMap().get(hash);
+	}
+
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -314,10 +320,17 @@ public class R_Hashes extends Transaction {
 		{
 			return INVALID_PARAMS_LENGTH;
 		}
-	
 
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		HashesMap map = db.getHashesMap();
+		for (byte[] hash: hashes) {
+			if (map.contains(hash)) {
+				return Transaction.ITEM_DUPLICATE_KEY;
+			}
+		}
+
 		
 		return Transaction.VALIDATE_OK;
 
@@ -325,15 +338,16 @@ public class R_Hashes extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	/*
-	public void process(DBSet db, boolean asPack) {
+	public void process(DBSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, asPack);
+		super.process(db, block, asPack);
 		
-		// it in any time is unconfirmed! byte[] ref = this.getDBRef(db);
-		db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, this.signature);
-
+		HashesMap map = db.getHashesMap();
+		byte[] signature = this.signature;
+		for (byte[] hash: hashes) {
+			map.set(hash, signature);
+		}
 	}
 
 	public void orphan(DBSet db, boolean asPack) {
@@ -341,10 +355,11 @@ public class R_Hashes extends Transaction {
 		//UPDATE SENDER
 		super.orphan(db, asPack);
 						
-		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
-
+		HashesMap map = db.getHashesMap();
+		for (byte[] hash: hashes) {
+			map.delete(hash);
+		}
 	}
-	*/
 
 	@Override
 	public HashSet<Account> getInvolvedAccounts()

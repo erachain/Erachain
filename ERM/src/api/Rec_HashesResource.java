@@ -53,6 +53,7 @@ public class Rec_HashesResource {
 	@Consumes(MediaType.WILDCARD)
 	
 	// http://127.0.0.1:9085/rec_hashes?sender=78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5&feePow=0&password=1&url=123
+	@SuppressWarnings("unchecked")
 	public String hashes(String x) {
 		try {
 
@@ -109,8 +110,14 @@ public class Rec_HashesResource {
 					.r_Hashes(maker, feePow,
 							url, data, hashes);
 
-			if (result.getB() == Transaction.VALIDATE_OK)
-				return result.getA().toJson().toJSONString();
+			if (result.getB() == Transaction.VALIDATE_OK) {
+				//return result.getA().toJson().toJSONString();
+				JSONObject json_result = new JSONObject();
+				String b58 = Base58.encode(result.getA().getSignature());
+				json_result.put("signature", b58);
+				
+				return json_result.toJSONString();
+			}
 			else
 				throw ApiErrorFactory.getInstance().createError(result.getB());
 
