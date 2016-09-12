@@ -50,21 +50,21 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 		}
 	}
 	
-	public List<String> getOptions()
+	public List<String> getValues()
 	{
-		List<String> options = new ArrayList<String>();
+		List<String> values = new ArrayList<String>();
 		
 		for(int i=0; i<this.getRowCount(); i++)
 		{
-			String option = String.valueOf(this.getValueAt(i, 0));
+			String value = String.valueOf(this.getValueAt(i, 0));
 			
-			if(option.length() > 0)
+			if(value.length() > 0)
 			{
-				options.add(option);
+				values.add(value);
 			}
 		}
 		
-		return options;
+		return values;
 	}
 	
 }

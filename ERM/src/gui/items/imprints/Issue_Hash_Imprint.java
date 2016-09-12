@@ -122,15 +122,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 
 			String description = this.jTextArea_Description.getText();
 			
-			List<String> hashes = new ArrayList<String>();
-			String cell_value;
-			for (int i=0; i<this.table_Model.getRowCount(); i++){
-				cell_value = (String)this.table_Model.getValueAt(i, 0);
-				if (cell_value == null || cell_value.trim().length() == 0)
-					continue;
-				hashes.add(cell_value);
-			}
-			
+			List<String> hashes = this.table_Model.getValues();			
 			
 			//CREATE IMPRINT
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
