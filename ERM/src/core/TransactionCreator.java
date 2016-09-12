@@ -521,7 +521,7 @@ public class TransactionCreator
 	}
 
 	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
-			String urlStr, String dataStr, String hashesStr) {
+			String urlStr, String dataStr, String[] hashes58) {
 		
 		this.checkUpdate();
 		
@@ -531,12 +531,6 @@ public class TransactionCreator
 		
 		byte[] url = urlStr.getBytes(StandardCharsets.UTF_8); 
 		byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
-		String[] hashes58;
-		if (hashesStr.length() > 0) {
-			hashes58 = hashesStr.split(" ");
-		} else {
-			hashes58 = new String[0];
-		}
 
 		byte[][] hashes = new byte[hashes58.length][32];
 		for (int i=0; i < hashes58.length; i++ ) {
@@ -548,6 +542,18 @@ public class TransactionCreator
 		messageTx.sign(creator, false);
 			
 		return afterCreate(messageTx, false);
+	}
+	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
+			String urlStr, String dataStr, String hashesStr) {
+		
+		String[] hashes58;
+		if (hashesStr.length() > 0) {
+			hashes58 = hashesStr.split(" ");
+		} else {
+			hashes58 = new String[0];
+		}
+		return r_Hashes(creator, feePow,
+				urlStr, dataStr, hashes58);
 	}
 
 	

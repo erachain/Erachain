@@ -2111,6 +2111,14 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender,
+			int feePow, String url, String data, String[] hashes) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Hashes(sender, feePow,
+					url, data, hashes);
+		}
+	}
+
 	/*
 	// ver 1
 	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,

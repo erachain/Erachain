@@ -5,12 +5,27 @@ package gui.items.imprints;
  * and open the template in the editor.
  */
 
-import javax.swing.JComboBox;
-import javax.swing.JTable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+
+import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.item.imprints.Imprint;
+import core.transaction.Transaction;
+import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
+import utils.Pair;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -46,7 +61,108 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
      this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
      this.jButton.setText(Lang.getInstance().translate("Create"));
         
+     this.jButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick();
+		    }
+		});
+
     }
+
+	public void onIssueClick()
+	{
+		//DISABLE
+		this.jButton.setEnabled(false);
+	
+		//CHECK IF NETWORK OK
+		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		{
+			//NETWORK NOT OK
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			this.jButton.setEnabled(true);
+			
+			return;
+		}
+		
+		//CHECK IF WALLET UNLOCKED
+		if(!Controller.getInstance().isWalletUnlocked())
+		{
+			//ASK FOR PASSWORD
+			String password = PasswordPane.showUnlockWalletDialog(); 
+			if(!Controller.getInstance().unlockWallet(password))
+			{
+				//WRONG PASSWORD
+				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				
+				//ENABLE
+				this.jButton.setEnabled(true);
+				
+				return;
+			}
+		}
+		
+		//READ CREATOR
+		Account sender = (Account) this.jComboBox_Account.getSelectedItem();
+		
+		long parse = 0;
+		try
+		{
+			
+			//READ FEE POW
+			int feePow = Integer.parseInt(this.txtFeePow.getText());
+			// READ AMOUNT
+			//float amount = Float.parseFloat(this.txtAmount.getText());
+			
+			// NAME TOTAL
+			String url = this.jTextField_URL.getText().trim();
+
+			String description = this.jTextArea_Description.getText();
+			
+			List<String> hashes = new ArrayList<String>();
+			String cell_value;
+			for (int i=0; i<this.table_Model.getRowCount(); i++){
+				cell_value = (String)this.table_Model.getValueAt(i, 0);
+				if (cell_value == null || cell_value.trim().length() == 0)
+					continue;
+				hashes.add(cell_value);
+			}
+			
+			
+			//CREATE IMPRINT
+			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+			Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
+					String.join(" ", hashes));
+			
+			//CHECK VALIDATE MESSAGE
+			if (result.getB() == Transaction.VALIDATE_OK) {
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				//this.dispose();
+			}
+			else {
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+
+		}
+		catch(Exception e)
+		{
+			if(parse == 0)
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		
+		//ENABLE
+		this.jButton.setEnabled(true);
+	}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -173,7 +289,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 13, 0, 0);
   //      add(jLabel_Table_Hash, gridBagConstraints);
 
-        jButton.setText("jButton1");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -186,12 +302,23 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         add(jLabel1, gridBagConstraints);
+        
+        //LABEL FEE POW
+        gridBagConstraints.gridx = 3;
+      	this.add(new JLabel(Lang.getInstance().translate("Fee Power") + ":"), gridBagConstraints);
+      		
+      	//TXT FEE
+      	this.txtFeePow = new JTextField();
+      	this.txtFeePow.setText("0");
+        this.add(this.txtFeePow, gridBagConstraints);
+
     }// </editor-fold>                        
 
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton;
     private javax.swing.JComboBox jComboBox_Account;
+	private javax.swing.JTextField txtFeePow;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel_Account;
     private javax.swing.JLabel jLabel_Description;
