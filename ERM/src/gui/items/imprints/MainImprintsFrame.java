@@ -39,6 +39,9 @@ public MainImprintsFrame(){
 	IssueImprintPanel issue_Imprint = new IssueImprintPanel();
 	this.jTabbedPane.add(issue_Imprint, Lang.getInstance().translate("Issue Imprint"));
 	
+	Issue_Hash_Imprint issue_Hash_Imprint = new Issue_Hash_Imprint();
+	this.jTabbedPane.add(issue_Hash_Imprint, Lang.getInstance().translate("Issue Hash Imprint"));
+	
 	
 	this.pack();
 	this.setSize(800,600);
