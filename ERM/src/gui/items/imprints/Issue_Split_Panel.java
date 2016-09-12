@@ -55,7 +55,7 @@ jButton1_jToolBar_RightPanel.addActionListener(new ActionListener() {
 
 jButton3_jToolBar_RightPanel = new JButton();
 jButton3_jToolBar_RightPanel.setText(Lang.getInstance().translate("Create Hash from File"));
-jButton3_jToolBar_RightPanel.setFocusable(false);
+//jButton3_jToolBar_RightPanel.setFocusable(false);
 jButton3_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
