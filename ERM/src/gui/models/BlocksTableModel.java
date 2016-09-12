@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.block.Block;
+import core.transaction.Transaction;
 import database.BlockMap;
 import database.DBSet;
 import database.SortableList;
@@ -92,12 +94,19 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 		//if(row >100)return null;
 		try {
 			
-			if(blocks == null || blocks.size() - 1 < row)
+			if(blocks == null)
 			{
 				return null;
 			}
 			
-			Block block = blocks.get(row).getB();
+			Pair<byte[], Block> data = this.blocks.get(row);
+			if (data == null || data.getB() == null) {
+				this.blocks.rescan();
+				//data = this.blocks.get(row);
+				return -1;
+			}
+
+			Block block = data.getB();
 			
 			switch(column)
 			{
@@ -137,7 +146,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return null;
 		
 		} catch (Exception e) {
-			//LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
 			return null;
 		}
 	}

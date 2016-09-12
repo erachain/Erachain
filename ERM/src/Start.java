@@ -40,8 +40,6 @@ public class Start {
 		
 		boolean cli = false;
 		
-		
-		
 		for(String arg: args)
 		{
 			if(arg.equals("-cli"))

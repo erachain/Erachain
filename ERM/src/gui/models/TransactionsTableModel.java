@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
@@ -75,12 +76,17 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	{
 		try
 		{
-			if(this.transactions == null || this.transactions.size() -1 < row)
+			if(this.transactions == null)
 			{
 				return null;
 			}
 			
-			Transaction transaction = this.transactions.get(row).getB();
+			Pair<byte[], Transaction> data = this.transactions.get(row);
+			if (data == null || data.getB() == null) {
+				return -1;
+			}
+
+			Transaction transaction = data.getB();
 			
 			switch(column)
 			{

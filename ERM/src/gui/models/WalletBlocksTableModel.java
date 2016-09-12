@@ -7,6 +7,7 @@ import org.mapdb.Fun.Tuple2;
 
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.block.Block;
 import core.wallet.Wallet;
@@ -86,16 +87,19 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	{
 		try 
 		{
-			if(blocks == null || blocks.size() < 1 || blocks.size() - 1 < row)
+			if(blocks == null)
 			{
 				return null;
 			}
 			
-			//if (!blocks.contains(row)) {
-				//return -1;
-			//}
+			//
+			Pair<Tuple2<String, String>, Block> data = this.blocks.get(row);
 			
-			Block block = this.blocks.get(row).getB();
+			if (data == null || data.getB() == null) {
+				return -1;
+			}
+
+			Block block = data.getB();
 			
 			switch(column)
 			{
@@ -127,12 +131,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			}
 		} catch (Exception e) {
-			//LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
-			// TODO здесь если кошелек на удален то данные ломаются и в цепочке - туда не катается данные нужные
-			// icreator - reset wallet.DB!
-			Controller.getInstance().synchronizeWallet();
-			//Controller.getInstance().setNeedSync(true);
-			//Controller.getInstance().actionAfterConnect();
+			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
 		}
 		
 		return null;

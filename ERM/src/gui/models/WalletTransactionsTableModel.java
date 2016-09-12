@@ -118,6 +118,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			}
 			
 			Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+
+			if (data == null || data.getB() == null) {
+				return -1;
+			}
+			
 			String creator_address = data.getA().a;
 			//Account creator = new Account(data.getA().a);
 			//Account recipient = null; // = new Account(data.getA().b);
@@ -205,6 +210,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			return null;
 			
 		} catch (Exception e) {
+			//GUI ERROR
 			LOGGER.error(e.getMessage(),e);
 			return null;
 		}

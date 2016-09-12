@@ -140,6 +140,17 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
 		this.lastValue = null;
 	}
 
+	public void rescan() {
+		
+		this.size = db.size();
+		this.iterator = this.filter(this.db.getIterator(index, descending));
+
+		this.position = 0;
+		this.lastValue = null;
+		
+	}
+
+
 	@Override
 	public void update(Observable o, Object object) {
 		
