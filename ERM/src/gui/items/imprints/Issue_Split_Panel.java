@@ -1,6 +1,8 @@
 package gui.items.imprints;
 
 import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,7 +29,12 @@ this.jTable_jScrollPanel_LeftPanel.setVisible(false);
 this.jScrollPanel_LeftPanel.setViewportView(new Issue_Hash_Imprint());
 
 // Right panel
+//this.jToolBar_RightPanel.setSize(WIDTH, 200);
 jButton2_jToolBar_RightPanel.setText(Lang.getInstance().translate("Get Hashs from File"));
+//jButton2_jToolBar_RightPanel.setSize(70, 30);
+//jButton2_jToolBar_RightPanel.setPreferredSize(new Dimension(100,200));
+
+
 jButton1_jToolBar_RightPanel.setText(Lang.getInstance().translate("Delete Hash"));
 jButton1_jToolBar_RightPanel.addActionListener(new ActionListener() {
 // delete row
@@ -54,7 +61,9 @@ jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.
 jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
 
 
-
+jButton1_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
+jButton2_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
+jButton3_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
 
 
 table_Model = new Table_Model_Issue_Hashes(new Object[] { Lang.getInstance().translate("Hash") + "   32 bits  (Base58 Format)" }, 0);
