@@ -254,9 +254,9 @@ public class Issue_Split_Panel extends Split_Panel {
 				}
 				
 				if (hashesStr.length() > 0) {
-				String[] hashes = hashesStr.split(" ");
+				String[] hashes = hashesStr.split("\\s*(\\s|,|!|;|:|\n|\\.)\\s*");
 					for (String hashB58: hashes) {
-						table_Model.addRow(new Object[] { hashB58, Lang.getInstance().translate("imported from") + " " +  file_name});					
+						if (hashB58!= null && !hashB58.equals(new String("")))	table_Model.addRow(new Object[] { hashB58, Lang.getInstance().translate("imported from") + " " +  file_name});					
 					}
 				}
 
