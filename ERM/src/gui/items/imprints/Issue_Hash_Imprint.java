@@ -55,7 +55,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
     	 
         initComponents();
         this.jLabel_Title.setText(Lang.getInstance().translate("Write Hashs to BlockChain"));
-        table_Model = new Table_Model_Issue_Hashes(new Object[] { Lang.getInstance().translate("Hash") + "32 bits" }, 0);
+        table_Model = new Table_Model_Issue_Hashes(0);
         this.jTable_Hash.setModel(table_Model);
      this.jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
      this.jComboBox_Account.setModel(new AccountsComboBoxModel());
@@ -126,7 +126,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 
 			String description = this.jTextArea_Description.getText();
 			
-			List<String> hashes = this.table_Model.getValues();			
+			List<String> hashes = this.table_Model.getValues(0);			
 			
 			List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
 			if (twins.size() > 0) {

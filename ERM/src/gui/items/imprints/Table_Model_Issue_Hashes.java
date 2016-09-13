@@ -5,18 +5,24 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
+import lang.Lang;
+
 @SuppressWarnings("serial")
 public class Table_Model_Issue_Hashes extends DefaultTableModel {
 	
-	public Table_Model_Issue_Hashes(Object[] objects, int i) {
-		super(objects, i);
+	public Table_Model_Issue_Hashes(int rows) {
+		super(new Object[] { Lang.getInstance().translate("Hash 32 bytes"),
+				Lang.getInstance().translate("Description") }, rows);
 		
-		this.addRow(new Object[]{""});
+		this.addRow(new Object[]{"", ""});
 	}
 
 	@Override
 	public boolean isCellEditable(int row, int column)
 	{
+		if (column == 0) {
+			return true;			
+		}
 		return true;
 	}
 	
@@ -32,7 +38,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 				//CHECK IF LAST ROW
 				if(row == this.getRowCount()-1)
 				{
-					this.addRow(new Object[]{""});
+					this.addRow(new Object[]{"", ""});
 				}
 				
 				super.setValueAt(aValue, row, column);
@@ -45,20 +51,20 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 			//CHECK IF LAST ROW
 			if(row == this.getRowCount()-1)
 			{
-				this.addRow(new Object[]{""});
+				this.addRow(new Object[]{"", ""});
 			}
 		}
 	}
 	
-	public List<String> getValues()
+	public List<String> getValues(int column)
 	{
 		List<String> values = new ArrayList<String>();
 		
 		for(int i=0; i<this.getRowCount(); i++)
 		{
-			String value = String.valueOf(this.getValueAt(i, 0));
+			String value = String.valueOf(this.getValueAt(i, column));
 			
-			if(value.length() > 0)
+			if(value.length() > column)
 			{
 				values.add(value);
 			}
