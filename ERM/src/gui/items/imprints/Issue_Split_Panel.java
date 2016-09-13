@@ -251,11 +251,13 @@ public class Issue_Split_Panel extends Split_Panel {
 					e.printStackTrace();
 					table_Model.addRow(new Object[] { "",
 							Lang.getInstance().translate("error reading") + " - " + file_name });
-					
 				}
+				
+				if (hashesStr.length() > 0) {
 				String[] hashes = hashesStr.split(" ");
-				for (String hashB58: hashes) {
-					table_Model.addRow(new Object[] { hashB58, Lang.getInstance().translate("imported from") + " " +  file_name});					
+					for (String hashB58: hashes) {
+						table_Model.addRow(new Object[] { hashB58, Lang.getInstance().translate("imported from") + " " +  file_name});					
+					}
 				}
 
 			} else {
