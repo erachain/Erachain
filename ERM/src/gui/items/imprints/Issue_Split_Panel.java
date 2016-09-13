@@ -3,6 +3,7 @@ package gui.items.imprints;
 import java.awt.Button;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.imprints.Imprint;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -305,6 +306,10 @@ protected void Hashs_from_Files(boolean imp)  {
 	}
  // кодируем в base58
  
+
+      /// HASHING
+	byte[] hash = Crypto.getInstance().digest(f.getBytes());
+
 
 	 
 
