@@ -64,6 +64,7 @@ import core.voting.PollOption;
 import database.ItemAssetBalanceMap;
 import database.DBSet;
 import database.SortableList;
+import lang.Lang;
 import settings.Settings;
 import utils.BlExpUnit;
 import utils.DateTimeFormat;
@@ -1332,7 +1333,21 @@ public class BlockExplorer
 		output.put("maxHeight", block.getHeight(DBSet.getInstance()));
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
-
+		
+		// TODO Lang.getInstance().translate(
+		
+		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
+		output.put("Label_Height", "Height");
+		output.put("Label_Time", "Time");
+		output.put("Label_Generator", "Creator");
+		output.put("Label_Gen_balance", "Gen.Balance");
+		output.put("Label_TXs", "TXs");
+		output.put("Label_Fee", "Fee");
+		output.put("Label_AT_Amount", "AT_Amount");
+		output.put("Label_Amount", "Amount");
+		output.put("Label_Later", "Later");
+		output.put("Label_Previous", "Previous");
+		
 		int counter = start; 
 
 		do{
