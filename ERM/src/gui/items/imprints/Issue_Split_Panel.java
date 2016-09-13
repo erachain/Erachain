@@ -78,6 +78,15 @@ public	Issue_Split_Panel(){
 	jButton2_jToolBar_RightPanel.setText(Lang.getInstance().translate("Import Hashs"));
 	//jButton2_jToolBar_RightPanel.setSize(70, 30);
 	//jButton2_jToolBar_RightPanel.setPreferredSize(new Dimension(100,200));
+	jButton2_jToolBar_RightPanel.addActionListener(new ActionListener() {
+		// create Hashs
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	    	Hashs_from_Files(true);
+	    	
+	    }
+		});
+		
 	
 	
 	jButton1_jToolBar_RightPanel.setText(Lang.getInstance().translate("Delete Hash"));
@@ -107,10 +116,10 @@ public	Issue_Split_Panel(){
 	// create Hashs
     @Override
     public void actionPerformed(ActionEvent e) {
-    	Create_Hashs_from_Files();
+    	Hashs_from_Files(false);
     	
     }
-});
+	});
 	
 	
 	
@@ -233,26 +242,37 @@ public void onIssueClick()
 }
 
 
-protected void Create_Hashs_from_Files() {
+protected void Hashs_from_Files(boolean imp)  {
 	// TODO Auto-generated method stub
-	
+// true - если импорт из файла
+// false - если создаем хэш для файлов
 	
 	// открыть диалог для файла
 	JFileChooser chooser = new JFileChooser();
 	
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	chooser.setMultiSelectionEnabled(true);
+	if (imp) chooser.setMultiSelectionEnabled(false);
+	
 //	 FileNameExtensionFilter filter = new FileNameExtensionFilter(
 //             "Image", "png", "jpg");
 //	 chooser.setFileFilter(filter);
 	 
     int returnVal = chooser.showOpenDialog(getParent());
     if(returnVal == JFileChooser.APPROVE_OPTION) {
-       System.out.println("You chose to open this file: " +
-            chooser.getSelectedFile().getName());
+ //      System.out.println("You chose to open this file: " +
+ //           chooser.getSelectedFile().getName());
+    if(imp){
+  // если импортируем то ....	 
+   	 String hashes = chooser.getSelectedFile().getPath(); // Base58.encode(fileInArray);
+   	    table_Model.addRow(new Object[]{"impotr:"+hashes});
+    	
+    }
+    else{ 
+    	// если создаем хэши то.....   	
+    	
+    	File[] patchs = chooser.getSelectedFiles();
     
-      File[] patchs = chooser.getSelectedFiles();
-     
  //  идем по выбранным файлам      
       for (File patch:patchs){
       
@@ -277,15 +297,26 @@ protected void Create_Hashs_from_Files() {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+      try {
+		f.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
  // кодируем в base58
-  // сюда надо вставить расчет Hash    
-    String hashes = file.getPath(); // Base58.encode(fileInArray);
-    table_Model.addRow(new Object[]{hashes});
  
+
+	 
+
+
+      // сюда надо вставить расчет Hash    
+    String hashes = file.getPath(); // Base58.encode(fileInArray);
+    table_Model.addRow(new Object[]{"Hesh:"+hashes});
+
       
       }
        
-      
+    }   
       table_Model.fireTableDataChanged(); 
        
     }
