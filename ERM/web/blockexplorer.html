@@ -2436,6 +2436,11 @@ function mainQuery(data) {
 						output += '</tr>';
 						output += '</table>';
 
+						if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 0) {
+							output += '<tr><td width="100%"><b>';
+							output += data[i].transaction.url;
+							output += '</b></td></tr>';
+						}
 						output += '<tr><td width="100%">';
 						output += data[i].transaction.data;
 						output += '</td></tr>';
@@ -2443,8 +2448,11 @@ function mainQuery(data) {
 						output += '<tr><td width="100%">';
 						
 						for (key in data[i].transaction.hashes) {
-							
-							output += ' ' + key + ':<a target="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + '">' + data[i].transaction.hashes[key] + '</a>';
+							if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 10) {
+								output += ' <b>' + key + '</b>:<a target="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + '">' + data[i].transaction.hashes[key] + '</a>';
+							} else {
+								output += ' <b>' + key + '</b>:' + data[i].transaction.hashes[key];
+							}
 						}
 						
 						output += '</td></tr>';
