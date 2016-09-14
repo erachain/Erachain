@@ -37,8 +37,10 @@ public class My_JFileChooser extends JFileChooser{
 		UIManager.put("FileChooser.fileDateHeaderText",  Lang.getInstance().translate("File Date"));
 		UIManager.put("FileChooser.fileAttrHeaderText",  Lang.getInstance().translate("File Attr"));
 		
+		
+		
 
-		UIManager.put("FileChooser.acceptAllFileFilterText",  Lang.getInstance().translate("All Files"));
+		UIManager.put("FileChooser.detailsViewButtonAccessibleName",  Lang.getInstance().translate("All Files"));
 		this.updateUI();
 		
 		/*
