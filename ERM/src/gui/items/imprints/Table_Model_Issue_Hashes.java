@@ -26,6 +26,11 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 		return true;
 	}
 	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	       return getValueAt(0, c).getClass();
+	   }
+	
+	
 	@Override 
 	public void setValueAt(Object aValue, int row, int column)
 	{

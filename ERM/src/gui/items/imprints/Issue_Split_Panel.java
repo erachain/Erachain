@@ -43,8 +43,10 @@ import core.account.PrivateKeyAccount;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.All_Options;
 import gui.PasswordPane;
 import gui.Split_Panel;
+import gui.models.Renderer_Hashes;
 import lang.Lang;
 import utils.Pair;
 
@@ -123,6 +125,7 @@ public class Issue_Split_Panel extends Split_Panel {
 
 		table_Model = new Table_Model_Issue_Hashes(0);
 		Table_Hash = new JTable(table_Model);
+		Table_Hash.setDefaultRenderer(String.class, new Renderer_Hashes());
 		this.jScrollPane_jPanel_RightPanel.setViewportView(Table_Hash);
 
 	}
@@ -228,6 +231,10 @@ public class Issue_Split_Panel extends Split_Panel {
 
 		// открыть диалог для файла
 		JFileChooser chooser = new JFileChooser();
+		// руссификация диалога выбора файла
+		new All_Options().setUpdateUI(chooser);
+		chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+		
 
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(true);
