@@ -43,9 +43,9 @@ import core.account.PrivateKeyAccount;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.All_Options;
 import gui.PasswordPane;
 import gui.Split_Panel;
+import gui.library.My_JFileChooser;
 import gui.models.Renderer_Hashes;
 import lang.Lang;
 import utils.Pair;
@@ -230,9 +230,10 @@ public class Issue_Split_Panel extends Split_Panel {
 		// false - если создаем хэш для файлов
 
 		// открыть диалог для файла
-		JFileChooser chooser = new JFileChooser();
+		//JFileChooser chooser = new JFileChooser();
 		// руссификация диалога выбора файла
-		new All_Options().setUpdateUI(chooser);
+		//new All_Options().setUpdateUI(chooser);
+		My_JFileChooser chooser = new My_JFileChooser();
 		chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 		
 

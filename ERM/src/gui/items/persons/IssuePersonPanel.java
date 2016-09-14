@@ -1,6 +1,7 @@
 package gui.items.persons;
 
 import gui.PasswordPane;
+import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 import java.awt.Dimension;
@@ -244,13 +245,14 @@ public class IssuePersonPanel extends JPanel
 		
 		
 		// открыть диалог для файла
-		JFileChooser chooser = new JFileChooser();
-		
+		//JFileChooser chooser = new JFileChooser();
+		My_JFileChooser chooser = new My_JFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
 		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
                  "Image", "png", "jpg");
 		 chooser.setFileFilter(filter);
+		
 		 
 	    int returnVal = chooser.showOpenDialog(getParent());
 	    if(returnVal == JFileChooser.APPROVE_OPTION) {
