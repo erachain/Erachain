@@ -92,10 +92,10 @@ public class Issue_Split_Panel extends Split_Panel {
 			// delete row
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				int a = table_Model.getRowCount();
 				if (table_Model.getRowCount() > 1) {
 					int selRow = Table_Hash.getSelectedRow();
-					if (selRow != -1) {
+					if (selRow != -1 && table_Model.getRowCount()>=selRow) {
 						((DefaultTableModel) table_Model).removeRow(selRow);
 						table_Model.fireTableDataChanged();
 					}
