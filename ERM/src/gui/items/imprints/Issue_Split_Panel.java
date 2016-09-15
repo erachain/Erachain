@@ -198,7 +198,7 @@ public class Issue_Split_Panel extends Split_Panel {
 		List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
 		if (twins.size() > 0) {
 			JOptionPane.showMessageDialog(new JFrame(),
-					Lang.getInstance().translate("Twin hashes: ") + twins.toString(),
+					Lang.getInstance().translate("Twin hashes")+": " + twins.toString(),
 					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			issue_Hash_Imprint.jButton.setEnabled(true);
 			return;
