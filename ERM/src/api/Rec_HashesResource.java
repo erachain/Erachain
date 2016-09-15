@@ -69,7 +69,7 @@ public class Rec_HashesResource {
 
 			String url = (String) jsonObject.get("url");
 			String data = (String) jsonObject.get("data");
-			String hashes = (String) jsonObject.get("hashes"); // :"12312 12123 234234"
+			String hashesStr = (String) jsonObject.get("hashes"); // :"12312 12123 234234"
 			
 			/*
 			String isTextMessageString = (String) jsonObject
@@ -110,11 +110,21 @@ public class Rec_HashesResource {
 			}
 			*/
 			
-			List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes.split(" "));
+			String beginStr = hashesStr.substring(0, 100);
+			List<String> twins;
+			String[] hashes;
+			if (beginStr.contains("-")) {
+				hashes = hashesStr.split("-");
+			} else {
+				hashes = hashesStr.split(" ");
+			}
+			twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
 			if (twins.size() > 0) {
 				JSONObject json_result = new JSONObject();
 				json_result.put("error", "twin hashes");
-				json_result.put("twins", new JSONArray().addAll(twins));
+				JSONArray twins_array = new JSONArray();
+				twins_array.addAll(twins);
+				json_result.put("twins", twins_array);
 				
 				return json_result.toJSONString();
 			}

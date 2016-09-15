@@ -190,16 +190,24 @@ public class APIUtils {
 			
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-			String sender = (String) jsonObject.get("sender");
+			String creator;
+			if (jsonObject.containsKey("creator")) {
+				creator = (String) jsonObject.get("creator");
+			} else if (jsonObject.containsKey("maker")) {
+					creator = (String) jsonObject.get("maker");
+			} else {
+				creator = (String) jsonObject.get("sender");
+			}
+			
 			String password = (String) jsonObject.get("password");
 
 			// PARSE FEE POWER
 			int feePow;
 			try {
-				feePow = (int)(long)jsonObject.get("feePow");
+				feePow = (int)(long)jsonObject.get("feepow");
 			} catch (Exception e0) {
 				try {
-					String feePowStr = (String) jsonObject.get("feePow");
+					String feePowStr = (String) jsonObject.get("feepow");
 					feePow = Integer.parseInt(feePowStr);
 				} catch (Exception e) {
 					throw ApiErrorFactory.getInstance().createError(
@@ -208,7 +216,7 @@ public class APIUtils {
 			}
 
 			// CHECK ADDRESS
-			if (!Crypto.getInstance().isValidAddress(sender)) {
+			if (!Crypto.getInstance().isValidAddress(creator)) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_MAKER_ADDRESS);
 			}
@@ -234,7 +242,7 @@ public class APIUtils {
 
 			// GET ACCOUNT
 			PrivateKeyAccount account = Controller.getInstance()
-					.getPrivateKeyAccountByAddress(sender);
+					.getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_MAKER_ADDRESS);
