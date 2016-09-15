@@ -95,6 +95,7 @@ public class Issue_Split_Panel extends Split_Panel {
 				int a = table_Model.getRowCount();
 				if (table_Model.getRowCount() > 1) {
 					int selRow = Table_Hash.getSelectedRow();
+					Object f = table_Model.getValueAt(selRow, 0);
 					if (selRow != -1 && table_Model.getRowCount()>=selRow) {
 						((DefaultTableModel) table_Model).removeRow(selRow);
 						table_Model.fireTableDataChanged();
@@ -248,6 +249,18 @@ public class Issue_Split_Panel extends Split_Panel {
 
 		int returnVal = chooser.showOpenDialog(getParent());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
+// если есть пустые строки удаляем их
+			int i;
+			for( i=0; i <= table_Model.getRowCount()-1; i++){
+				if (table_Model.getValueAt(i, 0).toString().equals("")){
+					
+					table_Model.removeRow(i);
+					
+				}
+			}
+			
+			
+			
 			if (importing) {
 				// IMPORT FROM FILE
 				File patch = chooser.getSelectedFile();
@@ -266,6 +279,7 @@ public class Issue_Split_Panel extends Split_Panel {
 					for (String hashB58: hashes) {
 						if (hashB58!= null && !hashB58.equals(new String("")))	table_Model.addRow(new Object[] { hashB58, Lang.getInstance().translate("imported from") + " " +  file_name});					
 					}
+					
 				}
 
 			} else {
@@ -319,10 +333,15 @@ public class Issue_Split_Panel extends Split_Panel {
 							Lang.getInstance().translate("from file ") + file_name });
 
 				}
-
+				
+				
 			}
+			table_Model.addRow(new Object[] { "",""});
 			table_Model.fireTableDataChanged();
-
+			Table_Hash.setRowSelectionInterval(table_Model.getRowCount()-1,table_Model.getRowCount()-1);
+			
+			
+			
 		}
 
 	}
