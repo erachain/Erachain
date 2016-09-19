@@ -94,7 +94,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 		//if(row >100)return null;
 		try {
 			
-			if(blocks == null)
+			if(this.blocks == null || this.blocks.size() -1 < row)
 			{
 				return null;
 			}

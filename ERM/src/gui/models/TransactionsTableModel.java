@@ -45,7 +45,11 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public Transaction getTransaction(int row)
 	{
-		return transactions.get(row).getB();
+		Pair<byte[], Transaction> data = this.transactions.get(row);
+		if (data == null || data.getB() == null) {
+			return null;
+		}
+		return data.getB();
 	}
 	
 	@Override
@@ -76,14 +80,14 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	{
 		try
 		{
-			if(this.transactions == null)
+			if(this.transactions == null || this.transactions.size() -1 < row)
 			{
 				return null;
 			}
 			
 			Pair<byte[], Transaction> data = this.transactions.get(row);
 			if (data == null || data.getB() == null) {
-				return -1;
+				return null;
 			}
 
 			Transaction transaction = data.getB();

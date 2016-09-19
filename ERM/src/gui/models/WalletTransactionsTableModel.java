@@ -81,7 +81,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	
 	public Transaction getTransaction(int row)
 	{
-		return transactions.get(row).getB();
+		Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+		if (data == null || data.getB() == null) {
+			return null;
+		}
+		return data.getB();
 	}
 	
 	@Override
@@ -120,7 +124,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
 
 			if (data == null || data.getB() == null) {
-				return -1;
+				return null;
 			}
 			
 			String creator_address = data.getA().a;
