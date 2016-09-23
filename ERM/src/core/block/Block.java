@@ -747,6 +747,12 @@ public class Block {
 
 		int height = this.getHeightByParent(dbSet);
 		
+		if (this.creator == null) {
+			LOGGER.error("block.creator == null in BLOCK:" + height);
+			return 1000;
+		}
+
+		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
 
