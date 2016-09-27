@@ -151,7 +151,7 @@ public class VotingDetailsPanel extends JPanel
 				onVoteClick();
 			}
 		});	
-		this.add(allButton, detailGBC);
+	//	this.add(allButton, detailGBC);
 		
 		//PACK
 		this.setVisible(true);
@@ -167,7 +167,7 @@ public class VotingDetailsPanel extends JPanel
 		}
 		row = this.table.convertRowIndexToModel(row);
 		
-		new VoteFrame(this.poll, row, asset);
+		new Voting_Dialog(this.poll, row, asset);
 	}
 	
 	public void setAsset(AssetCls asset)

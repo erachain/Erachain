@@ -60,7 +60,8 @@ import gui.MainFrame;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
-	import lang.Lang;
+import gui.voting.VoteFrame;
+import lang.Lang;
 
 
 	public class Votings_Search_SplitPanel extends Split_Panel{
@@ -75,6 +76,7 @@ import gui.MainFrame;
 // для прозрачности
 	     int alpha =255;
 	     int alpha_int;
+	     VotingDetailPanel votingDetailsPanel ;
 		
 		
 		public Votings_Search_SplitPanel(){
@@ -86,13 +88,26 @@ import gui.MainFrame;
 			
 			
 			setName(Lang.getInstance().translate("Search Votings"));
-		/*	
-		 * searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+		
+		 // searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			
 		// not show buttons
-			jToolBar_RightPanel.setVisible(false);
-			toolBar_LeftPanel.setVisible(false);
+		//	jToolBar_RightPanel.setVisible(false);
+		//	toolBar_LeftPanel.setVisible(false);
+			jButton1_jToolBar_RightPanel.setText(Lang.getInstance().translate("Vote"));
+			jButton1_jToolBar_RightPanel.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					onVoteClick();
+				}
+			});	
 			
+			
+			
+			
+			jButton2_jToolBar_RightPanel.setVisible(false);
+			/*	
 	// not show My filter
 			searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
@@ -269,16 +284,21 @@ import gui.MainFrame;
 		 class search_listener implements ListSelectionListener  {
 				@Override
 				public void valueChanged(ListSelectionEvent arg0) {
+					
 					Poll voting = null;
 					if (allVotingsPanel.pollsTable.getSelectedRow() >= 0 ) voting = allVotingsPanel.pollsTableModel.getPoll(allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
 				//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
 					
-					VotingDetailPanel votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
+					votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
 				//	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					//jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
 					jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
 					//jSplitPanel.setRightComponent(votingDetailsPanel);
+					
+					
 		
+					
+					
 				
 				}
 			}
@@ -343,6 +363,32 @@ import gui.MainFrame;
 		};
 		*/
 		
+		 public void onVoteClick()
+			{
+				//GET SELECTED OPTION
+				int row = allVotingsPanel.pollsTable.getSelectedRow();
+				if(row == -1)
+				{
+					row = 0;
+				}
+				row = allVotingsPanel.pollsTable.convertRowIndexToModel(row);
+				
+				
+		
+			
+				Poll voting = null;
+				if (allVotingsPanel.pollsTable.getSelectedRow() >= 0 ) voting = allVotingsPanel.pollsTableModel.getPoll(allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
+				//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
+					
+				new Voting_Dialog(voting, 0, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
+			
+			
+			
+			
+			
+			}
+	
+	
 	}
 
 
