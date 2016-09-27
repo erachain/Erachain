@@ -97,7 +97,7 @@ import lang.Lang;
 			my_Voting_table = new JTable(my_Voting_Model);
 			
 			TableColumnModel columnModel = my_Voting_table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
+		//	columnModel.getColumn(0).setMaxWidth((100));
 			
 			//Custom renderer for the String column;
 			my_Voting_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
