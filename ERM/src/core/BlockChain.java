@@ -80,10 +80,10 @@ public class BlockChain
 		return this.genesisBlock;
 	}
 	public long getTimestamp(int height) {
-		return this.genesisTimestamp + height * Block.GENERATING_MIN_BLOCK_TIME;
+		return this.genesisTimestamp + (long)height * (long)Block.GENERATING_MIN_BLOCK_TIME;
 	}
 	public long getTimestamp() {
-		return this.genesisTimestamp + getHeight() * Block.GENERATING_MIN_BLOCK_TIME;
+		return this.genesisTimestamp + (long)getHeight() * (long)Block.GENERATING_MIN_BLOCK_TIME;
 	}
 
 	// BUFFER of BLOCK for WIN solving
