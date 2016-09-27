@@ -31,6 +31,7 @@ import gui.items.persons.MainPersonsFrame;
 import gui.items.statement.MainStatementsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
+import gui.items.voting.MainVotingsFrame;
 import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -64,9 +65,9 @@ private JFrame parent;
 		parent = MainFrame.this;
 		
 		// tool bar
-	//	JToolBar tb1 = new JToolBar(" Панель 1");
+	//	JToolBar tb1 = new JToolBar(" РџР°РЅРµР»СЊ 1");
 
-			JToolBar	 Toolbar_Main = new JToolBar(" Панель 2");
+			JToolBar	 Toolbar_Main = new JToolBar(" РџР°РЅРµР»СЊ 2");
 
 			//	tb1.setRollover(true);
 
@@ -215,6 +216,23 @@ private JFrame parent;
 		});
 		Toolbar_Main.add(button7_MainToolBar);
 	*/	
+		
+		JButton button9_MainToolBar = new JButton();
+		button9_MainToolBar.setText(Lang.getInstance().translate("Votings"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button9_MainToolBar.setFocusable(false);
+		button9_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button9_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button9_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new MainVotingsFrame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button9_MainToolBar);
+		
+		
+		
+		
 		JButton button8_MainToolBar = new JButton();
 		button8_MainToolBar.setText(Lang.getInstance().translate("Other"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -246,7 +264,7 @@ private JFrame parent;
         this.setJMenuBar(menu);
         
         
-        // создаем рабочий стол Swing
+        // СЃРѕР·РґР°РµРј СЂР°Р±РѕС‡РёР№ СЃС‚РѕР» Swing
         desktopPane = new JDesktopPane();
         //desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
         desktopPane.setBackground(MainFrame.getFrames()[0].getBackground());
@@ -262,7 +280,7 @@ private JFrame parent;
 
 
       //  desktopPane.setSize(500, 300);
-        // добавляем его в центр окна
+        // РґРѕР±Р°РІР»СЏРµРј РµРіРѕ РІ С†РµРЅС‚СЂ РѕРєРЅР°
         add(desktopPane);
         
         
@@ -285,7 +303,7 @@ private JFrame parent;
         
         
         //ADD GENERAL TABPANE TO FRAME
-        desktopPane.add(frame1);
+  //      desktopPane.add(frame1);
         
         // WALLET STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
@@ -300,7 +318,7 @@ private JFrame parent;
         });
         
    
-      //класс взаимодействия с оконной системой ОС
+      //РєР»Р°СЃСЃ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕРєРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјРѕР№ РћРЎ
 
         Toolkit kit = Toolkit.getDefaultToolkit();
 
