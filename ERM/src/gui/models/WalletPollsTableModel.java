@@ -6,7 +6,9 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
+import core.block.Block;
 import core.voting.Poll;
 import database.SortableList;
 import database.wallet.PollMap;
@@ -65,7 +67,12 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 			return null;
 		}
 		
-		Poll poll = this.polls.get(row).getB();
+		Pair<Tuple2<String, String>, Poll> data = this.polls.get(row);
+		
+		if (data == null || data.getB() == null) {
+			return -1;
+		}
+		Poll poll = data.getB();
 		
 		switch(column)
 		{
