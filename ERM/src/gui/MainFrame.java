@@ -67,7 +67,7 @@ private JFrame parent;
 		// tool bar
 	//	JToolBar tb1 = new JToolBar(" РџР°РЅРµР»СЊ 1");
 
-			JToolBar	 Toolbar_Main = new JToolBar(" РџР°РЅРµР»СЊ 2");
+			JToolBar	 Toolbar_Main = new JToolBar(Lang.getInstance().translate("Menu"));
 
 			//	tb1.setRollover(true);
 

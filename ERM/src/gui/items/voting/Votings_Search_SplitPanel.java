@@ -94,7 +94,11 @@ import lang.Lang;
 		// not show buttons
 		//	jToolBar_RightPanel.setVisible(false);
 		//	toolBar_LeftPanel.setVisible(false);
-			jButton1_jToolBar_RightPanel.setText(Lang.getInstance().translate("Vote"));
+			jButton1_jToolBar_RightPanel.setText("<HTML><B> "+ Lang.getInstance().translate("Vote")+ "</></> ");
+			jButton1_jToolBar_RightPanel.setBorderPainted(true);
+			jButton1_jToolBar_RightPanel.setFocusable(true);
+			jButton1_jToolBar_RightPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED)));
+			jButton1_jToolBar_RightPanel.setSize(120, 30);
 			jButton1_jToolBar_RightPanel.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
