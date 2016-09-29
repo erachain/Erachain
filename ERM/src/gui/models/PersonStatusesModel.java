@@ -65,7 +65,8 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 // set class
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		       return getValueAt(0, c).getClass();
+		Object o = getValueAt(0, c);
+		return o==null?null:o.getClass();
 		   }
 		   
 	// читаем колонки которые изменяем высоту	   

@@ -44,7 +44,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	       return getValueAt(0, c).getClass();
+		Object o = getValueAt(0, c);
+		return o==null?null:o.getClass();
 	   }
 // читаем колонки которые изменяем высоту	   
 	public Boolean[] get_Column_AutoHeight(){

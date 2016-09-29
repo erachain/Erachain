@@ -91,9 +91,8 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 	     
-		Class<? extends Object> a = getValueAt(0, c).getClass();
-		
-		return a;
+		Object o = getValueAt(0, c);
+		return o==null?null:o.getClass();
 	    }
 	
 	

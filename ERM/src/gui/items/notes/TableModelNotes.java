@@ -36,7 +36,8 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	       return getValueAt(0, c).getClass();
+		Object o = getValueAt(0, c);
+		return o==null?null:o.getClass();
 	    }
 	
 	// читаем колонки которые изменяем высоту	   

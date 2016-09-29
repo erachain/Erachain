@@ -159,8 +159,9 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	// set class
 	
 		public Class<? extends Object> getColumnClass(int c) {     // set column type
-			       return getValueAt(0, c).getClass();
-			   }
+			Object o = getValueAt(0, c);
+			return o==null?null:o.getClass();
+		}
 	
 		// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){

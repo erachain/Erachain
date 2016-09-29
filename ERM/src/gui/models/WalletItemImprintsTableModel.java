@@ -44,7 +44,8 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	       return getValueAt(0, c).getClass();
+		Object o = getValueAt(0, c);
+		return o==null?null:o.getClass();
 	    }
 	
 	public ImprintCls getItem(int row)
