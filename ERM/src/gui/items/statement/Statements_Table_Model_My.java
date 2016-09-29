@@ -311,6 +311,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
 		tran = new ArrayList<Transaction>();
+		transactions.clear();
 		// база данных	
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);

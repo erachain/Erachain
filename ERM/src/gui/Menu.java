@@ -314,7 +314,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-        personsMenu.add(issuePersonMenu);  
+  //      personsMenu.add(issuePersonMenu);  
 
         // issue Person menu
         JMenuItem ripPersonMenu = new JMenuItem(Lang.getInstance().translate("R.I.P. Person"));
@@ -330,8 +330,8 @@ public class Menu extends JMenuBar
         	}
         });
 
-        personsMenu.addSeparator();  
-        personsMenu.add(ripPersonMenu);  
+ //       personsMenu.addSeparator();  
+ //       personsMenu.add(ripPersonMenu);  
 
  // DEALS
 // Send
