@@ -923,6 +923,7 @@ public class Block {
 		
 		int generatingBalance = calcGeneratingBalance(db);
 		if (this.generatingBalance != generatingBalance) {
+			generatingBalance = calcGeneratingBalance(db);
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid this.generatingBalance: " + this.generatingBalance
 					+ " != calcGeneratingBalance(db): " + calcGeneratingBalance(db));
 			return false;
@@ -1167,6 +1168,12 @@ public class Block {
 		}
 		int height = this.getHeight(dbSet);
 		
+		// TEST BUG
+		int genBal = 0;
+		if (height == 13311 || height == 13411 || height == 13477) {
+			genBal = this.calcGeneratingBalance(dbSet);
+		}
+		
 		//ORPHAN AT TRANSACTIONS
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
 
@@ -1230,6 +1237,12 @@ public class Block {
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
 			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
+
+		// TEST BUG
+		if (height == 13311 || height == 13411 || height == 13477) {
+			genBal = this.calcGeneratingBalance(dbSet);
+		}
+
 	}
 
 	private void orphanTransactions(List<Transaction> transactions, DBSet db)

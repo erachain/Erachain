@@ -58,10 +58,10 @@ public class BlockGenerator extends Thread implements Observer
 		private final int statuscode;
 		private String name;
 
-		 ForgingStatus(int status, String name) {
+		ForgingStatus(int status, String name) {
 			 statuscode = status;
 			 this.name = name;
-		  }
+		}
 
 		public int getStatuscode() {
 			return statuscode;
@@ -71,7 +71,6 @@ public class BlockGenerator extends Thread implements Observer
 			return name;
 		}
 
-	    
 	}
 	
     public ForgingStatus getForgingStatus()
@@ -80,11 +79,11 @@ public class BlockGenerator extends Thread implements Observer
     }
 	
 	//private Map<PrivateKeyAccount, Block> blocks;
-	private Map<PrivateKeyAccount, Long> winners;
+	//private Map<PrivateKeyAccount, Long> winners;
 	private PrivateKeyAccount acc_winner;
 	private List<Block> lastBlocksForTarget;
 	private Block solvingBlock;
-	private int solvingBlockHeight;
+	//private int solvingBlockHeight;
 	private List<PrivateKeyAccount> cachedAccounts;
 	
 	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
@@ -243,7 +242,7 @@ public class BlockGenerator extends Thread implements Observer
 			//CHECK IF WE ARE UP TO DATE
 			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
 			{
-				if (ctrl.getStatus() == ctrl.STATUS_SYNCHRONIZING) {
+				if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING) {
 					// IF already in sync...
 					wait_interval = wait_interval_run;
 					continue;
@@ -287,14 +286,14 @@ public class BlockGenerator extends Thread implements Observer
 				
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
-				this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
+				//this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
 				
 				
 				this.lastBlocksForTarget = bchain.getLastBlocksForTarget();
 
 				//RESET BLOCKS
 				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
-				this.winners = new HashMap<PrivateKeyAccount, Long>();
+				//this.winners = new HashMap<PrivateKeyAccount, Long>();
 				
 				this.acc_winner = null;
 				
