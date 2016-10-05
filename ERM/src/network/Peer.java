@@ -115,33 +115,45 @@ public class Peer extends Thread{
 		this.pingCounter = 0;
 		this.connectionTime = NTP.getTime();
 		
+		int steep = 0;
 		try
 		{
 			//OPEN SOCKET
+			steep++;
 			this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 			
 			//ENABLE KEEPALIVE
+			//steep++;
 			//this.socket.setKeepAlive(true);
 			
 			//TIMEOUT
+			steep++;
 			this.socket.setSoTimeout(1000*60*60);
 			
 			//CREATE STRINGWRITER
+			steep++;
 			this.out = socket.getOutputStream();
 			
 			//START COMMUNICATON THREAD
+			steep++;
 			this.start();
 			
 			//START PINGER
 			this.pinger = new Pinger(this);
+			if (this.pinger.isInterrupted()) {
+				this.close();
+				LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " by interrupt!!!");
+				return;
+			}
 			
 			//ON SOCKET CONNECT
+			steep++;
 			this.callback.onConnect(this);			
 		}
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address);
+			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
 		}
 	}
 	

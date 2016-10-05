@@ -87,7 +87,7 @@ public class Settings {
 	public static final int MINOR_ERMO_BALANCE = 100;
 	
 	
-	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = false;
+	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
 
 	private static final boolean DEFAULT_SOUND_RECEIVE_COIN = true;

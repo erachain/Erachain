@@ -39,6 +39,8 @@ public class Synchronizer
 		this.run = true;
 	}
 	
+	static boolean USE_AT_ORPHAN = true;
+	
 	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks) throws Exception
 	{
 		
@@ -54,7 +56,7 @@ public class Synchronizer
 			
 			//HEIGHT TO ROLL BACK
 	//		originalHeight = lastCommonBlock.getHeight();
-			int height = (int)(Math.round( lastCommonBlock.getHeight(fork) /AT_Constants.STATE_STORE_DISTANCE))
+			int height_AT = (int)(Math.round( lastCommonBlock.getHeight(fork) /AT_Constants.STATE_STORE_DISTANCE))
 					*AT_Constants.STATE_STORE_DISTANCE;
 	
 			//GET LAST BLOCK
@@ -85,30 +87,32 @@ public class Synchronizer
 					+ " run AT_TRANSACTION in FORK");
 					*/
 
-			// AT_TRANSACTION - not from GENESIS BLOCK
-			while ( lastBlock.getHeight(fork) >= height && lastBlock.getHeight(fork) > 1)
-			{
-				newBlocks.add( 0 , lastBlock );
-				//Block tempBlock = fork.getBlockMap().getLastBlock();
-				lastBlock.orphan(fork);
-				lastBlock = fork.getBlockMap().getLastBlock();
-				//lastBlock = tempBlock;
+			if (USE_AT_ORPHAN) {
+				// AT_TRANSACTION - not from GENESIS BLOCK
+				while ( lastBlock.getHeight(fork) >= height_AT && lastBlock.getHeight(fork) > 1)
+				{
+					newBlocks.add( 0 , lastBlock );
+					//Block tempBlock = fork.getBlockMap().getLastBlock();
+					lastBlock.orphan(fork);
+					lastBlock = fork.getBlockMap().getLastBlock();
+					//lastBlock = tempBlock;
+				}
+				
+				for ( String id : states.keySet() )
+				{
+					byte[] address = Base58.decode( id ); //25 BYTES
+					address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
+					AT at = fork.getATMap().getAT( address );
+					
+					at.setState( states.get( id ) );
+					
+					fork.getATMap().update( at , height_AT );
+					
+				}
+				
+				fork.getATMap().deleteAllAfterHeight( height_AT );
+				fork.getATStateMap().deleteStatesAfter( height_AT );
 			}
-			
-			for ( String id : states.keySet() )
-			{
-				byte[] address = Base58.decode( id ); //25 BYTES
-				address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
-				AT at = fork.getATMap().getAT( address );
-				
-				at.setState( states.get( id ) );
-				
-				fork.getATMap().update( at , height );
-				
-			}
-			
-			fork.getATMap().deleteAllAfterHeight( height );
-			fork.getATStateMap().deleteStatesAfter( height );
 			
 	
 		}
@@ -167,29 +171,31 @@ public class Synchronizer
 				lastBlock = dbSet.getBlockMap().getLastBlock();
 			}
 
-			// THEN orphan next AT_height blocks
-			//NOT orphan GENESIS BLOCK
-			while ( lastBlock.getHeight(dbSet) >= height_AT && lastBlock.getHeight(dbSet) > 1 )
-			{
-				orphanedTransactions.addAll(lastBlock.getTransactions());
-				lastBlock.orphan(dbSet);
-				lastBlock = dbSet.getBlockMap().getLastBlock();
+			if (USE_AT_ORPHAN) {
+				// THEN orphan next AT_height blocks
+				//NOT orphan GENESIS BLOCK
+				while ( lastBlock.getHeight(dbSet) >= height_AT && lastBlock.getHeight(dbSet) > 1 )
+				{
+					orphanedTransactions.addAll(lastBlock.getTransactions());
+					lastBlock.orphan(dbSet);
+					lastBlock = dbSet.getBlockMap().getLastBlock();
+				}
+				
+				for ( String id : states.keySet() )
+				{
+					byte[] address = Base58.decode( id ); //25 BYTES
+					address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
+					AT at = dbSet.getATMap().getAT( address );
+					
+					at.setState( states.get( id ) );
+					
+					dbSet.getATMap().update( at , height_AT );
+					
+				}
+	
+				dbSet.getATMap().deleteAllAfterHeight( height_AT );
+				dbSet.getATStateMap().deleteStatesAfter( height_AT );
 			}
-			
-			for ( String id : states.keySet() )
-			{
-				byte[] address = Base58.decode( id ); //25 BYTES
-				address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
-				AT at = dbSet.getATMap().getAT( address );
-				
-				at.setState( states.get( id ) );
-				
-				dbSet.getATMap().update( at , height_AT );
-				
-			}
-
-			dbSet.getATMap().deleteAllAfterHeight( height_AT );
-			dbSet.getATStateMap().deleteStatesAfter( height_AT );
 
 		}
 		

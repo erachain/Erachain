@@ -31,49 +31,58 @@ public class Pinger extends Thread
 	
 	public void run()
 	{
-		while(this.run)
+		try
 		{
-			//CREATE PING
-			Message pingMessage = MessageFactory.getInstance().createPingMessage();
-			
-			if(!this.run)
-				break;
-			
-			//GET RESPONSE
-			long start = System.currentTimeMillis();
-			Message response = this.peer.getResponse(pingMessage);
-
-			if(!this.run)
-				break;
-
-			//CHECK IF VALID PING
-			if(response == null || response.getType() != Message.PING_TYPE)
+	
+			while(this.run)
 			{
-				//PING FAILES
-				this.peer.onPingFail();
+				//CREATE PING
+				Message pingMessage = MessageFactory.getInstance().createPingMessage();
 				
-				//STOP PINGER
-				this.run = false;
-				return;
+				if(!this.run)
+					break;
+				
+				//GET RESPONSE
+				long start = System.currentTimeMillis();
+				Message response = this.peer.getResponse(pingMessage);
+	
+				if(!this.run)
+					break;
+	
+				//CHECK IF VALID PING
+				if(response == null || response.getType() != Message.PING_TYPE)
+				{
+					//PING FAILES
+					this.peer.onPingFail();
+					
+					//STOP PINGER
+					this.run = false;
+					return;
+				}
+				
+				//UPDATE PING
+				this.ping = System.currentTimeMillis() - start;
+				this.peer.addPingCounter(); 
+				
+				if(!DBSet.getInstance().isStoped()){
+					DBSet.getInstance().getPeerMap().addPeer(this.peer);
+				}
+				
+				//SLEEP
+				try 
+				{
+					Thread.sleep(Settings.getInstance().getPingInterval());
+				} 
+				catch (InterruptedException e)
+				{
+					//FAILED TO SLEEP
+				}
 			}
-			
-			//UPDATE PING
-			this.ping = System.currentTimeMillis() - start;
-			this.peer.addPingCounter(); 
-			
-			if(!DBSet.getInstance().isStoped()){
-				DBSet.getInstance().getPeerMap().addPeer(this.peer);
-			}
-			
-			//SLEEP
-			try 
-			{
-				Thread.sleep(Settings.getInstance().getPingInterval());
-			} 
-			catch (InterruptedException e)
-			{
-				//FAILED TO SLEEP
-			}
+		}
+		catch(Exception e)
+		{
+			LOGGER.debug(e.getMessage(), e);
+			this.stopPing();
 		}
 	}
 
@@ -87,7 +96,7 @@ public class Pinger extends Thread
 		}
 		catch(Exception e)
 		{
-			LOGGER.debug(e.getMessage(),e);
+			LOGGER.debug(e.getMessage(), e);
 		}
 	}
 }

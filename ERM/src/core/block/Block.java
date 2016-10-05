@@ -1219,12 +1219,14 @@ public class Block {
 		//DELETE BLOCK FROM DB
 		dbSet.getBlockMap().delete(this);
 		
+		/*
 		if (height > 1) {
 			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
 			LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
 					+ "] DELETE -> new last Height: " + lastHeight
 					+ (dbSet.isFork()?" in FORK!": ""));
 		}
+		*/
 
 		
 		this.height_process = -1;
