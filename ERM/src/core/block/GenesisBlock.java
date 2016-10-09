@@ -566,11 +566,13 @@ public class GenesisBlock extends Block{
 		return true;
 	}
 	
+	/*
 	@Override
 	public BigDecimal getTotalFee()
 	{
 		return BigDecimal.ZERO.setScale(8);
 	}
+	*/
 	
 	@Override
 	public boolean isValid(DBSet db)

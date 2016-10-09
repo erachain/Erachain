@@ -31,58 +31,75 @@ public class Pinger extends Thread
 	
 	public void run()
 	{
-		try
+	
+		while(this.run)
 		{
-	
-			while(this.run)
+			//CREATE PING
+			Message pingMessage = MessageFactory.getInstance().createPingMessage();
+			
+			if(!this.run)
+				break;
+			
+			//GET RESPONSE
+			long start = System.currentTimeMillis();
+			Message response = this.peer.getResponse(pingMessage);
+
+			if(!this.run)
+				break;
+
+			//CHECK IF VALID PING
+			if(response == null || response.getType() != Message.PING_TYPE)
 			{
-				//CREATE PING
-				Message pingMessage = MessageFactory.getInstance().createPingMessage();
+				//PING FAILES
+				this.peer.onPingFail();
 				
-				if(!this.run)
-					break;
-				
-				//GET RESPONSE
-				long start = System.currentTimeMillis();
-				Message response = this.peer.getResponse(pingMessage);
-	
-				if(!this.run)
-					break;
-	
-				//CHECK IF VALID PING
-				if(response == null || response.getType() != Message.PING_TYPE)
-				{
-					//PING FAILES
-					this.peer.onPingFail();
-					
-					//STOP PINGER
-					this.run = false;
-					return;
-				}
-				
+				//STOP PINGER
+				this.run = false;
+				return;
+			}
+
+			try
+			{
+
 				//UPDATE PING
 				this.ping = System.currentTimeMillis() - start;
-				this.peer.addPingCounter(); 
+				this.peer.addPingCounter();
+				
+				if (this.isInterrupted() || this.peer.isInterrupted()) {
+					//PING FAILES
+					this.peer.onPingFail();
+
+					//STOP PINGER
+					this.run = false;
+					return;					
+				}
 				
 				if(!DBSet.getInstance().isStoped()){
 					DBSet.getInstance().getPeerMap().addPeer(this.peer);
 				}
-				
-				//SLEEP
-				try 
-				{
-					Thread.sleep(Settings.getInstance().getPingInterval());
-				} 
-				catch (InterruptedException e)
-				{
-					//FAILED TO SLEEP
-				}
 			}
-		}
-		catch(Exception e)
-		{
-			LOGGER.debug(e.getMessage(), e);
-			this.stopPing();
+			catch(Exception e)
+			{
+				//PING FAILES
+				this.peer.onPingFail();
+				
+				//STOP PINGER
+				this.run = false;
+
+				LOGGER.error(" ???? " + e.getMessage(), e);
+				
+				return;
+			}
+			
+			//SLEEP
+			try 
+			{
+				Thread.sleep(Settings.getInstance().getPingInterval());
+			} 
+			catch (InterruptedException e)
+			{
+				//FAILED TO SLEEP
+			}
 		}
 	}
 

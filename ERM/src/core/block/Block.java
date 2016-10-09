@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,10 +18,12 @@ import settings.Settings;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import utils.Converter;
+import utils.ReverseComparator;
 import at.AT_API_Platform_Impl;
 import at.AT_Block;
 import at.AT_Constants;
@@ -32,9 +36,12 @@ import core.BlockGenerator;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.Order;
 import core.transaction.DeployATTransaction;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 
@@ -49,8 +56,6 @@ import lang.Lang;
 public class Block {
 
 	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
-	
-	public static final int GENESIS_WIN_VALUE = 1000;
 	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
@@ -197,9 +202,12 @@ public class Block {
 					0, 0, false, 0, 0);
 			
 			for(Transaction transaction: txs)
-			{
-				
-				if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY) {
+			{				
+				if (transaction instanceof R_SertifyPubKeys) {
+					amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
+					incomed_amount += amount;
+				} else if ( transaction.getKey() == Transaction.RIGHTS_KEY
+						&& transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
 					amount = (int)transaction.getAmount().longValue();
 					incomed_amount += amount;
 				}
@@ -227,7 +235,20 @@ public class Block {
 
 	public BigDecimal getTotalFee()
 	{
-		BigDecimal fee = BigDecimal.ZERO.setScale(8);
+		BigDecimal fee = this.getTotalFeeForProcess();
+
+		// TODO calculate AT FEE
+		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
+
+		if ( fee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) 
+			fee = BlockChain.MIN_FEE_IN_BLOCK;
+
+		return fee;
+	}
+	
+	public BigDecimal getTotalFeeForProcess()
+	{
+		BigDecimal fee = BigDecimal.ZERO;
 
 		for(Transaction transaction: this.getTransactions())
 		{
@@ -310,8 +331,10 @@ public class Block {
 		
 		this.transactions = transactions;
 		this.transactionCount = transactions.size();
-		this.transactionsHash = makeTransactionsHash(transactions);
+		this.atBytes = null;
+		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
 	}
+	
 	public void setATBytes(byte[] atBytes)
 	{
 		this.atBytes = atBytes;
@@ -377,27 +400,33 @@ public class Block {
 	}
 	*/
 	
-	public static byte[] makeTransactionsHash(List<Transaction> transactions) 
+	public static byte[] makeTransactionsHash(byte[] creator, List<Transaction> transactions, byte[] atBytes) 
 	{
-				
-		if (transactions == null || transactions.size() == 0) {
-			return new byte[TRANSACTIONS_HASH_LENGTH];
-		}
-		
+
 		byte[] data = new byte[0];
-		
-		//MAKE TRANSACTIONS HASH
-		for(Transaction transaction: transactions)
-		{
-			data = Bytes.concat(data, transaction.getSignature());
+
+		if (transactions == null || transactions.size() == 0) {
+			data = Bytes.concat(data, creator);
+			
+		} else {
+	
+			//MAKE TRANSACTIONS HASH
+			for(Transaction transaction: transactions)
+			{
+				data = Bytes.concat(data, transaction.getSignature());
+			}
 		}
+		
+		if (atBytes != null)
+			data = Bytes.concat(data, atBytes);
+
 		
 		return Crypto.getInstance().digest(data);
 
 	}
 	public void makeTransactionsHash() 
 	{
-		this.transactionsHash = makeTransactionsHash(this.transactions);
+		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), this.transactions, this.atBytes);
 	}
 
 	//PARSE/CONVERT
@@ -448,7 +477,7 @@ public class Block {
  
 		//CREATE BLOCK
 		Block block;
-		if(version > 0)
+		if(version > 1)
 		{
 			//ADD ATs BYTES
 			byte[] atBytesCountBytes = Arrays.copyOfRange(data, position, position + AT_BYTES_LENGTH);
@@ -535,13 +564,6 @@ public class Block {
 		versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
 		data = Bytes.concat(data, versionBytes);
 
-		/*
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
-		*/
-
 		//WRITE REFERENCE
 		byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
@@ -567,7 +589,7 @@ public class Block {
 		data = Bytes.concat(data, this.signature);
 
 		//ADD ATs BYTES
-		if(this.version > 0)
+		if(this.version > 1)
 		{
 			if (atBytes!=null)
 			{
@@ -609,9 +631,27 @@ public class Block {
 		return data;
 	}
 
+	public byte[] toBytesForSign()
+	{
+		byte[] data = new byte[0];
+
+		//WRITE VERSION
+		byte[] versionBytes = Ints.toByteArray(this.version);
+		versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
+		data = Bytes.concat(data, versionBytes);
+
+		//WRITE REFERENCE
+		byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+		data = Bytes.concat(data, referenceBytes);
+
+		data = Bytes.concat(data, this.transactionsHash);
+
+		return data;
+	}
+	
 	public void sign(PrivateKeyAccount account) 
 	{	
-		byte[] data = toBytes(false); // without SIGNATURE
+		byte[] data = toBytesForSign();
 		this.signature = Crypto.getInstance().sign(account, data);
 	}
 
@@ -620,7 +660,7 @@ public class Block {
 
 		int length = BASE_LENGTH;
 
-		if(this.version > 0)
+		if(this.version > 1)
 		{
 			length += AT_LENGTH;
 			if (this.atBytes!=null)
@@ -818,7 +858,7 @@ public class Block {
 	public boolean isSignatureValid()
 	{
 		//VALIDATE BLOCK SIGNATURE
-		byte[] data = this.toBytes(false);
+		byte[] data = this.toBytesForSign();
 
 		if(!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data))
 		{
@@ -887,7 +927,7 @@ public class Block {
 		 */
 		
 		// TODO - show it to USER
-		if(this.getTimestamp(db) - 60000 > NTP.getTime()) {
+		if(this.getTimestamp(db) - 10000 > NTP.getTime()) {
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
 					+ " this.getTimestamp(db):" + this.getTimestamp(db) + " > NTP.getTime():" + NTP.getTime());
 			return false;			
@@ -915,19 +955,23 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version invalid");
 			return false;
 		}
-		if(this.version < 1 && (this.atBytes.length > 0)) // || this.atFees != 0))
+		if(this.version < 2 && this.atBytes != null && this.atBytes.length > 0) // || this.atFees != 0))
 		{
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version AT invalid");
 			return false;
 		}
 		
+		/*
 		int generatingBalance = calcGeneratingBalance(db);
+		this.generatingBalance = generatingBalance; // for recalc all
 		if (this.generatingBalance != generatingBalance) {
 			generatingBalance = calcGeneratingBalance(db);
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid this.generatingBalance: " + this.generatingBalance
-					+ " != calcGeneratingBalance(db): " + calcGeneratingBalance(db));
+					+ " != calcGeneratingBalance(db): " + calcGeneratingBalance(db)
+					+ " for: " + this.getCreator().getAddress());
 			return false;
 		}
+		*/
 			
 		// TEST repeated win for CREATOR
 		Block testBlock = this.getParent(db);
@@ -1117,13 +1161,26 @@ public class Block {
 		}
 
 		//PROCESS FEE
-		BigDecimal blockFee = this.getTotalFee();
-		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
-		{
-			//UPDATE GENERATOR BALANCE WITH FEE
-			this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, dbSet).add(blockFee), dbSet);
+		BigDecimal blockFee = this.getTotalFeeForProcess();
+
+		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+			
+			// find rich account
+			String rich = Account.getRich(Transaction.FEE_KEY);
+			if (!rich.equals(this.creator.getAddress())) {
+			
+				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+				Account richAccount = new Account(rich);
+			
+				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
+						.subtract(bonus_fee), dbSet);
+			}
 		}
-		
+
+		//UPDATE GENERATOR BALANCE WITH FEE
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
+				.add(blockFee), dbSet);
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
@@ -1157,6 +1214,9 @@ public class Block {
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
 		
+		// if R_SertifyPubKeys change ERMO
+		this.setGeneratingBalance(dbSet);
+
 	}
 
 	public void orphan(DBSet dbSet)
@@ -1186,14 +1246,14 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalanceUSE(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
 				if ( recipient.getLastReference(dbSet) != null)
 				{
 					recipient.removeReference(dbSet);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setBalance(Transaction.FEE_KEY,  sender.getBalanceUSE(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
 
 		}
 
@@ -1201,12 +1261,27 @@ public class Block {
 		this.orphanTransactions(this.getTransactions(), dbSet);
 
 		//REMOVE FEE
-		BigDecimal blockFee = this.getTotalFee();
-		if(blockFee.compareTo(BigDecimal.ZERO) == 1)
-		{
-			//UPDATE GENERATOR BALANCE WITH FEE
-			this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalanceUSE(Transaction.FEE_KEY, dbSet).subtract(blockFee), dbSet);
+		BigDecimal blockFee = this.getTotalFeeForProcess();
+
+		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+			
+			// find rich account
+			String rich = Account.getRich(Transaction.FEE_KEY);
+
+			if (!rich.equals(this.creator.getAddress())) {
+				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+
+				Account richAccount = new Account(rich);
+				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
+						.add(bonus_fee), dbSet);
+				
+			}
 		}
+
+		//UPDATE GENERATOR BALANCE WITH FEE
+		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
+				.subtract(blockFee), dbSet);
 
 		//DELETE AT TRANSACTIONS FROM DB
 		dbSet.getATTransactionMap().delete(height);
@@ -1244,6 +1319,9 @@ public class Block {
 		if (height == 13311 || height == 13411 || height == 13477) {
 			genBal = this.calcGeneratingBalance(dbSet);
 		}
+		
+		// if R_SertifyPubKeys change ERMO
+		this.setGeneratingBalance(dbSet);
 
 	}
 

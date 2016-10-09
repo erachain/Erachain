@@ -75,7 +75,7 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			LOGGER.info("Failed to connect to : " + address);
+			//LOGGER.info("Failed to connect to : " + address);
 		}
 	}
 	
@@ -142,7 +142,7 @@ public class Peer extends Thread{
 			this.pinger = new Pinger(this);
 			if (this.pinger.isInterrupted()) {
 				this.close();
-				LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " by interrupt!!!");
+				//LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " by interrupt!!!");
 				return;
 			}
 			
@@ -153,7 +153,7 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
+			//LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
 		}
 	}
 	
@@ -166,70 +166,70 @@ public class Peer extends Thread{
 		} 
 		catch (Exception e) 
 		{
-			//LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 			
 			//DISCONNECT
 			callback.onDisconnect(this);
 			return;
 		}
 
-			while(in != null)
+		while(in != null)
+		{
+			//READ FIRST 4 BYTES
+			byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
+			try 
 			{
-				//READ FIRST 4 BYTES
-				byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
+				in.readFully(messageMagic);
+			} 
+			catch (Exception e) 
+			{
+				//LOGGER.error(e.getMessage(), e);
+				
+				//DISCONNECT
+				callback.onDisconnect(this);
+				return;
+			}
+			
+			if(Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic()))
+			{
+				//PROCESS NEW MESSAGE
+				Message message;
 				try 
 				{
-					in.readFully(messageMagic);
+					message = MessageFactory.getInstance().parse(this, in);
 				} 
 				catch (Exception e) 
 				{
-					//LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getMessage(), e);
 					
 					//DISCONNECT
 					callback.onDisconnect(this);
 					return;
 				}
 				
-				if(Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic()))
+				//LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
+				
+				//CHECK IF WE ARE WAITING FOR A MESSAGE WITH THAT ID
+				if(message.hasId() && this.messages.containsKey(message.getId()))
 				{
-					//PROCESS NEW MESSAGE
-					Message message;
-					try 
-					{
-						message = MessageFactory.getInstance().parse(this, in);
-					} 
-					catch (Exception e) 
-					{
-						//LOGGER.error(e.getMessage(), e);
-						
-						//DISCONNECT
-						callback.onDisconnect(this);
-						return;
-					}
-					
-					//LOGGER.info("received message " + message.getType() + " from " + this.address.toString());
-					
-					//CHECK IF WE ARE WAITING FOR A MESSAGE WITH THAT ID
-					if(message.hasId() && this.messages.containsKey(message.getId()))
-					{
-						//ADD TO OUR OWN LIST
-						this.messages.get(message.getId()).add(message);
-					}
-					else
-					{
-						//CALLBACK
-						// see in network.Network.onMessage(Message)
-						// and then see controller.Controller.onMessage(Message)
-						this.callback.onMessage(message);
-					}
+					//ADD TO OUR OWN LIST
+					this.messages.get(message.getId()).add(message);
 				}
 				else
 				{
-					//ERROR
-					callback.onError(this, Lang.getInstance().translate("received message with wrong magic"));
-					return;
+					//CALLBACK
+					// see in network.Network.onMessage(Message)
+					// and then see controller.Controller.onMessage(Message)
+					this.callback.onMessage(message);
 				}
 			}
+			else
+			{
+				//ERROR
+				callback.onError(this, Lang.getInstance().translate("received message with wrong magic"));
+				return;
+			}
+		}
 	}
 	
 	public boolean sendMessage(Message message)

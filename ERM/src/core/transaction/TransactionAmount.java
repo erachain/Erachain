@@ -278,7 +278,7 @@ public abstract class TransactionAmount extends Transaction {
 							// If the holder does not have enough hold balance
 							return NO_HOLD_BALANCE;
 						}
-						if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo( this.fee ) < 0)
+						if(this.creator.getBalance(FEE_KEY, db).compareTo( this.fee ) < 0)
 						{
 							return NOT_ENOUGH_FEE;
 						}
@@ -286,7 +286,7 @@ public abstract class TransactionAmount extends Transaction {
 						// common SEND
 						if (absKey != FEE_KEY) {
 							// CHECK FEE
-							if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(this.fee) < 0)
+							if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
 							{
 								return NOT_ENOUGH_FEE;
 							}

@@ -392,7 +392,9 @@ public class BlockGenerator extends Thread implements Observer
 				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 				unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
 				// CALCULATE HASH for that transactions
-				unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
+				byte[] winnerPubKey = acc_winner.getPublicKey();
+				byte[] atBytes = null;
+				unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
 
 				//ADD TRANSACTIONS
 				//this.addUnconfirmedTransactions(dbSet, block);

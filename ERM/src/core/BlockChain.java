@@ -1,5 +1,6 @@
 package core;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +22,21 @@ import utils.Pair;
 
 public class BlockChain
 {
+
+	public static final int START_LEVEL = 1;
+
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	public static final int TARGET_COUNT = 100;
 	public static final int REPEAT_WIN = 3;
 	
+	public static final int GENESIS_WIN_VALUE = 1000;
+
+	public static BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
+
+	// GIFTS for R_SertifyPubKeys
+	public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(100);
+	public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
+
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;

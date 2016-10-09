@@ -744,19 +744,15 @@ public class Controller extends Observable {
 		if(this.dbSet.isStoped())
 			return;
 		
-		//if(NTP.getTime() >= Transaction.getPOWFIX_RELEASE())
-		if (true)
-		{
-			// SEND FOUNDMYSELF MESSAGE
-			peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
-				Controller.getInstance().getFoundMyselfID() 
-				));
+		// SEND FOUNDMYSELF MESSAGE
+		peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
+			Controller.getInstance().getFoundMyselfID() 
+			));
 
-			// SEND VERSION MESSAGE
-			peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
-				Controller.getInstance().getVersion(),
-				this.getBuildTimestamp() ));
-		}
+		// SEND VERSION MESSAGE
+		peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
+			Controller.getInstance().getVersion(),
+			this.getBuildTimestamp() ));
 		
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(false);

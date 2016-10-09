@@ -122,6 +122,7 @@ public class GeneratorTests {
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
 			newBlock.makeTransactionsHash();
+			newBlock.sign(generator);
 			
 			//CHECK IF BLOCK SIGNATURE IS VALID
 			assertEquals(true, newBlock.isSignatureValid());
@@ -201,7 +202,7 @@ public class GeneratorTests {
 			
 			if (i == 0) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dbSet, height));
-				assertEquals(1464, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(1024, newBlock.calcWinValueTargeted(dbSet));
 				//assertEquals(14648, generator2.calcWinValueTargeted(dbSet, height));
 			}
 			else if (i == 1) {
@@ -610,7 +611,7 @@ public class GeneratorTests {
 		
 		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp(dbSet) );
 		// CALCULATE HASH for that transactions
-		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
+		byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
 
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
 		newBlock = BlockGenerator.generateNextBlock(dbSet, generator, genesisBlock, transactionsHash);
@@ -681,7 +682,7 @@ public class GeneratorTests {
 		assertEquals(true, max_count > transactions.size());
 		
 		// CALCULATE HASH for that transactions
-		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
+		byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
 
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
 		newBlock = BlockGenerator.generateNextBlock(dbSet, generator, genesisBlock, transactionsHash);
@@ -741,7 +742,7 @@ public class GeneratorTests {
 		transactions = BlockGenerator.getUnconfirmedTransactions(dbSet, newBlock.getTimestamp(dbSet) );
 		
 		// CALCULATE HASH for that transactions
-		byte[] transactionsHash = Block.makeTransactionsHash(transactions);
+		byte[] transactionsHash = Block.makeTransactionsHash(userAccount1.getPrivateKey(), transactions, null);
 
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
 		newBlock = BlockGenerator.generateNextBlock(dbSet, userAccount1, genesisBlock, transactionsHash);

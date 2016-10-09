@@ -598,7 +598,7 @@ public class TestRecPerson {
 		// PERSON -> ADDRESS
 		assertEquals( null, dbPA.getItem(personKey, userAddress3));
 		
-		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
+		BigDecimal oil_amount_diff = BlockChain.GIFTED_COMPU_AMOUNT;
 		
 		BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY,db);
 		BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, db);
@@ -620,7 +620,7 @@ public class TestRecPerson {
 				
 		//CHECK BALANCE RECIPIENT
 		assertEquals(BG_ZERO, userAccount1.getBalanceUSE(ERM_KEY, db));
-		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BlockChain.GIFTED_COMPU_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BG_ZERO, userAccount2.getBalanceUSE(ERM_KEY, db));
 		assertEquals(BG_ZERO, userAccount2.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BG_ZERO, userAccount3.getBalanceUSE(ERM_KEY, db));
@@ -801,7 +801,7 @@ public class TestRecPerson {
 		// PERSON -> ADDRESS
 		assertEquals( null, dbPA.getItem(personKey, userAddress3));
 		
-		BigDecimal oil_amount_diff = R_SertifyPubKeys.GIFTED_FEE_AMOUNT;
+		BigDecimal oil_amount_diff = BlockChain.GIFTED_COMPU_AMOUNT;
 		
 		BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY,db);
 		BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, db);
@@ -844,7 +844,7 @@ public class TestRecPerson {
 		assertEquals(BG_ZERO, userAccount1.getBalanceUSE(ERM_KEY, db));
 		// in FORK
 		//CHECK BALANCE RECIPIENT
-		assertEquals(R_SertifyPubKeys.GIFTED_FEE_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, fork));
+		assertEquals(BlockChain.GIFTED_COMPU_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, fork));
 
 		//CHECK REFERENCE SENDER
 		assertEquals(last_ref, certifier.getLastReference(db));

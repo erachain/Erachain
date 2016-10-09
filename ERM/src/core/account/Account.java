@@ -1,12 +1,18 @@
 package core.account;
 //04/01 +- 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -26,8 +32,10 @@ import core.BlockChain;
 import core.BlockGenerator;
 import core.block.Block;
 import core.block.GenesisBlock;
+import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
 import core.item.ItemCls;
+import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.naming.Name;
@@ -39,6 +47,7 @@ import settings.Settings;
 import utils.NameUtils;
 import utils.NumberAsString;
 import utils.Pair;
+import utils.ReverseComparator;
 import utils.NameUtils.NameResult;
 
 public class Account {
@@ -610,5 +619,47 @@ public class Account {
 		
 	}
 	
+	// top balance + orders values
+	public static String getRich(long key) {
+		
+		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
 
+		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getAssetBalanceMap().getKeys();
+		
+		for (Tuple2<String, Long> addr : addrs) {
+			if(addr.b == key)
+			{
+				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr);
+				values.put(addr.a, ball.a);
+			}
+		}
+
+		// add ORDER values
+		Collection<Order> orders = DBSet.getInstance().getOrderMap().getValues();
+
+		for (Order order : orders) {
+			if(order.getHave() == key)
+			{
+				String address = order.getCreator().address;
+				values.put(address, values.get(address).add(order.getAmountHave()));
+			}
+		}
+
+		// search richest address
+		String rich = null;
+		BigDecimal maxValue = BigDecimal.ZERO;
+		for (Map.Entry<String, BigDecimal> entry : values.entrySet()) {
+		    BigDecimal value = entry.getValue();
+			if(value.compareTo(maxValue) > 0)
+			{
+				maxValue = value;
+				rich = entry.getKey();
+			}
+		}
+
+		return rich;
+
+	}
+
+	
 }

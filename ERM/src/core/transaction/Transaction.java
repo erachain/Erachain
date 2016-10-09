@@ -300,7 +300,7 @@ public abstract class Transaction {
 	protected byte[] typeBytes;
 	protected Block block; // parent block
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
-	protected Long reference;
+	protected Long reference = 0l;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
@@ -428,6 +428,10 @@ public abstract class Transaction {
 	public BigDecimal getFee()
 	{
 		return this.fee;
+	}
+	public long getFeeLong()
+	{
+		return this.fee.toBigInteger().longValue();
 	}	
 	public byte getFeePow()
 	{
@@ -781,8 +785,8 @@ public abstract class Transaction {
 			return INVALID_ADDRESS;
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(this.fee) == -1)
+		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+		if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -802,15 +806,16 @@ public abstract class Transaction {
 		if (!asPack) {
 			this.calcFee();
 	
-			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db)
+			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
+				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
 						.subtract(this.fee), db);
 
-				//UPDATE REFERENCE OF SENDER
-				if (this.isReferenced() )
-					// IT IS REFERENCED RECORD?
-					this.creator.setLastReference(this.timestamp, db);
 			}
+
+			//UPDATE REFERENCE OF SENDER
+			if (this.isReferenced() )
+				// IT IS REFERENCED RECORD?
+				this.creator.setLastReference(this.timestamp, db);
 		}
 
 	}
@@ -818,14 +823,14 @@ public abstract class Transaction {
 	public void orphan(DBSet db, boolean asPack)
 	{
 		if (!asPack) {
-			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db).add(this.fee), db);
+			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
+				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db).add(this.fee), db);
 
-				//UPDATE REFERENCE OF SENDER
-				if (this.isReferenced() )
-					// IT IS REFERENCED RECORD?
-					this.creator.setLastReference(this.reference, db);
 			}
+			//UPDATE REFERENCE OF SENDER
+			if (this.isReferenced() )
+				// IT IS REFERENCED RECORD?
+				this.creator.setLastReference(this.reference, db);
 		}
 	}
 
