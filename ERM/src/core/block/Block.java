@@ -248,17 +248,20 @@ public class Block {
 	
 	public BigDecimal getTotalFeeForProcess()
 	{
-		BigDecimal fee = BigDecimal.ZERO;
+		//BigDecimal fee = BigDecimal.ZERO;
+		int fee = 0;
 
 		for(Transaction transaction: this.getTransactions())
 		{
-			fee = fee.add(transaction.getFee());
+			//fee = fee.add(transaction.getFee());
+			fee += transaction.getForgedFee();
 		}
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
 
-		return fee;
+		return BigDecimal.valueOf(fee, 8);
+		
 	}
 
 	/*

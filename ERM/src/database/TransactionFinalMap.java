@@ -200,6 +200,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 	public Transaction getTransaction(Integer height, Integer seq)
 	{
 		Transaction tx = this.get(new Tuple2<Integer,Integer>(height, seq));
+		/*
 		if ( this.parent != null )
 		{
 			if ( tx == null )
@@ -207,6 +208,7 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 				return this.parent.get(new Tuple2<Integer,Integer>(height, seq));
 			}
 		}
+		*/
 		return tx;
 	}
 	

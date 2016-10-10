@@ -53,10 +53,11 @@ public class ConnectionCreator extends Thread {
 							if(!callback.isConnectedTo(peer.getAddress()))
 							{							
 								//CHECK IF SOCKET IS NOT LOCALHOST
-								if(true)
-								//if(!peer.getAddress().isSiteLocalAddress() && !peer.getAddress().isLoopbackAddress() && !peer.getAddress().isAnyLocalAddress())
+								//if(true)
+								if(!peer.getAddress().isSiteLocalAddress() && !peer.getAddress().isLoopbackAddress() && !peer.getAddress().isAnyLocalAddress())
 								{
 									//CONNECT
+									/*
 									LOGGER.info(
 											Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
 												.replace("%peer%", peer.getAddress().getHostAddress())
@@ -64,6 +65,7 @@ public class ConnectionCreator extends Thread {
 												.replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
 												.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
 												);
+									*/
 									peer.connect(callback);
 								}
 							}
@@ -115,7 +117,7 @@ public class ConnectionCreator extends Thread {
 														{
 															int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
 															
-															if (true) {
+															/*
 																LOGGER.info(
 																	Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
 																		.replace("%newpeer%", newPeer.getAddress().getHostAddress())
@@ -125,7 +127,7 @@ public class ConnectionCreator extends Thread {
 																		.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
 																		.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
 																		);
-															}
+															*/
 															//CONNECT
 															newPeer.connect(callback);
 														}

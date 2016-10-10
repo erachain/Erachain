@@ -1702,7 +1702,7 @@ public class Controller extends Observable {
 				
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
-			LOGGER.error("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
+			LOGGER.info("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
 					+ (newBlock.getParentHeight(dbSet) + 1)
 					+ newBlock.calcWinValueTargeted(dbSet) + " " + newBlock.getCreator().getAddress());
 

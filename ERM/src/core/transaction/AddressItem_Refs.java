@@ -16,6 +16,7 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -195,6 +196,6 @@ public abstract class AddressItem_Refs extends Transaction
 			add_fee = 3^(10-len) * 100;
 		}
 	
-		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500) + add_fee;
+		return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
 	}
 }

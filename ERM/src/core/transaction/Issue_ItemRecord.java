@@ -2,6 +2,7 @@ package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,10 +13,13 @@ import java.util.List;
 //import ntp.NTP;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -151,7 +155,6 @@ public abstract class Issue_ItemRecord extends Transaction
 	}
 	
 	//PROCESS/ORPHAN
-
 	//@Override
 	public void process(DBSet db, Block block, boolean asPack)
 	{
@@ -163,7 +166,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//INSERT INTO DATABASE
 		this.item.insertToMap(db);
-		
+				
 	}
 
 	//@Override
@@ -212,6 +215,6 @@ public abstract class Issue_ItemRecord extends Transaction
 			add_fee = 3^(10-len) * 100;
 		}
 	
-		return calcCommonFee() + (Transaction.FEE_PER_BYTE * 500) + add_fee;
+		return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
 	}
 }

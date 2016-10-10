@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -30,6 +32,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import database.DBSet;
@@ -217,10 +220,6 @@ public abstract class Transaction {
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 
 	public static final long FEE_KEY = AssetCls.FEE_KEY;
-	public static final int FEE_PER_BYTE = 1;
-	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
-	public static final float FEE_POW_BASE = (float)1.5;
-	public static final int FEE_POW_MAX = 6;
 
 	//RELEASES
 	//private static final long ASSETS_RELEASE = 0l;
@@ -323,7 +322,7 @@ public abstract class Transaction {
 		this.timestamp = timestamp;
 		this.reference = reference;
 		if (feePow < 0 ) feePow = 0;
-		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
+		else if (feePow > BlockChain.FEE_POW_MAX ) feePow = BlockChain.FEE_POW_MAX;
 		this.feePow = feePow;
 	}
 	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature)
@@ -462,13 +461,13 @@ public abstract class Transaction {
 	public int calcCommonFee()
 	{		
 		int len = this.getDataLength(false);
-		int fee = len + 100 * FEE_PER_BYTE;
-		if (len > 1000) {
+		int fee = len + 200;
+		if (false && len > 1000) {
 			// add overheat
-			fee += (len - 1000) * FEE_PER_BYTE;
+			fee += (len - 1000);
 		}
 		
-		return (int) fee;
+		return (int) fee * BlockChain.FEE_PER_BYTE;
 	}
 	
 	// get fee
@@ -481,17 +480,35 @@ public abstract class Transaction {
 	{	
 		
 		BigDecimal fee = new BigDecimal(calcBaseFee())
-				.multiply(FEE_RATE)
+				.multiply(BlockChain.FEE_RATE)
 				.setScale(8, BigDecimal.ROUND_UP);
 
 		if (this.feePow > 0) {
-			this.fee = fee.multiply(new BigDecimal(FEE_POW_BASE).pow((int)this.feePow))
+			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow((int)this.feePow))
 					.setScale(8, BigDecimal.ROUND_UP);
 		} else {
 			this.fee = fee;
 		}
 	}
 
+	// GET forged FEE without invited FEE
+	public int getForgedFee()
+	{
+		int fee = this.fee.unscaledValue().intValue();
+		int fee_invited = fee>>BlockChain.FEE_INVITED_SHIFT;
+		return fee - fee_invited;
+	}
+	// GET only INVITED FEE
+	public int getInvitedFee()
+	{
+		int fee = this.fee.unscaledValue().intValue();
+		return fee>>BlockChain.FEE_INVITED_SHIFT;		
+	}
+	public BigDecimal feeToBD(int fee)
+	{
+		return BigDecimal.valueOf(fee, 8);		
+	}
+	
 	public Block getBlock(DBSet db) {
 		
 		if (block != null)
@@ -550,6 +567,11 @@ public abstract class Transaction {
 		return ref;
 		
 	}
+	
+	public static Transaction findByIntInt(DBSet db, int height, int seq) {
+		return db.getTransactionFinalMap().getTransaction(height, seq);
+	}
+
 	// reference in Map - or as signatire or as BlockHeight + seqNo
 	public static Transaction findByDBRef(DBSet db, byte[] dbRef)
 	{
@@ -797,6 +819,37 @@ public abstract class Transaction {
 
 	//PROCESS/ORPHAN
 	
+	public void process_gifts(DBSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
+		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
+		//byte[] recordSignature = record.getSignature();
+		if (personDuration == null) {
+			return;
+		}
+		
+		// CREATOR is PERSON
+		// FIND person
+		long personKey = personDuration.a;
+		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
+		ItemCls person = db.getItemPersonMap().get(personKey);
+		Account invitedAccount = person.getCreator(); 
+
+		int fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
+		int fee_gift_get =  fee_gift - fee_gift_next;
+		BigDecimal fee_gift_get_BD = new BigDecimal(asOrphan?-fee_gift_get:fee_gift_get)
+				.multiply(BlockChain.FEE_RATE)
+				.setScale(8, BigDecimal.ROUND_UP);
+
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3 = invitedAccount.getBalance3(FEE_KEY, db);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3_new = 
+				 new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance3.a.add(fee_gift_get_BD), balance3.b, balance3.c);
+		
+		invitedAccount.setBalance3(FEE_KEY, balance3_new, db);
+		
+		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 32) {
+			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
+		}
+	}
+
 	//public abstract void process(DBSet db);
 	public void process(DBSet db, Block block, boolean asPack)
 	{
@@ -810,6 +863,11 @@ public abstract class Transaction {
 				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
 						.subtract(this.fee), db);
 
+			}
+			
+			if (!db.isFork()) {
+				// calc INVITED FEE if its not a FORK
+				process_gifts(db, 0, getInvitedFee(), this.creator, false);
 			}
 
 			//UPDATE REFERENCE OF SENDER
@@ -827,6 +885,12 @@ public abstract class Transaction {
 				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db).add(this.fee), db);
 
 			}
+			
+			if (!db.isFork()) {
+				// calc INVITED FEE if its not a FORK
+				process_gifts(db, 0, getInvitedFee(), this.creator, true);
+			}
+
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() )
 				// IT IS REFERENCED RECORD?

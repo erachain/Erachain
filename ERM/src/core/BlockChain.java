@@ -31,7 +31,15 @@ public class BlockChain
 	
 	public static final int GENESIS_WIN_VALUE = 1000;
 
-	public static BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
+	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
+	public static final int FEE_PER_BYTE = 8;
+	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
+	public static final float FEE_POW_BASE = (float)1.5;
+	public static final int FEE_POW_MAX = 6;
+	//
+	public static final int FEE_INVITED_DEEP = 3; // levels foe deep
+	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
+	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 
 	// GIFTS for R_SertifyPubKeys
 	public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(100);
@@ -121,7 +129,7 @@ public class BlockChain
 
 			this.waitWinBuffer = block;
 
-			LOGGER.error("setWaitWinBuffer - WIN value: "
+			LOGGER.info("setWaitWinBuffer - WIN value: "
 					+ block.calcWinValue(dbSet));
 
 			return true;
@@ -392,6 +400,5 @@ public class BlockChain
 		
 		return true;
 	}
-
 	
 }
