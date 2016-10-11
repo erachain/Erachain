@@ -598,7 +598,7 @@ public class TestRecPerson {
 		// PERSON -> ADDRESS
 		assertEquals( null, dbPA.getItem(personKey, userAddress3));
 		
-		BigDecimal oil_amount_diff = BlockChain.GIFTED_COMPU_AMOUNT;
+		BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 		BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY,db);
 		BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, db);
@@ -801,7 +801,7 @@ public class TestRecPerson {
 		// PERSON -> ADDRESS
 		assertEquals( null, dbPA.getItem(personKey, userAddress3));
 		
-		BigDecimal oil_amount_diff = BlockChain.GIFTED_COMPU_AMOUNT;
+		BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 		BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY,db);
 		BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, db);

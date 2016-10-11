@@ -2,6 +2,7 @@ package core.transaction;
 
 // import org.apache.log4j.Logger;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 //import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
@@ -430,8 +431,9 @@ public abstract class Transaction {
 	}
 	public long getFeeLong()
 	{
-		return this.fee.toBigInteger().longValue();
-	}	
+		return this.fee.unscaledValue().longValue();
+	}
+	
 	public byte getFeePow()
 	{
 		return this.feePow;
@@ -498,12 +500,14 @@ public abstract class Transaction {
 		int fee_invited = fee>>BlockChain.FEE_INVITED_SHIFT;
 		return fee - fee_invited;
 	}
+	
 	// GET only INVITED FEE
 	public int getInvitedFee()
 	{
 		int fee = this.fee.unscaledValue().intValue();
 		return fee>>BlockChain.FEE_INVITED_SHIFT;		
 	}
+	
 	public BigDecimal feeToBD(int fee)
 	{
 		return BigDecimal.valueOf(fee, 8);		
@@ -822,7 +826,11 @@ public abstract class Transaction {
 	public void process_gifts(DBSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
 		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
 		//byte[] recordSignature = record.getSignature();
+		// TODO if PERSON die - skip it steep
 		if (personDuration == null) {
+			// USE all GIFT for current ACCOUNT
+			creator.addBalanceOWN(FEE_KEY,
+					BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
 			return;
 		}
 		
@@ -833,19 +841,17 @@ public abstract class Transaction {
 		ItemCls person = db.getItemPersonMap().get(personKey);
 		Account invitedAccount = person.getCreator(); 
 
-		int fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
+		int fee_gift_next;
+		if (fee_gift > 10)
+			fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
+		else
+			fee_gift_next = fee_gift - 1;
+		
 		int fee_gift_get =  fee_gift - fee_gift_next;
-		BigDecimal fee_gift_get_BD = new BigDecimal(asOrphan?-fee_gift_get:fee_gift_get)
-				.multiply(BlockChain.FEE_RATE)
-				.setScale(8, BigDecimal.ROUND_UP);
-
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3 = invitedAccount.getBalance3(FEE_KEY, db);
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3_new = 
-				 new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance3.a.add(fee_gift_get_BD), balance3.b, balance3.c);
+		BigDecimal fee_gift_get_BD = BigDecimal.valueOf(asOrphan?-fee_gift_get:fee_gift_get, BlockChain.FEE_SCALE);		
+		invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
 		
-		invitedAccount.setBalance3(FEE_KEY, balance3_new, db);
-		
-		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 32) {
+		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
 			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
 		}
 	}

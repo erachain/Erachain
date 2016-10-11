@@ -506,14 +506,37 @@ public class R_SertifyPubKeys extends Transaction {
 				transactionIndex = block.getTransactionIndex(signature);
 			}			
 		}
-		
-		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 
-		// GIFTs
-		this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-				.add(BlockChain.GIFTED_ERMO_AMOUNT), db);						
-		pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-				.add(BlockChain.GIFTED_COMPU_AMOUNT), db);
+		
+		boolean personalized = false;
+		for (Account pkAccount: this.sertifiedPublicKeys) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
+		}
+
+		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(this.key);
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
+					.getTransactionBySignature(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+		
+			// GIVE GIFTs
+			this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
+					.add(BlockChain.GIFTED_ERMO_AMOUNT), db);						
+			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
+					.subtract(issueFEE_BD), db);						
+			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
+					.add(issueFEE_BD), db);
+
+		}
 		
 		int add_day = this.add_day;
 		// set to time stamp of record
@@ -561,15 +584,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);
-		
-
-		// BACK GIFTs
-		this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-				.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
-		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
-		pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-				.subtract(BlockChain.GIFTED_COMPU_AMOUNT), db);
-						
+								
 		//UPDATE RECIPIENT
 		String address;
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
@@ -579,6 +594,36 @@ public class R_SertifyPubKeys extends Transaction {
 			db.getPersonAddressMap().removeItem(this.key, address);
 		}
 		
+		boolean personalized = false;
+		for (Account pkAccount: this.sertifiedPublicKeys) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
+		}
+
+		PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(this.key);
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
+					.getTransactionBySignature(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+		
+			// GIVE GIFTs
+			this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
+					.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
+			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
+					.add(issueFEE_BD), db);						
+			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
+					.subtract(issueFEE_BD), db);
+
+		}
+
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT

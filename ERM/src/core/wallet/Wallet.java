@@ -1562,18 +1562,42 @@ public class Wallet extends Observable implements Observer
 		Account creator = sertifyPubKeys.getCreator();
 		if (creator == null) return;
 		
-		// GIFTs
-		if(this.accountExists(creator.getAddress()))
-		{
-			this.database.getAccountMap().update(creator, RIGHTS_KEY,
-					this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(BlockChain.GIFTED_ERMO_AMOUNT));
+		DBSet db = DBSet.getInstance();
+		boolean personalized = false;
+		for (Account pkAccount: sertifyPubKeys.getSertifiedPublicKeys()) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
 		}
-		
-		PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
-		if(this.accountExists(creator.getAddress())) 
-		{
-			this.database.getAccountMap().update(pkAccount, FEE_KEY,
-					this.getUnconfirmedBalance(pkAccount, FEE_KEY).add(BlockChain.GIFTED_COMPU_AMOUNT));
+
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
+					.getTransactionBySignature(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+
+			// GIFTs
+			if(this.accountExists(creator.getAddress()))
+			{
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(BlockChain.GIFTED_ERMO_AMOUNT));
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(issueFEE_BD));
+			}
+			
+			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+			if(this.accountExists(creator.getAddress())) 
+			{
+				this.database.getAccountMap().update(pkAccount, FEE_KEY,
+						this.getUnconfirmedBalance(pkAccount, FEE_KEY).add(issueFEE_BD));
+			}
 		}
 	}
 	
@@ -1589,18 +1613,42 @@ public class Wallet extends Observable implements Observer
 		if (creator == null) return;
 
 		// GIFTs
-		//CHECK IF WE ARE OWNER
-		if(this.accountExists(creator.getAddress()))
-		{
-			this.database.getAccountMap().update(creator, RIGHTS_KEY,
-					this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(BlockChain.GIFTED_ERMO_AMOUNT));
+		DBSet db = DBSet.getInstance();
+		boolean personalized = false;
+		for (Account pkAccount: sertifyPubKeys.getSertifiedPublicKeys()) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
 		}
-		
-		PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
-		if(this.accountExists(creator.getAddress())) 
-		{
-			this.database.getAccountMap().update(pkAccount, FEE_KEY,
-					this.getUnconfirmedBalance(pkAccount, FEE_KEY).subtract(BlockChain.GIFTED_COMPU_AMOUNT));
+
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
+					.getTransactionBySignature(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+
+			// GIFTs
+			if(this.accountExists(creator.getAddress()))
+			{
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(BlockChain.GIFTED_ERMO_AMOUNT));
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(issueFEE_BD));
+			}
+			
+			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+			if(this.accountExists(creator.getAddress())) 
+			{
+				this.database.getAccountMap().update(pkAccount, FEE_KEY,
+						this.getUnconfirmedBalance(pkAccount, FEE_KEY).subtract(issueFEE_BD));
+			}
 		}
 	}
 	

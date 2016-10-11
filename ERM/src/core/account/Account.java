@@ -195,6 +195,14 @@ public class Account {
 		db.getAssetBalanceMap().set(getAddress(), key, balance);
 	}
 
+	public void addBalanceOWN(long key, BigDecimal value, DBSet db)
+	{
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.getBalance3(key, db);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance_new = 
+				 new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance.a.add(value), balance.b, balance.c);
+		
+		this.setBalance3(key, balance_new, db);
+	}
 
 	
 	// STATUS
