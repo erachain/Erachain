@@ -187,14 +187,17 @@ public class BlockMap extends DBMap<byte[], Block>
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
-			dbSet.getHeightMap().set(signature,
-					new Tuple2<Integer, Integer>(1, Block.GENESIS_WIN_VALUE));
+			dbSet.getBlockSignsMap().set(signature,
+					new Tuple2<Integer, Integer>(1, core.BlockChain.GENESIS_WIN_VALUE));
+			dbSet.getBlockHeightsMap().set(1l, signature);
 		} else {
 			Block parent = this.get(block.getReference());
 			int height = parent.getHeight(dbSet) + 1;
 			dbSet.getChildMap().set(parent, block);
-			dbSet.getHeightMap().set(signature,
+			dbSet.getBlockSignsMap().set(signature,
 					new Tuple2<Integer, Integer>(height, win_value));
+			//dbSet.getBlockHeightsMap().set((long)height, signature);
+			dbSet.getBlockHeightsMap().add(signature);
 			
 			//
 			// PROCESS FORGING DATA
@@ -210,6 +213,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 	}
 
+	// TODO make CHAIN deletes - only for LAST block!
 	public void delete(Block block)
 	{
 		DBSet dbSet = getDBSet();
@@ -219,7 +223,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			rr +=1;
 		}
 		
-		dbSet.getHeightMap().delete(block.getSignature());
+		dbSet.getBlockSignsMap().delete(block.getSignature());
 
 		byte[] parentSign = block.getReference();
 		Block parent = this.get(parentSign);
@@ -232,6 +236,8 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 			// ORPHAN FORGING DATA
 			int height = parent.getHeight(dbSet) + 1;
+			dbSet.getBlockHeightsMap().delete(height);
+			
 			PublicKeyAccount creator = block.getCreator();
 			Integer prevHeight = creator.getForgingData(dbSet, height);
 			if (prevHeight > 1) {

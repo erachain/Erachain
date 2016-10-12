@@ -1,5 +1,6 @@
 package core;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +22,31 @@ import utils.Pair;
 
 public class BlockChain
 {
+
+	public static final int START_LEVEL = 1;
+
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	public static final int TARGET_COUNT = 100;
 	public static final int REPEAT_WIN = 3;
 	
+	public static final int GENESIS_WIN_VALUE = 1000;
+
+	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
+	public static final int FEE_PER_BYTE = 32;
+	public static final int FEE_SCALE = 8;
+	public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
+	public static final float FEE_POW_BASE = (float)1.5;
+	public static final int FEE_POW_MAX = 6;
+	//
+	public static final int FEE_INVITED_DEEP = 15; // levels foe deep
+	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
+	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
+
+	// GIFTS for R_SertifyPubKeys
+	public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
+	public static final int GIFTED_COMPU_AMOUNT = 90000 * FEE_PER_BYTE;
+	//public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
+
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
@@ -109,7 +131,7 @@ public class BlockChain
 
 			this.waitWinBuffer = block;
 
-			LOGGER.error("setWaitWinBuffer - WIN value: "
+			LOGGER.info("setWaitWinBuffer - WIN value: "
 					+ block.calcWinValue(dbSet));
 
 			return true;
@@ -123,7 +145,7 @@ public class BlockChain
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-		return dbSet.getHeightMap().getHeight(lastBlockSignature);
+		return dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 
 	public Tuple2<Integer, Long> getHWeight(boolean withWinBuffer) {
@@ -146,8 +168,8 @@ public class BlockChain
 		if (lastBlockSignature == null) {
 			height++;
 		} else {
-			height += dbSet.getHeightMap().getHeight(lastBlockSignature);
-			weight += dbSet.getHeightMap().getFullWeight();
+			height += dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
+			weight += dbSet.getBlockSignsMap().getFullWeight();
 		}
 		
 		return  new Tuple2<Integer, Long>(height, weight);
@@ -156,7 +178,7 @@ public class BlockChain
 	
 	public long getFullWeight() {
 		
-		return dbSet.getHeightMap().getFullWeight();
+		return dbSet.getBlockSignsMap().getFullWeight();
 	}
 
 	public int getCheckPoint() {
@@ -208,7 +230,7 @@ public class BlockChain
 	}
 	public Block getBlock(int height) {
 
-		byte[] signature = dbSet.getHeightMap().getBlockSignatureByHeight(height);
+		byte[] signature = dbSet.getBlockHeightsMap().get((long)height);
 		return dbSet.getBlockMap().get(signature);
 	}
 
@@ -380,6 +402,5 @@ public class BlockChain
 		
 		return true;
 	}
-
 	
 }

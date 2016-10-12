@@ -2,6 +2,7 @@ package core.transaction;
 
 // import org.apache.log4j.Logger;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 //import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -30,6 +33,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import database.DBSet;
@@ -217,10 +221,6 @@ public abstract class Transaction {
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 
 	public static final long FEE_KEY = AssetCls.FEE_KEY;
-	public static final int FEE_PER_BYTE = 1;
-	public static final BigDecimal FEE_RATE = new BigDecimal(0.00000001);
-	public static final float FEE_POW_BASE = (float)1.5;
-	public static final int FEE_POW_MAX = 6;
 
 	//RELEASES
 	//private static final long ASSETS_RELEASE = 0l;
@@ -300,7 +300,7 @@ public abstract class Transaction {
 	protected byte[] typeBytes;
 	protected Block block; // parent block
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
-	protected Long reference;
+	protected Long reference = 0l;
 	protected BigDecimal fee  = BigDecimal.ZERO.setScale(8); // - for genesis transactions
 	//protected BigDecimal fee  = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
@@ -323,7 +323,7 @@ public abstract class Transaction {
 		this.timestamp = timestamp;
 		this.reference = reference;
 		if (feePow < 0 ) feePow = 0;
-		else if (feePow > FEE_POW_MAX ) feePow = FEE_POW_MAX;
+		else if (feePow > BlockChain.FEE_POW_MAX ) feePow = BlockChain.FEE_POW_MAX;
 		this.feePow = feePow;
 	}
 	protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature)
@@ -428,7 +428,12 @@ public abstract class Transaction {
 	public BigDecimal getFee()
 	{
 		return this.fee;
-	}	
+	}
+	public long getFeeLong()
+	{
+		return this.fee.unscaledValue().longValue();
+	}
+	
 	public byte getFeePow()
 	{
 		return this.feePow;
@@ -458,13 +463,13 @@ public abstract class Transaction {
 	public int calcCommonFee()
 	{		
 		int len = this.getDataLength(false);
-		int fee = len + 100 * FEE_PER_BYTE;
-		if (len > 1000) {
+		int fee = len + 200;
+		if (false && len > 1000) {
 			// add overheat
-			fee += (len - 1000) * FEE_PER_BYTE;
+			fee += (len - 1000);
 		}
 		
-		return (int) fee;
+		return (int) fee * BlockChain.FEE_PER_BYTE;
 	}
 	
 	// get fee
@@ -477,17 +482,37 @@ public abstract class Transaction {
 	{	
 		
 		BigDecimal fee = new BigDecimal(calcBaseFee())
-				.multiply(FEE_RATE)
+				.multiply(BlockChain.FEE_RATE)
 				.setScale(8, BigDecimal.ROUND_UP);
 
 		if (this.feePow > 0) {
-			this.fee = fee.multiply(new BigDecimal(FEE_POW_BASE).pow((int)this.feePow))
+			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow((int)this.feePow))
 					.setScale(8, BigDecimal.ROUND_UP);
 		} else {
 			this.fee = fee;
 		}
 	}
 
+	// GET forged FEE without invited FEE
+	public int getForgedFee()
+	{
+		int fee = this.fee.unscaledValue().intValue();
+		int fee_invited = fee>>BlockChain.FEE_INVITED_SHIFT;
+		return fee - fee_invited;
+	}
+	
+	// GET only INVITED FEE
+	public int getInvitedFee()
+	{
+		int fee = this.fee.unscaledValue().intValue();
+		return fee>>BlockChain.FEE_INVITED_SHIFT;		
+	}
+	
+	public BigDecimal feeToBD(int fee)
+	{
+		return BigDecimal.valueOf(fee, 8);		
+	}
+	
 	public Block getBlock(DBSet db) {
 		
 		if (block != null)
@@ -546,6 +571,11 @@ public abstract class Transaction {
 		return ref;
 		
 	}
+	
+	public static Transaction findByIntInt(DBSet db, int height, int seq) {
+		return db.getTransactionFinalMap().getTransaction(height, seq);
+	}
+
 	// reference in Map - or as signatire or as BlockHeight + seqNo
 	public static Transaction findByDBRef(DBSet db, byte[] dbRef)
 	{
@@ -556,7 +586,7 @@ public abstract class Transaction {
 		if(dbRef.length > 20)
 		{
 			// soft or hard confirmations
-			key = db.getTransactionFinalMap().getTransactionBySignature(dbRef);
+			key = db.getTransactionFinalMapSigns().get(dbRef);
 		} else {
 			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
 			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
@@ -781,8 +811,8 @@ public abstract class Transaction {
 			return INVALID_ADDRESS;
 		}
 		
-		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(this.fee) == -1)
+		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+		if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -793,6 +823,39 @@ public abstract class Transaction {
 
 	//PROCESS/ORPHAN
 	
+	public void process_gifts(DBSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
+		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
+		//byte[] recordSignature = record.getSignature();
+		// TODO if PERSON die - skip it steep
+		if (personDuration == null) {
+			// USE all GIFT for current ACCOUNT
+			creator.addBalanceOWN(FEE_KEY,
+					BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
+			return;
+		}
+		
+		// CREATOR is PERSON
+		// FIND person
+		long personKey = personDuration.a;
+		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
+		ItemCls person = db.getItemPersonMap().get(personKey);
+		Account invitedAccount = person.getCreator(); 
+
+		int fee_gift_next;
+		if (fee_gift > 10)
+			fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
+		else
+			fee_gift_next = fee_gift - 1;
+		
+		int fee_gift_get =  fee_gift - fee_gift_next;
+		BigDecimal fee_gift_get_BD = BigDecimal.valueOf(asOrphan?-fee_gift_get:fee_gift_get, BlockChain.FEE_SCALE);		
+		invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
+		
+		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
+			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
+		}
+	}
+
 	//public abstract void process(DBSet db);
 	public void process(DBSet db, Block block, boolean asPack)
 	{
@@ -802,15 +865,21 @@ public abstract class Transaction {
 		if (!asPack) {
 			this.calcFee();
 	
-			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db)
+			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
+				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
 						.subtract(this.fee), db);
 
-				//UPDATE REFERENCE OF SENDER
-				if (this.isReferenced() )
-					// IT IS REFERENCED RECORD?
-					this.creator.setLastReference(this.timestamp, db);
 			}
+			
+			if (!db.isFork()) {
+				// calc INVITED FEE if its not a FORK
+				process_gifts(db, 0, getInvitedFee(), this.creator, false);
+			}
+
+			//UPDATE REFERENCE OF SENDER
+			if (this.isReferenced() )
+				// IT IS REFERENCED RECORD?
+				this.creator.setLastReference(this.timestamp, db);
 		}
 
 	}
@@ -818,14 +887,20 @@ public abstract class Transaction {
 	public void orphan(DBSet db, boolean asPack)
 	{
 		if (!asPack) {
-			if (this.fee != null & this.fee.compareTo(BigDecimal.ZERO) > 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalanceUSE(FEE_KEY, db).add(this.fee), db);
+			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
+				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db).add(this.fee), db);
 
-				//UPDATE REFERENCE OF SENDER
-				if (this.isReferenced() )
-					// IT IS REFERENCED RECORD?
-					this.creator.setLastReference(this.reference, db);
 			}
+			
+			if (!db.isFork()) {
+				// calc INVITED FEE if its not a FORK
+				process_gifts(db, 0, getInvitedFee(), this.creator, true);
+			}
+
+			//UPDATE REFERENCE OF SENDER
+			if (this.isReferenced() )
+				// IT IS REFERENCED RECORD?
+				this.creator.setLastReference(this.reference, db);
 		}
 	}
 
@@ -888,13 +963,13 @@ public abstract class Transaction {
 		}
 		
 		//CALCULATE CONFIRMATIONS
-		int lastBlockHeight = db.getHeightMap().getHeight(db.getBlockMap().getLastBlockSignature());
+		int lastBlockHeight = db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
 		Block block = this.getBlock(db);
 		
 		if (block == null)return 0;
 		
-		int transactionBlockHeight = db.getHeightMap().getHeight(block);
+		int transactionBlockHeight = db.getBlockSignsMap().getHeight(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;

@@ -71,7 +71,7 @@ public class Network extends Observable implements ConnectionCallback {
 	@Override
 	public void onConnect(Peer peer) {
 		
-		LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
+		//LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 		
 		//ADD TO CONNECTED PEERS
 		synchronized(this.connectedPeers)
@@ -95,14 +95,14 @@ public class Network extends Observable implements ConnectionCallback {
 
 	@Override
 	public void onDisconnect(Peer peer) {
-
-		LOGGER.info(Lang.getInstance().translate("Connection close : ") + peer.getAddress());
 		
 		//REMOVE FROM CONNECTED PEERS
 		synchronized(this.connectedPeers)
 		{
 			this.connectedPeers.remove(peer);
 		}
+
+		//LOGGER.info(Lang.getInstance().translate("Connection close : ") + peer.getAddress());
 		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onDisconnect(peer);
@@ -122,7 +122,7 @@ public class Network extends Observable implements ConnectionCallback {
 	@Override
 	public void onError(Peer peer, String error) {
 		
-		LOGGER.warn(Lang.getInstance().translate("Connection error : ") + peer.getAddress() + " : " + error);
+		//LOGGER.warn(Lang.getInstance().translate("Connection error : ") + peer.getAddress() + " : " + error);
 		
 		//REMOVE FROM CONNECTED PEERS
 		synchronized(this.connectedPeers)
@@ -268,7 +268,7 @@ public class Network extends Observable implements ConnectionCallback {
 			FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 			
 			if(Arrays.equals(findMyselfMessage.getFoundMyselfID(),Controller.getInstance().getFoundMyselfID())) {
-				LOGGER.info(Lang.getInstance().translate("Connected to self. Disconnection."));
+				//LOGGER.info(Lang.getInstance().translate("Connected to self. Disconnection."));
 				message.getSender().close();
 			}
 			
@@ -284,7 +284,7 @@ public class Network extends Observable implements ConnectionCallback {
 
 	public void broadcast(Message message, List<Peer> exclude) 
 	{		
-		LOGGER.info(Lang.getInstance().translate("Broadcasting"));
+		//LOGGER.info(Lang.getInstance().translate("Broadcasting"));
 		
 		try
 		{
@@ -305,7 +305,7 @@ public class Network extends Observable implements ConnectionCallback {
 			LOGGER.error(e.getMessage(),e);
 		}
 		
-		LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
+		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
 	}
 	
 	@Override

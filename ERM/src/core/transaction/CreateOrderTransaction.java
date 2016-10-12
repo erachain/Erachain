@@ -248,7 +248,7 @@ public class CreateOrderTransaction extends Transaction
 
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if (FEE_KEY == have) {
-			if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(
+			if(this.creator.getBalance(FEE_KEY, db).compareTo(
 					this.order.getAmountHave().add(this.fee)) == -1)
 			{
 				return NO_BALANCE;
@@ -256,7 +256,7 @@ public class CreateOrderTransaction extends Transaction
 		} else {
 
 			//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-			if(this.creator.getBalanceUSE(FEE_KEY, db).compareTo(this.fee) == -1)
+			if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
@@ -265,7 +265,7 @@ public class CreateOrderTransaction extends Transaction
 			boolean unLimited = haveAsset.getQuantity().equals(0l)
 					&& haveAsset.getCreator().getAddress().equals(this.creator.getAddress());
 
-			if( !unLimited && this.creator.getBalanceUSE(have, db).compareTo(
+			if( !unLimited && this.creator.getBalance(have, db).compareTo(
 					this.order.getAmountHave()) == -1)
 			{
 				return NO_BALANCE;

@@ -24,6 +24,7 @@ import settings.Settings;
 import utils.PeerInfoComparator;
 import utils.ReverseComparator;
 
+// java nio channels.ClosedByInterruptException
 public class PeerMap extends DBMap<byte[], byte[]> 
 {
 	private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
@@ -304,13 +305,13 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			}
 			
 			if(allFromSettings) {
-				LOGGER.info("Peers loaded from database : " + peers.size());
+				//LOGGER.info("Peers loaded from database : " + peers.size());
 			}
 
 			List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
 			
 			if(allFromSettings) {
-				LOGGER.info("Peers loaded from settings : " + knownPeers.size());
+				//LOGGER.info("Peers loaded from settings : " + knownPeers.size());
 			}
 				
 			for (Peer knownPeer : knownPeers) {

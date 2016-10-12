@@ -119,9 +119,9 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			if (this.asset == null) return "-";
 			balance = account.getBalance3(this.asset.getKey(DBSet.getInstance()));
 			unconfBalance = account.getUnconfirmedBalance3(this.asset.getKey(DBSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(balance.a.subtract(unconfBalance.a))
-					+ "/" + balance.b.subtract(unconfBalance.b).toPlainString()
-					+ "/" + balance.c.subtract(unconfBalance.c).toPlainString();
+			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
+					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
+					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
 			return str;
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";

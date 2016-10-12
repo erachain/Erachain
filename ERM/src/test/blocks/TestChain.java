@@ -35,7 +35,7 @@ import core.wallet.Wallet;
 import database.AddressPersonMap;
 import database.DBMap;
 import database.DBSet;
-import database.HeightMap;
+import database.BlockSignsMap;
 import ntp.NTP;
 import database.ItemAssetMap;
 import database.KKPersonStatusMap;
@@ -154,7 +154,7 @@ public class TestChain {
 		Controller.getInstance().initBlockChain(dbSet);
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		blockChain = Controller.getInstance().getBlockChain();
-		HeightMap dbHeight = dbSet.getHeightMap();
+		BlockSignsMap dbHeight = dbSet.getBlockSignsMap();
 
 		int lastH = 0;
 		

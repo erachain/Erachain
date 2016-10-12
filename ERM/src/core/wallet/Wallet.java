@@ -20,6 +20,7 @@ import com.google.common.primitives.Ints;
 
 import at.AT_Transaction;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -48,6 +49,7 @@ import core.transaction.Issue_ItemRecord;
 //import core.transaction.IssuePersonRecord;
 //import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -74,6 +76,7 @@ public class Wallet extends Observable implements Observer
 	public static final int STATUS_UNLOCKED = 1;
 	public static final int STATUS_LOCKED = 0;
 	
+	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	private WalletDatabase database;
 	private SecureWalletDatabase secureDatabase;
@@ -1041,6 +1044,7 @@ public class Wallet extends Observable implements Observer
 			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account, key);
 			BigDecimal amount = asOrphan?BigDecimal.ZERO.subtract(transaction.getAmount(account)):transaction.getAmount(account);
 			unconfirmedBalance = unconfirmedBalance.add(amount);
+
 			if (fee.compareTo(BigDecimal.ZERO) != 0)
 			{
 				if (key == FEE_KEY)
@@ -1189,16 +1193,41 @@ public class Wallet extends Observable implements Observer
 		
 		//SET AS LAST BLOCK
 		this.database.setLastBlockSignature(block.getSignature());
-			
+
+		Account blockGenerator = block.getCreator();
+		String blockGeneratorStr = blockGenerator.getAddress(); 
+
 		//CHECK IF WE ARE GENERATOR
-		if(this.accountExists(block.getCreator().getAddress()))
+		if(this.accountExists(blockGeneratorStr))
 		{
 			//ADD BLOCK
 			this.database.getBlockMap().add(block);
 				
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getCreator(), FEE_KEY).add(block.getTotalFee());
-			this.database.getAccountMap().update(block.getCreator(), FEE_KEY, unconfirmedBalance);
+			//PROCESS FEE
+			BigDecimal blockFee = block.getTotalFeeForProcess();
+
+			if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+				
+				// find rich account
+				String rich = Account.getRich(Transaction.FEE_KEY);
+				if (!rich.equals(blockGeneratorStr)) {
+
+					blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+					
+					if(this.accountExists(rich)) {
+
+						BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+						Account richAccount = new Account(rich);				
+						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
+								.subtract(bonus_fee);
+						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
+					}
+				}
+			}
+			
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(blockGenerator, FEE_KEY).add(blockFee);
+			this.database.getAccountMap().update(blockGenerator, FEE_KEY, unconfirmedBalance);
 		}
 	}
 
@@ -1209,16 +1238,40 @@ public class Wallet extends Observable implements Observer
 		{
 			return;
 		}
-				
+		
+		Account blockGenerator = block.getCreator();
+		String blockGeneratorStr = blockGenerator.getAddress(); 
+
 		//CHECK IF WE ARE GENERATOR
-		if(this.accountExists(block.getCreator().getAddress()))
+		if(this.accountExists(blockGeneratorStr))
 		{
 			//DELETE BLOCK
 			this.database.getBlockMap().delete(block);
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(block.getCreator(), FEE_KEY).subtract(block.getTotalFee());
-			this.database.getAccountMap().update(block.getCreator(), FEE_KEY, unconfirmedBalance);
+			BigDecimal blockFee = block.getTotalFeeForProcess();
+
+			if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+				
+				// find rich account
+				String rich = Account.getRich(Transaction.FEE_KEY);
+				if (!rich.equals(blockGeneratorStr)) {
+
+					blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+					
+					if(this.accountExists(rich)) {
+
+						BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+						Account richAccount = new Account(rich);				
+						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
+								.add(bonus_fee);
+						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
+					}
+				}
+			}
+
+			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(blockGenerator, FEE_KEY).subtract(blockFee);
+			this.database.getAccountMap().update(blockGenerator, FEE_KEY, unconfirmedBalance);
 		}
 	}
 	
@@ -1497,6 +1550,107 @@ public class Wallet extends Observable implements Observer
 		}
 	}
 
+	private void processSertifyPerson(R_SertifyPubKeys sertifyPubKeys)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		//CHECK IF WE ARE OWNER
+		Account creator = sertifyPubKeys.getCreator();
+		if (creator == null) return;
+		
+		DBSet db = DBSet.getInstance();
+		boolean personalized = false;
+		for (Account pkAccount: sertifyPubKeys.getSertifiedPublicKeys()) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
+		}
+
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+					.get(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+
+			// GIFTs
+			if(this.accountExists(creator.getAddress()))
+			{
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(BlockChain.GIFTED_ERMO_AMOUNT));
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(issueFEE_BD));
+			}
+			
+			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+			if(this.accountExists(creator.getAddress())) 
+			{
+				this.database.getAccountMap().update(pkAccount, FEE_KEY,
+						this.getUnconfirmedBalance(pkAccount, FEE_KEY).add(issueFEE_BD));
+			}
+		}
+	}
+	
+	private void orphanSertifyPerson(R_SertifyPubKeys sertifyPubKeys)
+	{
+		//CHECK IF WALLET IS OPEN
+		if(!this.exists())
+		{
+			return;
+		}
+		
+		Account creator = sertifyPubKeys.getCreator();
+		if (creator == null) return;
+
+		// GIFTs
+		DBSet db = DBSet.getInstance();
+		boolean personalized = false;
+		for (Account pkAccount: sertifyPubKeys.getSertifiedPublicKeys()) {
+			if (pkAccount.getPersonDuration(db) != null) {
+				personalized = true;
+				break;
+			}
+		}
+
+		if (!personalized) {
+			// IT IS NOT VOUCHED PERSON
+
+			// FIND person
+			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			// FIND issue record
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+					.get(person.getReference()));
+			// GET FEE from that record
+			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+
+			// GIFTs
+			if(this.accountExists(creator.getAddress()))
+			{
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(BlockChain.GIFTED_ERMO_AMOUNT));
+				this.database.getAccountMap().update(creator, RIGHTS_KEY,
+						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(issueFEE_BD));
+			}
+			
+			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
+			if(this.accountExists(creator.getAddress())) 
+			{
+				this.database.getAccountMap().update(pkAccount, FEE_KEY,
+						this.getUnconfirmedBalance(pkAccount, FEE_KEY).subtract(issueFEE_BD));
+			}
+		}
+	}
 	
 	private void processOrderCreation(CreateOrderTransaction orderCreation)
 	{
@@ -1648,6 +1802,12 @@ public class Wallet extends Observable implements Observer
 					this.processItemIssue((Issue_ItemRecord) transaction);
 				}
 				
+				//CHECK IF SERTIFY PErSON
+				else if(transaction instanceof R_SertifyPubKeys)
+				{
+					this.processSertifyPerson((R_SertifyPubKeys) transaction);
+				}
+				
 				//CHECK IF ORDER CREATION
 				if(transaction instanceof CreateOrderTransaction)
 				{
@@ -1671,7 +1831,7 @@ public class Wallet extends Observable implements Observer
 			//CHECK IF PAYMENT
 			if (transaction instanceof R_Send)
 			{
-				
+				return;
 			}
 			
 			//CHECK IF NAME REGISTRATION
@@ -1691,6 +1851,13 @@ public class Wallet extends Observable implements Observer
 			{
 				this.processItemIssue((Issue_ItemRecord) transaction);
 			}
+
+			//CHECK IF SERTIFY PErSON
+			else if(transaction instanceof R_SertifyPubKeys)
+			{
+				this.processSertifyPerson((R_SertifyPubKeys) transaction);
+			}
+
 			//CHECK IF ORDER CREATION
 			else if(transaction instanceof CreateOrderTransaction)
 			{
@@ -1710,8 +1877,14 @@ public class Wallet extends Observable implements Observer
 			{
 				this.orphanTransaction(transaction);
 				
+				//CHECK IF PAYMENT
+				if (transaction instanceof R_Send)
+				{
+					continue;
+				}
+
 				//CHECK IF NAME REGISTRATION
-				if(transaction instanceof RegisterNameTransaction)
+				else if(transaction instanceof RegisterNameTransaction)
 				{
 					this.orphanNameRegistration((RegisterNameTransaction) transaction);
 				}
@@ -1758,6 +1931,12 @@ public class Wallet extends Observable implements Observer
 					this.orphanItemIssue((Issue_ItemRecord) transaction);
 				}
 				
+				//CHECK IF SERTIFY PErSON
+				else if(transaction instanceof R_SertifyPubKeys)
+				{
+					this.orphanSertifyPerson((R_SertifyPubKeys) transaction);
+				}
+
 				//CHECK IF ORDER CREATION
 				else if(transaction instanceof CreateOrderTransaction)
 				{
@@ -1781,7 +1960,7 @@ public class Wallet extends Observable implements Observer
 			//CHECK IF PAYMENT
 			if (transaction instanceof R_Send)
 			{
-				
+				return;
 			}
 			//CHECK IF NAME REGISTRATION
 			else if(transaction instanceof RegisterNameTransaction)
@@ -1801,6 +1980,12 @@ public class Wallet extends Observable implements Observer
 				this.orphanItemIssue((Issue_ItemRecord) transaction);
 			}
 			
+			//CHECK IF SERTIFY PErSON
+			else if(transaction instanceof R_SertifyPubKeys)
+			{
+				this.orphanSertifyPerson((R_SertifyPubKeys) transaction);
+			}
+
 			//CHECK IF ORDER CREATION
 			else if(transaction instanceof CreateOrderTransaction)
 			{

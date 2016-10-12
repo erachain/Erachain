@@ -19,6 +19,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -302,6 +303,6 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	
 	@Override
 	public int calcBaseFee() {
-		return 10 * (calcCommonFee() + (Transaction.FEE_PER_BYTE * 1000));
+		return 10 * (calcCommonFee() + BlockChain.FEE_PER_BYTE * 1000);
 	}
 }

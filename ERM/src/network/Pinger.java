@@ -31,6 +31,7 @@ public class Pinger extends Thread
 	
 	public void run()
 	{
+	
 		while(this.run)
 		{
 			//CREATE PING
@@ -56,13 +57,38 @@ public class Pinger extends Thread
 				this.run = false;
 				return;
 			}
-			
-			//UPDATE PING
-			this.ping = System.currentTimeMillis() - start;
-			this.peer.addPingCounter(); 
-			
-			if(!DBSet.getInstance().isStoped()){
-				DBSet.getInstance().getPeerMap().addPeer(this.peer);
+
+			try
+			{
+
+				//UPDATE PING
+				this.ping = System.currentTimeMillis() - start;
+				this.peer.addPingCounter();
+				
+				if (this.isInterrupted() || this.peer.isInterrupted()) {
+					//PING FAILES
+					this.peer.onPingFail();
+
+					//STOP PINGER
+					this.run = false;
+					return;					
+				}
+				
+				if(!DBSet.getInstance().isStoped()){
+					DBSet.getInstance().getPeerMap().addPeer(this.peer);
+				}
+			}
+			catch(Exception e)
+			{
+				//PING FAILES
+				this.peer.onPingFail();
+				
+				//STOP PINGER
+				this.run = false;
+
+				LOGGER.error(" ???? " + e.getMessage(), e);
+				
+				return;
 			}
 			
 			//SLEEP
@@ -87,7 +113,7 @@ public class Pinger extends Thread
 		}
 		catch(Exception e)
 		{
-			LOGGER.debug(e.getMessage(),e);
+			LOGGER.debug(e.getMessage(), e);
 		}
 	}
 }

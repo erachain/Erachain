@@ -20,6 +20,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.BlockChain;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
@@ -72,7 +73,13 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	{
 						
 		int res = super.isValid(db, releaserReference);
-		if (res != Transaction.VALIDATE_OK) return res;
+		if (res != Transaction.VALIDATE_OK) {
+			if (res == Transaction.NOT_ENOUGH_FEE) {
+				if (BlockChain.START_LEVEL == 0) {
+					return res;
+				}
+			}
+		}
 		
 		PersonCls person = (PersonCls) this.getItem();
 		// birthLatitude -90..90; birthLongitude -180..180
@@ -83,16 +90,26 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (person.getSkinColor().length() <1 || person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
 		if (person.getEyeColor().length() <1 || person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
 		if (person.getHairСolor().length() <1 || person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
-		int ii = Math.abs(person.getHeight());
+		//int ii = Math.abs(person.getHeight());
 		if (Math.abs(person.getHeight()) < 40) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-		
-		// CHECH MAKER IS PERSON?
-		if (!this.creator.isPerson(db)
-				// OR RIGHTS_KEY ENOUGHT
-				&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-						.compareTo(new BigDecimal(1000)) < 0)
-			
-			return Transaction.ACCOUNT_NOT_PERSONALIZED;
+
+		if (BlockChain.START_LEVEL == 1) {
+			BigDecimal fee_balance = this.creator.getBalance(FEE_KEY, db);
+			if (fee_balance.compareTo(BigDecimal.ZERO) >= 0) {
+				// for start - may be 0
+				return VALIDATE_OK;				
+			} else {
+				return Transaction.NOT_ENOUGH_FEE;
+			}
+		} else {
+			// CHECH MAKER IS PERSON?
+			if (!this.creator.isPerson(db)
+					// OR RIGHTS_KEY ENOUGHT
+					&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
+							.compareTo(new BigDecimal(1000)) < 0)
+				
+					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		}
 		
 		return VALIDATE_OK;
 	
@@ -168,7 +185,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 	@Override
 	public int calcBaseFee() {
-		return 3 * calcCommonFee();
+		return calcCommonFee();
 	}
 
 }

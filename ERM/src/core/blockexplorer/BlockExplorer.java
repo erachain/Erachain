@@ -423,7 +423,7 @@ public class BlockExplorer
 		help.put("Asset", "blockexplorer.json?asset={asset}");
 		help.put("Asset Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
 		help.put("Polls List", "blockexplorer.json?polls");
-		help.put("Poll", "blockexplorer.json?poll={poll}");
+		help.put("Poll", "blockexplorer.json?poll={poll}&asset={asset}");
 		help.put("AT TX", "blockexplorer.json?atTx={atTx}");
 		help.put("Trade", "blockexplorer.json?trade={initiatorSignature}/{targetSignature}");
 		help.put("Transaction", "blockexplorer.json?tx={txSignature}");
@@ -3053,7 +3053,7 @@ public class BlockExplorer
 		byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
 		
 		//RETURN HEIGHT
-		return DBSet.getInstance().getHeightMap().getHeight(lastBlockSignature);
+		return DBSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 	public Tuple2<Integer, Long> getHWeight() {
 		

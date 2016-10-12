@@ -219,7 +219,9 @@ public class BlockGenerator extends Thread implements Observer
 					wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush) / 2;
 				}
 			} else {
-				wait_interval = wait_interval_run;
+				// always 1sec
+				wait_interval = 1000;
+				//wait_interval = wait_interval_run;
 			}
 
 			try 
@@ -228,7 +230,7 @@ public class BlockGenerator extends Thread implements Observer
 			} 
 			catch (InterruptedException e) 
 			{
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.error(e.getMessage(), e);
 			}
 
 			if(dbSet.isStoped()
@@ -271,18 +273,20 @@ public class BlockGenerator extends Thread implements Observer
 					|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 					)
 			{
+				/*
 				// MAKE RANDOM time for minimize load to network
 				if (newTimestamp + wait_interval_run_gen > NTP.getTime()
 						//&& !isGenesisStart
 						) {
 					wait_interval = wait_interval_run;
 					continue;
-				} 
+				}
 				
 				if (isGenesisStart) {
 					// QUICK MAKE CHAIN
 					wait_interval = 200;
 				}
+				*/
 				
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
@@ -345,37 +349,64 @@ public class BlockGenerator extends Thread implements Observer
 					}
 				}
 				
-				if(acc_winner != null)
-				{
+				if(acc_winner == null)
+					continue;
 					
-					syncForgingStatus();
-					if(forgingStatus != ForgingStatus.FORGING) {
-						this.solvingBlock = null;
-						bchain.clearWaitWinBuffer();
+				syncForgingStatus();
+				if(forgingStatus != ForgingStatus.FORGING) {
+					this.solvingBlock = null;
+					bchain.clearWaitWinBuffer();
+					continue;
+				}
+
+				if (!isGenesisStart) {
+					// sleep by (TARGET / WIN_VALUE)
+					// for not to busy the NET
+					int wait_new_good_block = wait_interval_flush * (int)(target / max_winned_value); 
+					// wait more good new block from NET
+					try 
+					{
+						Thread.sleep(wait_new_good_block);
+					} 
+					catch (InterruptedException e) 
+					{
+						LOGGER.error(e.getMessage(), e);
+					}
+				}
+
+				waitWin = bchain.getWaitWinBuffer();
+				if (waitWin != null)
+				{
+					long wait_winned_value = waitWin.calcWinValue(dbSet);
+					if (wait_winned_value > max_winned_value) {
+						// block in buffer is more good
 						continue;
 					}
+				}
 
-					LOGGER.error("core.BlockGenerator.run() - selected account: "
-							+ max_winned_value + " " + acc_winner.getAddress());
+				/*
+				LOGGER.error("core.BlockGenerator.run() - selected account: "
+						+ max_winned_value + " " + acc_winner.getAddress());
+				*/
 
-					// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-					unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
-					// CALCULATE HASH for that transactions
-					unconfirmedTransactionsHash = Block.makeTransactionsHash(unconfirmedTransactions);
+				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+				unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
+				// CALCULATE HASH for that transactions
+				byte[] winnerPubKey = acc_winner.getPublicKey();
+				byte[] atBytes = null;
+				unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
 
-					//ADD TRANSACTIONS
-					//this.addUnconfirmedTransactions(dbSet, block);
-					Block block = generateNextBlock(dbSet, acc_winner, 
-							this.solvingBlock, unconfirmedTransactionsHash);
-					block.setTransactions(unconfirmedTransactions);
-					
-					//PASS BLOCK TO CONTROLLER
-					///ctrl.newBlockGenerated(block);
-					if (bchain.setWaitWinBuffer(block)) {
-						// need to BROADCAST
-						ctrl.broadcastWinBlock(block, null);
-					}
-					
+				//ADD TRANSACTIONS
+				//this.addUnconfirmedTransactions(dbSet, block);
+				Block block = generateNextBlock(dbSet, acc_winner, 
+						this.solvingBlock, unconfirmedTransactionsHash);
+				block.setTransactions(unconfirmedTransactions);
+				
+				//PASS BLOCK TO CONTROLLER
+				///ctrl.newBlockGenerated(block);
+				if (bchain.setWaitWinBuffer(block)) {
+					// need to BROADCAST
+					ctrl.broadcastWinBlock(block, null);
 				}
 			}
 		}
@@ -387,7 +418,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		int version = parentBlock.getNextBlockVersion(dbSet);
 		byte[] atBytes;
-		if ( version > 0 )
+		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
 					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );

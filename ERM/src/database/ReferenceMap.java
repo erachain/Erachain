@@ -44,7 +44,8 @@ public class ReferenceMap extends DBMap<String, Long>
 	@Override
 	protected Long getDefaultValue() 
 	{
-		return null;
+		// NEED for toByte for nit referenced accounts
+		return 0l;
 	}
 	
 	@Override

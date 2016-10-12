@@ -55,7 +55,7 @@ public class Settings {
 	public static final int CONFIRMS_TRUE = 333; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1472756917777L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1476016077777L; //1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -87,7 +87,7 @@ public class Settings {
 	public static final int MINOR_ERMO_BALANCE = 100;
 	
 	
-	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = false;
+	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
 
 	private static final boolean DEFAULT_SOUND_RECEIVE_COIN = true;
@@ -361,7 +361,7 @@ public class Settings {
 			if(this.cacheInternetPeers.size() == 0 || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
-				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/ERM/peers.json");
+				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");
 				InputStream in = u.openStream();
 				String stringInternetSettings = IOUtils.toString( in );
 				JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);
@@ -371,14 +371,14 @@ public class Settings {
 				}
 			}
 		
-			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
+			//LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
 
 			return this.cacheInternetPeers;
 			
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
-			LOGGER.debug(e.getMessage(),e);
+			LOGGER.error(e.getMessage(), e);
 			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 						
 			return this.cacheInternetPeers;
@@ -404,7 +404,7 @@ public class Settings {
 				}
 			}catch(Exception e)
 			{
-				LOGGER.debug(e.getMessage(),e);
+				LOGGER.error(e.getMessage(),e);
 				LOGGER.info(this.defaultPeers[i] + " - invalid peer address!");
 			}
 		}
