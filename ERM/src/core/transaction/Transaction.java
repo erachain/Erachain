@@ -586,7 +586,7 @@ public abstract class Transaction {
 		if(dbRef.length > 20)
 		{
 			// soft or hard confirmations
-			key = db.getTransactionFinalMap().getTransactionBySignature(dbRef);
+			key = db.getTransactionFinalMapSigns().get(dbRef);
 		} else {
 			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
 			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
@@ -963,13 +963,13 @@ public abstract class Transaction {
 		}
 		
 		//CALCULATE CONFIRMATIONS
-		int lastBlockHeight = db.getHeightMap().getHeight(db.getBlockMap().getLastBlockSignature());
+		int lastBlockHeight = db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
 		Block block = this.getBlock(db);
 		
 		if (block == null)return 0;
 		
-		int transactionBlockHeight = db.getHeightMap().getHeight(block);
+		int transactionBlockHeight = db.getBlockSignsMap().getHeight(block);
 		
 		//RETURN
 		return 1 + lastBlockHeight - transactionBlockHeight;

@@ -926,14 +926,17 @@ public class Controller extends Observable {
 				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
 						+ " form PEER: " + getBlockMessage.getSender().toString()
 						+ " sign: " + Base58.encode(getBlockMessage.getSignature()));
-						*/
+				*/
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
 						.getBlock(getBlockMessage.getSignature());
 
 				/*
-				LOGGER.error("responce: " + newBlock.toString());
+				if (newBlock != null)
+					LOGGER.error("response: " + newBlock.toString());
+				else
+					LOGGER.error("response: NOT FOUND");
 				*/
 
 				// CREATE RESPONSE WITH SAME ID
@@ -2167,7 +2170,7 @@ public class Controller extends Observable {
 	*/
 	
 	public Block getBlockByHeight(DBSet db, int parseInt) {
-		byte[] b = db.getHeightMap().getBlockSignatureByHeight(parseInt);
+		byte[] b = db.getBlockHeightsMap().get((long)parseInt);
 		return db.getBlockMap().get(b);
 	}
 	public Block getBlockByHeight(int parseInt) {

@@ -418,7 +418,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		int version = parentBlock.getNextBlockVersion(dbSet);
 		byte[] atBytes;
-		if ( version > 0 )
+		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
 					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );

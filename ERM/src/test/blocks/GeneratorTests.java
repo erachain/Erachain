@@ -502,7 +502,7 @@ public class GeneratorTests {
 
 			
 			//GENERATE NEXT BLOCK
-			byte[] signature = dbSet.getHeightMap().getBlockSignatureByHeight(i_height);
+			byte[] signature = dbSet.getBlockHeightsMap().get((long)i_height);
 			Block block = dbSet.getBlockMap().get(signature);
 			if (block == null) {
 				i_break++;

@@ -136,7 +136,7 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 		
-		int height = db.getHeightMap().get(this.signature).a;		
+		int height = db.getBlockSignsMap().get(this.signature).a;		
 		return height;
 
 	}
@@ -150,7 +150,7 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 0;
 		
-		int height = db.getHeightMap().get(this.reference).a;
+		int height = db.getBlockSignsMap().get(this.reference).a;
 		return height;
 
 	}
@@ -1188,7 +1188,7 @@ public class Block {
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
 		
-		this.height_process = dbSet.getHeightMap().getHeight(this.signature);
+		this.height_process = dbSet.getBlockSignsMap().getHeight(this.signature);
 
 		/*
 		if (!dbSet.isFork()) {
@@ -1208,7 +1208,9 @@ public class Block {
 		int seq = 1;
 		for(Transaction transaction: this.getTransactions())
 		{
-			dbSet.getTransactionFinalMap().add( height_process, seq, transaction);
+			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height_process, seq);
+			dbSet.getTransactionFinalMap().set( key, transaction);
+			dbSet.getTransactionFinalMapSigns().set( transaction.getSignature(), key);
 			seq++;
 		}
 
@@ -1307,12 +1309,14 @@ public class Block {
 		*/
 
 		
-		this.height_process = -1;
 
 		for(Transaction transaction: this.getTransactions())
 		{
 			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
 			dbSet.getTransactionMap().add(transaction);
+
+			dbSet.getTransactionFinalMapSigns()
+				.delete(transaction.getSignature());
 
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
 			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
@@ -1325,6 +1329,8 @@ public class Block {
 		
 		// if R_SertifyPubKeys change ERMO
 		this.setGeneratingBalance(dbSet);
+
+		this.height_process = -1;
 
 	}
 

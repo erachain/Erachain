@@ -145,7 +145,7 @@ public class BlockChain
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-		return dbSet.getHeightMap().getHeight(lastBlockSignature);
+		return dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 
 	public Tuple2<Integer, Long> getHWeight(boolean withWinBuffer) {
@@ -168,8 +168,8 @@ public class BlockChain
 		if (lastBlockSignature == null) {
 			height++;
 		} else {
-			height += dbSet.getHeightMap().getHeight(lastBlockSignature);
-			weight += dbSet.getHeightMap().getFullWeight();
+			height += dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
+			weight += dbSet.getBlockSignsMap().getFullWeight();
 		}
 		
 		return  new Tuple2<Integer, Long>(height, weight);
@@ -178,7 +178,7 @@ public class BlockChain
 	
 	public long getFullWeight() {
 		
-		return dbSet.getHeightMap().getFullWeight();
+		return dbSet.getBlockSignsMap().getFullWeight();
 	}
 
 	public int getCheckPoint() {
@@ -230,7 +230,7 @@ public class BlockChain
 	}
 	public Block getBlock(int height) {
 
-		byte[] signature = dbSet.getHeightMap().getBlockSignatureByHeight(height);
+		byte[] signature = dbSet.getBlockHeightsMap().get((long)height);
 		return dbSet.getBlockMap().get(signature);
 	}
 

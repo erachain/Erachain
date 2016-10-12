@@ -91,8 +91,12 @@ public class R_Vouch extends Transaction {
 			int seq = Integer.parseInt(strA[1]);
 	
 			return db.getTransactionFinalMap().getTransaction(height, seq);
-		} catch (Exception e) {
-			return null;
+		} catch (Exception e1) {
+			try {
+				return db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns().get(Base58.decode(refStr)));
+			} catch (Exception e2) {
+				return null;
+			}
 		}
 	}
 

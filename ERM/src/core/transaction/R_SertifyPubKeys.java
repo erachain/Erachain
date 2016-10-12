@@ -522,8 +522,8 @@ public class R_SertifyPubKeys extends Transaction {
 			// FIND person
 			ItemCls person = db.getItemPersonMap().get(this.key);
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
-					.getTransactionBySignature(person.getReference()));
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
@@ -608,8 +608,8 @@ public class R_SertifyPubKeys extends Transaction {
 			// FIND person
 			ItemCls person = db.getItemPersonMap().get(this.key);
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMap()
-					.getTransactionBySignature(person.getReference()));
+			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);

@@ -18,18 +18,16 @@ import controller.Controller;
 import core.block.Block;
 
 // block.signature -> Height, (int)Weight
-public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>> 
+public class BlockSignsMap extends DBMap<byte[], Tuple2<Integer, Integer>> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
-	private Map<Integer,byte[]> heightIndex;
-	
+		
 	// for saving in DB
 	private Var<Long> fullWeightVar;
 	private Long fullWeight = 0l;
 	private int startedInForkHeight = 0;
 	
-	public HeightMap(DBSet databaseSet, DB database)
+	public BlockSignsMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
 		
@@ -41,26 +39,14 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 		//startedInForkHeight = 0;
 	}
 
-	public HeightMap(HeightMap parent) 
+	public BlockSignsMap(BlockSignsMap parent) 
 	{
 		super(parent, null);
 		fullWeight = parent.getFullWeight();
 		//startedInForkHeight
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void createIndexes(DB database){
-		this.heightIndex = database.createTreeMap("block_height_index").makeOrGet();
-		
-		Bind.secondaryKey((BTreeMap)this.map, heightIndex, new Fun.Function2<Integer, byte[], Tuple2<Integer, Integer>>() {
-			@Override
-			public Integer run(byte[] arg0, Tuple2<Integer, Integer> arg1) {
-				// TODO Auto-generated method stub
-				return arg1.a;
-			}
-		
-		});
-	}
+
+	protected void createIndexes(DB database){}
 
 	@Override
 	protected Map<byte[], Tuple2<Integer, Integer>> getMap(DB database) 
@@ -121,25 +107,6 @@ public class HeightMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 			return this.get(block.getSignature()).b;
 		return 0;
 	}
-	
-	public byte[] getBlockSignatureByHeight(int height)
-	{
-		/* 1 - not must be used here!
-		if (height == 1) {
-			// GENESIS BLOCK !
-			return Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
-		}
-		*/
-		
-		return heightIndex.get(height);
-	}
-	
-	/*
-	public void set(Block block, int height, int weight)
-	{
-		this.set(block.getSignature(), new Tuple2<Integer, Integer>(height, weight));
-	}
-	*/
 	
 	public boolean set(byte[] key, Tuple2<Integer, Integer> value)
 	{

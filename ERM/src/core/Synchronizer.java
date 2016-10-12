@@ -330,7 +330,7 @@ public class Synchronizer
 
 		
 		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
-		int maxChainHeight = dbSet.getHeightMap().getHeight(lastBlockSignature);
+		int maxChainHeight = dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
 		if (maxChainHeight < checkPointHeight)
 			maxChainHeight = checkPointHeight;
 
@@ -347,7 +347,7 @@ public class Synchronizer
 			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock();						
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
-			checkPointHeightSignature = dbSet.getHeightMap().getBlockSignatureByHeight(checkPointHeight);
+			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
 			checkPointHeightCommonBlock = this.getBlock(checkPointHeightSignature, peer);			
 		}
 
@@ -364,7 +364,7 @@ public class Synchronizer
 				maxChainHeight = checkPointHeight;
 				lastBlockSignature = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastBlockSignature = dbSet.getHeightMap().getBlockSignatureByHeight(maxChainHeight);				
+				lastBlockSignature = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
 			}
 				
 			headers = this.getBlockSignatures(lastBlockSignature, peer);

@@ -45,8 +45,6 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 	private NavigableSet recipientKey;
 	@SuppressWarnings("rawtypes")
 	private NavigableSet typeKey;
-	@SuppressWarnings("rawtypes")
-	private BTreeMap signatureKey;
 	
 	public TransactionFinalMap(DBSet databaseSet, DB database)
 	{
@@ -123,19 +121,6 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 				Tuple2<String, Integer>[] ret = (Tuple2<String, Integer>[]) Array.newInstance(Fun.Tuple2.class,recps.size());
 				ret = recps.toArray( ret );
 				return ret;
-			}
-		});
-
-		this.signatureKey = database.createTreeMap("signature_tx")
-				.comparator(Fun.BYTE_ARRAY_COMPARATOR)
-				.makeOrGet();
-
-		// find transactions by signature
-		Bind.secondaryKey((BTreeMap)map, this.signatureKey,
-				new Fun.Function2<byte[], Tuple2<Integer,Integer>, Transaction>(){
-			@Override
-			public byte[] run(Tuple2<Integer, Integer> key, Transaction val) {
-				return val.getSignature();
 			}
 		});
 
@@ -252,12 +237,6 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 		}
 		
 		return txs;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Tuple2<Integer, Integer> getTransactionBySignature(byte[] signature)
-	{
-		return (Tuple2<Integer, Integer>)signatureKey.get(signature);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

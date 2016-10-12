@@ -162,7 +162,8 @@ public abstract class Issue_ItemRecord extends Transaction
 		super.process(db, block, asPack);
 		
 		// SET REFERENCE if not setted before (in Imprint it setted)
-		if (this.item.getReference() == null) this.item.setReference(this.signature);
+		if (this.item.getReference() == null)
+			this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
 		this.item.insertToMap(db);
