@@ -138,7 +138,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getKey());
+				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
 				itemName = item.toString();
 			} else if ( transaction instanceof GenesisTransferAssetTransaction)
 			{
@@ -161,7 +161,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getKey());
+				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
 				itemName = item.toString();
 			} else {
 				itemName = transaction.viewItemName();
@@ -275,7 +275,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 						}
 						
 						SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().asPerson() + "\nTo: " + account.asPerson()
-						+ "\n" + "Asset Key" + ": " + r_Send.getKey()
+						+ "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
 						+ ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
 					}
 					
