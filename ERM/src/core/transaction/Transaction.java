@@ -189,6 +189,7 @@ public abstract class Transaction {
 	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
 	
 	// confirms other transactions
+	// NOT EDIT - fkr CONCORCIUM = 40 !!!
 	public static final int VOUCH_TRANSACTION = 40;
 
 	public static final int HASHES_RECORD = 41;

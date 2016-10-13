@@ -239,27 +239,27 @@ public class BlockChain
 		//CHECK IF NOT GENESIS
 		if(block instanceof GenesisBlock)
 		{
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> as GenesisBlock");
+			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> as GenesisBlock");
 			return 1;
 		}
 		
 		//CHECK IF SIGNATURE IS VALID
 		if(!block.isSignatureValid())
 		{
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> signature");
+			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> signature");
 			return 2;
 		}
 		
 		//CHECK IF WE KNOW THIS BLOCK
 		if(dbSet.getBlockMap().contains(block.getSignature()))
 		{
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> already in DB #" + block.getHeight(dbSet));
+			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> already in DB #" + block.getHeight(dbSet));
 			return 3;
 		}
 
 		Block lastBlock = this.getLastBlock();
 		if(!Arrays.equals(lastBlock.getSignature(), block.getReference())) {
-			LOGGER.error("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
+			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
 			return 4;
 		}
 		

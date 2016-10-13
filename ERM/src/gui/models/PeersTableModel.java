@@ -106,7 +106,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		
 		Peer peer = peers.get(row);
 		
-		if(DBSet.getInstance().isStoped())
+		if(peer == null || DBSet.getInstance().isStoped())
 			return null;
 			
 		PeerInfo peerInfo = DBSet.getInstance().getPeerMap().getInfo(peer.getAddress());

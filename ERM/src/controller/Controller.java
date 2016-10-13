@@ -982,7 +982,7 @@ public class Controller extends Observable {
 						this.network.broadcast(message, excludes);
 					}
 				} else {
-					LOGGER.error("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
+					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
 							+ " code: " + isNewWinBlockValid
 							+ " " + Base58.encode(newBlock.getSignature()));
