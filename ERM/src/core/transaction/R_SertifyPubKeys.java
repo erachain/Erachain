@@ -526,6 +526,9 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			if (BlockChain.START_LEVEL == 1)
+				issueFEE = issueFEE>>2;
+			
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs
@@ -612,6 +615,9 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			if (BlockChain.START_LEVEL == 1)
+				issueFEE = issueFEE>>2;
+
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs

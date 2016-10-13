@@ -1,6 +1,7 @@
 package gui.items.assets;
 
 import lang.Lang;
+import utils.Pair;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,7 +224,10 @@ public class ExchangeFrame extends JFrame
 				if(row > sellOrdersTableModel.orders.size())
 					return;
 				
-				Order order = sellOrdersTableModel.orders.get(row).getB();
+				Pair<BigInteger, Order> rowObj = sellOrdersTableModel.orders.get(row);
+				if (rowObj == null)
+					return;
+				Order order = rowObj.getB();
 				if (order == null)
 					return;
 
@@ -263,7 +268,10 @@ public class ExchangeFrame extends JFrame
 				if(row > buyOrdersTableModel.orders.size())
 					return;
 				
-				Order order = buyOrdersTableModel.orders.get(row).getB();
+				Pair<BigInteger, Order> rowObj = buyOrdersTableModel.orders.get(row);
+				if (rowObj == null)
+					return;
+				Order order = rowObj.getB();
 				if (order == null)
 					return;
 				
