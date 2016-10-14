@@ -89,20 +89,21 @@ public class KK_K_Map extends DBMap<
 		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
-		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
-		if (stack == null)
-			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
-		
-		stack.add(item);
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
 			// need for updates only in fork - not in parent DB
 			value_new = (TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>)value.clone();
 		}
+
+		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
+		if (stack == null)
+			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
+		
+		stack.add(item);
 		
 		value_new.put(itemKey, stack);
 		
@@ -127,19 +128,20 @@ public class KK_K_Map extends DBMap<
 		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
 
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
-		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
-		if (stack==null || stack.size() == 0) return;
-
-		stack.pop();
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
 			// need for updates only in fork - not in parent DB
 			value_new = (TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>)value.clone();
 		}
+
+		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
+		if (stack==null || stack.size() == 0) return;
+
+		stack.pop();
 
 		value_new.put(itemKey, stack);
 		this.set(key, value_new);

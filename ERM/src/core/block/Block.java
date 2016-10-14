@@ -795,6 +795,12 @@ public class Block {
 			return 1000;
 		}
 
+		if (this.generatingBalance == 0) {
+			// if it block not calculated before
+			this.setGeneratingBalance(dbSet);
+			LOGGER.error("block.generatingBalance == 0 in BLOCK:" + height);
+			this.generatingBalance = 77;
+		}
 		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}

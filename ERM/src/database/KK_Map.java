@@ -96,7 +96,17 @@ public Block getBlockByHeight(int parseInt) {
 	{
 
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
-		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
+		
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
+		if (false && this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		}
+
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
 		if (stack == null) {
 			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
 			stack.add(item);
@@ -124,16 +134,7 @@ public Block getBlockByHeight(int parseInt) {
 				stack.add(item);
 			}
 		}
-		
-		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (this.parent == null)
-			value_new = value;
-		else {
-			// !!!! NEEED .clone() !!!
-			// need for updates only in fork - not in parent DB
-			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
-		}
-		
+
 		value_new.put(itemKey, stack);
 		
 		this.set(key, value_new);
@@ -150,18 +151,19 @@ public Block getBlockByHeight(int parseInt) {
 	public void removeItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
-		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
-		if (stack==null || stack.size() == 0)
-			return;
-
-		stack.pop();
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
 			value_new = value;
 		else {
 			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
 		}
+
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
+		if (stack==null || stack.size() == 0)
+			return;
+
+		stack.pop();
 
 		value_new.put(itemKey, stack);
 		this.set(key, value_new);

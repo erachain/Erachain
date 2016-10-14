@@ -31,15 +31,9 @@ import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
-import database.SortableList;
 import database.TransactionFinalMap;
-import database.VouchRecordMap;
-import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
-import network.Peer;
-import utils.NumberAsString;
 import utils.ObserverMessage;
-import utils.Pair;
 
 public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
 
