@@ -70,20 +70,21 @@ public class PersonAddressMap extends DBMap<
 	public void addItem(Long person, String address, Tuple3<Integer, Integer, Integer> item)
 	{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
-		Stack<Tuple3<Integer, Integer, Integer>> stack = value.get(address);
-		if (stack == null)
-			stack = new Stack<Tuple3<Integer, Integer, Integer>>();
-		
-		stack.push(item);
 		
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
 			// need for updates only in fork - not in parent DB
 			value_new = (TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>)value.clone();
 		}
+
+		Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
+		if (stack == null)
+			stack = new Stack<Tuple3<Integer, Integer, Integer>>();
+		
+		stack.push(item);
 
 		value_new.put(address, stack);
 		
@@ -109,19 +110,20 @@ public class PersonAddressMap extends DBMap<
 	public void removeItem(Long person, String address)
 	{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
-		Stack<Tuple3<Integer, Integer, Integer>> stack = value.get(address);
-		if (stack==null || stack.size() == 0) return;
-
-		stack.pop();
 		
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
 			// need for updates only in fork - not in parent DB
 			value_new = (TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>)value.clone();
 		}
+
+		Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
+		if (stack==null || stack.size() == 0) return;
+
+		stack.pop();
 
 		value_new.put(address, stack);
 		

@@ -499,7 +499,7 @@ public class R_SertifyPubKeys extends Transaction {
 			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
 		} else {
 			blockIndex = block.getHeight(db);
-			if (blockIndex < 1 ) {
+			if (blockIndex < 2 ) {
 				// if block not is confirmed - get last block + 1
 				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
 			} else {
@@ -510,7 +510,8 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		boolean personalized = false;
 		for (Account pkAccount: this.sertifiedPublicKeys) {
-			if (pkAccount.getPersonDuration(db) != null) {
+			Tuple4<Long, Integer, Integer, Integer> info = pkAccount.getPersonDuration(db);
+			if (info!= null) {
 				personalized = true;
 				break;
 			}
@@ -532,8 +533,13 @@ public class R_SertifyPubKeys extends Transaction {
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs
-			this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-					.add(BlockChain.GIFTED_ERMO_AMOUNT), db);						
+			if (BlockChain.START_LEVEL == 1) {
+				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
+						.add(BlockChain.GIFTED_ERMO_AMOUNT), db);
+				// for forging set
+				this.creator.setLastForgingData(db, blockIndex);
+			}
+			
 			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
 					.subtract(issueFEE_BD), db);						
 			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
@@ -621,8 +627,13 @@ public class R_SertifyPubKeys extends Transaction {
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs
-			this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-					.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
+			if (BlockChain.START_LEVEL == 1) {
+				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
+						.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
+				// for forging restore
+				this.creator.setLastForgingData(db, this.creator.getForgingData(db, this.getBlockHeight(db)));
+			}
+			
 			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
 					.add(issueFEE_BD), db);						
 			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)

@@ -68,12 +68,14 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 	}
 	
 	///////////////////////////////
+	@SuppressWarnings("unchecked")
 	public void addItem(String address, Tuple4<Long, Integer, Integer, Integer> item)
 	{
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
+			// !!!! NEEED .clone() !!! TOO
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -92,13 +94,16 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		return value.size()>0? value.peek(): null;
 	}
+	
+	@SuppressWarnings("unchecked")
 	public void removeItem(String address)
 	{
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		if (value==null || value.size() == 0) return;
 
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-		if (this.parent == null)
+		if (false && this.parent == null)
+			// !!!! NEEED .clone() !!! TOO
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!

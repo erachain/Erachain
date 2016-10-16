@@ -56,19 +56,20 @@ public class Synchronizer
 			
 			//HEIGHT TO ROLL BACK
 	//		originalHeight = lastCommonBlock.getHeight();
-			int height_AT = (int)(Math.round( lastCommonBlock.getHeight(fork) /AT_Constants.STATE_STORE_DISTANCE))
+			int height_AT = lastCommonBlock.getHeight(fork);
+			if (USE_AT_ORPHAN) {
+				height_AT = (int)(Math.round( height_AT /AT_Constants.STATE_STORE_DISTANCE))
 					*AT_Constants.STATE_STORE_DISTANCE;
+			} 
 	
 			//GET LAST BLOCK
 			Block lastBlock = fork.getBlockMap().getLastBlock();
 			
 			int lastHeight = lastBlock.getHeight(fork);
-			/*
-			LOGGER.error("*** core.Synchronizer.checkNewBlocks - lastBlock["
+			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock["
 					+ lastHeight + "]"
 					+ " search common block in FORK"
 					+ " in mainDB: " + lastBlock.getHeight(fork.getParent()));
-					*/
 
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
@@ -81,11 +82,9 @@ public class Synchronizer
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 
-			/*
-			LOGGER.error("*** core.Synchronizer.checkNewBlocks - lastBlock["
+			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock["
 					+ lastHeight + "]"
 					+ " run AT_TRANSACTION in FORK");
-					*/
 
 			if (USE_AT_ORPHAN) {
 				// AT_TRANSACTION - not from GENESIS BLOCK
@@ -225,7 +224,7 @@ public class Synchronizer
 		Block common = dbSet.getBlockMap().get(signatures.a);
 		int commonBlockHeight = common.getHeight(dbSet);
 				
-		LOGGER.error("Synchronizing from COMMON blockHeight " + commonBlockHeight);
+		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
 		//CHECK COMMON BLOCK EXISTS
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
@@ -258,7 +257,7 @@ public class Synchronizer
 		{
 			
 			//GET THE BLOCKS FROM SIGNATURES
-			List<Block> blocks = this.getBlocks(signatures.b, peer);
+			List<Block> blocks = this.getBlocks(dbSet, signatures.b, peer);
 							
 			//SYNCHRONIZE BLOCKS
 			/*
@@ -334,7 +333,7 @@ public class Synchronizer
 		if (maxChainHeight < checkPointHeight)
 			maxChainHeight = checkPointHeight;
 
-		LOGGER.error("core.Synchronizer.findLastCommonBlock(Peer) for: "
+		LOGGER.info("core.Synchronizer.findLastCommonBlock(Peer) for: "
 				+ " getBlockMap().getLastBlock: " + maxChainHeight
 				+ "to minHeight: " + checkPointHeight);
 
@@ -387,14 +386,19 @@ public class Synchronizer
 		return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
 	}
 
-	private List<Block> getBlocks(List<byte[]> signatures, Peer peer) throws Exception {
+	private List<Block> getBlocks(DBSet dbSet, List<byte[]> signatures, Peer peer) throws Exception {
 		
 		List<Block> blocks = new ArrayList<Block>();
 		
 		for(byte[] signature: signatures)
 		{
 			//ADD TO LIST
-			blocks.add(this.getBlock(signature, peer));	
+			Block block = this.getBlock(signature, peer);
+			// NOE generating balance not was send by NET
+			// need to SET it!
+			block.setGeneratingBalance(dbSet);
+
+			blocks.add(block);	
 		}
 		
 		return blocks;
@@ -415,14 +419,15 @@ public class Synchronizer
 			throw new Exception("Peer timed out");
 		}
 		
+		Block block = response.getBlock();
 		//CHECK BLOCK SIGNATURE
-		if(!response.getBlock().isSignatureValid())
+		if(!block.isSignatureValid())
 		{
 			throw new Exception("*** Invalid block --signature");
 		}
 		
 		//ADD TO LIST
-		return response.getBlock();
+		return block;
 	}
 	
 	

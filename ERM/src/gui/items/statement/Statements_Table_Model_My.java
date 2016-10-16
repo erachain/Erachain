@@ -29,13 +29,8 @@ import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.Transaction;
 import database.DBSet;
-import database.SortableList;
-import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
-import network.Peer;
-import utils.NumberAsString;
 import utils.ObserverMessage;
-import utils.Pair;
 
 public class Statements_Table_Model_My extends AbstractTableModel implements Observer {
 

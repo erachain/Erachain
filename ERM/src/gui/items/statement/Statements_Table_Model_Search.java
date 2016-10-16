@@ -30,10 +30,7 @@ import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
-import gui.items.statement.Statements_Table_Model.MessageBuf;
 import lang.Lang;
-import network.Peer;
-import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 

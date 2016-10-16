@@ -115,13 +115,21 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
+		Peer peer = peers.get(row);
+		if  (peer == null)
+			return null;
+
+		Boolean peerStatus = peersStatus.get(row);
+		if  (peerStatus == null)
+			return null;
+
 		switch(column)
 		{
 			case COLUMN_ADDRESS:
-				return peers.get(row).getAddress().getHostAddress().toString();
+				return peer.getAddress().getHostAddress().toString();
 			
 			case COLUMN_CONNECTED:
-				return peersStatus.get(row);
+				return peersStatus;
 		}
 		
 		return null;

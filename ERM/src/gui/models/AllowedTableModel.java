@@ -121,6 +121,10 @@ public class AllowedTableModel extends AbstractTableModel implements Observer{
 			return null;
 		}
 		
+		Peer peer = peers.get(row);
+		if  (peer == null)
+			return null;
+		
 		return peers.get(row).getAddress().getHostAddress().toString();
 		
 	}
