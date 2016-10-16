@@ -25,6 +25,7 @@ public class BlockChain
 
 	public static final int START_LEVEL = 1;
 
+	//
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	public static final int TARGET_COUNT = 100;
 	public static final int REPEAT_WIN = 3;
