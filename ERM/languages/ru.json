@@ -1,4 +1,4 @@
-{
+﻿{
 	"_lang_name_":"Русский",
 	"_timestamp_of_translation_": "1459730776001",
 	" ( * optional field )":" ( * дополнительное поле )",
@@ -799,6 +799,7 @@
 	"Interface language": "Язык интерфейса",
 	"Submitting...": "Отправка...",
 	"Visual editor": "Визуальный редактор",
+	"Vouch": "Заверить",
 	"Preview": "Просмотр",
 	"Upload": "Загрузить",
 	"Upload File":"Загрузить файл",
