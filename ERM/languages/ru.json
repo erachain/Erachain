@@ -799,7 +799,6 @@
 	"Interface language": "Язык интерфейса",
 	"Submitting...": "Отправка...",
 	"Visual editor": "Визуальный редактор",
-	"Vouch": "Заверить",
 	"Preview": "Просмотр",
 	"Upload": "Загрузить",
 	"Upload File":"Загрузить файл",
@@ -807,5 +806,7 @@
 	"Create or update keys in namestorage": "Создать или обновить ключ в хранилище имён",
 	"Max Amount": "Максимальное Количество",
 	"Amount (Optional/Default 20)": "Количество (Опционально/По умолчанию 20)",
+	"Vouch":"Заверить",
+	"Vouching record":"Заверения",
 	"":""
 }
