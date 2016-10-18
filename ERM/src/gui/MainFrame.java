@@ -234,7 +234,7 @@ private JFrame parent;
 		
 		
 		JButton button8_MainToolBar = new JButton();
-		button8_MainToolBar.setText(Lang.getInstance().translate("Other"));
+		button8_MainToolBar.setText(Lang.getInstance().translate("DashBoard"));
 		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
 		button8_MainToolBar.setFocusable(false);
 		button8_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

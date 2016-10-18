@@ -146,6 +146,9 @@ public class Lang {
         	{
         		try {
         			JSONObject langFile = openLangFile(fileList.get(i));
+        			if (langFile.size() == 0)
+        				continue;
+        			
         			String lang_name = (String)langFile.get("_lang_name_");
         			long time_of_translation = Long.parseLong((String)langFile.get("_timestamp_of_translation_"));
         			lngList.add( new LangFile( lang_name, fileList.get(i), time_of_translation) );

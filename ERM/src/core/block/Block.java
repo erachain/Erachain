@@ -730,7 +730,7 @@ public class Block {
 		if (len < 1)
 			return 1;
 			
-		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / generatingBalance;
+		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance + 1 );
 		
 		if (times < 100) {
 			if (len > times * 7)
@@ -797,7 +797,7 @@ public class Block {
 
 		if (this.generatingBalance == 0) {
 			// if it block not calculated before
-			this.setGeneratingBalance(dbSet);
+			//this.setGeneratingBalance(dbSet);
 			LOGGER.error("block.generatingBalance == 0 in BLOCK:" + height);
 			this.generatingBalance = 77;
 		}
@@ -1146,6 +1146,10 @@ public class Block {
 	// TODO - make it trownable
 	public void process(DBSet dbSet)
 	{	
+		
+		// if R_SertifyPubKeys change ERMO
+		this.setGeneratingBalance(dbSet);
+
 		//PROCESS TRANSACTIONS
 		for(Transaction transaction: this.getTransactions())
 		{
@@ -1225,9 +1229,6 @@ public class Block {
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
 		
-		// if R_SertifyPubKeys change ERMO
-		this.setGeneratingBalance(dbSet);
-
 	}
 
 	public void orphan(DBSet dbSet)
@@ -1332,9 +1333,6 @@ public class Block {
 		if (height == 13311 || height == 13411 || height == 13477) {
 			genBal = this.calcGeneratingBalance(dbSet);
 		}
-		
-		// if R_SertifyPubKeys change ERMO
-		this.setGeneratingBalance(dbSet);
 
 		this.height_process = -1;
 
