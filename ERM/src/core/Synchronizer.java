@@ -230,6 +230,10 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
+			if (signatures.b.size() == 0) {
+				// 
+				dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
 			//CREATE BLOCK BUFFER
@@ -378,8 +382,10 @@ public class Synchronizer
 		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignature = headers.remove(0);
 		}
-		if (headers.isEmpty()) {				
-			throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
+		if (headers.isEmpty()) {
+			if (false) {
+				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
+			}
 		}
 
 		
