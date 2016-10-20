@@ -1,4 +1,4 @@
-﻿{
+{
 	"_lang_name_":"Русский",
 	"_timestamp_of_translation_": "1459730776001",
 	" ( * optional field )":" ( * дополнительное поле )",
@@ -313,7 +313,6 @@
 	"Issue Person":"Создать персону",
 	"Issue Statement":"Создать Заявление",
 	"Issue Template":"Создать Шаблон",
-	"Issue Voting":"Создать Голосование",
 	"Issue Union":"Создать Объединение",
 	"Imprint issue has been sent!":"Выпуск Отпечатка заявлен!",
 	"I Owner":"Я Собственник",
@@ -363,7 +362,6 @@
 	"My Statuses":"Мной Созданные Статусы",
 	"My Transactions":"Мои Транзакции",
 	"My Votes":"Мои Голоса",
-	"My Votings":"Мои Голосования",
 	"My Unions":"Мои Объединения",
 	"name already exists":"Имя уже существует",
 	"name already for sale":"имя уже для продажи",
@@ -496,7 +494,6 @@
 	"Search Statements":"Поиск Заявления",
 	"Search Statuses":"Поиск Статуса",
 	"Search Templates":"Поиск шаблона",
-	"Search Votings":"Найти Голосование",
 	"Search Unions":"Поиск Объединения",
 	"Select pair":"Выбрать пару",
 	"Select Template":"Выберите Шаблон",
@@ -612,10 +609,9 @@
 	"Value":"Значение",
 	"Version: ":"Версия: ",
 	"Vote On Poll Transaction":"Транзакция Голосования в Опросе",
-	"Vote":"Голосовать",
+	"Vote":"Голосование",
 	"Voting will be enabled at ":"Голосование будет включено в ",
 	"Voting":"Голосование",
-	"Votings":"Голосования",
 	"Waiting...":"Подождите...",
 	"wallet already exists":"кошелек уже существует",
 	"Wallet dir:":"Папка кошелька",
@@ -643,7 +639,6 @@
 	"Work with Statements":"Работа с Заявлениями",
 	"Work with statuses":"Работа со Статусами",
 	"Work with Templates":"Работа с Шаблонами",
-	"Work with Votings":"Работа с Голосованиями",
 	"Work with Unions":"Работа с Объединениями",
 	"Write Hashs to BlockChain":"Запись Хэш в БлокЧайн",
 	"year":"год",
@@ -807,6 +802,15 @@
 	"Max Amount": "Максимальное Количество",
 	"Amount (Optional/Default 20)": "Количество (Опционально/По умолчанию 20)",
 	"Vouch":"Заверить",
-	"Vouching record":"Заверения",
+	"Vouch Record":"Заверение",
+	"Information about the record":"Данные о записи",
+	"Votings":"Опросы",
+	"My Votings":"Опросы",
+	"Search Votings":"Поиск Опросов",
+	"Issue Voting":"Создать Опрос",
+	"Work with Votings":"Работа с Опросами",
+	"DashBoard":"Обзор"	
+	"Network DashBoard":"Обзор Среды"	
+	"Network Port":"Порт Сети",
 	"":""
 }

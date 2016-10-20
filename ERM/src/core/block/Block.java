@@ -730,7 +730,10 @@ public class Block {
 		if (len < 1)
 			return 1;
 			
-		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance + 1 );
+		if (generatingBalance == 0) {
+			return 1;
+		}
+		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance );
 		
 		if (times < 100) {
 			if (len > times * 7)

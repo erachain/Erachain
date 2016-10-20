@@ -24,6 +24,7 @@ import gui.models.PeersTableModel;
 import gui.models.TransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import network.Network;
 
 public class Other_Internal_Frame extends Main_Internal_Frame {
 	
@@ -39,7 +40,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 	    Dimension size = MainFrame.desktopPane.getSize();
 	   
 		
-		this.setTitle(Lang.getInstance().translate("Other"));
+		this.setTitle(Lang.getInstance().translate("Network DashBoard"));
 		
 		other_Panel other_panel = new other_Panel();
 		
@@ -57,14 +58,8 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
         
         this.jToolBar.setVisible(false);
 		
- 
-        
-       
-        
-        
-     
 		
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Other"));
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Network Port") + ": " + Network.getNetworkPort());
 		
  // отключаем все что ниже  		
 		
