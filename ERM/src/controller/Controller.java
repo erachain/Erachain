@@ -154,9 +154,9 @@ public class Controller extends Observable {
 
 	public int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {
-			return Network.TESTNET_PORT;
+			return BlockChain.TESTNET_PORT;
 		} else {
-			return Network.MAINNET_PORT;
+			return BlockChain.MAINNET_PORT;
 		}
 	}
 	
@@ -1667,7 +1667,7 @@ public class Controller extends Observable {
 	}
 
 	public long getNextBlockGeneratingBalance(Block block) {
-		return block.getGeneratingBalance();
+		return block.getGeneratingBalance(this.dbSet);
 	}
 	public long getNextBlockGeneratingBalance() {
 		Block block = this.dbSet.getBlockMap().getLastBlock();

@@ -11,6 +11,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import core.BlockChain;
 import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
@@ -59,7 +60,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
         this.jToolBar.setVisible(false);
 		
 		
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Network Port") + ": " + Network.getNetworkPort());
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort());
 		
  // отключаем все что ниже  		
 		

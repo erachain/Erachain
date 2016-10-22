@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 
 
 import controller.Controller;
+import core.BlockChain;
 import lang.Lang;
 import network.message.FindMyselfMessage;
 import network.message.Message;
@@ -24,8 +25,6 @@ import utils.ObserverMessage;
 
 public class Network extends Observable implements ConnectionCallback {
 
-	public static final int MAINNET_PORT = 9181;
-	public static final int TESTNET_PORT = 4909;
 	
 	private static final int MAX_HANDLED_MESSAGES_SIZE = 10000;
 	
@@ -60,14 +59,7 @@ public class Network extends Observable implements ConnectionCallback {
 		acceptor = new ConnectionAcceptor(this);
 		acceptor.start();
 	}
-	public static int getNetworkPort() {
-		if(Settings.getInstance().isTestnet()) {
-			return Network.TESTNET_PORT;
-		} else {
-			return Network.MAINNET_PORT;
-		}
-	}
-
+	
 	@Override
 	public void onConnect(Peer peer) {
 		

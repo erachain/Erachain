@@ -1582,18 +1582,17 @@ public class Wallet extends Observable implements Observer
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 
 			// GIFTs
 			if(this.accountExists(creator.getAddress()))
 			{
-				this.database.getAccountMap().update(creator, RIGHTS_KEY,
-						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(BlockChain.GIFTED_ERMO_AMOUNT));
-				this.database.getAccountMap().update(creator, RIGHTS_KEY,
-						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(issueFEE_BD));
+				this.database.getAccountMap().update(creator, FEE_KEY,
+						this.getUnconfirmedBalance(creator, FEE_KEY).subtract(issueGIFT_FEE_BD));
 			}
 			
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
-			if(this.accountExists(creator.getAddress())) 
+			if(this.accountExists(pkAccount.getAddress())) 
 			{
 				this.database.getAccountMap().update(pkAccount, FEE_KEY,
 						this.getUnconfirmedBalance(pkAccount, FEE_KEY).add(issueFEE_BD));
@@ -1633,14 +1632,13 @@ public class Wallet extends Observable implements Observer
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 
 			// GIFTs
 			if(this.accountExists(creator.getAddress()))
 			{
-				this.database.getAccountMap().update(creator, RIGHTS_KEY,
-						this.getUnconfirmedBalance(creator, RIGHTS_KEY).subtract(BlockChain.GIFTED_ERMO_AMOUNT));
-				this.database.getAccountMap().update(creator, RIGHTS_KEY,
-						this.getUnconfirmedBalance(creator, RIGHTS_KEY).add(issueFEE_BD));
+				this.database.getAccountMap().update(creator, FEE_KEY,
+						this.getUnconfirmedBalance(creator, FEE_KEY).add(issueGIFT_FEE_BD));
 			}
 			
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);

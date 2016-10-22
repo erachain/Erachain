@@ -73,9 +73,10 @@ public class GenesisBlock extends Block{
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, genesisGenerator, Settings.GENERAL_ERMO_BALANCE, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, genesisGenerator, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
+		this.generatingBalance = Settings.GENERAL_ERMO_BALANCE;
 		
 		Account recipient;
 		BigDecimal bdAmount0;

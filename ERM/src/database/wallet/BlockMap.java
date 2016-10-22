@@ -101,7 +101,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Tuple2<String, String>, Block>() {
 		   	@Override
 		    public Integer run(Tuple2<String, String> key, Block value) {
-		   		return value.getGeneratingBalance();
+		   		return value.getGeneratingBalance(DBSet.getInstance());
 		    }
 		});
 		

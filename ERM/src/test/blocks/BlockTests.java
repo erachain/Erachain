@@ -163,7 +163,7 @@ public class BlockTests
 		assertEquals(true, Arrays.equals(gb.getSignature(), parsedBlock.getSignature()));
 				
 		//CHECK BASE TARGET
-		assertEquals(gb.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
+		assertEquals(gb.getGeneratingBalance(db), parsedBlock.getGeneratingBalance(db));	
 		
 		//CHECK FEE
 		assertEquals(gb.getTotalFee(), parsedBlock.getTotalFee());	
@@ -476,7 +476,7 @@ public class BlockTests
 			assertEquals(block.getCreator().getAddress(), parsedBlock.getCreator().getAddress());	
 					
 			//CHECK BASE TARGET
-			assertEquals(block.getGeneratingBalance(), parsedBlock.getGeneratingBalance());	
+			assertEquals(block.getGeneratingBalance(db), parsedBlock.getGeneratingBalance(db));	
 			
 			//CHECK FEE
 			assertEquals(block.getTotalFee(), parsedBlock.getTotalFee());	
@@ -561,7 +561,7 @@ public class BlockTests
 		block.setTransactions(transactions);
 
 		generator.setLastForgingData(db, block.getHeightByParent(db));
-		block.setGeneratingBalance(db);
+		block.getGeneratingBalance(db);
 		block.sign(generator);
 		
 		//CHECK VALID

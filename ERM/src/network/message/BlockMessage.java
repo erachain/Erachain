@@ -41,6 +41,7 @@ public class BlockMessage extends Message{
 		
 		//PARSE BLOCK
 		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1));
+		//block.getGeneratingBalance(dbSet);
 
 		//CREATE MESSAGE
 		BlockMessage message = new BlockMessage(block);

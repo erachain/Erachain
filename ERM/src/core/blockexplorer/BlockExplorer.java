@@ -1355,7 +1355,7 @@ public class BlockExplorer
 			blockJSON.put("height", counter);
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
 			blockJSON.put("generator", block.getCreator().getAddress());
-			blockJSON.put("generatingBalance", block.getGeneratingBalance());
+			blockJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
 			//blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
 			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
 			blockJSON.put("transactionCount", block.getTransactionCount());
@@ -2849,7 +2849,7 @@ public class BlockExplorer
 			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
 
-			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance());
+			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
 			//transactionDataJSON.put("atFees", block.getATfee().toPlainString());
 			transactionDataJSON.put("reference", Base58.encode(block.getReference()));
 			transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));

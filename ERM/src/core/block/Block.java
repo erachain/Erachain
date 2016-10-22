@@ -67,7 +67,9 @@ public class Block {
 	private static final int TRANSACTIONS_COUNT_LENGTH = 4;
 	private static final int TRANSACTION_SIZE_LENGTH = 4;
 	public static final int AT_BYTES_LENGTH = 4;
-	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + GENERATING_BALANCE_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
+	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
+			//+ GENERATING_BALANCE_LENGTH
+			+ TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
@@ -93,6 +95,7 @@ public class Block {
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
+	/*
 	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] transactionsHash, byte[] atBytes)
 	{
 		this.version = version;
@@ -107,11 +110,26 @@ public class Block {
 		this.atBytes = atBytes;
 
 	}
+	*/
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
+	{
+		this.version = version;
+		this.reference = reference;
+		this.creator = creator;
+
+		this.transactionsHash = transactionsHash;
+
+		this.transactionCount = 0;
+		this.atBytes = atBytes;
+		
+		//this.setGeneratingBalance(dbSet);
+
+	}
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] signature, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes, byte[] signature)
 	{
-		this(version, reference, creator, generatingBalance, transactionsHash, atBytes);
+		this(version, reference, creator, transactionsHash, atBytes);
 		this.signature = signature;
 	}
 
@@ -174,15 +192,14 @@ public class Block {
 
 	// balance on creator account when making this block
 	// TODO isValid
-	public int getGeneratingBalance()
+	public int getGeneratingBalance(DBSet dbSet)
 	{
+		if (this.generatingBalance == 0) {
+			this.generatingBalance = this.calcGeneratingBalance(dbSet);			
+		}
 		return this.generatingBalance;
 	}
-	public void setGeneratingBalance(DBSet dbSet)
-	{
-		this.generatingBalance = this.calcGeneratingBalance(dbSet);
-	}
-	
+		
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
@@ -203,10 +220,11 @@ public class Block {
 			
 			for(Transaction transaction: txs)
 			{				
-				if (transaction instanceof R_SertifyPubKeys) {
-					amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
-					incomed_amount += amount;
-				} else if ( transaction.getKey() == Transaction.RIGHTS_KEY
+				if (false) {
+				//else if (false && transaction instanceof R_SertifyPubKeys) {
+				//	amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
+				//	incomed_amount += amount;
+				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY
 						&& transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
 					amount = (int)transaction.getAmount().longValue();
 					incomed_amount += amount;
@@ -218,7 +236,7 @@ public class Block {
 		return (int)creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
 	}
 	
-	public int calcGeneratingBalance(DBSet dbSet)
+	private int calcGeneratingBalance(DBSet dbSet)
 	{
 		 return calcGeneratingBalance(dbSet, this.creator, this.getHeightByParent(dbSet));
 	}
@@ -465,10 +483,12 @@ public class Block {
 		PublicKeyAccount generator = new PublicKeyAccount(generatorBytes);
 		position += CREATOR_LENGTH;
 
-		//READ GENERATING BALANCE
-		byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
-		int generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
-		position += GENERATING_BALANCE_LENGTH;
+		if (false) {
+			//READ GENERATING BALANCE
+			byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
+			int generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
+			position += GENERATING_BALANCE_LENGTH;
+		}
 
 		//READ TRANSACTION SIGNATURE
 		byte[] transactionsHash =  Arrays.copyOfRange(data, position, position + TRANSACTIONS_HASH_LENGTH);
@@ -495,14 +515,14 @@ public class Block {
 	
 			//long atFeesL = Longs.fromByteArray(atFees);
 
-			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, atBytes); //, atFeesL);
+			block = new Block(version, reference, generator, transactionsHash, atBytes, signature); //, atFeesL);
 		}
 		else
 		{
 			// GENESIS BLOCK version = 0
-			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, new byte[0]);
+			block = new Block(version, reference, generator, transactionsHash, new byte[0], signature);
 		}
-
+		
 		//READ TRANSACTIONS COUNT
 		byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
 		int transactionCount = Ints.fromByteArray(transactionCountBytes);
@@ -575,10 +595,12 @@ public class Block {
 		byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 
-		//WRITE GENERATING BALANCE
-		byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
-		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
-		data = Bytes.concat(data, generatingBalanceBytes);
+		if (false) {
+			//WRITE GENERATING BALANCE
+			byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
+			generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
+			data = Bytes.concat(data, generatingBalanceBytes);
+		}
 
 		//WRITE TRANSACTIONS HASH
 		data = Bytes.concat(data, this.transactionsHash);
@@ -778,7 +800,7 @@ public class Block {
 		else
 			win_value >>= 11;
 			*/
-		win_value >>= 10;
+		win_value >>= 8;
 		
 		return win_value;
 
@@ -788,24 +810,26 @@ public class Block {
 	{
 		if (this.version == 0) {
 			// GENESIS
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
 
 		int height = this.getHeightByParent(dbSet);
 		
 		if (this.creator == null) {
 			LOGGER.error("block.creator == null in BLOCK:" + height);
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
 
+		/*
 		if (this.generatingBalance == 0) {
 			// if it block not calculated before
 			//this.setGeneratingBalance(dbSet);
 			LOGGER.error("block.generatingBalance == 0 in BLOCK:" + height);
 			this.generatingBalance = 77;
 		}
+		*/
 		
-		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
+		return calcWinValue(dbSet, this.creator, height, this.getGeneratingBalance(dbSet));
 	}
 
 	public long getTarget(DBSet dbSet)
@@ -836,16 +860,17 @@ public class Block {
 	public int calcWinValueTargeted2(long win_value, long target)
 	{
 		
-		int koeff = 1024;
+		int max_targ = BlockChain.BASE_TARGET * 15;
+		int koeff = BlockChain.BASE_TARGET;
 		int result = 0;
-		while (koeff > 0 && result < 15000 && win_value > target<<1) {
-			result += 1000; 
+		while (koeff > 0 && result < max_targ && win_value > target<<1) {
+			result += BlockChain.BASE_TARGET; 
 			koeff >>=1;
 			target <<=1;
 		}
 		result += (int)(koeff * win_value / target);
-		if (result > 15000)
-			result = 15000;
+		if (result > max_targ)
+			result = max_targ;
 		
 		return result;
 		
@@ -856,12 +881,11 @@ public class Block {
 		
 		if (this.version == 0) {
 			// GENESIS - getBlockChain = null
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
-		//return (int)(1000 * win_value / target);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -1150,9 +1174,6 @@ public class Block {
 	public void process(DBSet dbSet)
 	{	
 		
-		// if R_SertifyPubKeys change ERMO
-		this.setGeneratingBalance(dbSet);
-
 		//PROCESS TRANSACTIONS
 		for(Transaction transaction: this.getTransactions())
 		{

@@ -33,7 +33,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
-	
+
+	public static final int MAX_IMAGE_LENGTH = 10249;
 	
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
@@ -75,9 +76,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) {
 			if (res == Transaction.NOT_ENOUGH_FEE) {
-				if (BlockChain.START_LEVEL == 0) {
-					return res;
-				}
+				return res;
 			}
 		}
 		
@@ -92,8 +91,11 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (person.getHairСolor().length() <1 || person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
 		//int ii = Math.abs(person.getHeight());
 		if (Math.abs(person.getHeight()) < 40) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		
+		if (person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
+		
 
-		if (BlockChain.START_LEVEL == 1) {
+		if (false) {
 			BigDecimal fee_balance = this.creator.getBalance(FEE_KEY, db);
 			if (fee_balance.compareTo(BigDecimal.ZERO) >= 0) {
 				// for start - may be 0
@@ -106,7 +108,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			if (!this.creator.isPerson(db)
 					// OR RIGHTS_KEY ENOUGHT
 					&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-							.compareTo(new BigDecimal(1000)) < 0)
+							.compareTo(BlockChain.PERSON_MIN_ERM_BALANCE) < 0)
 				
 					return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		}

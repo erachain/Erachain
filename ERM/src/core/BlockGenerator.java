@@ -430,7 +430,7 @@ public class BlockGenerator extends Thread implements Observer
 		//CREATE NEW BLOCK
 		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 				transactionsHash, atBytes);
-		newBlock.setGeneratingBalance(dbSet);
+		newBlock.getGeneratingBalance(dbSet);
 		newBlock.sign(account);
 		
 		return newBlock;

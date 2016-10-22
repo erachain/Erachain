@@ -112,7 +112,6 @@ public class Synchronizer
 				fork.getATMap().deleteAllAfterHeight( height_AT );
 				fork.getATStateMap().deleteStatesAfter( height_AT );
 			}
-			
 	
 		}
 		
@@ -230,8 +229,8 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
-			if (signatures.b.size() == 0) {
-				// 
+			if (false && signatures.b.size() == 0) {
+				// TODO it is because incorrect calculate WIN_TARGET value
 				dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
 			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
@@ -400,9 +399,9 @@ public class Synchronizer
 		{
 			//ADD TO LIST
 			Block block = this.getBlock(signature, peer);
-			// NOE generating balance not was send by NET
+			// NOW generating balance not was send by NET
 			// need to SET it!
-			block.setGeneratingBalance(dbSet);
+			block.getGeneratingBalance(dbSet);
 
 			blocks.add(block);	
 		}

@@ -465,18 +465,10 @@ public class R_SertifyPubKeys extends Transaction {
 		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
-				if (BlockChain.START_LEVEL == 1) {
-					//
-				} else {
-					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-						return Transaction.NOT_ENOUGH_RIGHTS;
-				}
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				if (BlockChain.START_LEVEL == 1) {
-					//
-				} else {
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
-				}
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 
 			}
 		
@@ -527,21 +519,16 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-			if (BlockChain.START_LEVEL == 1)
-				issueFEE = issueFEE>>2;
+			//if (true || BlockChain.START_LEVEL == 1)
+			//	issueFEE = issueFEE>>2;
 			
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs
-			if (BlockChain.START_LEVEL == 1) {
-				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-						.add(BlockChain.GIFTED_ERMO_AMOUNT), db);
-				// for forging set
-				this.creator.setLastForgingData(db, blockIndex);
-			}
 			
 			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.subtract(issueFEE_BD), db);						
+					.subtract(issueGIFT_FEE_BD), db);						
 			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
 					.add(issueFEE_BD), db);
 
@@ -621,21 +608,16 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-			if (BlockChain.START_LEVEL == 1)
-				issueFEE = issueFEE>>2;
+			//if (true || BlockChain.START_LEVEL == 1)
+			//	issueFEE = issueFEE>>2;
 
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs
-			if (BlockChain.START_LEVEL == 1) {
-				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-						.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
-				// for forging restore
-				this.creator.setLastForgingData(db, this.creator.getForgingData(db, this.getBlockHeight(db)));
-			}
 			
 			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.add(issueFEE_BD), db);						
+					.add(issueGIFT_FEE_BD), db);						
 			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
 					.subtract(issueFEE_BD), db);
 

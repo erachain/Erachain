@@ -23,11 +23,17 @@ import utils.Pair;
 public class BlockChain
 {
 
-	public static final int START_LEVEL = 1;
+	//public static final int START_LEVEL = 1;
+	
+	public static final int TESTNET_PORT = 9055;
+	public static final int MAINNET_PORT = 9056;
+	public static final int DEFAULT_WEB_PORT = 9057;
+	public static final int DEFAULT_RPC_PORT = 9058;
 
 	//
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	public static final int TARGET_COUNT = 100;
+	public static final int BASE_TARGET = 1024 * 8;
 	public static final int REPEAT_WIN = 3;
 	
 	public static final int GENESIS_WIN_VALUE = 1000;
@@ -43,9 +49,12 @@ public class BlockChain
 	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
 
+	// issue PORSON
+	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+
 	// GIFTS for R_SertifyPubKeys
-	public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
-	public static final int GIFTED_COMPU_AMOUNT = 90000 * FEE_PER_BYTE;
+	//public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
+	public static final int GIFTED_COMPU_AMOUNT = 10000 * FEE_PER_BYTE;
 	//public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
@@ -195,6 +204,15 @@ public class BlockChain
 		if (checkPoint > 1)
 			this.checkPoint = checkPoint;
 	}
+	
+	public static int getNetworkPort() {
+		if(Settings.getInstance().isTestnet()) {
+			return BlockChain.TESTNET_PORT;
+		} else {
+			return BlockChain.MAINNET_PORT;
+		}
+	}
+
 
 	public List<byte[]> getSignatures(byte[] parent) {
 		

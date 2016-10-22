@@ -40,6 +40,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
 import gui.transaction.OnDealClick;
@@ -263,7 +264,7 @@ public class IssuePersonPanel extends JPanel
 	       
 	       File file = new File(chooser.getSelectedFile().getPath());
 // если размер больше 30к то не вставляем	       
-	       if (file.length()>30000) {
+	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
 	    	   
 	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
 	    	   

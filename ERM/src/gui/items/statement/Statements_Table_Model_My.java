@@ -203,8 +203,14 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			//Transaction transaction = (R_SignNote)this.transactions.get(row);
 			
 			
+			if (this.transactions == null || this.transactions.size() == 0)
+				return null;
 			
-			R_SignNote record = (R_SignNote)this.transactions.get(row);
+			Transaction trans = this.transactions.get(row);
+			if (trans == null)
+				return null;
+			
+			R_SignNote record = (R_SignNote)trans;
 			
 			switch(column)
 			{
