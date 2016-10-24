@@ -60,7 +60,6 @@ public class BlockChain
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
-	private List<Block> lastBlocksForTarget;
 
 	
 	private Block waitWinBuffer;
@@ -360,10 +359,12 @@ public class BlockChain
 
 		Block last = dbSet.getBlockMap().getLastBlock();
 		
+		/*
 		if (this.lastBlocksForTarget != null
 				&& Arrays.equals(this.lastBlocksForTarget.get(0).getSignature(), last.getSignature())) {
 			return this.lastBlocksForTarget;
 		}
+		*/
 		
 		List<Block> list =  new ArrayList<Block>();
 

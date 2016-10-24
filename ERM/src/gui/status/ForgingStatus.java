@@ -54,8 +54,8 @@ public class ForgingStatus extends JLabel implements Observer {
 					long winBalance = 0;
 					Account winAccount = null;
 					BlockChain bchain = Controller.getInstance().getBlockChain();
-					int newHeight = bchain.getHeight() + 1;
-					long target = bchain.getTarget();
+					int newHeight = bchain.getHeight(DBSet.getInstance()) + 1;
+					long target = bchain.getTarget(DBSet.getInstance());
 					if (target == 0l)
 						target = 1000l;
 

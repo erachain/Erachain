@@ -114,7 +114,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 
 				if (row == 0) {
 					return block.getHeight(DBSet.getInstance())
-							+ " " + Controller.getInstance().getBlockChain().getFullWeight();
+							+ " " + Controller.getInstance().getBlockChain().getFullWeight(DBSet.getInstance());
 					
 				}
 				
