@@ -329,7 +329,7 @@ public class AddressesResource {
 		}
 
 		return "" + Block.calcGeneratingBalance(DBSet.getInstance(),
-				new Account(address), Controller.getInstance().getBlockChain().getHeight() );
+				new Account(address), Controller.getInstance().getBlockChain().getHeight(DBSet.getInstance()) );
 	}
 
 	@GET

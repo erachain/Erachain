@@ -265,7 +265,7 @@ public class BlockGenerator extends Thread implements Observer
 			}
 				
 			byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-			long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp();
+			long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp(dbSet);
 			
 			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 			if(this.solvingBlock == null
@@ -293,7 +293,7 @@ public class BlockGenerator extends Thread implements Observer
 				//this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
 				
 				
-				this.lastBlocksForTarget = bchain.getLastBlocksForTarget();
+				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dbSet);
 
 				//RESET BLOCKS
 				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
@@ -322,8 +322,8 @@ public class BlockGenerator extends Thread implements Observer
 				byte[] unconfirmedTransactionsHash = null;
 				long max_winned_value = 0;
 				long winned_value;				
-				int height = bchain.getHeight() + 1;
-				long target = bchain.getTarget();
+				int height = bchain.getHeight(dbSet) + 1;
+				long target = bchain.getTarget(dbSet);
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
@@ -404,7 +404,7 @@ public class BlockGenerator extends Thread implements Observer
 				
 				//PASS BLOCK TO CONTROLLER
 				///ctrl.newBlockGenerated(block);
-				if (bchain.setWaitWinBuffer(block)) {
+				if (bchain.setWaitWinBuffer(dbSet, block)) {
 					// need to BROADCAST
 					ctrl.broadcastWinBlock(block, null);
 				}

@@ -74,7 +74,7 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				if (Controller.getInstance().getBlockChain().getCheckPoint() > lastBlock.getParentHeight(fork)) {
+				if (Controller.getInstance().getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
 					throw new Exception("Dishonest peer by not valid lastCommonBlock["
 							+ lastCommonBlock.getHeight(fork) + "]");
 				}

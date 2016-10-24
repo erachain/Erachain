@@ -447,7 +447,7 @@ public abstract class TransactionAmount extends Transaction {
 			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight() + 2;
+			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 2;
 			this.recipient.setLastForgingData(db, blockHeight);
 		}
 	}
@@ -532,7 +532,7 @@ public abstract class TransactionAmount extends Transaction {
 		if (absKey == Transaction.RIGHTS_KEY) {
 			
 			// Parent BLOCK is still in MAP!
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight();
+			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
 				// if it is first payment ERMO - reset last forging BLOCK
 				//this.recipient.delForgingData(db, blockHeight);
