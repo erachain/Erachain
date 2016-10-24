@@ -783,16 +783,17 @@ public class Send_TableModel extends JTable implements Observer{
 					fontSize = " size='2'";
 				}
 				int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+				long key = this.getAssetKey();
 				
 				String send_type;
-				if (this.getAssetKey() < 0 && amo_sign > 0) {
+				if (key < 0) {
 					send_type = Lang.getInstance().translate("DEBT");
-				} else if (this.getAssetKey() > 0 && amo_sign < 0) {
-					send_type = Lang.getInstance().translate("HOLD");
-				} else if (this.getAssetKey() < 0 && amo_sign < 0) {
-					send_type = Lang.getInstance().translate("SPEND");
 				} else {
-					send_type = Lang.getInstance().translate("PAY");					
+					if (amo_sign < 0) {
+						send_type = Lang.getInstance().translate("HOLD");
+					} else {
+						send_type = Lang.getInstance().translate("PAY");
+					}
 				}
 				amountStr = "<font" + fontSize + ">" + send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "

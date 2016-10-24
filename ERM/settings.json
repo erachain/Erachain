@@ -1,3 +1,13 @@
 {
-	"lang":"en.json"
+	"weballowed":[
+		"127.0.0.1"
+	],
+	"lang":"en.json",
+	"rpcallowed":[
+		"127.0.0.1"
+	],
+	"webport":9080,
+	"knownpeers":[
+		
+	]
 }

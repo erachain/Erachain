@@ -284,7 +284,7 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = 0;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();
@@ -327,7 +327,8 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 		}
 
 		//CREATE TX MESSAGE
-		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+		result = Controller.getInstance().
+				r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
 				-key, BigDecimal.ZERO.subtract(amount).setScale(8),
 				messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);

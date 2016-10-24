@@ -11,6 +11,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,9 +161,11 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		}
         
 		if (r_Send.getAmount() != null) {
+			
+			String sendType = Lang.getInstance().translate(r_Send.viewSendType());
 			//LABEL AMOUNT
 			++labelGBC.gridy;
-			JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
+			JLabel amountLabel = new JLabel(sendType + ":");
 			this.add(amountLabel, labelGBC);
 					
 			//AMOUNT
@@ -177,7 +180,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			//detailGBC.gridy;
 			detailGBC.gridx = 3;
 			detailGBC.gridwidth = 1;
-			JTextField asset = new JTextField(Controller.getInstance().getAsset( r_Send.getKey()).toString());
+			JTextField asset = new JTextField(Controller.getInstance().getAsset( r_Send.getAbsKey()).toString());
 			asset.setEditable(false);
 			MenuPopupUtil.installContextMenu(asset);
 			this.add(asset, detailGBC);	

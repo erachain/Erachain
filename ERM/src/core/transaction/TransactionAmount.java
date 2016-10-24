@@ -1,6 +1,7 @@
 package core.transaction;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,6 +25,7 @@ import core.item.assets.AssetCls;
 import database.AddressForging;
 //import database.BalanceMap;
 import database.DBSet;
+import lang.Lang;
 import utils.NumberAsString;
 
 public abstract class TransactionAmount extends Transaction {
@@ -139,6 +141,21 @@ public abstract class TransactionAmount extends Transaction {
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 
+	public String viewSendType() {
+		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+		
+		if (this.key < 0) {
+			return "DEBT";
+		} else {
+			if (amo_sign < 0) {
+				return "HOLD";
+			} else { 
+				return "PAY";
+			}
+		}
+		// return "SPEND";
+	}
+
 	
 	//PARSE/CONVERT
 	//@Override
@@ -157,9 +174,8 @@ public abstract class TransactionAmount extends Transaction {
 			data = Bytes.concat(data, keyBytes);
 			
 			//WRITE AMOUNT
-			byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-			byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-			amountBytes = Bytes.concat(fill, amountBytes);
+			byte[] amountBytes = Longs.toByteArray(this.amount.unscaledValue().longValue());
+			amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
 			data = Bytes.concat(data, amountBytes);
 		}
 				
@@ -250,7 +266,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 				
 		if (this.amount != null) {
-			int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
+			int amount_sign = this.amount.signum();
 			if (amount_sign != 0) {
 
 				if(!asset.isDivisible())
