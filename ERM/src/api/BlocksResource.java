@@ -198,7 +198,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
-		long generatingBalance = Controller.getInstance().getNextBlockGeneratingBalance(block);
+		long generatingBalance = block.getGeneratingBalance(DBSet.getInstance());
 		return String.valueOf(generatingBalance);
 	}
 	

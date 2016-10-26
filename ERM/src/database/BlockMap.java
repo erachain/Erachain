@@ -141,7 +141,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		{
 			this.lastBlockVar.set(this.lastBlockSignature);
 		}
-						
+
 	}
 	
 	public Block getLastBlock()

@@ -40,7 +40,7 @@ public class BlockMessage extends Message{
 		int height = Ints.fromByteArray(heightBytes);
 		
 		//PARSE BLOCK
-		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1));
+		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
 		//block.getGeneratingBalance(dbSet);
 
 		//CREATE MESSAGE
@@ -58,7 +58,7 @@ public class BlockMessage extends Message{
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.block.toBytes(true);
+		byte[] blockBytes = this.block.toBytes(true, false);
 		data = Bytes.concat(data, blockBytes);
 		
 		//ADD CHECKSUM
@@ -69,7 +69,7 @@ public class BlockMessage extends Message{
 	
 	protected int getDataLength()
 	{
-		return HEIGHT_LENGTH + this.block.getDataLength();
+		return HEIGHT_LENGTH + this.block.getDataLength(false);
 	}
 	
 }

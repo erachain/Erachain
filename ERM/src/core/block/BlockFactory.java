@@ -21,10 +21,10 @@ public class BlockFactory {
 		
 	}
 	
-	public Block parse(byte[] data) throws Exception
+	public Block parse(byte[] data, boolean forDB) throws Exception
 	{
 		//PARSE BLOCK
-		return Block.parse(data);
+		return Block.parse(data, forDB);
 	}
 
 	// not signed and not getGeneratingBalance

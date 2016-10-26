@@ -41,7 +41,8 @@ public class BlockTests
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[Crypto.SIGNATURE_LENGTH];
 	long timestamp = NTP.getTime();
-	
+
+	boolean forDB = true;
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db = DBSet.createEmptyDatabaseSet();
 	private GenesisBlock gb = new GenesisBlock();
@@ -140,15 +141,15 @@ public class BlockTests
 		//gb.process();
 				
 		//CONVERT TO BYTES
-		byte[] rawBlock = gb.toBytes(true);
+		byte[] rawBlock = gb.toBytes(true, forDB);
 		//CHECK length
-		assertEquals(rawBlock.length, gb.getDataLength());
+		assertEquals(rawBlock.length, gb.getDataLength(forDB));
 			
 		Block parsedBlock = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			parsedBlock = BlockFactory.getInstance().parse(rawBlock);		
+			parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);		
 					
 		}
 		catch (Exception e) 
@@ -157,7 +158,7 @@ public class BlockTests
 		}
 		
 		//CHECK length
-		assertEquals(rawBlock.length, parsedBlock.getDataLength());
+		assertEquals(rawBlock.length, parsedBlock.getDataLength(forDB));
 
 		//CHECK SIGNATURE
 		assertEquals(true, Arrays.equals(gb.getSignature(), parsedBlock.getSignature()));
@@ -186,7 +187,7 @@ public class BlockTests
 		try 
 		{	
 			//PARSE FROM BYTES
-			BlockFactory.getInstance().parse(rawBlock);
+			BlockFactory.getInstance().parse(rawBlock, forDB);
 					
 			//FAIL
 			fail("this should throw an exception");
@@ -459,12 +460,12 @@ public class BlockTests
 		block.sign(generator);
 				
 		//CONVERT TO BYTES
-		byte[] rawBlock = block.toBytes(true);
+		byte[] rawBlock = block.toBytes(true, forDB);
 				
 		try 
 		{	
 			//PARSE FROM BYTES
-			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock);
+			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);
 					
 			//CHECK INSTANCE
 			assertEquals(false, parsedBlock instanceof GenesisBlock);
@@ -501,7 +502,7 @@ public class BlockTests
 		try 
 		{	
 			//PARSE FROM BYTES
-			BlockFactory.getInstance().parse(rawBlock);
+			BlockFactory.getInstance().parse(rawBlock, forDB);
 					
 			//FAIL
 			fail("this should throw an exception");
@@ -561,7 +562,7 @@ public class BlockTests
 		block.setTransactions(transactions);
 
 		generator.setLastForgingData(db, block.getHeightByParent(db));
-		block.getGeneratingBalance(db);
+		block.setCalcGeneratingBalance(db);
 		block.sign(generator);
 		
 		//CHECK VALID
@@ -573,7 +574,8 @@ public class BlockTests
 		
 		//CHECK BALANCE GENERATOR
 		assertEquals(generator.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(99990).setScale(8));
-		assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(900.00009482).setScale(8));
+		//assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(900.00009482).setScale(8));
+		assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(900.0000).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
 		assertEquals((long)generator.getLastReference(db), (long)payment2.getTimestamp());
@@ -593,7 +595,7 @@ public class BlockTests
 		assertNotEquals(recipient2.getLastReference(db), payment2.getTimestamp());
 		
 		//CHECK TOTAL FEE
-		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.00010000).setScale(8));
+		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.00020048).setScale(8));
 		
 		//CHECK TOTAL TRANSACTIONS
 		assertEquals(2, block.getTransactionCount());
@@ -623,7 +625,7 @@ public class BlockTests
 		assertEquals(true, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0)) == 0);
 				
 		//CHECK LAST REFERENCE RECIPIENT 2
-		assertEquals(recipient2.getLastReference(db), null);
+		assertEquals((long)recipient2.getLastReference(db), (long)0);
 		
 		//CHECK LAST BLOCK
 		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().getLastBlock().getSignature()));

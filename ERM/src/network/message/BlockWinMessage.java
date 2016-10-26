@@ -40,7 +40,7 @@ public class BlockWinMessage extends Message{
 		int height = Ints.fromByteArray(heightBytes);
 		
 		//PARSE BLOCK
-		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1));
+		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
 
 		//CREATE MESSAGE
 		BlockWinMessage message = new BlockWinMessage(block);
@@ -57,7 +57,7 @@ public class BlockWinMessage extends Message{
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.block.toBytes(true);
+		byte[] blockBytes = this.block.toBytes(true, false);
 		data = Bytes.concat(data, blockBytes);
 		
 		//ADD CHECKSUM
@@ -68,7 +68,7 @@ public class BlockWinMessage extends Message{
 	
 	protected int getDataLength()
 	{
-		return HEIGHT_LENGTH + this.block.getDataLength();
+		return HEIGHT_LENGTH + this.block.getDataLength(false);
 	}
 	
 }

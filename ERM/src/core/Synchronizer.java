@@ -401,7 +401,7 @@ public class Synchronizer
 			Block block = this.getBlock(signature, peer);
 			// NOW generating balance not was send by NET
 			// need to SET it!
-			block.getGeneratingBalance(dbSet);
+			block.setCalcGeneratingBalance(dbSet);
 
 			blocks.add(block);	
 		}
