@@ -28,6 +28,7 @@ public class DBSet implements Observer, IDB {
 	private BlockChain bchain;
 	
 	private AddressForging addressForging;
+	private Credit_AddressesMap credit_AddressesMap;
 	private ItemAssetBalanceMap assetBalanceMap;
 	private AddressStatement_Refs addressStatement_Refs;
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
@@ -136,6 +137,7 @@ public class DBSet implements Observer, IDB {
 			this.actions = 0;
 			
 			this.addressForging = new AddressForging(this, database);
+			this.credit_AddressesMap = new Credit_AddressesMap(this, database);
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
 			this.addressStatement_Refs = new AddressStatement_Refs(this, database);
 			this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
@@ -213,6 +215,7 @@ public class DBSet implements Observer, IDB {
 		this.bchain = parent.bchain;
 		
 		this.addressForging = new AddressForging(parent.addressForging);
+		this.credit_AddressesMap = new Credit_AddressesMap(parent.credit_AddressesMap);
 		this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
 		this.addressStatement_Refs = new AddressStatement_Refs(parent.addressStatement_Refs);
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
@@ -278,6 +281,7 @@ public class DBSet implements Observer, IDB {
 	public void reset() {
 		
 		this.addressForging.reset();
+		this.credit_AddressesMap.reset();
 		this.assetBalanceMap.reset();
 		this.addressStatement_Refs.reset();
 		this.assetBalanceAccountingMap.reset();
@@ -358,6 +362,11 @@ public class DBSet implements Observer, IDB {
 	{
 		return this.addressForging;
 	}
+	public Credit_AddressesMap getCredit_AddressesMap() 
+	{
+		return this.credit_AddressesMap;
+	}
+	
 	public ItemAssetBalanceMap getAssetBalanceMap() 
 	{
 		return this.assetBalanceMap;

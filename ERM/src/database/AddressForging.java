@@ -80,9 +80,6 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 	}	
 	public void setLast(String address, int previosHeight) 
 	{
-		if ("77tH5ZnvcrSL5a9AordMddVs61x5Pzfj9g" == address) {
-			assert(true);
-		}
 		this.set(new Tuple2<String, Integer>(address, 0), previosHeight);
 	}	
 }

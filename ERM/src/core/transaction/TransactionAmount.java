@@ -327,8 +327,20 @@ public abstract class TransactionAmount extends Transaction {
 					}
 				} else {
 					// DEBTs
+					// this.key < 0
 					if (amount_sign < 0) {
-						// confiscate DEBT
+						// confiscate CREDIT
+						
+						// is it DEBTOR mine?
+						Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+								this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+						BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
+						if (this.amount.abs().compareTo(creditAmount) > 0) {
+							// here amount is negative
+							return NO_DEBT_BALANCE;
+						}
+
+						// is it DEBTOR has need amount?
 						Tuple3<BigDecimal, BigDecimal, BigDecimal> debtorBalance = this.recipient.getBalance3(absKey, db);
 						//BigDecimal balanceUSE = balance.a.add(balance.b);
 						if (this.amount.abs().compareTo(debtorBalance.b) > 0) {
@@ -336,7 +348,12 @@ public abstract class TransactionAmount extends Transaction {
 							return NO_DEBT_BALANCE;
 						}
 					} else {
-						// give DEBT
+						// give CREDIT
+						if (balance.a.add(balance.b).compareTo(amount) < 0) {
+							// OWN + (-CREDIT)) = max amount that can be used for new credit
+							return NO_BALANCE;
+							
+						}
 						if (balanceUSE.compareTo(amount) < 0)
 						{
 							return NO_BALANCE;
@@ -425,6 +442,11 @@ public abstract class TransactionAmount extends Transaction {
 			this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
 					recipientBalance.a, recipientBalance.b.add(this.amount), recipientBalance.c),
 					db);
+
+			// add CREDIT to pair CREDITOR - DEBTOR
+			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			BigDecimal creditAmount = db.getCredit_AddressesMap().add(creditKey, this.amount);
 		}
 		
 		if (!asPack) {

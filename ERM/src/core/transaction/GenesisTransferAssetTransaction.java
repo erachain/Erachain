@@ -270,7 +270,11 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		}
 
 		if (key < 0) {
-			this.owner.setBalance(key, this.owner.getBalance(key, db).subtract(this.amount), db);			
+			// THIS is CREDIT
+			this.owner.setBalance(key, this.owner.getBalance(key, db).subtract(this.amount), db);
+			db.getCredit_AddressesMap().add(
+					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
+					this.amount);
 		}
 	}
 
@@ -292,6 +296,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 		if (key < 0) {
 			this.owner.setBalance(key, this.owner.getBalance(key, db).add(this.amount), db);			
+			db.getCredit_AddressesMap().sub(
+					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
+					this.amount);
 		}
 
 	}
