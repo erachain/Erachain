@@ -116,8 +116,8 @@ public class TestRecUnion {
 		//genesis_certify.process(db, false);
 		
 		certifier.setLastReference(gb.getTimestamp(db), db);
-		certifier.setBalance(ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE, db);
-		certifier.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		certifier.changeBalance(db, false, ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE);
+		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		union = new Union(certifier, "РСФСР", timestamp - 1234567,
 				parent + 1, icon, image, "Россия");
@@ -186,15 +186,15 @@ public class TestRecUnion {
 		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastReference(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK IF ISSUE UNION IS VALID
-		userAccount1.setBalance(ERM_KEY, IssueUnionRecord.MIN_ERM_BALANCE, db);
+		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.MIN_ERM_BALANCE);
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK 
-		userAccount1.setBalance(ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE, db);
+		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE);
 		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
 
 	}

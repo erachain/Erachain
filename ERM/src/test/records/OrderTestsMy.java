@@ -97,12 +97,12 @@ public class OrderTestsMy
 		
 		// FEE FUND
 		accountA.setLastReference(gb.getTimestamp(db), db);
-		accountA.setBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
-		accountA.setBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), db);
+		accountA.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 
 		accountB.setLastReference(gb.getTimestamp(db), db);
-		accountB.setBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
-		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(10).setScale(8), db);
+		accountB.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 
     	assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", false, 50000L, (byte)2, true);
 		issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
@@ -1348,7 +1348,7 @@ public class OrderTestsMy
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db), new byte[64]);
 		issueAssetTransaction.process(db, null, false);
 				
-		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, true);
@@ -1458,7 +1458,7 @@ public class OrderTestsMy
 				
 		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(dbSet, false);
-		accountB.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", false, 50000l, (byte) 8, true);
@@ -1596,7 +1596,7 @@ public class OrderTestsMy
 		//CREATE INVALID CANCEL ORDER NO BALANCE
 		DBSet fork = db.fork();
 		cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER, System.currentTimeMillis(), accountA.getLastReference(db), new byte[]{1,2});		
-		accountA.setBalance(FEE_KEY, BigDecimal.ZERO, fork);		
+		accountA.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO);		
 		
 		//CHECK IF CANCEL ORDER IS INVALID
 		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));

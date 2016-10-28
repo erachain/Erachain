@@ -131,8 +131,8 @@ public class TestRecPerson {
 		genesis_certify.process(db, gb, false);
 		
 		certifier.setLastReference(last_ref, db);
-		certifier.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), db);
-		certifier.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -209,7 +209,7 @@ public class TestRecPerson {
 		issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastReference(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
 
 	}
@@ -419,11 +419,11 @@ public class TestRecPerson {
 		personalizeRecord_0.calcFee();
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
-		userAccount1.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), db);
+		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
 		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();

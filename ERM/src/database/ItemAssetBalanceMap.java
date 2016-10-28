@@ -112,6 +112,9 @@ public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, Tuple3<BigD
 	
 	public void set(String address, long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> value)
 	{
+		if (key < 0)
+			key = -key;
+
 		this.set(new Tuple2<String, Long>(address, key), value);
 	}
 	
@@ -124,12 +127,18 @@ public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, Tuple3<BigD
 	
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> get(String address, long key)
 	{
+		if (key < 0)
+			key = -key;
+		
 		return this.get(new Tuple2<String, Long>(address, key));
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getBalancesSortableList(long key)
 	{
+		if (key < 0)
+			key = -key;
+		
 		//FILTER ALL KEYS
 		Collection<Tuple2<String, Long>> keys = ((BTreeMap<Tuple3, Tuple2<String, Long>>) this.assetKeyMap).subMap(
 				Fun.t3(key, null, null),

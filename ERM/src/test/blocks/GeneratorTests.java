@@ -581,8 +581,8 @@ public class GeneratorTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
-		generator.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
-		generator.setBalance(FEE_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
+		generator.changeBalance(dbSet, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
+		generator.changeBalance(dbSet, false, FEE_KEY, BigDecimal.valueOf(10000).setScale(8));
 
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator(false);
@@ -642,8 +642,8 @@ public class GeneratorTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastReference(genesisBlock.getTimestamp(dbSet), dbSet);
-		generator.setBalance(ERM_KEY, BigDecimal.valueOf(10000).setScale(8), dbSet);
-		generator.setBalance(FEE_KEY, BigDecimal.valueOf(100000).setScale(8), dbSet);
+		generator.changeBalance(dbSet, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
+		generator.changeBalance(dbSet, false, FEE_KEY, BigDecimal.valueOf(100000).setScale(8));
 
 				
 		//GENERATE NEXT BLOCK

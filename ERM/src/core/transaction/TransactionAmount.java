@@ -144,13 +144,17 @@ public abstract class TransactionAmount extends Transaction {
 	public String viewSendType() {
 		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
 		
-		if (this.key < 0) {
-			return "DEBT";
-		} else {
-			if (amo_sign < 0) {
-				return "HOLD";
+		if (this.key > 0) {
+			if (amo_sign > 0) {
+				return "PROPERTY";
 			} else { 
-				return "PAY";
+				return "HOLD";
+			}
+		} else {
+			if (amo_sign > 0) {
+				return "CREDIT";
+			} else { 
+				return "SPEND";
 			}
 		}
 		// return "SPEND";
@@ -279,7 +283,7 @@ public abstract class TransactionAmount extends Transaction {
 					}
 				}
 
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.creator.getBalance3(absKey, db);
+				Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.creator.getBalance(db, absKey);
 				BigDecimal balanceUSE = balance.a.add(balance.b);
 
 				if (this.key > 0) {
@@ -294,7 +298,7 @@ public abstract class TransactionAmount extends Transaction {
 							// If the holder does not have enough hold balance
 							return NO_HOLD_BALANCE;
 						}
-						if(this.creator.getBalance(FEE_KEY, db).compareTo( this.fee ) < 0)
+						if(this.creator.getBalance(db, FEE_KEY).a.compareTo( this.fee ) < 0)
 						{
 							return NOT_ENOUGH_FEE;
 						}
@@ -302,7 +306,7 @@ public abstract class TransactionAmount extends Transaction {
 						// common SEND
 						if (absKey != FEE_KEY) {
 							// CHECK FEE
-							if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
+							if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 							{
 								return NOT_ENOUGH_FEE;
 							}
@@ -341,7 +345,7 @@ public abstract class TransactionAmount extends Transaction {
 						}
 
 						// is it DEBTOR has need amount?
-						Tuple3<BigDecimal, BigDecimal, BigDecimal> debtorBalance = this.recipient.getBalance3(absKey, db);
+						Tuple3<BigDecimal, BigDecimal, BigDecimal> debtorBalance = this.recipient.getBalance(db, absKey);
 						//BigDecimal balanceUSE = balance.a.add(balance.b);
 						if (this.amount.abs().compareTo(debtorBalance.b) > 0) {
 							// here amount is negative
@@ -392,57 +396,15 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> creatorBalance = this.creator.getBalance3(absKey, db);
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> recipientBalance = this.recipient.getBalance3(absKey, db);
+		//Tuple3<BigDecimal, BigDecimal, BigDecimal> creatorBalance = this.creator.getBalance(db, absKey);
+		//Tuple3<BigDecimal, BigDecimal, BigDecimal> recipientBalance = this.recipient.getBalance(db, absKey);
 
-		if (this.key > 0) {
-			if (amount_sign > 0) {
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a.subtract(this.amount), creatorBalance.b, creatorBalance.c),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a.add(this.amount), recipientBalance.b, recipientBalance.c),
-						db);
-				
-				AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
-				if (asset.isMovable()) {
-					// MOVABLE
-					//UPDATE SENDER
-					this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							creatorBalance.a, creatorBalance.b, creatorBalance.c.add(this.amount)),
-							db);
-					//UPDATE RECIPIENT
-					this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							recipientBalance.a, recipientBalance.b, recipientBalance.c.subtract(this.amount)),
-							db);
-				}
-			} else {
-				// HOLD transfer
-				// here amount is negative
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a, creatorBalance.b, creatorBalance.c.add(this.amount)),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a, recipientBalance.b, recipientBalance.c.subtract(this.amount)),
-						db);
-			}
-		} else {
-			/////// DEBTs
-			// give DEBT
-			// or
-			// confiscate DEBT
-			this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					creatorBalance.a, creatorBalance.b.subtract(this.amount), creatorBalance.c),
-					db);
-			//UPDATE RECIPIENT
-			this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					recipientBalance.a, recipientBalance.b.add(this.amount), recipientBalance.c),
-					db);
+		//UPDATE SENDER
+		this.creator.changeBalance(db, true, key, this.amount);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, false, key, this.amount);
 
+		if (this.key < 0 && amount_sign > 0 ) {
 			// add CREDIT to pair CREDITOR - DEBTOR
 			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
 					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
@@ -487,58 +449,18 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> creatorBalance = this.creator.getBalance3(absKey, db);
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> recipientBalance = this.recipient.getBalance3(absKey, db);
+		//UPDATE SENDER
+		this.creator.changeBalance(db, false, key, this.amount);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, true, key, this.amount);
 
-		if (this.key > 0) {
-			if (amount_sign > 0) {
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a.add(this.amount), creatorBalance.b, creatorBalance.c),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a.subtract(this.amount), recipientBalance.b, recipientBalance.c),
-						db);
-				
-				AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
-				if (asset.isMovable()) {
-					// MOVABLE
-					//UPDATE SENDER
-					this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							creatorBalance.a, creatorBalance.b, creatorBalance.c.subtract(this.amount)),
-							db);
-					//UPDATE RECIPIENT
-					this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							recipientBalance.a, recipientBalance.b, recipientBalance.c.add(this.amount)),
-							db);
-				}
-			} else {
-				// HOLD transfer
-				// here amount is negative
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a, creatorBalance.b, creatorBalance.c.subtract(this.amount)),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a, recipientBalance.b, recipientBalance.c.add(this.amount)),
-						db);
-			}
-		} else {
-			/////// DEBTs
-			// give DEBT
-			// or
-			// confiscate DEBT
-			this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					creatorBalance.a, creatorBalance.b.add(this.amount), creatorBalance.c),
-					db);
-			//UPDATE RECIPIENT
-			this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					recipientBalance.a, recipientBalance.b.subtract(this.amount), recipientBalance.c),
-					db);
+		if (this.key < 0 && amount_sign > 0 ) {
+			// add CREDIT to pair CREDITOR - DEBTOR
+			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			BigDecimal creditAmount = db.getCredit_AddressesMap().sub(creditKey, this.amount);
 		}
-			
+
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT

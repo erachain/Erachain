@@ -401,14 +401,16 @@ public class DeployATTransaction extends Transaction
 	{
 		//UPDATE ISSUER
 		super.process(db, block, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, db).subtract(this.amount), db);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
+		this.creator.changeBalance(db, true, Transaction.FEE_KEY, this.amount);
 
 		//CREATE AT ID = ADDRESS
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 
 		Account atAccount = new Account(atId);
 	
-		atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
+		//atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
+		atAccount.changeBalance(db, false, Transaction.FEE_KEY, this.amount );
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		if( atAccount.getLastReference(db) == null)
@@ -464,14 +466,16 @@ public class DeployATTransaction extends Transaction
 
 		//UPDATE ISSUER
 		super.orphan(db, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, db).add(this.amount), db);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
+		this.creator.changeBalance(db, false, Transaction.FEE_KEY, this.amount);
 		
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 		
 		Account atAccount = new Account(atId);
 		
 		//UPDATE RECIPIENT
-		atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(Transaction.FEE_KEY, db).subtract(this.amount), db);
+		//atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
+		atAccount.changeBalance(db, true, Transaction.FEE_KEY, this.amount);
 			
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastReference(this.reference, db);

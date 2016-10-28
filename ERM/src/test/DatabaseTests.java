@@ -99,8 +99,8 @@ public class DatabaseTests {
 		genesis_certify.process(dbSet, gb, false);
 		
 		maker.setLastReference(last_ref, dbSet);
-		maker.setBalance(ERM_KEY, BigDecimal.valueOf(1000).setScale(8), dbSet);
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), dbSet);
+		maker.changeBalance(dbSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(dbSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,

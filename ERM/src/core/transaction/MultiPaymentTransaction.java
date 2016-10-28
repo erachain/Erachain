@@ -224,10 +224,11 @@ public class MultiPaymentTransaction extends Transaction {
 		
 		//REMOVE FEE
 		DBSet fork = db.fork();
-		this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, fork).subtract(this.fee), fork);
+		//this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
+		this.creator.changeBalance(fork, true, FEE_KEY, this.fee);
 		
 		//CHECK IF CREATOR HAS ENOUGH FEE BALANCE
-		if(this.creator.getBalance(FEE_KEY, fork).compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getBalance(fork, FEE_KEY).a.compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
 		}	
@@ -248,7 +249,7 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 			
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-			if(this.creator.getBalance(payment.getAsset(), fork).compareTo(payment.getAmount()) == -1)
+			if(this.creator.getBalance(fork, payment.getAsset()).a.compareTo(payment.getAmount()) == -1)
 			{
 				return NO_BALANCE;
 			}

@@ -70,8 +70,8 @@ public class TestRec_Send {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setBalance(ERMO_KEY, BigDecimal.valueOf(100).setScale(8), db);
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 	}
 
@@ -263,7 +263,7 @@ public class TestRec_Send {
 
 		// NEGATE for test HOLD ///////////////////
 		amount = amount.negate();
-		recipient.setBalance(-ERMO_KEY, amount.negate(), db);
+		recipient.changeBalance(db, false, -ERMO_KEY, amount.negate());
 		/// MESSAGE + AMOUNT
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -335,7 +335,7 @@ public class TestRec_Send {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.setBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8));
 		
 		List<Payment> payments = new ArrayList<Payment>();
 		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
@@ -413,7 +413,7 @@ public class TestRec_Send {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.setBalance(61l, BigDecimal.valueOf(1000).setScale(8), db);
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8));
 		
 		List<Payment> payments = new ArrayList<Payment>();
 				

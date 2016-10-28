@@ -96,7 +96,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		
 
 		if (false) {
-			BigDecimal fee_balance = this.creator.getBalance(FEE_KEY, db);
+			BigDecimal fee_balance = this.creator.getBalance(db, FEE_KEY).a;
 			if (fee_balance.compareTo(BigDecimal.ZERO) >= 0) {
 				// for start - may be 0
 				return VALIDATE_OK;				

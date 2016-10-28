@@ -68,8 +68,8 @@ public class TestRec_Vouch {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setBalance(ERMO_KEY, BigDecimal.valueOf(1000).setScale(8), db);
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 	}
 	

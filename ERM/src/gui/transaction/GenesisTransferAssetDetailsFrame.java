@@ -27,7 +27,30 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame
 	public GenesisTransferAssetDetailsFrame(GenesisTransferAssetTransaction assetTransfer)
 	{
 		super(assetTransfer);
-				
+
+		boolean isCredit = false;
+		if (assetTransfer.getOwner() != null) {
+			isCredit = true;
+			//LABEL OWNER
+			++labelGBC.gridy;
+			JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Creditor") + ":");
+			this.add(ownerLabel, labelGBC);
+			
+			//RECIPIENT
+			++detailGBC.gridy;
+			JTextField ownerFld = new JTextField(assetTransfer.getOwner().getAddress());
+			ownerFld.setEditable(false);
+			MenuPopupUtil.installContextMenu(ownerFld);
+			this.add(ownerFld, detailGBC);		
+			
+			String personOwnerStr = assetTransfer.getOwner().viewPerson();
+			if (personOwnerStr.length()>0) {
+				++labelGBC.gridy;
+				++detailGBC.gridy;
+				this.add(new JLabel(personOwnerStr), detailGBC);
+			}
+		}
+
 		//LABEL RECIPIENT
 		++labelGBC.gridy;
 		JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
@@ -62,7 +85,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame
 		
 		//LABEL AMOUNT
 		++labelGBC.gridy;
-		JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
+		JLabel amountLabel = new JLabel(Lang.getInstance().translate(isCredit?"Credit":"Amount") + ":");
 		this.add(amountLabel, labelGBC);
 				
 		//AMOUNT

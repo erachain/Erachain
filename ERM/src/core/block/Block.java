@@ -1142,14 +1142,15 @@ public class Block {
 				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
 				Account richAccount = new Account(rich);
 			
-				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
-						.subtract(bonus_fee), dbSet);
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).subtract(bonus_fee), dbSet);
+				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee);
+				
 			}
 		}
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
-				.add(blockFee), dbSet);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).add(blockFee), dbSet);
+		this.creator.changeBalance(dbSet, false, Transaction.FEE_KEY, blockFee);
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
@@ -1208,14 +1209,16 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				//recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(dbSet,  Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				recipient.changeBalance(dbSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ));
 				if ( recipient.getLastReference(dbSet) != null)
 				{
 					recipient.removeReference(dbSet);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			//sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(dbSet,  Transaction.FEE_KEY ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			sender.changeBalance(dbSet, false, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ) );
 
 		}
 
@@ -1235,15 +1238,15 @@ public class Block {
 				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
 
 				Account richAccount = new Account(rich);
-				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
-						.add(bonus_fee), dbSet);
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).add(bonus_fee), dbSet);
+				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee);
 				
 			}
 		}
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
-				.subtract(blockFee), dbSet);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).subtract(blockFee), dbSet);
+		this.creator.changeBalance(dbSet, true, Transaction.FEE_KEY, blockFee);
 
 		//DELETE AT TRANSACTIONS FROM DB
 		dbSet.getATTransactionMap().delete(height);

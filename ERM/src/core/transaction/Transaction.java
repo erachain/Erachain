@@ -813,7 +813,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
+		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -830,8 +830,8 @@ public abstract class Transaction {
 		// TODO if PERSON die - skip it steep
 		if (personDuration == null) {
 			// USE all GIFT for current ACCOUNT
-			creator.addBalanceOWN(FEE_KEY,
-					BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
+			//creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
 			return;
 		}
 		
@@ -849,8 +849,8 @@ public abstract class Transaction {
 			fee_gift_next = fee_gift - 1;
 		
 		int fee_gift_get =  fee_gift - fee_gift_next;
-		BigDecimal fee_gift_get_BD = BigDecimal.valueOf(asOrphan?-fee_gift_get:fee_gift_get, BlockChain.FEE_SCALE);		
-		invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
+		//invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
+		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE));
 		
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
 			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
@@ -867,8 +867,8 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-						.subtract(this.fee), db);
+				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(this.fee), db);
+				this.creator.changeBalance(db, true, FEE_KEY, this.fee);
 
 			}
 			
@@ -889,7 +889,8 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db).add(this.fee), db);
+				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).add(this.fee), db);
+				this.creator.changeBalance(db, false, FEE_KEY, this.fee);
 
 			}
 			

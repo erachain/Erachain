@@ -222,7 +222,7 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(Transaction.FEE_KEY, db).compareTo(this.nameSale.getAmount()) == -1)
+		if(this.creator.getBalance(db, Transaction.FEE_KEY).a.compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
 		}
@@ -257,11 +257,13 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
+		this.creator.changeBalance(db, true, Transaction.FEE_KEY, this.nameSale.getAmount());
 		
 		//UPDATE SELLER
 		Name name = this.nameSale.getName(db);
-		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		//this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
+		this.seller.changeBalance(db, false, Transaction.FEE_KEY, this.nameSale.getAmount());
 						
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		name = new Name(this.creator, name.getName(), name.getValue());
@@ -277,10 +279,12 @@ public class BuyNameTransaction extends Transaction
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, db).add(this.nameSale.getAmount()), db);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
+		this.creator.changeBalance(db, false, Transaction.FEE_KEY, this.nameSale.getAmount());
 		
 		//UPDATE SELLER
-		this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(Transaction.FEE_KEY, db).subtract(this.nameSale.getAmount()), db);
+		//this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
+		this.seller.changeBalance(db, true, Transaction.FEE_KEY, this.nameSale.getAmount());
 
 		//UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
 		Name name = this.nameSale.getName(db);

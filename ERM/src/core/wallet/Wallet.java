@@ -613,7 +613,7 @@ public class Wallet extends Observable implements Observer
 			for(Tuple2<Account, Long> account_asset: accounts_assets)
 			{
 				this.database.getAccountMap().update(
-						account_asset.a, account_asset.b, account_asset.a.getBalance3(account_asset.b));
+						account_asset.a, account_asset.b, account_asset.a.getBalance(account_asset.b));
 			}
 		}
 

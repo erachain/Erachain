@@ -527,10 +527,10 @@ public class R_SertifyPubKeys extends Transaction {
 		
 			// GIVE GIFTs
 			
-			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.subtract(issueGIFT_FEE_BD), db);						
-			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-					.add(issueFEE_BD), db);
+			//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(issueGIFT_FEE_BD), db);						
+			this.creator.changeBalance(db, true, FEE_KEY, issueGIFT_FEE_BD);
+			//pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(db, Transaction.FEE_KEY).add(issueFEE_BD), db);
+			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
 
 		}
 		
@@ -616,10 +616,10 @@ public class R_SertifyPubKeys extends Transaction {
 		
 			// GIVE GIFTs
 			
-			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.add(issueGIFT_FEE_BD), db);						
-			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-					.subtract(issueFEE_BD), db);
+			//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).add(issueGIFT_FEE_BD), db);
+			this.creator.changeBalance(db, false, FEE_KEY, issueGIFT_FEE_BD);
+			//pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(db, Transaction.FEE_KEY).subtract(issueFEE_BD), db);
+			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
 
 		}
 
