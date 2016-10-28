@@ -2071,6 +2071,14 @@ public class Controller extends Observable {
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}
+	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount sender,
+			int feePow, Account recipient, long key,BigDecimal amount,
+			byte[] isText, byte[] message, byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Send(version, sender, recipient,
+					key, amount, feePow, message, isText, encryptMessage);
+		}
+	}
 
 	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount sender,
 			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {

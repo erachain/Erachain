@@ -61,8 +61,8 @@ public class R_Send extends TransactionAmount {
 		this.signature = signature;
 	}
 	// FOR CONFISCATE CREDIT
-	public R_Send(byte vers, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-		this(new byte[]{TYPE_ID, vers, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+	public R_Send(byte version, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, version, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 	}
 	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);

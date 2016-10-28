@@ -328,8 +328,8 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().
-				r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
-				-key, BigDecimal.ZERO.subtract(amount).setScale(8),
+				r_Send((byte)1, Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+				-key, amount,
 				messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 		
