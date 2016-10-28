@@ -23,6 +23,9 @@ import database.DBSet;
 import utils.Converter;
 
 
+// typeBytes[1] (version) = 1 - CONFISCATE CREDIT
+// typeBytes[2] = -128 if NO AMOUNT
+// typeBytes[3] = -128 if NO DATA
 
 public class R_Send extends TransactionAmount {
 
@@ -40,7 +43,7 @@ public class R_Send extends TransactionAmount {
 
 		if (data == null || data.length == 0) {
 			// set version byte
-			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
+			typeBytes[3] = (byte)(typeBytes[3] | (byte)-128);
 		} else {
 			this.data = data;
 			this.encrypted = encrypted;
@@ -57,6 +60,10 @@ public class R_Send extends TransactionAmount {
 		this(typeBytes, creator, (byte)0, recipient, key, amount, data, isText, encrypted, 0l, reference);
 		this.signature = signature;
 	}
+	// FOR CONFISCATE CREDIT
+	public R_Send(byte vers, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, vers, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
+	}
 	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, data, isText, encrypted, timestamp, reference);
 	}
@@ -71,7 +78,7 @@ public class R_Send extends TransactionAmount {
 	////////////////////////// SHOR -text DATA
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
-		typeBytes[2] = (byte)(typeBytes[2] & (byte)128);
+		typeBytes[3] = (byte)(typeBytes[3] & (byte)128);
 	}
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, timestamp, reference);
@@ -207,7 +214,7 @@ public class R_Send extends TransactionAmount {
 		
 		long key = 0;
 		BigDecimal amount = null;
-		if (typeBytes[1] >= 0) {
+		if (typeBytes[2] >= 0) {
 			// IF here is AMOUNT
 			
 			//READ KEY
@@ -225,7 +232,7 @@ public class R_Send extends TransactionAmount {
 		byte[] arbitraryData = null;
 		byte[] encryptedByte = null;
 		byte[] isTextByte = null;
-		if (typeBytes[2] >= 0) {
+		if (typeBytes[3] >= 0) {
 			// IF here is DATA
 
 			//READ DATA SIZE
@@ -277,7 +284,7 @@ public class R_Send extends TransactionAmount {
 
 	@Override
 	public int getDataLength(boolean asPack) {
-		if (this.typeBytes[2] >= 0)
+		if (this.typeBytes[3] >= 0)
 			return super.getDataLength(asPack) + BASE_LENGTH + this.data.length;
 		else 
 			return super.getDataLength(asPack);

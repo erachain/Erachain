@@ -196,16 +196,28 @@ public class Account {
 			
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
-
-	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DBSet db, boolean subtract, long key, BigDecimal amount) 
+	
+	public BigDecimal getBalance(DBSet db, long key, int actionType)
 	{
-		
+		if (key < 0)
+			key = -key;
+			
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		if (actionType == 1)
+			return balance.a;
+		else if (actionType == 2)
+			return balance.b;
+		else if (actionType == 3)
+			return balance.c;
+		else
+			return balance.a;
+
+	}
+
+	public static int actionType(long key, BigDecimal amount) {
 		int type;
-		long absKey;
 		int amount_sign = amount.signum();
 		if (key > 0) {
-			absKey = key;
 			if (amount_sign > 0) {
 				// SEND 
 				type = 1;
@@ -214,7 +226,6 @@ public class Account {
 				type = 3;
 			}
 		} else {
-			absKey = -key;
 			if (amount_sign > 0) {
 				// give CREDIT or BORROW CREDIT
 				type = 2;
@@ -222,6 +233,22 @@ public class Account {
 				// PRODUCE or SPEND 
 				type = 4;				
 			}
+		}
+		
+		return type;
+		
+	}
+	
+	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DBSet db, boolean subtract, long key, BigDecimal amount) 
+	{
+		
+		int type = actionType(key, amount);
+		long absKey;
+		if (key > 0) {
+			absKey = key;
+		} else {
+			absKey = -key;
 		}
 
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), absKey);
