@@ -333,8 +333,9 @@ public class Synchronizer
 		
 		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
 		int maxChainHeight = dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
-		if (maxChainHeight < checkPointHeight)
+		if (maxChainHeight < checkPointHeight) {
 			maxChainHeight = checkPointHeight;
+		}
 
 		LOGGER.info("core.Synchronizer.findLastCommonBlock(Peer) for: "
 				+ " getBlockMap().getLastBlock: " + maxChainHeight
@@ -382,7 +383,7 @@ public class Synchronizer
 			lastBlockSignature = headers.remove(0);
 		}
 		if (headers.isEmpty()) {
-			if (false) {
+			if (true) {
 				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
 			}
 		}
