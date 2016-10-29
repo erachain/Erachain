@@ -173,7 +173,9 @@ public class IssuePersonPanel extends JPanel
 		    }
 		});
  // add icin
-        iconButton.setText(Lang.getInstance().translate("Add Image")+ "...");
+        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH >>1))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
         iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         iconButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);

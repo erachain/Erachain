@@ -25,7 +25,7 @@
 	"Add Favorite":"Добавить в избранное",
 	"Add new address:":"Добавить новый Адрес",
 	"Add":"Добавить",
-	"Add Image":"Вставить Изображение",
+	"Add Image (%1% - %2% bytes)":"Вставить Изображение (%1% - %2% байт)",
 	"address does not exist in wallet":"Адрес не найден в кошельке",
 	"Address:":"Адрес",
 	"Address":"Адрес",

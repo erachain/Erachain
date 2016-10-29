@@ -257,8 +257,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 
 		long key = this.key;
+
 		//UPDATE RECIPIENT OWN or RENT
-		//this.recipient.setBalance(key, this.recipient.getBalance(db, key).add(this.amount), db);
 		this.recipient.changeBalance(db, false, key, this.amount);
 		
 		//UPDATE REFERENCE OF RECIPIENT
@@ -277,6 +277,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			db.getCredit_AddressesMap().add(
 					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
 					this.amount);
+		} else {
+			// CREATOR update
+			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount);			
 		}
 	}
 
@@ -303,6 +306,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			db.getCredit_AddressesMap().sub(
 					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
 					this.amount);
+		} else {
+			// CREATOR update
+			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);			
 		}
 
 	}

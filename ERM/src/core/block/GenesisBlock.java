@@ -68,13 +68,13 @@ public class GenesisBlock extends Block{
 	AssetVenture asset0;
 	AssetVenture asset1;
 	List<Transaction> transactions = new ArrayList<Transaction>();
-	private static PublicKeyAccount genesisGenerator = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
+	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 
 
 	public GenesisBlock()
 	{
 		//SET HEADER
-		super(genesisVersion, genesisReference, genesisGenerator, new byte[0], new byte[0]);
+		super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		this.generatingBalance = Settings.GENERAL_ERMO_BALANCE;
@@ -99,7 +99,7 @@ public class GenesisBlock extends Block{
 
 			this.testnetInfo += "\ngenesisSeed: " + Base58.encode(seed);
 			
-			bdAmount0 = new BigDecimal(asset0.getQuantity() * 0.1).setScale(8);
+			bdAmount0 = new BigDecimal(GENESIS_GENERATING_BALANCE * 0.1).setScale(8);
 			bdAmount1 = new BigDecimal(asset1.getQuantity() * 0.1).setScale(8);
 			for(int nonce=0; nonce<3; nonce++)
 		    {
@@ -247,7 +247,7 @@ public class GenesisBlock extends Block{
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-"))
 					);
 			List<PersonCls> personGenesisUsers = Arrays.asList(
-					new PersonHuman(genesisGenerator,
+					new PersonHuman(CREATOR,
 							"Менделеев, Дмитрий Иванович", "1834-02-08", "1907-02-02",
 							(byte)1, "европеец-славянин", (float)58.195278, (float)68.258056,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 180, icon, image, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
@@ -306,13 +306,13 @@ public class GenesisBlock extends Block{
 			float majorPick = (float)0.1;
 			float minorPick = (float)0.001;
 			float investorPick = (float)0.005;
-			double generalKoeff0 = (1.0 - majorPick - minorPick) * asset0.getQuantity() / generalPicked;
+			double generalKoeff0 = (1.0 - majorPick - minorPick) * GENESIS_GENERATING_BALANCE / generalPicked;
 			double generalKoeff1 = asset1.getQuantity() / generalPicked;
-			double majorKoeff = majorPick * asset0.getQuantity() / majorPicked;
-			double minorKoeff = minorPick * asset0.getQuantity() / minorPicked;
-			double investorKoeff = investorPick * asset0.getQuantity() / investorPicked;
-			double debtorKoeff = 0.8 * asset0.getQuantity() / debtorPicked;
-			BigDecimal limitOwned = new BigDecimal( 0.001 * asset0.getQuantity()).setScale(8);
+			double majorKoeff = majorPick * GENESIS_GENERATING_BALANCE / majorPicked;
+			double minorKoeff = minorPick * GENESIS_GENERATING_BALANCE / minorPicked;
+			double investorKoeff = investorPick * GENESIS_GENERATING_BALANCE / investorPicked;
+			double debtorKoeff = 0.8 * GENESIS_GENERATING_BALANCE / debtorPicked;
+			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
 			
 			//long i = 0;
 			int pick;
@@ -508,15 +508,16 @@ public class GenesisBlock extends Block{
 		switch((int)key)
 		{
 		case (int)AssetCls.FEE_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, false, 1000L, (byte)8, true);
+			return new AssetVenture(CREATOR, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, false, 0L, (byte)8, true);
+			return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0L, (byte)8, true);
+			return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.DEAL_KEY:
-			return new AssetVenture(genesisGenerator, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0L, (byte)8, true);
+			return new AssetVenture(CREATOR, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0l, (byte)8, true);
 		}
-		return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
+		//return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
+		return new AssetVenture(CREATOR, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, 0l, (byte)0, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 
@@ -524,29 +525,29 @@ public class GenesisBlock extends Block{
 		switch(key)
 		{
 		case (int)NoteCls.EMPTY_KEY:
-			return new Note(genesisGenerator, "empty", icon, image, "empty");
+			return new Note(CREATOR, "empty", icon, image, "empty");
 		case (int)NoteCls.ESTABLISH_UNION_KEY:
-			return new Note(genesisGenerator, "Establish the Union", icon, image, "Union name \"%Company Name%\" in country \"%Country%\"");
+			return new Note(CREATOR, "Establish the Union", icon, image, "Union name \"%Company Name%\" in country \"%Country%\"");
 		case (int)NoteCls.MARRIAGE_KEY:
-			return new Note(genesisGenerator, "Marriage", icon, image, "%person1% marries  %person2%");
+			return new Note(CREATOR, "Marriage", icon, image, "%person1% marries  %person2%");
 		case (int)NoteCls.HIRING_KEY:
-			return new Note(genesisGenerator, "Hiring", icon, image, "Hiring to %union%");
+			return new Note(CREATOR, "Hiring", icon, image, "Hiring to %union%");
 		}
-		return new Note(genesisGenerator, "I", icon, image, "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		return new Note(CREATOR, "I", icon, image, "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
 	}
 	// make notes
 	public static Status makeStatus(int key)
 	{
-		if (key == StatusCls.MEMBER_KEY) return new Status(genesisGenerator, "Member", icon, image, "Director, Manager, Worker, Member, Holder");
-		else if (key == StatusCls.ALIVE_KEY) return new Status(genesisGenerator, "Alive", icon, image, "Alive or Dead");
-		else if (key == StatusCls.RANK_KEY) return new Status(genesisGenerator, "Rank", icon, image, "General, Major or Minor");
-		else if (key == StatusCls.USER_KEY) return new Status(genesisGenerator, "User", icon, image, "Admin, User, Observer");
-		else if (key == StatusCls.MAKER_KEY) return new Status(genesisGenerator, "Maker", icon, image, "Creator, Designer, Maker");
-		else if (key == StatusCls.DELEGATE_KEY) return new Status(genesisGenerator, "Delegate", icon, image, "President, Senator, Deputy");
-		else if (key == StatusCls.CERTIFIED_KEY) return new Status(genesisGenerator, "Certified", icon, image, "Certified, Notarized, Confirmed");
-		else if (key == StatusCls.MARRIED_KEY) return new Status(genesisGenerator, "Married", icon, image, "Husband, Wife, Spouse");
+		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR, "Member", icon, image, "Director, Manager, Worker, Member, Holder");
+		else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
+		else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
+		else if (key == StatusCls.USER_KEY) return new Status(CREATOR, "User", icon, image, "Admin, User, Observer");
+		else if (key == StatusCls.MAKER_KEY) return new Status(CREATOR, "Maker", icon, image, "Creator, Designer, Maker");
+		else if (key == StatusCls.DELEGATE_KEY) return new Status(CREATOR, "Delegate", icon, image, "President, Senator, Deputy");
+		else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
+		else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
 
-		return new Status(genesisGenerator, "RIGHTs", icon, image, "Rights");		
+		return new Status(CREATOR, "RIGHTs", icon, image, "Rights");		
 	}
 	
 	
