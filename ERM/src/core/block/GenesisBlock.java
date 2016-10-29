@@ -311,7 +311,7 @@ public class GenesisBlock extends Block{
 			double majorKoeff = majorPick * GENESIS_GENERATING_BALANCE / majorPicked;
 			double minorKoeff = minorPick * GENESIS_GENERATING_BALANCE / minorPicked;
 			double investorKoeff = investorPick * GENESIS_GENERATING_BALANCE / investorPicked;
-			double debtorKoeff = 0.8 * GENESIS_GENERATING_BALANCE / debtorPicked;
+			double debtorKoeff = 0.5 * GENESIS_GENERATING_BALANCE / debtorPicked;
 			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
 			
 			//long i = 0;
@@ -448,8 +448,9 @@ public class GenesisBlock extends Block{
 
 				do {
 					if (bufferAmount.compareTo(bdAmount0) < 0) {
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
-								bufferAmount, bufferCreditor));
+						// REST for investor!
+						////transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
+						////		bufferAmount, bufferCreditor));
 						bdAmount0 = bdAmount0.subtract(bufferAmount);
 						i++;
 						bufferCreditor = sends_toUsers.get(i).a;
