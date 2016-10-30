@@ -30,7 +30,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 		// ALL PERSONS
 		///////////////////////
 		
-		search_Records_SplitPanel = new Persons_Search_SplitPanel();
+		search_Records_SplitPanel = new Records_Search_SplitPanel();
 		
 	 
 		//////////////////////////////////////	
@@ -42,7 +42,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 		
-		this.jTabbedPane.add(my_Records_SplitPanel);
+//		this.jTabbedPane.add(my_Records_SplitPanel);
 		
 		this.jTabbedPane.add(search_Records_SplitPanel);
 			

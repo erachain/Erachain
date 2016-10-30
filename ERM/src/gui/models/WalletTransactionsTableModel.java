@@ -16,6 +16,7 @@ import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.GenesisIssue_ItemRecord;
 import core.transaction.GenesisTransferAssetTransaction;
@@ -62,6 +63,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	@Override
 	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
 		return this.transactions;
+	}
+	
+	public void setAsset(AssetCls asset){
+		
+	
 	}
 	
 	
