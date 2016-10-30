@@ -16,6 +16,7 @@ import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
 import core.item.ItemCls;
+import core.item.persons.PersonCls;
 import core.transaction.GenesisIssue_ItemRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Issue_ItemRecord;
@@ -62,6 +63,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
 		return this.transactions;
 	}
+	
+	
+	public   Object getItem(int row)
+	{
+		return this.transactions.get(row).getB();
+	}
+	
 	
 	public Class<? extends Object> getColumnClass(int c)
 	{     // set column type

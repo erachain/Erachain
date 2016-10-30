@@ -28,6 +28,7 @@ import gui.items.imprints.MainImprintsFrame;
 import gui.items.notes.MainNotesFrame;
 import gui.items.other.Other_Internal_Frame;
 import gui.items.persons.MainPersonsFrame;
+import gui.items.records.Records_Main_Frame;
 import gui.items.statement.MainStatementsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
@@ -229,6 +230,23 @@ private JFrame parent;
 			}
 		});
 		Toolbar_Main.add(button9_MainToolBar);
+		
+		
+		
+		
+		
+		JButton button10_MainToolBar = new JButton();
+		button10_MainToolBar.setText(Lang.getInstance().translate("Records"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button10_MainToolBar.setFocusable(false);
+		button10_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button10_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button10_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new Records_Main_Frame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button10_MainToolBar);
 		
 		
 		
