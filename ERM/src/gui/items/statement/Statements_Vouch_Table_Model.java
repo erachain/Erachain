@@ -47,7 +47,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public static final int COLUMN_TIMESTAMP = 0;
 //	public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
-	public static final int COLUMN_BODY = 2;
+//	public static final int COLUMN_BODY = 2;
 //	public static final int COLUMN_AMOUNT = 2;
 //	public static final int COLUMN_FEE = 3;
 	List<Transaction> transactions;

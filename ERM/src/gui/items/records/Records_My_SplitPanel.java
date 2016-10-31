@@ -1,4 +1,4 @@
-	package gui.items.records;
+package gui.items.records;
 
 	import java.awt.event.ActionEvent;
 	import java.awt.event.ActionListener;
@@ -11,9 +11,9 @@
 	import java.awt.event.WindowEvent;
 	import java.awt.event.WindowFocusListener;
 	import java.awt.image.ColorModel;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import javax.swing.Timer;
 	import java.awt.*;
@@ -30,8 +30,7 @@ import javax.swing.JMenuItem;
 	import javax.swing.JScrollPane;
 	import javax.swing.JTable;
 	import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
+	import javax.swing.RowFilter;
 	import javax.swing.RowSorter;
 	import javax.swing.event.DocumentEvent;
 	import javax.swing.event.DocumentListener;
@@ -43,209 +42,204 @@ import javax.swing.RowFilter;
 	import javax.swing.table.TableColumnModel;
 	import javax.swing.table.TableRowSorter;
 
-	import controller.Controller;
-	import core.item.assets.AssetCls;
+import org.mapdb.Fun.Tuple2;
+
+import controller.Controller;
+import core.account.PublicKeyAccount;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
-import database.wallet.TransactionMap;
-import gui.CoreRowSorter;
+import core.voting.Poll;
+import database.DBSet;
 import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
-	import gui.models.Renderer_Boolean;
+import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
-import gui.models.WalletTransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
+import gui.voting.VoteFrame;
 import lang.Lang;
 
 
 	public class Records_My_SplitPanel extends Split_Panel{
+	
 		private static final long serialVersionUID = 2717571093561259483L;
 
-		
-		private WalletTransactionsTableModel my_Records_Model;
-		private JTable my_Person_table;
-		private TableRowSorter my_Sorter;
-		private RunMenu my_run_menu;
-	// для прозрачности
+		JScrollPane jScrollPane4;
+	
+	
+		private RunMenu Search_run_menu;
+		All_Records_Panel allVotingsPanel;
+// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
+//	     VotingDetailPanel votingDetailsPanel ;
 		
 		
-	public Records_My_SplitPanel(){
-	
-		this.setName(Lang.getInstance().translate("My Records"));
-			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
-			// not show buttons
-			this.button1_ToolBar_LeftPanel.setVisible(false);
-			this.button2_ToolBar_LeftPanel.setVisible(false);
-			this.jButton1_jToolBar_RightPanel.setVisible(false);
-			this.jButton2_jToolBar_RightPanel.setVisible(false);
-			
-
-			// not show My filter
-			this.searth_My_JCheckBox_LeftPanel.setVisible(false);
-			
+		public Records_My_SplitPanel(){
 		
 			
-			//TRANSACTIONS
-			my_Records_Model = new WalletTransactionsTableModel();
-			my_Person_table = new JTable(my_Records_Model);
+			this.leftPanel.setVisible(false);
+			allVotingsPanel = new All_Records_Panel();
+			this.jSplitPanel.setLeftComponent(allVotingsPanel);
 			
 			
-			//TRANSACTIONS SORTER
-			Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-			indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-			indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-			indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
-			indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-			CoreRowSorter sorter = new CoreRowSorter(my_Records_Model, indexes);
-			my_Person_table.setRowSorter(sorter);
+			setName(Lang.getInstance().translate("My Records"));
+		
+		 // searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			
-			//Custom renderer for the String column;
-			//RenderingHints.
-			my_Person_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()),my_Records_Model.get_Column_AutoHeight())); // set renderer
-			my_Person_table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-			my_Person_table.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+			jScrollPane4 = new  JScrollPane();
 			
-			my_Person_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+		// not show buttons
+			jToolBar_RightPanel.setVisible(false);
+		//	toolBar_LeftPanel.setVisible(false);
+			jButton1_jToolBar_RightPanel.setText("<HTML><B> "+ Lang.getInstance().translate("Record")+ "</></> ");
+			jButton1_jToolBar_RightPanel.setBorderPainted(true);
+			jButton1_jToolBar_RightPanel.setFocusable(true);
+			jButton1_jToolBar_RightPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED)));
+			jButton1_jToolBar_RightPanel.setSize(120, 30);
+			jButton1_jToolBar_RightPanel.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					onVoteClick();
+				}
+			});	
 			
-			TableColumn column_Size = my_Person_table.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_SIZE);
-			column_Size.setMinWidth(50);
-			column_Size.setMaxWidth(1000);
-			column_Size.setPreferredWidth(70);
 			
-			TableColumn column_Confirm = my_Person_table.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS);//.COLUMN_SIZE);
-			column_Confirm.setMinWidth(50);
-			column_Confirm.setMaxWidth(1000);
-			column_Confirm.setPreferredWidth(70);
 			
-			TableColumn column_Fee = my_Person_table.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_FEE);//.COLUMN_SIZE);
-			column_Fee.setMinWidth(80);
-			column_Fee.setMaxWidth(1000);
-			column_Fee.setPreferredWidth(80);
 			
-			TableColumn column_Date = my_Person_table.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_TIMESTAMP);//.COLUMN_FEE);//.COLUMN_SIZE);
-			column_Date.setMinWidth(120);
-			column_Date.setMaxWidth(1000);
-			column_Date.setPreferredWidth(120);
+			jButton2_jToolBar_RightPanel.setVisible(false);
+			/*	
+	// not show My filter
+			searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
-			my_Person_table.addMouseListener(new My_Mouse());
-			my_run_menu  = new RunMenu();
-			Dimension dim1 = new Dimension(180,25);
-			my_run_menu.setSize(dim1);
-			my_run_menu.setPreferredSize(dim1);
-			my_run_menu.setVisible(false);
-			my_run_menu.jButton1.setFocusPainted(true);
-			my_run_menu.jButton1.setFocusCycleRoot(true);
-			my_run_menu.jButton1.addActionListener(new My_run_menu_Button1_Action());
-			my_run_menu.addWindowFocusListener(new My_run_Menu_Focus_Listener());
-
-			 Dimension size = MainFrame.desktopPane.getSize();
-			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-			my_run_menu.pack();
-		  
+	//CREATE TABLE
+			search_Table_Model = new TableModelPersons();
+			search_Table = new JTable(this.search_Table_Model);
+			TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
+			columnModel.getColumn(0).setMaxWidth((100));
+		
+	//Custom renderer for the String column;
+			search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+			search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()),search_Table_Model.get_Column_AutoHeight())); // set renderer
+		
+	//CHECKBOX FOR FAVORITE
+			TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
+			favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
+			favoriteColumn.setMinWidth(50);
+			favoriteColumn.setMaxWidth(50);
+			favoriteColumn.setPreferredWidth(50);
+	//Sorter
+			 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
+			search_Table.setRowSorter(search_Sorter);	
+		
+	// UPDATE FILTER ON TEXT CHANGE
+//			searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener( new search_tab_filter());
+	// SET VIDEO			
+			jTable_jScrollPanel_LeftPanel.setModel(this.search_Table_Model);
+			jTable_jScrollPanel_LeftPanel = search_Table;
+			jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+	//		setRowHeightFormat(true);
+	 */
+	// Event LISTENER	
 			
-			this.jTable_jScrollPanel_LeftPanel = my_Person_table;
-			this.jTable_jScrollPanel_LeftPanel.isFontSet();
-			
-			this.jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+			allVotingsPanel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
+		
+//			search_Table.addMouseListener( new search_Mouse());
 				
-			
-			// обработка изменения положения курсора в таблице
-			this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-						@SuppressWarnings({ "unused" })
-						@Override
-							public void valueChanged(ListSelectionEvent arg0) {
-								String dateAlive;
-								String date_birthday;
-								String message; 
-				// устанавливаем формат даты
-								SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-				//создаем объект персоны
-								UnionCls union;
-								if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
-									 
-									//GET ROW
-								        int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-								        row =jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-								        
-								        //GET TRANSACTION
-								        Transaction transaction =  (Transaction) my_Records_Model.getItem(row);
-								      //SHOW DETAIL SCREEN OF TRANSACTION
-								     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-									  
-									 JPanel panel = new JPanel();
-								        panel.setLayout(new GridBagLayout());
-								      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-										
-										//TABLE GBC
-										GridBagConstraints tableGBC = new GridBagConstraints();
-										tableGBC.fill = GridBagConstraints.BOTH; 
-										tableGBC.anchor = GridBagConstraints.FIRST_LINE_START;
-										tableGBC.weightx = 1;
-										tableGBC.weighty = 1;
-										tableGBC.gridx = 0;	
-										tableGBC.gridy= 0;	
-										JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-										panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction),tableGBC);
-										  JLabel jLabel9 = new JLabel();
-											jLabel9.setText("");
-									        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-									        gridBagConstraints.gridx = 0;
-									        gridBagConstraints.gridy = 1;
-									        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-									        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-									        gridBagConstraints.weightx = 1.0;
-									        gridBagConstraints.weighty = 1.0;
-									        panel. add(jLabel9, gridBagConstraints);
-										
-										
-										
-										
-									
-								        jScrollPane_jPanel_RightPanel.setViewportView( panel);
-									
-									 
-								}
-							}
-						});				
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-		    
-		}
-	
-	// set favorine My
-		void favorite_my(JTable table){
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
+		/*	
+			Timer timer = new Timer( 200, new ActionListener(){
 
-			PersonCls person = (PersonCls) my_Records_Model.getItem(row);
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					
+					
+					if (alpha <50) {
+						
+						Search_run_menu.setVisible(false);
+						alpha = 50;
+					}
+			//	Search_run_menu.setBackground(new Color(0,204,102,alpha));	
+			//		Search_run_menu.jButton1.setForeground(new Color(0,0,0,alpha));
+			//		Search_run_menu.jButton2.setForeground(new Color(0,0,0,alpha));
+			//		Search_run_menu.jButton3.setForeground(new Color(0,0,0,alpha));
+			//		Search_run_menu.jButton1.setBackground( new Color(212,208,200,alpha));
+					alpha = alpha - alpha_int;
+					
+					
+					
+					
+				}
+				
+			});
+			
+			*/
+				   
+
+			//	timer.start();
+			
+			
+			
+				 
+
+			Search_run_menu  = new RunMenu();
+			
+			Search_run_menu.setUndecorated(true);
+		//	Search_run_menu.setBackground(new Color(0,204,102,255));
+		//	Dimension dim = new Dimension(180,70);
+	    //	Search_run_menu.setSize(dim);
+	    	Search_run_menu.setPreferredSize(new Dimension(180,70));
+	    	Search_run_menu.setVisible(false);
+	    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
+	   // 	aaa.jButton1.setBorderPainted(false);
+	  //  	Search_run_menu.jButton1.setFocusPainted(true);
+	 //  	Search_run_menu.jButton1.setFocusCycleRoot(true);
+		Search_run_menu.jButton1.setContentAreaFilled(false);
+		Search_run_menu.jButton1.setOpaque(false);
+//		Search_run_menu.jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+	    
+	    	   	
+	    	
+	    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
+	    	Search_run_menu.jButton2.setContentAreaFilled(false);
+	    	Search_run_menu.jButton2.setOpaque(false);
+	    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
+	    	
+	    	Search_run_menu.jButton3.setContentAreaFilled(false);
+	  //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+	    	Search_run_menu.jButton3.setOpaque(false);
+	    
+	   
+	    	Search_run_menu.pack();
+	    
+	  //  	Search_run_menu.addWindowFocusListener( new run_Menu_Search_Focus_Listener());
+	 
+		 
+			
+	
+		   
+	
+		}
+		
+		
+		/*
+	// set favorite Search	
+		void favorite_all(JTable personsTable){
+			int row = personsTable.getSelectedRow();
+			row = personsTable.convertRowIndexToModel(row);
+
+			PersonCls person = search_Table_Model.getPerson(row);
 			//new AssetPairSelect(asset.getKey());
 
 			
@@ -262,106 +256,243 @@ import lang.Lang;
 				}
 					
 
-				table.repaint();
+				personsTable.repaint();
 
 		}
-
-		
 	
-	
-	// listener search_tab run menu focus
-		class My_run_Menu_Focus_Listener implements WindowFocusListener{
-			@Override
-			public void windowGainedFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void windowLostFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				my_run_menu.setVisible(false);
-			}
-		};
+	// filter search
+		 class search_tab_filter implements DocumentListener {
+				
+				public void changedUpdate(DocumentEvent e) {
+					onChange();
+				}
 
-		class My_run_menu_Button1_Action implements ActionListener{
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				favorite_my(my_Person_table);
-				int row = my_Person_table.getSelectedRow();
-				row = my_Person_table.convertRowIndexToModel(row);
-				PersonCls person = (PersonCls) my_Records_Model.getItem(row);
-				if(Controller.getInstance().isItemFavorite(person))
-				{
-					my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
+				public void removeUpdate(DocumentEvent e) {
+					onChange();
 				}
-				else
-				{
-					my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
+
+				public void insertUpdate(DocumentEvent e) {
+					onChange();
 				}
-			
-			
+
+				public void onChange() {
+
+					// GET VALUE
+					String search = searchTextField_SearchToolBar_LeftPanel.getText();
+
+				 	// SET FILTER
+					//tableModelPersons.getSortableList().setFilter(search);
+					search_Table_Model.fireTableDataChanged();
+					
+					RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+					((DefaultRowSorter) search_Sorter).setRowFilter(filter);
+					
+					search_Table_Model.fireTableDataChanged();
+					
+				}
 			}
+	*/	
+	// listener select row	 
+		 class search_listener implements ListSelectionListener  {
+				@Override
+				public void valueChanged(ListSelectionEvent arg0) {
+						String dateAlive;
+										String date_birthday;
+										String message; 
+						// устанавливаем формат даты
+										SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+						//создаем объект персоны
+										UnionCls union;
+					Transaction voting = null;
+					if (allVotingsPanel.records_Table.getSelectedRow() >= 0 ){
+						voting = (Transaction) allVotingsPanel.records_model.getItem(allVotingsPanel.records_Table.convertRowIndexToModel(allVotingsPanel.records_Table.getSelectedRow()));
+					
+				//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
+					
+	//				votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
+				//	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+					//jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
+	//				jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
+					//jSplitPanel.setRightComponent(votingDetailsPanel);
+					
+					
+									
+										     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+											  
+											 JPanel panel = new JPanel();
+										        panel.setLayout(new GridBagLayout());
+										      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+												
+												//TABLE GBC
+												GridBagConstraints tableGBC = new GridBagConstraints();
+												tableGBC.fill = GridBagConstraints.BOTH; 
+												tableGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+												tableGBC.weightx = 1;
+												tableGBC.weighty = 1;
+												tableGBC.gridx = 0;	
+												tableGBC.gridy= 0;	
+											//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
+												panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);
+												
+												  
+										        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DBSet.getInstance()),voting.getSeqNo(DBSet.getInstance()));
+										        GridBagConstraints gridBagConstraints = null;
+										        if (signs != null){
+										  	    
+										        
+										       
+										  	    	Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(voting);
+										  	        JTable jTable_Sign = new JTable (table_sing_model);
+										  	        
+										  	      jTable_Sign.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+										  	    jTable_Sign.setDefaultRenderer(String.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
+										  	  jTable_Sign.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
+														
+										  
+										  	  
+										  	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
+										        gridBagConstraints = new java.awt.GridBagConstraints();
+										        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+										        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+										        gridBagConstraints.weightx = 0.1;
+										        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
+										        gridBagConstraints.gridx = 0;
+										        gridBagConstraints.gridy = 1;
+										        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
+										  	  
+										  	  
+										  	  
+											jScrollPane4.setViewportView(jTable_Sign);
+												
+												
+											        gridBagConstraints = new java.awt.GridBagConstraints();
+											        gridBagConstraints.gridx = 0;
+											        gridBagConstraints.gridy = 2;
+											        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+											        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+											        gridBagConstraints.weightx = 1.0;
+											        gridBagConstraints.weighty = 1.0;
+											        panel. add( jScrollPane4, gridBagConstraints);
+												
+										        }
+											     
+											        
+											        
+											        
+												
+												
+											
+										        jScrollPane_jPanel_RightPanel.setViewportView( panel);
+											
+											 
+										}
+									}
+										
+					
+					
+					
+					
+					
+					
+					
+								
 		
-		};
-
-		class My_Mouse extends MouseAdapter {
+					
+					
+				
+			
+			}
+		 
+		 
+		 
+		 
+		 
+	/*
+	// mouse listener		
+		class  search_Mouse extends MouseAdapter {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				Point p = e.getPoint();
-				int row = my_Person_table.rowAtPoint(p);
-				row = my_Person_table.convertRowIndexToModel(row);
-				PersonCls person = (PersonCls) my_Records_Model.getItem(row);
+				int row = search_Table.rowAtPoint(p);
 				if(e.getClickCount() == 2)
 				{
+		//			row = personsTable.convertRowIndexToModel(row);
+		//			PersonCls person = tableModelPersons.getPerson(row);
+		//			new PersonFrame(person);
 					
 				}
 			
-				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+			//	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+					if( e.getButton() == MouseEvent.BUTTON1)
 				{
+					
+					
+					row = search_Table.convertRowIndexToModel(row);
+					PersonCls person = search_Table_Model.getPerson(row);	
+	//выводим меню всплывающее
 					if(Controller.getInstance().isItemFavorite(person))
 					{
-						my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
 					}
 					else
 					{
-						my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
+						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
 					}
-					my_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-					my_run_menu.setVisible(true);	
+		//			alpha = 255;
+					alpha_int = 5;
+					Search_run_menu.setBackground(new Color(1,204,102,255));		
+				    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+				    Search_run_menu.repaint();
+			        Search_run_menu.setVisible(true);		
+		    
+			    
+			
 				}
 			}
-		}
-
+			}
 	
-		class My_Search implements DocumentListener {
-			public void changedUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void removeUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void insertUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void onChange() {
-				// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-				// SET FILTER
-				my_Records_Model.fireTableDataChanged();
-			
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter)  my_Sorter).setRowFilter(filter);
-					
-				my_Records_Model.fireTableDataChanged();
 
+	*/
+/*
+		
+		
+		class run_Menu_Search_Focus_Listener implements WindowFocusListener{
+			@Override
+			public void windowGainedFocus(WindowEvent arg0) {
+				alpha = 255;
 			}
-		}
+			@Override
+			public void windowLostFocus(WindowEvent arg0) {
+				Search_run_menu.setVisible(false);
+			}
+		};
+		*/
 		
+		 public void onVoteClick()
+			{
+				//GET SELECTED OPTION
+				int row = allVotingsPanel.records_Table.getSelectedRow();
+				if(row == -1)
+				{
+					row = 0;
+				}
+				row = allVotingsPanel.records_Table.convertRowIndexToModel(row);
+				
+				
 		
+			
+				Transaction voting = null;
+				if (allVotingsPanel.records_Table.getSelectedRow() >= 0 ) voting = (Transaction) allVotingsPanel.records_model.getItem(allVotingsPanel.records_Table.convertRowIndexToModel(allVotingsPanel.records_Table.getSelectedRow()));
+				//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
+					
+	//			new Voting_Dialog(voting, 0, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
+			
+			
+			
+			
+			
+			}
+	
 	
 	}
 

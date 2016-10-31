@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
@@ -37,6 +38,8 @@ import database.PollMap;
 import gui.CoreRowSorter;
 import gui.items.ComboBoxModelItemsAll;
 import gui.models.PollsTableModel;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import gui.models.WalletTransactionsTableModel;
 import lang.Lang;
 
@@ -186,14 +189,22 @@ public class All_Records_Panel extends JPanel{
 			}
 		});
 
-		this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
-		this.add(txtSearch, searchGBC);
+	//	this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
+	//	this.add(txtSearch, searchGBC);
+		
+		records_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		records_Table.setDefaultRenderer(String.class, new Renderer_Left(records_Table.getFontMetrics(records_Table.getFont()),this.records_model.get_Column_AutoHeight())); // set renderer
+		records_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(records_Table.getFontMetrics(records_Table.getFont()),this.records_model.get_Column_AutoHeight())); // set renderer
+		records_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer		
+		
+		
+		
 		this.add(new JScrollPane(records_Table), tableGBC);
 
-		this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
+	//	this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
 		
 		cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
-		this.add(cbxAssets, assetsGBC);
+	//	this.add(cbxAssets, assetsGBC);
 		
 		cbxAssets.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {

@@ -27,14 +27,14 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Records"));
 	
 		///////////////////////
-		// ALL PERSONS
+		// search pecords
 		///////////////////////
 		
 		search_Records_SplitPanel = new Records_Search_SplitPanel();
 		
 	 
 		//////////////////////////////////////	
-		// MY PERSONS
+		// MY records
 		//////////////////////////////////////
 		my_Records_SplitPanel = new Records_My_SplitPanel();
 	
@@ -42,7 +42,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 		
-//		this.jTabbedPane.add(my_Records_SplitPanel);
+		this.jTabbedPane.add(my_Records_SplitPanel);
 		
 		this.jTabbedPane.add(search_Records_SplitPanel);
 			
