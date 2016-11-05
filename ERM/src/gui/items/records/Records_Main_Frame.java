@@ -2,6 +2,8 @@ package gui.items.records;
 
 import java.awt.Dimension;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
+
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;

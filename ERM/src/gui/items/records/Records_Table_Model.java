@@ -6,14 +6,16 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.block.Block;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
 import utils.ObserverMessage;
 import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelPersons extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
+public class Records_Table_Model extends TableModelCls<byte[], Transaction> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -21,12 +23,13 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	public static final int COLUMN_FAVORITE = 3;
 
 //	private SortableList<Long, PersonCls> persons;
-	private SortableList<Tuple2<String, String>, PersonCls> persons;
+//	private SortableList<Tuple2<String, String>, PersonCls> transactions;
+	private SortableList<byte[], Transaction> transactions;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
-	public TableModelPersons()
+	public Records_Table_Model()
 	{
 		Controller.getInstance().addObserver(this);
 	}
@@ -39,15 +42,15 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	
 	@Override
-	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
-		return this.persons;
+	public SortableList<byte[], Transaction> getSortableList() {
+		return this.transactions;
 	}
 	
 	
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
-     }
+//	public Class<? extends Object> getColumnClass(int c) {     // set column type
+//		Object o = getValueAt(0, c);
+//		return o==null?null:o.getClass();
+//     }
 	
 	// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){
@@ -59,9 +62,9 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 			this.column_AutuHeight = arg0;	
 		}
 	
-	public PersonCls getPerson(int row)
+	public Transaction getTrabsaction(int row)
 	{
-		return this.persons.get(row).getB();
+		return this.transactions.get(row).getB();
 	}
 	
 	@Override
@@ -79,37 +82,37 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	@Override
 	public int getRowCount() 
 	{
-		return this.persons.size();
+		return this.transactions.size();
 		
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.persons == null || row > this.persons.size() - 1 )
+		if(this.transactions == null || row > this.transactions.size() - 1 )
 		{
 			return null;
 		}
 		
-		PersonCls person = this.persons.get(row).getB();
+		 Transaction transaction = this.transactions.get(row).getB(); 
 		
 		switch(column)
 		{
 		case COLUMN_KEY:
 			
-			return person.getKey();
+			return transaction.getKey();
 		
 		case COLUMN_NAME:
 			
-			return person.getName();
+			return transaction.getSeqNo(null);
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().asPerson();
+			return transaction.getCreator().asPerson();
 			
 		case COLUMN_FAVORITE:
 			
-			return person.isFavorite();
+			return transaction.isReferenced();
 
 		}
 		
@@ -137,12 +140,12 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE)
 		{			
-			if(this.persons == null)
+			if(this.transactions == null)
 			{
 			
-				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-				this.persons.addFilterField("name");
-				this.persons.registerObserver();
+				this.transactions = (SortableList<byte[], Transaction>) message.getValue();
+				this.transactions.addFilterField("name");
+				this.transactions.registerObserver();
 			}	
 			
 			this.fireTableDataChanged();
@@ -151,14 +154,14 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
-			this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
+			this.transactions = (SortableList<byte[], Transaction>) message.getValue();
 			this.fireTableDataChanged();
 		}
 	}
 	
 	public void removeObservers() 
 	{
-		this.persons.removeObserver();
+		this.transactions.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 }
