@@ -151,6 +151,9 @@ public class Controller extends Observable {
 	public String getVersion() {
 		return version;
 	}
+	public void setDBSet(DBSet db) {
+		this.dbSet = db;
+	}
 
 	public int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {
@@ -1177,7 +1180,7 @@ public class Controller extends Observable {
 		this.notifyObservers(new ObserverMessage(
 				ObserverMessage.NETWORK_STATUS, this.status));
 		
-		DBSet dbSet = DBSet.getInstance();
+		//DBSet dbSet = DBSet.getInstance();
 
 		Peer peer = null;
 		//Block lastBlock = getLastBlock();
@@ -2185,13 +2188,6 @@ public class Controller extends Observable {
 		return getBlockByHeight(this.dbSet, parseInt);
 	}
 
-	public PublicKeyAccount getPublicKeyByAddress1(String address) {
-		if(this.doesWalletExists()) {
-			return this.wallet.getPublicKeyAccount(address);
-		} else {
-			return null;
-		}
-	}
 
 	public byte[] getPublicKeyByAddress(String address) {
 

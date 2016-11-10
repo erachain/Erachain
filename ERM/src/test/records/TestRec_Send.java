@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
@@ -65,6 +66,7 @@ public class TestRec_Send {
 	private void init() {
 		
 		db = DBSet.createEmptyDatabaseSet();
+		Controller.getInstance().setDBSet(db);
 		gb = new GenesisBlock();
 		gb.process(db);
 		

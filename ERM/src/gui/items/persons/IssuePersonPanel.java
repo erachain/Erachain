@@ -366,7 +366,7 @@ public class IssuePersonPanel extends JPanel
 			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
 			if (str.length() < 11) str = str + " 00:00:00";
 			birthday = Timestamp.valueOf(str).getTime();
-try{
+		try{
 			parse++;
 			date = this.txtDeathday.getCalendar().getTime();
 			//str = this.txtDeathday.getDate().toString();
@@ -375,11 +375,11 @@ try{
 				if (str.length() < 11) str = str + " 00:00:00";
 				deathday = Timestamp.valueOf(str).getTime();
 			
-}
-catch(Exception e3){
-	deathday = birthday -1;
-	
-}
+		}
+		catch(Exception e3){
+			deathday = birthday -1;
+			
+		}
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			
@@ -449,14 +449,14 @@ catch(Exception e3){
 			//txtBirthday.setText("0000-00-00");
 			//txtDeathday.setText("0000-00-00");
 			
-			txtGender.setSelectedIndex(2);
-			txtRace.setText("");
-			 txtBirthLatitude.setText("");
-			 txtBirthLongitude.setText("");
-			 txtSkinColor.setText("");
-			 txtEyeColor.setText("");
-			 txtHairСolor.setText("");
-			 txtHeight.setText("");
+			//txtGender.setSelectedIndex(2);
+			//txtRace.setText("");
+			 //txtBirthLatitude.setText("");
+			 //txtBirthLongitude.setText("");
+			 //txtSkinColor.setText("");
+			 //txtEyeColor.setText("");
+			 //txtHairСolor.setText("");
+			 //txtHeight.setText("");
 			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
 			 imgButes = null;
 			 iconButton.setIcon(null);
