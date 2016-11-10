@@ -48,6 +48,7 @@ public class BlockChain
 	public static final int FEE_INVITED_DEEP = 15; // levels foe deep
 	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
+	public static final int FEE_FOR_ANONIMOUSE = 33;
 
 	// issue PORSON
 	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);

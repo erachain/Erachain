@@ -624,6 +624,9 @@ public class Wallet extends Observable implements Observer
 		if(Controller.getInstance().isProcessingWalletSynchronize()) {
 			return;
 		}
+		// ICREATOR
+		Controller.getInstance().setNeedSync(false);
+		Controller.getInstance().setProcessingWalletSynchronize(true);
 				
 		//RESET MAPS
 		this.database.getTransactionMap().reset();
@@ -642,11 +645,12 @@ public class Wallet extends Observable implements Observer
 		
 		//REPROCESS BLOCKS
 		Block block = new GenesisBlock();
-		this.database.setLastBlockSignature(new byte[]{1,1,1,1,1,1,1,1});
+		//this.database.setLastBlockSignature(new byte[]{1,1,1,1,1,1,1,1});
+		this.database.setLastBlockSignature(block.getSignature());
 		
 		try{
-			Controller.getInstance().setNeedSync(false);
-			Controller.getInstance().setProcessingWalletSynchronize(true);
+			//Controller.getInstance().setNeedSync(false);
+			//Controller.getInstance().setProcessingWalletSynchronize(true);
 			DBSet dbSet = DBSet.getInstance();
 			this.syncHeight = 1;
 			do

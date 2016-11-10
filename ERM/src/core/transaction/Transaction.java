@@ -470,6 +470,31 @@ public abstract class Transaction {
 			// add overheat
 			fee += (len - 1000);
 		}
+
+		// FEE_FOR_ANONIMOUSE !
+		///if (this.getBlockHeightByParent(db))
+		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
+		int anonimuus = 0;
+		Controller cnt = Controller.getInstance();
+		BlockChain bchain = cnt.getBlockChain();
+		for ( Account acc : this.getRecipientAccounts())
+		{
+			byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
+			if (publicKey == null) {
+				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
+			}
+		}
+		
+		if ( anonimuus == 0 && this.creator != null) {
+			byte[] publicKey = cnt.getPublicKeyByAddress(this.creator.getAddress());
+			if (publicKey == null) {
+				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
+			}
+		}
+		
+		if ( anonimuus > 0) {
+			fee *= anonimuus;
+		}
 		
 		return (int) fee * BlockChain.FEE_PER_BYTE;
 	}
