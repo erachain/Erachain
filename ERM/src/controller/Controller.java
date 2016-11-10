@@ -1485,7 +1485,10 @@ public class Controller extends Observable {
 		}
 		
 		// CHECK IF IN TRANSACTION DATABASE
+		if (database.getTransactionMap().contains(signature)) {
 		return database.getTransactionMap().get(signature);
+		}
+		return null;
 	}
 
 	public List<Transaction> getLastTransactions(Account account, int limit) {
@@ -2211,9 +2214,11 @@ public class Controller extends Observable {
 			return null;
 		}
 
-		Transaction transaction = cntr.getTransaction(
-				getSignatureByAddrTime(db, address, db.getReferenceMap().get(address)));
-
+		byte[] sign = getSignatureByAddrTime(db, address, db.getReferenceMap().get(address));
+		if (sign == null)
+			return null;
+				
+		Transaction transaction = cntr.getTransaction(sign);
 		if (transaction == null) {
 			return null;
 		}
