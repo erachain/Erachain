@@ -88,7 +88,7 @@ public class Pinger extends Thread
 				//STOP PINGER
 				this.run = false;
 
-				LOGGER.error(" ???? " + e.getMessage(), e);
+				//LOGGER.error(" ???? " + e.getMessage(), e);
 				
 				return;
 			}

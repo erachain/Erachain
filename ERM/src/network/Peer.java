@@ -166,7 +166,7 @@ public class Peer extends Thread{
 		} 
 		catch (Exception e) 
 		{
-			LOGGER.error(e.getMessage(), e);
+			//LOGGER.error(e.getMessage(), e);
 			
 			//DISCONNECT
 			callback.onDisconnect(this);
@@ -200,7 +200,7 @@ public class Peer extends Thread{
 				} 
 				catch (Exception e) 
 				{
-					LOGGER.error(e.getMessage(), e);
+					//LOGGER.error(e.getMessage(), e);
 					
 					//DISCONNECT
 					callback.onDisconnect(this);
@@ -220,7 +220,18 @@ public class Peer extends Thread{
 					//CALLBACK
 					// see in network.Network.onMessage(Message)
 					// and then see controller.Controller.onMessage(Message)
-					this.callback.onMessage(message);
+					try // ICREATOR
+					{
+						this.callback.onMessage(message);
+					} 
+					catch (Exception e) 
+					{
+						//LOGGER.error(e.getMessage(), e);
+						
+						//DISCONNECT
+						callback.onDisconnect(this); // ICREATOR
+						return;
+					}
 				}
 			}
 			else
