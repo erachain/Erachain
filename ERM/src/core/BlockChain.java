@@ -410,9 +410,11 @@ public class BlockChain
 
 	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 
 		// not use small values
-		if (height < 100) {}
-		else if (height < 10000) {
-			if ((target>>2) > winned_value)
+		if (height < 100) {
+			if ((target>>1) > winned_value)
+				return false;
+		} else if (height < 1000) {
+			if ((target>>1) > winned_value)
 				return false;
 		} else {
 			if ((target>>1) > winned_value)

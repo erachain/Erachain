@@ -243,7 +243,7 @@ public class Synchronizer
 			{
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
-				//int blockHeightFromPeer = blockFromPeer.getHeight(dbSet);
+				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
 				
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
@@ -351,7 +351,7 @@ public class Synchronizer
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
 			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
-			checkPointHeightCommonBlock = this.getBlock(checkPointHeightSignature, peer);			
+			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);			
 		}
 
 		if (checkPointHeightSignature == null) {
@@ -399,7 +399,7 @@ public class Synchronizer
 		for(byte[] signature: signatures)
 		{
 			//ADD TO LIST
-			Block block = this.getBlock(signature, peer);
+			Block block = getBlock(signature, peer);
 			// NOW generating balance not was send by NET
 			// need to SET it!
 			block.setCalcGeneratingBalance(dbSet);
@@ -410,7 +410,7 @@ public class Synchronizer
 		return blocks;
 	}
 	
-	private Block getBlock(byte[] signature, Peer peer) throws Exception
+	public static Block getBlock(byte[] signature, Peer peer) throws Exception
 	{
 		//CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);

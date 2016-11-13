@@ -835,6 +835,10 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 		
+		if (this.generatingBalance == 0) {
+			this.setCalcGeneratingBalance(dbSet);
+		}
+		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
 
@@ -851,6 +855,7 @@ public class Block {
 		{
 			i++;
 			win_value += parent.calcWinValue(dbSet);
+			
 			
 			parent = parent.getParent(dbSet);
 		}
@@ -988,13 +993,26 @@ public class Block {
 		}
 					
 		// TEST repeated win for CREATOR
-		Block testBlock = this.getParent(db);
+		int base;			
+		if (false &&  height < 10) {
+			base = (BlockChain.BASE_TARGET>>2) + (BlockChain.BASE_TARGET>>3);
+		} else {
+			base = BlockChain.BASE_TARGET>>1;
+		}
+		int targetedWinValue = this.calcWinValueTargeted(db); 
+		if (base > targetedWinValue) {
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] targeted WIN_VALUE < 1/2 TARGET");
+			return false;
+		}
+		
+		/*
 		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
 			if (testBlock.getCreator().equals(this.creator)) {
 				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
 				return false;
 			}
 		}
+		*/
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
 		{

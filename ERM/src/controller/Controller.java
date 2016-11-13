@@ -1138,16 +1138,43 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		long maxPeerWeight = this.getMaxPeerHWeight().b;
-		long chainWeight = this.blockChain.getHWeight(dbSet, false).b;
+		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
+		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeight(dbSet, false);
+		if (maxHW.a > thisHW.a ) {
+			return false;
+		} else if (maxHW.a < thisHW.a)
+			return true;
+		
+		long maxPeerWeight = maxHW.b;
+		long chainWeight = thisHW.b;
+		if (true || (maxPeerWeight > chainWeight)) {
+			// SAME last block?
+			int pickTarget = BlockChain.BASE_TARGET >>2;
+			if (true || (maxPeerWeight - chainWeight < pickTarget)) {
+				byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+
+				try {
+					Block maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c);
+					if (maxBlock != null) {
+						// SAME LAST BLOCK
+						return true;
+					}
+				} catch (Exception e) {
+					// pass
+					this.onDisconnect(maxHW.c);
+				}
+			}
+		}
 		//LOGGER.info("Controller.isUpToDate getMaxPeerHWeight:" + maxPeerWeight + "<=" + chainWeight);
 
 		return maxPeerWeight <= chainWeight;
 	}
 	
 	public boolean isReadyForging() {
+		
+		/*
 		if (this.peerHWeight.size() == 0) {
-			return true;
+			return false;
 		}
 
 		if (true) {
@@ -1161,6 +1188,9 @@ public class Controller extends Observable {
 			long diff = chainWeight - maxPeerWeight;
 			return diff >= 0 && diff < 999;
 		}
+		*/
+		
+		return true;
 	}
 	
 	public boolean isNSUpToDate() {
@@ -1261,10 +1291,11 @@ public class Controller extends Observable {
 		return highestPeer;
 	}
 
-	public Tuple2<Integer, Long> getMaxPeerHWeight() {
+	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight() {
 		
 		int height = 0;
 		long weight = 0;
+		Peer maxPeer = null;
 
 		try {
 			synchronized (this.peerHWeight) {
@@ -1272,6 +1303,7 @@ public class Controller extends Observable {
 					if (weight < this.peerHWeight.get(peer).b) {
 						height = this.peerHWeight.get(peer).a;
 						weight = this.peerHWeight.get(peer).b;
+						maxPeer = peer;
 					}
 				}
 			}
@@ -1279,7 +1311,7 @@ public class Controller extends Observable {
 			// PEER REMOVED WHILE ITERATING
 		}
 
-		return new Tuple2<Integer, Long>(height, weight);
+		return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
 	}
 
 	// WALLET

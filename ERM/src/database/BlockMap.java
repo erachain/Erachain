@@ -192,7 +192,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			// GENESIS block
 			dbSet.getBlockSignsMap().set(signature,
 					new Tuple2<Integer, Integer>(1, core.BlockChain.GENESIS_WIN_VALUE));
-			dbSet.getBlockHeightsMap().set(1l, signature);
+			dbSet.getBlockHeightsMap().add(signature);
 		} else {
 			Block parent = this.get(block.getReference());
 			int height = parent.getHeight(dbSet) + 1;

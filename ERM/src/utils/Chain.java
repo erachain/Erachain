@@ -1,8 +1,10 @@
 package utils;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
+import network.Peer;
 
 public class Chain {
 
@@ -14,7 +16,7 @@ public class Chain {
 			return 0;
 		}
 
-		Tuple2<Integer, Long> maxPeerWeight = cnt.getMaxPeerHWeight();
+		Tuple3<Integer, Long, Peer> maxPeerWeight = cnt.getMaxPeerHWeight();
 		return 1;
 	}
 

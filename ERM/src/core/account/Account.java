@@ -696,6 +696,7 @@ public class Account {
 		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 			return 0l;
 		
+		/* not NEED - by smal TARGET_WIN
 		if (lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
 			// test repeated win account
 			int i = 0;
@@ -707,6 +708,7 @@ public class Account {
 					break;
 			}
 		}
+		*/
 
 		/*
 		// if new block in DB - get next height

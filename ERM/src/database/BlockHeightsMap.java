@@ -11,7 +11,8 @@ import org.mapdb.DB;
 import database.DBSet;
 import utils.ObserverMessage;
 
-// BlockNo -> signature
+// BlockNo + 1 -> signature
+// 0 - as GENESIS ?
 public class BlockHeightsMap extends DBMap<Long, byte[]> 
 {
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -94,6 +95,16 @@ public class BlockHeightsMap extends DBMap<Long, byte[]>
 	}
 	
 	
+	public byte[] get(long key)
+	{
+		return super.get(key);
+	}
+
+	public void set(long key, byte[] signature)
+	{
+		super.set(key, signature);
+	}
+
 	public void delete(long key)
 	{
 		super.delete(key);
