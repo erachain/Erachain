@@ -41,7 +41,7 @@ public class Synchronizer
 	
 	static boolean USE_AT_ORPHAN = true;
 	
-	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
 		AT_API_Platform_Impl.getInstance().setDBSet( fork );
@@ -75,6 +75,8 @@ public class Synchronizer
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
 				if (Controller.getInstance().getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
+					peer.close(); // icreator
+
 					throw new Exception("Dishonest peer by not valid lastCommonBlock["
 							+ lastCommonBlock.getHeight(fork) + "]");
 				}
@@ -129,6 +131,9 @@ public class Synchronizer
 			else
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
+
+				peer.close(); // icreator
+
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
 			}
@@ -138,12 +143,12 @@ public class Synchronizer
 	}
 
 	// process new BLOCKS to DB and orphan DB
-	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
 		
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks);	
+		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks, peer);	
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
 		
@@ -248,6 +253,7 @@ public class Synchronizer
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
 				{
+					peer.close(); // icreator
 					//INVALID BLOCK THROW EXCEPTION
 					throw new Exception("Dishonest peer on block " + blockFromPeer.getHeight(dbSet));
 				}
@@ -266,7 +272,7 @@ public class Synchronizer
 			/*
 			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			*/
-			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
+			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks, peer);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER
 			for(Transaction transaction: orphanedTransactions)
@@ -355,6 +361,8 @@ public class Synchronizer
 		}
 
 		if (checkPointHeightSignature == null) {
+			peer.close(); // icreator
+
 			throw new Exception("Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found");			
 		}
@@ -384,6 +392,8 @@ public class Synchronizer
 		}
 		if (headers.isEmpty()) {
 			if (true) {
+				peer.close(); // icreator
+
 				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
 			}
 		}

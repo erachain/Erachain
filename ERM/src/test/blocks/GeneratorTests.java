@@ -278,7 +278,7 @@ public class GeneratorTests {
 		//PROCESS GENESISBLOCK
 		GenesisBlock genesisBlock = new GenesisBlock();
 		cntrlr.initBlockChain(dbSet);
-		genesisBlock.process(dbSet);
+		// already processed genesisBlock.process(dbSet);
 		
 		
 		//CREATE KNOWN ACCOUNT
@@ -318,27 +318,27 @@ public class GeneratorTests {
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
+		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.045).setScale(8));
 		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
-		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
+		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.045).setScale(8));
 		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.025).setScale(8));
+		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.03).setScale(8));
 		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.01).setScale(8));
+		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.02).setScale(8));
 		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.005).setScale(8));
+		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(GenesisBlock.GENESIS_GENERATING_BALANCE * 0.02).setScale(8));
 		transaction.process(dbSet, genesisBlock, false);
 		dbSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dbSet.getTransactionFinalMap().add( height, seq++, transaction);
@@ -363,6 +363,7 @@ public class GeneratorTests {
 		
 		TreeMap<Integer, Tuple2<Integer, Long>> buffer = new TreeMap();
 
+		// break on NUM
 		int i_break = 3;
 
 		//GENERATE 2000 NEXT BLOCKS
@@ -401,18 +402,19 @@ public class GeneratorTests {
 			Block newBlock = BlockGenerator.generateNextBlock(dbSet, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
-			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
+			byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
 			newBlock.makeTransactionsHash();
+			newBlock.sign(generator);
 			
 			//CHECK IF BLOCK SIGNATURE IS VALID
 			assertEquals(true, newBlock.isSignatureValid());
 			
+			long weight_old = newBlock.calcWinValueTargeted(dbSet);
 			//CHECK IF BLOCK IS VALID
 			if (!newBlock.isValid(dbSet))
-				assertEquals(true, newBlock.isValid(dbSet));
+				assertEquals(false, newBlock.isValid(dbSet));
 
 			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeight(dbSet, false);
-			long weight_old = newBlock.calcWinValueTargeted(dbSet);
 
 			if (i == 2) {
 				// for debug breakpoint
@@ -440,49 +442,49 @@ public class GeneratorTests {
 			buffer.put(height, hWeight);
 
 			if (i == 2) {
-				assertEquals(1000, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(8192, newBlock.calcWinValueTargeted(dbSet));
 				//assertEquals(14648, generator2.calcWinValueTargetedTargeted(dbSet, height));
-				assertEquals((long)hWeight.b, 2000); // GENESIS + new first block
+				assertEquals((long)hWeight.b, 9192); // GENESIS + new first block
 			}
 			else if (i == 3) {
-				assertEquals(600, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(7369, newBlock.calcWinValueTargeted(dbSet));
 				assertEquals((int)hWeight.a, height);
-				assertEquals((long)hWeight.b, 2000 + 600);
+				assertEquals((long)hWeight.b, 9192 + 7369);
 			}
 			else if (i == 4) {
-				assertEquals(750, newBlock.calcWinValueTargeted(dbSet));
-				assertEquals((long)hWeight.b, 2000 + 600 + 750);
+				assertEquals(15522, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals((long)hWeight.b, 9192 + 7369 + 15522);
 			}
 			else if (i == 11) {
-				assertEquals(4228, newBlock.calcWinValueTargeted(dbSet));
-				assertEquals((long)hWeight.b, 18204);
+				assertEquals(18873, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals((long)hWeight.b, 130617);
 				//assertEquals(25024, generator2.calcWinValueTargeted(dbSet, height));
 			}
 			else if (i == 12) {
-				assertEquals(3654, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(15963, newBlock.calcWinValueTargeted(dbSet));
 				//assertEquals(26245, generator2.calcWinValueTargeted(dbSet, height));
 			}
 			else if (i == 13) {
 				//assertEquals(1678, generator1.calcWinValueTargeted(dbSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(13226, newBlock.calcWinValueTargeted(dbSet));
 				//assertEquals(14648, generator2.calcWinValueTargeted(dbSet, height));
 			}
 			else if (i == 14) {
 				//assertEquals(1785, generator1.calcWinValueTargeted(dbSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(12581, newBlock.calcWinValueTargeted(dbSet));
 				//assertEquals(14648, generator2.calcWinValueTargeted(dbSet, height));
 			}
 			else if (i == 30) {
 				//assertEquals(21240, generator3.calcWinValueTargeted(dbSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(13911, newBlock.calcWinValueTargeted(dbSet));
 			}
 			else if (i == 31) {
 				//assertEquals(22338, generator3.calcWinValueTargeted(dbSet, height));
-				assertEquals(22338, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(13578, newBlock.calcWinValueTargeted(dbSet));
 			}
 			else if (i == 32) {
 				//assertEquals(4394, generator3.calcWinValueTargeted(dbSet, height));
-				assertEquals(4394, newBlock.calcWinValueTargeted(dbSet));
+				assertEquals(10218, newBlock.calcWinValueTargeted(dbSet));
 			}
 			else if (i == 13) {
 			}

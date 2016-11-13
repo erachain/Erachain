@@ -200,7 +200,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			dbSet.getBlockSignsMap().set(signature,
 					new Tuple2<Integer, Integer>(height, win_value));
 			//dbSet.getBlockHeightsMap().set((long)height, signature);
-			dbSet.getBlockHeightsMap().add(signature);
+			long heightInMap = dbSet.getBlockHeightsMap().add(signature);
 			
 			//
 			// PROCESS FORGING DATA

@@ -477,10 +477,13 @@ public abstract class Transaction {
 		int anonimuus = 0;
 		Controller cnt = Controller.getInstance();
 		BlockChain bchain = cnt.getBlockChain();
+		
+		// TODO DBSet get from CHAIN
+		/*
 		for ( Account acc : this.getRecipientAccounts())
 		{
-			byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
-			if (publicKey == null) {
+			//byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
+			if (!acc.isPerson(bchain.getDB())) {
 				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
 			}
 		}
@@ -491,6 +494,7 @@ public abstract class Transaction {
 				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
 			}
 		}
+		*/
 		
 		if ( anonimuus > 0) {
 			fee *= anonimuus;

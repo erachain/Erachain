@@ -195,6 +195,8 @@ public class BlockGenerator extends Thread implements Observer
 		while(!dbSet.isStoped())
 		{
 			
+			boolean quickRun = false; 
+			
 			try 
 			{
 				Thread.sleep(500);
@@ -223,11 +225,7 @@ public class BlockGenerator extends Thread implements Observer
 			}
 			
 			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			/////syncForgingStatus();
-
-			//boolean stst = ctrl.isReadyForging();
 			if(forgingStatus != ForgingStatus.FORGING
-					//|| (!stst)
 					) {
 				continue;
 			}
@@ -235,34 +233,32 @@ public class BlockGenerator extends Thread implements Observer
 			// try solve and flush new block from Win Buffer			
 			Block waitWin = bchain.getWaitWinBuffer();
 
+
 			if (!dbSet.getBlockMap().isProcessing() // NOT run in core.Synchronizer.process(DBSet, Block)
-					&& waitWin != null
-					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
+					&& waitWin != null ) {
+				
+				long diffTimeWinBlock =  NTP.getTime() - (waitWin.getTimestamp(dbSet) + wait_interval_flush);
+				
+				if (diffTimeWinBlock >0 ) {
+	
+					// start new SOLVE for WIN Blocks
+					this.solvingBlock = null;
+									
+					// FLUSH WINER to DB MAP
+					ctrl.flushNewBlockGenerated();
 
-				// start new SOLVE rof WIN Blocks
-				this.solvingBlock = null;
-				
-				// set random time waiting for send
-				//wait_interval_run_gen = 10000 + (int) ((Math.random() * (wait_interval_flush - 15000)));
-				
-				/*
-				syncForgingStatus();
-				if(forgingStatus != ForgingStatus.FORGING) {
-					// IF now not forging - clear old win block
-					bchain.clearWaitWinBuffer();
-					continue;
+					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
+						wait_interval = 500;
+						quickRun = true;
+					} else {
+						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - 2 * wait_interval_flush);					
+					}
+				} else {
+					wait_interval = 500;
 				}
-				*/
-				
-				// FLUSH WINER to DB MAP
-				ctrl.flushNewBlockGenerated();
-
-				wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush) / 2;
-				
 			} else {
 				// always 1sec
-				wait_interval = 1000;
-				//wait_interval = wait_interval_run;
+				wait_interval = 500;
 			}
 
 			try 
@@ -285,7 +281,6 @@ public class BlockGenerator extends Thread implements Observer
 			}
 
 			byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-			long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp(dbSet);
 			
 			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 			if(this.solvingBlock == null
@@ -353,17 +348,12 @@ public class BlockGenerator extends Thread implements Observer
 				if(acc_winner == null)
 					continue;
 					
-				/*syncForgingStatus();
-				if(forgingStatus != ForgingStatus.FORGING) {
-					this.solvingBlock = null;
-					bchain.clearWaitWinBuffer();
-					continue;
-				}
-				*/
-
 				// sleep by (TARGET / WIN_VALUE)
 				// for not to busy the NET
 				int wait_new_good_block = (int) ((wait_interval_flush * target) / (target / 10 + max_winned_value)); 
+				if (quickRun) {
+					wait_new_good_block = wait_new_good_block>>8;
+				}
 				// wait more good new block from NET
 				try 
 				{
@@ -390,6 +380,7 @@ public class BlockGenerator extends Thread implements Observer
 				*/
 
 				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+				long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp(dbSet);
 				unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
 				// CALCULATE HASH for that transactions
 				byte[] winnerPubKey = acc_winner.getPublicKey();

@@ -518,7 +518,7 @@ public class BlockTests
 	{
 										
 		init();
-		gb.process(db);
+		// already processed gb.process(db);
 										
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

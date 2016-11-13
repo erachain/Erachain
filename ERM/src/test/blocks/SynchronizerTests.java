@@ -117,7 +117,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize(databaseSet, null, newBlocks);
+			synchronizer.synchronize(databaseSet, null, newBlocks, null);
 			
 			//CHECK LAST 5 BLOCKS
 			lastBlock = databaseSet.getBlockMap().getLastBlock();
@@ -236,7 +236,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize(databaseSet, genesisBlock, newBlocks);
+			synchronizer.synchronize(databaseSet, genesisBlock, newBlocks, null);
 		}
 		catch(Exception e)
 		{
