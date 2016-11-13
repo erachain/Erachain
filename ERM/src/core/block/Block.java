@@ -863,6 +863,25 @@ public class Block {
 		if (i == 0) {
 			return this.calcWinValue(dbSet);
 		}
+
+		
+		long average = win_value / i;
+
+		// remove bigger values
+		win_value = 0;
+		parent = this.getParent(dbSet);
+		i = 0;
+		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
+		{
+			i++;
+			long value = parent.calcWinValue(dbSet);
+			if (value > (average<<1)) {
+				value = average<<1;
+			}
+			win_value += parent.calcWinValue(dbSet);
+			
+			parent = parent.getParent(dbSet);
+		}
 		
 		return win_value / i;
 		
