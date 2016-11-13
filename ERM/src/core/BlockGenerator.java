@@ -203,10 +203,12 @@ public class BlockGenerator extends Thread implements Observer
 			}
 			catch (InterruptedException e) 
 			{
-				LOGGER.error(e.getMessage(), e);
+				//LOGGER.error(e.getMessage(), e);
 			}
 			
-			//syncForgingStatus();
+			if (dbSet.isStoped())
+				return;
+			
 
 			//CHECK IF WE ARE UP TO DATE
 			// NOT NEED isUpToDate!
@@ -232,7 +234,6 @@ public class BlockGenerator extends Thread implements Observer
 				
 			// try solve and flush new block from Win Buffer			
 			Block waitWin = bchain.getWaitWinBuffer();
-
 
 			if (!dbSet.getBlockMap().isProcessing() // NOT run in core.Synchronizer.process(DBSet, Block)
 					&& waitWin != null ) {
@@ -267,11 +268,11 @@ public class BlockGenerator extends Thread implements Observer
 			} 
 			catch (InterruptedException e) 
 			{
-				LOGGER.error(e.getMessage(), e);
+				//LOGGER.error(e.getMessage(), e);
 			}
 
 			if(dbSet.isStoped()) {
-				break;
+				return;
 			}
 			
 			if (dbSet.getBlockMap().isProcessing()) {
@@ -361,8 +362,11 @@ public class BlockGenerator extends Thread implements Observer
 				} 
 				catch (InterruptedException e) 
 				{
-					LOGGER.error(e.getMessage(), e);
+					//LOGGER.error(e.getMessage(), e);
 				}
+
+				if (dbSet.isStoped())
+					return;
 
 				waitWin = bchain.getWaitWinBuffer();
 				if (waitWin != null)
