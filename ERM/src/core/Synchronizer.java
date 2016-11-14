@@ -248,6 +248,13 @@ public class Synchronizer
 			{
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
+				if (blockFromPeer == null) { // icreator
+					
+					LOGGER.info("synchronize - blockFromPeer = null: " + peer.getAddress());
+
+					peer.close();
+					return;
+				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
 				
 				//PROCESS BLOCK
@@ -319,8 +326,12 @@ public class Synchronizer
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
-		if (response == null)
+		if (response == null) {
+			//peer.close(); // icreator
+			peer.onPingFail(); // icreator
+
 			throw new Exception("Failed to communicate with peer - response = null");
+		}
 
 		return response.getSignatures();
 	}
@@ -431,6 +442,8 @@ public class Synchronizer
 		//CHECK IF WE GOT RESPONSE
 		if(response == null)
 		{
+			peer.close(); // icreator
+
 			//ERROR
 			throw new Exception("Peer timed out");
 		}
@@ -439,6 +452,8 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!block.isSignatureValid())
 		{
+			peer.close(); // icreator
+
 			throw new Exception("*** Invalid block --signature");
 		}
 		

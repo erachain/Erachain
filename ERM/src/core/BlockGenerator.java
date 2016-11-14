@@ -290,6 +290,10 @@ public class BlockGenerator extends Thread implements Observer
 					)
 			{
 				
+				if(dbSet.isStoped()) {
+					return;
+				}
+
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
 				

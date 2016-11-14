@@ -141,8 +141,8 @@ public class Peer extends Thread{
 			//START PINGER
 			this.pinger = new Pinger(this);
 			if (this.pinger.isInterrupted()) {
+				LOGGER.info("peer.connect - Failed to connect to : " + address + " by interrupt!!!");
 				this.close();
-				//LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " by interrupt!!!");
 				return;
 			}
 			
@@ -303,6 +303,7 @@ public class Peer extends Thread{
 		} 
 		catch (InterruptedException e)
 		{
+			this.callback.onDisconnect(this); // icreator
 			//NO MESSAGE RECEIVED WITHIN TIME;
 			return null;
 		}
@@ -312,6 +313,7 @@ public class Peer extends Thread{
 	{
 		//DISCONNECTED
 		this.callback.onDisconnect(this);
+		LOGGER.info("Try callback.onDisconnect : " + this.callback.toString());
 	}
 
 	public boolean isWhite()
@@ -331,6 +333,9 @@ public class Peer extends Thread{
 	
 	public void close() 
 	{
+		
+		LOGGER.info("Try close peer : " + address);
+		
 		try
 		{
 			//STOP PINGER
