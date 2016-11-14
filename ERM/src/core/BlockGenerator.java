@@ -296,7 +296,11 @@ public class BlockGenerator extends Thread implements Observer
 
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
-				
+
+				if(dbSet.isStoped()) {
+					return;
+				}
+
 				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dbSet);
 
 				//RESET BLOCKS
