@@ -1147,7 +1147,7 @@ public class Controller extends Observable {
 		
 		long maxPeerWeight = maxHW.b;
 		long chainWeight = thisHW.b;
-		if (true || (maxPeerWeight > chainWeight)) {
+		if (maxPeerWeight > chainWeight) {
 			// SAME last block?
 			int pickTarget = BlockChain.BASE_TARGET >>2;
 			if (true || (maxPeerWeight - chainWeight < pickTarget)) {
@@ -1157,6 +1157,8 @@ public class Controller extends Observable {
 					Block maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c);
 					if (maxBlock != null) {
 						// SAME LAST BLOCK
+						//this.blockChain.getHWeight(dbSet, false);
+						dbSet.getBlockSignsMap().setFullWeight(maxPeerWeight);
 						return true;
 					}
 				} catch (Exception e) {

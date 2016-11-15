@@ -565,7 +565,8 @@ public class TransactionCreator
 		
 		String[] hashes58;
 		if (hashesStr.length() > 0) {
-			hashes58 = hashesStr.split(" -");
+			//hashes58 = hashesStr.split(" -");
+			hashes58 = hashesStr.split(" ");
 		} else {
 			hashes58 = new String[0];
 		}
