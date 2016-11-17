@@ -186,7 +186,7 @@ public class BlockExplorer
 			{
 				output.put("lastBlock", jsonQueryLastBlock());
 
-				output.putAll(jsonQueryPools());
+				output.putAll(jsonQueryPools(info.getQueryParameters().getFirst("asset")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -369,7 +369,7 @@ public class BlockExplorer
 			{
 				output.put("lastBlock", jsonQueryLastBlock());
 
-				output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll")));
+				output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),info.getQueryParameters().getFirst(" asset")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -733,10 +733,17 @@ public class BlockExplorer
 		return output;
 	}
 
-	public Map jsonQueryPools()
+	public Map jsonQueryPools(String asset_1)
 	{
-		Map lastPools = new LinkedHashMap();
+		Map lastPools = new LinkedHashMap();;
 		Map output=new LinkedHashMap();
+		
+Long asset_g;
+if ( asset_1 == null) {
+	asset_g =(long) 1;
+}else{
+	 asset_g = Long.valueOf(asset_1);
+}
 
 		List<Poll> pools = new ArrayList< Poll > (DBSet.getInstance().getPollMap().getValues());
 
@@ -759,8 +766,8 @@ public class BlockExplorer
 		Comparator<Poll> comparator = new Comparator<Poll>() {
 			public int compare(Poll c1, Poll c2) {
 
-				BigDecimal c1votes = c1.getTotalVotes();
-				BigDecimal c2votes = c2.getTotalVotes();
+				BigDecimal c1votes = c1.getTotalVotes(asset_g);
+				BigDecimal c2votes = c2.getTotalVotes(asset_g);
 
 				return c2votes.compareTo(c1votes);
 			}
@@ -773,7 +780,7 @@ public class BlockExplorer
 		for (Poll pool : pools) {
 			Map poolJSON=new LinkedHashMap();
 
-			poolJSON.put( "totalVotes",  pool.getTotalVotes().toPlainString() ); 
+			poolJSON.put( "totalVotes",  pool.getTotalVotes(asset_g).toPlainString() ); 
 
 			poolJSON.put( "new",  lastPools.containsKey(pool.getName()) );
 
@@ -785,8 +792,11 @@ public class BlockExplorer
 		return output;
 	}
 
-	public Map jsonQueryPool(String query)
+	public Map jsonQueryPool(String query, String asset_1)
 	{
+		
+		Long asset_q = Long.valueOf(asset_1);
+		
 		Map output = new LinkedHashMap();
 
 		Poll poll = Controller.getInstance().getPoll(query);
@@ -796,7 +806,7 @@ public class BlockExplorer
 		pollJSON.put("creator", poll.getCreator().getAddress());
 		pollJSON.put("name", poll.getName());
 		pollJSON.put("description", poll.getDescription());
-		pollJSON.put("totalVotes", poll.getTotalVotes().toPlainString());
+		pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
 		
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
@@ -813,15 +823,15 @@ public class BlockExplorer
 		Map optionsJSON = new LinkedHashMap();
 		for(PollOption option: poll.getOptions())
 		{
-			optionsJSON.put(option.getName(), option.getVotes().toPlainString());
+			optionsJSON.put(option.getName(), option.getVotes(asset_q).toPlainString());
 		}
 		pollJSON.put("options", optionsJSON);
 
 		Comparator<Pair<Account, PollOption>> comparator = new Comparator<Pair<Account, PollOption>>() {
 			public int compare(Pair<Account, PollOption> c1, Pair<Account, PollOption> c2) {
 
-				BigDecimal c1votes = c1.getA().getBalanceUSE(Transaction.FEE_KEY);
-				BigDecimal c2votes = c2.getA().getBalanceUSE(Transaction.FEE_KEY);
+				BigDecimal c1votes = c1.getA().getBalanceUSE(asset_q);
+				BigDecimal c2votes = c2.getA().getBalanceUSE(asset_q);
 
 				return c2votes.compareTo(c1votes);
 			}
@@ -838,7 +848,7 @@ public class BlockExplorer
 		{
 			Map voteJSON = new LinkedHashMap();
 			voteJSON.put("option", vote.getB().getName());
-			voteJSON.put("votes", vote.getA().getBalanceUSE(Transaction.FEE_KEY).toPlainString());
+			voteJSON.put("votes", vote.getA().getBalanceUSE(asset_q).toPlainString());
 
 			votesJSON.put(vote.getA().getAddress(), voteJSON);
 		}
