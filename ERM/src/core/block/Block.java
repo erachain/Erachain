@@ -866,6 +866,7 @@ public class Block {
 
 		
 		long average = win_value / i;
+		average = average + (average>>2);
 
 		// remove bigger values
 		win_value = 0;
@@ -875,8 +876,8 @@ public class Block {
 		{
 			i++;
 			long value = parent.calcWinValue(dbSet);
-			if (value > (average<<1)) {
-				value = average<<1;
+			if (value > (average)) {
+				value = average;
 			}
 			win_value += parent.calcWinValue(dbSet);
 			
@@ -1020,6 +1021,7 @@ public class Block {
 		}
 		int targetedWinValue = this.calcWinValueTargeted(db); 
 		if (base > targetedWinValue) {
+			targetedWinValue = this.calcWinValueTargeted(db);
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] targeted WIN_VALUE < 1/2 TARGET");
 			return false;
 		}

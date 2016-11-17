@@ -153,7 +153,7 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			//LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
+			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
 		}
 	}
 	
@@ -226,10 +226,10 @@ public class Peer extends Thread{
 					} 
 					catch (Exception e) 
 					{
-						//LOGGER.error(e.getMessage(), e);
-						
+						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
-						callback.onDisconnect(this); // ICREATOR
+						this.onPingFail();
+						//callback.onDisconnect(this); // ICREATOR
 						return;
 					}
 				}
@@ -312,8 +312,8 @@ public class Peer extends Thread{
 	public void onPingFail()
 	{
 		//DISCONNECTED
-		this.callback.onDisconnect(this);
 		LOGGER.info("Try callback.onDisconnect : " + this.callback.toString());
+		this.callback.onDisconnect(this);
 	}
 
 	public boolean isWhite()

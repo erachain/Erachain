@@ -176,6 +176,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
 				//recipient = transAmo.getRecipient();
 				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+				if (item == null)
+					return null;
 				itemName = item.toString();
 			} else {
 				itemName = transaction.viewItemName();
