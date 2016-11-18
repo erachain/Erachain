@@ -39,6 +39,8 @@ public class Network extends Observable implements ConnectionCallback {
 	
 	private boolean run;
 	
+	private static InetAddress myselfAddress;
+	
 	public Network()
 	{	
 		this.connectedPeers = new ArrayList<Peer>();
@@ -261,6 +263,8 @@ public class Network extends Observable implements ConnectionCallback {
 			
 			if(Arrays.equals(findMyselfMessage.getFoundMyselfID(),Controller.getInstance().getFoundMyselfID())) {
 				LOGGER.info("network.onMessage - Connected to self. Disconnection.");
+				
+				Network.myselfAddress = message.getSender().getAddress(); 
 				message.getSender().close();
 			}
 			
