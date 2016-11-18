@@ -112,12 +112,12 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return account.asPerson();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance3(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance3(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 			unconfBalance = account.getUnconfirmedBalance3(this.asset.getKey(DBSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()

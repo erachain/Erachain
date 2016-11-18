@@ -21,16 +21,16 @@ public class BlockFactory {
 		
 	}
 	
-	public Block parse(byte[] data) throws Exception
+	public Block parse(byte[] data, boolean forDB) throws Exception
 	{
 		//PARSE BLOCK
-		return Block.parse(data);
+		return Block.parse(data, forDB);
 	}
 
 	// not signed and not getGeneratingBalance
 	public Block create(int version, byte[] reference, PublicKeyAccount generator, byte[] unconfirmedTransactionsHash, byte[] atBytes) 
 	{		
-		return new Block(version, reference, generator, 0, unconfirmedTransactionsHash, atBytes);
+		return new Block(version, reference, generator, unconfirmedTransactionsHash, atBytes);
 	}
 	
 }

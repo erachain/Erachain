@@ -67,7 +67,9 @@ public class Block {
 	private static final int TRANSACTIONS_COUNT_LENGTH = 4;
 	private static final int TRANSACTION_SIZE_LENGTH = 4;
 	public static final int AT_BYTES_LENGTH = 4;
-	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH + GENERATING_BALANCE_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
+	private static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
+			//+ GENERATING_BALANCE_LENGTH
+			+ TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
@@ -92,26 +94,25 @@ public class Block {
 
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
-	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes)
 	{
 		this.version = version;
 		this.reference = reference;
-		//this.timestamp = timestamp;
 		this.creator = creator;
-		this.generatingBalance = generatingBalance;
 
 		this.transactionsHash = transactionsHash;
 
 		this.transactionCount = 0;
 		this.atBytes = atBytes;
+		
+		//this.setGeneratingBalance(dbSet);
 
 	}
 
 	// VERSION 2 AND 3 BLOCKS, WITH AT AND MESSAGE
-	public Block(int version, byte[] reference, PublicKeyAccount creator, int generatingBalance, byte[] signature, byte[] transactionsHash, byte[] atBytes)
+	public Block(int version, byte[] reference, PublicKeyAccount creator, byte[] transactionsHash, byte[] atBytes, byte[] signature)
 	{
-		this(version, reference, creator, generatingBalance, transactionsHash, atBytes);
+		this(version, reference, creator, transactionsHash, atBytes);
 		this.signature = signature;
 	}
 
@@ -173,16 +174,15 @@ public class Block {
 	}
 
 	// balance on creator account when making this block
-	// TODO isValid
-	public int getGeneratingBalance()
+	public int getGeneratingBalance(DBSet dbSet)
 	{
 		return this.generatingBalance;
 	}
-	public void setGeneratingBalance(DBSet dbSet)
+	private void setGeneratingBalance(int generatingBalance)
 	{
-		this.generatingBalance = this.calcGeneratingBalance(dbSet);
+		this.generatingBalance = generatingBalance;
 	}
-	
+		
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
@@ -197,19 +197,47 @@ public class Block {
 				
 		if (previousForgingHeight <= height) {
 			
+			// for recipient
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
 			for(Transaction transaction: txs)
 			{				
-				if (transaction instanceof R_SertifyPubKeys) {
-					amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
-					incomed_amount += amount;
-				} else if ( transaction.getKey() == Transaction.RIGHTS_KEY
-						&& transaction.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-					amount = (int)transaction.getAmount().longValue();
-					incomed_amount += amount;
+				 if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
+					int amo_sign = transaction.getAmount().signum();
+					if (transaction.getKey() > 0 && amo_sign > 0) {
+						// SEND
+						amount = (int)transaction.getAmount().longValue();						
+					} else if (transaction.getKey() < 0 && amo_sign > 0) {
+						// DEBT
+						amount = (int)transaction.getAmount().longValue();						
+					} else {
+						amount = 0;
+					}
+				incomed_amount += amount;
+				}
+			}
+
+			// for creator
+			txs = dbSet.getTransactionFinalMap().findTransactions(null, creator.getAddress(), null,
+					previousForgingHeight, height,
+					0, 0, false, 0, 0);
+			
+			for(Transaction transaction: txs)
+			{				
+				if (false && transaction instanceof R_SertifyPubKeys) {
+				//	amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
+				//	incomed_amount += amount;
+				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
+					int amo_sign = transaction.getAmount().signum();
+					if (transaction.getKey() < 0 && amo_sign < 0) {
+						// RE DEBT to me
+						amount = -(int)transaction.getAmount().longValue();						
+					} else {
+						amount = 0;
+					}
+				incomed_amount += amount;
 				}
 			}
 		}
@@ -217,10 +245,11 @@ public class Block {
 		// OWN + RENT balance - in USE
 		return (int)creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
 	}
-	
-	public int calcGeneratingBalance(DBSet dbSet)
+
+	// CALCULATE and SET
+	public void setCalcGeneratingBalance(DBSet dbSet)
 	{
-		 return calcGeneratingBalance(dbSet, this.creator, this.getHeightByParent(dbSet));
+		 this.generatingBalance = calcGeneratingBalance(dbSet, this.creator, this.getHeightByParent(dbSet));
 	}
 
 	public byte[] getReference()
@@ -434,7 +463,7 @@ public class Block {
 
 	//PARSE/CONVERT
 
-	public static Block parse(byte[] data) throws Exception
+	public static Block parse(byte[] data, boolean forDB) throws Exception
 	{
 		//CHECK IF WE HAVE MINIMUM BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
@@ -465,10 +494,13 @@ public class Block {
 		PublicKeyAccount generator = new PublicKeyAccount(generatorBytes);
 		position += CREATOR_LENGTH;
 
-		//READ GENERATING BALANCE
-		byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
-		int generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
-		position += GENERATING_BALANCE_LENGTH;
+		int generatingBalance = 0;
+		if (forDB) {
+			//READ GENERATING BALANCE
+			byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
+			generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
+			position += GENERATING_BALANCE_LENGTH;
+		}
 
 		//READ TRANSACTION SIGNATURE
 		byte[] transactionsHash =  Arrays.copyOfRange(data, position, position + TRANSACTIONS_HASH_LENGTH);
@@ -495,14 +527,17 @@ public class Block {
 	
 			//long atFeesL = Longs.fromByteArray(atFees);
 
-			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, atBytes); //, atFeesL);
+			block = new Block(version, reference, generator, transactionsHash, atBytes, signature); //, atFeesL);
 		}
 		else
 		{
 			// GENESIS BLOCK version = 0
-			block = new Block(version, reference, generator, generatingBalance, signature, transactionsHash, new byte[0]);
+			block = new Block(version, reference, generator, transactionsHash, new byte[0], signature);
 		}
-
+		
+		if (forDB)
+			block.setGeneratingBalance(generatingBalance);
+		
 		//READ TRANSACTIONS COUNT
 		byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
 		int transactionCount = Ints.fromByteArray(transactionCountBytes);
@@ -558,7 +593,7 @@ public class Block {
 		return block;
 	}
 
-	public byte[] toBytes(boolean withSign)
+	public byte[] toBytes(boolean withSign, boolean forDB)
 	{
 		byte[] data = new byte[0];
 
@@ -575,10 +610,12 @@ public class Block {
 		byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 
-		//WRITE GENERATING BALANCE
-		byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
-		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
-		data = Bytes.concat(data, generatingBalanceBytes);
+		if (forDB) {
+			//WRITE GENERATING BALANCE
+			byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
+			generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
+			data = Bytes.concat(data, generatingBalanceBytes);
+		}
 
 		//WRITE TRANSACTIONS HASH
 		data = Bytes.concat(data, this.transactionsHash);
@@ -658,10 +695,10 @@ public class Block {
 		this.signature = Crypto.getInstance().sign(account, data);
 	}
 
-	public int getDataLength()
+	public int getDataLength(boolean forDB)
 	{
 
-		int length = BASE_LENGTH;
+		int length = BASE_LENGTH + (forDB?GENERATING_BALANCE_LENGTH:0);
 
 		if(this.version > 1)
 		{
@@ -730,7 +767,10 @@ public class Block {
 		if (len < 1)
 			return 1;
 			
-		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / generatingBalance;
+		if (generatingBalance == 0) {
+			return 1;
+		}
+		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance );
 		
 		if (times < 100) {
 			if (len > times * 7)
@@ -775,7 +815,7 @@ public class Block {
 		else
 			win_value >>= 11;
 			*/
-		win_value >>= 10;
+		win_value >>= 8;
 		
 		return win_value;
 
@@ -785,21 +825,18 @@ public class Block {
 	{
 		if (this.version == 0) {
 			// GENESIS
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
 
 		int height = this.getHeightByParent(dbSet);
 		
 		if (this.creator == null) {
 			LOGGER.error("block.creator == null in BLOCK:" + height);
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
-
+		
 		if (this.generatingBalance == 0) {
-			// if it block not calculated before
-			this.setGeneratingBalance(dbSet);
-			LOGGER.error("block.generatingBalance == 0 in BLOCK:" + height);
-			this.generatingBalance = 77;
+			this.setCalcGeneratingBalance(dbSet);
 		}
 		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
@@ -819,11 +856,32 @@ public class Block {
 			i++;
 			win_value += parent.calcWinValue(dbSet);
 			
+			
 			parent = parent.getParent(dbSet);
 		}
 		
 		if (i == 0) {
 			return this.calcWinValue(dbSet);
+		}
+
+		
+		long average = win_value / i;
+		average = average + (average>>2);
+
+		// remove bigger values
+		win_value = 0;
+		parent = this.getParent(dbSet);
+		i = 0;
+		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
+		{
+			i++;
+			long value = parent.calcWinValue(dbSet);
+			if (value > (average)) {
+				value = average;
+			}
+			win_value += parent.calcWinValue(dbSet);
+			
+			parent = parent.getParent(dbSet);
 		}
 		
 		return win_value / i;
@@ -833,16 +891,17 @@ public class Block {
 	public int calcWinValueTargeted2(long win_value, long target)
 	{
 		
-		int koeff = 1024;
+		int max_targ = BlockChain.BASE_TARGET * 15;
+		int koeff = BlockChain.BASE_TARGET;
 		int result = 0;
-		while (koeff > 0 && result < 15000 && win_value > target<<1) {
-			result += 1000; 
+		while (koeff > 0 && result < max_targ && win_value > target<<1) {
+			result += BlockChain.BASE_TARGET; 
 			koeff >>=1;
 			target <<=1;
 		}
 		result += (int)(koeff * win_value / target);
-		if (result > 15000)
-			result = 15000;
+		if (result > max_targ)
+			result = max_targ;
 		
 		return result;
 		
@@ -853,12 +912,11 @@ public class Block {
 		
 		if (this.version == 0) {
 			// GENESIS - getBlockChain = null
-			return 1000;
+			return BlockChain.BASE_TARGET;
 		}
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
-		//return (int)(1000 * win_value / target);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -942,22 +1000,6 @@ public class Block {
 			return false;			
 		}
 		
-		/* not need
-		if(this.getTimestamp(db) - this.getParent(db).getTimestamp(db) != GENERATING_MIN_BLOCK_TIME) {
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp PERIOD invalid != GENERATING_MIN_BLOCK_TIME");
-				return false;			
-			}
-			*/
-
-		/*
-		//CHECK IF GENERATING BALANCE IS CORRECT
-		if(this.generatingBalance != BlockGenerator.getNextBlockGeneratingBalance(db, this.getParent(db)))
-		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid");
-			return false;
-		}
-		*/
-
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
@@ -969,74 +1011,27 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version AT invalid");
 			return false;
 		}
-		
-		/*
-		int generatingBalance = calcGeneratingBalance(db);
-		this.generatingBalance = generatingBalance; // for recalc all
-		if (this.generatingBalance != generatingBalance) {
-			generatingBalance = calcGeneratingBalance(db);
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].generatingBalance invalid this.generatingBalance: " + this.generatingBalance
-					+ " != calcGeneratingBalance(db): " + calcGeneratingBalance(db)
-					+ " for: " + this.getCreator().getAddress());
+					
+		// TEST repeated win for CREATOR
+		int base;			
+		if (false &&  height < 10) {
+			base = (BlockChain.BASE_TARGET>>2) + (BlockChain.BASE_TARGET>>3);
+		} else {
+			base = BlockChain.BASE_TARGET>>1;
+		}
+		int targetedWinValue = this.calcWinValueTargeted(db); 
+		if (base > targetedWinValue) {
+			targetedWinValue = this.calcWinValueTargeted(db);
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] targeted WIN_VALUE < 1/2 TARGET");
 			return false;
 		}
-		*/
-			
-		// TEST repeated win for CREATOR
-		Block testBlock = this.getParent(db);
+		
+		/*
 		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
 			if (testBlock.getCreator().equals(this.creator)) {
 				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
 				return false;
 			}
-		}
-		
-		// TODO
-		/*
-		if (!BlockChain.isGoodWinForTarget(height, winned_value, target)) {
-			return 0l;
-		}
-		*/
-
-
-		/*
-		//CREATE TARGET
-		byte[] targetBytes = new byte[SIGNATURE_LENGTH];
-		Arrays.fill(targetBytes, Byte.MAX_VALUE);
-		BigInteger target = new BigInteger(1, targetBytes);
-
-		//DIVIDE TARGET BY BASE TARGET
-		BigInteger baseTarget = BigInteger.valueOf(BlockGenerator.getBaseTarget(this.generatingBalance));
-		target = target.divide(baseTarget);
-
-		//MULTIPLY TARGET BY USER BALANCE
-		target = target.multiply(this.creator.getGeneratingBalance(db).toBigInteger());
-
-		//MULTIPLE TARGET BY GUESSES
-		long guesses = (this.timestamp - this.getParent(db).getTimestamp()) / 1000; // orid /1000
-		//BigInteger lowerTarget = target.multiply(BigInteger.valueOf(guesses-1)); // orig -1
-		BigInteger lowerTarget = target.multiply(BigInteger.valueOf(guesses-1));
-		target = target.multiply(BigInteger.valueOf(guesses));
-
-		//CONVERT PROOF HASH TO BIGINT
-		BigInteger hashValue = new BigInteger(1, getProofHash());
-
-		//CHECK IF HASH LOWER THEN TARGET (blockchain total hash - "chain length")
-		if(hashValue.compareTo(target) >= 0)
-		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db)
-					+ "].target is invalid!. " + "guesses: " + guesses
-					+ "\nhash >= target:\n" + hashValue.toString() + "\n" + target.toString());
-			return false;
-		}
-
-		//CHECK IF FIRST BLOCK OF USER	
-		if(hashValue.compareTo(lowerTarget) < 0)
-		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db)
-				+ "].lowerTarget invalid!. " + "guesses: " + guesses
-				+ "\nhash < lower:\n" + hashValue.toString() + "\n" + lowerTarget.toString());
-			return false;
 		}
 		*/
 
@@ -1146,6 +1141,10 @@ public class Block {
 	// TODO - make it trownable
 	public void process(DBSet dbSet)
 	{	
+		
+		if (this.generatingBalance == 0) {
+			this.setCalcGeneratingBalance(dbSet);
+		}
 		//PROCESS TRANSACTIONS
 		for(Transaction transaction: this.getTransactions())
 		{
@@ -1182,14 +1181,15 @@ public class Block {
 				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
 				Account richAccount = new Account(rich);
 			
-				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
-						.subtract(bonus_fee), dbSet);
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).subtract(bonus_fee), dbSet);
+				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee);
+				
 			}
 		}
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
-				.add(blockFee), dbSet);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).add(blockFee), dbSet);
+		this.creator.changeBalance(dbSet, false, Transaction.FEE_KEY, blockFee);
 
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
@@ -1225,9 +1225,6 @@ public class Block {
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
 		
-		// if R_SertifyPubKeys change ERMO
-		this.setGeneratingBalance(dbSet);
-
 	}
 
 	public void orphan(DBSet dbSet)
@@ -1238,13 +1235,7 @@ public class Block {
 			i++;
 		}
 		int height = this.getHeight(dbSet);
-		
-		// TEST BUG
-		int genBal = 0;
-		if (height == 13311 || height == 13411 || height == 13477) {
-			genBal = this.calcGeneratingBalance(dbSet);
-		}
-		
+				
 		//ORPHAN AT TRANSACTIONS
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
 
@@ -1257,14 +1248,16 @@ public class Block {
 			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 			{
 				Account recipient = new Account( key.getRecipient() );
-				recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(Transaction.FEE_KEY,  dbSet ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				//recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(dbSet,  Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+				recipient.changeBalance(dbSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ));
 				if ( recipient.getLastReference(dbSet) != null)
 				{
 					recipient.removeReference(dbSet);
 				}
 			}
 			Account sender = new Account( key.getSender() );
-			sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(Transaction.FEE_KEY,  dbSet ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			//sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(dbSet,  Transaction.FEE_KEY ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
+			sender.changeBalance(dbSet, false, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ) );
 
 		}
 
@@ -1284,15 +1277,15 @@ public class Block {
 				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
 
 				Account richAccount = new Account(rich);
-				richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(Transaction.FEE_KEY, dbSet)
-						.add(bonus_fee), dbSet);
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).add(bonus_fee), dbSet);
+				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee);
 				
 			}
 		}
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(Transaction.FEE_KEY, dbSet)
-				.subtract(blockFee), dbSet);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).subtract(blockFee), dbSet);
+		this.creator.changeBalance(dbSet, true, Transaction.FEE_KEY, blockFee);
 
 		//DELETE AT TRANSACTIONS FROM DB
 		dbSet.getATTransactionMap().delete(height);
@@ -1327,15 +1320,6 @@ public class Block {
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
 			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
-
-		// TEST BUG
-		if (height == 13311 || height == 13411 || height == 13477) {
-			genBal = this.calcGeneratingBalance(dbSet);
-		}
-		
-		// if R_SertifyPubKeys change ERMO
-		this.setGeneratingBalance(dbSet);
-
 		this.height_process = -1;
 
 	}

@@ -118,7 +118,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			case COLUMN_BASETARGET:
 
 				long iii = block.calcWinValueTargeted(DBSet.getInstance());
-				return block.getGeneratingBalance() + " "
+				return block.getGeneratingBalance(DBSet.getInstance()) + " "
 					+ iii;
 				
 			case COLUMN_TRANSACTIONS:

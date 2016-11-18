@@ -73,6 +73,14 @@ public class BlockSignsMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	public Long getFullWeight() {
 		return this.fullWeight;
 	}
+	public void setFullWeight(long value) {
+		
+		fullWeight = value;
+		if(this.fullWeightVar != null)
+		{
+			this.fullWeightVar.set(fullWeight);
+		}
+	}
 	
 	public int getStartedInForkHeight() {
 		return this.startedInForkHeight;

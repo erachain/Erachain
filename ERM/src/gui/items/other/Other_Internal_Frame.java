@@ -11,6 +11,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import core.BlockChain;
 import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
@@ -24,6 +25,7 @@ import gui.models.PeersTableModel;
 import gui.models.TransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import network.Network;
 
 public class Other_Internal_Frame extends Main_Internal_Frame {
 	
@@ -39,7 +41,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 	    Dimension size = MainFrame.desktopPane.getSize();
 	   
 		
-		this.setTitle(Lang.getInstance().translate("Other"));
+		this.setTitle(Lang.getInstance().translate("Network DashBoard"));
 		
 		other_Panel other_panel = new other_Panel();
 		
@@ -57,14 +59,8 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
         
         this.jToolBar.setVisible(false);
 		
- 
-        
-       
-        
-        
-     
 		
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Other"));
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort());
 		
  // отключаем все что ниже  		
 		

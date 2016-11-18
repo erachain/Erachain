@@ -114,7 +114,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 
 				if (row == 0) {
 					return block.getHeight(DBSet.getInstance())
-							+ " " + Controller.getInstance().getBlockChain().getFullWeight();
+							+ " " + Controller.getInstance().getBlockChain().getFullWeight(DBSet.getInstance());
 					
 				}
 				
@@ -130,7 +130,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				
 			case COLUMN_BASETARGET:
 				
-				return block.getGeneratingBalance() + " "
+				return block.getGeneratingBalance(DBSet.getInstance()) + " "
 						+ block.calcWinValueTargeted(DBSet.getInstance());
 				
 			case COLUMN_TRANSACTIONS:

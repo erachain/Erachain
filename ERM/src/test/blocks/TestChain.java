@@ -103,7 +103,7 @@ public class TestChain {
 		
 		// 	test controller.Controller.onMessage(Message) -> GET_SIGNATURES_TYPE
 		List<byte[]> headers = blockChain
-				.getSignatures(blockSignature);
+				.getSignatures(dbSet, blockSignature);
 		
 		assertEquals(30, headers.size());
 
@@ -122,7 +122,7 @@ public class TestChain {
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		blockChain = Controller.getInstance().getBlockChain();
 
-		Block block = blockChain.getLastBlock();
+		Block block = blockChain.getLastBlock(dbSet);
 		int height = block.getHeight(dbSet);
 		Account creator = block.getCreator();
 		int forging = creator.getForgingData(dbSet, height);
@@ -161,8 +161,8 @@ public class TestChain {
 		Block block;
 		long totalWin = 0l;
 		int i = 1;
-		while (i <= blockChain.getHeight()) {
-			block = blockChain.getBlock(i);
+		while (i <= blockChain.getHeight(dbSet)) {
+			block = blockChain.getBlock(dbSet, i);
 			int win_value = block.calcWinValueTargeted(dbSet);
 			int www = dbHeight.getWeight(block);
 			if (www != win_value) {
@@ -181,7 +181,7 @@ public class TestChain {
 			i++;
 		}
 		
-		long realWeight = blockChain.getFullWeight();
+		long realWeight = blockChain.getFullWeight(dbSet);
 		int diff = (int)(realWeight - totalWin);
 		assertEquals(0, diff);
 		

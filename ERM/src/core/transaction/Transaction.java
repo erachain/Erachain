@@ -82,6 +82,7 @@ public abstract class Transaction {
 	public static final int INVALID_TAGS_LENGTH = 42;
 	public static final int INVALID_TYPE_LENGTH = 43;
 	public static final int NOT_MOVABLE_ASSET = 44;
+	public static final int NOT_DEBT_ASSET = 45;
 
 	public static final int INVALID_NAME_LENGTH = 50;
 	public static final int INVALID_ICON_LENGTH = 51;
@@ -469,6 +470,35 @@ public abstract class Transaction {
 			// add overheat
 			fee += (len - 1000);
 		}
+
+		// FEE_FOR_ANONIMOUSE !
+		///if (this.getBlockHeightByParent(db))
+		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
+		int anonimuus = 0;
+		Controller cnt = Controller.getInstance();
+		BlockChain bchain = cnt.getBlockChain();
+		
+		// TODO DBSet get from CHAIN
+		/*
+		for ( Account acc : this.getRecipientAccounts())
+		{
+			//byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
+			if (!acc.isPerson(bchain.getDB())) {
+				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
+			}
+		}
+		
+		if ( anonimuus == 0 && this.creator != null) {
+			byte[] publicKey = cnt.getPublicKeyByAddress(this.creator.getAddress());
+			if (publicKey == null) {
+				anonimuus += BlockChain.FEE_FOR_ANONIMOUSE;
+			}
+		}
+		*/
+		
+		if ( anonimuus > 0) {
+			fee *= anonimuus;
+		}
 		
 		return (int) fee * BlockChain.FEE_PER_BYTE;
 	}
@@ -813,7 +843,7 @@ public abstract class Transaction {
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
+		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}
@@ -830,8 +860,8 @@ public abstract class Transaction {
 		// TODO if PERSON die - skip it steep
 		if (personDuration == null) {
 			// USE all GIFT for current ACCOUNT
-			creator.addBalanceOWN(FEE_KEY,
-					BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
+			//creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
 			return;
 		}
 		
@@ -849,8 +879,8 @@ public abstract class Transaction {
 			fee_gift_next = fee_gift - 1;
 		
 		int fee_gift_get =  fee_gift - fee_gift_next;
-		BigDecimal fee_gift_get_BD = BigDecimal.valueOf(asOrphan?-fee_gift_get:fee_gift_get, BlockChain.FEE_SCALE);		
-		invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
+		//invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
+		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE));
 		
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
 			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
@@ -867,8 +897,8 @@ public abstract class Transaction {
 			this.calcFee();
 	
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-						.subtract(this.fee), db);
+				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(this.fee), db);
+				this.creator.changeBalance(db, true, FEE_KEY, this.fee);
 
 			}
 			
@@ -889,7 +919,8 @@ public abstract class Transaction {
 	{
 		if (!asPack) {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db).add(this.fee), db);
+				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).add(this.fee), db);
+				this.creator.changeBalance(db, false, FEE_KEY, this.fee);
 
 			}
 			

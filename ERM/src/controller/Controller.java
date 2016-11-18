@@ -151,12 +151,15 @@ public class Controller extends Observable {
 	public String getVersion() {
 		return version;
 	}
+	public void setDBSet(DBSet db) {
+		this.dbSet = db;
+	}
 
 	public int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {
-			return Network.TESTNET_PORT;
+			return BlockChain.TESTNET_PORT;
 		} else {
-			return Network.MAINNET_PORT;
+			return BlockChain.MAINNET_PORT;
 		}
 	}
 	
@@ -204,10 +207,10 @@ public class Controller extends Observable {
 	{
 		LOGGER.info(
 			"STATUS OK\n" 
-			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock().getSignature()) + "\n"
-			+ "| Last Block Height: " + this.blockChain.getLastBlock().getHeight(this.dbSet) + "\n"
-			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock().getTimestamp(this.dbSet)) + "\n"
-			+ "| Last Block Found " + DateTimeFormat.timeAgo(this.blockChain.getLastBlock().getTimestamp(this.dbSet)) + " ago."
+			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock(dbSet).getSignature()) + "\n"
+			+ "| Last Block Height: " + this.blockChain.getLastBlock(dbSet).getHeight(this.dbSet) + "\n"
+			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(dbSet).getTimestamp(this.dbSet)) + "\n"
+			+ "| Last Block Found " + DateTimeFormat.timeAgo(this.blockChain.getLastBlock(dbSet).getTimestamp(this.dbSet)) + " ago."
 			);
 	}
 	
@@ -221,7 +224,7 @@ public class Controller extends Observable {
 	}
 	
 	public Tuple2<Integer, Long> getMyHWeight(boolean withWinBuffer) {
-		return this.blockChain.getHWeight(withWinBuffer);
+		return this.blockChain.getHWeight(dbSet, withWinBuffer);
 	}
 
 	public void sendMyHWeightToPeer (Peer peer) {
@@ -755,7 +758,7 @@ public class Controller extends Observable {
 			this.getBuildTimestamp() ));
 		
 		// GET HEIGHT
-		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(false);
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
 		// SEND HEIGTH MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
 				HWeight));
@@ -836,7 +839,7 @@ public class Controller extends Observable {
 	}
 
 	public List<byte[]> getNextHeaders(byte[] signature) {
-		return this.blockChain.getSignatures(signature);
+		return this.blockChain.getSignatures(dbSet, signature);
 	}
 
 	// SYNCHRONIZED DO NOT PROCESSS MESSAGES SIMULTANEOUSLY
@@ -930,7 +933,7 @@ public class Controller extends Observable {
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = this.blockChain
-						.getBlock(getBlockMessage.getSignature());
+						.getBlock(dbSet, getBlockMessage.getSignature());
 
 				/*
 				if (newBlock != null)
@@ -964,11 +967,11 @@ public class Controller extends Observable {
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
 
-				int isNewWinBlockValid = this.blockChain.isNewBlockValid(newBlock);
+				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
 				// CHECK IF VALID
 				if(isNewWinBlockValid == 0)	{
-					if (blockChain.setWaitWinBuffer(newBlock)) {
+					if (blockChain.setWaitWinBuffer(dbSet, newBlock)) {
 						// IF IT WIN
 						
 						/*
@@ -1000,7 +1003,7 @@ public class Controller extends Observable {
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();
 
-				int isNewBlockValid = this.blockChain.isNewBlockValid(newBlock);
+				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 								
 				if(this.isProcessingWalletSynchronize()) {
 					
@@ -1135,29 +1138,61 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		long maxPeerWeight = this.getMaxPeerHWeight().b;
-		long chainWeight = this.blockChain.getHWeight(false).b;
+		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
+		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeight(dbSet, false);
+		if (maxHW.a > thisHW.a ) {
+			return false;
+		} else if (maxHW.a < thisHW.a)
+			return true;
+		
+		long maxPeerWeight = maxHW.b;
+		long chainWeight = thisHW.b;
+		if (maxPeerWeight > chainWeight) {
+			// SAME last block?
+			int pickTarget = BlockChain.BASE_TARGET >>2;
+			if (true || (maxPeerWeight - chainWeight < pickTarget)) {
+				byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+
+				try {
+					Block maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c);
+					if (maxBlock != null) {
+						// SAME LAST BLOCK
+						//this.blockChain.getHWeight(dbSet, false);
+						dbSet.getBlockSignsMap().setFullWeight(maxPeerWeight);
+						return true;
+					}
+				} catch (Exception e) {
+					// pass
+					this.onDisconnect(maxHW.c);
+				}
+			}
+		}
 		//LOGGER.info("Controller.isUpToDate getMaxPeerHWeight:" + maxPeerWeight + "<=" + chainWeight);
 
 		return maxPeerWeight <= chainWeight;
 	}
 	
 	public boolean isReadyForging() {
+		
+		/*
 		if (this.peerHWeight.size() == 0) {
-			return true;
+			return false;
 		}
 
 		if (true) {
 			int maxPeerHeight = this.getMaxPeerHWeight().a;
-			int chainHeight = this.blockChain.getHWeight(false).a;
+			int chainHeight = this.blockChain.getHWeight(dbSet, false).a;
 			int diff = chainHeight - maxPeerHeight;
 			return diff >= 0;
 		} else {
 			long maxPeerWeight = this.getMaxPeerHWeight().b;
-			long chainWeight = this.blockChain.getHWeight(false).b;
+			long chainWeight = this.blockChain.getHWeight(dbSet, false).b;
 			long diff = chainWeight - maxPeerWeight;
 			return diff >= 0 && diff < 999;
 		}
+		*/
+		
+		return true;
 	}
 	
 	public boolean isNSUpToDate() {
@@ -1177,12 +1212,12 @@ public class Controller extends Observable {
 		this.notifyObservers(new ObserverMessage(
 				ObserverMessage.NETWORK_STATUS, this.status));
 		
-		DBSet dbSet = DBSet.getInstance();
+		//DBSet dbSet = DBSet.getInstance();
 
 		Peer peer = null;
 		//Block lastBlock = getLastBlock();
 		//int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
-		int checkPointHeight = this.getBlockChain().getCheckPoint();
+		int checkPointHeight = this.getBlockChain().getCheckPoint(dbSet);
 		
 		try {
 			// WHILE NOT UPTODATE
@@ -1258,10 +1293,11 @@ public class Controller extends Observable {
 		return highestPeer;
 	}
 
-	public Tuple2<Integer, Long> getMaxPeerHWeight() {
+	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight() {
 		
 		int height = 0;
 		long weight = 0;
+		Peer maxPeer = null;
 
 		try {
 			synchronized (this.peerHWeight) {
@@ -1269,6 +1305,7 @@ public class Controller extends Observable {
 					if (weight < this.peerHWeight.get(peer).b) {
 						height = this.peerHWeight.get(peer).a;
 						weight = this.peerHWeight.get(peer).b;
+						maxPeer = peer;
 					}
 				}
 			}
@@ -1276,7 +1313,7 @@ public class Controller extends Observable {
 			// PEER REMOVED WHILE ITERATING
 		}
 
-		return new Tuple2<Integer, Long>(height, weight);
+		return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
 	}
 
 	// WALLET
@@ -1485,7 +1522,10 @@ public class Controller extends Observable {
 		}
 		
 		// CHECK IF IN TRANSACTION DATABASE
+		if (database.getTransactionMap().contains(signature)) {
 		return database.getTransactionMap().get(signature);
+		}
+		return null;
 	}
 
 	public List<Transaction> getLastTransactions(Account account, int limit) {
@@ -1643,11 +1683,11 @@ public class Controller extends Observable {
 
 	public int getMyHeight() {
 		// need for TESTs
-		return this.blockChain != null? this.blockChain.getHWeight(false).a: -1;
+		return this.blockChain != null? this.blockChain.getHWeight(dbSet, false).a: -1;
 	}
 
 	public Block getLastBlock() {
-		return this.blockChain.getLastBlock();
+		return this.blockChain.getLastBlock(dbSet);
 	}
 	
 	public byte[] getWalletLastBlockSign() {
@@ -1655,23 +1695,20 @@ public class Controller extends Observable {
 	}
 	
 	public Block getBlock(byte[] header) {
-		return this.blockChain.getBlock(header);
+		return this.blockChain.getBlock(dbSet, header);
 	}
 
 	public Pair<Block, List<Transaction>> scanTransactions(Block block,
 			int blockLimit, int transactionLimit, int type, int service,
 			Account account) {
-		return this.blockChain.scanTransactions(block, blockLimit,
+		return this.blockChain.scanTransactions(dbSet, block, blockLimit,
 				transactionLimit, type, service, account);
 
 	}
 
-	public long getNextBlockGeneratingBalance(Block block) {
-		return block.getGeneratingBalance();
-	}
 	public long getNextBlockGeneratingBalance() {
 		Block block = this.dbSet.getBlockMap().getLastBlock();
-		return getNextBlockGeneratingBalance(block);
+		return block.getGeneratingBalance(dbSet);
 	}
 
 
@@ -2074,6 +2111,14 @@ public class Controller extends Observable {
 					key, amount, feePow, message, isText, encryptMessage);
 		}
 	}
+	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount sender,
+			int feePow, Account recipient, long key,BigDecimal amount,
+			byte[] isText, byte[] message, byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Send(version, sender, recipient,
+					key, amount, feePow, message, isText, encryptMessage);
+		}
+	}
 
 	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount sender,
 			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {
@@ -2177,13 +2222,6 @@ public class Controller extends Observable {
 		return getBlockByHeight(this.dbSet, parseInt);
 	}
 
-	public PublicKeyAccount getPublicKeyByAddress1(String address) {
-		if(this.doesWalletExists()) {
-			return this.wallet.getPublicKeyAccount(address);
-		} else {
-			return null;
-		}
-	}
 
 	public byte[] getPublicKeyByAddress(String address) {
 
@@ -2206,9 +2244,11 @@ public class Controller extends Observable {
 			return null;
 		}
 
-		Transaction transaction = cntr.getTransaction(
-				getSignatureByAddrTime(db, address, db.getReferenceMap().get(address)));
-
+		byte[] sign = getSignatureByAddrTime(db, address, db.getReferenceMap().get(address));
+		if (sign == null)
+			return null;
+				
+		Transaction transaction = cntr.getTransaction(sign);
 		if (transaction == null) {
 			return null;
 		}

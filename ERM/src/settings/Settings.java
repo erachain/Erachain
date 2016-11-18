@@ -28,6 +28,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import controller.Controller;
+import core.BlockChain;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;
@@ -41,8 +42,8 @@ public class Settings {
 	private static final int DEFAULT_MAX_CONNECTIONS = 50;
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 20;
 	private static final int DEFAULT_MAX_SENT_PEERS = 20;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
-	private static final int DEFAULT_PING_INTERVAL = 30000;
+	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000; // 10000 
+	private static final int DEFAULT_PING_INTERVAL = 60000;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	//private static final String[] DEFAULT_PEERS = { };
 	
@@ -55,11 +56,10 @@ public class Settings {
 	public static final int CONFIRMS_TRUE = 333; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1476016077777L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1477635567777L; //1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC
-	private static final int DEFAULT_RPC_PORT = 9085;
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_RPC_ENABLED = true;
 	
@@ -68,7 +68,6 @@ public class Settings {
 	public static final int DEFAULT_ACCOUNTS = 3;
 	
 	//WEB
-	private static final int DEFAULT_WEB_PORT = 9090;
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_WEB_ENABLED = true;
 	
@@ -542,7 +541,7 @@ public class Settings {
 			return ((Long) this.settingsJSON.get("rpcport")).intValue();
 		}
 		
-		return DEFAULT_RPC_PORT;
+		return BlockChain.DEFAULT_RPC_PORT;
 	}
 	
 	public String[] getRpcAllowed()
@@ -592,7 +591,7 @@ public class Settings {
 			return ((Long) this.settingsJSON.get("webport")).intValue();
 		}
 		
-		return DEFAULT_WEB_PORT;
+		return BlockChain.DEFAULT_WEB_PORT;
 	}
 	
 	public boolean isGuiConsoleEnabled() 

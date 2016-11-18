@@ -41,7 +41,7 @@ public class Synchronizer
 	
 	static boolean USE_AT_ORPHAN = true;
 	
-	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
 		AT_API_Platform_Impl.getInstance().setDBSet( fork );
@@ -74,7 +74,9 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				if (Controller.getInstance().getBlockChain().getCheckPoint() > lastBlock.getParentHeight(fork)) {
+				if (Controller.getInstance().getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
+					peer.close(); // icreator
+
 					throw new Exception("Dishonest peer by not valid lastCommonBlock["
 							+ lastCommonBlock.getHeight(fork) + "]");
 				}
@@ -112,7 +114,6 @@ public class Synchronizer
 				fork.getATMap().deleteAllAfterHeight( height_AT );
 				fork.getATStateMap().deleteStatesAfter( height_AT );
 			}
-			
 	
 		}
 		
@@ -130,6 +131,9 @@ public class Synchronizer
 			else
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
+
+				peer.close(); // icreator
+
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
 			}
@@ -139,12 +143,12 @@ public class Synchronizer
 	}
 
 	// process new BLOCKS to DB and orphan DB
-	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks) throws Exception
+	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
 		
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks);	
+		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks, peer);	
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
 		
@@ -230,6 +234,10 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
+			if (false && signatures.b.size() == 0) {
+				// TODO it is because incorrect calculate WIN_TARGET value
+				dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
 			//CREATE BLOCK BUFFER
@@ -240,11 +248,19 @@ public class Synchronizer
 			{
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
-				//int blockHeightFromPeer = blockFromPeer.getHeight(dbSet);
+				if (blockFromPeer == null) { // icreator
+					
+					LOGGER.info("synchronize - blockFromPeer = null: " + peer.getAddress());
+
+					peer.close();
+					return;
+				}
+				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
 				
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
 				{
+					peer.close(); // icreator
 					//INVALID BLOCK THROW EXCEPTION
 					throw new Exception("Dishonest peer on block " + blockFromPeer.getHeight(dbSet));
 				}
@@ -263,7 +279,7 @@ public class Synchronizer
 			/*
 			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			*/
-			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks);
+			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks, peer);
 			
 			//SEND ORPHANED TRANSACTIONS TO PEER
 			for(Transaction transaction: orphanedTransactions)
@@ -310,8 +326,12 @@ public class Synchronizer
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
-		if (response == null)
+		if (response == null) {
+			//peer.close(); // icreator
+			peer.onPingFail(); // icreator
+
 			throw new Exception("Failed to communicate with peer - response = null");
+		}
 
 		return response.getSignatures();
 	}
@@ -330,8 +350,9 @@ public class Synchronizer
 		
 		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
 		int maxChainHeight = dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
-		if (maxChainHeight < checkPointHeight)
+		if (maxChainHeight < checkPointHeight) {
 			maxChainHeight = checkPointHeight;
+		}
 
 		LOGGER.info("core.Synchronizer.findLastCommonBlock(Peer) for: "
 				+ " getBlockMap().getLastBlock: " + maxChainHeight
@@ -347,10 +368,12 @@ public class Synchronizer
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
 			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
-			checkPointHeightCommonBlock = this.getBlock(checkPointHeightSignature, peer);			
+			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);			
 		}
 
 		if (checkPointHeightSignature == null) {
+			peer.close(); // icreator
+
 			throw new Exception("Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found");			
 		}
@@ -378,8 +401,12 @@ public class Synchronizer
 		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignature = headers.remove(0);
 		}
-		if (headers.isEmpty()) {				
-			throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
+		if (headers.isEmpty()) {
+			if (true) {
+				peer.close(); // icreator
+
+				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
+			}
 		}
 
 		
@@ -393,10 +420,10 @@ public class Synchronizer
 		for(byte[] signature: signatures)
 		{
 			//ADD TO LIST
-			Block block = this.getBlock(signature, peer);
-			// NOE generating balance not was send by NET
+			Block block = getBlock(signature, peer);
+			// NOW generating balance not was send by NET
 			// need to SET it!
-			block.setGeneratingBalance(dbSet);
+			block.setCalcGeneratingBalance(dbSet);
 
 			blocks.add(block);	
 		}
@@ -404,7 +431,7 @@ public class Synchronizer
 		return blocks;
 	}
 	
-	private Block getBlock(byte[] signature, Peer peer) throws Exception
+	public static Block getBlock(byte[] signature, Peer peer) throws Exception
 	{
 		//CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
@@ -415,6 +442,8 @@ public class Synchronizer
 		//CHECK IF WE GOT RESPONSE
 		if(response == null)
 		{
+			peer.close(); // icreator
+
 			//ERROR
 			throw new Exception("Peer timed out");
 		}
@@ -423,6 +452,8 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!block.isSignatureValid())
 		{
+			peer.close(); // icreator
+
 			throw new Exception("*** Invalid block --signature");
 		}
 		

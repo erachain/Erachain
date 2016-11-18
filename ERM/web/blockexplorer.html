@@ -196,17 +196,20 @@ function asyncAjax (url, type){
 				
 				if(type == 'aTs')
 				{
+				
 					document.getElementById('main').innerHTML = aTs(data)
 				}
 				
 				if(type == 'polls')
 				{
+					document.getElementById('main').innerHTML = oppa();
 					document.getElementById('main').innerHTML = polls(data)
 				}
 				
 				if(type == 'poll')
 				{
 					document.getElementById('main').innerHTML = poll(data)
+
 				}
 				
 				if(type == 'assets')
@@ -470,13 +473,40 @@ function topRichest(data)
 	
 	return output;
 }		
+
+
+
+function polls11(a){
+window.location="/index/blockexplorer.html?polls& asset="+ a.value;
+
+
+
+}	
+
+function oppa(){
+var output= '';
+output += '<select name="SelectMyLove" id = "aa" onChange="polls11(this)"; >';
+	output +=' <option value="1" selected>1</option>';
+	output +=' <option value="6">6</option> </select>';
 	
+	return output;
+}
 	
 function polls(data)
 {
 	var output = "";
 	
 	output += lastBlock(data.lastBlock);
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	output += '<h3>Polls</h3>';
 	
@@ -487,27 +517,54 @@ function polls(data)
 		return output;
 	}
 	
+	
+	
 	var table = '<table id=top100 BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;">';
 	
-	table += '<tr><td><b>Poll<td><b>Votes'; 
+	table += '<tr><td><b>Poll<td><b>Votes<td><b>Asset';//<td><b>View'; 
 	
+	asset_key =  document.getElementById("aa").options.selectedIndex;
+	 dat=data;
 	for(key in data.pools) {
 		table += '<tr>';
 		
-		table += '<td>' + '<a href=?poll='+encodeURIComponent(key)+'>' + htmlFilter(key) + '</a>';
+		table += '<td>' +  htmlFilter(key);
 		if(data.pools[key].new)
 		{
 			table += ' <b>New!</b>';
 		}
 		table += '<td>' + addCommas(data.pools[key].totalVotes);
 		
+// select
+		table += '<td><select style="0" onchange="Onselect(dat,this.options[this.selectedIndex].value)">';
+	
+	table += '<option>Выберите актив</option>';
+	a=0;	
+	for (a in data.assets){	
+		table += '<option>'+ data.assets[a].name +'</option>';
+		
+  	}
+	table +='</select></td>';
+// переход		
+//	table += '<td>' + '<a href=?poll='+encodeURIComponent(key)+'&asset='+encodeURIComponent(asset_key)+'>>></a>';
+	
+	
 	}
+	
+	
 	table += '</table>';
 	
 	output += table;
 	
+		
 	return output;
 }		
+function Onselect(data,a){
+
+for (c in data.assets){
+ if ( a == data.assets[c].name) {document.location='?poll='+encodeURIComponent(key)+'&asset='+c;} 
+}
+}
 
 function poll(data)
 {
@@ -576,6 +633,9 @@ function poll(data)
 		output += '<td>'+addCommas(data.pool.votes[key].votes);
 	}
 	output += '</table>';
+	
+	
+	
 	
 	return output;
 }	
@@ -3147,7 +3207,7 @@ function start() {
 	
 	if(params.hasOwnProperty('polls'))
 	{
-		asyncAjax('blockexplorer.json?polls', 'polls')
+		asyncAjax('blockexplorer.json?polls& asset = ' +params['asset'], 'polls')
 		
 		document.title = title + ' - Polls';
 		
@@ -3350,7 +3410,7 @@ function start() {
 	
 	if(params.hasOwnProperty('poll'))
 	{
-		asyncAjax('blockexplorer.json?poll=' + params['poll'], 'poll');
+		asyncAjax('blockexplorer.json?poll=' + params['poll']+'& asset=' +params['asset'], 'poll');
 		
 		document.title = title + ' - Poll - ' + decodeURIComponent(params['poll']);
 		
@@ -3489,7 +3549,7 @@ function start() {
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
 				<li id=menuTop100Richest><a href="?top=100">Top 100 Richest</a></li>
-				<li id=menuPolls><a href="?polls">Polls</a></li>
+				<li id=menuPolls><a href="?polls&asset=1">Polls</a></li>
 				<li id=menuAssets><a href="?assets">Assets</a></li>
 				<li id=menuATs><a href="?aTs">ATs</a></li>				
               </ul>

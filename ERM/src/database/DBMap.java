@@ -159,7 +159,8 @@ public abstract class DBMap<T, U> extends Observable {
 			if(this.parent == null)
 			{
 				// IT IS NOT FORK
-				if(!(this.databaseSet instanceof WalletDatabase && Controller.getInstance().isProcessingWalletSynchronize()))
+				if(!(this.databaseSet instanceof WalletDatabase
+						&& Controller.getInstance().isProcessingWalletSynchronize()))
 				{
 					this.databaseSet.commit();
 				}

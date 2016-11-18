@@ -1,6 +1,7 @@
 package core.transaction;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,8 +25,11 @@ import core.item.assets.AssetCls;
 import database.AddressForging;
 //import database.BalanceMap;
 import database.DBSet;
+import lang.Lang;
 import utils.NumberAsString;
 
+//typeBytes[1] (version) = 1 - CONFISCATE CREDIT
+//typeBytes[2] = -128 if NO AMOUNT
 public abstract class TransactionAmount extends Transaction {
 
 	protected static final int AMOUNT_LENGTH = 8;
@@ -45,7 +49,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (amount == null || amount.equals(BigDecimal.ZERO)) {
 			// set version to 1
-			typeBytes[1] = (byte)(typeBytes[1] | (byte)-128);
+			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
 			this.amount = amount;
 		}
@@ -61,7 +65,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (amount == null || amount.equals(BigDecimal.ZERO)) {
 			// set version to 1
-			typeBytes[1] = (byte)(typeBytes[1] | (byte)-128);
+			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
 			this.amount = amount;
 		}
@@ -139,6 +143,25 @@ public abstract class TransactionAmount extends Transaction {
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 
+	public String viewSendType() {
+		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+		
+		if (this.key > 0) {
+			if (amo_sign > 0) {
+				return "PROPERTY";
+			} else { 
+				return "HOLD";
+			}
+		} else {
+			if (amo_sign > 0) {
+				return "CREDIT";
+			} else { 
+				return "SPEND";
+			}
+		}
+		// return "SPEND";
+	}
+
 	
 	//PARSE/CONVERT
 	//@Override
@@ -157,9 +180,8 @@ public abstract class TransactionAmount extends Transaction {
 			data = Bytes.concat(data, keyBytes);
 			
 			//WRITE AMOUNT
-			byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-			byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-			amountBytes = Bytes.concat(fill, amountBytes);
+			byte[] amountBytes = Longs.toByteArray(this.amount.unscaledValue().longValue());
+			amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
 			data = Bytes.concat(data, amountBytes);
 		}
 				
@@ -212,7 +234,7 @@ public abstract class TransactionAmount extends Transaction {
 	public int getDataLength(boolean asPack) {
 		// IF VERSION 1 (amount = null)
 		return (asPack?BASE_LENGTH_AS_PACK:BASE_LENGTH) 
-				- (this.typeBytes[1]<0?(KEY_LENGTH + AMOUNT_LENGTH):0);
+				- (this.typeBytes[2]<0?(KEY_LENGTH + AMOUNT_LENGTH):0);
 	}
 
 	@Override // - fee + balance - calculate here
@@ -231,14 +253,6 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
-		/*
-		//CHECK IF AMOUNT IS POSITIVE
-		if(this.amount != null && this.amount.compareTo(BigDecimal.ZERO) <= 0)
-		{
-			return NEGATIVE_AMOUNT;
-		}
-		*/
-
 		//CHECK IF AMOUNT IS DIVISIBLE
 		long absKey = this.key;
 		if (absKey < 0)
@@ -250,7 +264,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 				
 		if (this.amount != null) {
-			int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
+			int amount_sign = this.amount.signum();
 			if (amount_sign != 0) {
 
 				if(!asset.isDivisible())
@@ -263,82 +277,80 @@ public abstract class TransactionAmount extends Transaction {
 					}
 				}
 
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.creator.getBalance3(absKey, db);
-				BigDecimal balanceUSE = balance.a.add(balance.b);
+				int actionType = Account.actionType(key, amount);
+				
+				if (actionType == 3) {
+					// HOLD GOODS
+					if (!asset.isMovable()) {
+						return NOT_MOVABLE_ASSET;						
+					}					
+				}
+					
+				boolean confiscate_credit = typeBytes[1] == 1; 
+				if (actionType == 2 && confiscate_credit) {
+					// CONFISCATE CREDIT
+					Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+							this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+					BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
+					if (creditAmount.compareTo(amount) < 1) {
+						// NOT ENOUGHT DEBT from recipient to creator
+						return NO_DEBT_BALANCE;
+					}
+					
+				}
 
-				if (this.key > 0) {
-					if (amount_sign < 0) {
-						// HOLD transfer
-						// here amount is negative
-						if (!asset.isMovable()) {
-							return NOT_MOVABLE_ASSET;						
+				if (actionType == 1) {
+					// if asset is unlimited and me is creator of this asset 
+					boolean unLimited = 
+							absKey > AssetCls.DEAL_KEY // not genesis assets!
+							&& asset.getQuantity().equals(0l)
+							&& asset.getCreator().getAddress().equals(this.creator.getAddress());
+		
+					//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+					if (unLimited) {
+						return VALIDATE_OK;
+					} else if (absKey == FEE_KEY) {
+						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.amount.add(this.fee) ) < 0) {
+							return NO_BALANCE;
 						}
-						
-						if (amount.abs().compareTo(balance.c) > 0) {
-							// If the holder does not have enough hold balance
-							return NO_HOLD_BALANCE;
-						}
-						if(this.creator.getBalance(FEE_KEY, db).compareTo( this.fee ) < 0)
-						{
+					} else {
+						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-					} else {
-						// common SEND
-						if (absKey != FEE_KEY) {
-							// CHECK FEE
-							if(this.creator.getBalance(FEE_KEY, db).compareTo(this.fee) < 0)
-							{
-								return NOT_ENOUGH_FEE;
-							}
-				
-							// if asset is unlimited and me is creator of this asset 
-							boolean unLimited = 
-									absKey > AssetCls.DEAL_KEY // not genesis assets!
-									&& asset.getQuantity().equals(0l)
-									&& asset.getCreator().getAddress().equals(this.creator.getAddress());
-				
-							//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-							if(!unLimited && balanceUSE.compareTo(this.amount) < 0)
-							{
-								return NO_BALANCE;
-							}
-						} else {
-							if(balanceUSE.compareTo( this.amount.add(this.fee) ) < 0)
-							{
-								return NO_BALANCE;
-							}
+						BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
+						if (amount.compareTo(balance1) > 0) {
+							return NO_BALANCE;
 						}
+							
 					}
 				} else {
-					// DEBTs
-					if (amount_sign < 0) {
-						// confiscate DEBT
-						Tuple3<BigDecimal, BigDecimal, BigDecimal> debtorBalance = this.recipient.getBalance3(absKey, db);
-						//BigDecimal balanceUSE = balance.a.add(balance.b);
-						if (this.amount.abs().compareTo(debtorBalance.b) > 0) {
-							// here amount is negative
-							return NO_DEBT_BALANCE;
+					// NOT SEND action
+					// TRY FEE
+					if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
+						return NOT_ENOUGH_FEE;
+					}
+					
+					if (actionType == 2) {
+						if (absKey == FEE_KEY) {
+							return NOT_DEBT_ASSET;		
+						}
+						Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3 = this.creator.getBalance(db, absKey);
+						if (balance3.a.add(balance3.c).compareTo(amount) < 0) {
+							// OWN + (-CREDIT)) = max amount that can be used for new credit
+							return NO_BALANCE;
+						}
+					} else if (actionType == 3) {
+						BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
+						if (amount.compareTo(balance1) > 0) {
+							return NO_HOLD_BALANCE;
 						}
 					} else {
-						// give DEBT
-						if (balanceUSE.compareTo(amount) < 0)
-						{
+						// TODO SPEND 
+						BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
+						if (amount.compareTo(balance1) > 0) {
 							return NO_BALANCE;
 						}
 					}
-					
-					// test FEE
-					if(this.creator.getBalanceUSE(FEE_KEY, db)
-							.compareTo( this.fee ) < 0)
-					{
-						return NOT_ENOUGH_FEE;
-					}
-				}
-			} else {
-				if(this.creator.getBalanceUSE(FEE_KEY, db)
-						.compareTo( this.fee ) < 0)
-				{
-					return NOT_ENOUGH_FEE;
 				}
 			}
 		}
@@ -359,56 +371,17 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> creatorBalance = this.creator.getBalance3(absKey, db);
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> recipientBalance = this.recipient.getBalance3(absKey, db);
+		boolean confiscate_credit = typeBytes[1] == 1; 
+		//UPDATE SENDER
+		this.creator.changeBalance(db, !confiscate_credit, key, this.amount);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, confiscate_credit, key, this.amount);
 
-		if (this.key > 0) {
-			if (amount_sign > 0) {
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a.subtract(this.amount), creatorBalance.b, creatorBalance.c),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a.add(this.amount), recipientBalance.b, recipientBalance.c),
-						db);
-				
-				AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
-				if (asset.isMovable()) {
-					// MOVABLE
-					//UPDATE SENDER
-					this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							creatorBalance.a, creatorBalance.b, creatorBalance.c.add(this.amount)),
-							db);
-					//UPDATE RECIPIENT
-					this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							recipientBalance.a, recipientBalance.b, recipientBalance.c.subtract(this.amount)),
-							db);
-				}
-			} else {
-				// HOLD transfer
-				// here amount is negative
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a, creatorBalance.b, creatorBalance.c.add(this.amount)),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a, recipientBalance.b, recipientBalance.c.subtract(this.amount)),
-						db);
-			}
-		} else {
-			/////// DEBTs
-			// give DEBT
-			// or
-			// confiscate DEBT
-			this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					creatorBalance.a, creatorBalance.b.subtract(this.amount), creatorBalance.c),
-					db);
-			//UPDATE RECIPIENT
-			this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					recipientBalance.a, recipientBalance.b.add(this.amount), recipientBalance.c),
-					db);
+		if (confiscate_credit) {
+			// 
+			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			BigDecimal creditAmount = db.getCredit_AddressesMap().add(creditKey, this.amount);
 		}
 		
 		if (!asPack) {
@@ -431,7 +404,7 @@ public abstract class TransactionAmount extends Transaction {
 			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight() + 2;
+			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 2;
 			this.recipient.setLastForgingData(db, blockHeight);
 		}
 	}
@@ -449,58 +422,19 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> creatorBalance = this.creator.getBalance3(absKey, db);
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> recipientBalance = this.recipient.getBalance3(absKey, db);
+		boolean confiscate_credit = typeBytes[1] == 1; 
+		//UPDATE SENDER
+		this.creator.changeBalance(db, confiscate_credit, key, this.amount);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount);
 
-		if (this.key > 0) {
-			if (amount_sign > 0) {
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a.add(this.amount), creatorBalance.b, creatorBalance.c),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a.subtract(this.amount), recipientBalance.b, recipientBalance.c),
-						db);
-				
-				AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
-				if (asset.isMovable()) {
-					// MOVABLE
-					//UPDATE SENDER
-					this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							creatorBalance.a, creatorBalance.b, creatorBalance.c.subtract(this.amount)),
-							db);
-					//UPDATE RECIPIENT
-					this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							recipientBalance.a, recipientBalance.b, recipientBalance.c.add(this.amount)),
-							db);
-				}
-			} else {
-				// HOLD transfer
-				// here amount is negative
-				//UPDATE SENDER
-				this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						creatorBalance.a, creatorBalance.b, creatorBalance.c.subtract(this.amount)),
-						db);
-				//UPDATE RECIPIENT
-				this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-						recipientBalance.a, recipientBalance.b, recipientBalance.c.add(this.amount)),
-						db);
-			}
-		} else {
-			/////// DEBTs
-			// give DEBT
-			// or
-			// confiscate DEBT
-			this.creator.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					creatorBalance.a, creatorBalance.b.add(this.amount), creatorBalance.c),
-					db);
-			//UPDATE RECIPIENT
-			this.recipient.setBalance3(absKey, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					recipientBalance.a, recipientBalance.b.subtract(this.amount), recipientBalance.c),
-					db);
+		if (confiscate_credit) {
+			// 
+			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
+					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			BigDecimal creditAmount = db.getCredit_AddressesMap().sub(creditKey, this.amount);
 		}
-			
+
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT
@@ -516,7 +450,7 @@ public abstract class TransactionAmount extends Transaction {
 		if (absKey == Transaction.RIGHTS_KEY) {
 			
 			// Parent BLOCK is still in MAP!
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight();
+			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
 				// if it is first payment ERMO - reset last forging BLOCK
 				//this.recipient.delForgingData(db, blockHeight);

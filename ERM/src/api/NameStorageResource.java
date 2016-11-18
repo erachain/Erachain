@@ -130,6 +130,9 @@ public class NameStorageResource {
 	@POST
 	@Path("/update/{name}")
 	public String updateEntry(String x, @PathParam("name") String name) {
+		
+		DBSet dbSet = DBSet.getInstance();
+		
 		try {
 			APIUtils.disallowRemote(request);
 
@@ -391,7 +394,7 @@ public class NameStorageResource {
 								Transaction.CREATOR_NOT_OWNER);
 					}
 					
-					if (account.getBalance(Transaction.FEE_KEY, DBSet.getInstance()).compareTo(
+					if (account.getBalance(dbSet, Transaction.FEE_KEY).a.compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.NO_BALANCE);

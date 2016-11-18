@@ -16,6 +16,8 @@ import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.GenesisIssue_ItemRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Issue_ItemRecord;
@@ -62,6 +64,18 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
 		return this.transactions;
 	}
+	
+	public void setAsset(AssetCls asset){
+		
+	
+	}
+	
+	
+	public   Object getItem(int row)
+	{
+		return this.transactions.get(row).getB();
+	}
+	
 	
 	public Class<? extends Object> getColumnClass(int c)
 	{     // set column type
@@ -162,6 +176,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
 				//recipient = transAmo.getRecipient();
 				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+				if (item == null)
+					return null;
 				itemName = item.toString();
 			} else {
 				itemName = transaction.viewItemName();

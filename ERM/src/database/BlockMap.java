@@ -3,6 +3,7 @@ import java.util.Arrays;
 // 30/03
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -38,6 +39,8 @@ public class BlockMap extends DBMap<byte[], Block>
 	private Var<Boolean> processingVar;
 	private Boolean processing;
 	
+	private List<Block> lastBlocksForTarget;
+
 	private BTreeMap<Tuple2<String, String>, byte[]> generatorMap;
 	
 	public BlockMap(DBSet databaseSet, DB database)
@@ -138,7 +141,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		{
 			this.lastBlockVar.set(this.lastBlockSignature);
 		}
-						
+
 	}
 	
 	public Block getLastBlock()
@@ -189,7 +192,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			// GENESIS block
 			dbSet.getBlockSignsMap().set(signature,
 					new Tuple2<Integer, Integer>(1, core.BlockChain.GENESIS_WIN_VALUE));
-			dbSet.getBlockHeightsMap().set(1l, signature);
+			dbSet.getBlockHeightsMap().add(signature);
 		} else {
 			Block parent = this.get(block.getReference());
 			int height = parent.getHeight(dbSet) + 1;
@@ -197,7 +200,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			dbSet.getBlockSignsMap().set(signature,
 					new Tuple2<Integer, Integer>(height, win_value));
 			//dbSet.getBlockHeightsMap().set((long)height, signature);
-			dbSet.getBlockHeightsMap().add(signature);
+			long heightInMap = dbSet.getBlockHeightsMap().add(signature);
 			
 			//
 			// PROCESS FORGING DATA

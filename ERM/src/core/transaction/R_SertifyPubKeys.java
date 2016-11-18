@@ -29,6 +29,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
@@ -465,18 +466,10 @@ public class R_SertifyPubKeys extends Transaction {
 		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
-				if (BlockChain.START_LEVEL == 1) {
-					//
-				} else {
-					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-						return Transaction.NOT_ENOUGH_RIGHTS;
-				}
+				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				if (BlockChain.START_LEVEL == 1) {
-					//
-				} else {
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
-				}
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 
 			}
 		
@@ -526,24 +519,22 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-			if (BlockChain.START_LEVEL == 1)
-				issueFEE = issueFEE>>2;
+			long issueFEE = transPersonIssue.getFeeLong();
+			//if (true || BlockChain.START_LEVEL == 1)
+			//	issueFEE = issueFEE>>2;
 			
+			// ISSUE NEW COMPU in chain
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			// GIFT from CREATOR to TARGET
+			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
-			// GIVE GIFTs
-			if (BlockChain.START_LEVEL == 1) {
-				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-						.add(BlockChain.GIFTED_ERMO_AMOUNT), db);
-				// for forging set
-				this.creator.setLastForgingData(db, blockIndex);
-			}
-			
-			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.subtract(issueFEE_BD), db);						
-			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-					.add(issueFEE_BD), db);
+			// GIVE GIFTs			
+			//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(issueGIFT_FEE_BD), db);						
+			this.creator.changeBalance(db, true, FEE_KEY, giftFEE_BD);
+			//pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(db, Transaction.FEE_KEY).add(issueFEE_BD), db);
+			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+
+			GenesisBlock.CREATOR.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
 
 		}
 		
@@ -621,23 +612,19 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 			// GET FEE from that record
 			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-			if (BlockChain.START_LEVEL == 1)
-				issueFEE = issueFEE>>2;
+			//if (true || BlockChain.START_LEVEL == 1)
+			//	issueFEE = issueFEE>>2;
 
+			// ISSUE NEW COMPU in chain
 			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			// GIFT from CREATOR to TARGET
+			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
-			// GIVE GIFTs
-			if (BlockChain.START_LEVEL == 1) {
-				this.creator.setBalance(RIGHTS_KEY, this.creator.getBalance(RIGHTS_KEY, db)
-						.subtract(BlockChain.GIFTED_ERMO_AMOUNT), db);						
-				// for forging restore
-				this.creator.setLastForgingData(db, this.creator.getForgingData(db, this.getBlockHeight(db)));
-			}
-			
-			this.creator.setBalance(FEE_KEY, this.creator.getBalance(FEE_KEY, db)
-					.add(issueFEE_BD), db);						
-			pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(Transaction.FEE_KEY, db)
-					.subtract(issueFEE_BD), db);
+			// GIVE GIFTs			
+			this.creator.changeBalance(db, false, FEE_KEY, giftFEE_BD);
+			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+
+			GenesisBlock.CREATOR.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
 
 		}
 

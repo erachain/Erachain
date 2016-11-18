@@ -19,8 +19,8 @@ public class BlockSerializer implements Serializer<Block>, Serializable
 	@Override
 	public void serialize(DataOutput out, Block value) throws IOException 
 	{
-		out.writeInt(value.getDataLength());
-        out.write(value.toBytes(true));
+		out.writeInt(value.getDataLength(true));
+        out.write(value.toBytes(true, true));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class BlockSerializer implements Serializer<Block>, Serializable
         in.readFully(bytes);
         try 
         {
-        	return BlockFactory.getInstance().parse(bytes);
+        	return BlockFactory.getInstance().parse(bytes, true);
 		} 
         catch (Exception e) 
         {

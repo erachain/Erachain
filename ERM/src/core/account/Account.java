@@ -115,9 +115,12 @@ public class Account {
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
 		return balance.a.add(balance.b);
 	}
-	
+
+	/*
 	public BigDecimal getBalance(long key)
 	{
+		if (key < 0)
+			key = -key;
 		return this.getBalance(key, DBSet.getInstance());
 	}	
 	public BigDecimal getBalance(long key, DBSet db)
@@ -137,17 +140,6 @@ public class Account {
 			return balance.c;
 	}
 	
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance3(long key)
-	{
-		return this.getBalance3(key, DBSet.getInstance());
-	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance3(long key, DBSet db)
-	{
-		return db.getAssetBalanceMap().get(getAddress(), key);
-	}
-
-	
-	/*
 	public Integer setConfirmedPersonStatus(long personKey, long statusKey, int end_date, DBSet db)
 	{
 		return db.getPersonStatusMap().addItem(personKey, statusKey, end_date);
@@ -165,7 +157,6 @@ public class Account {
 		//UPDATE BALANCE IN DB
 		db.getAssetBalanceMap().set(getAddress(), Transaction.FEE_KEY, amount);
 	}
-	*/
 	//
 	public void setBalance(long key, BigDecimal balance)
 	{
@@ -175,18 +166,125 @@ public class Account {
 	// TODO in_OWN in_RENT on_HOLD
 	public void setBalance(long key, BigDecimal balance, DBSet db)
 	{
+
+		int type = 1;
+		if (key < 0) {
+			key = -key;
+			type = 2;
+		}
+		
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = db.getAssetBalanceMap().get(getAddress(), key); 
 		//UPDATE BALANCE IN DB
-		if (key > 0) {
+		if (type == 1) {
 			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance, value.b, value.c);
 		} else {
 			// SET RENT balance
-			key = -key;
 			value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, balance, value.c);
 		}
 		db.getAssetBalanceMap().set(getAddress(), key, value);
 	}
+	*/
+
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(long key)
+	{
+		return this.getBalance(DBSet.getInstance(), key);
+	}
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(DBSet db, long key)
+	{
+		if (key < 0)
+			key = -key;
+			
+		return db.getAssetBalanceMap().get(getAddress(), key);
+	}
 	
+	public BigDecimal getBalance(DBSet db, long key, int actionType)
+	{
+		if (key < 0)
+			key = -key;
+			
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		if (actionType == 1)
+			return balance.a;
+		else if (actionType == 2)
+			return balance.b;
+		else if (actionType == 3)
+			return balance.c;
+		else
+			return balance.a;
+
+	}
+
+	public static int actionType(long key, BigDecimal amount) {
+		int type;
+		int amount_sign = amount.signum();
+		if (key > 0) {
+			if (amount_sign > 0) {
+				// SEND 
+				type = 1;
+			} else {
+				// HOLD in STOCK
+				type = 3;
+			}
+		} else {
+			if (amount_sign > 0) {
+				// give CREDIT or BORROW CREDIT
+				type = 2;
+			} else {
+				// PRODUCE or SPEND 
+				type = 4;				
+			}
+		}
+		
+		return type;
+		
+	}
+	
+	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DBSet db, boolean subtract, long key, BigDecimal amount) 
+	{
+		
+		int type = actionType(key, amount);
+		long absKey;
+		if (key > 0) {
+			absKey = key;
+		} else {
+			absKey = -key;
+		}
+
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), absKey);
+
+		if (type == 1) {
+			// OWN + property
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					subtract?balance.a.subtract(amount):balance.a.add(amount),
+					balance.b, balance.c
+					);
+		} else if (type == 2) {
+			// DEBT + CREDIT
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a,
+					subtract?balance.b.subtract(amount):balance.b.add(amount),
+					balance.c
+					);
+		} else if(type == 3) {
+			// HOLD + STOCK
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a, balance.b,
+					subtract?balance.c.subtract(amount):balance.c.add(amount)
+					);
+		} else {
+			// TODO - SPEND + PRODUCE
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a, balance.b,
+					subtract?balance.c.subtract(amount):balance.c.add(amount)
+					);
+		}
+		
+		db.getAssetBalanceMap().set(getAddress(), absKey, balance);
+		return balance;
+	}	
+
+	/*
 	public void setBalance3(long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> balance, DBSet db)
 	{
 		if (key < 0)
@@ -203,6 +301,7 @@ public class Account {
 		
 		this.setBalance3(key, balance_new, db);
 	}
+	*/
 
 	
 	// STATUS
@@ -235,11 +334,11 @@ public class Account {
 		//IF 1 CONFIRMATION
 		if(confirmations == 1)
 		{
-			return this.getBalance3(key, db);
+			return this.getBalance(db, key);
 		}
 		
 		//GO TO PARENT BLOCK 10
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.getBalance3(key, db);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.getBalance(db, key);
 		BigDecimal own = balance.a;
 		BigDecimal rent = balance.b;
 		BigDecimal hold = balance.c;
@@ -597,6 +696,7 @@ public class Account {
 		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
 			return 0l;
 		
+		/* not NEED - by smal TARGET_WIN
 		if (lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
 			// test repeated win account
 			int i = 0;
@@ -608,6 +708,7 @@ public class Account {
 					break;
 			}
 		}
+		*/
 
 		/*
 		// if new block in DB - get next height

@@ -461,6 +461,23 @@ public class TransactionCreator
 			
 		return afterCreate(messageTx, false);
 	}
+
+	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount creator,
+			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
+			byte[] message, byte[] encryptMessage) {
+		
+		this.checkUpdate();
+		
+		Transaction messageTx;
+
+		long timestamp = NTP.getTime();
+		
+		//CREATE MESSAGE TRANSACTION
+		messageTx = new R_Send(version, creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx.sign(creator, false);
+			
+		return afterCreate(messageTx, false);
+	}
 	
 	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
@@ -548,7 +565,8 @@ public class TransactionCreator
 		
 		String[] hashes58;
 		if (hashesStr.length() > 0) {
-			hashes58 = hashesStr.split(" -");
+			//hashes58 = hashesStr.split(" -");
+			hashes58 = hashesStr.split(" ");
 		} else {
 			hashes58 = new String[0];
 		}

@@ -83,7 +83,7 @@ public class TestRecAsset {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		maker_1.setLastReference(gb.getTimestamp(db), db);
 		
@@ -463,7 +463,7 @@ public class TestRecAsset {
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		maker.setBalance(key, BigDecimal.valueOf(200).setScale(8), db);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
 		assetTransfer.isValid(db, releaserReference);
@@ -495,7 +495,7 @@ public class TestRecAsset {
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
-		maker.setBalance(key, BigDecimal.valueOf(100).setScale(8), db);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
 		assetTransfer.process(db, gb, false);
@@ -764,7 +764,7 @@ public class TestRecAsset {
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		maker.setBalance(key, BigDecimal.valueOf(200).setScale(8), db);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
 				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
@@ -797,7 +797,7 @@ public class TestRecAsset {
 			
 		//CREATE ASSET TRANSFER
 		long key = 2l;
-		maker.setBalance(key, BigDecimal.valueOf(100).setScale(8), db);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
 				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
@@ -986,7 +986,7 @@ public class TestRecAsset {
 		rsend.sign(maker, false);
 		rsend.process(db, gb, false);
 		
-		balance3 = maker.getBalance3(key, db);
+		balance3 = maker.getBalance(db, key);
 		
 		//CHECK BALANCE SENDER
 		

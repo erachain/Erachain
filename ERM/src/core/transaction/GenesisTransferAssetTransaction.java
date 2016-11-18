@@ -257,8 +257,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 
 		long key = this.key;
+
 		//UPDATE RECIPIENT OWN or RENT
-		this.recipient.setBalance(key, this.recipient.getBalance(key, db).add(this.amount), db);
+		this.recipient.changeBalance(db, false, key, this.amount);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastReference(this.timestamp, db);
@@ -270,7 +271,15 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		}
 
 		if (key < 0) {
-			this.owner.setBalance(key, this.owner.getBalance(key, db).subtract(this.amount), db);			
+			// THIS is CREDIT
+			//this.owner.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
+			this.owner.changeBalance(db, true, key, this.amount);
+			db.getCredit_AddressesMap().add(
+					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
+					this.amount);
+		} else {
+			// CREATOR update
+			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount);			
 		}
 	}
 
@@ -280,7 +289,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			
 		long key = this.key;
 		//UPDATE RECIPIENT
-		this.recipient.setBalance(key, this.recipient.getBalance(key, db).subtract(this.amount), db);
+		//this.recipient.setBalance(key, this.recipient.getBalance(db, key).subtract(this.amount), db);
+		this.recipient.changeBalance(db, true, key, this.amount);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
@@ -291,7 +301,14 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		}
 
 		if (key < 0) {
-			this.owner.setBalance(key, this.owner.getBalance(key, db).add(this.amount), db);			
+			//this.owner.setBalance(key, this.owner.getBalance(db, key).add(this.amount), db);
+			this.owner.changeBalance(db, false, key, this.amount);
+			db.getCredit_AddressesMap().sub(
+					new Tuple3<String, String, Long>(this.owner.getAddress(), this.recipient.getAddress(), -key),
+					this.amount);
+		} else {
+			// CREATOR update
+			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);			
 		}
 
 	}

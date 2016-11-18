@@ -99,7 +99,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 	@Override
 	public Object getValueAt(int row, int column)
 	{
-		if(peers == null || this.peers.size() -1 < row)
+		if(peers == null || this.peers.size() -1 < row )
 		{
 			return null;
 		}
@@ -110,6 +110,9 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 			return null;
 			
 		PeerInfo peerInfo = DBSet.getInstance().getPeerMap().getInfo(peer.getAddress());
+		if (peerInfo == null)
+			return null;
+		
 		switch(column)
 		{
 			case COLUMN_ADDRESS:

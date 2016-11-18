@@ -40,6 +40,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
 import gui.transaction.OnDealClick;
@@ -172,7 +173,9 @@ public class IssuePersonPanel extends JPanel
 		    }
 		});
  // add icin
-        iconButton.setText(Lang.getInstance().translate("Add Image")+ "...");
+        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH >>1))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
         iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         iconButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
@@ -250,7 +253,7 @@ public class IssuePersonPanel extends JPanel
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
 		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                 "Image", "png", "jpg");
+                 "Image", "png", "jpg", "gif");
 		 chooser.setFileFilter(filter);
 		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
 		 
@@ -263,7 +266,7 @@ public class IssuePersonPanel extends JPanel
 	       
 	       File file = new File(chooser.getSelectedFile().getPath());
 // если размер больше 30к то не вставляем	       
-	       if (file.length()>30000) {
+	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
 	    	   
 	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
 	    	   
@@ -363,7 +366,7 @@ public class IssuePersonPanel extends JPanel
 			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
 			if (str.length() < 11) str = str + " 00:00:00";
 			birthday = Timestamp.valueOf(str).getTime();
-try{
+		try{
 			parse++;
 			date = this.txtDeathday.getCalendar().getTime();
 			//str = this.txtDeathday.getDate().toString();
@@ -372,11 +375,11 @@ try{
 				if (str.length() < 11) str = str + " 00:00:00";
 				deathday = Timestamp.valueOf(str).getTime();
 			
-}
-catch(Exception e3){
-	deathday = birthday -1;
-	
-}
+		}
+		catch(Exception e3){
+			deathday = birthday -1;
+			
+		}
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			
@@ -446,14 +449,14 @@ catch(Exception e3){
 			//txtBirthday.setText("0000-00-00");
 			//txtDeathday.setText("0000-00-00");
 			
-			txtGender.setSelectedIndex(2);
-			txtRace.setText("");
-			 txtBirthLatitude.setText("");
-			 txtBirthLongitude.setText("");
-			 txtSkinColor.setText("");
-			 txtEyeColor.setText("");
-			 txtHairСolor.setText("");
-			 txtHeight.setText("");
+			//txtGender.setSelectedIndex(2);
+			//txtRace.setText("");
+			 //txtBirthLatitude.setText("");
+			 //txtBirthLongitude.setText("");
+			 //txtSkinColor.setText("");
+			 //txtEyeColor.setText("");
+			 //txtHairСolor.setText("");
+			 //txtHeight.setText("");
 			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
 			 imgButes = null;
 			 iconButton.setIcon(null);

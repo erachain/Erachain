@@ -48,6 +48,9 @@ public class BlockGenerator extends Thread implements Observer
 	
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
+	static final int wait_interval_flush = 60000;
+
+	
 	public enum ForgingStatus {
 	    
 		FORGING_DISABLED(0, Lang.getInstance().translate("Forging disabled") ),
@@ -182,46 +185,81 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 
 		DBSet dbSet = DBSet.getInstance();
-		boolean isGenesisStart = false;
+		//boolean isGenesisStart = false;
 
 		int wait_interval_run = 1000;
 		int wait_interval_flush = 60000;
-		int wait_interval_run_gen = wait_interval_flush / 2;
+		//int wait_interval_run_gen = wait_interval_flush / 2;
 		int wait_interval = wait_interval_run;
-		while(true)
+		
+		while(!dbSet.isStoped())
 		{
 			
+			boolean quickRun = false; 
+			
+			try 
+			{
+				Thread.sleep(500);
+			}
+			catch (InterruptedException e) 
+			{
+				//LOGGER.error(e.getMessage(), e);
+			}
+			
+			if (dbSet.isStoped())
+				return;
+			
+
+			//CHECK IF WE ARE UP TO DATE
+			// NOT NEED isUpToDate!
+			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
+			{
+				bchain.clearWaitWinBuffer();
+				
+				if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING) {
+					// IF already in sync...
+					wait_interval = wait_interval_run;
+				} else {
+					ctrl.update();
+				}
+
+				continue;
+			}
+			
+			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
+			if(forgingStatus != ForgingStatus.FORGING
+					) {
+				continue;
+			}
+				
 			// try solve and flush new block from Win Buffer			
 			Block waitWin = bchain.getWaitWinBuffer();
-			if (!dbSet.getBlockMap().isProcessing() // NOT core.Synchronizer.process(DBSet, Block)
-					&& waitWin != null
-					&& waitWin.getTimestamp(dbSet) + wait_interval_flush < NTP.getTime()) {
 
-				// start new SOLVE rof WIN Blocks
-				this.solvingBlock = null;
+			if (!dbSet.getBlockMap().isProcessing() // NOT run in core.Synchronizer.process(DBSet, Block)
+					&& waitWin != null ) {
 				
-				// set random time waiting for send
-				wait_interval_run_gen = 5000 + (int) ((Math.random() * (wait_interval_flush - 10000)));
+				long diffTimeWinBlock =  NTP.getTime() - (waitWin.getTimestamp(dbSet) + wait_interval_flush);
 				
-				syncForgingStatus();
-				if(forgingStatus != ForgingStatus.FORGING) {
-					// IF now not forging - clear old win block
-					bchain.clearWaitWinBuffer();
-					continue;
-				}
-				
-				// FLUSH WINER to DB MAP
-				ctrl.flushNewBlockGenerated();
+				if (diffTimeWinBlock >0 ) {
+	
+					// start new SOLVE for WIN Blocks
+					this.solvingBlock = null;
+									
+					// FLUSH WINER to DB MAP
+					ctrl.flushNewBlockGenerated();
 
-				if (isGenesisStart) {
-					wait_interval = 100;
+					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
+						wait_interval = 500;
+						quickRun = true;
+					} else {
+						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - 2 * wait_interval_flush);					
+					}
 				} else {
-					wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush) / 2;
+					wait_interval = 500;
 				}
 			} else {
 				// always 1sec
-				wait_interval = 1000;
-				//wait_interval = wait_interval_run;
+				wait_interval = 500;
 			}
 
 			try 
@@ -230,42 +268,20 @@ public class BlockGenerator extends Thread implements Observer
 			} 
 			catch (InterruptedException e) 
 			{
-				LOGGER.error(e.getMessage(), e);
+				//LOGGER.error(e.getMessage(), e);
 			}
 
-			if(dbSet.isStoped()
-					|| dbSet.getBlockMap().isProcessing() // core.Synchronizer.process(DBSet, Block)
-					) {
-				continue;
-			}
-
-			syncForgingStatus();
-
-			//CHECK IF WE ARE UP TO DATE
-			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
-			{
-				if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING) {
-					// IF already in sync...
-					wait_interval = wait_interval_run;
-					continue;
-				} else {
-					ctrl.update();
-				}
+			if(dbSet.isStoped()) {
+				return;
 			}
 			
-			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			syncForgingStatus();
-
-			boolean stst = ctrl.isReadyForging();
-			if(forgingStatus != ForgingStatus.FORGING
-					|| (!stst
-						&& !isGenesisStart)
-					) {
+			if (dbSet.getBlockMap().isProcessing()) {
+				// IF core.Synchronizer.process(DBSet, Block))
+				bchain.clearWaitWinBuffer();
 				continue;
 			}
-				
+
 			byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-			long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp();
 			
 			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
 			if(this.solvingBlock == null
@@ -273,27 +289,19 @@ public class BlockGenerator extends Thread implements Observer
 					|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
 					)
 			{
-				/*
-				// MAKE RANDOM time for minimize load to network
-				if (newTimestamp + wait_interval_run_gen > NTP.getTime()
-						//&& !isGenesisStart
-						) {
-					wait_interval = wait_interval_run;
-					continue;
-				}
 				
-				if (isGenesisStart) {
-					// QUICK MAKE CHAIN
-					wait_interval = 200;
+				if(dbSet.isStoped()) {
+					return;
 				}
-				*/
-				
+
 				//SET NEW BLOCK TO SOLVE
 				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
-				//this.solvingBlockHeight = this.solvingBlock.getHeight(dbSet);
-				
-				
-				this.lastBlocksForTarget = bchain.getLastBlocksForTarget();
+
+				if(dbSet.isStoped()) {
+					return;
+				}
+
+				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dbSet);
 
 				//RESET BLOCKS
 				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
@@ -322,8 +330,8 @@ public class BlockGenerator extends Thread implements Observer
 				byte[] unconfirmedTransactionsHash = null;
 				long max_winned_value = 0;
 				long winned_value;				
-				int height = bchain.getHeight() + 1;
-				long target = bchain.getTarget();
+				int height = bchain.getHeight(dbSet) + 1;
+				long target = bchain.getTarget(dbSet);
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
@@ -342,9 +350,6 @@ public class BlockGenerator extends Thread implements Observer
 							acc_winner = account;
 							max_winned_value = winned_value;
 							
-							if (account.getAddress().equals("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ")) {
-								isGenesisStart = true;
-							}
 						}
 					}
 				}
@@ -352,27 +357,24 @@ public class BlockGenerator extends Thread implements Observer
 				if(acc_winner == null)
 					continue;
 					
-				syncForgingStatus();
-				if(forgingStatus != ForgingStatus.FORGING) {
-					this.solvingBlock = null;
-					bchain.clearWaitWinBuffer();
-					continue;
+				// sleep by (TARGET / WIN_VALUE)
+				// for not to busy the NET
+				int wait_new_good_block = (int) ((wait_interval_flush * target) / (target / 10 + max_winned_value)); 
+				if (quickRun) {
+					wait_new_good_block = wait_new_good_block>>8;
+				}
+				// wait more good new block from NET
+				try 
+				{
+					Thread.sleep(wait_new_good_block);
+				} 
+				catch (InterruptedException e) 
+				{
+					//LOGGER.error(e.getMessage(), e);
 				}
 
-				if (!isGenesisStart) {
-					// sleep by (TARGET / WIN_VALUE)
-					// for not to busy the NET
-					int wait_new_good_block = wait_interval_flush * (int)(target / max_winned_value); 
-					// wait more good new block from NET
-					try 
-					{
-						Thread.sleep(wait_new_good_block);
-					} 
-					catch (InterruptedException e) 
-					{
-						LOGGER.error(e.getMessage(), e);
-					}
-				}
+				if (dbSet.isStoped())
+					return;
 
 				waitWin = bchain.getWaitWinBuffer();
 				if (waitWin != null)
@@ -390,6 +392,7 @@ public class BlockGenerator extends Thread implements Observer
 				*/
 
 				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+				long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp(dbSet);
 				unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
 				// CALCULATE HASH for that transactions
 				byte[] winnerPubKey = acc_winner.getPublicKey();
@@ -404,7 +407,7 @@ public class BlockGenerator extends Thread implements Observer
 				
 				//PASS BLOCK TO CONTROLLER
 				///ctrl.newBlockGenerated(block);
-				if (bchain.setWaitWinBuffer(block)) {
+				if (bchain.setWaitWinBuffer(dbSet, block)) {
 					// need to BROADCAST
 					ctrl.broadcastWinBlock(block, null);
 				}
@@ -430,7 +433,8 @@ public class BlockGenerator extends Thread implements Observer
 		//CREATE NEW BLOCK
 		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 				transactionsHash, atBytes);
-		newBlock.setGeneratingBalance(dbSet);
+		// SET GENERATING BALANCE here
+		newBlock.setCalcGeneratingBalance(dbSet);
 		newBlock.sign(account);
 		
 		return newBlock;
@@ -594,12 +598,15 @@ public class BlockGenerator extends Thread implements Observer
 		
 		int status = Controller.getInstance().getStatus();
 		//CONNECTIONS OKE? -> FORGING
-		if(status != Controller.STATUS_OK) {
+		// CONNECTION not NEED now !!
+		// TARGET_WIN will be small
+		if(false && status != Controller.STATUS_OK) {
 			setForgingStatus(ForgingStatus.FORGING_ENABLED);
 			return;
 		}
 
-		if (Controller.getInstance().isReadyForging())
+		// NOT NEED to wait - TARGET_WIN will be small
+		if (true || Controller.getInstance().isReadyForging())
 			setForgingStatus(ForgingStatus.FORGING);
 		else
 			setForgingStatus(ForgingStatus.FORGING_WAIT);

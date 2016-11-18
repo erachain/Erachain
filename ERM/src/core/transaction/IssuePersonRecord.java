@@ -33,7 +33,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
-	
+
+	public static final int MAX_IMAGE_LENGTH = 10249;
 	
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
@@ -75,9 +76,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) {
 			if (res == Transaction.NOT_ENOUGH_FEE) {
-				if (BlockChain.START_LEVEL == 0) {
-					return res;
-				}
+				return res;
 			}
 		}
 		
@@ -85,16 +84,19 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		// birthLatitude -90..90; birthLongitude -180..180
 		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
 		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
-		if (person.getRace().length() <1 || person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
-		if (person.getGender() < 0 || person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
-		if (person.getSkinColor().length() <1 || person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
-		if (person.getEyeColor().length() <1 || person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-		if (person.getHairСolor().length() <1 || person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
+		if (person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
+		if (person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
+		if (person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
+		if (person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
+		if (person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
 		//int ii = Math.abs(person.getHeight());
-		if (Math.abs(person.getHeight()) < 40) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		if (Math.abs(person.getHeight()) < 0) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		
+		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
+		
 
-		if (BlockChain.START_LEVEL == 1) {
-			BigDecimal fee_balance = this.creator.getBalance(FEE_KEY, db);
+		if (false) {
+			BigDecimal fee_balance = this.creator.getBalance(db, FEE_KEY).a;
 			if (fee_balance.compareTo(BigDecimal.ZERO) >= 0) {
 				// for start - may be 0
 				return VALIDATE_OK;				
@@ -106,7 +108,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			if (!this.creator.isPerson(db)
 					// OR RIGHTS_KEY ENOUGHT
 					&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-							.compareTo(new BigDecimal(1000)) < 0)
+							.compareTo(BlockChain.PERSON_MIN_ERM_BALANCE) < 0)
 				
 					return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		}

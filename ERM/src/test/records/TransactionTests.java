@@ -97,12 +97,12 @@ public class TransactionTests {
 		
 		// FEE FUND
 		maker.setLastReference(last_ref, db);
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		new_ref = maker.getLastReference(db);
 		
 		buyer.setLastReference(last_ref, db);
-		buyer.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), db);
-		buyer.setBalance(ERM_KEY, BigDecimal.valueOf(2000).setScale(8), db); // for bye
+		buyer.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		buyer.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(8)); // for bye
 		
 
 	}
@@ -686,7 +686,7 @@ public class TransactionTests {
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, gb, false);
 		// set FEE
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+		maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		//CREATE NAME UPDATE
 		name = new Name(new Account("Qj5Aq4P4ehXaCEmi6vqVrFQDecpPXKSi8z"), "test", "new value");
@@ -727,7 +727,7 @@ public class TransactionTests {
 		nameRegistration.sign(maker, false);
 		nameRegistration.process(databaseSet, gb, false);
 		// set FEE
-		maker.setBalance(FEE_KEY, BigDecimal.valueOf(1).setScale(8), databaseSet);
+		maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		//CREATE NAME UPDATE
 		name = new Name(new Account("XYLEQnuvhracK2WMN3Hjif67knkJe9hTQn"), "test", "new value");
@@ -1355,14 +1355,14 @@ public class TransactionTests {
 		assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(databaseSet, releaserReference));
 				
 		//CREATE INVALID NAME UPDATE NO BALANCE
-		buyer.setBalance(FEE_KEY, BigDecimal.ZERO.setScale(8), databaseSet);
+		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.ZERO.setScale(8));
 		namePurchaseTransaction = new BuyNameTransaction(buyer,nameSale,nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastReference(databaseSet));		
 		
 		//CHECK IF NAME UPDATE IS INVALID
 		assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(databaseSet, releaserReference));
 
 		// setConfirmedBalance(long key, BigDecimal amount, DBSet db)
-		buyer.setBalance(FEE_KEY, BigDecimal.valueOf(2000).setScale(8), databaseSet);
+		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(8));
 				
 		//CREATE NAME UPDATE INVALID REFERENCE
 		namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, -123L);		

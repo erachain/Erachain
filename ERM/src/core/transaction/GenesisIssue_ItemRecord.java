@@ -130,14 +130,6 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		//INSERT INTO DATABASE
 		this.item.insertToMap(db);
 
-		/*
-		LOGGER.error("*** ISSUE GENESIS +++ Block[" + this.getBlockHeight(db) + "].TX.IssueItem [" + this.viewFullTypeName() + "\n"
-				+ "keys: " + this.item.getDBMap(db).getKeys().toString() + "\n"
-				+ "values: " + this.item.getDBMap(db).getValues().toString());
-		LOGGER.error(" +++ " + this.item.toString(db) + "\n"
-				);
-				*/
-
 	}
 
 

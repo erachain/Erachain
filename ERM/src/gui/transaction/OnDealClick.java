@@ -242,7 +242,11 @@ public class OnDealClick
 		case Transaction.NOT_MOVABLE_ASSET:
 			mess = "Not movable asset";
 			break;
-						
+
+		case Transaction.NOT_DEBT_ASSET:
+			mess = "Not debt asset";
+			break;
+
 		case Transaction.INVALID_RAW_DATA:
 			mess = "Invalid raw data";
 			break;

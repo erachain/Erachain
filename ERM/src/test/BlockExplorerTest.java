@@ -91,7 +91,7 @@ public class BlockExplorerTest {
 				LOGGER.error(block.getHeight(DBSet.getInstance()));
 			}
 			
-			balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(Transaction.FEE_KEY, databaseSet)));
+			balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(databaseSet, Transaction.FEE_KEY).a));
 			
 			block = block.getChild(DBSet.getInstance());
 			

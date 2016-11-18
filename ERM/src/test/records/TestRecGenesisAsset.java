@@ -296,7 +296,7 @@ public class TestRecGenesisAsset {
 		assetTransfer.process(db, gb, false);
 
 		//CREATE VALID ASSET TRANSFER
-		maker.setBalance(1, BigDecimal.valueOf(100).setScale(8), db);
+		maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(8));
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -520,10 +520,10 @@ public class TestRecGenesisAsset {
 		//assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(amoSend, recipient.getBalance(-key, db));
-		System.out.println(" 1: " + recipient.getBalance3(key, db) );
+		assertEquals(amoSend, recipient.getBalance(db, -key));
+		System.out.println(" 1: " + recipient.getBalance(db, key) );
 
-		assertEquals(BigDecimal.ZERO.subtract(amoSend), owner.getBalance(-key, db));
+		assertEquals(BigDecimal.ZERO.subtract(amoSend), owner.getBalance(db, -key));
 
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -541,10 +541,10 @@ public class TestRecGenesisAsset {
 		//assertEquals(total, maker.getConfirmedBalance(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalance(-key, db));
-		System.out.println(" 1: " + recipient.getBalance3(key, db) );
+		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalance(db, -key));
+		System.out.println(" 1: " + recipient.getBalance(db, key) );
 
-		assertEquals(BigDecimal.ZERO.setScale(8), owner.getBalance(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(8), owner.getBalance(db, key));
 
 		//CHECK REFERENCE RECIPIENT
 		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));

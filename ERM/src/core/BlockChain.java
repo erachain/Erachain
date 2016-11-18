@@ -23,10 +23,17 @@ import utils.Pair;
 public class BlockChain
 {
 
-	public static final int START_LEVEL = 1;
+	//public static final int START_LEVEL = 1;
+	
+	public static final int TESTNET_PORT = 9055;
+	public static final int MAINNET_PORT = 9056;
+	public static final int DEFAULT_WEB_PORT = 9057;
+	public static final int DEFAULT_RPC_PORT = 9058;
 
+	//
 	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
 	public static final int TARGET_COUNT = 100;
+	public static final int BASE_TARGET = 1024 * 8;
 	public static final int REPEAT_WIN = 3;
 	
 	public static final int GENESIS_WIN_VALUE = 1000;
@@ -41,23 +48,26 @@ public class BlockChain
 	public static final int FEE_INVITED_DEEP = 15; // levels foe deep
 	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
+	public static final int FEE_FOR_ANONIMOUSE = 33;
+
+	// issue PORSON
+	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
 
 	// GIFTS for R_SertifyPubKeys
-	public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
-	public static final int GIFTED_COMPU_AMOUNT = 90000 * FEE_PER_BYTE;
+	//public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
+	public static final int GIFTED_COMPU_AMOUNT = 10000 * FEE_PER_BYTE;
 	//public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
-	private List<Block> lastBlocksForTarget;
 
 	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
 
 	
-	private DBSet dbSet;
+	//private DBSet dbSet;
 	
 	// dbSet_in = db() - for test
 	public BlockChain(DBSet dbSet_in)
@@ -66,8 +76,8 @@ public class BlockChain
 		genesisBlock = new GenesisBlock();
 		genesisTimestamp = genesisBlock.getTimestamp(null);
 		
-		dbSet = dbSet_in;
-		if (dbSet_in == null) {
+		DBSet dbSet = dbSet_in;
+		if (dbSet == null) {
 			dbSet = DBSet.getInstance();
 		}
 
@@ -75,9 +85,7 @@ public class BlockChain
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
-		if(	!dbSet.getBlockMap().contains(genesisBlock.getSignature())
-			// not need now || dbSet.getBlockMap().get(genesisBlock.getSignature()).getTimestamp(dbSet) != genesisBlock.getTimestamp(dbSet)
-			)
+		if(	!dbSet.getBlockMap().contains(genesisBlock.getSignature()) )
 		// process genesis block
 		{
 			if(dbSet_in == null && dbSet.getBlockMap().getLastBlockSignature() != null)
@@ -104,8 +112,8 @@ public class BlockChain
 	public long getTimestamp(int height) {
 		return this.genesisTimestamp + (long)height * (long)Block.GENERATING_MIN_BLOCK_TIME;
 	}
-	public long getTimestamp() {
-		return this.genesisTimestamp + (long)getHeight() * (long)Block.GENERATING_MIN_BLOCK_TIME;
+	public long getTimestamp(DBSet dbSet) {
+		return this.genesisTimestamp + (long)getHeight(dbSet) * (long)Block.GENERATING_MIN_BLOCK_TIME;
 	}
 
 	// BUFFER of BLOCK for WIN solving
@@ -124,7 +132,7 @@ public class BlockChain
 	// SOLVE WON BLOCK
 	// 0 - unchanged;
 	// 1 - changed, need broadcasting;
-	public boolean setWaitWinBuffer(Block block) {
+	public boolean setWaitWinBuffer(DBSet dbSet, Block block) {
 				
 		if (this.waitWinBuffer == null
 				|| block.calcWinValue(dbSet) > this.waitWinBuffer.calcWinValue(dbSet)) {
@@ -141,14 +149,14 @@ public class BlockChain
 	}
 	
 	// 
-	public int getHeight() {
+	public int getHeight(DBSet dbSet) {
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 		return dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 
-	public Tuple2<Integer, Long> getHWeight(boolean withWinBuffer) {
+	public Tuple2<Integer, Long> getHWeight(DBSet dbSet, boolean withWinBuffer) {
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
@@ -176,14 +184,14 @@ public class BlockChain
 		
 	}
 	
-	public long getFullWeight() {
+	public long getFullWeight(DBSet dbSet) {
 		
 		return dbSet.getBlockSignsMap().getFullWeight();
 	}
 
-	public int getCheckPoint() {
+	public int getCheckPoint(DBSet dbSet) {
 		
-		int checkPoint = getHeight() - BlockChain.MAX_SIGNATURES; 
+		int checkPoint = getHeight(dbSet) - BlockChain.MAX_SIGNATURES; 
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;
 		
@@ -194,8 +202,17 @@ public class BlockChain
 		if (checkPoint > 1)
 			this.checkPoint = checkPoint;
 	}
+	
+	public static int getNetworkPort() {
+		if(Settings.getInstance().isTestnet()) {
+			return BlockChain.TESTNET_PORT;
+		} else {
+			return BlockChain.MAINNET_PORT;
+		}
+	}
 
-	public List<byte[]> getSignatures(byte[] parent) {
+
+	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
 		
 		LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
@@ -224,17 +241,17 @@ public class BlockChain
 		return headers;		
 	}
 
-	public Block getBlock(byte[] header) {
+	public Block getBlock(DBSet dbSet, byte[] header) {
 
 		return dbSet.getBlockMap().get(header);
 	}
-	public Block getBlock(int height) {
+	public Block getBlock(DBSet dbSet, int height) {
 
 		byte[] signature = dbSet.getBlockHeightsMap().get((long)height);
 		return dbSet.getBlockMap().get(signature);
 	}
 
-	public int isNewBlockValid(Block block) {
+	public int isNewBlockValid(DBSet dbSet, Block block) {
 		
 		//CHECK IF NOT GENESIS
 		if(block instanceof GenesisBlock)
@@ -257,7 +274,7 @@ public class BlockChain
 			return 3;
 		}
 
-		Block lastBlock = this.getLastBlock();
+		Block lastBlock = this.getLastBlock(dbSet);
 		if(!Arrays.equals(lastBlock.getSignature(), block.getReference())) {
 			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
 			return 4;
@@ -266,7 +283,7 @@ public class BlockChain
 		return 0;
 	}
 	
-	public Pair<Block, List<Transaction>> scanTransactions(Block block, int blockLimit, int transactionLimit, int type, int service, Account account) 
+	public Pair<Block, List<Transaction>> scanTransactions(DBSet dbSet, Block block, int blockLimit, int transactionLimit, int type, int service, Account account) 
 	{	
 		//CREATE LIST
 		List<Transaction> transactions = new ArrayList<Transaction>();
@@ -321,7 +338,7 @@ public class BlockChain
 		//CHECK IF WE REACHED THE END
 		if(block == null)
 		{
-			block = this.getLastBlock();
+			block = this.getLastBlock(dbSet);
 		}
 		else
 		{
@@ -332,21 +349,23 @@ public class BlockChain
 		return new Pair<Block, List<Transaction>>(block, transactions);
 	}
 	
-	public Block getLastBlock() 
+	public Block getLastBlock(DBSet dbSet) 
 	{	
 		return dbSet.getBlockMap().getLastBlock();
 	}
 
 	// get last blocks for target
-	public List<Block> getLastBlocksForTarget() 
+	public List<Block> getLastBlocksForTarget(DBSet dbSet) 
 	{	
 
 		Block last = dbSet.getBlockMap().getLastBlock();
 		
+		/*
 		if (this.lastBlocksForTarget != null
 				&& Arrays.equals(this.lastBlocksForTarget.get(0).getSignature(), last.getSignature())) {
 			return this.lastBlocksForTarget;
 		}
+		*/
 		
 		List<Block> list =  new ArrayList<Block>();
 
@@ -365,12 +384,12 @@ public class BlockChain
 	
 	// calc Target by last blocks in chain
 	// ignore BIG win_values
-	public long getTarget() 
+	public long getTarget(DBSet dbSet) 
 	{	
 		
 		long target = 0;
 		
-		List<Block> lastBlocks = this.getLastBlocksForTarget();
+		List<Block> lastBlocks = this.getLastBlocksForTarget(dbSet);
 		if (lastBlocks == null || lastBlocks.isEmpty())
 			return 0l;
 		
@@ -391,9 +410,11 @@ public class BlockChain
 
 	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 
 		// not use small values
-		if (height < 100) {}
-		else if (height < 10000) {
-			if ((target>>2) > winned_value)
+		if (height < 100) {
+			if ((target>>1) > winned_value)
+				return false;
+		} else if (height < 1000) {
+			if ((target>>1) > winned_value)
 				return false;
 		} else {
 			if ((target>>1) > winned_value)

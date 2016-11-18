@@ -178,7 +178,7 @@ public class Send_TableModel extends JTable implements Observer{
 				row = invokerAsJComponent.convertRowIndexToModel(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(messageBufs.get(row).getSender());
+				StringSelection value = new StringSelection(messageBufs.get(row).getSender().getAddress());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -198,7 +198,7 @@ public class Send_TableModel extends JTable implements Observer{
 				row = invokerAsJComponent.convertRowIndexToModel(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(messageBufs.get(row).getRecipient());
+				StringSelection value = new StringSelection(messageBufs.get(row).getRecipient().getAddress());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -403,8 +403,8 @@ public class Send_TableModel extends JTable implements Observer{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
-				transaction.getCreator().asPerson(),
-				transaction.getRecipient().asPerson(),
+				transaction.getCreator(), //.asPerson(),
+				transaction.getRecipient(), //.asPerson(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),
 				transaction.getKey(),
@@ -468,14 +468,14 @@ public class Send_TableModel extends JTable implements Observer{
 					}
 				}
 		
-				Account account = Controller.getInstance().getAccountByAddress(messageBufs.get(row).getSender());	
+				Account account = messageBufs.get(row).getSender();	
 				
 				byte[] privateKey = null; 
 				byte[] publicKey = null;
 				//IF SENDER ANOTHER
 				if( account == null )
 				{
-		    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(messageBufs.get(row).getRecipient());
+		    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(messageBufs.get(row).getRecipient().getAddress());
 					privateKey = accountRecipient.getPrivateKey();		
 					
 					publicKey = messageBufs.get(row).getSenderPublicKey();    				
@@ -488,7 +488,7 @@ public class Send_TableModel extends JTable implements Observer{
 					
 					if( messageBufs.get(row).getToPublicKey() == null )
 					{
-						messageBufs.get(row).setRecipientPublicKey(Controller.getInstance().getPublicKeyByAddress( messageBufs.get(row).getRecipient()));
+						messageBufs.get(row).setRecipientPublicKey(Controller.getInstance().getPublicKeyByAddress( messageBufs.get(row).getRecipient().getAddress()));
 					}
 					publicKey = messageBufs.get(row).getToPublicKey();    				
 				}
@@ -561,9 +561,9 @@ public class Send_TableModel extends JTable implements Observer{
 		private boolean encrypted;
 		private boolean opened;
 		private boolean isText;
-		private String sender;
+		private Account sender;
 		private byte[] senderPublicKey;
-		private String recipient;
+		private Account recipient;
 		private byte[] recipientPublicKey;
 		private long timestamp;
 		private BigDecimal amount;
@@ -571,7 +571,7 @@ public class Send_TableModel extends JTable implements Observer{
 		private BigDecimal fee;
 		private byte[] signature;
 		
-		public MessageBuf( byte[] rawMessage, boolean encrypted, String sender, String recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
+		public MessageBuf( byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
 		{
 			this.rawMessage = rawMessage;
 			this.encrypted = encrypted;	
@@ -614,11 +614,11 @@ public class Send_TableModel extends JTable implements Observer{
 			}
 			return this.decryptedMessage;
 		}
-		public String getSender()
+		public Account getSender()
 		{
 			return this.sender;
 		}
-		public String getRecipient()
+		public Account getRecipient()
 		{
 			return this.recipient;
 		}
@@ -632,6 +632,13 @@ public class Send_TableModel extends JTable implements Observer{
 		}
 		public long getAssetKey()
 		{
+			return this.assetKey;
+		}
+		public long getAbsAssetKey()
+		{
+			if (this.assetKey < 0)
+				return -this.assetKey;
+			
 			return this.assetKey;
 		}
 		public byte[] getSignature()
@@ -695,7 +702,7 @@ public class Send_TableModel extends JTable implements Observer{
 		
 		public String getDecrMessageHtml(int width, boolean selected, boolean images)
 		{
-			Account account = Controller.getInstance().getAccountByAddress( this.sender );
+			Account account = this.sender;
 			String imginout = "";
 			if(account != null)
 		    {
@@ -765,17 +772,33 @@ public class Send_TableModel extends JTable implements Observer{
 			String amountStr = "";
 			
 			if (this.amount != null) {
+				
+				int amo_big = this.amount.abs().intValue(); 
 				String fontSize = "";
-				if(this.amount.compareTo(new BigDecimal(10)) >= 0)
-				{
+				if(amo_big > 1000) {
+					fontSize = " size='4'";
+				} else if(amo_big > 10) {
 					fontSize = " size='3'";
 				} else {
 					fontSize = " size='2'";
 				}
-				amountStr = "<font" + fontSize + ">"
-						+ Lang.getInstance().translate("Amount") + ": "
+				int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+				long key = this.getAssetKey();
+				
+				String send_type;
+				if (key < 0) {
+					send_type = Lang.getInstance().translate("DEBT");
+				} else {
+					if (amo_sign < 0) {
+						send_type = Lang.getInstance().translate("HOLD");
+					} else {
+						send_type = Lang.getInstance().translate("PAY");
+					}
+				}
+				amountStr = "<font" + fontSize + ">" + send_type + " "
+						//+ Lang.getInstance().translate("Amount") + ": "
 						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>"
-						+ Controller.getInstance().getAsset(this.getAssetKey()).getShort(DBSet.getInstance()) + ". ";
+						+ " " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance());
 			}
 			
 		
@@ -805,7 +828,7 @@ public class Send_TableModel extends JTable implements Observer{
 		
 		public String getDecrMessageTXT()
 		{
-			Account account = Controller.getInstance().getAccountByAddress( this.sender );
+			Account account = this.sender;
 			
 			String imginout = "";
 			if( account != null )
@@ -843,10 +866,24 @@ public class Send_TableModel extends JTable implements Observer{
 			{
 				strConfirmations = strConfirmations + " !";
 			}
-			
-			String strAsset = Controller.getInstance().getAsset(this.getAssetKey()).getShort();
+
+			int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+
+			String send_type;
+			if (this.getAssetKey() < 0 && amo_sign > 0) {
+				send_type = Lang.getInstance().translate("debt");
+			} else if (this.getAssetKey() > 0 && amo_sign < 0) {
+				send_type = Lang.getInstance().translate("hold");
+			} else if (this.getAssetKey() < 0 && amo_sign < 0) {
+				send_type = Lang.getInstance().translate("spend");
+			} else {
+				send_type = Lang.getInstance().translate("pay");					
+			}
+
+			String strAsset = Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort();
 			
 			return 	  Lang.getInstance().translate("Date") + ": " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
+					+ send_type + "\n"
 					+ Lang.getInstance().translate("Sender") + ": " + this.sender + "\n"
 					+ Lang.getInstance().translate("Recipient") + ": " + this.recipient + "\n"
 					+ Lang.getInstance().translate("Amount") + ": " + NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee") + ": " + NumberAsString.getInstance().numberAsString(this.fee) + "\n"
