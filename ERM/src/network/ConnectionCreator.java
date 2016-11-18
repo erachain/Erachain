@@ -44,6 +44,10 @@ public class ConnectionCreator extends Thread {
 					//ITERATE knownPeers
 					for(Peer peer: knownPeers)
 					{
+						if (Network.isMyself(peer.getAddress())) {
+							continue;
+						}
+							
 						knownPeersCounter ++;
 	
 						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
@@ -95,6 +99,9 @@ public class ConnectionCreator extends Thread {
 									
 									for(Peer newPeer: peersMessage.getPeers())
 									{		
+										if (Network.isMyself(newPeer.getAddress())) {
+											continue;
+										}
 										//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
 										if(this.isRun && Settings.getInstance().getMaxConnections() > callback.getActiveConnections().size())
 										{

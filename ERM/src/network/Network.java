@@ -327,6 +327,15 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 	}
 
+	public static boolean isMyself(InetAddress address)
+	{
+		if (myselfAddress != null
+				&& myselfAddress.getHostAddress().equals(address.getHostAddress())) {
+		    return true;
+		}
+	    return false;
+	}
+
 	public void stop() 
 	{
 		this.run = false;
