@@ -788,6 +788,9 @@ if ( asset_1 == null) {
 		}
 
 		output.put("pools", poolsJSON);
+		
+		Map assets1 = jsonQueryAssets();
+		output.put("assets",assets1);
 
 		return output;
 	}

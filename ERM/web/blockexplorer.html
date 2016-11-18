@@ -524,7 +524,7 @@ function polls(data)
 	table += '<tr><td><b>Poll<td><b>Votes<td><b>Asset';//<td><b>View'; 
 	
 	asset_key =  document.getElementById("aa").options.selectedIndex;
-	
+	 dat=data;
 	for(key in data.pools) {
 		table += '<tr>';
 		
@@ -536,10 +536,12 @@ function polls(data)
 		table += '<td>' + addCommas(data.pools[key].totalVotes);
 		
 // select
-		table += '<td><select style="0" onchange="Onselect(this.options[this.selectedIndex].value)">';
+		table += '<td><select style="0" onchange="Onselect(dat,this.options[this.selectedIndex].value)">';
+	
+	table += '<option>Выберите актив</option>';
 	a=0;	
-	for (var a = 0; a < 9; a++){	
-		table += '<option>'+ a +'</option>';
+	for (a in data.assets){	
+		table += '<option>'+ data.assets[a].name +'</option>';
 		
   	}
 	table +='</select></td>';
@@ -557,10 +559,11 @@ function polls(data)
 		
 	return output;
 }		
-function Onselect(a){
+function Onselect(data,a){
 
-document.location='?poll='+encodeURIComponent(key)+'&asset='+a; 
-
+for (c in data.assets){
+ if ( a == data.assets[c].name) {document.location='?poll='+encodeURIComponent(key)+'&asset='+c;} 
+}
 }
 
 function poll(data)
