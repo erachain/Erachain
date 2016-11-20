@@ -166,7 +166,7 @@ public class Peer extends Thread{
 		} 
 		catch (Exception e) 
 		{
-			//LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 			
 			//DISCONNECT
 			callback.onDisconnect(this);
@@ -183,7 +183,7 @@ public class Peer extends Thread{
 			} 
 			catch (Exception e) 
 			{
-				//LOGGER.error(e.getMessage(), e);
+				LOGGER.error(e.getMessage(), e);
 				
 				//DISCONNECT
 				callback.onDisconnect(this);
@@ -200,7 +200,7 @@ public class Peer extends Thread{
 				} 
 				catch (Exception e) 
 				{
-					//LOGGER.error(e.getMessage(), e);
+					LOGGER.error(e.getMessage(), e);
 					
 					//DISCONNECT
 					callback.onDisconnect(this);

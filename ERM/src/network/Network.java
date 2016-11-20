@@ -265,6 +265,7 @@ public class Network extends Observable implements ConnectionCallback {
 				LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
+				LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
 				message.getSender().close();
 			}
 			
@@ -329,6 +330,13 @@ public class Network extends Observable implements ConnectionCallback {
 
 	public static boolean isMyself(InetAddress address)
 	{
+		
+		
+		if (myselfAddress != null) {
+			LOGGER.info("in myselfAddress - myselfAddress: " + Network.myselfAddress.getHostAddress());
+			LOGGER.info("in myselfAddress - Address: " + address.getHostAddress());
+		}
+
 		if (myselfAddress != null
 				&& myselfAddress.getHostAddress().equals(address.getHostAddress())) {
 		    return true;
