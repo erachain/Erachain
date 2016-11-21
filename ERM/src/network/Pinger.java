@@ -28,6 +28,11 @@ public class Pinger extends Thread
 	{
 		return this.ping;
 	}
+	public boolean isRun()
+	{
+		return this.run;
+	}
+	
 	
 	public void run()
 	{

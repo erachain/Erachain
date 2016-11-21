@@ -331,12 +331,6 @@ public class Network extends Observable implements ConnectionCallback {
 	public static boolean isMyself(InetAddress address)
 	{
 		
-		
-		if (myselfAddress != null) {
-			LOGGER.info("in myselfAddress - myselfAddress: " + Network.myselfAddress.getHostAddress());
-			LOGGER.info("in myselfAddress - Address: " + address.getHostAddress());
-		}
-
 		if (myselfAddress != null
 				&& myselfAddress.getHostAddress().equals(address.getHostAddress())) {
 		    return true;

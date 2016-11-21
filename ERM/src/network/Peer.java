@@ -31,6 +31,7 @@ public class Peer extends Thread{
 	private boolean white;
 	private long pingCounter;
 	private long connectionTime;
+	private boolean runed;
 	
 	private Map<Integer, BlockingQueue<Message>> messages;
 	
@@ -133,11 +134,7 @@ public class Peer extends Thread{
 			//CREATE STRINGWRITER
 			steep++;
 			this.out = socket.getOutputStream();
-			
-			//START COMMUNICATON THREAD
-			steep++;
-			this.start();
-			
+						
 			//START PINGER
 			this.pinger = new Pinger(this);
 			if (this.pinger.isInterrupted()) {
@@ -145,7 +142,11 @@ public class Peer extends Thread{
 				this.close();
 				return;
 			}
-			
+
+			//START COMMUNICATON THREAD
+			steep++;
+			this.start();
+
 			//ON SOCKET CONNECT
 			steep++;
 			this.callback.onConnect(this);			
@@ -153,12 +154,18 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			LOGGER.info(Lang.getInstance().translate("Failed to connect to : ") + address + " on steep: " + steep);
+			if (steep != 1) {
+				LOGGER.error(e.getMessage(), e);
+				LOGGER.info("Failed to connect to : " + address + " on steep: " + steep);
+			}
 		}
 	}
 	
 	public void run()
 	{
+		
+		runed = true;
+		
 		DataInputStream in = null;
 		try 
 		{
@@ -173,13 +180,22 @@ public class Peer extends Thread{
 			return;
 		}
 
-		while(in != null)
+		while(runed && in != null)
+		//while(in != null)
 		{
 			//READ FIRST 4 BYTES
 			byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
 			try 
 			{
-				in.readFully(messageMagic);
+				//Thread.sleep(100);	
+
+				if (!runed || !socket.isConnected() || socket.isClosed() || !pinger.isRun() ) {
+					//callback.onDisconnect(this);
+					return;
+				//} else if (in.available()>0) {
+				} else {
+					in.readFully(messageMagic);
+				}
 			} 
 			catch (Exception e) 
 			{
@@ -333,6 +349,11 @@ public class Peer extends Thread{
 	
 	public void close() 
 	{
+		
+		if (!runed) {
+			return;
+		}
+		runed = false;
 		
 		LOGGER.info("Try close peer : " + address);
 		
