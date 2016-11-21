@@ -187,14 +187,20 @@ public class Peer extends Thread{
 			byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
 			try 
 			{
-				//Thread.sleep(100);	
 
 				if (!runed || !socket.isConnected() || socket.isClosed() || !pinger.isRun() ) {
 					//callback.onDisconnect(this);
 					return;
-				//} else if (in.available()>0) {
-				} else {
+				} else if (in.available()>0) {
 					in.readFully(messageMagic);
+				} else {
+					try {
+						Thread.sleep(10);
+					}
+					catch (Exception e) {
+						
+					}
+					continue;
 				}
 			} 
 			catch (Exception e) 
