@@ -11,7 +11,7 @@ import network.Peer;
 
 public class Message {
 
-	public static final byte[] MAINNET_MAGIC = {0x12, 0x34, 0x56, 0x78};
+	public static final byte[] MAINNET_MAGIC = {0x19, 0x66, 0x08, 0x21};
 	
 	public static final int MAGIC_LENGTH = 4;
 	

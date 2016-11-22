@@ -45,7 +45,7 @@ public class NamestorageKeyValueHistory {
 		String[] split = StringUtils.split(before);
 		if(split == null)
 		{
-			split = new String[]{};
+			split = new String[]{""};
 		}
 		
 		Patch<String> patch = DiffHelper.getPatch(before, after);
