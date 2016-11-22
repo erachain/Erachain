@@ -97,6 +97,9 @@ public class Peer extends Thread{
 	
 	public long getPing()
 	{
+		if (this.pinger == null)
+			return 1999999;
+		
 		return this.pinger.getPing();
 	}
 	
