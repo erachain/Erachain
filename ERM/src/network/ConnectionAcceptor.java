@@ -33,6 +33,9 @@ public class ConnectionAcceptor extends Thread{
 		{
 			try
 			{	
+				
+				Thread.sleep(10);	
+
 				if(socket == null)
 				{
 					//START LISTENING
@@ -84,6 +87,10 @@ public class ConnectionAcceptor extends Thread{
 					}
 					else
 					{
+						
+						if (!this.isRun)
+							return;
+
 						//CREATE PEER
 						new Peer(callback, connectionSocket);
 					}

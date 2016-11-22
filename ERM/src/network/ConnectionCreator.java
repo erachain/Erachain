@@ -31,6 +31,9 @@ public class ConnectionCreator extends Thread {
 		{
 			try
 			{	
+
+				Thread.sleep(10);	
+
 				int maxReceivePeers = Settings.getInstance().getMaxReceivePeers();
 				
 				//CHECK IF WE NEED NEW CONNECTIONS
@@ -60,7 +63,6 @@ public class ConnectionCreator extends Thread {
 								//if(true)
 								if(!peer.getAddress().isSiteLocalAddress() && !peer.getAddress().isLoopbackAddress() && !peer.getAddress().isAnyLocalAddress())
 								{
-									//CONNECT
 									/*
 									LOGGER.info(
 											Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
@@ -70,6 +72,11 @@ public class ConnectionCreator extends Thread {
 												.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
 												);
 									*/
+									
+									if (!this.isRun)
+										return;
+
+									//CONNECT
 									peer.connect(callback);
 								}
 							}
@@ -84,67 +91,78 @@ public class ConnectionCreator extends Thread {
 					//avoids Exception when adding new elements
 					for(int i=0; i<callback.getActiveConnections().size(); i++)
 					{
+						if (!this.isRun)
+							return;
+
 						Peer peer = callback.getActiveConnections().get(i);
 	
 						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
-						if(this.isRun && Settings.getInstance().getMaxConnections() > callback.getActiveConnections().size())
+						
+						if(Settings.getInstance().getMaxConnections() > callback.getActiveConnections().size())
 						{
-								//ASK PEER FOR PEERS
-								Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
-								PeersMessage peersMessage = (PeersMessage) peer.getResponse(getPeersMessage);
-								if(peersMessage != null)
+							//ASK PEER FOR PEERS
+							Message getPeersMessage = MessageFactory.getInstance().createGetPeersMessage();
+							PeersMessage peersMessage = (PeersMessage) peer.getResponse(getPeersMessage);
+							if(peersMessage != null)
+							{
+								int foreignPeersCounter = 0;
+								//FOR ALL THE RECEIVED PEERS
+								
+								for(Peer newPeer: peersMessage.getPeers())
 								{
-									int foreignPeersCounter = 0;
-									//FOR ALL THE RECEIVED PEERS
 									
-									for(Peer newPeer: peersMessage.getPeers())
-									{		
-										if (Network.isMyself(newPeer.getAddress())) {
-											continue;
+									if (!this.isRun)
+										return;
+
+									if (Network.isMyself(newPeer.getAddress())) {
+										continue;
+									}
+									//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
+									if(Settings.getInstance().getMaxConnections() > callback.getActiveConnections().size())
+									{
+										if(foreignPeersCounter >= maxReceivePeers) {
+											break;
 										}
-										//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
-										if(this.isRun && Settings.getInstance().getMaxConnections() > callback.getActiveConnections().size())
+
+										foreignPeersCounter ++;
+										
+										//CHECK IF THAT PEER IS NOT BLACKLISTED
+										if(!PeerManager.getInstance().isBlacklisted(newPeer))
 										{
-											if(foreignPeersCounter >= maxReceivePeers) {
-												break;
-											}
-	
-											foreignPeersCounter ++;
-											
-											//CHECK IF THAT PEER IS NOT BLACKLISTED
-											if(!PeerManager.getInstance().isBlacklisted(newPeer))
+											//CHECK IF CONNECTED
+											if(!callback.isConnectedTo(newPeer))
 											{
-												//CHECK IF CONNECTED
-												if(!callback.isConnectedTo(newPeer))
+												//CHECK IF SOCKET IS NOT LOCALHOST
+												if(!newPeer.getAddress().isSiteLocalAddress() && !newPeer.getAddress().isLoopbackAddress() && !newPeer.getAddress().isAnyLocalAddress())
 												{
-													//CHECK IF SOCKET IS NOT LOCALHOST
-													if(!newPeer.getAddress().isSiteLocalAddress() && !newPeer.getAddress().isLoopbackAddress() && !newPeer.getAddress().isAnyLocalAddress())
+													if(Settings.getInstance().isTryingConnectToBadPeers() || !newPeer.isBad())
 													{
-														if(Settings.getInstance().isTryingConnectToBadPeers() || !newPeer.isBad())
-														{
-															int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
-															
-															/*
-																LOGGER.info(
-																	Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
-																		.replace("%newpeer%", newPeer.getAddress().getHostAddress())
-																		.replace("%peer%", peer.getAddress().getHostAddress())
-																		.replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
-																		.replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
-																		.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
-																		.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
-																		);
-															*/
-															//CONNECT
-															newPeer.connect(callback);
-														}
+														int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
+														
+														/*
+															LOGGER.info(
+																Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
+																	.replace("%newpeer%", newPeer.getAddress().getHostAddress())
+																	.replace("%peer%", peer.getAddress().getHostAddress())
+																	.replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
+																	.replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
+																	.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
+																	.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
+																	);
+														*/
+														
+														if (!this.isRun)
+															return;
+
+														//CONNECT
+														newPeer.connect(callback);
 													}
 												}
 											}
 										}
-									}									
-								}					
-							
+									}
+								}									
+							}							
 						}
 					}
 				}			
