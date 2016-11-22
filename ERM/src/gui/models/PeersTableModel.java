@@ -46,7 +46,13 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		
 		TimerTask action = new TimerTask() {
 	        public void run() {
-	        		fireTableDataChanged();	        	
+	        	try {
+	        		fireTableDataChanged();
+	        	}
+				catch(Exception e)
+				{
+					//LOGGER.error(e.getMessage(),e);
+				}
 	        }
 		};
 		
