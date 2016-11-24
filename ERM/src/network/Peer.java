@@ -191,7 +191,9 @@ public class Peer extends Thread{
 			try 
 			{
 
-				if (!runed || !socket.isConnected() || socket.isClosed() || !pinger.isRun() ) {
+				if (!runed || !socket.isConnected() || socket.isClosed()
+						//|| (this.pinger!= null && this.pinger.isInterrupted())
+						) {
 					//callback.onDisconnect(this);
 					return;
 				} else if (in.available()>0) {
@@ -328,7 +330,7 @@ public class Peer extends Thread{
 		} 
 		catch (InterruptedException e)
 		{
-			this.callback.onDisconnect(this); // icreator
+			//this.callback.onDisconnect(this); // icreator
 			//NO MESSAGE RECEIVED WITHIN TIME;
 			return null;
 		}
@@ -338,12 +340,6 @@ public class Peer extends Thread{
 	{
 		//DISCONNECTED
 		LOGGER.info("Try callback.onDisconnect : " + this.address.getHostAddress());
-		this.callback.onDisconnect(this);
-	}
-	public void doDisconnect()
-	{
-		//DISCONNECTED
-		LOGGER.info("disconnect  : " + this.address.getHostAddress());
 		this.callback.onDisconnect(this);
 	}
 
@@ -398,6 +394,8 @@ public class Peer extends Thread{
 	}
 	
 	// icreator - wair is DB is busy
+	// https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
+	//
 	public void goInterrupt()
 	{
 		DBSet dbSet = DBSet.getInstance();

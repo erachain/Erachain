@@ -125,6 +125,8 @@ public class Pinger extends Thread
 	}
 	
 	// icreator - wair is DB is busy
+	// https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
+	//
 	public void goInterrupt()
 	{
 
