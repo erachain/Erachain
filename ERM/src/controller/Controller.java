@@ -1016,9 +1016,17 @@ public class Controller extends Observable {
 					
 						
 					synchronized (this.peerHWeight) {
+						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
+						long hmVal;
+						if (peerHM == null || peerHM.b == null) {
+							hmVal = 0;
+						} else {
+							hmVal = peerHM.b;
+						}
+							
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValueTargeted(dbSet)));
+										hmVal + newBlock.calcWinValueTargeted(dbSet)));
 						
 					}
 
