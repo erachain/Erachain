@@ -36,6 +36,7 @@ public abstract class DBMap<T, U> extends Observable {
 	protected Map<T, U> map;
 	protected List<T> deleted;
 	private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+	private boolean worked;
 	
 	static Logger LOGGER = Logger.getLogger(DBMap.class.getName());
 
@@ -63,11 +64,18 @@ public abstract class DBMap<T, U> extends Observable {
 	    this.deleted = new ArrayList<T>();
 	}
 
+	
 	public DBSet getDBSet()
 	{		
 		return (DBSet) this.databaseSet;
 	}
+
 	
+	public boolean isWorked()
+	{		
+		return this.worked;
+	}
+
 	protected abstract Map<T, U> getMap(DB database);
 	
 	protected abstract Map<T, U> getMemoryMap();
@@ -98,17 +106,39 @@ public abstract class DBMap<T, U> extends Observable {
 		this.indexes.put(index + 10000, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
 	}
 	
+	public void addUses()
+	{
+		worked = true;
+		if (this.databaseSet!=null) {
+			this.databaseSet.addUses();
+		}
+	}
+	public void outUses()
+	{
+		worked = false;
+		if (this.databaseSet!=null) {
+			this.databaseSet.outUses();
+		}
+	}
+	
 	public int size() {
-		return this.map.size();
+		this.addUses();
+		int u = this.map.size();
+		this.outUses();
+		return u;
 	}
 	
 	public U get(T key)
 	{
+		this.addUses();
+		
 		try
 		{
 			if(this.map.containsKey(key))
 			{
-				return this.map.get(key);
+				U u = this.map.get(key);
+				this.outUses();
+				return u;
 			}
 			else
 			{
@@ -116,33 +146,47 @@ public abstract class DBMap<T, U> extends Observable {
 				{
 					if(this.parent != null)
 					{
-						return this.parent.get(key);
+						U u = this.parent.get(key);
+						this.outUses();
+						return u;
 					}
 				}
 			}
 			
-			return this.getDefaultValue();
+			U u = this.getDefaultValue();
+			this.outUses();
+			return u;
 		}
 		catch(Exception e)
 		{
 			LOGGER.error(e.getMessage(),e);
 			
-			return this.getDefaultValue();
+			U u = this.getDefaultValue();
+			this.outUses();
+			return u;
 		}			
 	}
 	
 	public Set<T> getKeys()
 	{
-		return this.map.keySet();
+		
+		this.addUses();
+		Set<T> u = this.map.keySet();
+		this.outUses();
+		return u;
 	}
 	
 	public Collection<U> getValues()
 	{
-		return this.map.values();
+		this.addUses();
+		Collection<U> u = this.map.values();
+		this.outUses();
+		return u;
 	}
 	
 	public boolean set(T key, U value)
 	{
+		this.addUses();
 		try
 		{
 			//Controller.getInstance().
@@ -186,19 +230,23 @@ public abstract class DBMap<T, U> extends Observable {
 				this.setChanged();
 				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), new SortableList<T, U>(this)));
 			}
-			
+
+			this.outUses();
 			return old != null;
 		}
 		catch(Exception e)
 		{
 			LOGGER.error(e.getMessage(),e);
 		}
-		
+
+		this.outUses();
 		return false;
 	}
 	
 	public void delete(T key) 
 	{
+		this.addUses();
+
 		try
 		{
 			//REMOVE
@@ -244,14 +292,20 @@ public abstract class DBMap<T, U> extends Observable {
 		catch(Exception e)
 		{
 			LOGGER.error(e.getMessage(),e);
-		}		
+		}
+		
+		this.outUses();
+
 	}
 	
 	public boolean contains(T key)
 	{
 		
+		this.addUses();
+
 		if(this.map.containsKey(key))
 		{
+			this.outUses();
 			return true;
 		}
 		else
@@ -260,17 +314,23 @@ public abstract class DBMap<T, U> extends Observable {
 			{
 				if(this.parent != null)
 				{
-					return this.parent.contains(key);
+					boolean u = this.parent.contains(key);
+					
+					this.outUses();
+					return u;
 				}
 			}
 		}
 		
+		this.outUses();
 		return false;
 	}
 	
 	@Override
 	public void addObserver(Observer o) 
 	{
+		this.addUses();
+
 		//ADD OBSERVER
 		super.addObserver(o);	
 		
@@ -283,18 +343,25 @@ public abstract class DBMap<T, U> extends Observable {
 			//UPDATE
 			o.update(null, new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
 		}
+		this.outUses();
 	}
 	
 	public Iterator<T> getIterator(int index, boolean descending)
 	{
+		this.addUses();
+
 		if(index == DEFAULT_INDEX)
 		{
 			if(descending)
 			{
-				return ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+				Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+				this.outUses();
+				return u;
 			}
 			
-			return ((NavigableMap<T, U>) this.map).keySet().iterator();
+			Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
+			this.outUses();
+			return u;
 		}
 		else
 		{
@@ -303,26 +370,38 @@ public abstract class DBMap<T, U> extends Observable {
 				index += 10000;
 			}
 			
-			return new IndexIterator<T>(this.indexes.get(index));
+			IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
+			this.outUses();
+			return u;
 		}
 	}
 
 	public SortableList<T, U> getList() 
 	{
-		return new SortableList<T, U>(this);
+		this.addUses();
+		SortableList<T, U> u = new SortableList<T, U>(this);
+		this.outUses();
+		return u;
 	}
 	
 	public SortableList<T, U> getParentList()
 	{
+		this.addUses();
+
 		if (this.parent!=null)
 		{
-			return new SortableList<T, U>(this.parent);
+			SortableList<T, U> u = new SortableList<T, U>(this.parent);
+			this.outUses();
+			return u;
 		}
+		this.outUses();
 		return null;
 	}
 	
 	public void reset() 
 	{
+		this.addUses();
+
 		//RESET MAP
 		this.map.clear();
 		
@@ -342,5 +421,7 @@ public abstract class DBMap<T, U> extends Observable {
 			this.setChanged();
 			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
 		}
+
+		this.outUses();
 	}
 }

@@ -83,7 +83,7 @@ public class Wallet extends Observable implements Observer
 	
 	private int secondsToUnlock = -1;
 	private Timer lockTimer = new Timer();
-	
+
 	private int syncHeight;
 	
 	AssetsFavorites assetsFavorites; 
@@ -111,11 +111,13 @@ public class Wallet extends Observable implements Observer
 	
 	//GETTERS/SETTERS
 	
+
 	public int getSyncHeight()
 	{
 		return this.syncHeight;
 	}
 
+	
 	/*
 	public void initiateAssetsFavorites()
 	{

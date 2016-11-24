@@ -1093,6 +1093,10 @@ public class Controller extends Observable {
 		}
 	}
 
+	public void closePeerOnError(Peer peer, String mess) {
+		this.network.onError(peer, mess);
+	}
+
 	public void addActivePeersObserver(Observer o) {
 		this.network.addObserver(o);
 	}
@@ -1162,7 +1166,7 @@ public class Controller extends Observable {
 						return true;
 					}
 				} catch (Exception e) {
-					// pass
+					// error on peer - disconnect!
 					this.onDisconnect(maxHW.c);
 				}
 			}

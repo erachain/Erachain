@@ -337,7 +337,13 @@ public class Peer extends Thread{
 	public void onPingFail()
 	{
 		//DISCONNECTED
-		LOGGER.info("Try callback.onDisconnect : " + this.callback.toString());
+		LOGGER.info("Try callback.onDisconnect : " + this.address.getHostAddress());
+		this.callback.onDisconnect(this);
+	}
+	public void doDisconnect()
+	{
+		//DISCONNECTED
+		LOGGER.info("disconnect  : " + this.address.getHostAddress());
 		this.callback.onDisconnect(this);
 	}
 
@@ -390,4 +396,26 @@ public class Peer extends Thread{
 			
 		}		
 	}
+	
+	// icreator - wair is DB is busy
+	public void goInterrupt()
+	{
+		DBSet dbSet = DBSet.getInstance();
+		//int i = 0;
+		while( dbSet.isBusy() || dbSet.getBlockMap().isProcessing()) {
+			try {
+				LOGGER.info(" PEER.goInterrupt wait DB : " + address);
+				Thread.sleep(50);
+			}
+			catch (Exception e) {
+			}
+			/*
+			i++;
+			if (i > 20) 
+				break;
+				*/
+		}
+		this.interrupt();
+	}
+	
 }

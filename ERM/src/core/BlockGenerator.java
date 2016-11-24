@@ -211,7 +211,7 @@ public class BlockGenerator extends Thread implements Observer
 			
 
 			//CHECK IF WE ARE UP TO DATE
-			// NOT NEED isUpToDate!
+			// NOT NEED isUpToDate! 
 			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
 			{
 				bchain.clearWaitWinBuffer();

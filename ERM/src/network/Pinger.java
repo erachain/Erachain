@@ -115,12 +115,35 @@ public class Pinger extends Thread
 		try
 		{
 			this.run = false;
-			this.interrupt();
+			this.goInterrupt();
 			this.join();
 		}
 		catch(Exception e)
 		{
 			LOGGER.debug(e.getMessage(), e);
 		}
+	}
+	
+	// icreator - wair is DB is busy
+	public void goInterrupt()
+	{
+
+		DBSet dbSet = DBSet.getInstance(); 
+		//int i =0;
+		while(dbSet.getBlockMap().isProcessing() || dbSet.isBusy() ) {
+			try {
+				LOGGER.info(" pinger.goInterrupt wait DB : " + this.peer.getAddress());
+				Thread.sleep(50);
+			}
+			catch (Exception e) {		
+			}
+			/*
+			i++;
+			if (i > 20) 
+				break;
+				*/
+
+		}
+		this.interrupt();
 	}
 }

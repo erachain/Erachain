@@ -28,6 +28,8 @@ public class WalletDatabase implements IDB
 	private static final String LAST_BLOCK = "lastBlock";
 	
 	private DB database;	
+	private int uses;
+
 	private AccountMap accountMap;
 	private TransactionMap transactionMap;
 	private BlockMap blockMap;
@@ -68,6 +70,8 @@ public class WalletDatabase implements IDB
 	    		.mmapFileEnableIfSupported()
 	            .make();
 	    
+	    uses = 0;
+	    
 	    this.accountMap = new AccountMap(this, this.database);
 	    this.transactionMap = new TransactionMap(this, this.database);
 	    this.blockMap = new BlockMap(this, this.database);
@@ -90,16 +94,41 @@ public class WalletDatabase implements IDB
 	
 	public void setVersion(int version)
 	{
+		this.uses++;
 		this.database.getAtomicInteger(VERSION).set(version);
+		this.uses--;
 	}
 	
 	public int getVersion()
 	{
-		return this.database.getAtomicInteger(VERSION).intValue();
+		this.uses++;
+		int u = this.database.getAtomicInteger(VERSION).intValue();
+		this.uses--;
+		return u;
 	}
 	
+	public void addUses()
+	{
+		this.uses++;
+		
+	}
+	public void outUses()
+	{
+		this.uses--;
+	}
+	
+	public boolean isBusy()
+	{
+		if (this.uses > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public void setLastBlockSignature(byte[] signature)
 	{
+		this.uses++;
 		/*
 		Var<byte[]> atomic;
 		if(database.exists(LAST_BLOCK))
@@ -113,10 +142,12 @@ public class WalletDatabase implements IDB
 		*/
 		Var<byte[]> atomic = this.database.getAtomicVar(LAST_BLOCK);
 		atomic.set(signature);
+		this.uses--;
 	}
 	
 	public byte[] getLastBlockSignature()
 	{
+		this.uses++;
 		/*
 		Var<byte[]> atomic;
 		if(database.exists(LAST_BLOCK))
@@ -129,7 +160,9 @@ public class WalletDatabase implements IDB
 		}
 		*/
 		Var<byte[]> atomic = this.database.getAtomicVar(LAST_BLOCK);
-		return atomic.get();
+		byte[] u = atomic.get();
+		this.uses--;
+		return u;
 	}
 	
 	public AccountMap getAccountMap()
@@ -300,6 +333,8 @@ public class WalletDatabase implements IDB
 	
 	public void delete(PublicKeyAccount account)
 	{
+		this.uses++;
+
 		this.accountMap.delete(account);
 		this.blockMap.delete(account);
 		this.transactionMap.delete(account);
@@ -313,11 +348,17 @@ public class WalletDatabase implements IDB
 		this.personMap.delete(account);
 		this.statusMap.delete(account);
 		this.orderMap.delete(account);
+		
+		this.uses--;
+
 	}
 	
 	public void commit()
 	{
+		this.uses++;
 		this.database.commit();
+		this.uses--;
+
 	}
 	
 	public void close() 
@@ -326,8 +367,11 @@ public class WalletDatabase implements IDB
 		{
 			if(!this.database.isClosed())
 			{
+				this.uses++;
 				this.database.commit();
 				this.database.close();
+				this.uses--;
+
 			}
 		}
 	}
