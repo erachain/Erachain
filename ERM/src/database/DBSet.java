@@ -729,8 +729,11 @@ public class DBSet implements Observer, IDB {
 			// THIS IS not FORK
 			if(!this.database.isClosed())
 			{
+				this.uses++;
+
 				this.database.commit();
 				this.database.close();
+				
 				this.uses = 0;
 			}
 		}
@@ -749,6 +752,8 @@ public class DBSet implements Observer, IDB {
 	@Override
 	public void update(Observable o, Object arg) 
 	{
+		this.uses++;
+
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW BLOCK
@@ -765,6 +770,8 @@ public class DBSet implements Observer, IDB {
 				Controller.getInstance().onDatabaseCommit();
 			}
 		}
+		this.uses--;
+
 	}
 
 }
