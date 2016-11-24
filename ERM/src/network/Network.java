@@ -266,6 +266,8 @@ public class Network extends Observable implements ConnectionCallback {
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
 				LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
+				// delete from peersHW
+				Controller.getInstance().onDisconnect(message.getSender());
 				message.getSender().close();
 			}
 			

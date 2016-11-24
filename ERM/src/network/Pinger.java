@@ -56,7 +56,7 @@ public class Pinger extends Thread
 			if(response == null || response.getType() != Message.PING_TYPE)
 			{
 				//PING FAILES
-				this.peer.onPingFail();
+				this.peer.onPingFail(response == null?"response == null": "response.getType() != Message.PING_TYPE" );
 				
 				//STOP PINGER
 				this.run = false;
@@ -72,7 +72,7 @@ public class Pinger extends Thread
 				
 				if (this.isInterrupted() || this.peer.isInterrupted()) {
 					//PING FAILES
-					this.peer.onPingFail();
+					this.peer.onPingFail("this.isInterrupted() || this.peer.isInterrupted()");
 
 					//STOP PINGER
 					this.run = false;
@@ -88,7 +88,7 @@ public class Pinger extends Thread
 			catch(Exception e)
 			{
 				//PING FAILES
-				this.peer.onPingFail();
+				this.peer.onPingFail(e.getMessage());
 				
 				//STOP PINGER
 				this.run = false;

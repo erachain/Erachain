@@ -255,7 +255,7 @@ public class Peer extends Thread{
 					{
 						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
-						this.onPingFail();
+						this.onPingFail("onMessage error");
 						//callback.onDisconnect(this); // ICREATOR
 						return;
 					}
@@ -336,10 +336,10 @@ public class Peer extends Thread{
 		}
 	}
 	
-	public void onPingFail()
+	public void onPingFail(String mess)
 	{
 		//DISCONNECTED
-		LOGGER.info("Try callback.onDisconnect : " + this.address.getHostAddress());
+		LOGGER.info("onPingFail : " + this.address.getHostAddress() + " - " + mess);
 		this.callback.onDisconnect(this);
 	}
 
