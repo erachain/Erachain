@@ -252,6 +252,20 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 	public Peer startPeer(Socket socket) {
 		
+		// REUSE known peer
+		InetAddress address = socket.getInetAddress();
+		synchronized(this.knownPeers)
+		{
+			//FOR ALL connectedPeers
+			for(Peer knownPeer: knownPeers)
+			{
+				//CHECK IF ADDRESS IS THE SAME
+				if(address.equals(knownPeer.getAddress())) {
+					knownPeer.reconnect(socket);
+					return knownPeer;
+				}
+			}
+		}
 		// ADD new peer
 		int maxPeers = Settings.getInstance().getMaxConnections(); 
 		if (maxPeers > this.knownPeers.size()) {
