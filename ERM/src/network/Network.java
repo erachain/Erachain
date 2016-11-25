@@ -251,7 +251,8 @@ public class Network extends Observable implements ConnectionCallback {
 	public Peer startPeer(Socket socket) {
 		
 		for (Peer peer: this.knownPeers) {
-			if (!peer.isUsed()) {
+			if (!peer.isUsed()
+					|| Network.isMyself(peer.getAddress())) {
 				peer.reconnect(socket);
 				return peer;
 			}
