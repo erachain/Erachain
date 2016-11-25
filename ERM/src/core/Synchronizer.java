@@ -46,6 +46,7 @@ public class Synchronizer
 		
 		AT_API_Platform_Impl.getInstance().setDBSet( fork );
 	
+		Controller cnt = Controller.getInstance();
 		//int originalHeight = 0;
 		
 		//ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
@@ -74,8 +75,9 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
-				if (Controller.getInstance().getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
-					peer.close(); // icreator
+				if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
+					cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
+							+ lastCommonBlock.getHeight(fork) + "]"); // icreator
 
 					throw new Exception("Dishonest peer by not valid lastCommonBlock["
 							+ lastCommonBlock.getHeight(fork) + "]");
@@ -132,7 +134,7 @@ public class Synchronizer
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 
-				peer.close(); // icreator
+				cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
 
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
@@ -250,17 +252,14 @@ public class Synchronizer
 				Block blockFromPeer = blockBuffer.getBlock(signature);
 				if (blockFromPeer == null) { // icreator
 					
-					LOGGER.info("synchronize - blockFromPeer = null: " + peer.getAddress());
-
-					peer.close();
-					return;
+					//INVALID BLOCK THROW EXCEPTION
+					throw new Exception("Dishonest peer on block null");
 				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
 				
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
 				{
-					peer.close(); // icreator
 					//INVALID BLOCK THROW EXCEPTION
 					throw new Exception("Dishonest peer on block " + blockFromPeer.getHeight(dbSet));
 				}
@@ -327,9 +326,6 @@ public class Synchronizer
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
 		if (response == null) {
-			//peer.close(); // icreator
-			peer.onPingFail(); // icreator
-
 			throw new Exception("Failed to communicate with peer - response = null");
 		}
 
@@ -372,8 +368,6 @@ public class Synchronizer
 		}
 
 		if (checkPointHeightSignature == null) {
-			peer.close(); // icreator
-
 			throw new Exception("Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found");			
 		}
@@ -403,8 +397,6 @@ public class Synchronizer
 		}
 		if (headers.isEmpty()) {
 			if (true) {
-				peer.close(); // icreator
-
 				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
 			}
 		}
@@ -442,8 +434,6 @@ public class Synchronizer
 		//CHECK IF WE GOT RESPONSE
 		if(response == null)
 		{
-			peer.close(); // icreator
-
 			//ERROR
 			throw new Exception("Peer timed out");
 		}
@@ -452,8 +442,6 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!block.isSignatureValid())
 		{
-			peer.close(); // icreator
-
 			throw new Exception("*** Invalid block --signature");
 		}
 		

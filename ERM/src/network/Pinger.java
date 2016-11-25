@@ -12,13 +12,13 @@ public class Pinger extends Thread
 	
 	private static final Logger LOGGER = Logger.getLogger(Pinger.class);
 	private Peer peer;
-	private boolean run;
+	//private boolean run;
 	private long ping;
 	
 	public Pinger(Peer peer)
 	{
 		this.peer = peer;
-		this.run = true;
+		//this.run = true;
 		this.ping = Long.MAX_VALUE;
 		
 		this.start();
@@ -28,34 +28,46 @@ public class Pinger extends Thread
 	{
 		return this.ping;
 	}
+	/*
+	public boolean isRun()
+	{
+		return this.run;
+	}
+	*/
 	
 	public void run()
 	{
 	
-		while(this.run)
+		while(true)
 		{
+			
+			if(!this.peer.isUsed()) {
+				try {
+					Thread.sleep(100);
+				}
+				catch (Exception e) {		
+				}
+				continue;
+			}
+			
 			//CREATE PING
 			Message pingMessage = MessageFactory.getInstance().createPingMessage();
-			
-			if(!this.run)
-				break;
-			
+						
 			//GET RESPONSE
 			long start = System.currentTimeMillis();
 			Message response = this.peer.getResponse(pingMessage);
-
-			if(!this.run)
-				break;
 
 			//CHECK IF VALID PING
 			if(response == null || response.getType() != Message.PING_TYPE)
 			{
 				//PING FAILES
-				this.peer.onPingFail();
-				
-				//STOP PINGER
-				this.run = false;
-				return;
+				this.peer.onPingFail(response == null?"response == null": "response.getType() != Message.PING_TYPE" );
+				try {
+					Thread.sleep(100);
+				}
+				catch (Exception e) {		
+				}
+				continue;
 			}
 
 			try
@@ -64,33 +76,22 @@ public class Pinger extends Thread
 				//UPDATE PING
 				this.ping = System.currentTimeMillis() - start;
 				this.peer.addPingCounter();
-				
-				if (this.isInterrupted() || this.peer.isInterrupted()) {
-					//PING FAILES
-					this.peer.onPingFail();
-
-					//STOP PINGER
-					this.run = false;
-					return;					
-				}
-				
+								
 				if(!DBSet.getInstance().isStoped()){
-					if (!this.isInterrupted() && this.isAlive()) { // ICREATOR
 						DBSet.getInstance().getPeerMap().addPeer(this.peer);
-					}
 				}
 			}
 			catch(Exception e)
 			{
 				//PING FAILES
-				this.peer.onPingFail();
+				this.peer.onPingFail(e.getMessage());
+				try {
+					Thread.sleep(100);
+				}
+				catch (Exception e1) {		
+				}
+				continue;
 				
-				//STOP PINGER
-				this.run = false;
-
-				//LOGGER.error(" ???? " + e.getMessage(), e);
-				
-				return;
 			}
 			
 			//SLEEP
@@ -105,17 +106,50 @@ public class Pinger extends Thread
 		}
 	}
 
+	/*
 	public void stopPing() 
 	{
 		try
 		{
 			this.run = false;
-			this.interrupt();
+			this.goInterrupt();
 			this.join();
 		}
 		catch(Exception e)
 		{
 			LOGGER.debug(e.getMessage(), e);
 		}
+		
+		try {
+			this.wait();
+		} catch(Exception e) {
+			
+		}
+	}
+	 */
+	
+	// icreator - wair is DB is busy
+	// https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
+	//
+	public void goInterrupt_old()
+	{
+
+		DBSet dbSet = DBSet.getInstance(); 
+		//int i =0;
+		while(dbSet.getBlockMap().isProcessing() || dbSet.isBusy() ) {
+			try {
+				LOGGER.info(" pinger.goInterrupt wait DB : " + this.peer.getAddress());
+				Thread.sleep(50);
+			}
+			catch (Exception e) {		
+			}
+			/*
+			i++;
+			if (i > 20) 
+				break;
+				*/
+
+		}
+		this.interrupt();
 	}
 }

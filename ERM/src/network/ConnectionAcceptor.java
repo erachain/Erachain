@@ -33,6 +33,9 @@ public class ConnectionAcceptor extends Thread{
 		{
 			try
 			{	
+				
+				Thread.sleep(10);	
+
 				if(socket == null)
 				{
 					//START LISTENING
@@ -41,7 +44,7 @@ public class ConnectionAcceptor extends Thread{
 				
 				
 				//CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-				if(Settings.getInstance().getMaxConnections() <= callback.getActiveConnections().size())
+				if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size())
 				{
 					//IF SOCKET IS OPEN CLOSE IT
 					if(!socket.isClosed())
@@ -84,14 +87,19 @@ public class ConnectionAcceptor extends Thread{
 					}
 					else
 					{
+						
+						if (!this.isRun)
+							return;
+
 						//CREATE PEER
-						new Peer(callback, connectionSocket);
+						////new Peer(callback, connectionSocket);
+						callback.startPeer(connectionSocket);
 					}
 				}
 			}
 			catch(Exception e)
 			{
-				LOGGER.error(e.getMessage(),e);
+				//LOGGER.error(e.getMessage(),e);
 				LOGGER.warn(Lang.getInstance().translate("Error accepting new connection"));			
 			}
 		}

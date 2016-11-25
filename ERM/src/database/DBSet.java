@@ -24,6 +24,7 @@ public class DBSet implements Observer, IDB {
 	
 	private static DBSet instance;
 	private DBSet parent;
+	private int uses;
 	
 	private BlockChain bchain;
 	
@@ -103,7 +104,33 @@ public class DBSet implements Observer, IDB {
 		return instance;
 	}
 
+	public void addUses()
+	{
+		if (this.parent!=null) {
+			return;
+		}
+		this.uses++;
+	}
+	public void outUses()
+	{
+		if (this.parent!=null) {
+			return;
+		}
+		this.uses--;
+	}
+	
+	public boolean isBusy()
+	{
+		if (this.uses > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	
 	public static void reCreateDatabase() {
+
 		//OPEN DB
 		File dbFile = new File(Settings.getInstance().getDataDir(), "data.dat");
 		dbFile.getParentFile().mkdirs();
@@ -132,6 +159,8 @@ public class DBSet implements Observer, IDB {
 	
 	public DBSet(DB database)
 	{
+		uses = 1;
+
 		try {
 			this.database = database;
 			this.actions = 0;
@@ -203,11 +232,14 @@ public class DBSet implements Observer, IDB {
 			this.close();
 			throw e;
 		}
+		uses--;
+		
 	}
 	
 	protected DBSet(DBSet parent)
 	{
 		
+		this.uses = 1;
 		
 		//DB database = DBMaker.newMemoryDB().make();
 
@@ -276,9 +308,13 @@ public class DBSet implements Observer, IDB {
 		this.atMap = new ATMap(parent.atMap);
 		this.atStateMap = new ATStateMap(parent.atStateMap);
 		this.atTransactionMap = new ATTransactionMap(parent.atTransactionMap);
+		
+		this.uses--;
 	}
 	
 	public void reset() {
+		
+		this.uses++;
 		
 		this.addressForging.reset();
 		this.credit_AddressesMap.reset();
@@ -339,6 +375,8 @@ public class DBSet implements Observer, IDB {
 		this.atMap.reset();
 		this.atStateMap.reset();
 		this.atTransactionMap.reset();
+		
+		this.uses--;
 	}
 	
 	public DBSet getParent() {
@@ -677,7 +715,11 @@ public class DBSet implements Observer, IDB {
 	
 	public DBSet fork()
 	{
-		return new DBSet(this);
+		this.uses++;
+		DBSet fork = new DBSet(this);
+		this.uses--;
+		
+		return fork;
 	}
 	
 	public void close()
@@ -687,8 +729,12 @@ public class DBSet implements Observer, IDB {
 			// THIS IS not FORK
 			if(!this.database.isClosed())
 			{
+				this.uses++;
+
 				this.database.commit();
 				this.database.close();
+				
+				this.uses = 0;
 			}
 		}
 	}
@@ -706,6 +752,8 @@ public class DBSet implements Observer, IDB {
 	@Override
 	public void update(Observable o, Object arg) 
 	{
+		this.uses++;
+
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW BLOCK
@@ -722,6 +770,8 @@ public class DBSet implements Observer, IDB {
 				Controller.getInstance().onDatabaseCommit();
 			}
 		}
+		this.uses--;
+
 	}
 
 }

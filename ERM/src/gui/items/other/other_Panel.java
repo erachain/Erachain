@@ -35,7 +35,7 @@ import lang.Lang;
 public class other_Panel extends javax.swing.JPanel {
 
     private PeersTableModel peersTableModel;
-	private JTable peersTable;
+	//private JTable peersTable;
 	private BlocksTableModel All_Blocks_TableModel;
 	private WalletBlocksTableModel blocksModel;
 	private WalletTransactionsTableModel transactionsModel;

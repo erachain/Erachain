@@ -1,20 +1,16 @@
 package utils;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
+import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 
 public class SaveStrToFile {
 	
 	public static void save(String path, String str) throws IOException 
 	{
-		Files.write(Paths.get(path), 
-				str.getBytes(StandardCharsets.UTF_8), 
-				StandardOpenOption.WRITE);
+		FileUtils.writeStringToFile(new File(path), str, false);
 	} 
 
 	public static void saveJsonFine(String path, JSONObject json) throws IOException 

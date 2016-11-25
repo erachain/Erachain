@@ -108,15 +108,15 @@ public class NameStorageResource {
 	@Path("/{name}/key/{key}")
 	public String getNameStorageValue(@PathParam("name") String name,
 			@PathParam("key") String key) {
-		Name nameObj = DBSet.getInstance().getNameMap().get(name);
-
-		if (nameObj == null) {
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.NAME_DOES_NOT_EXIST);
-		}
 
 		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
 				.get(name);
+		
+		
+		if (map == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					Transaction.NAME_DOES_NOT_EXIST);
+		}
 
 		JSONObject json = new JSONObject();
 		if (map != null && map.containsKey(key)) {

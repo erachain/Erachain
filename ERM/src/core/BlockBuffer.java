@@ -128,6 +128,7 @@ public class BlockBuffer extends Thread
 		try
 		{
 			this.run = false;
+			
 			this.join();
 		}
 		catch (InterruptedException e) 

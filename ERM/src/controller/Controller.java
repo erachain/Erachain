@@ -719,7 +719,7 @@ public class Controller extends Observable {
 
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
-		return this.network.getActiveConnections();
+		return this.network.getActivePeers();
 	}
 
 	public void walletSyncStatusUpdate(int height) {
@@ -1016,9 +1016,17 @@ public class Controller extends Observable {
 					
 						
 					synchronized (this.peerHWeight) {
+						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
+						long hmVal;
+						if (peerHM == null || peerHM.b == null) {
+							hmVal = 0;
+						} else {
+							hmVal = peerHM.b;
+						}
+							
 						this.peerHWeight.put(message.getSender(),
 								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										this.peerHWeight.get(message.getSender()).b + newBlock.calcWinValueTargeted(dbSet)));
+										hmVal + newBlock.calcWinValueTargeted(dbSet)));
 						
 					}
 
@@ -1046,7 +1054,7 @@ public class Controller extends Observable {
 				if (transaction.getCreator() != null 
 						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
-					this.network.onError(message.getSender(), Lang.getInstance().translate("invalid transaction signature"));
+					this.network.onError(message.getSender(), "invalid transaction signature");
 
 					return;
 				}
@@ -1091,6 +1099,10 @@ public class Controller extends Observable {
 				break;
 			}
 		}
+	}
+
+	public void closePeerOnError(Peer peer, String mess) {
+		this.network.onError(peer, "closePeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1162,7 +1174,7 @@ public class Controller extends Observable {
 						return true;
 					}
 				} catch (Exception e) {
-					// pass
+					// error on peer - disconnect!
 					this.onDisconnect(maxHW.c);
 				}
 			}
@@ -1237,7 +1249,7 @@ public class Controller extends Observable {
 
 			if (peer != null) {
 				// DISHONEST PEER
-				this.network.onError(peer, e.getMessage());
+				this.network.onError(peer, "update error - " + e.getMessage());
 			}
 		}
 
@@ -1335,7 +1347,7 @@ public class Controller extends Observable {
 	public boolean recoverWallet(byte[] seed, String password, int amount) {
 		if(this.wallet.create(seed, password, amount, false))
 		{
-			LOGGER.info(Lang.getInstance().translate("Wallet needs to synchronize!"));
+			LOGGER.info("Wallet needs to synchronize!");
 			this.actionAfterConnect();
 			this.setNeedSync(true);
 

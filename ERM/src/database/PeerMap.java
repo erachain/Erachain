@@ -24,7 +24,6 @@ import settings.Settings;
 import utils.PeerInfoComparator;
 import utils.ReverseComparator;
 
-// java nio channels.ClosedByInterruptException
 public class PeerMap extends DBMap<byte[], byte[]> 
 {
 	private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
