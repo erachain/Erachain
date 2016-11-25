@@ -719,7 +719,7 @@ public class Controller extends Observable {
 
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
-		return this.network.getActiveConnections();
+		return this.network.getActivePeers();
 	}
 
 	public void walletSyncStatusUpdate(int height) {
@@ -1054,7 +1054,7 @@ public class Controller extends Observable {
 				if (transaction.getCreator() != null 
 						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
-					this.network.onError(message.getSender(), Lang.getInstance().translate("invalid transaction signature"));
+					this.network.onError(message.getSender(), "invalid transaction signature");
 
 					return;
 				}
@@ -1102,7 +1102,7 @@ public class Controller extends Observable {
 	}
 
 	public void closePeerOnError(Peer peer, String mess) {
-		this.network.onError(peer, mess);
+		this.network.onError(peer, "closePeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1249,7 +1249,7 @@ public class Controller extends Observable {
 
 			if (peer != null) {
 				// DISHONEST PEER
-				this.network.onError(peer, e.getMessage());
+				this.network.onError(peer, "update error - " + e.getMessage());
 			}
 		}
 

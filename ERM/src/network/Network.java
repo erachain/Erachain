@@ -2,6 +2,7 @@ package network;
 // 30/03 ++
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +34,7 @@ public class Network extends Observable implements ConnectionCallback {
 
 	private static final Logger LOGGER = Logger.getLogger(Network.class);
 
-	private List<Peer> connectedPeers;
+	private List<Peer> knownPeers;
 	
 	private SortedSet<String> handledMessages;
 	
@@ -43,7 +44,7 @@ public class Network extends Observable implements ConnectionCallback {
 	
 	public Network()
 	{	
-		this.connectedPeers = new ArrayList<Peer>();
+		this.knownPeers = new ArrayList<Peer>();
 		this.run = true;
 		
 		this.start();
@@ -63,18 +64,20 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 	
 	@Override
-	public void onConnect(Peer peer) {
+	public void onConnect(Peer peer, boolean asNew) {
 		
 		//LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 		
-		//ADD TO CONNECTED PEERS
-		synchronized(this.connectedPeers)
-		{
-			this.connectedPeers.add(peer);
+		if (asNew) {
+			//ADD TO CONNECTED PEERS
+			synchronized(this.knownPeers)
+			{
+				this.knownPeers.add(peer);
+			}
+			//ADD TO WHITELIST
+			PeerManager.getInstance().addPeer(peer);
+			
 		}
-		
-		//ADD TO WHITELIST
-		PeerManager.getInstance().addPeer(peer);
 		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onConnect(peer);
@@ -84,45 +87,64 @@ public class Network extends Observable implements ConnectionCallback {
 		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));		
 		
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.connectedPeers));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
 
 	@Override
 	public void onDisconnect(Peer peer) {
 		
+		/*
 		//REMOVE FROM CONNECTED PEERS
 		synchronized(this.connectedPeers)
 		{
 			this.connectedPeers.remove(peer);
 		}
+		*/
 
-		LOGGER.info("onDisconnect - Connection close : " + peer.getAddress());
+		//LOGGER.info("onDisconnect - Connection close : " + peer.getAddress());
 		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onDisconnect(peer);
 		
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
-		peer.goInterrupt();
+		
+		//peer.goInterrupt();
+		/*
+		synchronized (peer) {
+			try {
+				peer.wait();
+			} catch(Exception e) {
+				
+			}
+		}
+		*/
+
 		
 		//NOTIFY OBSERVERS
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
 		
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.connectedPeers));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
 	
 	@Override
 	public void onError(Peer peer, String error) {
 		
-		LOGGER.info("onError - Connection error : " + peer.getAddress() + " : " + error);
+		//LOGGER.info("onError - Connection error : " + peer.getAddress() + " : " + error);
 		
+		peer.addError();
+		if (peer.getErrors() < 3)
+			return;
+		
+		/*
 		//REMOVE FROM CONNECTED PEERS
 		synchronized(this.connectedPeers)
 		{
 			this.connectedPeers.remove(peer);
 		}
+		*/
 		
 		//ADD TO BLACKLIST
 		PeerManager.getInstance().blacklistPeer(peer);
@@ -132,29 +154,38 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
-		peer.goInterrupt();
+		//peer.goInterrupt();
+		/*
+		try {
+			peer.wait();
+		} catch(Exception e) {
+			
+		}
+		*/
 					
 		//NOTIFY OBSERVERS
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
 		
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.connectedPeers));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
 	
 	@Override
-	public boolean isConnectedTo(InetAddress address) {
+	public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 		
 		try
 		{
-			synchronized(this.connectedPeers)
+			synchronized(this.knownPeers)
 			{
 				//FOR ALL connectedPeers
-				for(Peer connectedPeer: connectedPeers)
+				for(Peer knownPeer: knownPeers)
 				{
 					//CHECK IF ADDRESS IS THE SAME
-					if(address.equals(connectedPeer.getAddress()))
-					{
+					if(address.equals(knownPeer.getAddress())) {
+						if (andUsed) {
+							return knownPeer.isUsed();
+						}
 						return true;
 					}
 				}
@@ -162,22 +193,75 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 		catch(Exception e)
 		{
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isConnectedTo(Peer peer) {
+	// IF PEER in exist in NETWORK - get it
+	public Peer getKnownPeer(Peer peer) {
 		
-		return this.isConnectedTo(peer.getAddress());
+		try
+		{
+			InetAddress address = peer.getAddress();
+			synchronized(this.knownPeers)
+			{
+				//FOR ALL connectedPeers
+				for(Peer knownPeer: knownPeers)
+				{
+					//CHECK IF ADDRESS IS THE SAME
+					if(address.equals(knownPeer.getAddress())) {
+						return knownPeer;
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			//LOGGER.error(e.getMessage(),e);
+		}
+		
+		return peer;
 	}
 	
 	@Override
-	public List<Peer> getActiveConnections() {
+	public boolean isKnownPeer(Peer peer, boolean andUsed) {
 		
-		return this.connectedPeers;
+		return this.isKnownAddress(peer.getAddress(), andUsed);
+	}
+
+	/*@Override
+	public List<Peer> getKnownPeers() {
+		
+		return this.knownPeers;
+	}
+	*/
+	
+	public List<Peer> getActivePeers() {
+		
+		List<Peer> activePeers = new ArrayList<Peer>();
+		for (Peer peer: this.knownPeers) {
+			if (peer.isUsed())
+				activePeers.add(peer);
+		}
+		return activePeers;
+	}
+	public Peer startPeer(Socket socket) {
+		
+		for (Peer peer: this.knownPeers) {
+			if (!peer.isUsed()) {
+				peer.reconnect(socket);
+				return peer;
+			}
+		}
+		// ADD new peer
+		if (Settings.getInstance().getMaxConnections() > this.getActivePeers().size()) {
+			return new Peer(this, socket);
+		}
+		return null;
+		
 	}
 	
 	private void addHandledMessage(byte[] hash)
@@ -197,7 +281,7 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 		catch(Exception e)
 		{
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 		}
 	}
 
@@ -287,9 +371,12 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		try
 		{
-			for(int i=0; i < this.connectedPeers.size() ; i++)
+			for(int i=0; i < this.knownPeers.size() ; i++)
 			{
-				Peer peer = this.connectedPeers.get(i);
+				Peer peer = this.knownPeers.get(i);
+				if (!peer.isUsed()) {
+					continue;
+				}
 				
 				//EXCLUDE PEERS
 				if(peer != null && (exclude == null || !exclude.contains(peer)))
@@ -301,7 +388,7 @@ public class Network extends Observable implements ConnectionCallback {
 		catch(Exception e)
 		{
 			//error broadcasting
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 		}
 		
 		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
@@ -313,7 +400,7 @@ public class Network extends Observable implements ConnectionCallback {
 		super.addObserver(o);
 		
 		//SEND CONNECTEDPEERS ON REGISTER
-		o.update(this, new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.connectedPeers));
+		o.update(this, new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
 	}
 	
 	public static boolean isPortAvailable(int port)
@@ -344,10 +431,10 @@ public class Network extends Observable implements ConnectionCallback {
 	{
 		this.run = false;
 		this.onMessage(null);
-		while (this.connectedPeers.size() > 0) {
+		while (this.knownPeers.size() > 0) {
 			try {
-				this.connectedPeers.get(0).close();
-				this.connectedPeers.remove(0); // icreator
+				this.knownPeers.get(0).close();
+				this.knownPeers.remove(0); // icreator
 			} catch (Exception e) {
 
 			}

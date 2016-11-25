@@ -9,6 +9,8 @@ import java.util.TimerTask;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import database.DBSet;
 import database.PeerMap.PeerInfo;
@@ -125,10 +127,13 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 				return peer.getAddress().getHostAddress();
 
 			case COLUMN_HEIGHT:
-				return Controller.getInstance().getHWeightOfPeer(peer);
+				 Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
+				return res==null?Lang.getInstance().translate("Closed"):res;
 			
 			case COLUMN_PINGMC:
-				if(peer.getPing() > 1000000) {
+				if(!peer.isUsed()) {
+					return Lang.getInstance().translate("--");
+				} else if(peer.getPing() > 1000000) {
 					return Lang.getInstance().translate("Waiting...");
 				} else {
 					return peer.getPing();

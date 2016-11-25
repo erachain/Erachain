@@ -44,7 +44,7 @@ public class ConnectionAcceptor extends Thread{
 				
 				
 				//CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-				if(Settings.getInstance().getMaxConnections() <= callback.getActiveConnections().size())
+				if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size())
 				{
 					//IF SOCKET IS OPEN CLOSE IT
 					if(!socket.isClosed())
@@ -92,7 +92,8 @@ public class ConnectionAcceptor extends Thread{
 							return;
 
 						//CREATE PEER
-						new Peer(callback, connectionSocket);
+						////new Peer(callback, connectionSocket);
+						callback.startPeer(connectionSocket);
 					}
 				}
 			}
