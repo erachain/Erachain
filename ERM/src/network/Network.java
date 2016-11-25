@@ -242,24 +242,33 @@ public class Network extends Observable implements ConnectionCallback {
 	public List<Peer> getActivePeers() {
 		
 		List<Peer> activePeers = new ArrayList<Peer>();
-		for (Peer peer: this.knownPeers) {
-			if (peer.isUsed())
-				activePeers.add(peer);
+		synchronized(this.knownPeers) {
+			for (Peer peer: this.knownPeers) {
+				if (peer.isUsed())
+					activePeers.add(peer);
+			}
 		}
 		return activePeers;
 	}
 	public Peer startPeer(Socket socket) {
 		
-		for (Peer peer: this.knownPeers) {
-			if (!peer.isUsed()
-					|| Network.isMyself(peer.getAddress())) {
-				peer.reconnect(socket);
-				return peer;
-			}
-		}
 		// ADD new peer
-		if (Settings.getInstance().getMaxConnections() > this.getActivePeers().size()) {
+		int maxPeers = Settings.getInstance().getMaxConnections(); 
+		if (maxPeers > this.knownPeers.size()) {
+			// use empty slots
 			return new Peer(this, socket);
+		}
+		if (maxPeers > this.getActivePeers().size()) {
+			// use UNUSED peers				
+			synchronized(this.knownPeers) {
+				for (Peer knownPeer: this.knownPeers) {
+					if (!knownPeer.isUsed()
+							|| Network.isMyself(knownPeer.getAddress())) {
+						knownPeer.reconnect(socket);
+						return knownPeer;
+					}
+				}
+			}
 		}
 		return null;
 		

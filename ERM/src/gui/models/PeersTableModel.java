@@ -127,12 +127,19 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 				return peer.getAddress().getHostAddress();
 
 			case COLUMN_HEIGHT:
-				 Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
-				return res==null?Lang.getInstance().translate("Closed"):res;
+				if(!peer.isUsed()) {
+					return Lang.getInstance().translate("Broken");
+				}
+				Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
+				if(res == null) {
+					return Lang.getInstance().translate("Waiting...");
+				} else {
+					return res;
+				}
 			
 			case COLUMN_PINGMC:
 				if(!peer.isUsed()) {
-					return Lang.getInstance().translate("--");
+					return Lang.getInstance().translate("Broken");
 				} else if(peer.getPing() > 1000000) {
 					return Lang.getInstance().translate("Waiting...");
 				} else {

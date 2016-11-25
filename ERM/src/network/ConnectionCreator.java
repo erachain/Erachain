@@ -188,7 +188,7 @@ public class ConnectionCreator extends Thread {
 					}
 				}			
 				//SLEEP
-				Thread.sleep(6 * 1000);	
+				Thread.sleep(60 * 1000);	
 	
 			}
 			catch(Exception e)
