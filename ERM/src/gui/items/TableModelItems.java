@@ -81,7 +81,7 @@ public class TableModelItems extends TableModelCls<Long, ItemCls> implements Obs
 		
 		case COLUMN_ADDRESS:
 			
-			return item.getCreator().getAddress();
+			return item.getCreator().asPerson();
 			
 		}
 		

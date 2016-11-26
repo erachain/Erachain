@@ -682,7 +682,7 @@ public class Wallet extends Observable implements Observer
 		
 
 		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
-		Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+		////Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 		
 		
 		//NOW IF NOT SYNCHRONIZED SET STATUS

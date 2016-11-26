@@ -379,7 +379,7 @@ public class UpdateNameFrame extends JFrame
     	{
     		this.cbxName.setSelectedItem(name);
     		//this.txtareaValue.setText(name.getValue());
-			this.txtOwner.setText(name.getOwner().getAddress());
+			this.txtOwner.setText(name.getOwner().asPerson());
     	}
     	
         //PACK

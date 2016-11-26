@@ -96,7 +96,7 @@ public class ImprintDetailsPanel extends JPanel {
 				
 		//OWNER
 		detailGBC.gridy = 4;
-		JTextField owner = new JTextField(imprint.getCreator().getAddress());
+		JTextField owner = new JTextField(imprint.getCreator().asPerson());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
 								

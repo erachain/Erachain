@@ -114,7 +114,7 @@ public class SellNameFrame extends JFrame
       			{
       				Name name = (Name) event.getItem();
       	 
-      				txtOwner.setText(name.getOwner().getAddress());
+      				txtOwner.setText(name.getOwner().asPerson());
       			}
       	    }    
       	});
@@ -170,7 +170,7 @@ public class SellNameFrame extends JFrame
     	if(this.cbxName.getItemCount() > 0)
     	{
     		this.cbxName.setSelectedItem(name);
-			this.txtOwner.setText(name.getOwner().getAddress());
+			this.txtOwner.setText(name.getOwner().asPerson());
     	}
     	
         //PACK
