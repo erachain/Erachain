@@ -370,10 +370,10 @@ public class Network extends Observable implements ConnectionCallback {
 			FindMyselfMessage findMyselfMessage = (FindMyselfMessage) message;
 			
 			if(Arrays.equals(findMyselfMessage.getFoundMyselfID(),Controller.getInstance().getFoundMyselfID())) {
-				LOGGER.info("network.onMessage - Connected to self. Disconnection.");
+				//LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
-				LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
+				//LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
 				// delete from peersHW
 				Controller.getInstance().onDisconnect(message.getSender());
 				message.getSender().close();

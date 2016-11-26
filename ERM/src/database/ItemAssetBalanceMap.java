@@ -130,7 +130,20 @@ public class ItemAssetBalanceMap extends DBMap<Tuple2<String, Long>, Tuple3<BigD
 		if (key < 0)
 			key = -key;
 		
-		return this.get(new Tuple2<String, Long>(address, key));
+		
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.get(new Tuple2<String, Long>(address, key));
+
+		// TODO for TEST
+		// FOR TEST NET
+		if (key == Transaction.FEE_KEY &&
+				value.a.compareTo(BigDecimal.ONE.setScale(8)) < 0) {
+					
+			return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					BigDecimal.ONE.setScale(8), BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8));
+			
+		}
+
+		return value;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
