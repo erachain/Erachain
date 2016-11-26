@@ -1147,7 +1147,7 @@ public class Controller extends Observable {
 
 	public boolean isUpToDate() {
 		if (this.peerHWeight.size() == 0) {
-			return true;
+			return false;
 		}
 
 		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
@@ -1236,7 +1236,10 @@ public class Controller extends Observable {
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxWeightPeer();
-				
+				if (peer == null) {
+					Thread.sleep(1000);
+					continue;
+				}
 				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
 						+ " WH: " + getHWeightOfPeer(peer));
 
