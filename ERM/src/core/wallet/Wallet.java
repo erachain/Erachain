@@ -118,20 +118,6 @@ public class Wallet extends Observable implements Observer
 	}
 
 	
-	/*
-	public void initiateAssetsFavorites()
-	{
-		if(this.assetsFavorites == null){
-			this.assetsFavorites = new AssetsFavorites();
-		}
-	}
-	public void initiateNotesFavorites()
-	{
-		if(this.notesFavorites == null){
-			this.notesFavorites = new NotesFavorites();
-		}
-	}
-	*/
 	public void initiateItemsFavorites()
 	{
 		if(this.assetsFavorites == null){
@@ -626,7 +612,9 @@ public class Wallet extends Observable implements Observer
 		if(Controller.getInstance().isProcessingWalletSynchronize()) {
 			return;
 		}
-		// ICREATOR
+		LOGGER.info("Resetted maps");
+
+		// here ICREATOR
 		Controller.getInstance().setNeedSync(false);
 		Controller.getInstance().setProcessingWalletSynchronize(true);
 				
@@ -643,26 +631,25 @@ public class Wallet extends Observable implements Observer
 		this.database.getStatusMap().reset();
 		this.database.getUnionMap().reset();
 		this.database.getOrderMap().reset();
-		LOGGER.info("Resetted maps");
 		
 		//REPROCESS BLOCKS
 		Block block = new GenesisBlock();
 		//this.database.setLastBlockSignature(new byte[]{1,1,1,1,1,1,1,1});
 		this.database.setLastBlockSignature(block.getSignature());
+		DBSet dbSet = DBSet.getInstance();
+		int height = 1;
 		
 		try{
-			//Controller.getInstance().setNeedSync(false);
-			//Controller.getInstance().setProcessingWalletSynchronize(true);
-			DBSet dbSet = DBSet.getInstance();
 			this.syncHeight = 1;
 			do
 			{
 				//UPDATE
 				this.update(this, new ObserverMessage(ObserverMessage.ADD_BLOCK_TYPE, block));
+				height = block.getHeight(dbSet);
 				
-				if(block.getHeight(dbSet) % Settings.BLOCK_MAX_SIGNATURES == 0) 
+				if(height % Settings.BLOCK_MAX_SIGNATURES == 0) 
 				{
-					this.syncHeight = block.getHeight(dbSet);
+					this.syncHeight = height;
 					
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 					
@@ -674,20 +661,29 @@ public class Wallet extends Observable implements Observer
 				block = block.getChild(dbSet);
 			}
 			while(block != null);
+		}
+		catch(Exception e)
+		{
+			LOGGER.error(e.getMessage(), e);
+
+		} finally {
 			
-		}finally{
 			Controller.getInstance().setProcessingWalletSynchronize(false);
 			this.database.commit();
-			this.syncHeight = -1;
+			// icreator this.syncHeight = -1;
+			this.syncHeight = height;
+			Controller.getInstance().walletSyncStatusUpdate(height);
 		}
 		
 		
 		//RESET UNCONFIRMED BALANCE for accounts + assets
+		LOGGER.info("Resetted balances");
 		update_account_assets();
 		
-		LOGGER.info("Resetted balances");
 
-		Controller.getInstance().walletSyncStatusUpdate(-1);
+		/// ic Controller.getInstance().walletSyncStatusUpdate(-1);
+		////Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
+		
 		
 		//NOW IF NOT SYNCHRONIZED SET STATUS
 		//CHECK IF WE ARE UPTODATE

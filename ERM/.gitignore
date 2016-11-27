@@ -9,6 +9,5 @@
 log.txt
 log.txt.*
 settings.json
-/*.jar
 *.jar
 *.zip

@@ -109,7 +109,7 @@ public class CancelSellNameFrame extends JFrame
       			if (event.getStateChange() == ItemEvent.SELECTED) 
       			{
       				NameSale nameSale = (NameSale) event.getItem();
-      				txtOwner.setText(nameSale.getName().getOwner().getAddress());
+      				txtOwner.setText(nameSale.getName().getOwner().asPerson());
       				txtPrice.setText(nameSale.getAmount().toPlainString());
       			}
       	    }    
@@ -166,7 +166,7 @@ public class CancelSellNameFrame extends JFrame
     	if(this.cbxNameSale.getItemCount() > 0)
     	{
     		this.cbxNameSale.setSelectedItem(nameSale);
-			this.txtOwner.setText(nameSale.getName().getOwner().getAddress());
+			this.txtOwner.setText(nameSale.getName().getOwner().asPerson());
 			this.txtPrice.setText(nameSale.getAmount().toPlainString());
     	}
     	

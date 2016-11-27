@@ -147,7 +147,7 @@ this.setVisible(false);
         jPanel2.add(jLabel4, gridBagConstraints);
 
         Account creator = asset.getCreator();
-        jTextField3.setText(creator.getAddress());
+        jTextField3.setText(creator.asPerson());
         jTextField3.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;

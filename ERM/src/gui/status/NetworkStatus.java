@@ -65,25 +65,27 @@ public class NetworkStatus extends JLabel implements Observer
 		if(message.getType() == ObserverMessage.WALLET_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
-			if(currentHeight == -1)
+			int height = Controller.getInstance().getMyHWeight(false).a;
+			if(currentHeight == height)
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-				currentHeight = Controller.getInstance().getMyHWeight(false).a;
+				//currentHeight = Controller.getInstance().getMyHWeight(false).a;
 				return;
 			}
 			
 			this.setIcon(walletSynchronizingIcon);
-			this.setText(Lang.getInstance().translate("Wallet Synchronizing")+" " + 100 * currentHeight/Controller.getInstance().getMyHWeight(false).a + "%");
+			this.setText(Lang.getInstance().translate("Wallet Synchronizing")+" " + 100 * currentHeight/height + "%");
 		}
 		
 		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue(); 
+			int height = Controller.getInstance().getMyHWeight(false).a;
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{
-				this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight().a + "%");	
+				this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight/height + "%");	
 			}	
 		}
 		

@@ -228,7 +228,7 @@ public class Peer extends Thread{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
 			if (steep != 1) {
 				//LOGGER.error(e.getMessage(), e);
-				LOGGER.info("Failed to connect to : " + address + " on steep: " + steep);
+				//LOGGER.info("Failed to connect to : " + address + " on steep: " + steep);
 			}
 		}
 	}

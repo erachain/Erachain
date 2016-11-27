@@ -153,6 +153,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+				if (item==null)
+					return null;
 				itemName = item.toString();
 			} else if ( transaction instanceof GenesisTransferAssetTransaction)
 			{

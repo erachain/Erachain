@@ -600,13 +600,13 @@ public class BlockGenerator extends Thread implements Observer
 		//CONNECTIONS OKE? -> FORGING
 		// CONNECTION not NEED now !!
 		// TARGET_WIN will be small
-		if(false && status != Controller.STATUS_OK) {
+		if(status != Controller.STATUS_OK) {
 			setForgingStatus(ForgingStatus.FORGING_ENABLED);
 			return;
 		}
 
 		// NOT NEED to wait - TARGET_WIN will be small
-		if (true || Controller.getInstance().isReadyForging())
+		if (Controller.getInstance().isReadyForging())
 			setForgingStatus(ForgingStatus.FORGING);
 		else
 			setForgingStatus(ForgingStatus.FORGING_WAIT);

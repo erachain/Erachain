@@ -17,6 +17,9 @@ import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
@@ -28,9 +31,11 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
+import core.item.persons.PersonCls;
 //import database.BalanceMap;
 import database.DBSet;
 import database.HashesMap;
+import database.HashesSignsMap;
 
 
 public class R_Hashes extends Transaction {
@@ -346,12 +351,14 @@ public class R_Hashes extends Transaction {
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
+		/** double singns is available
 		HashesMap map = db.getHashesMap();
 		for (byte[] hash: hashes) {
 			if (map.contains(hash)) {
 				return Transaction.ITEM_DUPLICATE_KEY;
 			}
 		}
+		*/
 
 		
 		return Transaction.VALIDATE_OK;
@@ -365,10 +372,31 @@ public class R_Hashes extends Transaction {
 		//UPDATE SENDER
 		super.process(db, block, asPack);
 		
-		HashesMap map = db.getHashesMap();
-		byte[] signature = this.signature;
+		int transactionIndex = -1;
+		int blockIndex = -1;
+		if (block == null) {
+			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+		} else {
+			blockIndex = block.getHeight(db);
+			if (blockIndex < 2 ) {
+				// if block not is confirmed - get last block + 1
+				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+			} else {
+				transactionIndex = block.getTransactionIndex(signature);
+			}			
+		}
+
+		long personKey;
+		Tuple2<Integer, PersonCls> asPerson = this.creator.hasPerson(db);
+		if (asPerson != null && asPerson.a >= 0) {
+			personKey = asPerson.b.getKey(db);
+		} else {
+			personKey = 0l;
+		}
+		
+		HashesSignsMap map = db.getHashesSignsMap();
 		for (byte[] hash: hashes) {
-			map.set(hash, signature);
+			map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, blockIndex, transactionIndex));
 		}
 	}
 
@@ -377,9 +405,9 @@ public class R_Hashes extends Transaction {
 		//UPDATE SENDER
 		super.orphan(db, asPack);
 						
-		HashesMap map = db.getHashesMap();
+		HashesSignsMap map = db.getHashesSignsMap();
 		for (byte[] hash: hashes) {
-			map.delete(hash);
+			map.removeItem(hash);
 		}
 	}
 
