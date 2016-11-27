@@ -188,7 +188,7 @@ public class BlockGenerator extends Thread implements Observer
 		//boolean isGenesisStart = false;
 
 		int wait_interval_run = 1000;
-		int wait_interval_flush = 60000;
+		//int wait_interval_flush = 60000;
 		//int wait_interval_run_gen = wait_interval_flush / 2;
 		int wait_interval = wait_interval_run;
 		
@@ -232,11 +232,14 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 				
-			// try solve and flush new block from Win Buffer			
+			if (dbSet.getBlockMap().isProcessing()) {
+				// NOT run in core.Synchronizer.process(DBSet, Block)
+				continue;
+			}
+				
+			// try solve and flush new block from Win Buffer		
 			Block waitWin = bchain.getWaitWinBuffer();
-
-			if (!dbSet.getBlockMap().isProcessing() // NOT run in core.Synchronizer.process(DBSet, Block)
-					&& waitWin != null ) {
+			if (waitWin != null ) {
 				
 				long diffTimeWinBlock =  NTP.getTime() - (waitWin.getTimestamp(dbSet) + wait_interval_flush);
 				
@@ -249,10 +252,10 @@ public class BlockGenerator extends Thread implements Observer
 					ctrl.flushNewBlockGenerated();
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
-						wait_interval = 5000;
+						wait_interval = 500;
 						quickRun = true;
 					} else {
-						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - 2 * wait_interval_flush);					
+						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush);					
 					}
 				} else {
 					wait_interval = 500;
@@ -361,7 +364,7 @@ public class BlockGenerator extends Thread implements Observer
 				// for not to busy the NET
 				int wait_new_good_block = (int) ((wait_interval_flush * target) / (target / 10 + max_winned_value)); 
 				if (quickRun) {
-					wait_new_good_block = wait_new_good_block>>8;
+					wait_new_good_block = wait_new_good_block>>2;
 				}
 				// wait more good new block from NET
 				try 
