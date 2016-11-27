@@ -44,7 +44,8 @@ public class DBSet implements Observer, IDB {
 	private KK_KPersonStatusUnionMap kK_KPersonStatusUnionMap;
 	private VouchRecordMap vouchRecordMap;
 	private HashesMap hashesMap;
-
+	private HashesSignsMap hashesSignsMap;
+	
 	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
 	private ChildMap childMap;
@@ -183,6 +184,7 @@ public class DBSet implements Observer, IDB {
 			this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
 			this.vouchRecordMap = new VouchRecordMap(this, database);
 			this.hashesMap = new HashesMap(this, database);
+			this.hashesSignsMap = new HashesSignsMap(this, database);
 			
 			this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
 			this.blockMap = new BlockMap(this, database);
@@ -264,7 +266,8 @@ public class DBSet implements Observer, IDB {
 		this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
 		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
 		this.hashesMap = new HashesMap(parent.hashesMap);
-
+		this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap);
+		
 		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap, this);
 		this.childMap = new ChildMap(parent.childMap, this);
@@ -332,7 +335,8 @@ public class DBSet implements Observer, IDB {
 		this.kK_KPersonStatusUnionMap.reset();
 		this.vouchRecordMap.reset();
 		this.hashesMap.reset();
-
+		this.hashesSignsMap.reset();
+		
 		this.blockSignsMap.reset();
 		this.blockHeightsMap.reset();
 		this.referenceMap.reset();
@@ -476,6 +480,11 @@ public class DBSet implements Observer, IDB {
 	public HashesMap getHashesMap() 
 	{
 		return this.hashesMap;
+	}
+
+	public HashesSignsMap getHashesSignsMap() 
+	{
+		return this.hashesSignsMap;
 	}
 
 	public BlockMap getBlockMap() 
