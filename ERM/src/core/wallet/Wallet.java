@@ -612,11 +612,12 @@ public class Wallet extends Observable implements Observer
 		if(Controller.getInstance().isProcessingWalletSynchronize()) {
 			return;
 		}
-		LOGGER.info("Resetted maps");
 
 		// here ICREATOR
 		Controller.getInstance().setNeedSync(false);
 		Controller.getInstance().setProcessingWalletSynchronize(true);
+
+		LOGGER.info("Resetted maps");
 				
 		//RESET MAPS
 		this.database.getTransactionMap().reset();

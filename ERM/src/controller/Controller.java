@@ -1273,7 +1273,7 @@ public class Controller extends Observable {
 			this.notifyObservers(new ObserverMessage(
 					ObserverMessage.NETWORK_STATUS, this.status));
 			
-			Controller.getInstance().statusInfo();
+			this.statusInfo();
 		}
 	}
 

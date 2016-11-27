@@ -226,9 +226,9 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 			
+			syncForgingStatus();
 			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			if(forgingStatus != ForgingStatus.FORGING
-					) {
+			if(forgingStatus != ForgingStatus.FORGING) {
 				continue;
 			}
 				
@@ -249,7 +249,7 @@ public class BlockGenerator extends Thread implements Observer
 					ctrl.flushNewBlockGenerated();
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
-						wait_interval = 500;
+						wait_interval = 5000;
 						quickRun = true;
 					} else {
 						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - 2 * wait_interval_flush);					
@@ -405,6 +405,11 @@ public class BlockGenerator extends Thread implements Observer
 						this.solvingBlock, unconfirmedTransactionsHash);
 				block.setTransactions(unconfirmedTransactions);
 				
+				syncForgingStatus();
+				if(forgingStatus != ForgingStatus.FORGING) {
+					continue;
+				}
+
 				//PASS BLOCK TO CONTROLLER
 				///ctrl.newBlockGenerated(block);
 				if (bchain.setWaitWinBuffer(dbSet, block)) {
@@ -596,11 +601,12 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 		}
 		
-		int status = Controller.getInstance().getStatus();
+		Controller ctrl = Controller.getInstance();
+		int status = ctrl.getStatus();
 		//CONNECTIONS OKE? -> FORGING
 		// CONNECTION not NEED now !!
 		// TARGET_WIN will be small
-		if(status != Controller.STATUS_OK) {
+		if(status != Controller.STATUS_OK || ctrl.isProcessingWalletSynchronize()) {
 			setForgingStatus(ForgingStatus.FORGING_ENABLED);
 			return;
 		}
