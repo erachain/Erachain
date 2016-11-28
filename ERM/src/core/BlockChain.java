@@ -215,7 +215,7 @@ public class BlockChain
 
 	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
 		
-		LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
+		//LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
@@ -235,7 +235,7 @@ public class BlockChain
 			}
 			//LOGGER.debug("get size " + counter);
 		} else {
-			LOGGER.debug("*** getSignatures NOT FOUND !");
+			//LOGGER.debug("*** getSignatures NOT FOUND !");
 			
 		}
 		
@@ -275,8 +275,8 @@ public class BlockChain
 			return 3;
 		}
 
-		Block lastBlock = this.getLastBlock(dbSet);
-		if(!Arrays.equals(lastBlock.getSignature(), block.getReference())) {
+		byte[] lastSignature = dbSet.getBlockMap().getLastBlockSignature();
+		if(!Arrays.equals(lastSignature, block.getReference())) {
 			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
 			return 4;
 		}
@@ -353,6 +353,10 @@ public class BlockChain
 	public Block getLastBlock(DBSet dbSet) 
 	{	
 		return dbSet.getBlockMap().getLastBlock();
+	}
+	public byte[] getLastBlockSignature(DBSet dbSet) 
+	{	
+		return dbSet.getBlockMap().getLastBlockSignature();
 	}
 
 	// get last blocks for target

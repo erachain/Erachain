@@ -326,7 +326,7 @@ public class Settings {
 				}
 				
 			} catch (Exception e) {
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.debug(e.getMessage(),e);
 				LOGGER.info("Error with loading knownpeers from peers.json.");
 			}
 			
@@ -342,7 +342,7 @@ public class Settings {
 			return knownPeers;
 		
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.debug(e.getMessage(),e);
 			LOGGER.info("Error in getKnownPeers().");
 			return new ArrayList<Peer>();
 		}
@@ -377,7 +377,7 @@ public class Settings {
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
-			LOGGER.error(e.getMessage(), e);
+			LOGGER.debug(e.getMessage(), e);
 			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 						
 			return this.cacheInternetPeers;
@@ -403,7 +403,7 @@ public class Settings {
 				}
 			}catch(Exception e)
 			{
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.debug(e.getMessage(),e);
 				LOGGER.info(this.defaultPeers[i] + " - invalid peer address!");
 			}
 		}

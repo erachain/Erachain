@@ -954,11 +954,8 @@ public class Controller extends Observable {
 
 			case Message.WIN_BLOCK_TYPE:
 
-				if (this.status != STATUS_OK)
-					break;
-
-				if(this.isProcessingWalletSynchronize()) {
-					
+				if (this.status != STATUS_OK
+					|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
 				
@@ -988,7 +985,7 @@ public class Controller extends Observable {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
 							+ " code: " + isNewWinBlockValid
-							+ " " + Base58.encode(newBlock.getSignature()));
+							+ newBlock.toString(dbSet));
 				}
 
 				break;
@@ -1006,22 +1003,26 @@ public class Controller extends Observable {
 				newBlock = blockMessage.getBlock();
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-				if (isNewBlockValid != 0) {
-					break;
+				if (isNewBlockValid == 4) {
+					// fork branch! disconnect!
+					this.onDisconnect(message.getSender());
+					return;
+				} else if (isNewBlockValid != 0) {
+					return;
 				}
 				
 				// may be it block need in WIN battle with MY winBlock?
 				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
 				if (waitWinBlock != null
-						&& waitWinBlock.getHeightByParent(dbSet) == newBlock.getHeightByParent(dbSet)) {
+						// alreday checced && waitWinBlock.getHeightByParent(dbSet) == newBlock.getHeightByParent(dbSet)
+						) {
 					// same candidate for win
 					if (this.blockChain.setWaitWinBuffer(dbSet, newBlock)) {
 						// need to BROADCAST
 						this.broadcastWinBlock(newBlock, null);
 					}
-					break;
-				}
-								
+					return;
+				}	
 				
 				// CHECK IF VALID
 				if (this.synchronizer.process(dbSet, newBlock)) {
@@ -1230,7 +1231,8 @@ public class Controller extends Observable {
 	public void update() {
 		// UPDATE STATUS
 		
-		if (this.status == STATUS_SYNCHRONIZING)
+		if (this.status == STATUS_SYNCHRONIZING
+				|| this.status == STATUS_NO_CONNECTIONS)
 			return;
 		
 		this.status = STATUS_SYNCHRONIZING;
