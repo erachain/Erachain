@@ -230,6 +230,11 @@ public class BlockGenerator extends Thread implements Observer
 				// NOT run in core.Synchronizer.process(DBSet, Block)
 				continue;
 			}
+			
+			if(ctrl.isProcessingWalletSynchronize())
+			{
+				continue;
+			}
 				
 			// try solve and flush new block from Win Buffer		
 			Block waitWin = bchain.getWaitWinBuffer();
