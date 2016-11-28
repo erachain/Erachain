@@ -134,17 +134,18 @@ public class BlockChain
 	// 1 - changed, need broadcasting;
 	public boolean setWaitWinBuffer(DBSet dbSet, Block block) {
 				
+		LOGGER.info("try set new winBlock: " + block.toString(dbSet));
+		
 		if (this.waitWinBuffer == null
 				|| block.calcWinValue(dbSet) > this.waitWinBuffer.calcWinValue(dbSet)) {
 
 			this.waitWinBuffer = block;
 
-			LOGGER.info("setWaitWinBuffer - WIN value: "
-					+ block.calcWinValue(dbSet));
-
+			LOGGER.info("new winBlock setted!");
 			return true;
 		}
 		
+		LOGGER.info("new winBlock ignored!");
 		return false;
 	}
 	

@@ -362,10 +362,15 @@ public class BlockGenerator extends Thread implements Observer
 					
 				// sleep by (TARGET / WIN_VALUE)
 				// for not to busy the NET
-				int wait_new_good_block = (int) ((wait_interval_flush * target) / (target / 10 + max_winned_value)); 
+				int wait_new_good_block = (int) ((wait_interval_flush * (target>>1)) / (target / 10 + max_winned_value)); 
 				if (quickRun) {
 					wait_new_good_block = wait_new_good_block>>2;
 				}
+
+				LOGGER.info("for height: " + height + " Selected max_winned_value: "
+						+ max_winned_value + " " + acc_winner.asPerson());
+				LOGGER.info("wait_new_good_block: " + wait_new_good_block);
+
 				// wait more good new block from NET
 				try 
 				{

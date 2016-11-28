@@ -995,8 +995,10 @@ public class Controller extends Observable {
 
 			case Message.BLOCK_TYPE:
 
-				if (this.status != STATUS_OK)
+				if (this.status != STATUS_OK
+						|| this.isProcessingWalletSynchronize()) {
 					break;
+				}
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
@@ -1004,16 +1006,25 @@ public class Controller extends Observable {
 				newBlock = blockMessage.getBlock();
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-								
-				if(this.isProcessingWalletSynchronize()) {
-					
+				if (isNewBlockValid != 0) {
 					break;
 				}
 				
+				// may be it block need in WIN battle with MY winBlock?
+				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
+				if (waitWinBlock != null
+						&& waitWinBlock.getHeightByParent(dbSet) == newBlock.getHeightByParent(dbSet)) {
+					// same candidate for win
+					if (this.blockChain.setWaitWinBuffer(dbSet, newBlock)) {
+						// need to BROADCAST
+						this.broadcastWinBlock(newBlock, null);
+					}
+					break;
+				}
+								
+				
 				// CHECK IF VALID
-				if (isNewBlockValid == 0
-						&& this.synchronizer.process(dbSet, newBlock)) {
-					
+				if (this.synchronizer.process(dbSet, newBlock)) {
 						
 					synchronized (this.peerHWeight) {
 						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
@@ -1115,13 +1126,18 @@ public class Controller extends Observable {
 
 	public void broadcastWinBlock(Block newBlock, List<Peer> excludes) {
 
+		LOGGER.info("broadcast winBlock " + newBlock.toString(this.dbSet));
+
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
 		
 		// BROADCAST MESSAGE		
 		this.network.broadcast(message, excludes);
+		
 	}
 	public void broadcastBlock(Block newBlock, List<Peer> excludes) {
+
+		LOGGER.info("broadcast chainBlock: " + newBlock.toString(this.dbSet));
 
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createBlockMessage(newBlock);
@@ -1757,9 +1773,8 @@ public class Controller extends Observable {
 				
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
-			LOGGER.info("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
-					+ (newBlock.getParentHeight(dbSet) + 1)
-					+ newBlock.calcWinValueTargeted(dbSet) + " " + newBlock.getCreator().getAddress());
+			LOGGER.info("flush and broadcast chainBlock: "
+					+ newBlock.toString(this.dbSet));
 
 			this.broadcastBlock(newBlock, null);
 		}

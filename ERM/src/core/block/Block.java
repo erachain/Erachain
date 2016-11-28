@@ -917,6 +917,7 @@ public class Block {
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
+		LOGGER.info("Target: " + target);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -1361,4 +1362,12 @@ public class Block {
 		
 		return false;
 	}
+
+	public String toString(DBSet dbSet) {
+		return "H:" + this.getHeightByParent(dbSet)
+			+ " W: " + this.calcWinValue(dbSet)
+			+ "WT: " + this.calcWinValueTargeted(dbSet)
+			+ " C: " + this.getCreator().asPerson();
+	}
+	
 }
