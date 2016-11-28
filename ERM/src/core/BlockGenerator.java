@@ -225,13 +225,7 @@ public class BlockGenerator extends Thread implements Observer
 
 				continue;
 			}
-			
-			syncForgingStatus();
-			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			if(forgingStatus != ForgingStatus.FORGING) {
-				continue;
-			}
-				
+							
 			if (dbSet.getBlockMap().isProcessing()) {
 				// NOT run in core.Synchronizer.process(DBSet, Block)
 				continue;
@@ -277,7 +271,13 @@ public class BlockGenerator extends Thread implements Observer
 			if(dbSet.isStoped()) {
 				return;
 			}
-			
+
+			syncForgingStatus();
+			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
+			if(forgingStatus != ForgingStatus.FORGING) {
+				continue;
+			}
+
 			if (dbSet.getBlockMap().isProcessing()) {
 				// IF core.Synchronizer.process(DBSet, Block))
 				bchain.clearWaitWinBuffer();

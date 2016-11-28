@@ -762,7 +762,14 @@ public class Controller extends Observable {
 		// SEND HEIGTH MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
 				HWeight));
-		
+
+		// GET CURRENT WIN BLOCK
+		Block winBlock = this.blockChain.getWaitWinBuffer();
+		if (winBlock != null) {
+			// SEND  MESSAGE
+			peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock));
+		}
+
 		if (this.status == STATUS_NO_CONNECTIONS) {
 			// UPDATE STATUS
 			this.status = STATUS_OK;
@@ -846,6 +853,7 @@ public class Controller extends Observable {
 	public void onMessage(Message message) {
 		Message response;
 		Block newBlock;
+
 
 		synchronized (this) {
 			switch (message.getType()) {
@@ -963,6 +971,8 @@ public class Controller extends Observable {
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
+				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
+				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
@@ -1001,6 +1011,8 @@ public class Controller extends Observable {
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();
+				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
+				LOGGER.debug(" received new chain Block " + newBlock.toString(dbSet));
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				if (isNewBlockValid == 4) {
@@ -1775,10 +1787,11 @@ public class Controller extends Observable {
 				
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
-			LOGGER.info("flush and broadcast chainBlock: "
+			LOGGER.info("flush chainBlock: "
 					+ newBlock.toString(this.dbSet));
 
-			this.broadcastBlock(newBlock, null);
+			///LOGGER.info("and broadcast it");
+			///this.broadcastBlock(newBlock, null);
 		}
 		
 		return isValid;
