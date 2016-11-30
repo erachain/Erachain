@@ -52,7 +52,7 @@ public class ConnectionAcceptor extends Thread{
 						socket.close();
 					}
 					
-					Thread.sleep(100);
+					Thread.sleep(50);
 				}
 				else
 				{		

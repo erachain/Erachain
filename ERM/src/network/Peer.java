@@ -250,7 +250,7 @@ public class Peer extends Thread{
 				in = null;
 				
 				try {
-					Thread.sleep(100);
+					Thread.sleep(50);
 				}
 				catch (Exception e) {		
 				}
@@ -270,7 +270,7 @@ public class Peer extends Thread{
 					//DISCONNECT
 					callback.onDisconnect(this);
 					try {
-						Thread.sleep(100);
+						Thread.sleep(10);
 					}
 					catch (Exception e1) {
 						

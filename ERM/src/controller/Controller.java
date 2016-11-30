@@ -1001,11 +1001,15 @@ public class Controller extends Observable {
 				break;
 
 			case Message.BLOCK_TYPE:
+				
 
-				if (this.status != STATUS_OK
+				// ALL IINCOMED BLOCKS ignored now!!!
+				if (true || this.status != STATUS_OK
 						|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
+				
+				
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
@@ -1785,6 +1789,13 @@ public class Controller extends Observable {
 			return false;
 		}
 				
+		// IC
+		if(isProcessingWalletSynchronize())
+		{
+			// IC
+			return false;
+		}
+
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
 			LOGGER.info("flush chainBlock: "
