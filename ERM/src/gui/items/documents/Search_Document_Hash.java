@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.event.AncestorEvent;
@@ -37,9 +38,13 @@ public class Search_Document_Hash extends Split_Panel {
 	this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500,20));
 	this.searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new Dimension(500,20));
 	this.button2_ToolBar_LeftPanel.setVisible(false);
-	this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search Hash"));
+	this.button1_ToolBar_LeftPanel.setVisible(false);
+	JButton search_Button = new JButton();
+	this.searchToolBar_LeftPanel.add(search_Button);
+	
+	search_Button.setText(Lang.getInstance().translate("Search Hash"));
 		
-	this.button1_ToolBar_LeftPanel.addActionListener(new ActionListener(){
+	search_Button.addActionListener(new ActionListener(){
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -58,8 +63,8 @@ public class Search_Document_Hash extends Split_Panel {
 	
 	DBSet db = DBSet.getInstance();
 	HashesSignsMap map = db.getHashesSignsMap();
-	byte[] a = "3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes();
-	Object hashs = map.get("3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes());
+	byte[] a = "BMw84Ln5eLZQFYxPY5ZGTWVcfauqKJavT6uJf674WV92".getBytes();
+	Object hashs = map.get("by9y2PopcgqXkwP4mdZ5dAbayGX5XEYfEG1Ms6taYUX".getBytes());
 			
 		
 		
