@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.Stack;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -16,10 +18,15 @@ import javax.swing.JTable;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.HashesSignsMap;
+import database.SortableList;
 import gui.Split_Panel;
 import gui.items.imprints.TableModelImprints;
 import gui.library.My_JFileChooser;
@@ -27,6 +34,9 @@ import lang.Lang;
 
 public class Search_Document_Hash extends Split_Panel {
 	
+		
+	Model_Hashes_info aaa;
+	JTable Table_Hash;
 	
 	public Search_Document_Hash(){
 	
@@ -56,18 +66,25 @@ public class Search_Document_Hash extends Split_Panel {
 			
 	});
 		
-	TableModelImprints aaa = new TableModelImprints();
-	JTable Table_Hash = new JTable(aaa);
+	
 	
 	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
 	
-	DBSet db = DBSet.getInstance();
-	HashesSignsMap map = db.getHashesSignsMap();
-	byte[] a = "BMw84Ln5eLZQFYxPY5ZGTWVcfauqKJavT6uJf674WV92".getBytes();
-	Object hashs = map.get("by9y2PopcgqXkwP4mdZ5dAbayGX5XEYfEG1Ms6taYUX".getBytes());
-			
-		
-		
+	
+	// while hashs.
+	// SortableList<byte[], Stack<Tuple3<Long, Integer, Integer>>> bbb = map.getList();
+	// Integer seq = null;
+	// Integer hh = null;
+	//int seq = 1;
+	// Transaction tt = db.getTransactionFinalMap().getTransaction(Integer.valueOf(1000),Integer.valueOf(1));
+	 // код персоны, номер блока, номер транзакции
+//	 value = stack.clone()
+//	 db.getTransactionFinalMap().getTransaction(hashs.pop(), seq);Transaction
+// while (value.size >0)
+	 
+	
+//	byte[] a1 = 	{116, -87, -21, -1, 47, -76, -109, 86, 81, -39, -13, 86, 49, -66, 66, -71, -124, 106, 115, -31, -40, -11, -30, -128, -75, -120, 113, 74, 111, -120, -125, 105};
+//	String as = Base58.encode(a1)	;
 	}
 	
 	
@@ -141,8 +158,9 @@ public class Search_Document_Hash extends Split_Panel {
 				//			Lang.getInstance().translate("from file ") + file_name });
 					this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
 
-			
-		
+					  aaa = new Model_Hashes_info(hashe);
+						Table_Hash = new JTable(aaa);
+					this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
 		
 		
 		
