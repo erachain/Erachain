@@ -2,6 +2,7 @@ package test.records;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 //import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 //import java.util.List;
  import org.apache.log4j.Logger;
@@ -25,21 +27,14 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.item.notes.Note;
-import core.item.notes.NoteCls;
-import core.transaction.IssueNoteRecord;
 import core.transaction.R_Hashes;
-import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-
-import utils.Corekeys;
-import webserver.WebResource;
 
 //import com.google.common.primitives.Longs;
 
 import database.DBSet;
-import database.ItemNoteMap;
+import database.HashesSignsMap;
 
 public class TestRecHash {
 
@@ -168,6 +163,8 @@ public class TestRecHash {
 		
 		init();
 		
+		byte[] hash0 = maker.getPublicKey();
+		hashes[0] = hash0;
 		
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastReference(db));
 		
@@ -177,13 +174,21 @@ public class TestRecHash {
 		hashesRecord.process(db, gb, false);
 							
 		//CHECK REFERENCE SENDER
-		assertEquals(hashesRecord.getTimestamp(), maker.getLastReference(db));	
+		assertEquals(hashesRecord.getTimestamp(), maker.getLastReference(db));
+		
+		HashesSignsMap map = db.getHashesSignsMap();
+		Stack<Tuple3<Long, Integer, Integer>> result = map.get(hash0);
+		assertEquals(result.size(), 1);
 			
 		///// ORPHAN
 		hashesRecord.orphan(db, false);
 										
 		//CHECK REFERENCE SENDER
 		assertEquals(hashesRecord.getReference(), maker.getLastReference(db));
+
+		result = map.get(hash0);
+		assertEquals(result.size(), 0);
+
 	}
 
 
