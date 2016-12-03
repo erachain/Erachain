@@ -387,30 +387,55 @@ public class BlockChain
 	}
 
 	
-	// calc Target by last blocks in chain
 	// ignore BIG win_values
-	public long getTarget(DBSet dbSet) 
-	{	
+	public static long getTarget(DBSet dbSet, Block block)
+	{
 		
-		long target = 0;
+		long win_value = 0;
+		Block parent = block.getParent(dbSet);
+		int i = 0;
 		
-		List<Block> lastBlocks = this.getLastBlocksForTarget(dbSet);
-		if (lastBlocks == null || lastBlocks.isEmpty())
-			return 0l;
-		
-		long win_value;
-		int size = 0;
-		for (Block block: lastBlocks)
+		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
-			win_value = block.calcWinValue(dbSet);
-			if (size > 20 && win_value > target<<2) {
-				// NOT USE BIG values
-				win_value = target<<2;
-			}
-			target += win_value;
-			size++;
+			i++;
+			win_value += parent.calcWinValue(dbSet);
+			
+			
+			parent = parent.getParent(dbSet);
 		}
-		return target /= size;
+		
+		if (i == 0) {
+			return block.calcWinValue(dbSet);
+		}
+
+		
+		long average = win_value / i;
+		average = average + (average>>2);
+
+		// remove bigger values
+		win_value = 0;
+		parent = block.getParent(dbSet);
+		i = 0;
+		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
+		{
+			i++;
+			long value = parent.calcWinValue(dbSet);
+			if (value > (average)) {
+				value = average;
+			}
+			win_value += parent.calcWinValue(dbSet);
+			
+			parent = parent.getParent(dbSet);
+		}
+		
+		return win_value / i;
+		
+	}
+
+	// calc Target by last blocks in chain
+	public long getTarget(DBSet dbSet)
+	{	
+		return getTarget(dbSet, this.getLastBlock(dbSet));
 	}
 
 	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 

@@ -71,7 +71,6 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 	public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item)
 	{
 		
-		SortableList<byte[], Stack<Tuple3<Long, Integer, Integer>>> list = this.getList();
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
 		
 		Stack<Tuple3<Long, Integer, Integer>> value_new;

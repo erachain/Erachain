@@ -113,9 +113,7 @@ public class TestRecPerson {
 
 		gb = new GenesisBlock();
 		gb.process(db);
-		
-		genesisPersonKey = db.getIssuePersonMap().size();
-		
+				
 		last_ref = gb.getTimestamp(db);
 		
 		// GET RIGHTS TO CERTIFIER
@@ -124,10 +122,14 @@ public class TestRecPerson {
 		personGeneral = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
 				gender, "Slav", (float)28.12345, (float)133.7777,
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+		//personGeneral.setKey(genesisPersonKey);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
 		genesis_issue_person.process(db, gb, false);
-		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, 0L);
+		//genesisPersonKey = db.getIssuePersonMap().size();
+		genesisPersonKey = genesis_issue_person.getAssetKey(db); 
+
+		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
 		genesis_certify.process(db, gb, false);
 		
 		certifier.setLastReference(last_ref, db);
@@ -138,6 +140,7 @@ public class TestRecPerson {
 				gender, "Slav", (float)28.12345, (float)133.7777,
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
 
+		//person.setKey(genesisPersonKey + 1);
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastReference(db));
 
@@ -154,7 +157,8 @@ public class TestRecPerson {
 	public void initPersonalize() {
 
 
-		assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+		//assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(db, releaserReference));
 
 		issuePersonTransaction.sign(certifier, false);
 		
@@ -344,7 +348,8 @@ public class TestRecPerson {
 		
 		init();				
 		
-		assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+		//assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(db, releaserReference));
 
 		issuePersonTransaction.sign(certifier, false);
 		
@@ -610,7 +615,7 @@ public class TestRecPerson {
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
 		r_SertifyPubKeys.process(db, gb, false);
-		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
+		int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 		
 		//CHECK BALANCE SENDER
 		assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, db));
@@ -823,7 +828,7 @@ public class TestRecPerson {
 
 		
 		r_SertifyPubKeys.process(fork, gb, false);
-		int transactionIndex = gb.getTransactionIndex(r_SertifyPubKeys.getSignature());
+		int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 		
 		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 

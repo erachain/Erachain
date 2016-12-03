@@ -372,6 +372,21 @@ public class Block {
 		this.atBytes = atBytes;
 	}
 
+	public int getTransactionSeq(byte[] signature)
+	{
+		int seq = 1;
+		for(Transaction transaction: this.getTransactions())
+		{
+			if(Arrays.equals(transaction.getSignature(), signature))
+			{
+				return seq;
+			}
+			seq ++;
+		}
+
+		return -1;
+	}
+	/*
 	public int getTransactionIndex(byte[] signature)
 	{
 
@@ -388,6 +403,7 @@ public class Block {
 
 		return -1;
 	}
+	*/
 
 	public Transaction getTransaction(byte[] signature)
 	{
@@ -842,51 +858,6 @@ public class Block {
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
 
-	public long getTarget(DBSet dbSet)
-	{
-		
-		BlockChain blockChain = Controller.getInstance().getBlockChain();
-		
-		long win_value = 0;
-		Block parent = this.getParent(dbSet);
-		int i = 0;
-		
-		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
-		{
-			i++;
-			win_value += parent.calcWinValue(dbSet);
-			
-			
-			parent = parent.getParent(dbSet);
-		}
-		
-		if (i == 0) {
-			return this.calcWinValue(dbSet);
-		}
-
-		
-		long average = win_value / i;
-		average = average + (average>>2);
-
-		// remove bigger values
-		win_value = 0;
-		parent = this.getParent(dbSet);
-		i = 0;
-		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
-		{
-			i++;
-			long value = parent.calcWinValue(dbSet);
-			if (value > (average)) {
-				value = average;
-			}
-			win_value += parent.calcWinValue(dbSet);
-			
-			parent = parent.getParent(dbSet);
-		}
-		
-		return win_value / i;
-		
-	}
 
 	public int calcWinValueTargeted2(long win_value, long target)
 	{
@@ -905,6 +876,11 @@ public class Block {
 		
 		return result;
 		
+	}
+	
+	public long getTarget(DBSet dbSet)
+	{	
+		return BlockChain.getTarget(dbSet, this);
 	}
 
 	public int calcWinValueTargeted(DBSet dbSet)
@@ -1335,21 +1311,6 @@ public class Block {
 		}
 	}
 
-	public int getTransactionSeq(byte[] signature)
-	{
-		int seq = 1;
-		for(Transaction transaction: this.getTransactions())
-		{
-			if(Arrays.equals(transaction.getSignature(), signature))
-			{
-				return seq;
-			}
-			seq ++;
-		}
-
-		return -1;
-	}
-	
 	@Override 
 	public boolean equals(Object otherObject)
 	{

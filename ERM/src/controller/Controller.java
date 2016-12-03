@@ -1267,10 +1267,15 @@ public class Controller extends Observable {
 		
 		try {
 			// WHILE NOT UPTODATE
+			int tryes = 0;
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxWeightPeer();
 				if (peer == null) {
+					tryes++;
+					if (tryes > 10) {
+						break;
+					}
 					Thread.sleep(1000);
 					continue;
 				}
@@ -1290,25 +1295,26 @@ public class Controller extends Observable {
 			}
 		}
 
-		if (this.peerHWeight.size() == 0) {
+		if (this.peerHWeight.size() == 0
+				|| peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
 
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
-		} else {
+		} else if (!this.isUpToDate()) {
 			// UPDATE STATUS
-			this.status = STATUS_OK;
-
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
+			this.status = STATUS_SYNCHRONIZING;
 			
-			this.statusInfo();
+		} else {
+			this.status = STATUS_OK;
 		}
+
+		// NOTIFY
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(
+				ObserverMessage.NETWORK_STATUS, this.status));
+		
+		this.statusInfo();
+
 	}
 
 	private Peer getMaxWeightPeer() {

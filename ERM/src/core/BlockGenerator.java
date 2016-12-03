@@ -210,32 +210,31 @@ public class BlockGenerator extends Thread implements Observer
 				return;
 			
 
+			if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING
+					|| dbSet.getBlockMap().isProcessing()
+					|| ctrl.isProcessingWalletSynchronize()) {
+				
+				wait_interval = wait_interval_run;
+				bchain.clearWaitWinBuffer();
+				continue;
+			}
+
 			//CHECK IF WE ARE UP TO DATE
 			// NOT NEED isUpToDate! 
-			if(!ctrl.isUpToDate() && !ctrl.isProcessingWalletSynchronize())
+			if(!ctrl.isUpToDate())
 			{
 				bchain.clearWaitWinBuffer();
-				
-				if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING) {
-					// IF already in sync...
-					wait_interval = wait_interval_run;
-				} else {
-					ctrl.update();
-				}
-
+				ctrl.update();
 				continue;
 			}
 							
-			if (dbSet.getBlockMap().isProcessing()) {
+			if (dbSet.getBlockMap().isProcessing()
+					|| ctrl.isProcessingWalletSynchronize()) {
 				// NOT run in core.Synchronizer.process(DBSet, Block)
+				bchain.clearWaitWinBuffer();
 				continue;
 			}
-			
-			if(ctrl.isProcessingWalletSynchronize())
-			{
-				continue;
-			}
-				
+							
 			// try solve and flush new block from Win Buffer		
 			Block waitWin = bchain.getWaitWinBuffer();
 			if (waitWin != null ) {

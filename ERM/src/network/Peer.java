@@ -353,7 +353,7 @@ public class Peer extends Thread{
 					} 
 					catch (Exception e) 
 					{
-						//LOGGER.error(e.getMessage(), e);
+						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
 						//this.onPingFail("onMessage error");
 						callback.onError(this, "onMessage wrong - " + e.getMessage());
