@@ -51,8 +51,7 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 	@Override
 	protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() 
 	{
-		// HashMap ?
-		return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>();
+		return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
@@ -71,6 +70,8 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 	@SuppressWarnings("unchecked")
 	public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item)
 	{
+		
+		SortableList<byte[], Stack<Tuple3<Long, Integer, Integer>>> list = this.getList();
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
 		
 		Stack<Tuple3<Long, Integer, Integer>> value_new;
