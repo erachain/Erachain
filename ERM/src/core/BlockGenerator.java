@@ -210,8 +210,7 @@ public class BlockGenerator extends Thread implements Observer
 				return;
 			
 
-			if (ctrl.getStatus() == Controller.STATUS_SYNCHRONIZING
-					|| dbSet.getBlockMap().isProcessing()
+			if (dbSet.getBlockMap().isProcessing()
 					|| ctrl.isProcessingWalletSynchronize()) {
 				
 				wait_interval = wait_interval_run;
@@ -225,6 +224,7 @@ public class BlockGenerator extends Thread implements Observer
 			{
 				bchain.clearWaitWinBuffer();
 				ctrl.update();
+				// IF not update by error - try anew update
 				continue;
 			}
 							

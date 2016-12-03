@@ -1247,8 +1247,7 @@ public class Controller extends Observable {
 	public void update() {
 		// UPDATE STATUS
 		
-		if (this.status == STATUS_SYNCHRONIZING
-				|| this.status == STATUS_NO_CONNECTIONS)
+		if (this.status == STATUS_NO_CONNECTIONS)
 			return;
 		
 		this.status = STATUS_SYNCHRONIZING;
@@ -1273,7 +1272,7 @@ public class Controller extends Observable {
 				peer = this.getMaxWeightPeer();
 				if (peer == null) {
 					tryes++;
-					if (tryes > 10) {
+					if (tryes > 3) {
 						break;
 					}
 					Thread.sleep(1000);
@@ -1299,11 +1298,9 @@ public class Controller extends Observable {
 				|| peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
-
 		} else if (!this.isUpToDate()) {
 			// UPDATE STATUS
 			this.status = STATUS_SYNCHRONIZING;
-			
 		} else {
 			this.status = STATUS_OK;
 		}

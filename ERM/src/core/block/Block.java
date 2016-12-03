@@ -515,6 +515,9 @@ public class Block {
 			//READ GENERATING BALANCE
 			byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
 			generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
+			if (generatingBalance < 0) {
+				LOGGER.error("block.generatingBalance < 0:" + generatingBalance);
+			}
 			position += GENERATING_BALANCE_LENGTH;
 		}
 
@@ -851,7 +854,7 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 		
-		if (this.generatingBalance == 0) {
+		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dbSet);
 		}
 		
@@ -861,7 +864,12 @@ public class Block {
 
 	public int calcWinValueTargeted2(long win_value, long target)
 	{
-		
+
+		if (target == 0l) {
+			// in forked chain in may be = 0
+			return -1;
+		}
+
 		int max_targ = BlockChain.BASE_TARGET * 15;
 		int koeff = BlockChain.BASE_TARGET;
 		int result = 0;
@@ -870,6 +878,7 @@ public class Block {
 			koeff >>=1;
 			target <<=1;
 		}
+		
 		result += (int)(koeff * win_value / target);
 		if (result > max_targ)
 			result = max_targ;
@@ -1119,7 +1128,7 @@ public class Block {
 	public void process(DBSet dbSet)
 	{	
 		
-		if (this.generatingBalance == 0) {
+		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dbSet);
 		}
 		//PROCESS TRANSACTIONS

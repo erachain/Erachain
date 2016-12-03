@@ -107,6 +107,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			}
 
 			Block block = data.getB();
+			DBSet dbSet = DBSet.getInstance();
 			
 			switch(column)
 			{
@@ -114,7 +115,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 
 				if (row == 0) {
 					return block.getHeight(DBSet.getInstance())
-							+ " " + Controller.getInstance().getBlockChain().getFullWeight(DBSet.getInstance());
+							+ " " + Controller.getInstance().getBlockChain().getFullWeight(dbSet);
 					
 				}
 				
@@ -122,7 +123,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(block.getTimestamp(DBSet.getInstance()));// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
+				return DateTimeFormat.timestamptoString(block.getTimestamp(dbSet));// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
 				
 			case COLUMN_GENERATOR:
 				
@@ -130,8 +131,10 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				
 			case COLUMN_BASETARGET:
 				
-				return block.getGeneratingBalance(DBSet.getInstance()) + " "
-						+ block.calcWinValueTargeted(DBSet.getInstance());
+				return block.getGeneratingBalance(dbSet) + " "
+						+ Block.getPreviousForgingHeightForCalcWin(dbSet, block.getCreator(), block.getHeight(dbSet)) + " "
+						+ block.calcWinValue(dbSet) + " "
+						+ block.calcWinValueTargeted(dbSet);
 				
 			case COLUMN_TRANSACTIONS:
 				
