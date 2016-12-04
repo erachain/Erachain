@@ -59,7 +59,7 @@ public class ConnectionCreator extends Thread {
 						
 						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size()) {
 							try {
-								Thread.sleep(1000);
+								Thread.sleep(10);
 							}
 							catch (Exception e) {		
 							}
@@ -188,7 +188,17 @@ public class ConnectionCreator extends Thread {
 					}
 				}			
 				//SLEEP
-				Thread.sleep(30 * 1000);	
+				int sleep_time = 1;
+				if (callback.getActivePeers().size()<3)
+					sleep_time = 3;
+				else if (callback.getActivePeers().size()< (Settings.getInstance().getMaxConnections()>>1))
+					sleep_time = 10;
+				else if (callback.getActivePeers().size()< Settings.getInstance().getMaxConnections())
+					sleep_time = 20;
+				else 
+					sleep_time = 40;
+					
+				Thread.sleep(sleep_time * 1000);	
 	
 			}
 			catch(Exception e)
