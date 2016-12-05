@@ -62,7 +62,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
      this.jLabel_URL.setText(Lang.getInstance().translate("URL") + ":");
      this.jTextField_URL.setText("");
      this.jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
-     this.jButton.setText(Lang.getInstance().translate("Create"));
+     this.jButton.setText(Lang.getInstance().translate("Write & Sign"));
         
   /*   this.jButton.addActionListener(new ActionListener()
 		{

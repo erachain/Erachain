@@ -53,8 +53,8 @@ import lang.Lang;
 import utils.Pair;
 
 public class Write_Documents_Hashes_Panel extends Split_Panel {
-	Table_Model_Issue_Hashes table_Model;
-	private JTable Table_Hash;
+	public Table_Model_Issue_Hashes table_Model;
+	public JTable Table_Hash;
 	private JButton jButton3_jToolBar_RightPanel;
 	Issue_Hash_Imprint issue_Hash_Imprint;
 

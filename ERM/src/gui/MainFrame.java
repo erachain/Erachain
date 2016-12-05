@@ -108,6 +108,23 @@ private JFrame parent;
        	Toolbar_Main.add(button2_MainToolBar);
 			
 		
+       	
+    	JButton button11_MainToolBar = new JButton();
+		button11_MainToolBar.setText(Lang.getInstance().translate("Documents"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button11_MainToolBar.setFocusable(false);
+		button11_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button11_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button11_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new Main_Hash_Document_Frame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button11_MainToolBar);
+       	
+       	
+       	
+       	
        	JButton button_Statements_MainToolBar = new JButton();
        	button_Statements_MainToolBar.setText(Lang.getInstance().translate("Statements"));
 		    //    button2_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -234,18 +251,7 @@ private JFrame parent;
 		
 		
 		
-		JButton button11_MainToolBar = new JButton();
-		button11_MainToolBar.setText(Lang.getInstance().translate("Document Hash"));
-		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
-		button11_MainToolBar.setFocusable(false);
-		button11_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-		button11_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
-		button11_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new Main_Hash_Document_Frame(), MainFrame.desktopPane.getAllFrames());
-			}
-		});
-		Toolbar_Main.add(button11_MainToolBar);
+	
 		
 		
 		

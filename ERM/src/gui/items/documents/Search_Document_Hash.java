@@ -14,6 +14,8 @@ import java.util.Stack;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -106,20 +108,8 @@ public class Search_Document_Hash extends Split_Panel {
 	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
 	
 	
-	// while hashs.
-	// SortableList<byte[], Stack<Tuple3<Long, Integer, Integer>>> bbb = map.getList();
-	// Integer seq = null;
-	// Integer hh = null;
-	//int seq = 1;
-	// Transaction tt = db.getTransactionFinalMap().getTransaction(Integer.valueOf(1000),Integer.valueOf(1));
-	 // код персоны, номер блока, номер транзакции
-//	 value = stack.clone()
-//	 db.getTransactionFinalMap().getTransaction(hashs.pop(), seq);Transaction
-// while (value.size >0)
-	 
-	
-//	byte[] a1 = 	{116, -87, -21, -1, 47, -76, -109, 86, 81, -39, -13, 86, 49, -66, 66, -71, -124, 106, 115, -31, -40, -11, -30, -128, -75, -120, 113, 74, 111, -120, -125, 105};
-//	String as = Base58.encode(a1)	;
+
+
 	}
 	
 	
@@ -206,7 +196,7 @@ public class Search_Document_Hash extends Split_Panel {
 			}
 		
 			
-			
+	
 		
 
 	}
