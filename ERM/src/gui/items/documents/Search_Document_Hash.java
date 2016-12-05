@@ -35,10 +35,14 @@ import lang.Lang;
 public class Search_Document_Hash extends Split_Panel {
 	
 		
-	Model_Hashes_info aaa;
+	Model_Hashes_info model_Hashs;
 	JTable Table_Hash;
 	
 	public Search_Document_Hash(){
+		
+		
+		 model_Hashs = new Model_Hashes_info();
+			Table_Hash = new JTable(model_Hashs);	
 	
 	this.jButton2_jToolBar_RightPanel.setVisible(false);
 	this.jButton1_jToolBar_RightPanel.setVisible(false);
@@ -60,12 +64,43 @@ public class Search_Document_Hash extends Split_Panel {
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
 			
+				//Hashs_from_Files();
+			
+			model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText());
+
+			}
+			
+	});
+	
+	searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener(){
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText().toString());
+		}
+		
+		
+		
+		
+		
+	});
+	
+	JButton from_File_Button = new JButton(Lang.getInstance().translate("Get Hash"));
+	this.searchToolBar_LeftPanel.add(from_File_Button);
+	from_File_Button.addActionListener(new ActionListener(){
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			
 				Hashs_from_Files();
 
 			}
 			
 	});
-		
+	
+	
 	
 	
 	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
@@ -158,9 +193,10 @@ public class Search_Document_Hash extends Split_Panel {
 				//			Lang.getInstance().translate("from file ") + file_name });
 					this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
 
-					  aaa = new Model_Hashes_info(hashe);
-						Table_Hash = new JTable(aaa);
-					this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
+					model_Hashs.Set_Data(hashe);
+				//	model_Hashs = new Model_Hashes_info(hashe);
+				//		Table_Hash = new JTable(model_Hashs);
+				//	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
 		
 		
 		
