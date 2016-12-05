@@ -378,12 +378,11 @@ public class R_Hashes extends Transaction {
 			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
 		} else {
 			blockIndex = block.getHeight(db);
-			if (blockIndex < 2 ) {
+			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
 				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
-			} else {
-				transactionIndex = block.getTransactionIndex(signature);
 			}			
+			transactionIndex = block.getTransactionSeq(signature);
 		}
 
 		long personKey;

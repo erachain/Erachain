@@ -81,7 +81,7 @@ public class NetworkStatus extends JLabel implements Observer
 		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue(); 
-			int height = Controller.getInstance().getMyHWeight(false).a;
+			int height = Controller.getInstance().getMaxPeerHWeight().a;
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{
