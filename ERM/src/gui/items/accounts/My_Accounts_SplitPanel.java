@@ -9,6 +9,7 @@ import lang.Lang;
 public class My_Accounts_SplitPanel extends Split_Panel {
 	
 	private Accounts_Panel accountPanel;
+	private Accounts_Right_Panel rightPanel;
 	public My_Accounts_SplitPanel(){
 		
 	//	LayoutManager favoritesGBC = this.getLayout();
@@ -27,8 +28,11 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 		PanelGBC.gridy= 0;	
 		
 		accountPanel = new Accounts_Panel();
+		rightPanel = new Accounts_Right_Panel();
 		
 		this.leftPanel.add( accountPanel, PanelGBC);
+		//this.rightPanel1.add(rightPanel,PanelGBC);
+		jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
 	
 	}
 

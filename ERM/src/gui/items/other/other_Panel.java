@@ -47,7 +47,7 @@ public class other_Panel extends javax.swing.JPanel {
     // peers table	
     	 this.peersTableModel = new PeersTableModel();
          this.jTable_Peers = new JTable(this.peersTableModel);
-        
+         this.jTable_Peers.setAutoCreateRowSorter(true);
          this.jTable_Peers.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
     //     Renderer_Left ren = new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
          this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
