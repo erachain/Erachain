@@ -239,6 +239,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 		My_JFileChooser chooser = new My_JFileChooser();
 		chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
 		
+		
 
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(true);

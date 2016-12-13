@@ -1,18 +1,25 @@
 package gui.models;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.apache.log4j.Logger;
+import org.mapdb.DB;
+import org.mapdb.Fun.Tuple2;
 
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.block.Block;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import database.SortableList;
+import database.TransactionFinalMap;
 import database.TransactionMap;
 import lang.Lang;
 
@@ -25,8 +32,10 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	public static final int COLUMN_AMOUNT = 2;
 	public static final int COLUMN_FEE = 3;
 	
-	private SortableList<byte[], Transaction> transactions;
-	
+	//private SortableList<byte[], Transaction> transactions;
+	private Integer blockNo = null;
+	Long block_Height;
+	List<Transaction> transactions;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
@@ -35,21 +44,47 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	public TransactionsTableModel()
 	{
 		Controller.getInstance().addObserver(this);
+//		SortableList<byte[], Transaction> a = this.transactions;
+		
+	//	TransactionFinalMap table = DBSet.getInstance().getTransactionFinalMap();
+		
+		
+		
+	//	 byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get((long) blockNo);
+	//	 Block block = DBSet.getInstance().getBlockMap().get(block_key);
+	//	 transactions = block.getTransactions();
+	//	 Transaction signs = DBSet.getInstance().getTransactionFinalMap().getTransaction(21452, 1);
+
+//		for(Tuple2<Integer, Integer> seq: signs.b)
+//		{
+			// tran.add(table.getTransaction(seq.a, seq.b));
+//		}
+		
 	}
 	
-	@Override
-	public SortableList<byte[], Transaction> getSortableList() 
-	{
-		return this.transactions;
+//	@Override
+//	public SortableList<byte[], Transaction> getSortableList() 
+//	{
+//		return this.transactions;
+//	}
+	
+	public void Set_Block_Namber(String string){
+		
+		 byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
+		 Block block = DBSet.getInstance().getBlockMap().get(block_key);
+		 transactions = block.getTransactions();	
+		 this.fireTableDataChanged();
+		
 	}
+	
 	
 	public Transaction getTransaction(int row)
 	{
-		Pair<byte[], Transaction> data = this.transactions.get(row);
-		if (data == null || data.getB() == null) {
+		Transaction data = transactions.get(row);
+		if (data == null ) {
 			return null;
 		}
-		return data.getB();
+		return data;
 	}
 	
 	@Override
@@ -85,12 +120,12 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				return null;
 			}
 			
-			Pair<byte[], Transaction> data = this.transactions.get(row);
-			if (data == null || data.getB() == null) {
+			Transaction data = transactions.get(row);
+			if (data == null)  {
 				return null;
 			}
 
-			Transaction transaction = data.getB();
+			Transaction transaction = data;
 			
 			switch(column)
 			{
@@ -144,9 +179,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		{
 			if(this.transactions == null)
 			{
-				this.transactions = (SortableList<byte[], Transaction>) message.getValue();
-				this.transactions.registerObserver();
-				this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+			//	this.transactions = (SortableList<byte[], Transaction>) message.getValue();
+			//	this.transactions.registerObserver();
+			//	this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
 			}
 			
 			this.fireTableDataChanged();
@@ -161,7 +196,13 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
 	public void removeObservers() 
 	{
-		this.transactions.removeObserver();
+	//	this.transactions.removeObserver();
 		Controller.getInstance().deleteObserver(this);		
+	}
+
+	@Override
+	public SortableList<byte[], Transaction> getSortableList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
