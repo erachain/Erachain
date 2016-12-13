@@ -675,7 +675,7 @@ public class Account_Send_Panel extends JPanel
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = -1;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();

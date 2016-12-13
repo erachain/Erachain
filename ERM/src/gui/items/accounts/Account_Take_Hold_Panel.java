@@ -283,7 +283,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = 0;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();
