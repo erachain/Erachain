@@ -26,6 +26,7 @@ import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.documents.Main_Hash_Document_Frame;
 import gui.items.imprints.MainImprintsFrame;
+import gui.items.mails.Mails_Main_Frame;
 import gui.items.notes.MainNotesFrame;
 import gui.items.other.Other_Internal_Frame;
 import gui.items.persons.MainPersonsFrame;
@@ -108,6 +109,22 @@ private JFrame parent;
        	Toolbar_Main.add(button2_MainToolBar);
 			
 		
+       	
+      	JButton button_Mails_MainToolBar = new JButton();
+		button_Mails_MainToolBar.setText(Lang.getInstance().translate("Mails"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button_Mails_MainToolBar.setFocusable(false);
+		button_Mails_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button_Mails_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button_Mails_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new Mails_Main_Frame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button_Mails_MainToolBar);
+       	
+       	
+       	
        	
     	JButton button11_MainToolBar = new JButton();
 		button11_MainToolBar.setText(Lang.getInstance().translate("Documents"));
