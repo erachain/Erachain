@@ -47,7 +47,7 @@ import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.Gui;
 @SuppressWarnings("serial")
-public class Sent_Mails_Panel extends JPanel // implements ItemListener
+public class Outcoming_Mails_Panel extends JPanel // implements ItemListener
 
 
 //JInternalFrame
@@ -59,10 +59,10 @@ public class Sent_Mails_Panel extends JPanel // implements ItemListener
 	JTable table;
 
 	@SuppressWarnings("unchecked")
-	public Sent_Mails_Panel()
+	public Outcoming_Mails_Panel()
 	{
 		
-		this.setName(Lang.getInstance().translate("Sent Mails"));
+		this.setName(Lang.getInstance().translate("Outcoming Mails"));
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		

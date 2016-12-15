@@ -21,7 +21,7 @@ import lang.Lang;
 public class Mails_Main_Frame extends Main_Internal_Frame {
 	
 	Incoming_Mails_Panel incoming_Mails_Panel;
-	Sent_Mails_Panel sent_Mails_Panel;
+	Outcoming_Mails_Panel sent_Mails_Panel;
 	Mail_Send_Panel send_panel;
 	
 	public Mails_Main_Frame(){
@@ -42,7 +42,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		this.jTabbedPane.add(incoming_Mails_Panel);
 		
 	// Search Accounts
-		sent_Mails_Panel = new Sent_Mails_Panel();
+		sent_Mails_Panel = new Outcoming_Mails_Panel();
 		this.jTabbedPane.add(sent_Mails_Panel);
 		
 		send_panel = new Mail_Send_Panel(null,null);

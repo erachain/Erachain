@@ -84,7 +84,7 @@ public class Mail_Send_Panel extends JPanel
 	public Mail_Send_Panel(AssetCls asset, Account account)
 	{
 		
-		this.setName(Lang.getInstance().translate("Send Mails"));
+		this.setName(Lang.getInstance().translate("Send Mail"));
 		if (asset == null)
 		{
 			asset = Controller.getInstance().getAsset(1l);
