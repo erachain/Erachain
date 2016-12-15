@@ -22,6 +22,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	
 	Incoming_Mails_Panel incoming_Mails_Panel;
 	Sent_Mails_Panel sent_Mails_Panel;
+	Mail_Send_Panel send_panel;
 	
 	public Mails_Main_Frame(){
 		
@@ -29,21 +30,11 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		this.setTitle(Lang.getInstance().translate("Mails"));
 		this.jButton2_jToolBar.setVisible(false);
 		this.jButton3_jToolBar.setVisible(false);
-		this.jButton1_jToolBar.setText(Lang.getInstance().translate("Create")+" "+Lang.getInstance().translate("New Mails"));
+		this.jButton1_jToolBar.setVisible(false);
 		
 		
 		
-		this.jButton1_jToolBar.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		    	onNewClick();
-		    }
-
 			
-		});	
-		
-		
 		//this.jToolBar.setFloatable(true);
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Mails"));
 	// MY Accounts
@@ -53,8 +44,10 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	// Search Accounts
 		sent_Mails_Panel = new Sent_Mails_Panel();
 		this.jTabbedPane.add(sent_Mails_Panel);
+		
+		send_panel = new Mail_Send_Panel(null,null);
 	
-	
+		this.jTabbedPane.add(send_panel);	
 	
 	
 	this.pack();
@@ -75,25 +68,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	
 	}
 
-	public void onNewClick()
-	{
-		//CHECK IF WALLET UNLOCKED
-		if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
-			if(!Controller.getInstance().unlockWallet(password))
-			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
-		
-		//GENERATE NEW ACCOUNT
-		Controller.getInstance().generateNewAccount();
-	}
-	
+
 	
 	
 	

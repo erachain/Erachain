@@ -84,6 +84,7 @@ public class Mail_Send_Panel extends JPanel
 	public Mail_Send_Panel(AssetCls asset, Account account)
 	{
 		
+		this.setName(Lang.getInstance().translate("Send Mails"));
 		if (asset == null)
 		{
 			asset = Controller.getInstance().getAsset(1l);
@@ -107,7 +108,8 @@ public class Mail_Send_Panel extends JPanel
 		favoritesGBC.gridy = 0;	
 		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-		this.add(cbxFavorites, favoritesGBC);
+		
+		//this.add(cbxFavorites, favoritesGBC);
 		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		this.accountsModel = new AccountsComboBoxModel();
@@ -319,7 +321,7 @@ public class Mail_Send_Panel extends JPanel
 		
 		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		this.add(amountLabel, amountlabelGBC);
+	//	this.add(amountLabel, amountlabelGBC);
         
       	//TXT AMOUNT
 		GridBagConstraints txtAmountGBC = new GridBagConstraints();
@@ -332,7 +334,7 @@ public class Mail_Send_Panel extends JPanel
 		
 		txtAmount = new JTextField("0.00000000");
 		txtAmount.setPreferredSize(new Dimension(130,22));
-		this.add(txtAmount, txtAmountGBC);
+//		this.add(txtAmount, txtAmountGBC);
 		
         //BUTTON SEND
         GridBagConstraints buttonGBC = new GridBagConstraints();
@@ -364,7 +366,7 @@ public class Mail_Send_Panel extends JPanel
 		final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		feeLabel.setVerticalAlignment(SwingConstants.TOP);
-		this.add(feeLabel, feelabelGBC);
+	//	this.add(feeLabel, feelabelGBC);
 		
 		//FEE TXT
 		GridBagConstraints feetxtGBC = new GridBagConstraints();
@@ -377,7 +379,7 @@ public class Mail_Send_Panel extends JPanel
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
-		this.add(txtFeePow, feetxtGBC);
+	//	this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();
