@@ -598,9 +598,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	private void setHeight(int row)
 	{
 		int textHeight = (3+lineCount(messageBufs.get(row).getDecrMessage()))*fontHeight;
-		if(textHeight< 24 + 2*fontHeight)
+		if(textHeight< 24 + 3*fontHeight)
 		{
-			textHeight = 24 + 2*fontHeight;
+			textHeight = 24 + 3*fontHeight;
 		}
 		this.setRowHeight(row, textHeight);
 	}
