@@ -894,8 +894,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.getAddress()
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
+					
 					
 					+"</tr>"
 					+"</Table>"
@@ -931,8 +932,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Received")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=blue><b>" + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.getAddress()
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.asPerson()
+					
 					
 					+"</tr>"
 					+"</Table>"
