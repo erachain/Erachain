@@ -38,7 +38,7 @@ public Main_Hash_Document_Frame(){
 	// MENU
 		JPopupMenu popMenu = new JPopupMenu();
 		
-		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Write in Hash"));
+		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Write in BlockChain"));
 		favorite.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
