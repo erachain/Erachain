@@ -50,6 +50,7 @@
 	"Amount <font size=-2> left from <a href=?order=%order%>order</a></font>": "Сумма <font size=-2> оставшаяся от <a href=?order=%order%>ордера</a></font>",
 	"Amount must be between 1-100!":"Количество должоа быть в диапазоне 1-100!",
 	"Amount must be positive!":"Количество должно быть положительно!",
+	"Amount must be greater 0.0":"Количество должно быть больше 0.0",
 	"Amount of accounts to recover":"Количество учетных записей для восстановления",
 	"Amount to pay:":"Кол-во к оплате:",
 	"Amount:":"Кол-во:",

@@ -236,6 +236,14 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 			return;
 		}
 
+		if (amount.equals(new BigDecimal("0.0").setScale(8))){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error")+":  "+Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;	
+		}
+		
 		String message = txtMessage.getText();
 		
 		boolean isTextB = isText.isSelected();
