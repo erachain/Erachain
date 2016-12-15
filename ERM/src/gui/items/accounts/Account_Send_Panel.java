@@ -415,7 +415,7 @@ public class Account_Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+   //     add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()

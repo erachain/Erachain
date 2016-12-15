@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -40,6 +41,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
+import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
@@ -74,6 +76,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	private DefaultTableModel messagesModel;
 	int width;
 	int fontHeight;
+	List<Transaction> transactions;
 	
 	public Account_Transactions_Table()
 	{
@@ -90,7 +93,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
 		this.getColumn("").setCellRenderer( topRenderer );
 		
-		List<Transaction> transactions = new ArrayList<Transaction>();
+		 transactions = new ArrayList<Transaction>();
 
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
@@ -114,7 +117,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			}
 			if(!is)
 			{
-				addMessage(messageBufs.size(),(R_Send)messagetx);
+	//			addMessage(messageBufs.size(),(R_Send)messagetx, null);
 			}
 		}
 				
@@ -125,6 +128,10 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		{
 			setHeight(j);	
 		}
+		
+		
+		
+		
 		
 		
 		//MENU
@@ -285,6 +292,60 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	}
 
 	
+	
+	public void Search_Accoutnt_Transaction_From_Asset(Account account, AssetCls asset){
+		
+	
+	
+		
+		//	for (MessageBuf message : messageBufs) {
+				
+				
+		//		if(message.getAssetKey() == asset.getKey())// && message.getRecipient().equals(account)) 
+		//		{
+		//			messageBufs1.add(message);
+		//		}
+		//	}
+			
+		messageBufs.clear();	
+		transactions.clear();
+		if (account != null) 	transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+		
+		
+		for (Transaction messagetx : transactions) {
+			
+			if (asset.getKey() == messagetx.getAssetKey())
+			{
+			boolean is = false;
+			for (MessageBuf message : messageBufs) {
+				if(Arrays.equals(messagetx.getSignature(), message.getSignature()))
+				{
+					is = true;
+					break;
+				}
+			}
+			if(!is)
+			{
+				addMessage(messageBufs.size(),(R_Send)messagetx, account);
+			}
+			}
+		}
+				
+		Collections.sort(messageBufs, comparator);
+		
+		messagesModel.setRowCount(messageBufs.size());
+		for ( int j = messageBufs.size()-1; j >= 0; j-- )
+		{
+			setHeight(j);	
+		}
+		
+		
+			
+		
+	}
+	
+	
+	
 	@Override
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
 	{
@@ -383,7 +444,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				}
 				if(!is)
 				{
-					addMessage(0, (R_Send) message.getValue());
+					addMessage(0, (R_Send) message.getValue(), null);
 					
 					messagesModel.setRowCount( messageBufs.size() );
 					
@@ -403,7 +464,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		}
 	}
 
-	private void addMessage(int pos, R_Send transaction)
+	private void addMessage(int pos, R_Send transaction, Account account)
 	{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
@@ -416,7 +477,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				transaction.getFee(),
 				transaction.getSignature(),
 				transaction.getCreator().getPublicKey(),
-				transaction.isText()
+				transaction.isText(),
+				account
 		));
 	}
 	
@@ -536,9 +598,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	private void setHeight(int row)
 	{
 		int textHeight = (3+lineCount(messageBufs.get(row).getDecrMessage()))*fontHeight;
-		if(textHeight< 24 + 3*fontHeight)
+		if(textHeight< 24 + 2*fontHeight)
 		{
-			textHeight = 24 + 3*fontHeight;
+			textHeight = 24 + 2*fontHeight;
 		}
 		this.setRowHeight(row, textHeight);
 	}
@@ -575,8 +637,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		private long assetKey;
 		private BigDecimal fee;
 		private byte[] signature;
+		private Account account1;
 		
-		public MessageBuf( byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText )
+		public MessageBuf( byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText, Account account1 )
 		{
 			this.rawMessage = rawMessage;
 			this.encrypted = encrypted;	
@@ -592,6 +655,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			this.recipientPublicKey = null;
 			this.signature = signature;
 			this.isText = isText;
+			this.account1 = account1;
+			
 		}
 
 		public byte[] getMessage()
@@ -797,18 +862,20 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					if (amo_sign < 0) {
 						send_type = Lang.getInstance().translate("HOLD");
 					} else {
-						send_type = Lang.getInstance().translate("PAY");
+						
+						if (sender.equals(account1)) {send_type = Lang.getInstance().translate("Sent");}
+						else{send_type = Lang.getInstance().translate("Received");}
 					}
 				}
-				amountStr = "<font" + fontSize + ">" + send_type + " "
+				amountStr = /*"<font" + fontSize + ">" +send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
-						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>"
-						+ " " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance());
+						+  */ NumberAsString.getInstance().numberAsString(this.amount) /*+ "</font>"
+						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
 			}
 			
-		
+		if (sender.equals(account1)){
 			return	  "<html>\n"
-					+ "<body width='" + width + "'>\n"
+			/*		+ "<body width='" + width + "'>\n"
 					+ "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'>\n"
 					+ "<font size='2' color='" + colorTextHeader + "'>\n"+Lang.getInstance().translate("From") + ":" + this.sender
 					+ "\n<br>\n" + Lang.getInstance().translate("To") + ": "
@@ -818,9 +885,21 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+ DateTimeFormat.timestamptoString(this.timestamp)
 					+ " " + Lang.getInstance().translate("Fee") + ": "
 					+ NumberAsString.getInstance().numberAsString(fee)
-					+ "<br></font>\n"
+					+ "<br></font>\n ttttttttttttttt"
 					+ amountStr
 					+ "</td></tr></table>"
+			*/		
+					+ "<table border='0' cellpadding='3' cellspacing='0'>"
+					+"<tr>"
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.getAddress()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+					
+					+"</tr>"
+					+"</Table>"
+					
 					+ "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='"+colorTextBackground+"'><td width='25'>"+imginout
 					+ "<td width='" + width + "'>\n"
 					+ "<font size='2.5' color='" + colorTextMessage + "'>\n"
@@ -829,6 +908,53 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+ "<td width='30'>"+ imgLock
 					+ "</td></tr>\n</table>\n"
 					+ "</body></html>\n";
+		}
+		else{
+			
+			return  "<html>\n"
+			/*			+ "<body width='" + width + "'>\n"
+						+ "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'>\n"
+						+ "<font size='2' color='" + colorTextHeader + "'>\n"+Lang.getInstance().translate("From") + ":" + this.sender
+						+ "\n<br>\n" + Lang.getInstance().translate("To") + ": "
+						+ this.recipient + "\n</font></td>\n"
+						+ "<td bgcolor='" + colorHeader + "' align='right' width='" + (width/2-1) + "'>\n"
+						+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
+						+ DateTimeFormat.timestamptoString(this.timestamp)
+						+ " " + Lang.getInstance().translate("Fee") + ": "
+						+ NumberAsString.getInstance().numberAsString(fee)
+						+ "<br></font>\n"
+						+ amountStr
+						+ "</td></tr></table>"
+				*/		
+					+"<table border='0' cellpadding='3' cellspacing='0'>"
+					+"<tr>"
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Received")
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=blue><b>" + amountStr
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.getAddress()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
+					
+					+"</tr>"
+					+"</Table>"
+						
+						+ "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='"+colorTextBackground+"'><td width='25'>"+imginout
+						+ "<td width='" + width + "'>\n"
+						+ "<font size='2.5' color='" + colorTextMessage + "'>\n"
+						+ decrMessage
+						+ "\n</font>"
+						+ "<td width='30'>"+ imgLock
+						+ "</td></tr>\n</table>\n"
+						+ "</body></html>\n";
+			
+			
+			
+			
+			
+			
+			
+			
+		
+		}
 		}
 		
 		public String getDecrMessageTXT()
