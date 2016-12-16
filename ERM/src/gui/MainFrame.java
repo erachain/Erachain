@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -319,6 +321,83 @@ private JFrame parent;
 
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);
+        
+       
+        
+        // 
+        addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			for ( JInternalFrame a:	MainFrame.desktopPane.getAllFrames()){
+				
+			JInternalFrame b = a;	
+			Point loc = a.getLocation();
+			Dimension siz = a.getSize();
+			boolean isMax = a.isMaximum();
+			String name = a.getClass().getName();
+			b =b;
+			
+				
+			};
+				
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+				JInternalFrame object = null;
+				
+					try {
+						 object= (JInternalFrame)Class.forName("gui.items.other.Other_Internal_Frame").newInstance();
+					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				
+					object.setSize(900, 500); 
+					object.setLocation(20, 20); 
+					object.isMaximizable();
+					gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
+					
+			}
+            
+        });
+        
         
         
         // СЃРѕР·РґР°РµРј СЂР°Р±РѕС‡РёР№ СЃС‚РѕР» Swing

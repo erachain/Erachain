@@ -28,14 +28,14 @@ import lang.Lang;
 public  class PersonAccountsModel extends  AbstractTableModel implements Observer
 {
 	public static final int COLUMN_TO_DATE = 1;
-	//public static final int COLUMN_NAME = 1;
+	public static final int COLUMN_CREATOR = 2;
 	public static final int COLUMN_ADDRESS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
 	long key_person_table;
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","To Date"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","To Date", "Creator"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	
@@ -131,6 +131,11 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		case COLUMN_TO_DATE:
 			
 			return  formatDate.format( new Date(value.a)).toString();
+			
+		
+		case COLUMN_CREATOR:
+			
+			return 1;
 			
 		}
 		
