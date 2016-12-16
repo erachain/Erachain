@@ -20,6 +20,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.item.imprints.ImprintCls;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
 import lang.Lang;
@@ -135,7 +136,13 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		
 		case COLUMN_CREATOR:
 			
-			return 1;
+			int height = value.b;
+			int seq = value.c;
+			Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+			if (trans == null)
+				return null;
+			
+			return trans.getCreator().asPerson_01(true);
 			
 		}
 		
