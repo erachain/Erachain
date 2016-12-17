@@ -68,6 +68,7 @@ private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
 private JFrame parent;
 
+
 	@SuppressWarnings("null")
 	public MainFrame()
 	{
@@ -369,6 +370,16 @@ private JFrame parent;
 			
 			JInternalFrame[] s = MainFrame.desktopPane.getAllFrames();
 			
+			
+			
+			json = "{\"Main Frame\":" + "{"
+			+ "\"location_X\":\""+ e.getWindow().getLocation().x +"\","
+			+ "\"location_Y\":\""+ e.getWindow().getLocation().y +"\","
+			+ "\"width\":\""+ e.getWindow().getWidth() +"\","
+			+ "\"height\":\""+ e.getWindow().getHeight() +"\""
+			+ "},";
+			
+			
 			for (int i=MainFrame.desktopPane.getAllFrames().length-1; i >= 0; i--) {
 			
 				
@@ -377,12 +388,12 @@ private JFrame parent;
 			}
 			
 			if (frame_Classes.isEmpty()){
-				 json = "";
+				 
 			}
 			else
 			{
 				Gson gson = new Gson();
-				json = "{ \"Open Frames\": " + gson.toJson(frame_Classes) + "}"; 
+				json = json +" \"Open Frames\": " + gson.toJson(frame_Classes) + "}"; 
 				try {
 					SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
 				} catch (IOException e1) {
@@ -421,15 +432,24 @@ private JFrame parent;
 				
 				String stringFromInternet = "";
 				
-				String a = Settings.getInstance().getGuiSettingPath();
-				
+							
 				try {
 					stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 				JsonParser parser = new JsonParser(); 
+				
+				if (!stringFromInternet.isEmpty()){
 				JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+				
+				
+				JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+				
+				parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+				parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
+				
+			
 				JsonArray pItem = mainObject.getAsJsonArray("Open Frames"); 
 
 				for (JsonElement user : pItem) {
@@ -449,7 +469,7 @@ private JFrame parent;
 						}
 				}
 			}
-            
+			}
         });
         
         
