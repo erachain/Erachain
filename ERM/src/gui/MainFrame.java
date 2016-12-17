@@ -430,7 +430,7 @@ private JFrame parent;
 			@Override
 			public void windowOpened(WindowEvent e) {
 				// TODO Auto-generated method stub
-				
+			/*	
 				JInternalFrame object = null;
 				
 				
@@ -473,8 +473,8 @@ private JFrame parent;
 						}
 				}
 				}
-			}
-			}
+			}*/
+			} 
         });
         
         
@@ -546,7 +546,7 @@ private JFrame parent;
 		}
 		JsonParser parser = new JsonParser(); 
 		
-		if (!stringFromInternet.isEmpty()){
+		if (!stringFromInternet.isEmpty() && stringFromInternet != "" ){
 		JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
 		
 		
@@ -577,7 +577,7 @@ private JFrame parent;
         //SHOW FRAME
       //  this.pack();
      //   this.setLocationRelativeTo(null);
-      //  this.setVisible(true);
+        this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
     //    desktopPane.add(new MainImprintsFrame());
         
