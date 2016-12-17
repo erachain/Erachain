@@ -430,7 +430,7 @@ private JFrame parent;
 			@Override
 			public void windowOpened(WindowEvent e) {
 				// TODO Auto-generated method stub
-			/*	
+				
 				JInternalFrame object = null;
 				
 				
@@ -473,7 +473,7 @@ private JFrame parent;
 						}
 				}
 				}
-			}*/
+				}
 			} 
         });
         
