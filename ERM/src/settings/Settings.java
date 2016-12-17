@@ -249,6 +249,12 @@ public class Settings {
 		return this.userPath + "settings.json";
 	}
 	
+	public String getGuiSettingPath(){
+		
+		return this.userPath + "gui_settings.json";
+		
+	}
+	
 	public String getPeersPath()
 	{
 		return this.userPath + "peers.json";

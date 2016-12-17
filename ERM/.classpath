@@ -114,6 +114,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/ERM/libs/sourceandjavadoc/json-io-4.8.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/gson-2.3.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

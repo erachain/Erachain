@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +22,23 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
@@ -41,6 +57,9 @@ import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
+import utils.SaveStrToFile;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -339,24 +358,41 @@ private JFrame parent;
 				
 			}
 
+			@SuppressWarnings({ "unchecked", "unused" })
 			@Override
 			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
-				
-			for ( JInternalFrame a:	MainFrame.desktopPane.getAllFrames()){
-				
-			JInternalFrame b = a;	
-			Point loc = a.getLocation();
-			Dimension siz = a.getSize();
-			boolean isMax = a.isMaximum();
-			String name = a.getClass().getName();
-			b =b;
+			
+			
+			String json = null;
+			ArrayList<Frame_Class> frame_Classes = new ArrayList<Frame_Class>();
+			
+			JInternalFrame[] s = MainFrame.desktopPane.getAllFrames();
+			
+			for (int i=MainFrame.desktopPane.getAllFrames().length-1; i >= 0; i--) {
 			
 				
-			};
-				
-				
+				frame_Classes.add(new Frame_Class(s[i].getClass().getCanonicalName(),s[i].getLocation().x,s[i].getLocation().y,s[i].getSize().width,s[i].getSize().height));
+						
 			}
+			
+			if (frame_Classes.isEmpty()){
+				 json = "";
+			}
+			else
+			{
+				Gson gson = new Gson();
+				json = "{ \"Open Frames\": " + gson.toJson(frame_Classes) + "}"; 
+				try {
+					SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}		
+			
+			
+			}
+	}
 
 			@Override
 			public void windowDeactivated(WindowEvent e) {
@@ -382,18 +418,36 @@ private JFrame parent;
 				
 				JInternalFrame object = null;
 				
-					try {
-						 object= (JInternalFrame)Class.forName("gui.items.other.Other_Internal_Frame").newInstance();
-					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
 				
-					object.setSize(900, 500); 
-					object.setLocation(20, 20); 
-					object.isMaximizable();
-					gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
-					
+				String stringFromInternet = "";
+				
+				String a = Settings.getInstance().getGuiSettingPath();
+				
+				try {
+					stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				JsonParser parser = new JsonParser(); 
+				JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+				JsonArray pItem = mainObject.getAsJsonArray("Open Frames"); 
+
+				for (JsonElement user : pItem) {
+
+				    JsonObject userObject = user.getAsJsonObject(); 
+				  
+				    String str = userObject.get("name").getAsString();
+				  
+				    	try {
+							object  = (JInternalFrame) Class.forName(str).newInstance();
+							object.setLocation(Integer.valueOf( userObject.get("location_X").toString()), Integer.valueOf(userObject.get("location_Y").toString()));
+							object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
+							gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
+						} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				}
 			}
             
         });
@@ -477,4 +531,23 @@ private JFrame parent;
     //    desktopPane.add(new MainImprintsFrame());
         
 	}
+}
+
+  class Frame_Class  {
+    
+    String name;
+    int location_X;
+    int location_Y;
+    int size_X;
+    int size_Y;
+    
+
+    public  Frame_Class (String name, int location_X, int location_Y, int size_X, int size_Y) {
+       
+        this.name = name;
+        this.location_X=location_X;
+        this.location_Y=location_Y;
+        this.size_X=size_X;
+        this.size_Y=size_Y;
+    }
 }

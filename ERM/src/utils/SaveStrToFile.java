@@ -17,4 +17,9 @@ public class SaveStrToFile {
 	{
 		save(path, StrJSonFine.convert(json));
 	}
+	
+	public static void saveJsonFine_not_Convert(String path, String json) throws IOException 
+	{
+		save(path, json);
+	}
 }
