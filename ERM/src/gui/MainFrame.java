@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -72,8 +73,10 @@ private JFrame parent;
 	@SuppressWarnings("null")
 	public MainFrame()
 	{
+		
 		//CREATE FRAME
 		super(Lang.getInstance().translate("DATACHAINS.world"));
+		this.setVisible(false);
 		if(Settings.getInstance().isTestnet()) {
 			setTitle(Lang.getInstance().translate("DATACHAINS.world TestNet ") + Settings.getInstance().getGenesisStamp());
 		}
@@ -342,8 +345,7 @@ private JFrame parent;
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);
         
-       
-        
+     
         // 
         addWindowListener(new WindowListener() {
 
@@ -377,7 +379,11 @@ private JFrame parent;
 			+ "\"location_Y\":\""+ e.getWindow().getLocation().y +"\","
 			+ "\"width\":\""+ e.getWindow().getWidth() +"\","
 			+ "\"height\":\""+ e.getWindow().getHeight() +"\""
-			+ "},";
+			+ "}";
+			
+			
+			int s1 = e.getWindow().getX();
+			int s2 = e.getWindow().getWidth();
 			
 			
 			for (int i=MainFrame.desktopPane.getAllFrames().length-1; i >= 0; i--) {
@@ -387,22 +393,20 @@ private JFrame parent;
 						
 			}
 			
-			if (frame_Classes.isEmpty()){
-				 
-			}
-			else
-			{
+			if (!frame_Classes.isEmpty()){
+			
 				Gson gson = new Gson();
-				json = json +" \"Open Frames\": " + gson.toJson(frame_Classes) + "}"; 
-				try {
-					SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}		
-			
-			
+				json = json +", \"Open Frames\": " + gson.toJson(frame_Classes) ; 
 			}
+			
+			json = json + "}";
+			try {
+				SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}	
+			
 	}
 
 			@Override
@@ -444,14 +448,14 @@ private JFrame parent;
 				JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
 				
 				
-				JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+		//		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
 				
-				parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
-				parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
+		//		parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+		//		parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
 				
 			
 				JsonArray pItem = mainObject.getAsJsonArray("Open Frames"); 
-
+				if (!pItem.isJsonNull()){
 				for (JsonElement user : pItem) {
 
 				    JsonObject userObject = user.getAsJsonObject(); 
@@ -467,6 +471,7 @@ private JFrame parent;
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
+				}
 				}
 			}
 			}
@@ -505,6 +510,8 @@ private JFrame parent;
         frame1.setBorder(new EmptyBorder(10, 10, 10, 10));
         frame1.setSize(500, 500);
         frame1.setLocation(500, 80);
+             
+        
         frame1.setVisible(true);
         frame1.setMaximizable(true);
         frame1.setTitle(Lang.getInstance().translate("Old Panels"));
@@ -528,25 +535,49 @@ private JFrame parent;
         });
         
    
-      //РєР»Р°СЃСЃ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕРєРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјРѕР№ РћРЎ
+      //set location and size
+            
+        
+        String stringFromInternet = "";
+		try {
+			stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		JsonParser parser = new JsonParser(); 
+		
+		if (!stringFromInternet.isEmpty()){
+		JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+		
+		
+		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+		
+		setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+		setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));	
+    	
+		}
+		else{
+			 Toolkit kit = Toolkit.getDefaultToolkit();
 
-        Toolkit kit = Toolkit.getDefaultToolkit();
+		        Dimension screens = kit.getScreenSize();
 
-        Dimension screens = kit.getScreenSize();
+		        int w,h;
 
-        int w,h;
+		        w = screens.width;
 
-        w = screens.width;
+		        setSize((int) (w/1.3),(int) (w/1.3/1.618));
 
-        setSize((int) (w/1.3),(int) (w/1.3/1.618));
-
-        setLocation(w/12, w/12);
+		        setLocation(w/12, w/12);
+		       	
+			
+		}
+        
         
         
         //SHOW FRAME
       //  this.pack();
      //   this.setLocationRelativeTo(null);
-        this.setVisible(true);
+      //  this.setVisible(true);
       //  desktopPane.add(new AllPersonsFrame(this));
     //    desktopPane.add(new MainImprintsFrame());
         
