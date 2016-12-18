@@ -124,7 +124,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 			
 		case COLUMN_BALANCE:
 		
-			return table_balance.get(row).getB().getB();
+			return table_balance.get(row).getB().getB().a;
 		
 		case COLUMN_ASSET_NAME:
 			

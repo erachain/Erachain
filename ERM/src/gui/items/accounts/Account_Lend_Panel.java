@@ -134,7 +134,7 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 	public void onSendClick()
 	{
 		//DISABLE
-		this.sendButton.setEnabled(false);
+		
 		
 		//TODO TEST
 		//CHECK IF NETWORK OK
@@ -148,6 +148,12 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 			
 			return;
 		}*/
+		
+		
+	
+				
+		
+				this.sendButton.setEnabled(false);
 		
 		//CHECK IF WALLET UNLOCKED
 		if(!Controller.getInstance().isWalletUnlocked())
@@ -205,6 +211,20 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 		int parsing = 0;
 		int feePow = 0;
 		BigDecimal amount = null; 
+		
+		
+		// amount
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		try
 		{
 			//READ AMOUNT
@@ -234,7 +254,16 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 			this.sendButton.setEnabled(true);
 			return;
 		}
-
+		
+		if (amount.equals(new BigDecimal("0.0").setScale(8))){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error")+":  "+Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;	
+		}
+		
+		
 		String message = txtMessage.getText();
 		
 		boolean isTextB = isText.isSelected();

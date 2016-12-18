@@ -1,5 +1,7 @@
-package gui;
+package gui.items.mails;
 
+import gui.AccountRenderer;
+import gui.PasswordPane;
 import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
@@ -59,7 +61,7 @@ import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
 
-public class Send_Panel extends JPanel
+public class Mail_Send_Panel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
     private final JTable table;
@@ -79,9 +81,10 @@ public class Send_Panel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public Send_Panel(AssetCls asset, Account account)
+	public Mail_Send_Panel(AssetCls asset, Account account)
 	{
 		
+		this.setName(Lang.getInstance().translate("Send Mail"));
 		if (asset == null)
 		{
 			asset = Controller.getInstance().getAsset(1l);
@@ -105,7 +108,8 @@ public class Send_Panel extends JPanel
 		favoritesGBC.gridy = 0;	
 		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-		this.add(cbxFavorites, favoritesGBC);
+		
+		//this.add(cbxFavorites, favoritesGBC);
 		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		this.accountsModel = new AccountsComboBoxModel();
@@ -118,7 +122,7 @@ public class Send_Panel extends JPanel
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
 		labelFromGBC.gridy = 1;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From") + ":");
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
 		
@@ -317,7 +321,7 @@ public class Send_Panel extends JPanel
 		
 		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		this.add(amountLabel, amountlabelGBC);
+	//	this.add(amountLabel, amountlabelGBC);
         
       	//TXT AMOUNT
 		GridBagConstraints txtAmountGBC = new GridBagConstraints();
@@ -330,7 +334,7 @@ public class Send_Panel extends JPanel
 		
 		txtAmount = new JTextField("0.00000000");
 		txtAmount.setPreferredSize(new Dimension(130,22));
-		this.add(txtAmount, txtAmountGBC);
+//		this.add(txtAmount, txtAmountGBC);
 		
         //BUTTON SEND
         GridBagConstraints buttonGBC = new GridBagConstraints();
@@ -362,7 +366,7 @@ public class Send_Panel extends JPanel
 		final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		feeLabel.setVerticalAlignment(SwingConstants.TOP);
-		this.add(feeLabel, feelabelGBC);
+	//	this.add(feeLabel, feelabelGBC);
 		
 		//FEE TXT
 		GridBagConstraints feetxtGBC = new GridBagConstraints();
@@ -375,7 +379,7 @@ public class Send_Panel extends JPanel
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
-		this.add(txtFeePow, feetxtGBC);
+	//	this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();
@@ -413,7 +417,7 @@ public class Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+   //     add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()
@@ -673,7 +677,7 @@ public class Send_Panel extends JPanel
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = 0;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();

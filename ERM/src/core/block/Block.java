@@ -188,8 +188,8 @@ public class Block {
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
 	{
 		
-		int incomed_amount = 0;
-		int amount;
+		long incomed_amount = 0l;
+		long amount;
 		
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
 		if (previousForgingHeight == -1)
@@ -208,12 +208,12 @@ public class Block {
 					int amo_sign = transaction.getAmount().signum();
 					if (transaction.getKey() > 0 && amo_sign > 0) {
 						// SEND
-						amount = (int)transaction.getAmount().longValue();						
+						amount = transaction.getAmount().longValue();						
 					} else if (transaction.getKey() < 0 && amo_sign > 0) {
 						// DEBT
-						amount = (int)transaction.getAmount().longValue();						
+						amount = transaction.getAmount().longValue();						
 					} else {
-						amount = 0;
+						amount = 0l;
 					}
 				incomed_amount += amount;
 				}
@@ -233,9 +233,9 @@ public class Block {
 					int amo_sign = transaction.getAmount().signum();
 					if (transaction.getKey() < 0 && amo_sign < 0) {
 						// RE DEBT to me
-						amount = -(int)transaction.getAmount().longValue();						
+						amount = -transaction.getAmount().longValue();						
 					} else {
-						amount = 0;
+						amount = 0l;
 					}
 				incomed_amount += amount;
 				}
@@ -243,7 +243,7 @@ public class Block {
 		}
 		
 		// OWN + RENT balance - in USE
-		return (int)creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
+		return (int)(creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount);
 	}
 
 	// CALCULATE and SET

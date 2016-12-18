@@ -109,19 +109,11 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/org"/>
 	<classpathentry kind="lib" path="libs/jcalendar-1.4.jar"/>
-    
-    <classpathentry kind="lib" path="libs/json-io-4.8.0.jar" sourcepath="libs/sourceandjavadoc/json-io-4.8.0-sources.jar">
- 		<attributes>
- 			<attribute name="javadoc_location" value="jar:platform:/resource/ERM/libs/sourceandjavadoc/json-io-4.8.0-javadoc.jar!/"/>
- 		</attributes>
- 	</classpathentry>
-    
-    <dependency>
-        <groupId>com.cedarsoftware</groupId>
-        <artifactId>json-io</artifactId>
-        <version>4.1.8</version>
-    </dependency>
-
+	<classpathentry kind="lib" path="libs/json-io-4.8.0.jar" sourcepath="libs/sourceandjavadoc/json-io-4.8.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ERM/libs/sourceandjavadoc/json-io-4.8.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
-    
 </classpath>

@@ -104,11 +104,12 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.15.01";
-	private String buildTime = "2016-05-18 12:12:12 UTC";
+	private String version = "2.16.03";
+	private String buildTime = "2016-12-16 12:12:12 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "2.05.0";
+	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
+	public static final String releaseVersion = "2.06.01";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;

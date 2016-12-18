@@ -87,7 +87,7 @@ public class Accounts_Right_Panel extends JPanel {
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
-    private Account_Transactions_Table jTable1;
+    public Account_Transactions_Table jTable1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     // End of variables declaration                   

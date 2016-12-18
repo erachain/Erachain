@@ -7,8 +7,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import controller.Controller;
+import core.account.Account;
+import core.item.assets.AssetCls;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.PasswordPane;
@@ -90,6 +94,8 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
 		//GENERATE NEW ACCOUNT
 		Controller.getInstance().generateNewAccount();
 	}
+	
+	
 	
 	
 }

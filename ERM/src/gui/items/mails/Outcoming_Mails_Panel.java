@@ -1,4 +1,4 @@
-package gui.items.accounts;
+package gui.items.mails;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.items.persons.Person_info_panel_001;
@@ -47,7 +47,7 @@ import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.Gui;
 @SuppressWarnings("serial")
-public class Accounts_Panel extends JPanel // implements ItemListener
+public class Outcoming_Mails_Panel extends JPanel // implements ItemListener
 
 
 //JInternalFrame
@@ -59,8 +59,10 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 	JTable table;
 
 	@SuppressWarnings("unchecked")
-	public Accounts_Panel()
+	public Outcoming_Mails_Panel()
 	{
+		
+		this.setName(Lang.getInstance().translate("Outcoming Mails"));
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		
@@ -95,44 +97,28 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		favoritesGBC.gridy = 0;	
 		
 		//ASSET FAVORITES
-		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-		this.add(cbxFavorites, favoritesGBC);
+//		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
+//		this.add(cbxFavorites, favoritesGBC);
 		
 		//TABLE
-		tableModel = new AccountsTableModel();
-		// start data in model
-		tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
-		 table = Gui.createSortableTable(tableModel, 1);
 		
-		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-		sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
-		sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
-		sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
+		// start data in model
+		
+		 table =new Mails_Transactions_Table(false);
+		 
+		
+	//	TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
+	//	sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
+	//	sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
+	//	sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 		
 		// render
-		table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
+	//	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+	//	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
 		
-		//ON FAVORITES CHANGE
-		cbxFavorites.addItemListener(new ItemListener(){
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
-			
+	
 				
-				if(e.getStateChange() == ItemEvent.SELECTED) 
-				{		
-					AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-						tableModel.setAsset(asset);  
-				} 	
-				
-				
-			}
-		});
-		
-				
-		
+	/*	
 		
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
@@ -150,90 +136,15 @@ public class Accounts_Panel extends JPanel // implements ItemListener
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Send_Dialog(asset, account); 
+				 new Mail_Send_Dialog(asset, account); 
 						
 			}
 		});
 		menu.add(sendAsset);
 
-		JMenuItem holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
-		holdAsset.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
-        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-				
-				 new Account_Take_Hold_Dialog(asset, account); 
-						
-			}
-		});
-		menu.add(holdAsset);
-
-		menu.addSeparator();  
-
-		JMenuItem lend_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Lend"));
-		lend_Debt_Asset.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
-        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-				
-				 new Account_Lend_Dialog(asset, account); 
-						
-			}
-		});
-		menu.add(lend_Debt_Asset);
-
-		
-		JMenuItem repay_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
-		repay_Debt_Asset.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
-        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-				
-				 new Account_Repay_Debt_Dialog(asset, account); 
-						
-			}
-		});
-		menu.add(repay_Debt_Asset);
-				
-		JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
-		confiscate_Debt_Asset.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
-        		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-				
-				 new Account_Confiscate_Debt_Dialog(asset, account); 
-						
-			}
-		});
-		menu.add(confiscate_Debt_Asset);
+	
+	
+	
 		
 		
 		
@@ -296,7 +207,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		menu.add(copyConfirmedBalance);
 		
-		/*
 		JMenuItem copyGeneratingBalance = new JMenuItem(Lang.getInstance().translate("Copy Generating Balance"));
 		copyGeneratingBalance.addActionListener(new ActionListener()
 		{
@@ -313,7 +223,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			}
 		});
 		menu.add(copyGeneratingBalance);
-		*/
+		
 
 		menu.addSeparator();
 		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
@@ -337,7 +247,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 
 		////////////////////
 		TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-		
+	*/	
 		table.addMouseListener(new MouseAdapter() 
 		{
 		     @Override
@@ -350,7 +260,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		
 		
-		
+	/*	
 				
 		//ADD TOTAL BALANCE
 		final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": " + tableModel.getTotalBalance().toPlainString());
@@ -365,6 +275,9 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		
 		//ADD ACCOUNTS TABLE
+		 
+		 */
+		
 		this.add(new JScrollPane(table), tableGBC);
 
 		/*

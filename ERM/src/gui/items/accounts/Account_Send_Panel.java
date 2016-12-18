@@ -415,7 +415,7 @@ public class Account_Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+   //     add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()
@@ -627,6 +627,14 @@ public class Account_Send_Panel extends JPanel
 			this.sendButton.setEnabled(true);
 			return;
 		}
+		
+		if (amount.equals(new BigDecimal("0.0").setScale(8))){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error")+":  "+Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;	
+		}
 
 		String message = txtMessage.getText();
 		
@@ -675,7 +683,7 @@ public class Account_Send_Panel extends JPanel
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = -1;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();

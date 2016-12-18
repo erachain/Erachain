@@ -253,17 +253,18 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
-		//CHECK IF AMOUNT IS DIVISIBLE
-		long absKey = this.key;
-		if (absKey < 0)
-			absKey = -absKey;
-		
-		AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
-		if (asset == null) {
-			return ASSET_DOES_NOT_EXIST;
-		}
-				
+		//CHECK IF AMOUNT AND ASSET
 		if (this.amount != null) {
+			long absKey = this.key;
+			if (absKey < 0)
+				absKey = -absKey;
+
+			AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
+			if (asset == null) {
+				return ASSET_DOES_NOT_EXIST;
+			}
+
+			//CHECK IF AMOUNT IS DIVISIBLE
 			int amount_sign = this.amount.signum();
 			if (amount_sign != 0) {
 

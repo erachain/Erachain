@@ -1,4 +1,4 @@
-package gui.items.accounts;
+package gui.items.mails;
 // 30/03
 import java.awt.Color;
 import java.awt.Component;
@@ -55,11 +55,11 @@ import utils.ObserverMessage;
 import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class Account_Transactions_Table extends JTable implements Observer{
+public class Mails_Transactions_Table extends JTable implements Observer{
 	
-	
+	public Boolean incoming;
 	private static final Logger LOGGER = Logger
-			.getLogger(Account_Transactions_Table.class);
+			.getLogger(Mails_Transactions_Table.class);
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
@@ -78,10 +78,10 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	int fontHeight;
 	List<Transaction> transactions;
 	
-	public Account_Transactions_Table()
+	public Mails_Transactions_Table(Boolean incoming)
 	{
 		this.setShowGrid(false);
-
+		this.incoming = incoming;
 		fontHeight = this.getFontMetrics(this.getFont()).getHeight();
 
 		messageBufs = new ArrayList<MessageBuf>();
@@ -117,7 +117,24 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			}
 			if(!is)
 			{
-	//			addMessage(messageBufs.size(),(R_Send)messagetx, null);
+				
+				if (messagetx.getAssetKey() == 0  )	{
+					for (Account account1 : Controller.getInstance().getAccounts()) {
+						R_Send a = (R_Send)messagetx;
+						String aa = a.getRecipient().getAddress();
+						String aaa = account1.getAddress();
+						if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming  ){
+							addMessage(messageBufs.size(),(R_Send)messagetx, null,incoming);
+						}
+						
+						if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming  ){
+							addMessage(messageBufs.size(),(R_Send)messagetx, null, incoming);
+						}
+						
+						
+						
+				}
+				}
 			}
 		}
 				
@@ -145,7 +162,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)
-		        Account_Transactions_Table invokerAsJComponent = (Account_Transactions_Table) invoker;
+		        Mails_Transactions_Table invokerAsJComponent = (Mails_Transactions_Table) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -184,7 +201,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Account_Transactions_Table invokerAsJComponent = (Account_Transactions_Table) invoker;
+		        Mails_Transactions_Table invokerAsJComponent = (Mails_Transactions_Table) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -204,7 +221,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Account_Transactions_Table invokerAsJComponent = (Account_Transactions_Table) invoker;
+		        Mails_Transactions_Table invokerAsJComponent = (Mails_Transactions_Table) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -225,7 +242,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				JMenuItem menuItem = (JMenuItem) e.getSource();
 		        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
 		        Component invoker = popupMenu.getInvoker(); 
-		        Account_Transactions_Table invokerAsJComponent = (Account_Transactions_Table) invoker;
+		        Mails_Transactions_Table invokerAsJComponent = (Mails_Transactions_Table) invoker;
 		        
 				int row = invokerAsJComponent.getSelectedRow();
 				row = invokerAsJComponent.convertRowIndexToModel(row);
@@ -247,7 +264,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				{
 					if(e.getClickCount() == 2) 
 					{
-						Account_Transactions_Table tableModelparent = (Account_Transactions_Table) e.getSource();
+						Mails_Transactions_Table tableModelparent = (Mails_Transactions_Table) e.getSource();
 						
 				        Point p = e.getPoint();
 					    int row = tableModelparent.rowAtPoint(p);
@@ -326,7 +343,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			}
 			if(!is)
 			{
-				addMessage(messageBufs.size(),(R_Send)messagetx, account);
+				addMessage(messageBufs.size(),(R_Send)messagetx, account, incoming);
 			}
 			}
 		}
@@ -444,7 +461,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				}
 				if(!is)
 				{
-					addMessage(0, (R_Send) message.getValue(), null);
+					addMessage(0, (R_Send) message.getValue(), null, incoming);
 					
 					messagesModel.setRowCount( messageBufs.size() );
 					
@@ -464,7 +481,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		}
 	}
 
-	private void addMessage(int pos, R_Send transaction, Account account)
+	private void addMessage(int pos, R_Send transaction, Account account, Boolean incoming)
 	{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
@@ -478,7 +495,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				transaction.getSignature(),
 				transaction.getCreator().getPublicKey(),
 				transaction.isText(),
-				account
+				account,
+				incoming
 		));
 	}
 	
@@ -638,8 +656,9 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		private BigDecimal fee;
 		private byte[] signature;
 		private Account account1;
+		private Boolean incoming;
 		
-		public MessageBuf( byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText, Account account1 )
+		public MessageBuf( byte[] rawMessage, boolean encrypted, Account sender, Account recipient, long timestamp, BigDecimal amount, long assetKey, BigDecimal fee, byte[] signature, byte[] senderPublicKey, boolean isText, Account account1, boolean incoming1 )
 		{
 			this.rawMessage = rawMessage;
 			this.encrypted = encrypted;	
@@ -656,6 +675,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			this.signature = signature;
 			this.isText = isText;
 			this.account1 = account1;
+			this.incoming = incoming1;
 			
 		}
 
@@ -873,7 +893,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
 			}
 			
-		if (sender.equals(account1)){
+		if (!incoming){
 			return	  "<html>\n"
 			/*		+ "<body width='" + width + "'>\n"
 					+ "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'>\n"
@@ -893,10 +913,12 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<tr>"
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
-					
+		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
+		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Confirmation") + ": " +  strconfirmations
 					
 					+"</tr>"
 					+"</Table>"
@@ -931,14 +953,13 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<tr>"
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Received")
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=blue><b>" + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.asPerson()
-					
-					
+					//				+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Confirmation") + ": " +  strconfirmations
 					+"</tr>"
 					+"</Table>"
-						
+					
 						+ "<table border='0' cellpadding='3' cellspacing='0'>\n<tr bgcolor='"+colorTextBackground+"'><td width='25'>"+imginout
 						+ "<td width='" + width + "'>\n"
 						+ "<font size='2.5' color='" + colorTextMessage + "'>\n"
