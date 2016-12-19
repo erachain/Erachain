@@ -252,6 +252,7 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 		return activePeers;
 	}
+	
 	public Peer startPeer(Socket socket) {
 		
 		// REUSE known peer
@@ -274,7 +275,7 @@ public class Network extends Observable implements ConnectionCallback {
 			// use empty slots
 			return new Peer(this, socket);
 		}
-		if (maxPeers > this.getActivePeers(true).size()) {
+		if (maxPeers > this.getActivePeers(false).size()) {
 			// use UNUSED peers				
 			synchronized(this.knownPeers) {
 				for (Peer knownPeer: this.knownPeers) {
