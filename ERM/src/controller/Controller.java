@@ -1009,8 +1009,6 @@ public class Controller extends Observable {
 						|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
-				
-				
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
@@ -1018,6 +1016,27 @@ public class Controller extends Observable {
 				newBlock = blockMessage.getBlock();
 				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
 				LOGGER.debug(" received new chain Block " + newBlock.toString(dbSet));
+
+				/*
+				synchronized (this.peerHWeight) {
+					Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
+					long hmVal;
+					if (peerHM == null || peerHM.b == null) {
+						hmVal = 0;
+					} else {
+						hmVal = peerHM.b;
+					}
+						
+					int peerHeight =  blockWinMessage.getHeight();
+					if (peerHeight < 0) {
+						peerHeight = newBlock.getHeightByParent(dbSet);
+					}
+					this.peerHWeight.put(message.getSender(),							
+							new Tuple2<Integer, Long>(peerHeight,
+									hmVal + newBlock.calcWinValueTargeted(dbSet)));
+					
+				}
+				*/
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				if (isNewBlockValid == 4) {
@@ -1370,7 +1389,7 @@ public class Controller extends Observable {
 					for (Peer peer : this.peerHWeight.keySet()) {
 						if (peer.isWhite()) {
 							currHeight = this.peerHWeight.get(peer).a;
-							if (height > currHeight + 10) {
+							if (height > currHeight + 50) {
 								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
 							}
 						}
