@@ -460,6 +460,7 @@ public class Peer extends Thread{
 	}
 	
 
+	// TRUE = You;  FALSE = Remote
 	public boolean isWhite()
 	{
 		return this.white; 

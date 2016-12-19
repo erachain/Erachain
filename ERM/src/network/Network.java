@@ -239,13 +239,15 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 	*/
 	
-	public List<Peer> getActivePeers() {
+	// 
+	public List<Peer> getActivePeers(boolean onlyWhite) {
 		
 		List<Peer> activePeers = new ArrayList<Peer>();
 		synchronized(this.knownPeers) {
 			for (Peer peer: this.knownPeers) {
 				if (peer.isUsed())
-					activePeers.add(peer);
+					if (!onlyWhite || peer.isWhite())
+						activePeers.add(peer);
 			}
 		}
 		return activePeers;
@@ -272,7 +274,7 @@ public class Network extends Observable implements ConnectionCallback {
 			// use empty slots
 			return new Peer(this, socket);
 		}
-		if (maxPeers > this.getActivePeers().size()) {
+		if (maxPeers > this.getActivePeers(true).size()) {
 			// use UNUSED peers				
 			synchronized(this.knownPeers) {
 				for (Peer knownPeer: this.knownPeers) {

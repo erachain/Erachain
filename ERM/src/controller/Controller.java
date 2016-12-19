@@ -720,7 +720,7 @@ public class Controller extends Observable {
 
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
-		return this.network.getActivePeers();
+		return this.network.getActivePeers(true);
 	}
 
 	public void walletSyncStatusUpdate(int height) {

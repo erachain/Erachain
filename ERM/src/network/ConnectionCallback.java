@@ -14,7 +14,7 @@ public interface ConnectionCallback {
 	boolean isKnownAddress(InetAddress address, boolean andUsed);
 	boolean isKnownPeer(Peer peer, boolean andUsed);
 	//List<Peer> getKnownPeers();
-	List<Peer> getActivePeers();
+	List<Peer> getActivePeers(boolean onlyWhite);
 	Peer getKnownPeer(Peer peer);
 	void onMessage(Message message);
 	Peer startPeer(Socket socket);
