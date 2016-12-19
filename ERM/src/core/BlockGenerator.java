@@ -376,7 +376,7 @@ public class BlockGenerator extends Thread implements Observer
 				}
 				
 				if (quickRun) {
-					wait_new_good_block = wait_new_good_block>>2;
+					wait_new_good_block = 10000 + wait_new_good_block>>2;
 				}
 
 				LOGGER.info("for height and target: " + height + " : " + target

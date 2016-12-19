@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.16.03";
-	private String buildTime = "2016-12-16 12:12:12 UTC";
+	private String version = "2.16.04";
+	private String buildTime = "2016-12-19 12:12:12 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -1361,6 +1361,22 @@ public class Controller extends Observable {
 						maxPeer = peer;
 					}
 				}
+
+				// CLOSE all my connections to PEER with small Height 
+				if (height > 0) {
+					//int myHeight = this.getMyHeight();
+					//int maxHeight = myHeight
+					int currHeight = 0;
+					for (Peer peer : this.peerHWeight.keySet()) {
+						if (peer.isWhite()) {
+							currHeight = this.peerHWeight.get(peer).a;
+							if (height > currHeight + 10) {
+								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
+							}
+						}
+					}
+				}
+
 			}
 		} catch (Exception e) {
 			// PEER REMOVED WHILE ITERATING

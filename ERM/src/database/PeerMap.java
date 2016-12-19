@@ -445,13 +445,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 	
 	public void blacklistPeer(Peer peer)
 	{
-		//TODO DISABLED WHILE UNSTABLE
-		return;
-		
-		/*try
+
+		try
 		{
 			//ADD PEER INTO DB
-			this.peersMap.put(peer.getAddress().getAddress(), BYTE_BLACKLISTED);
+			this.map.put(peer.getAddress().getAddress(), BYTE_BLACKLISTED);
 				
 			//COMMIT
 			if(this.parent == null)
@@ -461,8 +459,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		catch(Exception e)
 		{
-			LOGGER.error(eSystem.out);
-		}	*/		
+		}
 	}
 	
 	public PeerInfo getInfo(InetAddress address) 

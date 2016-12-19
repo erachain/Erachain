@@ -9,6 +9,7 @@ import network.message.PeersMessage;
 
 import org.apache.log4j.Logger;
 
+import controller.Controller;
 import settings.Settings;
 
 public class ConnectionCreator extends Thread {
@@ -82,6 +83,9 @@ public class ConnectionCreator extends Thread {
 							continue;
 						}
 						
+						if (PeerManager.getInstance().isBlacklisted(peer.getAddress()))
+							continue;
+
 						if (!this.isRun)
 							return;
 
@@ -164,8 +168,15 @@ public class ConnectionCreator extends Thread {
 									continue;
 								}
 								
+								// TODO small height not use
+								//Controller.getInstance().getMyHeight();
+								// newPeer.
+								if (PeerManager.getInstance().isBlacklisted(newPeer.getAddress()))
+									continue;
+									
 								if (!this.isRun)
 									return;
+								
 								
 								/*
 								int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
@@ -180,6 +191,7 @@ public class ConnectionCreator extends Thread {
 										);
 								*/
 
+								
 								//CONNECT
 								newPeer.connect(callback);
 							}
@@ -197,8 +209,8 @@ public class ConnectionCreator extends Thread {
 				else 
 					sleep_time = 20;
 					
-				Thread.sleep(sleep_time * 1000);	
-	
+				Thread.sleep(sleep_time * 1000);
+
 			}
 			catch(Exception e)
 			{
