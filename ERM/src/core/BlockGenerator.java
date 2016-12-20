@@ -245,13 +245,16 @@ public class BlockGenerator extends Thread implements Observer
 	
 					// start new SOLVE for WIN Blocks
 					this.solvingBlock = null;
-									
+						
+					int wait_rand = 0;
 					// FLUSH WINER to DB MAP
 					if (ctrl.flushNewBlockGenerated()) {
 						// if flushed - broadcast it
+						wait_rand = (int) (20000 * Math.random());
+
 						try 
 						{
-							Thread.sleep(quickRun?1000:10000);
+							Thread.sleep(quickRun?1000:wait_rand);
 						} 
 						catch (InterruptedException e) 
 						{
@@ -263,14 +266,14 @@ public class BlockGenerator extends Thread implements Observer
 						wait_interval = 500;
 						quickRun = true;
 					} else {
-						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush);					
+						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush - wait_rand);					
 					}
 				} else {
-					wait_interval = 500;
+					wait_interval = 2000;
 				}
 			} else {
 				// always 1sec
-				wait_interval = 500;
+				wait_interval = 2000;
 			}
 
 			try 
