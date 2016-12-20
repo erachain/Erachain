@@ -102,6 +102,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			}
 		}
 		
+		
+		
 		for (Account account : Controller.getInstance().getAccounts()) {
 			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
@@ -309,8 +311,12 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			
 		messageBufs.clear();	
 		transactions.clear();
-		if (account != null) 	transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+		if (account != null) 	{
+		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
+		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		
+		
+		}
 		
 		for (Transaction messagetx : transactions) {
 			
@@ -326,7 +332,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			}
 			if(!is)
 			{
-				addMessage(messageBufs.size(),(R_Send)messagetx, account);
+				addMessage(messageBufs.size(),messagetx, account);
 			}
 			}
 		}
@@ -464,22 +470,61 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		}
 	}
 
-	private void addMessage(int pos, R_Send transaction, Account account)
+	private void addMessage(int pos, Transaction transaction, Account account)
 	{
+		
+		if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION){
+			
+			 Transaction messagetx = transaction;
+			
+			
+			
+			messageBufs.add(pos, new MessageBuf(
+					null, //messagetx.getData(), 
+					false , //messagetx.isEncrypted(),
+					messagetx.getCreator(), //.asPerson(),
+					null, //messagetx.getRecipient(), //.asPerson(),
+					messagetx.getTimestamp(),
+					messagetx.getAmount(),
+					messagetx.getKey(),
+					messagetx.getFee(),
+					messagetx.getSignature(),
+					null,
+					false, //messagetx.isText(),
+					account
+			));
+		
+		
+		
+		
+		
+		
+		
+		
+		}
+		
+R_Send messagetx = null;
+if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
+	messagetx = (R_Send)transaction;
+		
+		
+		
 		messageBufs.add(pos, new MessageBuf(
-				transaction.getData(), 
-				transaction.isEncrypted(),
-				transaction.getCreator(), //.asPerson(),
-				transaction.getRecipient(), //.asPerson(),
-				transaction.getTimestamp(),
-				transaction.getAmount(),
-				transaction.getKey(),
-				transaction.getFee(),
-				transaction.getSignature(),
-				transaction.getCreator().getPublicKey(),
-				transaction.isText(),
+				messagetx.getData(), 
+				messagetx.isEncrypted(),
+				messagetx.getCreator(), //.asPerson(),
+				messagetx.getRecipient(), //.asPerson(),
+				messagetx.getTimestamp(),
+				messagetx.getAmount(),
+				messagetx.getKey(),
+				messagetx.getFee(),
+				messagetx.getSignature(),
+				messagetx.getCreator().getPublicKey(),
+				messagetx.isText(),
 				account
 		));
+		
+}
 	}
 	
 	public void cryptoCloseAll()
@@ -863,8 +908,11 @@ public class Account_Transactions_Table extends JTable implements Observer{
 						send_type = Lang.getInstance().translate("HOLD");
 					} else {
 						
-						if (sender.equals(account1)) {send_type = Lang.getInstance().translate("Sent");}
-						else{send_type = Lang.getInstance().translate("Received");}
+						send_type = Lang.getInstance().translate("Genesis Block");
+						if (sender != null){
+							if (sender.equals(account1)) {send_type = Lang.getInstance().translate("Sent");}
+							else{send_type = Lang.getInstance().translate("Received");}
+						}
 					}
 				}
 				amountStr = /*"<font" + fontSize + ">" +send_type + " "
@@ -873,7 +921,28 @@ public class Account_Transactions_Table extends JTable implements Observer{
 						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
 			}
 			
-		if (sender.equals(account1)){
+		if(sender == null)	{
+		
+			
+			return "<html>\n"
+				
+					+ "<table border='0' cellpadding='3' cellspacing='0'>"
+					+"<tr>"
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Genesis Block")
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=green><b> " + amountStr
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" // +   this.recipient.asPerson()
+					
+					
+					+"</tr>"
+					+"</Table>";
+			
+			
+			
+		}
+		else if (sender.equals(account1))
+		{
 			return	  "<html>\n"
 			/*		+ "<body width='" + width + "'>\n"
 					+ "<table border='0' cellpadding='3' cellspacing='0'><tr>\n<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'>\n"
