@@ -57,13 +57,18 @@ public class PeerManager {
 		DBSet.getInstance().getPeerMap().blacklistPeer(peer);
 	}
 	
+	//private Set<<byte[], Long> blacklisted;
+	
 	public boolean isBlacklisted(InetAddress address)
 	{
+		return false;
+		/*
 		if(!DBSet.getInstance().isStoped()){
 			return DBSet.getInstance().getPeerMap().isBlacklisted(address);
 		}else{
 			return true;
 		}
+		*/
 	}
 	
 	public boolean isBlacklisted(Peer peer)

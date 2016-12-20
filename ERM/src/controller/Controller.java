@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.16.03";
-	private String buildTime = "2016-12-16 12:12:12 UTC";
+	private String version = "2.16.04";
+	private String buildTime = "2016-12-19 12:12:12 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -720,7 +720,7 @@ public class Controller extends Observable {
 
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
-		return this.network.getActivePeers();
+		return this.network.getActivePeers(false);
 	}
 
 	public void walletSyncStatusUpdate(int height) {
@@ -1009,8 +1009,6 @@ public class Controller extends Observable {
 						|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
-				
-				
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
@@ -1018,6 +1016,27 @@ public class Controller extends Observable {
 				newBlock = blockMessage.getBlock();
 				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
 				LOGGER.debug(" received new chain Block " + newBlock.toString(dbSet));
+
+				/*
+				synchronized (this.peerHWeight) {
+					Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
+					long hmVal;
+					if (peerHM == null || peerHM.b == null) {
+						hmVal = 0;
+					} else {
+						hmVal = peerHM.b;
+					}
+						
+					int peerHeight =  blockWinMessage.getHeight();
+					if (peerHeight < 0) {
+						peerHeight = newBlock.getHeightByParent(dbSet);
+					}
+					this.peerHWeight.put(message.getSender(),							
+							new Tuple2<Integer, Long>(peerHeight,
+									hmVal + newBlock.calcWinValueTargeted(dbSet)));
+					
+				}
+				*/
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				if (isNewBlockValid == 4) {
@@ -1044,6 +1063,7 @@ public class Controller extends Observable {
 				// CHECK IF VALID
 				if (this.synchronizer.process(dbSet, newBlock)) {
 						
+					/*
 					synchronized (this.peerHWeight) {
 						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
 						long hmVal;
@@ -1058,6 +1078,7 @@ public class Controller extends Observable {
 										hmVal + newBlock.calcWinValueTargeted(dbSet)));
 						
 					}
+					*/
 
 					/*
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
@@ -1153,6 +1174,20 @@ public class Controller extends Observable {
 		this.network.broadcast(message, excludes);
 		
 	}
+	public void broadcastHWeight(List<Peer> excludes) {
+
+		//LOGGER.info("broadcast winBlock " + newBlock.toString(this.dbSet));
+
+		// CREATE MESSAGE
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		
+	}
+	
 	public void broadcastBlock(Block newBlock, List<Peer> excludes) {
 
 		LOGGER.info("broadcast chainBlock: " + newBlock.toString(this.dbSet));
@@ -1162,6 +1197,21 @@ public class Controller extends Observable {
 		
 		// BROADCAST MESSAGE		
 		this.network.broadcast(message, excludes);
+
+		/*
+		// TODO HWeight
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		// SEND HEIGTH MESSAGE
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				HWeight));
+
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(
+				new Tuple2<Integer, Long>(newBlock.getHeightByParent(dbSet), newBlock.calcWinValue(dbSet)));
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		*/
 	}
 
 	private void broadcastTransaction(Transaction transaction) {
@@ -1361,6 +1411,22 @@ public class Controller extends Observable {
 						maxPeer = peer;
 					}
 				}
+
+				// CLOSE all my connections to PEER with small Height 
+				if (height > 0) {
+					//int myHeight = this.getMyHeight();
+					//int maxHeight = myHeight
+					int currHeight = 0;
+					for (Peer peer : this.peerHWeight.keySet()) {
+						if (peer.isWhite()) {
+							currHeight = this.peerHWeight.get(peer).a;
+							if (height > currHeight + 50) {
+								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
+							}
+						}
+					}
+				}
+
 			}
 		} catch (Exception e) {
 			// PEER REMOVED WHILE ITERATING
@@ -1806,7 +1872,8 @@ public class Controller extends Observable {
 					+ newBlock.toString(this.dbSet));
 
 			///LOGGER.info("and broadcast it");
-			///this.broadcastBlock(newBlock, null);
+			this.broadcastHWeight(null);
+			
 		}
 		
 		return isValid;
