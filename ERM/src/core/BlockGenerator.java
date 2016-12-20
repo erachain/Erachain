@@ -247,7 +247,17 @@ public class BlockGenerator extends Thread implements Observer
 					this.solvingBlock = null;
 									
 					// FLUSH WINER to DB MAP
-					ctrl.flushNewBlockGenerated();
+					if (ctrl.flushNewBlockGenerated()) {
+						// if flushed - broadcast it
+						try 
+						{
+							Thread.sleep(quickRun?1000:10000);
+						} 
+						catch (InterruptedException e) 
+						{
+						}
+						ctrl.broadcastHWeight(null);
+					}
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
 						wait_interval = 500;
