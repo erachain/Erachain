@@ -54,7 +54,7 @@ public class BlockMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE BLOCK HEIGHT
-		byte[] heightBytes = Ints.toByteArray(this.block.getHeight(DBSet.getInstance()));
+		byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DBSet.getInstance()));
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK

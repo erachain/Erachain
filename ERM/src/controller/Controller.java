@@ -1063,6 +1063,7 @@ public class Controller extends Observable {
 				// CHECK IF VALID
 				if (this.synchronizer.process(dbSet, newBlock)) {
 						
+					/*
 					synchronized (this.peerHWeight) {
 						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
 						long hmVal;
@@ -1077,6 +1078,7 @@ public class Controller extends Observable {
 										hmVal + newBlock.calcWinValueTargeted(dbSet)));
 						
 					}
+					*/
 
 					/*
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
@@ -1172,6 +1174,20 @@ public class Controller extends Observable {
 		this.network.broadcast(message, excludes);
 		
 	}
+	public void broadcastHWeight(List<Peer> excludes) {
+
+		//LOGGER.info("broadcast winBlock " + newBlock.toString(this.dbSet));
+
+		// CREATE MESSAGE
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		
+	}
+	
 	public void broadcastBlock(Block newBlock, List<Peer> excludes) {
 
 		LOGGER.info("broadcast chainBlock: " + newBlock.toString(this.dbSet));
@@ -1181,6 +1197,21 @@ public class Controller extends Observable {
 		
 		// BROADCAST MESSAGE		
 		this.network.broadcast(message, excludes);
+
+		/*
+		// TODO HWeight
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		// SEND HEIGTH MESSAGE
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				HWeight));
+
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(
+				new Tuple2<Integer, Long>(newBlock.getHeightByParent(dbSet), newBlock.calcWinValue(dbSet)));
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		*/
 	}
 
 	private void broadcastTransaction(Transaction transaction) {
@@ -1841,7 +1872,8 @@ public class Controller extends Observable {
 					+ newBlock.toString(this.dbSet));
 
 			///LOGGER.info("and broadcast it");
-			///this.broadcastBlock(newBlock, null);
+			this.broadcastHWeight(null);
+			
 		}
 		
 		return isValid;
