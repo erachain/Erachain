@@ -218,6 +218,7 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 
+			syncForgingStatus();
 			//CHECK IF WE ARE UP TO DATE
 			// NOT NEED isUpToDate! 
 			if(!ctrl.isUpToDate())
@@ -259,6 +260,11 @@ public class BlockGenerator extends Thread implements Observer
 						catch (InterruptedException e) 
 						{
 						}
+						
+						syncForgingStatus();
+						if(!ctrl.isUpToDate())
+							continue;
+
 						ctrl.broadcastHWeight(null);
 					}
 
@@ -282,8 +288,11 @@ public class BlockGenerator extends Thread implements Observer
 			} 
 			catch (InterruptedException e) 
 			{
-				//LOGGER.error(e.getMessage(), e);
 			}
+
+			syncForgingStatus();
+			if(!ctrl.isUpToDate())
+				continue;
 
 			if(dbSet.isStoped()) {
 				return;
@@ -403,8 +412,11 @@ public class BlockGenerator extends Thread implements Observer
 				} 
 				catch (InterruptedException e) 
 				{
-					//LOGGER.error(e.getMessage(), e);
 				}
+
+				syncForgingStatus();
+				if(!ctrl.isUpToDate())
+					continue;
 
 				if (dbSet.isStoped())
 					return;
