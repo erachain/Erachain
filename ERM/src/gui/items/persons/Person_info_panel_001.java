@@ -3,6 +3,10 @@ package gui.items.persons;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Blob;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -13,19 +17,31 @@ import java.util.TreeMap;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import org.glassfish.jersey.internal.util.Base64;
 import org.mapdb.Fun.Tuple3;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
 import database.DBSet;
+import gui.items.accounts.Account_Confiscate_Debt_Dialog;
+import gui.items.accounts.Account_Lend_Dialog;
+import gui.items.accounts.Account_Repay_Debt_Dialog;
+import gui.items.accounts.Account_Send_Dialog;
+import gui.items.accounts.Account_Take_Hold_Dialog;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -394,6 +410,27 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jTextField13, gridBagConstraints);
+        
+        JPopupMenu creator_Meny = new JPopupMenu();
+        JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+  		copy_Creator_Address1.addActionListener(new ActionListener()
+  		{
+  			public void actionPerformed(ActionEvent e) 
+  			{
+  				int row = jTable2.getSelectedRow();
+  				row = jTable2.convertRowIndexToModel(row);
+  				      				
+  				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  			    clipboard.setContents(value, null);
+  			}
+  		});
+  		 creator_Meny.add(copy_Creator_Address1);
+        
+  		jTextField13.add(creator_Meny);
+  		jTextField13.setComponentPopupMenu(creator_Meny);
+  		//TableMenuPopupUtil.installContextMenu(jTextField13, creator_Meny);
+        
 
         jLabel14.setText(Lang.getInstance().translate("Statuses"));
         jLabel14.setAlignmentY(0.2F);
@@ -462,7 +499,10 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       		to_Date_Column.setMaxWidth(200);
       		to_Date_Column.setPreferredWidth(80);//.setWidth(30);
         
-        
+       
+      		
+      		
+      		
         
         /*
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
@@ -562,6 +602,58 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 6);
         add(iconLabel, gridBagConstraints);
+        
+        
+        
+   
+      //MENU
+      		JPopupMenu menu = new JPopupMenu();	
+      		
+      		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+      		copyAddress.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				      				
+      				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      				StringSelection value = new StringSelection(personModel.getAccount(row));
+      			    clipboard.setContents(value, null);
+      			}
+      		});
+      		menu.add(copyAddress);
+      		
+      		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
+      		copy_Creator_Address.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				      				
+      				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      				StringSelection value = new StringSelection(personModel.get_Creator_Account(row));
+      			    clipboard.setContents(value, null);
+      			}
+      		});
+      		menu.add(copy_Creator_Address);
+      		
+
+      		////////////////////
+      		TableMenuPopupUtil.installContextMenu(jTable2, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+      	
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         

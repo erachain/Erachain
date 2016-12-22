@@ -19,6 +19,7 @@ import org.mapdb.Fun.Tuple3;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
 import core.item.imprints.ImprintCls;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -188,6 +189,33 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 			this.fireTableDataChanged();
 		}	
+	}
+
+
+	public String getAccount(int row) {
+		// TODO Auto-generated method stub
+	
+		return  (String) getValueAt( row, COLUMN_ADDRESS) ;
+		
+		
+	}
+	
+	public String get_Creator_Account(int row) {
+		// TODO Auto-generated method stub
+	
+		//return  (String) getValueAt( row, COLUMN_ADDRESS) ;
+		Stack<Tuple3<Integer, Integer, Integer>> entry = addresses.get((String) getValueAt( row, COLUMN_ADDRESS));
+		if (entry == null || entry.isEmpty() ) return "-";
+		
+		Tuple3<Integer, Integer, Integer> value = entry.peek();
+		int height = value.b;
+		int seq = value.c;
+		Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		if (trans == null)
+			return null;
+		
+		return trans.getCreator().getAddress().toString();
+		
 	}
 	
 /*
