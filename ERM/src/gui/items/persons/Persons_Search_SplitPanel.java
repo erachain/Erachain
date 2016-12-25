@@ -51,8 +51,10 @@ import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.RunMenu;
 import gui.Split_Panel;
+import gui.items.accounts.Account_Send_Dialog;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -225,7 +227,11 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	Search_run_menu.jButton6.addActionListener(new ActionListener(){
   		@Override
     	public void actionPerformed(ActionEvent e) {
-   
+  			int row = search_Table.getSelectedRow();
+			row = search_Table.convertRowIndexToModel(row);
+			PersonCls person = search_Table_Model.getPerson(row);	
+			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);
+  			
   
     //		@SuppressWarnings("unused")
 	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
@@ -241,6 +247,15 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	public void actionPerformed(ActionEvent e) {
    
   
+  			int row = search_Table.getSelectedRow();
+			row = search_Table.convertRowIndexToModel(row);
+			PersonCls person = search_Table_Model.getPerson(row);	
+			Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+  			
+  			
+  			
+  			
+  			
     //		@SuppressWarnings("unused")
 	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
     		}});

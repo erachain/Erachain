@@ -5,6 +5,7 @@ import javax.swing.table.AbstractTableModel;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Map;
 ////////
 import java.util.Observable;
@@ -33,6 +34,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_CREATOR = 2;
 	public static final int COLUMN_ADDRESS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
+	private static final HashSet<Account> Account = null;
 	
 	long key_person_table;
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
@@ -192,13 +194,48 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	}
 
 
-	public String getAccount(int row) {
+	public String getAccount_String(int row) {
 		// TODO Auto-generated method stub
 	
 		return  (String) getValueAt( row, COLUMN_ADDRESS) ;
 		
 		
 	}
+	
+	public Account getAccount(int row){
+	
+		//return  (String) getValueAt( row, COLUMN_ADDRESS) ;
+				Stack<Tuple3<Integer, Integer, Integer>> entry = addresses.get((String) getValueAt( row, COLUMN_ADDRESS));
+				if (entry == null || entry.isEmpty() ) return null;
+				
+				Tuple3<Integer, Integer, Integer> value = entry.peek();
+				int height = value.b;
+				int seq = value.c;
+				Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+				if (trans == null)
+					return null;
+				HashSet<core.account.Account> accounts = trans.getRecipientAccounts();
+				
+				for ( Account acc:accounts){
+					
+					String a = acc.getAddress();
+					String b = getValueAt( row, COLUMN_ADDRESS).toString();
+					
+					
+					if (acc.getAddress().equals( getValueAt( row, COLUMN_ADDRESS).toString()) ){
+						
+						return  acc;
+						
+					}
+					
+				}
+				
+				return  null;
+				
+		
+		
+	}
+	
 	
 	public String get_Creator_Account(int row) {
 		// TODO Auto-generated method stub

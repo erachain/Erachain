@@ -45,7 +45,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		sent_Mails_Panel = new Outcoming_Mails_Panel();
 		this.jTabbedPane.add(sent_Mails_Panel);
 		
-		send_panel = new Mail_Send_Panel(null,null);
+		send_panel = new Mail_Send_Panel(null,null,null,null);
 	
 		this.jTabbedPane.add(send_panel);	
 	

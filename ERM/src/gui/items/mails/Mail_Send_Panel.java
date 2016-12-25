@@ -2,6 +2,7 @@ package gui.items.mails;
 
 import gui.AccountRenderer;
 import gui.PasswordPane;
+import gui.items.accounts.Accounts_ComboBox_Model;
 import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
@@ -57,6 +58,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -69,6 +71,7 @@ public class Mail_Send_Panel extends JPanel
     final static String wrongFirstCharOfAddress = "A";
     
 	private JComboBox<Account> cbxFrom;
+	private JComboBox cbx_To;
 	private JTextField txtTo;
 	private JTextField txtAmount;
 	private JTextField txtFeePow;
@@ -81,7 +84,7 @@ public class Mail_Send_Panel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public Mail_Send_Panel(AssetCls asset, Account account)
+	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 		
 		this.setName(Lang.getInstance().translate("Send Mail"));
@@ -107,10 +110,28 @@ public class Mail_Send_Panel extends JPanel
 		favoritesGBC.gridx = 0;	
 		favoritesGBC.gridy = 0;	
 		
+		txtRecDetails = new JTextField();
+		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		
 		//this.add(cbxFavorites, favoritesGBC);
 		if (asset != null) cbxFavorites.setSelectedItem(asset);
+		
+		
+		
+		//LABEL RECEIVER
+				GridBagConstraints labelDetailsGBC = new GridBagConstraints();
+				labelDetailsGBC.gridy = 3;
+				labelDetailsGBC.insets = new Insets(5,5,5,5);
+				labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
+				labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
+				labelDetailsGBC.weightx = 0;	
+				labelDetailsGBC.gridx = 0;
+		      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
+		      	this.add(recDetailsLabel, labelDetailsGBC);
+		        
+		
+		
 		
 		this.accountsModel = new AccountsComboBoxModel();
         
@@ -179,8 +200,41 @@ public class Mail_Send_Panel extends JPanel
 		txtToGBC.gridx = 1;
 		txtToGBC.gridy = 2;
 
+		
+		
 		txtTo = new JTextField();
-		this.add(txtTo, txtToGBC);
+// if person show selectbox with all adresses for person		
+		if (person !=null){
+			
+			Accounts_ComboBox_Model accounts_To_Model = new Accounts_ComboBox_Model(person.getKey());
+			this.cbx_To = new JComboBox(accounts_To_Model);
+			this.add(this.cbx_To, txtToGBC);
+		 	txtTo.setText(cbx_To.getSelectedItem().toString());
+			Account account1 = new Account(txtTo.getText());
+			txtRecDetails.setText(account1.toString());
+			toLabel.setText(Lang.getInstance().translate("SeLect Adress To: "));
+			cbx_To.addActionListener (new ActionListener () {
+				    public void actionPerformed(ActionEvent e) {
+				    	String str = (String) cbx_To.getSelectedItem();
+				    	if(str != null)
+				    	{
+				    		txtTo.setText(cbx_To.getSelectedItem().toString());
+						 	refreshReceiverDetails();
+				    	}
+
+				    }
+				});	
+		}
+		else {
+			
+			if (account_To != null) {
+			txtTo.setText(account_To.getAddress());
+		}
+			this.add(txtTo, txtToGBC);
+		}
+		
+		
+	
 		
         txtTo.getDocument().addDocumentListener(new DocumentListener() {
             
@@ -198,17 +252,7 @@ public class Mail_Send_Panel extends JPanel
         });
 		        
       	
-		//LABEL RECEIVER
-		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
-		labelDetailsGBC.gridy = 3;
-		labelDetailsGBC.insets = new Insets(5,5,5,5);
-		labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelDetailsGBC.weightx = 0;	
-		labelDetailsGBC.gridx = 0;
-      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
-      	this.add(recDetailsLabel, labelDetailsGBC);
-        
+		
       	//RECEIVER DETAILS 
 		GridBagConstraints txtReceiverGBC = new GridBagConstraints();
 		txtReceiverGBC.gridwidth = 4;
@@ -219,7 +263,7 @@ public class Mail_Send_Panel extends JPanel
 		txtReceiverGBC.gridx = 1;
       	txtReceiverGBC.gridy = 3;
 
-      	txtRecDetails = new JTextField();
+      	
       	txtRecDetails.setEditable(false);
       	this.add(txtRecDetails, txtReceiverGBC);
       	

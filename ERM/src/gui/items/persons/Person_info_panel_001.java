@@ -36,6 +36,7 @@ import gui.items.accounts.Account_Lend_Dialog;
 import gui.items.accounts.Account_Repay_Debt_Dialog;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.accounts.Account_Take_Hold_Dialog;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Boolean;
@@ -417,8 +418,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
   		{
   			public void actionPerformed(ActionEvent e) 
   			{
-  				int row = jTable2.getSelectedRow();
-  				row = jTable2.convertRowIndexToModel(row);
+  				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
   				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
@@ -426,6 +426,39 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
   			}
   		});
   		 creator_Meny.add(copy_Creator_Address1);
+  		 
+
+   		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+   		Send_Coins_Crator.addActionListener(new ActionListener()
+   		{
+   			public void actionPerformed(ActionEvent e) 
+   			{
+   				Account_Send_Dialog ff = new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   			}
+   		});
+   		creator_Meny.add(Send_Coins_Crator);
+
+   		JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+   		Send_Mail_Creator.addActionListener(new ActionListener()
+   		{
+   			public void actionPerformed(ActionEvent e) 
+   			{
+   				
+   			}
+   		});
+   		creator_Meny.add(Send_Mail_Creator);
+   		
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
         
   		jTextField13.add(creator_Meny);
   		jTextField13.setComponentPopupMenu(creator_Meny);
@@ -618,7 +651,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       				row = jTable2.convertRowIndexToModel(row);
       				      				
       				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      				StringSelection value = new StringSelection(personModel.getAccount(row));
+      				StringSelection value = new StringSelection(personModel.getAccount_String(row));
       			    clipboard.setContents(value, null);
       			}
       		});
@@ -639,7 +672,47 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       		});
       		menu.add(copy_Creator_Address);
       		
+      		
+      		
+      		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+      		Send_Coins_item_Menu.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				Account account = personModel.getAccount(row);
+      				
+      				Account_Send_Dialog ff = new Account_Send_Dialog(null, null,account, null);
+      				
+      				
+      				
+      			}
+      		});
+      		menu.add(Send_Coins_item_Menu);
 
+      		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+      		Send_Mail_item_Menu.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				Account account = personModel.getAccount(row);
+      				
+      				Mail_Send_Dialog ff = new Mail_Send_Dialog(null,null,account,null);
+      				
+      				
+      			
+      				
+      			}
+      		});
+      		menu.add(Send_Mail_item_Menu);
+      		
+        	
+      		
       		////////////////////
       		TableMenuPopupUtil.installContextMenu(jTable2, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
       	
