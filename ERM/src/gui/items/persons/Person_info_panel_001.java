@@ -433,7 +433,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				Account_Send_Dialog ff = new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -443,7 +443,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				
+   			
+   				new Mail_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);
@@ -684,7 +685,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       				row = jTable2.convertRowIndexToModel(row);
       				Account account = personModel.getAccount(row);
       				
-      				Account_Send_Dialog ff = new Account_Send_Dialog(null, null,account, null);
+      				new Account_Send_Dialog(null, null,account, null);
       				
       				
       				
@@ -702,7 +703,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       				row = jTable2.convertRowIndexToModel(row);
       				Account account = personModel.getAccount(row);
       				
-      				Mail_Send_Dialog ff = new Mail_Send_Dialog(null,null,account,null);
+      				new Mail_Send_Dialog(null,null,account,null);
       				
       				
       			

@@ -54,8 +54,7 @@ public class Account_Send_Dialog extends JDialog{
 		Account_Send_Panel panel = new Account_Send_Panel(asset, account, account_To, person);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         
-       //SHOW FRAME
-        this.pack();
+   
    //     this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Send"));
 	//	this.setClosable(true);
@@ -68,7 +67,7 @@ public class Account_Send_Dialog extends JDialog{
 		
 		 setMinimumSize(new java.awt.Dimension(650, 23));
 		setModal(true);
-        setPreferredSize(new java.awt.Dimension(800, 650));
+        setPreferredSize(new java.awt.Dimension(650,401));
 	    
         
         
@@ -76,6 +75,8 @@ public class Account_Send_Dialog extends JDialog{
         
 	    
 		//PACK
+        //SHOW FRAME
+        this.pack();
 		
         this.setResizable(false);
         this.setLocationRelativeTo(null);
