@@ -18,6 +18,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.image.ColorModel;
+import java.util.Stack;
+import java.util.TreeMap;
+
 import javax.swing.Timer;
 import java.awt.*;
 
@@ -44,9 +47,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import database.DBSet;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.RunMenu;
@@ -220,6 +226,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	
     	});
     	
+
     	Search_run_menu.jButton6.setText(Lang.getInstance().translate("Send Coins"));
     	Search_run_menu.jButton6.setContentAreaFilled(false);
     	Search_run_menu.jButton6.setOpaque(false);
@@ -230,7 +237,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
   			int row = search_Table.getSelectedRow();
 			row = search_Table.convertRowIndexToModel(row);
 			PersonCls person = search_Table_Model.getPerson(row);	
-			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);
+			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+			if (addresses.isEmpty()) {
+				
+			} else {
+				Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+			}
   			
   
     //		@SuppressWarnings("unused")
@@ -250,7 +262,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
   			int row = search_Table.getSelectedRow();
 			row = search_Table.convertRowIndexToModel(row);
 			PersonCls person = search_Table_Model.getPerson(row);	
-			Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+			if (addresses.isEmpty()) {
+				
+			} else {
+				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+			}
   			
   			
   			

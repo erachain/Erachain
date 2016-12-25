@@ -119,6 +119,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 				addrses_key_value = addrses_key;
 				break;
 			}
+			i++;
 		}
 		Stack<Tuple3<Integer, Integer, Integer>> entry = addresses.get(addrses_key_value);
 		if (entry == null || entry.isEmpty() ) return "-";
