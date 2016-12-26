@@ -61,7 +61,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
      * Creates new form person_info
      */
     public Person_info_panel_001(PersonCls person, boolean full) {
-        initComponents(person, full);
+    	 key_jLabel = new javax.swing.JLabel();
+       if (person != null)     	initComponents(person, full);
     }
 
     /**
@@ -107,7 +108,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         jTable2 = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         description_jTextPane = new javax.swing.JTextPane();
-        key_jLabel = new javax.swing.JLabel();
+       
         iconLabel = new javax.swing.JLabel();
 
         
@@ -630,7 +631,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -784,7 +785,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField13;
-    private javax.swing.JLabel key_jLabel;
+    public javax.swing.JLabel key_jLabel;
     private javax.swing.JLabel iconLabel;
     private javax.swing.JTextField name_jTextField;
     private javax.swing.JTextField race_jTextField;
