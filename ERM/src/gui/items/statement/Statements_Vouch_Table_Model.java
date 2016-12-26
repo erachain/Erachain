@@ -120,6 +120,12 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		}
 		return c; // transactions.size();
 	}
+	
+	public String get_No_Trancaction(int row){
+		
+		return this.transactions.get(row).viewHeightSeq(DBSet.getInstance());
+		
+	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
@@ -168,7 +174,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 			case COLUMN_CREATOR:
 
-				return (transaction.getCreator().toString());
+				return (transaction.getCreator());
 			}
 
 			return null;

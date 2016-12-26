@@ -555,7 +555,7 @@ public class SettingsBasicPanel extends JPanel
  // size font set        
          size_Font = new javax.swing.JComboBox<String>();
 
-         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "11", "14", "18", "24" }));
+         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "11", "12", "14" ,"16","18", "20","24" }));
          size_Font.setSelectedItem(Settings.getInstance().get_Font());  
          gbc_cbxListOfAvailableLangs.gridwidth = 1;
          gbc_cbxListOfAvailableLangs.insets = new Insets(0, 0, 5, 5);

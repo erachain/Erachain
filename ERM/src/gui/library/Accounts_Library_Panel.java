@@ -129,6 +129,24 @@ public class Accounts_Library_Panel extends JPanel {
 			}
 		});
 		menu.add(menu_copy_Creator_PublicKey);
+		
+		JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy No.Transaction"));
+		menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Accounts.getSelectedRow();
+				row = jTable_Accounts.convertRowIndexToModel(row);
+
+				
+				StringSelection value = new StringSelection(person_Accounts_Model.get_No_Trancaction(row));
+				clipboard.setContents(value, null);
+			}
+		});
+		menu.add(menu_copy_Block_PublicKey);
+
+
 
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {

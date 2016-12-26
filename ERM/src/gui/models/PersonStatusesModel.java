@@ -74,6 +74,25 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		return statuses;
 	}
 	
+public String get_No_Trancaction(int row){
+		
+	Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+ return 	value.b.d +"-"+ value.b.e;
+	
+
+		
+	}
+
+public Account get_Creator_Account(int row){
+	
+	Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+	
+	int block = value.b.d;
+	int recNo = value.b.e;
+	Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+	return (Account)record.getCreator();
+	
+}
 
 
 // set class
