@@ -87,25 +87,26 @@ public class Mail_Send_Panel extends JPanel
 	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 		
+		
 		this.setName(Lang.getInstance().translate("Send Mail"));
 		if (asset == null)
 		{
 			asset = Controller.getInstance().getAsset(1l);
 		}
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+	//	gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
+	//	gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		this.setLayout(gridBagLayout);
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
+		 this.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 		//ASSET FAVORITES
 		GridBagConstraints favoritesGBC = new GridBagConstraints();
 		favoritesGBC.insets = new Insets(5, 5, 5, 0);
 		favoritesGBC.fill = GridBagConstraints.BOTH;  
-		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-		favoritesGBC.weightx = 1;
+		favoritesGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		favoritesGBC.weightx = 1.0;
 		favoritesGBC.gridwidth = 5;
 		favoritesGBC.gridx = 0;	
 		favoritesGBC.gridy = 0;	
@@ -122,9 +123,9 @@ public class Mail_Send_Panel extends JPanel
 		//LABEL RECEIVER
 				GridBagConstraints labelDetailsGBC = new GridBagConstraints();
 				labelDetailsGBC.gridy = 3;
-				labelDetailsGBC.insets = new Insets(5,5,5,5);
+				labelDetailsGBC.insets = new Insets(5,10,5,5);
 				labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
-				labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
+				labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 				labelDetailsGBC.weightx = 0;	
 				labelDetailsGBC.gridx = 0;
 		      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
@@ -137,9 +138,9 @@ public class Mail_Send_Panel extends JPanel
         
 		//LABEL FROM
 		GridBagConstraints labelFromGBC = new GridBagConstraints();
-		labelFromGBC.insets = new Insets(5, 5, 5, 5);
+		labelFromGBC.insets = new Insets(5,10, 5, 5);
 		labelFromGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelFromGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelFromGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
 		labelFromGBC.gridy = 1;
@@ -150,10 +151,10 @@ public class Mail_Send_Panel extends JPanel
 		//COMBOBOX FROM
 		GridBagConstraints cbxFromGBC = new GridBagConstraints();
 		cbxFromGBC.gridwidth = 4;
-		cbxFromGBC.insets = new Insets(5, 5, 5, 0);
+		cbxFromGBC.insets = new Insets(5, 5, 5, 10);
 		cbxFromGBC.fill = GridBagConstraints.HORIZONTAL;   
 		cbxFromGBC.anchor = GridBagConstraints.NORTHWEST;
-		cbxFromGBC.weightx = 0;	
+		cbxFromGBC.weightx = 0.1;	
 		cbxFromGBC.gridx = 1;
 		cbxFromGBC.gridy = 1;
 		
@@ -182,9 +183,9 @@ public class Mail_Send_Panel extends JPanel
 		//LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
 		labelToGBC.gridy = 2;
-		labelToGBC.insets = new Insets(5,5,5,5);
+		labelToGBC.insets = new Insets(5,10,5,10);
 		labelToGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelToGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelToGBC.weightx = 0;	
 		labelToGBC.gridx = 0;
 		JLabel toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
@@ -193,10 +194,10 @@ public class Mail_Send_Panel extends JPanel
       	//TXT TO
 		GridBagConstraints txtToGBC = new GridBagConstraints();
 		txtToGBC.gridwidth = 4;
-		txtToGBC.insets = new Insets(5, 5, 5, 0);
+		txtToGBC.insets = new Insets(5, 5, 5, 10);
 		txtToGBC.fill = GridBagConstraints.HORIZONTAL;   
-		txtToGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtToGBC.weightx = 0;	
+		txtToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		txtToGBC.weightx = 0.1;	
 		txtToGBC.gridx = 1;
 		txtToGBC.gridy = 2;
 
@@ -256,9 +257,9 @@ public class Mail_Send_Panel extends JPanel
       	//RECEIVER DETAILS 
 		GridBagConstraints txtReceiverGBC = new GridBagConstraints();
 		txtReceiverGBC.gridwidth = 4;
-		txtReceiverGBC.insets = new Insets(5, 5, 5, 0);
+		txtReceiverGBC.insets = new Insets(5, 5, 5, 10);
 		txtReceiverGBC.fill = GridBagConstraints.HORIZONTAL;   
-		txtReceiverGBC.anchor = GridBagConstraints.NORTHWEST;
+		txtReceiverGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtReceiverGBC.weightx = 0;	
 		txtReceiverGBC.gridx = 1;
       	txtReceiverGBC.gridy = 3;
@@ -269,9 +270,9 @@ public class Mail_Send_Panel extends JPanel
       	
       	//LABEL MESSAGE
       	GridBagConstraints labelMessageGBC = new GridBagConstraints();
-      	labelMessageGBC.insets = new Insets(5,5,5,5);
+      	labelMessageGBC.insets = new Insets(5,10,5,5);
       	labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
-      	labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+      	labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
       	labelMessageGBC.weightx = 0;	
       	labelMessageGBC.gridx = 0;
       	labelMessageGBC.gridy = 4;
@@ -281,9 +282,9 @@ public class Mail_Send_Panel extends JPanel
 		//TXT MESSAGE
 		GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
-		txtMessageGBC.insets = new Insets(5, 5, 5, 0);
+		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
 		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
-		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+		txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtMessageGBC.weightx = 0;	
 		txtMessageGBC.gridx = 1;
         txtMessageGBC.gridy = 4;
@@ -306,7 +307,7 @@ public class Mail_Send_Panel extends JPanel
 		labelIsTextGBC.gridy = 5;
 		labelIsTextGBC.insets = new Insets(5,5,5,5);
 		labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelIsTextGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelIsTextGBC.weightx = 0;	
 		labelIsTextGBC.gridx = 0;     
 
@@ -318,7 +319,7 @@ public class Mail_Send_Panel extends JPanel
 		GridBagConstraints isChkTextGBC = new GridBagConstraints();
 		isChkTextGBC.insets = new Insets(5,5,5,5);
 		isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;   
-		isChkTextGBC.anchor = GridBagConstraints.NORTHWEST;
+		isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		isChkTextGBC.weightx = 0;	
 		isChkTextGBC.gridx = 1;
 		isChkTextGBC.gridy = 5;
@@ -331,7 +332,7 @@ public class Mail_Send_Panel extends JPanel
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
 		labelEncGBC.insets = new Insets(5,5,5,5);
 		labelEncGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelEncGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelEncGBC.weightx = 0;	
 		labelEncGBC.gridx = 4;
 		labelEncGBC.gridx = 2;
@@ -345,7 +346,7 @@ public class Mail_Send_Panel extends JPanel
 		GridBagConstraints ChkEncGBC = new GridBagConstraints();
 		ChkEncGBC.insets = new Insets(5,5,5,5);
 		ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;   
-		ChkEncGBC.anchor = GridBagConstraints.NORTHWEST;
+		ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		ChkEncGBC.weightx = 0;	
 		ChkEncGBC.gridx = 3;
 		ChkEncGBC.gridy = 5;
@@ -358,7 +359,7 @@ public class Mail_Send_Panel extends JPanel
 		GridBagConstraints amountlabelGBC = new GridBagConstraints();
 		amountlabelGBC.insets = new Insets(5,5,5,5);
 		amountlabelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		amountlabelGBC.anchor = GridBagConstraints.NORTHWEST;
+		amountlabelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		amountlabelGBC.weightx = 0;	
 		amountlabelGBC.gridx = 0;
 		amountlabelGBC.gridy = 6;
@@ -371,7 +372,7 @@ public class Mail_Send_Panel extends JPanel
 		GridBagConstraints txtAmountGBC = new GridBagConstraints();
 		txtAmountGBC.insets = new Insets(5,5,5,5);
 		txtAmountGBC.fill = GridBagConstraints.HORIZONTAL;   
-		txtAmountGBC.anchor = GridBagConstraints.NORTHWEST;
+		txtAmountGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtAmountGBC.weightx = 0;	
 		txtAmountGBC.gridx = 1;
 		txtAmountGBC.gridy = 6;
@@ -382,10 +383,10 @@ public class Mail_Send_Panel extends JPanel
 		
         //BUTTON SEND
         GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,5,5,5);
+		buttonGBC.insets = new Insets(5,25,5,5);
 		buttonGBC.fill = GridBagConstraints.BOTH;  
 		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx = 0;
+		buttonGBC.gridx =2;
 		buttonGBC.gridy = 11;
         
 		sendButton = new JButton(Lang.getInstance().translate("Send"));
@@ -434,7 +435,7 @@ public class Mail_Send_Panel extends JPanel
 		decryptAllGBC.gridx = 3;
 		decryptAllGBC.gridy = 11;
 		JButton decryptButton = new JButton(Lang.getInstance().translate("Decrypt All"));
-    	this.add(decryptButton, decryptAllGBC);
+    //	this.add(decryptButton, decryptAllGBC);
 		
 		//MESSAGES HISTORY TABLE
 
