@@ -16,16 +16,17 @@ import core.item.statuses.StatusCls;
 import database.ItemStatusMap;
 import database.DBSet;
 import gui.MainFrame;
+import gui.library.MTextPane;
 import lang.Lang;
 
 // Info for status
-public class Status_Info extends JTextPane {
+public class Status_Info extends MTextPane {
 	private static final long serialVersionUID = 476307470457045006L;	
 	
 	public  Status_Info() {
 	
-		this.setContentType("text/html");
-		this.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	this.setContentType("text/html");
+	//	this.setBackground(MainFrame.getFrames()[0].getBackground());
 		
 	}
 	
@@ -58,7 +59,7 @@ public class Status_Info extends JTextPane {
 	 	
 	public void show_001(StatusCls status){
 		
-		setText("<html>" + Get_HTML_Status_Info_001(status) + "</html>");
+		set_text("<html>" + Get_HTML_Status_Info_001(status) + "</html>");
 		
 		return;
 	}	
