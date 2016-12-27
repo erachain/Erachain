@@ -89,6 +89,8 @@ public class library {
 	      UIManager.put("RadioButton.font", font);
 	      UIManager.put("ComboBox.font", font);
 	      UIManager.put("CheckBox.font", font);
+	      UIManager.put("FormattedTextField.font", font);
+	      
 	 
 	      UIManager.put("Menu.font", font);
 	      UIManager.put("MenuItem.font", font);
