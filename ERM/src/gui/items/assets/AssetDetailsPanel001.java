@@ -172,14 +172,9 @@ this.setVisible(false);
 
        // jTextArea1.setColumns(20);
         jTextArea1 = new MTextPane(asset.getDescription());
-      //  ss= jTextField3.getText();
         
+       
         jTextArea1.setPreferredSize(new Dimension(600,300));
-   
-   //     jTextArea1.setRows(4);
-    //    jTextArea1.setLineWrap(true);
-        jTextArea1.setEditable(false);
-        //jScrollPane2.setViewportView(jTextArea1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -247,7 +242,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         jPanel2.add(jCheckBox1, gridBagConstraints);
 
-        jScrollPane1.setViewportView(jPanel2);
+     //  jScrollPane1.setViewportView(jPanel2);
         
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -312,7 +307,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jScrollPane1, gridBagConstraints);
+        jPanel1.add(jPanel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
