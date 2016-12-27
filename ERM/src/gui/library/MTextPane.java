@@ -44,7 +44,8 @@ public class MTextPane extends JScrollPane {
 				+ " h4{ font-size: " + font_saze + "px;  }"
 				+ " h5{ font-size: " + font_saze + "px;  }" 
 				+ " body{ font-family:"
-				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px}"
+				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px;"
+				+ "word-wrap:break-word;}"
 				+ "</style> </head><body>" + str + "</body>";
 		text_pane.setText(str);
 		
@@ -53,7 +54,7 @@ public class MTextPane extends JScrollPane {
 	}
 	private void install(){
 		setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
-		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		text_pane = new JTextPane();
 		text_pane.setEditable(false);

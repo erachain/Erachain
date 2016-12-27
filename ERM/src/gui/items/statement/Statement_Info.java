@@ -13,6 +13,7 @@ import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.library.MTextPane;
 import gui.library.Voush_Library_Panel;
 import lang.Lang;
 
@@ -49,8 +50,8 @@ public class Statement_Info extends javax.swing.JPanel {
 
 		statement = (R_SignNote) transaction;
 		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
-		jTextArea_Body.setContentType("text/html");
-		jTextArea_Body.setText(note.getName() + "\n\n" + note.getDescription() + "\n\n"
+		//jTextArea_Body.setContentType("text/html");
+		jTextArea_Body.set_text(note.getName() + "\n\n" + note.getDescription() + "\n\n"
 				+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
@@ -71,7 +72,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		jSplitPane1 = new javax.swing.JSplitPane();
 		jPanel1 = new javax.swing.JPanel();
 		jScrollPane3 = new javax.swing.JScrollPane();
-		jTextArea_Body = new javax.swing.JTextPane();
+		jTextArea_Body = new MTextPane();
 		jPanel2 = new javax.swing.JPanel();
 		new javax.swing.JLabel();
 
@@ -97,7 +98,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		// jTextArea_Body.setColumns(20);
 		// jTextArea_Body.setRows(5);
 		// jScrollPane3.setViewportView(jTextArea_Body);
-		jScrollPane3.getViewport().add(jTextArea_Body);
+	//	jScrollPane3.getViewport().add(jTextArea_Body);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -105,7 +106,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
-		jPanel1.add(jScrollPane3, gridBagConstraints);
+		jPanel1.add(jTextArea_Body, gridBagConstraints);
 
 		jSplitPane1.setLeftComponent(jPanel1);
 
@@ -142,6 +143,6 @@ public class Statement_Info extends javax.swing.JPanel {
 
 	private javax.swing.JSplitPane jSplitPane1;
 
-	private javax.swing.JTextPane jTextArea_Body;
+	private MTextPane jTextArea_Body;
 	// End of variables declaration
 }
