@@ -7,9 +7,12 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import core.account.Account;
 import core.item.assets.AssetCls;
 import gui.library.MTable;
+import gui.library.MTextPane;
 import gui.library.M_Accoutn_Text_Field;
 import gui.models.AccountsTableModel;
 import gui.models.Accounts_Of_Deals_TableModel;
@@ -61,7 +64,7 @@ public class Asset_to_Accounts_DetailsPanel extends javax.swing.JPanel {
         jTextField2 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+   
         jLabel4 = new javax.swing.JLabel();
      //   jTextField3 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -133,12 +136,14 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel2.add(jLabel3, gridBagConstraints);
 
-       // jTextArea1.setColumns(20);
-        jTextArea1.setText(asset.getDescription());
-        jTextArea1.setRows(4);
-        jTextArea1.setLineWrap(true);
+    //    jTextArea1.setColumns(20);
+     
+  //      jTextArea1.setRows(4);
+  //      jTextArea1.setLineWrap(true);
+      
+        jTextArea1 = new MTextPane(asset.getDescription());
         jTextArea1.setEditable(false);
-        jScrollPane2.setViewportView(jTextArea1);
+   //     jScrollPane2.setViewportView(jTextArea1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -147,7 +152,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.15;
-        jPanel2.add(jScrollPane2, gridBagConstraints);
+        jPanel2.add(jTextArea1, gridBagConstraints);
 
         jLabel4.setText(Lang.getInstance().translate("Owner") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -287,7 +292,7 @@ this.setVisible(false);
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
+    private MTextPane jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private M_Accoutn_Text_Field jTextField_Creator;
