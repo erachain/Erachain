@@ -16,18 +16,25 @@ public class MTextPane extends JScrollPane {
 
 	public MTextPane() {
 		super();
+		install();
 	}
 
 	public MTextPane(String str) {
 		super();
+		
+		install();
+		//setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
+		//setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
 
-		setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
-		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+		//text_pane = new JTextPane();
+		//text_pane.setEditable(false);
 
-		text_pane = new JTextPane();
-		text_pane.setEditable(false);
+		//text_pane.setContentType("text/html");
+		set_text(str);
+		//setViewportView(text_pane);
 
-		text_pane.setContentType("text/html");
+	}
+	public void set_text(String str){
 		str = Processor.process(str);
 		int font_saze = UIManager.getFont("Label.font").getSize();
 		str = "<head><style>" 
@@ -40,8 +47,22 @@ public class MTextPane extends JScrollPane {
 				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px}"
 				+ "</style> </head><body>" + str + "</body>";
 		text_pane.setText(str);
-		setViewportView(text_pane);
+		
+		
+		
+	}
+	private void install(){
+		setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
+		setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
 
+		text_pane = new JTextPane();
+		text_pane.setEditable(false);
+
+		text_pane.setContentType("text/html");
+		setViewportView(text_pane);
+		
+		
+		
 	}
 
 }

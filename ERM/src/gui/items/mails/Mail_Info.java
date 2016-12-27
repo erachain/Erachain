@@ -27,6 +27,7 @@ import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import database.DBSet;
 import gui.PasswordPane;
+import gui.library.MTextPane;
 import gui.library.M_Accoutn_Text_Field;
 import gui.library.Voush_Library_Panel;
 import gui.transaction.Send_RecordDetailsFrame;
@@ -78,7 +79,7 @@ public class Mail_Info extends javax.swing.JPanel {
     //    jTextField_Sender = new javax.swing.JTextField();
         jLabel_Message = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea_Messge = new javax.swing.JTextPane();
+        jTextArea_Messge = new MTextPane();
         jLabel_Reciever = new javax.swing.JLabel();
     //    jTextField_Reciever = new javax.swing.JTextField();
         jLabel_Title = new javax.swing.JLabel();
@@ -197,15 +198,15 @@ public class Mail_Info extends javax.swing.JPanel {
         add(jLabel_Message, gridBagConstraints);
 
        
-        jTextArea_Messge.setEditable(false);
-		jTextArea_Messge.setContentType("text/html");
+     //   jTextArea_Messge.setEditable(false);
+	//	jTextArea_Messge.setContentType("text/html");
 
-		MenuPopupUtil.installContextMenu(jTextArea_Messge);
+	//	MenuPopupUtil.installContextMenu(jTextArea_Messge);
   //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
    //     jTextArea_Messge.setColumns(20);
    //     jTextArea_Messge.setRows(5);
    //     jTextArea_Messge.setLineWrap(true);
-       jTextArea_Messge.setText(descript_Mesage());
+       jTextArea_Messge.set_text(descript_Mesage());
         
     /* 
         StyledDocument doc = (StyledDocument) jTextArea_Messge.getDocument();
@@ -221,7 +222,7 @@ public class Mail_Info extends javax.swing.JPanel {
      */   
         
         //jTextArea_Messge.setText();
-        jScrollPane1.setViewportView(jTextArea_Messge);
+    //    jScrollPane1.setViewportView(jTextArea_Messge);
 
     
         gridBagConstraints.gridx = 1;
@@ -233,7 +234,7 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.6;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
-        add(jScrollPane1, gridBagConstraints);
+        add(jTextArea_Messge, gridBagConstraints);
 
         
         
@@ -312,7 +313,7 @@ public class Mail_Info extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JScrollPane jScrollPane1;
 //    private javax.swing.JTextArea jTextArea_Messge;
-    private javax.swing.JTextPane jTextArea_Messge;
+    private MTextPane jTextArea_Messge;
     
    
     private javax.swing.JTextField jTextField_Block;
@@ -368,8 +369,8 @@ public class Mail_Info extends javax.swing.JPanel {
 		}
 		
 		try {
-			jTextArea_Messge.setText(Processor.process(
-					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8")));
+			jTextArea_Messge.set_text(
+					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
 			jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 			encrypted =!encrypted;
 		
@@ -382,7 +383,7 @@ public class Mail_Info extends javax.swing.JPanel {
 	{
 		//jTextArea_Messge.setText(new String(trans.getData(), "UTF-8"));
 		
-		jTextArea_Messge.setText(descript_Mesage());
+		jTextArea_Messge.set_text(descript_Mesage());
 		jButton1.setText(Lang.getInstance().translate("Decrypt"));
 		encrypted =!encrypted;
 	}
