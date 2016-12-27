@@ -7,6 +7,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -125,7 +126,9 @@ public class Person_Info extends JTextPane {
 	 	
 	public void show_001(PersonCls person){
 		
-		setText("<html>" + Get_HTML_Person_Info_001(person) + "</html>");
+		setText("<html><head><style> body{ font-family:"
+				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" +  UIManager.getFont("Label.font").getSize() + "px}"
+				+ "</style> </head><body>" + Get_HTML_Person_Info_001(person) + "</body></html>");
 		return;
 	}	
 
