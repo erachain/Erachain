@@ -331,7 +331,7 @@ public MainAssetsFrame(){
 	search_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Orders_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-	my_Balanses_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	my_Balanses_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	
 	}
 

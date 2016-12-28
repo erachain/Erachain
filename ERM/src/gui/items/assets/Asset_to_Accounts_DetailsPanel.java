@@ -1,5 +1,7 @@
 package gui.items.assets;
 
+import java.math.BigDecimal;
+
 import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -8,8 +10,11 @@ import javax.swing.JTable;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import gui.models.AccountsTableModel;
+import gui.models.Accounts_Of_Deals_TableModel;
 import gui.models.BalancesTableModel;
 import gui.models.Balances_To_Account_TableModel;
+import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 /*
@@ -138,7 +143,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.15;
         jPanel2.add(jScrollPane2, gridBagConstraints);
 
@@ -201,7 +206,7 @@ this.setVisible(false);
         
         
         
-		jLabel7.setText(Lang.getInstance().translate("Holders"));
+		jLabel7.setText(Lang.getInstance().translate("Accounts"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 16;
@@ -210,10 +215,17 @@ this.setVisible(false);
         jPanel2.add(jLabel7, gridBagConstraints);
 
       //  Balances_To_Account_TableModel balancesTableModel = new Balances_To_Account_TableModel(asset.getKey());
-        AccountsTableModel balancesTableModel = new AccountsTableModel();
+        Accounts_Of_Deals_TableModel balancesTableModel = new Accounts_Of_Deals_TableModel(0);
         balancesTableModel.setAsset(asset);
   		final JTable  jTable1 = new JTable(balancesTableModel);
     
+  	//Custom renderer for the String column;
+  		jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
+  		
+  		
   
 	
     //    jTable1.setAlignmentX(0.0F);
