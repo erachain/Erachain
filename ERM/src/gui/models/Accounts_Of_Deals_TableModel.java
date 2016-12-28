@@ -145,10 +145,10 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 				return "<HTML><b>"+ Lang.getInstance().translate("Total")+":";
 			case COLUMN_CONFIRMED_BALANCE:
 				
-				return get_Total(deal);
+				return  "<HTML><b>"+ get_Total(deal);
 			case COLUMN_WAINTING_BALANCE:
 				
-				return get_Total_Waiting(deal);
+				return  "<HTML><b>"+ get_Total_Waiting(deal);
 			case COLUMN_FEE_BALANCE:
 				
 				return "11";
