@@ -206,7 +206,7 @@ this.setVisible(false);
         
         
         
-		jLabel7.setText(Lang.getInstance().translate("Accounts"));
+		jLabel7.setText(Lang.getInstance().translate("Asset")+" "+ asset.getName().toString()+" "+ Lang.getInstance().translate("on Accounts"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 16;
