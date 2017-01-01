@@ -375,6 +375,7 @@ public abstract class Transaction {
 		return this.timestamp + (1000*60*60*24);
 	}
 
+	/// tyutuy
 	/*
 	// TIME
 	public Long viewTime() {
