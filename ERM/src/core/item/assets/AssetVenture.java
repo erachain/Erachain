@@ -46,6 +46,7 @@ public class AssetVenture extends AssetCls {
 	}
 
 	//GETTERS/SETTERS
+	
 	public String getItemSubType() { return "venture"; }
 
 	public Long getQuantity() {

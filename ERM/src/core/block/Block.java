@@ -188,8 +188,8 @@ public class Block {
 	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
 	{
 		
-		int incomed_amount = 0;
-		int amount;
+		long incomed_amount = 0l;
+		long amount;
 		
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
 		if (previousForgingHeight == -1)
@@ -208,12 +208,12 @@ public class Block {
 					int amo_sign = transaction.getAmount().signum();
 					if (transaction.getKey() > 0 && amo_sign > 0) {
 						// SEND
-						amount = (int)transaction.getAmount().longValue();						
+						amount = transaction.getAmount().longValue();						
 					} else if (transaction.getKey() < 0 && amo_sign > 0) {
 						// DEBT
-						amount = (int)transaction.getAmount().longValue();						
+						amount = transaction.getAmount().longValue();						
 					} else {
-						amount = 0;
+						amount = 0l;
 					}
 				incomed_amount += amount;
 				}
@@ -233,9 +233,9 @@ public class Block {
 					int amo_sign = transaction.getAmount().signum();
 					if (transaction.getKey() < 0 && amo_sign < 0) {
 						// RE DEBT to me
-						amount = -(int)transaction.getAmount().longValue();						
+						amount = -transaction.getAmount().longValue();						
 					} else {
-						amount = 0;
+						amount = 0l;
 					}
 				incomed_amount += amount;
 				}
@@ -243,7 +243,7 @@ public class Block {
 		}
 		
 		// OWN + RENT balance - in USE
-		return (int)creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount;
+		return (int)(creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount);
 	}
 
 	// CALCULATE and SET
@@ -372,6 +372,21 @@ public class Block {
 		this.atBytes = atBytes;
 	}
 
+	public int getTransactionSeq(byte[] signature)
+	{
+		int seq = 1;
+		for(Transaction transaction: this.getTransactions())
+		{
+			if(Arrays.equals(transaction.getSignature(), signature))
+			{
+				return seq;
+			}
+			seq ++;
+		}
+
+		return -1;
+	}
+	/*
 	public int getTransactionIndex(byte[] signature)
 	{
 
@@ -388,6 +403,7 @@ public class Block {
 
 		return -1;
 	}
+	*/
 
 	public Transaction getTransaction(byte[] signature)
 	{
@@ -499,6 +515,9 @@ public class Block {
 			//READ GENERATING BALANCE
 			byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
 			generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
+			if (generatingBalance < 0) {
+				LOGGER.error("block.generatingBalance < 0:" + generatingBalance);
+			}
 			position += GENERATING_BALANCE_LENGTH;
 		}
 
@@ -835,62 +854,22 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 		
-		if (this.generatingBalance == 0) {
+		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dbSet);
 		}
 		
 		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
 	}
 
-	public long getTarget(DBSet dbSet)
-	{
-		
-		BlockChain blockChain = Controller.getInstance().getBlockChain();
-		
-		long win_value = 0;
-		Block parent = this.getParent(dbSet);
-		int i = 0;
-		
-		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
-		{
-			i++;
-			win_value += parent.calcWinValue(dbSet);
-			
-			
-			parent = parent.getParent(dbSet);
-		}
-		
-		if (i == 0) {
-			return this.calcWinValue(dbSet);
-		}
-
-		
-		long average = win_value / i;
-		average = average + (average>>2);
-
-		// remove bigger values
-		win_value = 0;
-		parent = this.getParent(dbSet);
-		i = 0;
-		while (parent != null && parent.getVersion() > 0 && i < blockChain.TARGET_COUNT)
-		{
-			i++;
-			long value = parent.calcWinValue(dbSet);
-			if (value > (average)) {
-				value = average;
-			}
-			win_value += parent.calcWinValue(dbSet);
-			
-			parent = parent.getParent(dbSet);
-		}
-		
-		return win_value / i;
-		
-	}
 
 	public int calcWinValueTargeted2(long win_value, long target)
 	{
-		
+
+		if (target == 0l) {
+			// in forked chain in may be = 0
+			return -1;
+		}
+
 		int max_targ = BlockChain.BASE_TARGET * 15;
 		int koeff = BlockChain.BASE_TARGET;
 		int result = 0;
@@ -899,12 +878,18 @@ public class Block {
 			koeff >>=1;
 			target <<=1;
 		}
+		
 		result += (int)(koeff * win_value / target);
 		if (result > max_targ)
 			result = max_targ;
 		
 		return result;
 		
+	}
+	
+	public long getTarget(DBSet dbSet)
+	{	
+		return BlockChain.getTarget(dbSet, this);
 	}
 
 	public int calcWinValueTargeted(DBSet dbSet)
@@ -917,6 +902,7 @@ public class Block {
 		
 		long win_value = this.calcWinValue(dbSet);
 		long target = this.getTarget(dbSet);
+		LOGGER.info("Target: " + target);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -1142,7 +1128,7 @@ public class Block {
 	public void process(DBSet dbSet)
 	{	
 		
-		if (this.generatingBalance == 0) {
+		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dbSet);
 		}
 		//PROCESS TRANSACTIONS
@@ -1334,21 +1320,6 @@ public class Block {
 		}
 	}
 
-	public int getTransactionSeq(byte[] signature)
-	{
-		int seq = 1;
-		for(Transaction transaction: this.getTransactions())
-		{
-			if(Arrays.equals(transaction.getSignature(), signature))
-			{
-				return seq;
-			}
-			seq ++;
-		}
-
-		return -1;
-	}
-	
 	@Override 
 	public boolean equals(Object otherObject)
 	{
@@ -1361,4 +1332,12 @@ public class Block {
 		
 		return false;
 	}
+
+	public String toString(DBSet dbSet) {
+		return "H:" + this.getHeightByParent(dbSet)
+			+ " W: " + this.calcWinValue(dbSet)
+			+ "WT: " + this.calcWinValueTargeted(dbSet)
+			+ " C: " + this.getCreator().asPerson();
+	}
+	
 }

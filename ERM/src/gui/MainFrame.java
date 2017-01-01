@@ -4,10 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +23,29 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
+import gui.items.documents.Main_Hash_Document_Frame;
 import gui.items.imprints.MainImprintsFrame;
+import gui.items.mails.Mails_Main_Frame;
 import gui.items.notes.MainNotesFrame;
 import gui.items.other.Other_Internal_Frame;
 import gui.items.persons.MainPersonsFrame;
@@ -37,6 +58,9 @@ import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
+import utils.SaveStrToFile;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -45,11 +69,14 @@ private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
 private JFrame parent;
 
+
 	@SuppressWarnings("null")
 	public MainFrame()
 	{
+		
 		//CREATE FRAME
 		super(Lang.getInstance().translate("DATACHAINS.world"));
+		this.setVisible(false);
 		if(Settings.getInstance().isTestnet()) {
 			setTitle(Lang.getInstance().translate("DATACHAINS.world TestNet ") + Settings.getInstance().getGenesisStamp());
 		}
@@ -107,6 +134,39 @@ private JFrame parent;
        	Toolbar_Main.add(button2_MainToolBar);
 			
 		
+       	
+      	JButton button_Mails_MainToolBar = new JButton();
+		button_Mails_MainToolBar.setText(Lang.getInstance().translate("Mails"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button_Mails_MainToolBar.setFocusable(false);
+		button_Mails_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button_Mails_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button_Mails_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new Mails_Main_Frame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button_Mails_MainToolBar);
+       	
+       	
+       	
+       	
+    	JButton button11_MainToolBar = new JButton();
+		button11_MainToolBar.setText(Lang.getInstance().translate("Documents"));
+		//    button2_MainToolBar.setActionCommand("button1_Main_Panel");
+		button11_MainToolBar.setFocusable(false);
+		button11_MainToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		button11_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
+		button11_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				gui.Menu.selectOrAdd( new Main_Hash_Document_Frame(), MainFrame.desktopPane.getAllFrames());
+			}
+		});
+		Toolbar_Main.add(button11_MainToolBar);
+       	
+       	
+       	
+       	
        	JButton button_Statements_MainToolBar = new JButton();
        	button_Statements_MainToolBar.setText(Lang.getInstance().translate("Statements"));
 		    //    button2_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -233,6 +293,10 @@ private JFrame parent;
 		
 		
 		
+	
+		
+		
+		
 		
 		
 		JButton button10_MainToolBar = new JButton();
@@ -281,6 +345,139 @@ private JFrame parent;
         //ADD MENU TO FRAME
         this.setJMenuBar(menu);
         
+     
+        // 
+        addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@SuppressWarnings({ "unchecked", "unused" })
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+			
+			
+			String json = null;
+			ArrayList<Frame_Class> frame_Classes = new ArrayList<Frame_Class>();
+			
+			JInternalFrame[] s = MainFrame.desktopPane.getAllFrames();
+			
+			
+			
+			json = "{\"Main Frame\":" + "{"
+			+ "\"location_X\":\""+ e.getWindow().getLocation().x +"\","
+			+ "\"location_Y\":\""+ e.getWindow().getLocation().y +"\","
+			+ "\"width\":\""+ e.getWindow().getWidth() +"\","
+			+ "\"height\":\""+ e.getWindow().getHeight() +"\""
+			+ "}";
+			
+			
+			int s1 = e.getWindow().getX();
+			int s2 = e.getWindow().getWidth();
+			
+			
+			for (int i=MainFrame.desktopPane.getAllFrames().length-1; i >= 0; i--) {
+			
+				
+				frame_Classes.add(new Frame_Class(s[i].getClass().getCanonicalName(),s[i].getLocation().x,s[i].getLocation().y,s[i].getSize().width,s[i].getSize().height));
+						
+			}
+			
+			if (!frame_Classes.isEmpty()){
+			
+				Gson gson = new Gson();
+				json = json +", \"Open Frames\": " + gson.toJson(frame_Classes) ; 
+			}
+			
+			json = json + "}";
+			try {
+				SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}	
+			
+	}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+				JInternalFrame object = null;
+				
+				
+				String stringFromInternet = "";
+				
+							
+				try {
+					stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				JsonParser parser = new JsonParser(); 
+				
+				if (!stringFromInternet.isEmpty()){
+				JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+				
+				
+		//		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+				
+		//		parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+		//		parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
+				
+			
+				JsonArray pItem = mainObject.getAsJsonArray("Open Frames"); 
+				if (!pItem.isJsonNull()){
+				for (JsonElement user : pItem) {
+
+				    JsonObject userObject = user.getAsJsonObject(); 
+				  
+				    String str = userObject.get("name").getAsString();
+				  
+				    	try {
+							object  = (JInternalFrame) Class.forName(str).newInstance();
+							object.setLocation(Integer.valueOf( userObject.get("location_X").toString()), Integer.valueOf(userObject.get("location_Y").toString()));
+							object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
+							gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
+						} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				}
+				}
+				}
+			} 
+        });
+        
+        
         
         // СЃРѕР·РґР°РµРј СЂР°Р±РѕС‡РёР№ СЃС‚РѕР» Swing
         desktopPane = new JDesktopPane();
@@ -313,6 +510,8 @@ private JFrame parent;
         frame1.setBorder(new EmptyBorder(10, 10, 10, 10));
         frame1.setSize(500, 500);
         frame1.setLocation(500, 80);
+             
+        
         frame1.setVisible(true);
         frame1.setMaximizable(true);
         frame1.setTitle(Lang.getInstance().translate("Old Panels"));
@@ -336,19 +535,43 @@ private JFrame parent;
         });
         
    
-      //РєР»Р°СЃСЃ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕРєРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјРѕР№ РћРЎ
+      //set location and size
+            
+        
+        String stringFromInternet = "";
+		try {
+			stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		JsonParser parser = new JsonParser(); 
+		
+		if (!stringFromInternet.isEmpty() && stringFromInternet != "" ){
+		JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+		
+		
+		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+		
+		setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+		setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));	
+    	
+		}
+		else{
+			 Toolkit kit = Toolkit.getDefaultToolkit();
 
-        Toolkit kit = Toolkit.getDefaultToolkit();
+		        Dimension screens = kit.getScreenSize();
 
-        Dimension screens = kit.getScreenSize();
+		        int w,h;
 
-        int w,h;
+		        w = screens.width;
 
-        w = screens.width;
+		        setSize((int) (w/1.3),(int) (w/1.3/1.618));
 
-        setSize((int) (w/1.3),(int) (w/1.3/1.618));
-
-        setLocation(w/12, w/12);
+		        setLocation(w/12, w/12);
+		       	
+			
+		}
+        
         
         
         //SHOW FRAME
@@ -359,4 +582,23 @@ private JFrame parent;
     //    desktopPane.add(new MainImprintsFrame());
         
 	}
+}
+
+  class Frame_Class  {
+    
+    String name;
+    int location_X;
+    int location_Y;
+    int size_X;
+    int size_Y;
+    
+
+    public  Frame_Class (String name, int location_X, int location_Y, int size_X, int size_Y) {
+       
+        this.name = name;
+        this.location_X=location_X;
+        this.location_Y=location_Y;
+        this.size_X=size_X;
+        this.size_Y=size_Y;
+    }
 }

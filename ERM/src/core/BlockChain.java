@@ -134,17 +134,18 @@ public class BlockChain
 	// 1 - changed, need broadcasting;
 	public boolean setWaitWinBuffer(DBSet dbSet, Block block) {
 				
+		LOGGER.info("try set new winBlock: " + block.toString(dbSet));
+		
 		if (this.waitWinBuffer == null
 				|| block.calcWinValue(dbSet) > this.waitWinBuffer.calcWinValue(dbSet)) {
 
 			this.waitWinBuffer = block;
 
-			LOGGER.info("setWaitWinBuffer - WIN value: "
-					+ block.calcWinValue(dbSet));
-
+			LOGGER.info("new winBlock setted!");
 			return true;
 		}
 		
+		LOGGER.info("new winBlock ignored!");
 		return false;
 	}
 	
@@ -214,7 +215,7 @@ public class BlockChain
 
 	public List<byte[]> getSignatures(DBSet dbSet, byte[] parent) {
 		
-		LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
+		//LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
@@ -234,7 +235,7 @@ public class BlockChain
 			}
 			//LOGGER.debug("get size " + counter);
 		} else {
-			LOGGER.debug("*** getSignatures NOT FOUND !");
+			//LOGGER.debug("*** getSignatures NOT FOUND !");
 			
 		}
 		
@@ -274,8 +275,8 @@ public class BlockChain
 			return 3;
 		}
 
-		Block lastBlock = this.getLastBlock(dbSet);
-		if(!Arrays.equals(lastBlock.getSignature(), block.getReference())) {
+		byte[] lastSignature = dbSet.getBlockMap().getLastBlockSignature();
+		if(!Arrays.equals(lastSignature, block.getReference())) {
 			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
 			return 4;
 		}
@@ -353,6 +354,10 @@ public class BlockChain
 	{	
 		return dbSet.getBlockMap().getLastBlock();
 	}
+	public byte[] getLastBlockSignature(DBSet dbSet) 
+	{	
+		return dbSet.getBlockMap().getLastBlockSignature();
+	}
 
 	// get last blocks for target
 	public List<Block> getLastBlocksForTarget(DBSet dbSet) 
@@ -382,30 +387,55 @@ public class BlockChain
 	}
 
 	
-	// calc Target by last blocks in chain
 	// ignore BIG win_values
-	public long getTarget(DBSet dbSet) 
-	{	
+	public static long getTarget(DBSet dbSet, Block block)
+	{
 		
-		long target = 0;
+		long win_value = 0;
+		Block parent = block.getParent(dbSet);
+		int i = 0;
 		
-		List<Block> lastBlocks = this.getLastBlocksForTarget(dbSet);
-		if (lastBlocks == null || lastBlocks.isEmpty())
-			return 0l;
-		
-		long win_value;
-		int size = 0;
-		for (Block block: lastBlocks)
+		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
-			win_value = block.calcWinValue(dbSet);
-			if (size > 20 && win_value > target<<2) {
-				// NOT USE BIG values
-				win_value = target<<2;
-			}
-			target += win_value;
-			size++;
+			i++;
+			win_value += parent.calcWinValue(dbSet);
+			
+			
+			parent = parent.getParent(dbSet);
 		}
-		return target /= size;
+		
+		if (i == 0) {
+			return block.calcWinValue(dbSet);
+		}
+
+		
+		long average = win_value / i;
+		average = average + (average>>2);
+
+		// remove bigger values
+		win_value = 0;
+		parent = block.getParent(dbSet);
+		i = 0;
+		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
+		{
+			i++;
+			long value = parent.calcWinValue(dbSet);
+			if (value > (average)) {
+				value = average;
+			}
+			win_value += parent.calcWinValue(dbSet);
+			
+			parent = parent.getParent(dbSet);
+		}
+		
+		return win_value / i;
+		
+	}
+
+	// calc Target by last blocks in chain
+	public long getTarget(DBSet dbSet)
+	{	
+		return getTarget(dbSet, this.getLastBlock(dbSet));
 	}
 
 	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 

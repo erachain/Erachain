@@ -375,7 +375,7 @@ public class PersonConfirmDialog extends JDialog  {
 				//personDetails = personDetails; 
 			}
 
-			pubKeyDetails.setText("<html><h3>" + personDetails + "</h3>" + account.toString(Transaction.FEE_KEY) + "</html>");
+			pubKeyDetails.setText("<html>" + personDetails  + account.toString(Transaction.FEE_KEY) +  "</html>");
 			
 		}
 		
@@ -583,8 +583,11 @@ public class PersonConfirmDialog extends JDialog  {
 	        
 	        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 4;
-	        gridBagConstraints.gridy = 6;
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.weightx = 0.1;
+	        //gridBagConstraints.gridheight =7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jLabel_Adress1_Check, gridBagConstraints);
 

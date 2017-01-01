@@ -250,7 +250,7 @@ public class Peer extends Thread{
 				in = null;
 				
 				try {
-					Thread.sleep(100);
+					Thread.sleep(50);
 				}
 				catch (Exception e) {		
 				}
@@ -270,7 +270,7 @@ public class Peer extends Thread{
 					//DISCONNECT
 					callback.onDisconnect(this);
 					try {
-						Thread.sleep(100);
+						Thread.sleep(10);
 					}
 					catch (Exception e1) {
 						
@@ -353,7 +353,7 @@ public class Peer extends Thread{
 					} 
 					catch (Exception e) 
 					{
-						//LOGGER.error(e.getMessage(), e);
+						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
 						//this.onPingFail("onMessage error");
 						callback.onError(this, "onMessage wrong - " + e.getMessage());
@@ -460,6 +460,7 @@ public class Peer extends Thread{
 	}
 	
 
+	// TRUE = You;  FALSE = Remote
 	public boolean isWhite()
 	{
 		return this.white; 

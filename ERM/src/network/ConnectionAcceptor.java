@@ -44,7 +44,7 @@ public class ConnectionAcceptor extends Thread{
 				
 				
 				//CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-				if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size())
+				if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(false).size())
 				{
 					//IF SOCKET IS OPEN CLOSE IT
 					if(!socket.isClosed())
@@ -52,7 +52,7 @@ public class ConnectionAcceptor extends Thread{
 						socket.close();
 					}
 					
-					Thread.sleep(100);
+					Thread.sleep(50);
 				}
 				else
 				{		

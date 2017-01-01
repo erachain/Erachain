@@ -53,6 +53,11 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		return this.item;
 	}
 
+	public long getAssetKey(DBSet db)
+	{
+		return this.getItem().getKey(db);
+	}
+
 	public void generateSignature() {
 		
 		super.generateSignature();

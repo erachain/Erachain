@@ -104,11 +104,12 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.15.01";
-	private String buildTime = "2016-05-18 12:12:12 UTC";
+	private String version = "2.16.05";
+	private String buildTime = "2016-12-20 12:12:12 UTC";
 	private long buildTimestamp;
 	
-	public static final String releaseVersion = "2.05.0";
+	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
+	public static final String releaseVersion = "2.06.01";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -719,7 +720,7 @@ public class Controller extends Observable {
 
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
-		return this.network.getActivePeers();
+		return this.network.getActivePeers(false);
 	}
 
 	public void walletSyncStatusUpdate(int height) {
@@ -762,7 +763,14 @@ public class Controller extends Observable {
 		// SEND HEIGTH MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
 				HWeight));
-		
+
+		// GET CURRENT WIN BLOCK
+		Block winBlock = this.blockChain.getWaitWinBuffer();
+		if (winBlock != null) {
+			// SEND  MESSAGE
+			peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock));
+		}
+
 		if (this.status == STATUS_NO_CONNECTIONS) {
 			// UPDATE STATUS
 			this.status = STATUS_OK;
@@ -846,6 +854,7 @@ public class Controller extends Observable {
 	public void onMessage(Message message) {
 		Message response;
 		Block newBlock;
+
 
 		synchronized (this) {
 			switch (message.getType()) {
@@ -954,11 +963,8 @@ public class Controller extends Observable {
 
 			case Message.WIN_BLOCK_TYPE:
 
-				if (this.status != STATUS_OK)
-					break;
-
-				if(this.isProcessingWalletSynchronize()) {
-					
+				if (this.status != STATUS_OK
+					|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
 				
@@ -966,6 +972,8 @@ public class Controller extends Observable {
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
+				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
+				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
@@ -988,33 +996,74 @@ public class Controller extends Observable {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
 							+ " code: " + isNewWinBlockValid
-							+ " " + Base58.encode(newBlock.getSignature()));
+							+ newBlock.toString(dbSet));
 				}
 
 				break;
 
 			case Message.BLOCK_TYPE:
+				
 
-				if (this.status != STATUS_OK)
+				// ALL IINCOMED BLOCKS ignored now!!!
+				if (true || this.status != STATUS_OK
+						|| this.isProcessingWalletSynchronize()) {
 					break;
+				}
 
 				BlockMessage blockMessage = (BlockMessage) message;
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();
+				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
+				LOGGER.debug(" received new chain Block " + newBlock.toString(dbSet));
+
+				/*
+				synchronized (this.peerHWeight) {
+					Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
+					long hmVal;
+					if (peerHM == null || peerHM.b == null) {
+						hmVal = 0;
+					} else {
+						hmVal = peerHM.b;
+					}
+						
+					int peerHeight =  blockWinMessage.getHeight();
+					if (peerHeight < 0) {
+						peerHeight = newBlock.getHeightByParent(dbSet);
+					}
+					this.peerHWeight.put(message.getSender(),							
+							new Tuple2<Integer, Long>(peerHeight,
+									hmVal + newBlock.calcWinValueTargeted(dbSet)));
+					
+				}
+				*/
 
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-								
-				if(this.isProcessingWalletSynchronize()) {
-					
-					break;
+				if (isNewBlockValid == 4) {
+					// fork branch! disconnect!
+					this.onDisconnect(message.getSender());
+					return;
+				} else if (isNewBlockValid != 0) {
+					return;
 				}
 				
+				// may be it block need in WIN battle with MY winBlock?
+				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
+				if (waitWinBlock != null
+						// alreday checced && waitWinBlock.getHeightByParent(dbSet) == newBlock.getHeightByParent(dbSet)
+						) {
+					// same candidate for win
+					if (this.blockChain.setWaitWinBuffer(dbSet, newBlock)) {
+						// need to BROADCAST
+						this.broadcastWinBlock(newBlock, null);
+					}
+					return;
+				}	
+				
 				// CHECK IF VALID
-				if (isNewBlockValid == 0
-						&& this.synchronizer.process(dbSet, newBlock)) {
-					
+				if (this.synchronizer.process(dbSet, newBlock)) {
 						
+					/*
 					synchronized (this.peerHWeight) {
 						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
 						long hmVal;
@@ -1029,6 +1078,7 @@ public class Controller extends Observable {
 										hmVal + newBlock.calcWinValueTargeted(dbSet)));
 						
 					}
+					*/
 
 					/*
 					LOGGER.info(Lang.getInstance().translate("received new valid block"));
@@ -1115,19 +1165,53 @@ public class Controller extends Observable {
 
 	public void broadcastWinBlock(Block newBlock, List<Peer> excludes) {
 
+		LOGGER.info("broadcast winBlock " + newBlock.toString(this.dbSet));
+
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
 		
 		// BROADCAST MESSAGE		
 		this.network.broadcast(message, excludes);
+		
 	}
+	public void broadcastHWeight(List<Peer> excludes) {
+
+		//LOGGER.info("broadcast winBlock " + newBlock.toString(this.dbSet));
+
+		// CREATE MESSAGE
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		
+	}
+	
 	public void broadcastBlock(Block newBlock, List<Peer> excludes) {
+
+		LOGGER.info("broadcast chainBlock: " + newBlock.toString(this.dbSet));
 
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createBlockMessage(newBlock);
 		
 		// BROADCAST MESSAGE		
 		this.network.broadcast(message, excludes);
+
+		/*
+		// TODO HWeight
+ 		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		// SEND HEIGTH MESSAGE
+		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				HWeight));
+
+		Message messageHW = MessageFactory.getInstance().createHWeightMessage(
+				new Tuple2<Integer, Long>(newBlock.getHeightByParent(dbSet), newBlock.calcWinValue(dbSet)));
+		
+		// BROADCAST MESSAGE		
+		this.network.broadcast(messageHW, excludes);
+		*/
 	}
 
 	private void broadcastTransaction(Transaction transaction) {
@@ -1214,7 +1298,7 @@ public class Controller extends Observable {
 	public void update() {
 		// UPDATE STATUS
 		
-		if (this.status == STATUS_SYNCHRONIZING)
+		if (this.status == STATUS_NO_CONNECTIONS)
 			return;
 		
 		this.status = STATUS_SYNCHRONIZING;
@@ -1233,10 +1317,15 @@ public class Controller extends Observable {
 		
 		try {
 			// WHILE NOT UPTODATE
+			int tryes = 0;
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
 				peer = this.getMaxWeightPeer();
 				if (peer == null) {
+					tryes++;
+					if (tryes > 3) {
+						break;
+					}
 					Thread.sleep(1000);
 					continue;
 				}
@@ -1256,25 +1345,24 @@ public class Controller extends Observable {
 			}
 		}
 
-		if (this.peerHWeight.size() == 0) {
+		if (this.peerHWeight.size() == 0
+				|| peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
-
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
-		} else {
+		} else if (!this.isUpToDate()) {
 			// UPDATE STATUS
+			this.status = STATUS_SYNCHRONIZING;
+		} else {
 			this.status = STATUS_OK;
-
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
-			
-			Controller.getInstance().statusInfo();
 		}
+
+		// NOTIFY
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(
+				ObserverMessage.NETWORK_STATUS, this.status));
+		
+		this.statusInfo();
+
 	}
 
 	private Peer getMaxWeightPeer() {
@@ -1323,6 +1411,22 @@ public class Controller extends Observable {
 						maxPeer = peer;
 					}
 				}
+
+				// CLOSE all my connections to PEER with small Height 
+				if (height > 0) {
+					//int myHeight = this.getMyHeight();
+					//int maxHeight = myHeight
+					int currHeight = 0;
+					for (Peer peer : this.peerHWeight.keySet()) {
+						if (peer.isWhite()) {
+							currHeight = this.peerHWeight.get(peer).a;
+							if (height > currHeight + 50) {
+								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
+							}
+						}
+					}
+				}
+
 			}
 		} catch (Exception e) {
 			// PEER REMOVED WHILE ITERATING
@@ -1755,13 +1859,20 @@ public class Controller extends Observable {
 			return false;
 		}
 				
+		// IC
+		if(isProcessingWalletSynchronize())
+		{
+			// IC
+			return false;
+		}
+
 		boolean isValid = this.synchronizer.process(this.dbSet, newBlock);
 		if (isValid) {
-			LOGGER.info("controller.Controller.flushNewBlockGenerated() ->  broadcast valid Block. Height: "
-					+ (newBlock.getParentHeight(dbSet) + 1)
-					+ newBlock.calcWinValueTargeted(dbSet) + " " + newBlock.getCreator().getAddress());
+			LOGGER.info("flush chainBlock: "
+					+ newBlock.toString(this.dbSet));
 
-			this.broadcastBlock(newBlock, null);
+			///LOGGER.info("and broadcast it");
+			
 		}
 		
 		return isValid;

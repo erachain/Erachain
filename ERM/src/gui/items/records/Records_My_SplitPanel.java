@@ -111,7 +111,7 @@ import lang.Lang;
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					onVoteClick();
+					onClick();
 				}
 			});	
 			
@@ -468,7 +468,7 @@ import lang.Lang;
 		};
 		*/
 		
-		 public void onVoteClick()
+		 public void onClick()
 			{
 				//GET SELECTED OPTION
 				int row = allVotingsPanel.records_Table.getSelectedRow();

@@ -15,6 +15,8 @@ import org.mapdb.Fun.Tuple3;
 //import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
+import com.google.common.primitives.UnsignedBytes;
+
 // hash[byte] -> Stack person + block.height + transaction.seqNo
 // Example - database.AddressPersonMap
 public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
@@ -42,15 +44,14 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 		//OPEN MAP
 		return database.createTreeMap("hashes_signs")
 				.keySerializer(BTreeKeySerializer.BASIC)
-				.counterEnable()
+				.comparator(UnsignedBytes.lexicographicalComparator())
 				.makeOrGet();
 	}
 
 	@Override
 	protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() 
 	{
-		// HashMap ?
-		return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>();
+		return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 	@SuppressWarnings("unchecked")
 	public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item)
 	{
+		
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
 		
 		Stack<Tuple3<Long, Integer, Integer>> value_new;

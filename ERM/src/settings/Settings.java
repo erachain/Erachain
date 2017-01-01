@@ -38,9 +38,9 @@ public class Settings {
 	private static final Logger LOGGER = Logger.getLogger(Settings.class);
 
 	//NETWORK
-	private static final int DEFAULT_MIN_CONNECTIONS = 10;
-	private static final int DEFAULT_MAX_CONNECTIONS = 50;
-	private static final int DEFAULT_MAX_RECEIVE_PEERS = 20;
+	private static final int DEFAULT_MIN_CONNECTIONS = 8; // for OWN maked connections
+	private static final int DEFAULT_MAX_CONNECTIONS = 20;
+	private static final int DEFAULT_MAX_RECEIVE_PEERS = 40;
 	private static final int DEFAULT_MAX_SENT_PEERS = 20;
 	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = 60000;
@@ -249,6 +249,12 @@ public class Settings {
 		return this.userPath + "settings.json";
 	}
 	
+	public String getGuiSettingPath(){
+		
+		return this.userPath + "gui_settings.json";
+		
+	}
+	
 	public String getPeersPath()
 	{
 		return this.userPath + "peers.json";
@@ -326,7 +332,7 @@ public class Settings {
 				}
 				
 			} catch (Exception e) {
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.debug(e.getMessage(),e);
 				LOGGER.info("Error with loading knownpeers from peers.json.");
 			}
 			
@@ -342,7 +348,7 @@ public class Settings {
 			return knownPeers;
 		
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(),e);
+			LOGGER.debug(e.getMessage(),e);
 			LOGGER.info("Error in getKnownPeers().");
 			return new ArrayList<Peer>();
 		}
@@ -377,7 +383,7 @@ public class Settings {
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
-			LOGGER.error(e.getMessage(), e);
+			LOGGER.debug(e.getMessage(), e);
 			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 						
 			return this.cacheInternetPeers;
@@ -403,7 +409,7 @@ public class Settings {
 				}
 			}catch(Exception e)
 			{
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.debug(e.getMessage(),e);
 				LOGGER.info(this.defaultPeers[i] + " - invalid peer address!");
 			}
 		}

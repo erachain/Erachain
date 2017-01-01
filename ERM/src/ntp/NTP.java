@@ -12,7 +12,7 @@ import network.message.MessageFactory;
 
 public final class NTP
 {
-	private static final long TIME_TILL_UPDATE = 1000*60*10;
+	private static final long TIME_TILL_UPDATE = 1000*60*60*12;
 	private static final String NTP_SERVER = "pool.ntp.org";
 	
 	private static long lastUpdate = 0;

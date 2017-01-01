@@ -62,7 +62,12 @@ public class Statements_Table_Model extends JTable implements Observer{
 	private ArrayList<MessageBuf> messageBufs;
 	Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
 	    public int compare(MessageBuf c1, MessageBuf c2) {
-	        return (int) (c2.getTimestamp() - c1.getTimestamp());
+	    	long diff = c2.getTimestamp() - c1.getTimestamp();
+	    	if (diff > 0)
+	    		return 1;
+	    	if (diff < 0)
+	    		return -1;
+	        return 0;
 	    }
 	};
 

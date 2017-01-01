@@ -483,8 +483,6 @@ public class R_SertifyPubKeys extends Transaction {
 		//UPDATE SENDER
 		super.process(db, block, asPack);
 
-		// Controller.getInstance().getHeight()
-		// TODO нужно сделать запись что данная транзакция принадлежит данному блоку чтобы в нем найти её номер
 		int transactionIndex = -1;
 		int blockIndex = -1;
 		//Block block = this.getBlock(db);// == null (((
@@ -492,12 +490,12 @@ public class R_SertifyPubKeys extends Transaction {
 			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
 		} else {
 			blockIndex = block.getHeight(db);
-			if (blockIndex < 2 ) {
+			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
 				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
-			} else {
-				transactionIndex = block.getTransactionIndex(signature);
-			}			
+			}
+			//transactionIndex = this.getSeqNo(db);
+			transactionIndex = block.getTransactionSeq(signature);
 		}
 
 		

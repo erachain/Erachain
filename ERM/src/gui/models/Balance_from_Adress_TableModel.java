@@ -2,6 +2,7 @@ package gui.models;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -24,20 +25,22 @@ import lang.Lang;
 public class Balance_from_Adress_TableModel extends AbstractTableModel implements Observer
 {
 	//private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_BALANCE = 3;
-	public static final int COLUMN_KEY = 2;
+	public static final int COLUMN_C = 4;
+	public static final int COLUMN_B = 3;
+	public static final int COLUMN_A = 2;
 	public static final int COLUMN_ASSET_NAME = 1;
-	public static final int COLUMN_ACCOUNT = 0;
+	public static final int COLUMN_ASSET_KEY = 0;
 	List<Account> accounts;
 	Account account;
 		
 	private long key;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Asset","key Asset", "Balance"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"key Asset","Asset", "Balance A", "Balance B", "Balance C"});
 	// balances;
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance;
 	Object tab_Balances;
 	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance ;
+	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance1 ;
 	Tuple2<Long,String> asset;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -50,15 +53,41 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 		List<Account> accounts = Controller.getInstance().getAccounts();
 	//	 table_balance = new List();
 		table_balance = new ArrayList<>();//Pair();
+		table_balance1 = new ArrayList<>();
+		HashSet <Long >item;
+		item = new HashSet();
 		
 		for (int ia = 0; accounts.size()>ia; ia++){
 			account = accounts.get(ia);
 			this.balances = Controller.getInstance().getBalances(account); //.getBalances(key);
 			for (int ib=0; this.balances.size()>ib; ib++){
 				balance = this.balances.get(ib);
-				table_balance.add(new Pair(account,new Pair(balance.getA().b, balance.getB())));
+				table_balance1.add(new Pair(account,new Pair(balance.getA().b, balance.getB())));
+			item.add(balance.getA().b);
 			}
 		}
+		
+		
+		
+			
+		for (Long i:item){
+			BigDecimal sumA = new BigDecimal(0);
+			BigDecimal sumB = new BigDecimal(0);
+			BigDecimal sumC = new BigDecimal(0);
+			for ( Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> k:this.table_balance1){
+				if (k.getB().getA()==i){
+				
+				sumA=sumA.add(k.getB().getB().a);
+				sumB=sumB.add(k.getB().getB().b);
+				sumC=sumC.add(k.getB().getB().c);
+			}
+			
+				
+		}	
+			table_balance.add(new Pair(account,new Pair(i, new Tuple3(sumA,sumB,sumC))));	
+				
+			}
+	
 		
 		((SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.balances).registerObserver();
 	}
@@ -118,20 +147,27 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 		Pair<Tuple2<String, Long>, BigDecimal> sa;
 		switch(column)
 		{
-		case COLUMN_KEY:
+		case COLUMN_ASSET_KEY:
 			
 			return asset.getKey();
 			
-		case COLUMN_BALANCE:
+		case COLUMN_A:
 		
-			return table_balance.get(row).getB().getB();
+			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().a);
+			
+		case COLUMN_B:
+			
+			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().b);
+			
+		case COLUMN_C:
+			
+			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().c);
 		
 		case COLUMN_ASSET_NAME:
 			
 			return asset.getName(); 
 			
-		case COLUMN_ACCOUNT:
-			return table_balance.get(row).getA().getAddress();
+	
 		}	
 		
 		return null;

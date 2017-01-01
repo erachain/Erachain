@@ -9,6 +9,7 @@ import network.message.PeersMessage;
 
 import org.apache.log4j.Logger;
 
+import controller.Controller;
 import settings.Settings;
 
 public class ConnectionCreator extends Thread {
@@ -32,12 +33,12 @@ public class ConnectionCreator extends Thread {
 			try
 			{	
 
-				Thread.sleep(100);	
+				Thread.sleep(50);	
 
 				int maxReceivePeers = Settings.getInstance().getMaxReceivePeers();
 				
 				//CHECK IF WE NEED NEW CONNECTIONS
-				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers().size())
+				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
 				{			
 					//GET LIST OF KNOWN PEERS
 					List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
@@ -53,13 +54,13 @@ public class ConnectionCreator extends Thread {
 							
 						//knownPeersCounter ++;
 	
-						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
 						if(!this.isRun)
 							return;
 						
-						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size()) {
+						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
+						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1) {
 							try {
-								Thread.sleep(1000);
+								Thread.sleep(10);
 							}
 							catch (Exception e) {		
 							}
@@ -82,6 +83,9 @@ public class ConnectionCreator extends Thread {
 							continue;
 						}
 						
+						if (PeerManager.getInstance().isBlacklisted(peer.getAddress()))
+							continue;
+
 						if (!this.isRun)
 							return;
 
@@ -102,20 +106,19 @@ public class ConnectionCreator extends Thread {
 				}
 				
 				//CHECK IF WE STILL NEED NEW CONNECTIONS
-				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers().size())
+				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
 				{
 					//OLD SCHOOL ITERATE activeConnections
 					//avoids Exception when adding new elements
-					for(int i=0; i<callback.getActivePeers().size(); i++)
+					for(int i=0; i<callback.getActivePeers(true).size(); i++)
 					{
 						if (!this.isRun)
 							return;
 
-						Peer peer = callback.getActivePeers().get(i);
+						Peer peer = callback.getActivePeers(true).get(i);
 	
-						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
-						
-						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size())
+						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE					
+						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1)
 							break;
 						
 						//ASK PEER FOR PEERS
@@ -135,8 +138,8 @@ public class ConnectionCreator extends Thread {
 								if (Network.isMyself(newPeer.getAddress())) {
 									continue;
 								}
-								//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
-								if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers().size())
+								//CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
+								if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1)
 									break;
 
 								if(foreignPeersCounter >= maxReceivePeers) {
@@ -165,8 +168,15 @@ public class ConnectionCreator extends Thread {
 									continue;
 								}
 								
+								// TODO small height not use
+								//Controller.getInstance().getMyHeight();
+								// newPeer.
+								if (PeerManager.getInstance().isBlacklisted(newPeer.getAddress()))
+									continue;
+									
 								if (!this.isRun)
 									return;
+								
 								
 								/*
 								int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
@@ -181,6 +191,7 @@ public class ConnectionCreator extends Thread {
 										);
 								*/
 
+								
 								//CONNECT
 								newPeer.connect(callback);
 							}
@@ -188,8 +199,18 @@ public class ConnectionCreator extends Thread {
 					}
 				}			
 				//SLEEP
-				Thread.sleep(60 * 1000);	
-	
+				int sleep_time = 1;
+				if (callback.getActivePeers(true).size()<3)
+					sleep_time = 1;
+				else if (callback.getActivePeers(true).size()< (Settings.getInstance().getMaxConnections()>>2))
+					sleep_time = 5;
+				else if (callback.getActivePeers(true).size()< Settings.getInstance().getMaxConnections()>>1)
+					sleep_time = 10;
+				else 
+					sleep_time = 20;
+					
+				Thread.sleep(sleep_time * 1000);
+
 			}
 			catch(Exception e)
 			{

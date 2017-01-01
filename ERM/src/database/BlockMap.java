@@ -35,6 +35,9 @@ public class BlockMap extends DBMap<byte[], Block>
 	
 	private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
+		
+	private Var<Long> feePoolVar;
+	private long feePool; // POOL for OVER_FREE FEE
 	
 	private Var<Boolean> processingVar;
 	private Boolean processing;
@@ -54,7 +57,11 @@ public class BlockMap extends DBMap<byte[], Block>
 		//LAST BLOCK
 		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
-		
+
+		//POOL FEE
+		//this.feePoolVar = database.getAtomicVar("feePool");
+		//this.feePool = this.feePoolVar.get();
+
 		//PROCESSING
 		this.processingVar = database.getAtomicVar("processingBlock");
 		this.processing = this.processingVar.get();
@@ -65,6 +72,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		super(parent, dbSet);
 				
 		this.lastBlockSignature = parent.getLastBlockSignature();
+		this.feePool = parent.getFeePool();
 		this.processing = parent.isProcessing();
 		
 	}
@@ -153,7 +161,23 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		return this.lastBlockSignature;
 	}
+
+	private void setFeePool(Long feePool) 
+	{
 		
+		this.feePool = feePool;
+		if(this.feePoolVar != null)
+		{
+			this.feePoolVar.set(this.feePool);
+		}
+
+	}
+		
+	public Long getFeePool()
+	{
+		return this.feePool;
+	}
+
 	public boolean isProcessing() 
 	{
 		if(this.processing != null)
@@ -178,6 +202,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		this.set(block.getSignature(), block);
 	}
+	
 	public boolean set(byte[] signature, Block block)
 	{
 			
@@ -211,6 +236,8 @@ public class BlockMap extends DBMap<byte[], Block>
 		}
 
 		this.setLastBlockSignature(signature);
+		// TODO feePool
+		//this.setFeePool(_feePool);
 
 		return super.set(signature, block);
 		

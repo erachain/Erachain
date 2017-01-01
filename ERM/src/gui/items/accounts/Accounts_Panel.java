@@ -1,11 +1,14 @@
 package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
+import gui.items.persons.Person_info_panel_001;
+
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import lang.Lang;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,6 +31,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
@@ -38,6 +43,7 @@ import utils.TableMenuPopupUtil;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.Gui;
 @SuppressWarnings("serial")
@@ -48,8 +54,9 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 {
 	//private JFrame parent;
 
-	private JComboBox<AssetCls> cbxFavorites;
-	private AccountsTableModel tableModel;
+	public JComboBox<AssetCls> cbxFavorites;
+	public AccountsTableModel tableModel;
+	JTable table;
 
 	@SuppressWarnings("unchecked")
 	public Accounts_Panel()
@@ -95,7 +102,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		tableModel = new AccountsTableModel();
 		// start data in model
 		tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
-		JTable table = Gui.createSortableTable(tableModel, 1);
+		 table = Gui.createSortableTable(tableModel, 1);
 		
 		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
 		sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
@@ -143,7 +150,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Send_Dialog(asset, account); 
+				 new Account_Send_Dialog(asset, account, null, null); 
 						
 			}
 		});
@@ -341,6 +348,9 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		        table.setRowSelectionInterval(row, row);
 		     }
 		});
+		
+		
+		
 				
 		//ADD TOTAL BALANCE
 		final JLabel totalBalance = new JLabel(Lang.getInstance().translate("Confirmed Balance") + ": " + tableModel.getTotalBalance().toPlainString());
@@ -388,5 +398,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 	}
 */	
 	// set select in Favorites to FEE asset
+	
+
 
 }

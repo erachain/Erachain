@@ -69,12 +69,14 @@ public class Gui extends JFrame{
         	//OPEN WALLET CREATION SCREEN
         	new NoWalletFrame(this);
         }
-        else
-        {
+     //   else
+     //   {
         	if (Settings.getInstance().isGuiEnabled())
+        	{
         		mainframe =	new MainFrame();
-        		mainframe.setVisible(true);        	
-        }
+        		mainframe.setVisible(true);     
+        	}
+     //   }
         
 	}
 	

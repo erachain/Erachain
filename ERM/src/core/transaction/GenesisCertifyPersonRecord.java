@@ -152,8 +152,21 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 
 		//Block block = new GenesisBlock();
-		int blockIndex = block.getHeight(db);
-		int transactionIndex = block.getTransactionIndex(signature);
+		int transactionIndex = -1;
+		int blockIndex = -1;
+		//Block block = this.getBlock(db);// == null (((
+		if (block == null) {
+			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+		} else {
+			blockIndex = block.getHeight(db);
+			if (blockIndex < 1 ) {
+				// if block not is confirmed - get last block + 1
+				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+			}
+			//transactionIndex = this.getSeqNo(db);
+			transactionIndex = block.getTransactionSeq(signature);
+		}
+		
 		//UPDATE RECIPIENT
 		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
 				new Tuple5<Long, Long, byte[], Integer, Integer>

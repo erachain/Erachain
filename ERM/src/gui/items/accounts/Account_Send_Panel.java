@@ -57,6 +57,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -69,6 +70,7 @@ public class Account_Send_Panel extends JPanel
     final static String wrongFirstCharOfAddress = "A";
     
 	private JComboBox<Account> cbxFrom;
+	private JComboBox cbx_To;
 	private JTextField txtTo;
 	private JTextField txtAmount;
 	private JTextField txtFeePow;
@@ -81,7 +83,7 @@ public class Account_Send_Panel extends JPanel
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	
-	public Account_Send_Panel(AssetCls asset, Account account)
+	public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 		
 		if (asset == null)
@@ -95,6 +97,10 @@ public class Account_Send_Panel extends JPanel
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		
+		txtRecDetails = new JTextField();
+		
 		
 		//ASSET FAVORITES
 		GridBagConstraints favoritesGBC = new GridBagConstraints();
@@ -178,9 +184,37 @@ public class Account_Send_Panel extends JPanel
 		txtToGBC.gridy = 2;
 
 		txtTo = new JTextField();
-		this.add(txtTo, txtToGBC);
 		
-        txtTo.getDocument().addDocumentListener(new DocumentListener() {
+		// if person show selectbox with all adresses for person		
+				if (person !=null){
+					
+					Accounts_ComboBox_Model accounts_To_Model = new Accounts_ComboBox_Model(person.getKey());
+					this.cbx_To = new JComboBox(accounts_To_Model);
+					this.add(this.cbx_To, txtToGBC);
+				 	txtTo.setText(cbx_To.getSelectedItem().toString());
+					Account account1 = new Account(txtTo.getText());
+					txtRecDetails.setText(account1.toString());
+					toLabel.setText(Lang.getInstance().translate("SeLect Adress To: "));
+					cbx_To.addActionListener (new ActionListener () {
+						    public void actionPerformed(ActionEvent e) {
+						    	String str = (String) cbx_To.getSelectedItem();
+						    	if(str != null)
+						    	{
+						    		txtTo.setText(cbx_To.getSelectedItem().toString());
+								 	refreshReceiverDetails();
+						    	}
+
+						    }
+						});	
+				}
+				else {
+					
+					if (account_To != null) {
+					txtTo.setText(account_To.getAddress());
+				}
+					this.add(txtTo, txtToGBC);
+				}
+	        txtTo.getDocument().addDocumentListener(new DocumentListener() {
             
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -217,7 +251,7 @@ public class Account_Send_Panel extends JPanel
 		txtReceiverGBC.gridx = 1;
       	txtReceiverGBC.gridy = 3;
 
-      	txtRecDetails = new JTextField();
+      
       	txtRecDetails.setEditable(false);
       	this.add(txtRecDetails, txtReceiverGBC);
       	
@@ -415,7 +449,7 @@ public class Account_Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+   //     add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()
@@ -627,6 +661,14 @@ public class Account_Send_Panel extends JPanel
 			this.sendButton.setEnabled(true);
 			return;
 		}
+		
+		if (amount.equals(new BigDecimal("0.0").setScale(8))){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error")+":  "+Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+			
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;	
+		}
 
 		String message = txtMessage.getText();
 		
@@ -675,7 +717,7 @@ public class Account_Send_Panel extends JPanel
 		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 		
 		AssetCls asset;
-		long key = -1;
+		long key = 0l;
 		if (amount != null) {
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			asset = (AssetCls) this.cbxFavorites.getSelectedItem();

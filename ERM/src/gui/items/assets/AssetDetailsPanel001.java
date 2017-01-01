@@ -59,6 +59,8 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
         jCheckBox1 = new javax.swing.JCheckBox();
         JLabel jLabel7 = new javax.swing.JLabel();
         JScrollPane jScrollPane3 = new JScrollPane();
+        jLabel_Block = new javax.swing.JLabel();
+        jTextField_Block= new javax.swing.JTextField();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -95,6 +97,26 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField1, gridBagConstraints);
+        
+        
+		jLabel_Block.setText(Lang.getInstance().translate("Block") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanel2.add(jLabel_Block, gridBagConstraints);
+
+        jTextField_Block.setText("000000000000000000");
+        jTextField_Block.setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jTextField_Block, gridBagConstraints);
+        
 
         jLabel2.setText(Lang.getInstance().translate("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -267,6 +289,8 @@ this.setVisible(false);
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
+    private javax.swing.JLabel jLabel_Block;
+    private javax.swing.JTextField jTextField_Block;
     // End of variables declaration                   
 }
 

@@ -18,6 +18,7 @@ import javax.swing.event.TableModelListener;
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import lang.Lang;
 import utils.NumberAsString;
 
@@ -47,14 +48,13 @@ public class Account_Send_Dialog extends JDialog{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Account_Send_Dialog (AssetCls asset, Account account)
+	public Account_Send_Dialog (AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 	
-		Account_Send_Panel panel = new Account_Send_Panel(asset, account);
+		Account_Send_Panel panel = new Account_Send_Panel(asset, account, account_To, person);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         
-       //SHOW FRAME
-        this.pack();
+   
    //     this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Send"));
 	//	this.setClosable(true);
@@ -67,7 +67,7 @@ public class Account_Send_Dialog extends JDialog{
 		
 		 setMinimumSize(new java.awt.Dimension(650, 23));
 		setModal(true);
-        setPreferredSize(new java.awt.Dimension(800, 650));
+        setPreferredSize(new java.awt.Dimension(650,401));
 	    
         
         
@@ -75,6 +75,8 @@ public class Account_Send_Dialog extends JDialog{
         
 	    
 		//PACK
+        //SHOW FRAME
+        this.pack();
 		
         this.setResizable(false);
         this.setLocationRelativeTo(null);
