@@ -1,5 +1,7 @@
 package gui.items.assets;
 
+import java.math.BigDecimal;
+
 import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -7,7 +9,12 @@ import javax.swing.JTable;
 
 import core.account.Account;
 import core.item.assets.AssetCls;
+import gui.models.AccountsTableModel;
+import gui.models.Accounts_Of_Deals_TableModel;
 import gui.models.BalancesTableModel;
+import gui.models.Balances_To_Account_TableModel;
+import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 /*
@@ -21,14 +28,16 @@ import lang.Lang;
  *
  * @author Саша
  */
-public class AssetDetailsPanel001 extends javax.swing.JPanel {
+public class Asset_to_Accounts_DetailsPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form НовыйJPanel1
      * @param asset 
      */
-    public AssetDetailsPanel001(AssetCls asset) {
+    public Asset_to_Accounts_DetailsPanel(AssetCls asset) {
+    	this.setVisible(false);
         initComponents(asset);
+        this.setVisible(true);
     }
 
     /**
@@ -59,8 +68,6 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
         jCheckBox1 = new javax.swing.JCheckBox();
         JLabel jLabel7 = new javax.swing.JLabel();
         JScrollPane jScrollPane3 = new JScrollPane();
-        jLabel_Block = new javax.swing.JLabel();
-        jTextField_Block= new javax.swing.JTextField();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -97,26 +104,6 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField1, gridBagConstraints);
-        
-        
-		jLabel_Block.setText(Lang.getInstance().translate("Block") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jPanel2.add(jLabel_Block, gridBagConstraints);
-
-        jTextField_Block.setText("000000000000000000");
-        jTextField_Block.setEditable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        jPanel2.add(jTextField_Block, gridBagConstraints);
-        
 
         jLabel2.setText(Lang.getInstance().translate("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -156,7 +143,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.15;
         jPanel2.add(jScrollPane2, gridBagConstraints);
 
@@ -219,17 +206,28 @@ this.setVisible(false);
         
         
         
-		jLabel7.setText(Lang.getInstance().translate("Holders"));
+		jLabel7.setText(Lang.getInstance().translate("Asset")+" "+ asset.getName().toString()+" "+ Lang.getInstance().translate("on Accounts"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 16;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel2.add(jLabel7, gridBagConstraints);
 
-        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+      //  Balances_To_Account_TableModel balancesTableModel = new Balances_To_Account_TableModel(asset.getKey());
+        Accounts_Of_Deals_TableModel balancesTableModel = new Accounts_Of_Deals_TableModel(0);
+        balancesTableModel.setAsset(asset);
   		final JTable  jTable1 = new JTable(balancesTableModel);
     
+  	//Custom renderer for the String column;
+  		jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+  		jTable1.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
+  		
+  		
   
 	
     //    jTable1.setAlignmentX(0.0F);
@@ -289,8 +287,6 @@ this.setVisible(false);
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
-    private javax.swing.JLabel jLabel_Block;
-    private javax.swing.JTextField jTextField_Block;
     // End of variables declaration                   
 }
 

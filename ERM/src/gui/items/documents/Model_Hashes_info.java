@@ -9,8 +9,11 @@ import javax.swing.table.DefaultTableModel;
 
 import org.mapdb.Fun.Tuple3;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.imprints.ImprintCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.HashesSignsMap;
@@ -71,6 +74,26 @@ public class Model_Hashes_info extends AbstractTableModel {
 	}
 	
 	
+	
+	
+	public  PersonCls getCreatorAdress(int row){
+		
+		Tuple3<Long, Integer, Integer> ss = hashs.get(row);
+		 Transaction tt = db.getTransactionFinalMap().getTransaction(ss.b,1);
+		
+			 
+			try {
+				return tt.getCreator().hasPerson().b;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				return null;
+			}
+		
+			
+			
+			
+			
+	}
 	
 	
 	

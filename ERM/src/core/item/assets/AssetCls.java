@@ -60,6 +60,26 @@ public abstract class AssetCls extends ItemCls {
 	}
 
 	//GETTERS/SETTERS
+	public String getName() {
+		if (this.key == 1)
+			return "ERA";
+		
+		return this.name;
+	}
+	public String getDescription() {
+		if (this.key == 1)
+			return "'Управляющая единица' (единица доли собственности) - подобна акции предприятия. Дает право собирать блоки тем чаще, чем больше Вы имеете их в обладании. Так же дает право удостоверять других персон и создавать новые статусы.";
+		else if (this.key == 2)
+			return "'Рабочая единица' (единица оплаты) - применяется для оплаты транзакций и как награда за сборку блоков.";
+		else if (this.key == 3)
+			return "'Доверяющая единица' (единица доверия) - применяется для оценки доверия и чести личности.";
+		else if (this.key == 4)
+			return "'Полезная единица' (единица пользы) - применяется для оценки пользы личности.";
+		else if (this.key == 5)
+			return "'Деловая единица' (единица деловитости) - применяется для оценки деловитости и активности личности.";
+		
+		return this.description;
+	}
 
 	public int getItemTypeInt() { return ItemCls.ASSET_TYPE; }
 	public String getItemTypeStr() { return "asset"; }

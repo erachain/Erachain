@@ -18,6 +18,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.image.ColorModel;
+import java.util.Stack;
+import java.util.TreeMap;
+
 import javax.swing.Timer;
 import java.awt.*;
 
@@ -44,15 +47,20 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import database.DBSet;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.RunMenu;
 import gui.Split_Panel;
+import gui.items.accounts.Account_Send_Dialog;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -160,7 +168,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	//	Search_run_menu.setBackground(new Color(0,204,102,255));
 	//	Dimension dim = new Dimension(180,70);
     //	Search_run_menu.setSize(dim);
-    	Search_run_menu.setPreferredSize(new Dimension(180,70));
+    	Search_run_menu.setPreferredSize(new Dimension(180,120));
     	Search_run_menu.setVisible(false);
     	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
    // 	aaa.jButton1.setBorderPainted(false);
@@ -217,6 +225,63 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 			}
     	
     	});
+    	
+
+    	Search_run_menu.jButton6.setText(Lang.getInstance().translate("Send Coins"));
+    	Search_run_menu.jButton6.setContentAreaFilled(false);
+    	Search_run_menu.jButton6.setOpaque(false);
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton6);
+    	Search_run_menu.jButton6.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+  			int row = search_Table.getSelectedRow();
+			row = search_Table.convertRowIndexToModel(row);
+			PersonCls person = search_Table_Model.getPerson(row);	
+			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+			if (addresses.isEmpty()) {
+				
+			} else {
+				Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+			}
+  			
+  
+    //		@SuppressWarnings("unused")
+	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
+    		}});
+    	
+    	
+      	Search_run_menu.jButton5.setText(Lang.getInstance().translate("Send Mail"));
+    	Search_run_menu.jButton5.setContentAreaFilled(false);
+    	Search_run_menu.jButton5.setOpaque(false);
+    	Search_run_menu.getContentPane().add(Search_run_menu.jButton5);
+    	Search_run_menu.jButton5.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+   
+  
+  			int row = search_Table.getSelectedRow();
+			row = search_Table.convertRowIndexToModel(row);
+			PersonCls person = search_Table_Model.getPerson(row);	
+			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+			if (addresses.isEmpty()) {
+				
+			} else {
+				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+			}
+  			
+  			
+  			
+  			
+  			
+    //		@SuppressWarnings("unused")
+	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
+    		}});
+    	
+    	
+    	
+    	
+    	
+    	
    
     	Search_run_menu.pack();
     
@@ -293,7 +358,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 				PersonCls person = null;
 				if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
 				if (person != null) {
-					Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+					//Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+					Person_Info_002 info_panel = new Person_Info_002(person, false);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				}

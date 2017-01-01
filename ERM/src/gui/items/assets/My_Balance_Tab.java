@@ -18,6 +18,11 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -42,19 +47,26 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import database.DBSet;
+import database.SortableList;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
+import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemImprintsTableModel;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
+import utils.Pair;
 
 public class My_Balance_Tab extends Split_Panel {
 	
@@ -63,8 +75,11 @@ public class My_Balance_Tab extends Split_Panel {
 	 */
 	
 	private static final long serialVersionUID = 1L;
-	Balance_from_Adress_TableModel BalancesModel;
 	
+	Balance_from_Adress_TableModel BalancesModel;
+	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
+	
+	@SuppressWarnings({ "null", "unchecked", "rawtypes" })
 	public My_Balance_Tab()
 	{
 
@@ -111,32 +126,48 @@ public class My_Balance_Tab extends Split_Panel {
 	table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 
 // column #1
-	TableColumn column1 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
+	TableColumn column1 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_KEY);//.COLUMN_CONFIRMED);
 	column1.setMinWidth(1);
 	column1.setMaxWidth(1000);
-	column1.setPreferredWidth(50);
+	column1.setPreferredWidth(20);
+	column1.setWidth(20);
 	column1.setCellRenderer(new Renderer_Right());
 	
 	
 	// column #1
-	TableColumn column2 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_BALANCE);//.COLUMN_CONFIRMED);
+	TableColumn column2 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_A);//.COLUMN_CONFIRMED);
 	column2.setMinWidth(50);
 	column2.setMaxWidth(1000);
 	column2.setPreferredWidth(50);
 	column2.setCellRenderer(new Renderer_Right());
-		// column #1
-		TableColumn column3 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+	
+	// column #1
+		TableColumn column3 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_B);//.COLUMN_CONFIRMED);
 		column3.setMinWidth(50);
 		column3.setMaxWidth(1000);
 		column3.setPreferredWidth(50);
 		column3.setCellRenderer(new Renderer_Right());
+		
 		// column #1
+		TableColumn column4 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_C);//.COLUMN_CONFIRMED);
+		column4.setMinWidth(50);
+		column4.setMaxWidth(1000);
+		column4.setPreferredWidth(50);
+		column4.setCellRenderer(new Renderer_Right());
+		
+		// column #1
+		TableColumn column5 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ASSET_NAME);//.COLUMN_CONFIRMED);
+		column5.setMinWidth(50);
+		column5.setMaxWidth(1000);
+		column5.setPreferredWidth(150);
+		column5.setCellRenderer(new Renderer_Left(null, null));
+/*		// column #1
 		TableColumn column4 = table.getColumnModel().getColumn(Balance_from_Adress_TableModel.COLUMN_ACCOUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column4.setMinWidth(50);
 		column4.setMaxWidth(1000);
 		column4.setPreferredWidth(50);
 		column4.setCellRenderer(new Renderer_Right());
-	
+*/	
 		
 		
 // add listener
@@ -176,9 +207,7 @@ public class My_Balance_Tab extends Split_Panel {
 	
 	
 	
-	
-	
-	
+		
 	
 	
 	//MENU

@@ -3,6 +3,10 @@ package gui.items.persons;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Blob;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -13,19 +17,32 @@ import java.util.TreeMap;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import org.glassfish.jersey.internal.util.Base64;
 import org.mapdb.Fun.Tuple3;
 
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
 import database.DBSet;
+import gui.items.accounts.Account_Confiscate_Debt_Dialog;
+import gui.items.accounts.Account_Lend_Dialog;
+import gui.items.accounts.Account_Repay_Debt_Dialog;
+import gui.items.accounts.Account_Send_Dialog;
+import gui.items.accounts.Account_Take_Hold_Dialog;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -44,7 +61,8 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
      * Creates new form person_info
      */
     public Person_info_panel_001(PersonCls person, boolean full) {
-        initComponents(person, full);
+    	 key_jLabel = new javax.swing.JLabel();
+       if (person != null)     	initComponents(person, full);
     }
 
     /**
@@ -90,7 +108,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         jTable2 = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         description_jTextPane = new javax.swing.JTextPane();
-        key_jLabel = new javax.swing.JLabel();
+       
         iconLabel = new javax.swing.JLabel();
 
         
@@ -394,6 +412,60 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         add(jTextField13, gridBagConstraints);
+        
+        JPopupMenu creator_Meny = new JPopupMenu();
+        JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+  		copy_Creator_Address1.addActionListener(new ActionListener()
+  		{
+  			public void actionPerformed(ActionEvent e) 
+  			{
+  				
+  				      				
+  				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  			    clipboard.setContents(value, null);
+  			}
+  		});
+  		 creator_Meny.add(copy_Creator_Address1);
+  		 
+
+   		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+   		Send_Coins_Crator.addActionListener(new ActionListener()
+   		{
+   			public void actionPerformed(ActionEvent e) 
+   			{
+   				new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   			}
+   		});
+   		creator_Meny.add(Send_Coins_Crator);
+
+   		JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+   		Send_Mail_Creator.addActionListener(new ActionListener()
+   		{
+   			public void actionPerformed(ActionEvent e) 
+   			{
+   			
+   				new Mail_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   			}
+   		});
+   		creator_Meny.add(Send_Mail_Creator);
+   		
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+  		 
+        
+  		jTextField13.add(creator_Meny);
+  		jTextField13.setComponentPopupMenu(creator_Meny);
+  		//TableMenuPopupUtil.installContextMenu(jTextField13, creator_Meny);
+        
 
         jLabel14.setText(Lang.getInstance().translate("Statuses"));
         jLabel14.setAlignmentY(0.2F);
@@ -462,7 +534,10 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
       		to_Date_Column.setMaxWidth(200);
       		to_Date_Column.setPreferredWidth(80);//.setWidth(30);
         
-        
+       
+      		
+      		
+      		
         
         /*
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
@@ -556,12 +631,104 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 6);
         add(iconLabel, gridBagConstraints);
+        
+        
+        
+   
+      //MENU
+      		JPopupMenu menu = new JPopupMenu();	
+      		
+      		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+      		copyAddress.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				      				
+      				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      				StringSelection value = new StringSelection(personModel.getAccount_String(row));
+      			    clipboard.setContents(value, null);
+      			}
+      		});
+      		menu.add(copyAddress);
+      		
+      		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
+      		copy_Creator_Address.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				      				
+      				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      				StringSelection value = new StringSelection(personModel.get_Creator_Account(row));
+      			    clipboard.setContents(value, null);
+      			}
+      		});
+      		menu.add(copy_Creator_Address);
+      		
+      		
+      		
+      		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+      		Send_Coins_item_Menu.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				Account account = personModel.getAccount(row);
+      				
+      				new Account_Send_Dialog(null, null,account, null);
+      				
+      				
+      				
+      			}
+      		});
+      		menu.add(Send_Coins_item_Menu);
+
+      		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+      		Send_Mail_item_Menu.addActionListener(new ActionListener()
+      		{
+      			public void actionPerformed(ActionEvent e) 
+      			{
+      				
+      				int row = jTable2.getSelectedRow();
+      				row = jTable2.convertRowIndexToModel(row);
+      				Account account = personModel.getAccount(row);
+      				
+      				new Mail_Send_Dialog(null,null,account,null);
+      				
+      				
+      			
+      				
+      			}
+      		});
+      		menu.add(Send_Mail_item_Menu);
+      		
+        	
+      		
+      		////////////////////
+      		TableMenuPopupUtil.installContextMenu(jTable2, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+      	
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -618,7 +785,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField13;
-    private javax.swing.JLabel key_jLabel;
+    public javax.swing.JLabel key_jLabel;
     private javax.swing.JLabel iconLabel;
     private javax.swing.JTextField name_jTextField;
     private javax.swing.JTextField race_jTextField;

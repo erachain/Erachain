@@ -19,18 +19,23 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.HashesSignsMap;
 import database.SortableList;
 import gui.Split_Panel;
 import gui.items.imprints.TableModelImprints;
+import gui.items.persons.Person_info_panel_001;
 import gui.library.My_JFileChooser;
 import lang.Lang;
 
@@ -45,6 +50,33 @@ public class Search_Document_Hash extends Split_Panel {
 		
 		 model_Hashs = new Model_Hashes_info();
 			Table_Hash = new JTable(model_Hashs);	
+			
+			
+			Table_Hash.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+
+				@Override
+				public void valueChanged(ListSelectionEvent arg0) {
+					// TODO Auto-generated method stub
+					
+					
+					
+					
+					PersonCls person = null;
+					if (Table_Hash.getSelectedRow() >= 0 ) person =  model_Hashs.getCreatorAdress(Table_Hash.convertRowIndexToModel(Table_Hash.getSelectedRow()));
+				//	if (person != null) {
+						
+						Person_info_panel_001 info_panel = new Person_info_panel_001(person , false);
+						info_panel.key_jLabel.setText(Lang.getInstance().translate("Information about the Signer"));
+						info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+						jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+					
+				//	}
+				
+				}
+				
+				
+				
+			});
 	
 	this.jButton2_jToolBar_RightPanel.setVisible(false);
 	this.jButton1_jToolBar_RightPanel.setVisible(false);
@@ -79,7 +111,12 @@ public class Search_Document_Hash extends Split_Panel {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-			model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText().toString());
+			try {
+				model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText().toString());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		

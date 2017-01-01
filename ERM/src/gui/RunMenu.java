@@ -8,6 +8,8 @@ public class RunMenu extends JDialog {
     public javax.swing.JButton jButton2;
     public javax.swing.JButton jButton3;
     public javax.swing.JButton jButton4;
+    public javax.swing.JButton jButton5;
+    public javax.swing.JButton jButton6;
     // End of variables declaration  
 	 public RunMenu() {
 	        
@@ -25,6 +27,8 @@ public class RunMenu extends JDialog {
 	        jButton2 = new javax.swing.JButton();
 	        jButton3 = new javax.swing.JButton();
 	        jButton4 = new javax.swing.JButton();
+	        jButton5 = new javax.swing.JButton();
+	        jButton6 = new javax.swing.JButton();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	       

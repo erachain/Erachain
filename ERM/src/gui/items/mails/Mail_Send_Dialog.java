@@ -1,4 +1,4 @@
-package gui.items.accounts;
+package gui.items.mails;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -40,7 +40,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.BoxLayout;
 
-public class Account_Send_Dialog extends JDialog{
+public class Mail_Send_Dialog extends JDialog{
 
 
 	/**
@@ -48,13 +48,14 @@ public class Account_Send_Dialog extends JDialog{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Account_Send_Dialog (AssetCls asset, Account account, Account account_To, PersonCls person)
+	public Mail_Send_Dialog (AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 	
-		Account_Send_Panel panel = new Account_Send_Panel(asset, account, account_To, person);
+		Mail_Send_Panel panel = new Mail_Send_Panel(asset, account, account_To, person);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         
-   
+       //SHOW FRAME
+ //       this.pack();
    //     this.setMaximizable(true);
 		this.setTitle(Lang.getInstance().translate("Send"));
 	//	this.setClosable(true);
@@ -75,9 +76,7 @@ public class Account_Send_Dialog extends JDialog{
         
 	    
 		//PACK
-        //SHOW FRAME
         this.pack();
-		
         this.setResizable(false);
         this.setLocationRelativeTo(null);
 		

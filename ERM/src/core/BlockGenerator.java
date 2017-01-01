@@ -218,6 +218,7 @@ public class BlockGenerator extends Thread implements Observer
 				continue;
 			}
 
+			syncForgingStatus();
 			//CHECK IF WE ARE UP TO DATE
 			// NOT NEED isUpToDate! 
 			if(!ctrl.isUpToDate())
@@ -245,22 +246,40 @@ public class BlockGenerator extends Thread implements Observer
 	
 					// start new SOLVE for WIN Blocks
 					this.solvingBlock = null;
-									
+						
+					int wait_rand = 0;
 					// FLUSH WINER to DB MAP
-					ctrl.flushNewBlockGenerated();
+					if (ctrl.flushNewBlockGenerated()) {
+						// if flushed - broadcast it
+						wait_rand = (int) (20000 * Math.random());
+
+						try 
+						{
+							Thread.sleep(quickRun?1000:wait_rand);
+						} 
+						catch (InterruptedException e) 
+						{
+						}
+						
+						syncForgingStatus();
+						if(!ctrl.isUpToDate())
+							continue;
+
+						ctrl.broadcastHWeight(null);
+					}
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
 						wait_interval = 500;
 						quickRun = true;
 					} else {
-						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush);					
+						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush - wait_rand);					
 					}
 				} else {
-					wait_interval = 500;
+					wait_interval = 2000;
 				}
 			} else {
 				// always 1sec
-				wait_interval = 500;
+				wait_interval = 2000;
 			}
 
 			try 
@@ -269,8 +288,11 @@ public class BlockGenerator extends Thread implements Observer
 			} 
 			catch (InterruptedException e) 
 			{
-				//LOGGER.error(e.getMessage(), e);
 			}
+
+			syncForgingStatus();
+			if(!ctrl.isUpToDate())
+				continue;
 
 			if(dbSet.isStoped()) {
 				return;
@@ -390,8 +412,11 @@ public class BlockGenerator extends Thread implements Observer
 				} 
 				catch (InterruptedException e) 
 				{
-					//LOGGER.error(e.getMessage(), e);
 				}
+
+				syncForgingStatus();
+				if(!ctrl.isUpToDate())
+					continue;
 
 				if (dbSet.isStoped())
 					return;

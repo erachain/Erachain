@@ -289,7 +289,7 @@ public MainAssetsFrame(){
 									search_Assets_SplitPanel.rightPanel1.add(info2, gridBagConstraints);
 								*/		
 									
-			 						my_Balanses_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+			 						my_Balanses_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(new Asset_to_Accounts_DetailsPanel((AssetCls) asset));
 									
 									 
 								}
@@ -331,7 +331,7 @@ public MainAssetsFrame(){
 	search_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Orders_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-	my_Balanses_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	my_Balanses_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	
 	}
 

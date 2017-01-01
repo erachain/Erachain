@@ -1020,27 +1020,10 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 			{
 				strConfirmations = strConfirmations + " !";
 			}
-
-			int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
-
-			String send_type;
-			if (this.getAssetKey() < 0 && amo_sign > 0) {
-				send_type = Lang.getInstance().translate("debt");
-			} else if (this.getAssetKey() > 0 && amo_sign < 0) {
-				send_type = Lang.getInstance().translate("hold");
-			} else if (this.getAssetKey() < 0 && amo_sign < 0) {
-				send_type = Lang.getInstance().translate("spend");
-			} else {
-				send_type = Lang.getInstance().translate("pay");					
-			}
-
-			String strAsset = Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort();
 			
 			return 	  Lang.getInstance().translate("Date") + ": " + DateTimeFormat.timestamptoString(this.timestamp) + "\n"
-					+ send_type + "\n"
 					+ Lang.getInstance().translate("Sender") + ": " + this.sender + "\n"
 					+ Lang.getInstance().translate("Recipient") + ": " + this.recipient + "\n"
-					+ Lang.getInstance().translate("Amount") + ": " + NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee") + ": " + NumberAsString.getInstance().numberAsString(this.fee) + "\n"
 					+ Lang.getInstance().translate("Type") + ": " + imginout + ". " + imgLock + "\n"
 					+ Lang.getInstance().translate("Confirmations") + ": " + strConfirmations + "\n"
 					+ Lang.getInstance().translate("[MESSAGE START]\n")
