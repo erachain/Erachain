@@ -19,6 +19,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -398,7 +399,14 @@ public abstract class TransactionAmount extends Transaction {
 		}
 
 		if (absKey == Transaction.RIGHTS_KEY
-				&& this.recipient.getLastForgingData(db) == -1) {
+				&& this.recipient.getLastForgingData(db) == -1
+				&& this.amount.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0) {
+			// TODO - если сначала прислать 12 а потом дослать 200000
+			// то будет все время выдавать недостаточное чило моне для форжинга
+			// так как все доначисления буду вычиаться из самого первого
+			// так как ттут нет добавки
+			
+			
 			// update last forging block if it not exist
 			// if exist - it not need - incomes will be negate from forging balance
 
