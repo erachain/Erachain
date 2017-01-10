@@ -99,6 +99,8 @@ public class Start {
 				
 				try
 				{
+						Thread.sleep(1000);
+
 						//START GUI
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					

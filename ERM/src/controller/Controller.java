@@ -656,6 +656,10 @@ public class Controller extends Observable {
 
 	private boolean isStopping = false;
 
+	public boolean isOnStopping() {
+		return this.isStopping;
+	}
+
 	public void stopAll() {
 		// PREVENT MULTIPLE CALLS
 		if (!this.isStopping) {

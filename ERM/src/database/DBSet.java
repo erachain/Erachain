@@ -757,6 +757,13 @@ public class DBSet implements Observer, IDB {
 	{
 		this.actions++;
 	}
+	public void commitHard()
+	{
+		this.uses++;
+		this.database.commit();
+		this.actions = 0;
+		this.uses--;
+	}
 	
 	@Override
 	public void update(Observable o, Object arg) 
@@ -772,8 +779,7 @@ public class DBSet implements Observer, IDB {
 			//CHECK IF WE NEED TO COMMIT
 			if(this.actions >= ACTIONS_BEFORE_COMMIT)
 			{
-				this.database.commit();
-				this.actions = 0;
+				this.commitHard();
 				
 				//NOTIFY CONTROLLER SO HE CAN NOTIFY WALLET
 				Controller.getInstance().onDatabaseCommit();
