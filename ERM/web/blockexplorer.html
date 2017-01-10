@@ -182,6 +182,13 @@ function asyncAjax (url, type){
 					document.getElementById('main').innerHTML = topRichest(data);
 				}
 				
+				if (type == 'persons')
+				
+				{
+					document.getElementById('main').innerHTML = persons(data);
+				
+				}
+				
 				if(type == 'mainQuery')
 				{
 					document.getElementById('main').innerHTML = mainQuery(data);
@@ -1283,6 +1290,29 @@ function mainQuery(data) {
 			}
 			
 		}
+		
+		
+			if(data.type == 'person')
+		{
+			if(data.allOnOnePage)
+			{
+				allOnOnePage = '&allOnOnePage';
+			}
+			else
+			{
+				allOnOnePage = '';
+			}
+			
+			urlstart = '?person=' + data.name+'&start=' + data.start + allOnOnePage;
+			url = '?person=' + data.name + allOnOnePage;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Person: <a href=?name='+encodeURIComponent(data.name)+'>' + htmlFilter(data.name) + '</a></font>';
+			
+			output += '<br><br>';
+		}
+	
+		
 		
 		if(data.type == 'name')
 		{
@@ -3157,6 +3187,61 @@ function parseUrlQuery() {
     return data;
 }
 
+function persons(data)
+{
+
+var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<tr><td align=left>';
+	output += '<a href=?unconfirmed>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr><td><b>'+ data.Label_key +' <td><b>'+data.Label_name+'<td><b>'+ data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount; 
+
+	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
+	row = data.row;
+	for(var i = 0; i < row; i++)
+	{
+		output += '<tr>';
+	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
+	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
+	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
+	output += '<td>'+addCommas(data[i].key)+'<td><a href= >'+data[i].name +'</a><td>'+data[i].creator;
+	}
+	
+	output += '<tr><td colspan=4>';
+/*	if(data.maxHeight != data.lastBlock.height)
+	{
+		if(data.lastBlock.height < data.maxHeight + 21)
+		{
+			output += '<a href=?startBlock='+(data.lastBlock.height)+'>'+data.Label_Later;
+		}
+		else
+		{
+			output += '<a href=?startBlock='+(data.maxHeight+21)+'>'+data.Label_Later;
+		}
+	}
+	
+	output += '<td colspan=4 align=right>';
+	if(minHeight > 1) {
+		output += '<a href=?startBlock='+(data.maxHeight-21)+'>'+data.Label_Previous;
+	}
+*/	
+	return output;
+
+
+
+}
+
+
 function getQueryParams(name) {
    qs = location.search;
 
@@ -3485,6 +3570,29 @@ function start() {
 		return;
 	}
 	
+	if(params.hasOwnProperty('persons'))
+	{
+		asyncAjax('blockexplorer.json?persons' , 'persons');
+
+		document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
+	//	document.getElementById('persons').value = params['persons'];
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('person'))
+	{
+		
+		asyncAjax('blockexplorer.json?person=' + params['person'], 'mainQuery');
+		
+		document.title = title + ' - Person- ' + params['person'];
+		
+		document.getElementById('q').value = decodeURIComponent(params['person']);
+		
+		return;
+	}
+	
+	
 	asyncAjax('blockexplorer.json?blocks', 'blocks');
 	
 	document.title = title;
@@ -3549,6 +3657,7 @@ function start() {
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
 				<li id=menuTop100Richest><a href="?top=100">Top 100 Richest</a></li>
+				<li id=menuPersons><a href="?persons">Persons</a></li>
 				<li id=menuPolls><a href="?polls&asset=1">Polls</a></li>
 				<li id=menuAssets><a href="?assets">Assets</a></li>
 				<li id=menuATs><a href="?aTs">ATs</a></li>				
