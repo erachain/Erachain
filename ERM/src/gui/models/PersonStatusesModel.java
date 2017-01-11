@@ -21,6 +21,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.item.imprints.ImprintCls;
+import core.item.statuses.Status;
 import database.DBSet;
 import database.ItemStatusMap;
 import database.SortableList;
@@ -86,6 +87,9 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	}
 	*/
 	
+		public  Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStatus(int row){
+			return this.statuses.get(row);
+		}
 	
 	@Override
 	public int getColumnCount() 

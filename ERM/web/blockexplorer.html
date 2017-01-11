@@ -3206,6 +3206,35 @@ output +=   data.Label_born + ':' + data.birthday + '<br>';
 output +=   data.Label_description + ':' + data.description + '<br>';
 output +=   data.Label_gender + ':' + data.gender + '<br>';
 //output = + '<br> img:' + data.img;
+
+
+//statuses
+output += '<br>'+ data.Label_statuses +':';
+output += '<table><tr><td>'+data.Label_Status_table_status+'<td>'+data.Label_Status_table_data+ '<tr>'; 
+
+key =0;
+for(key in data.statuses) {
+output += '<tr><td>'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<tr>';
+
+key ++;
+}
+output += '</table><br>';
+
+
+// accounts
+
+output +='<br>' + data.Label_accounts + ':';
+output += '<table><tr><td>'+data.Label_accounts_table_adress+'<td>'+data.Label_accounts_table_data+ '<td>'+ data.Label_accounts_table_creator+'<tr>'; 
+
+key =0;
+for(key in data.accounts) {
+output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td>'+ data.accounts[key].creator  +'<tr>';
+
+key ++;
+}
+
+output += '</table><br>';
+
 return output;
 }
 

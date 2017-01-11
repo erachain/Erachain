@@ -65,6 +65,8 @@ import core.voting.PollOption;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
+import gui.models.PersonAccountsModel;
+import gui.models.PersonStatusesModel;
 import lang.Lang;
 import settings.Settings;
 import utils.BlExpUnit;
@@ -1482,6 +1484,43 @@ if ( asset_1 == null) {
 		String gender = Lang.getInstance().translate("Man");
 		if (person.getGender() != 0) gender = Lang.getInstance().translate("Woman");
 		output.put("gender", gender);
+		
+		// statuses
+		output.put("Label_statuses", Lang.getInstance().translate("Statuses"));
+		output.put("Label_Status_table_status", Lang.getInstance().translate("Status"));
+		output.put("Label_Status_table_data", Lang.getInstance().translate("Data"));
+		
+		
+		Map statusesJSON=new LinkedHashMap();
+		
+		 PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
+		int rowCount = statusModel.getRowCount();
+		for (int i = 0; i<rowCount; i++){
+			Map statusJSON=new LinkedHashMap();
+			statusJSON.put("status_name", statusModel.getValueAt(i, 0));
+			statusJSON.put("status_data", statusModel.getValueAt(i, 1));
+			statusesJSON.put(i, statusJSON);	
+		}
+		output.put("statuses", statusesJSON);
+		// accounts
+		output.put("Label_accounts", Lang.getInstance().translate("Accounts"));
+		output.put("Label_accounts_table_adress", Lang.getInstance().translate("Adress"));
+		output.put("Label_accounts_table_data", Lang.getInstance().translate("Data"));
+		output.put("Label_accounts_table_creator", Lang.getInstance().translate("Creator"));
+		
+		Map accountsJSON=new LinkedHashMap();
+		
+		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
+		rowCount = personModel.getRowCount();
+		for (int i = 0; i<rowCount; i++){
+			Map accountJSON=new LinkedHashMap();
+			accountJSON.put("adress", personModel.getValueAt(i, 0));
+			accountJSON.put("data", personModel.getValueAt(i, 1));
+			accountJSON.put("creator", personModel.getValueAt(i, 2));
+			accountsJSON.put(i, accountJSON);	
+		}
+		output.put("accounts", accountsJSON);
+		
 		
 		return output;
 	}
