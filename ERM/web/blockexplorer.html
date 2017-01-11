@@ -189,6 +189,14 @@ function asyncAjax (url, type){
 				
 				}
 				
+				if (type == 'person')
+				
+				{
+					document.getElementById('main').innerHTML = person(data);
+				
+				}
+				
+				
 				if(type == 'mainQuery')
 				{
 					document.getElementById('main').innerHTML = mainQuery(data);
@@ -3187,6 +3195,21 @@ function parseUrlQuery() {
     return data;
 }
 
+
+function person(data)
+{
+output = '<img src="data:image/gif;base64,' + data.img+ '"/><br>'; 
+output += 	data.Label_key+ ':' + data.key +'<br>';
+output +=   data.Label_name + ':' + data.name + '<br>';
+output +=   data.Label_creator + ':' + data.creator + '<br>';
+output +=   data.Label_born + ':' + data.birthday + '<br>';
+output +=   data.Label_description + ':' + data.description + '<br>';
+output +=   data.Label_gender + ':' + data.gender + '<br>';
+//output = + '<br> img:' + data.img;
+return output;
+}
+
+
 function persons(data)
 {
 
@@ -3214,7 +3237,7 @@ var output = '';
 	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
 	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
 	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-	output += '<td>'+addCommas(data[i].key)+'<td><a href= >'+data[i].name +'</a><td>'+data[i].creator;
+	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key +'>'+data[i].name +'</a><td>'+data[i].creator;
 	}
 	
 	output += '<tr><td colspan=4>';
@@ -3541,6 +3564,8 @@ function start() {
 		return;
 	}
 	
+	
+	
 	if(params.hasOwnProperty('unconfirmed'))
 	{
 		
@@ -3583,7 +3608,7 @@ function start() {
 	if(params.hasOwnProperty('person'))
 	{
 		
-		asyncAjax('blockexplorer.json?person=' + params['person'], 'mainQuery');
+		asyncAjax('blockexplorer.json?person=' + params['person'], 'person');
 		
 		document.title = title + ' - Person- ' + params['person'];
 		

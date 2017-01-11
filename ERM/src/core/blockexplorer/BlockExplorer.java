@@ -5,11 +5,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -51,9 +52,8 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
-import core.transaction.R_Send;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_Hashes;
+import core.transaction.R_Send;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -62,7 +62,6 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.ItemAssetBalanceMap;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
@@ -415,6 +414,16 @@ public class BlockExplorer
 				return output;
 			}
 			
+			if(info.getQueryParameters().containsKey("person"))
+			{
+				
+
+				output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
 			
 			
 
@@ -435,6 +444,15 @@ public class BlockExplorer
 
 	
 	
+	
+		
+		
+		
+		
+		
+		
+
+
 	public Map jsonQueryHelp()
 	{
 		Map help = new LinkedHashMap();
@@ -1437,6 +1455,38 @@ if ( asset_1 == null) {
 	}
 
 
+	private Map jsonQueryPerson(String first) {
+		// TODO Auto-generated method stub
+		Map output=new LinkedHashMap();
+		TableModelPersons search_Table_Model = new TableModelPersons();
+		
+		PersonCls person = search_Table_Model.getPerson(new Integer(first)-1);
+		byte[] b = person.getImage();
+		String a = Base64.encodeBase64String(b);
+		
+		output.put("Label_key", Lang.getInstance().translate("Key"));
+		output.put("Label_name", Lang.getInstance().translate("Name"));
+		output.put("Label_creator", Lang.getInstance().translate("Creator"));
+		output.put("Label_born", Lang.getInstance().translate("Birthday"));
+		output.put("Label_gender", Lang.getInstance().translate("Gender"));
+		output.put("Label_description", Lang.getInstance().translate("Description"));
+		
+	
+		output.put("img", a);
+		output.put("key", person.getKey());
+		output.put("creator", person.getCreator().asPerson());
+		output.put("name", person.getName());
+		output.put("birthday", new Date(person.getBirthday()).toString());
+		output.put("description", person.getDescription());
+		
+		String gender = Lang.getInstance().translate("Man");
+		if (person.getGender() != 0) gender = Lang.getInstance().translate("Woman");
+		output.put("gender", gender);
+		
+		return output;
+	}
+	
+	
 	public Map jsonQueryPersons(int start)
 	{
 	/*	Block block;
