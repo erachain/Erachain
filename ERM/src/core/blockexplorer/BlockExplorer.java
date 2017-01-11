@@ -1488,7 +1488,7 @@ if ( asset_1 == null) {
 		// statuses
 		output.put("Label_statuses", Lang.getInstance().translate("Statuses"));
 		output.put("Label_Status_table_status", Lang.getInstance().translate("Status"));
-		output.put("Label_Status_table_data", Lang.getInstance().translate("Data"));
+		output.put("Label_Status_table_data", Lang.getInstance().translate("Date"));
 		
 		
 		Map statusesJSON=new LinkedHashMap();
@@ -1505,7 +1505,7 @@ if ( asset_1 == null) {
 		// accounts
 		output.put("Label_accounts", Lang.getInstance().translate("Accounts"));
 		output.put("Label_accounts_table_adress", Lang.getInstance().translate("Adress"));
-		output.put("Label_accounts_table_data", Lang.getInstance().translate("Data"));
+		output.put("Label_accounts_table_data", Lang.getInstance().translate("Date"));
 		output.put("Label_accounts_table_creator", Lang.getInstance().translate("Creator"));
 		
 		Map accountsJSON=new LinkedHashMap();
