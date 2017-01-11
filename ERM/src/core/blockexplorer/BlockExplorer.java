@@ -52,6 +52,7 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.Issue_ItemRecord;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.R_Send;
 import core.transaction.RegisterNameTransaction;
@@ -67,6 +68,7 @@ import database.SortableList;
 import gui.items.persons.TableModelPersons;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
+import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 import settings.Settings;
 import utils.BlExpUnit;
@@ -1530,6 +1532,8 @@ if ( asset_1 == null) {
 		
 		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
 		rowCount = personModel.getRowCount();
+		
+		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
 		for (int i = 0; i<rowCount; i++){
 			Map accountJSON=new LinkedHashMap();
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
@@ -1540,8 +1544,45 @@ if ( asset_1 == null) {
 			accountJSON.put("creator_name", cc.getName());
 			accountJSON.put("creator_key", cc.getKey());
 			accountsJSON.put(i, accountJSON);	
+			
+			String acc = personModel.getValueAt(i, 0).toString();
+			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
+		
+//			trans.addAll(tt); // "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"
 		}
 		output.put("accounts", accountsJSON);
+		
+	// my persons
+		
+		output.put("Label_My_Persons", Lang.getInstance().translate("My Persons"));
+		output.put("Label_My_Person_key", Lang.getInstance().translate("Key"));
+		output.put("Label_My_Persons_Name", Lang.getInstance().translate("Name"));
+			
+		Map my_Persons_JSON=new LinkedHashMap();
+		
+
+		
+		
+		int i = 0;
+		for ( Transaction my_Issue_Person:my_Issue_Persons){
+			Map my_Person_JSON=new LinkedHashMap();
+			Issue_ItemRecord record = (Issue_ItemRecord) my_Issue_Person;
+			ItemCls item = record.getItem();
+			
+			my_Person_JSON.put("key", item.getKey());
+			my_Person_JSON.put("name",item.getName());
+			my_Person_JSON.put("date",new Date(my_Issue_Person.getTimestamp()).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
+			my_Persons_JSON.put(i, my_Person_JSON);
+			i++;
+		}
+		
+		output.put("My_Persons", my_Persons_JSON);
+		
+		
+		
+		
+		
+		
 		
 		
 		return output;
