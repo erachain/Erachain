@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple6;
 
 import at.AT;
@@ -1764,9 +1765,25 @@ if ( asset_1 == null) {
 			}
 			couter ++;
 
+						
+			Account account = new Account(top100.a);
+			
+			Tuple2<Integer, PersonCls> person = account.getPerson();
+			
 			Map balance=new LinkedHashMap();
 			balance.put("address", top100.a);
 			balance.put("balance", top100.b.toPlainString());
+			
+			if (person != null){
+			balance.put("person", person.b.getName());
+			balance.put("person_key", person.b.getKey());
+			} else{
+				balance.put("person", "-");
+				balance.put("person_key", "-");//(String)person.b.getKey());	
+				
+			}
+				
+			
 			balances.put(couter, balance);
 
 			if(couter >= limit && limit != -2 && limit != -1) // -2 = all
@@ -1775,6 +1792,12 @@ if ( asset_1 == null) {
 			}
 		}
 
+		output.put("Label_Table_Account", Lang.getInstance().translate("Account"));
+		output.put("Label_Table_Balance", Lang.getInstance().translate("Balance"));
+		output.put("Label_Table_Prop", Lang.getInstance().translate("Prop."));
+		output.put("Label_Table_person", Lang.getInstance().translate("Owner"));
+		
+		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
 		output.put("allTotal", (all.add(alloreders)).toPlainString());

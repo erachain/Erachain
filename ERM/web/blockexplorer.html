@@ -456,11 +456,17 @@ function topRichest(data)
 	}
 	
 	
-	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>Address<td><b>Balance<td><b>Prop.'; 
+	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance+'<td><b>'+data.Label_Table_Prop; 
 
 	for(key in data.top) {
 		table += '<tr>';		
-		table += '<td>'+ key + '<td>' + '<a href=?addr='+data.top[key].address+'>' + data.top[key].address;
+		table += '<td>'+ key + '<td>' + '<a href="?addr='+data.top[key].address+'">' + data.top[key].address + '</a>';
+		
+		if (data.top[key].person_key !='-'){
+		table += '<td><a href="?person='+data.top[key].person_key+'">' + data.top[key].person+ '</a>';
+		}else{
+		table += '<td>' + data.top[key].person;
+		}
 		table += '<td>' + addCommas(data.top[key].balance) + '<td>' +  ((data.top[key].balance / data.allTotal) * 100).toFixed(2) + " %";
 	}
 	table += '</table>';
@@ -3217,11 +3223,11 @@ output +=   '</table>';
 
 //statuses
 output += '<br>'+ data.Label_statuses +':';
-output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+'<td><b>'+ data.Label_accounts_table_creator + '<tr>'; 
+output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+'<td><b>'+ data.Label_accounts_table_creator + '<tr>'; 
 
 key =0;
 for(key in data.statuses) {
-output += '<tr><td>'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+'">'+ data.statuses[key].status_creator  +'</a><tr>';
+output += '<tr ><td >'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+'">'+ data.statuses[key].status_creator  +'</a><tr>';
 
 key ++;
 }
@@ -3231,7 +3237,7 @@ output += '</table><br>';
 // accounts
 
 output +='<br>' + data.Label_accounts + ':';
-output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_accounts_table_adress+'<td><b>'+data.Label_accounts_table_data+ '<td><b>'+ data.Label_accounts_table_creator+'<tr>'; 
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_accounts_table_adress+'<td><b>'+data.Label_accounts_table_data+ '<td><b>'+ data.Label_accounts_table_creator+'<tr>'; 
 
 key =0;
 for(key in data.accounts) {
@@ -3240,8 +3246,11 @@ output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +
 key ++;
 }
 output += '</table><br>';
+
+//my p3ersons
 output +='<br>' + data.Label_My_Persons + ':';
-output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+ data.Label_accounts_table_data +'<td><b>'+data.Label_My_Person_key+'<td><b>'+data.Label_My_Persons_Name+ '<tr>'; 
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+ data.Label_accounts_table_data +'<td><b>'+data.Label_My_Person_key+'<td><b>'+data.Label_My_Persons_Name+ '<tr>'; 
+
 
 key =0;
 for(key in data.My_Persons){
