@@ -1477,6 +1477,9 @@ if ( asset_1 == null) {
 		output.put("img", a);
 		output.put("key", person.getKey());
 		output.put("creator", person.getCreator().getPersonAsString());
+		
+		output.put("creator_key", person.getCreator().getPerson().b.getKey());
+		output.put("creator_name", person.getCreator().getPerson().b.getName());
 		output.put("name", person.getName());
 		output.put("birthday", new Date(person.getBirthday()).toString());
 		output.put("description", person.getDescription());
@@ -1499,6 +1502,21 @@ if ( asset_1 == null) {
 			Map statusJSON=new LinkedHashMap();
 			statusJSON.put("status_name", statusModel.getValueAt(i, 0));
 			statusJSON.put("status_data", statusModel.getValueAt(i, 1));
+			Object creat = statusModel.getValueAt(i, 2);
+			if (!creat.equals("")){
+				statusJSON.put("status_creator", creat.toString());
+				
+				PersonCls pp = (PersonCls) statusModel.getValueAt(i, 3);
+				statusJSON.put("status_creator_name", pp.getName());
+				statusJSON.put("status_creator_key", pp.getKey());
+				} else {
+					statusJSON.put("status_creator", "");
+					statusJSON.put("status_creator_key", "");
+					statusJSON.put("status_creator_name","");
+				}
+			
+			
+			
 			statusesJSON.put(i, statusJSON);	
 		}
 		output.put("statuses", statusesJSON);
@@ -1516,7 +1534,11 @@ if ( asset_1 == null) {
 			Map accountJSON=new LinkedHashMap();
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
 			accountJSON.put("data", personModel.getValueAt(i, 1));
+			PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
+			
 			accountJSON.put("creator", personModel.getValueAt(i, 2));
+			accountJSON.put("creator_name", cc.getName());
+			accountJSON.put("creator_key", cc.getKey());
 			accountsJSON.put(i, accountJSON);	
 		}
 		output.put("accounts", accountsJSON);

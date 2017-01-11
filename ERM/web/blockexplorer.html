@@ -3207,7 +3207,7 @@ output += '<table><tr><td>';
 output += '<img src="data:image/gif;base64,' + data.img+ '"/></td><td style ="padding-left:20px">'; 
 output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
 output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
-output +=   data.Label_creator + ': &nbsp&nbsp<a href><b> ' + data.creator + '</b></a><br>';
+output +=   data.Label_creator + ': &nbsp&nbsp<a href ="?person='+ data.creator_key+'"><b> ' + data.creator + '</b></a><br>';
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
@@ -3217,11 +3217,11 @@ output +=   '</table>';
 
 //statuses
 output += '<br>'+ data.Label_statuses +':';
-output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+ '<tr>'; 
+output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+'<td><b>'+ data.Label_accounts_table_creator + '<tr>'; 
 
 key =0;
 for(key in data.statuses) {
-output += '<tr><td>'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<tr>';
+output += '<tr><td>'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+'">'+ data.statuses[key].status_creator  +'</a><tr>';
 
 key ++;
 }
@@ -3235,7 +3235,7 @@ output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="1180"
 
 key =0;
 for(key in data.accounts) {
-output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td><a href>'+ data.accounts[key].creator  +'</a><tr>';
+output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+'">'+ data.accounts[key].creator  +'</a><tr>';
 
 key ++;
 }
@@ -3647,10 +3647,10 @@ function start() {
 	{
 		
 		asyncAjax('blockexplorer.json?person=' + params['person'], 'person');
+//		a =  decodeURIComponent(params['title']);
+		document.title = title ;//+  + decodeURIComponent(params['title']);
 		
-		document.title = title + ' - Person- ' + params['person'];
-		
-		document.getElementById('q').value = decodeURIComponent(params['person']);
+	//	document.getElementById('q').value = decodeURIComponent(params['person']);
 		
 		return;
 	}
