@@ -1504,7 +1504,7 @@ if ( asset_1 == null) {
 		output.put("statuses", statusesJSON);
 		// accounts
 		output.put("Label_accounts", Lang.getInstance().translate("Accounts"));
-		output.put("Label_accounts_table_adress", Lang.getInstance().translate("Adress"));
+		output.put("Label_accounts_table_adress", Lang.getInstance().translate("Address"));
 		output.put("Label_accounts_table_data", Lang.getInstance().translate("Date"));
 		output.put("Label_accounts_table_creator", Lang.getInstance().translate("Creator"));
 		

@@ -3198,19 +3198,26 @@ function parseUrlQuery() {
 
 function person(data)
 {
-output = '<img src="data:image/gif;base64,' + data.img+ '"/><br>'; 
-output += 	data.Label_key+ ':' + data.key +'<br>';
-output +=   data.Label_name + ':' + data.name + '<br>';
-output +=   data.Label_creator + ':' + data.creator + '<br>';
-output +=   data.Label_born + ':' + data.birthday + '<br>';
-output +=   data.Label_description + ':' + data.description + '<br>';
-output +=   data.Label_gender + ':' + data.gender + '<br>';
+
+output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+output += '<tr><td align=left>';
+output += '<table><tr><td>';
+
+
+output += '<img src="data:image/gif;base64,' + data.img+ '"/></td><td style ="padding-left:20px">'; 
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+output +=   data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
+output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
+output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
+output +=   '</table>';
 //output = + '<br> img:' + data.img;
 
 
 //statuses
 output += '<br>'+ data.Label_statuses +':';
-output += '<table><tr><td>'+data.Label_Status_table_status+'<td>'+data.Label_Status_table_data+ '<tr>'; 
+output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+ '<tr>'; 
 
 key =0;
 for(key in data.statuses) {
@@ -3224,7 +3231,7 @@ output += '</table><br>';
 // accounts
 
 output +='<br>' + data.Label_accounts + ':';
-output += '<table><tr><td>'+data.Label_accounts_table_adress+'<td>'+data.Label_accounts_table_data+ '<td>'+ data.Label_accounts_table_creator+'<tr>'; 
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_accounts_table_adress+'<td><b>'+data.Label_accounts_table_data+ '<td><b>'+ data.Label_accounts_table_creator+'<tr>'; 
 
 key =0;
 for(key in data.accounts) {
