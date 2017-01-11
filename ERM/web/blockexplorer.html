@@ -3207,7 +3207,7 @@ output += '<table><tr><td>';
 output += '<img src="data:image/gif;base64,' + data.img+ '"/></td><td style ="padding-left:20px">'; 
 output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
 output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
-output +=   data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
+output +=   data.Label_creator + ': &nbsp&nbsp<a href><b> ' + data.creator + '</b></a><br>';
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
@@ -3235,7 +3235,7 @@ output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="1180"
 
 key =0;
 for(key in data.accounts) {
-output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td>'+ data.accounts[key].creator  +'<tr>';
+output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td><a href>'+ data.accounts[key].creator  +'</a><tr>';
 
 key ++;
 }
@@ -3323,6 +3323,8 @@ function buttonSearch() {
 
 function start() {
     
+	
+	
 	document.getElementById('main').innerHTML = '';
 	 
 	document.getElementById('home').href = document.location.pathname;
@@ -3714,7 +3716,7 @@ function start() {
       <div class="row">
         <div class="main-tabs">
           <div class="container">
-            <div class="row">
+            <div class="row" id="main-menu" >
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
 				<li id=menuTop100Richest><a href="?top=100">Top 100 Richest</a></li>
@@ -3757,4 +3759,5 @@ function start() {
 
 </table>
 </body>
+
 </html>
