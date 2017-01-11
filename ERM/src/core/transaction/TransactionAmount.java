@@ -105,7 +105,7 @@ public abstract class TransactionAmount extends Transaction {
 	// VIEW
 	@Override
 	public String viewRecipient() {
-		return recipient.asPerson();
+		return recipient.getPersonAsString();
 	}
 	
 	@Override

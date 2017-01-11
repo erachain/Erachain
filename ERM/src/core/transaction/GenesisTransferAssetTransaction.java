@@ -118,7 +118,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	@Override
 	public String viewRecipient() {
-		return recipient.asPerson();
+		return recipient.getPersonAsString();
 	}
 
 	@SuppressWarnings("unchecked")

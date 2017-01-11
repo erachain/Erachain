@@ -411,7 +411,7 @@ public class BlockGenerator extends Thread implements Observer
 				}
 
 				LOGGER.info("for height and target: " + height + " : " + target
-						+ " Selected max_winned_value: " + max_winned_value + " " + acc_winner.asPerson());
+						+ " Selected max_winned_value: " + max_winned_value + " " + acc_winner.getPersonAsString());
 				LOGGER.info("wait_new_good_block: " + wait_new_good_block);
 
 				// wait more good new block from NET

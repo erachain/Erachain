@@ -148,14 +148,14 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			if (trans == null)
 				return null;
 			
-			return trans.getCreator().asPerson_01(true);
+			return trans.getCreator().getPersonAsString_01(true);
 			
 		case 4:
 			if (trans == null)
 				return null;
 			
 			
-			return trans.getCreator().hasPerson().b.getKey();
+			return trans.getCreator().getPerson().b.getKey();
 		}
 		
 		

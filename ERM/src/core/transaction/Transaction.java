@@ -662,7 +662,7 @@ public abstract class Transaction {
 	}
 
 	public String viewCreator() {
-		return creator==null?"GENESIS":creator.asPerson();
+		return creator==null?"GENESIS":creator.getPersonAsString();
 	}
 	public String viewRecipient() {
 		return "";

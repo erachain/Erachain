@@ -84,7 +84,7 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
 			
 		case COLUMN_OWNER:
 			 
-			return account.asPerson();
+			return account.getPersonAsString();
 			
 		case COLUMN_PRICE:
 			

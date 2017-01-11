@@ -439,7 +439,7 @@ public class Statements_Table_Model extends JTable implements Observer{
 		messageBufs.add(pos, new MessageBuf(
 				transaction.getData(), 
 				transaction.isEncrypted(),
-				transaction.getCreator().asPerson(),
+				transaction.getCreator().getPersonAsString(),
 			//	transaction.getRecipient().asPerson(),
 				transaction.getTimestamp(),
 				transaction.getAmount(),

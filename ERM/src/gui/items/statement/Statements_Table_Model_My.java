@@ -245,7 +245,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			case COLUMN_CREATOR:
 				
 				
-				return record.getCreator().asPerson();
+				return record.getCreator().getPersonAsString();
 			}
 			
 			return null;

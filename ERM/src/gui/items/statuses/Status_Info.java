@@ -48,7 +48,7 @@ public class Status_Info extends JTextPane {
 
 		String creator = status.getCreator().getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)?
 				"GENESIS":
-					status.getCreator().asPerson_01(false);
+					status.getCreator().getPersonAsString_01(false);
 
 		message += "<div> Creator: " + (creator.length()==0?status.getCreator().getAddress():creator) + "</div>";
 

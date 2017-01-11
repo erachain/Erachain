@@ -86,7 +86,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 		{
 		case COLUMN_ADDRESS:
 			
-			return account.asPerson();
+			return account.getPersonAsString();
 			
 		case COLUMN_BALANCE:
 			

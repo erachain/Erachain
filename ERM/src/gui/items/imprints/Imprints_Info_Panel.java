@@ -132,7 +132,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 9);
         add(owner_jLabel, gridBagConstraints);
-        owner_jTextField.setText(imprint.getCreator().asPerson());
+        owner_jTextField.setText(imprint.getCreator().getPersonAsString());
         owner_jTextField.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;

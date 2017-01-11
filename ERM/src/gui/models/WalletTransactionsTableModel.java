@@ -292,7 +292,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 							PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature()) ;
 						}
 						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().asPerson() + "\nTo: " + account.asPerson()
+						SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
 						+ "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
 						+ ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
 					}

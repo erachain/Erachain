@@ -167,7 +167,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		switch(column)
 		{
 		case COLUMN_ADDRESS:			
-			return account.asPerson();
+			return account.getPersonAsString();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));

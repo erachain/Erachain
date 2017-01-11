@@ -1476,7 +1476,7 @@ if ( asset_1 == null) {
 	
 		output.put("img", a);
 		output.put("key", person.getKey());
-		output.put("creator", person.getCreator().asPerson());
+		output.put("creator", person.getCreator().getPersonAsString());
 		output.put("name", person.getName());
 		output.put("birthday", new Date(person.getBirthday()).toString());
 		output.put("description", person.getDescription());

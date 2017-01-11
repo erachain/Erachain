@@ -86,7 +86,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
 		{
 		case COLUMN_ADDRESS:
 			
-			return account.asPerson();
+			return account.getPersonAsString();
 			
 		case COLUMN_BALANCE:
 			

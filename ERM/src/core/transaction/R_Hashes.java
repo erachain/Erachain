@@ -386,7 +386,7 @@ public class R_Hashes extends Transaction {
 		}
 
 		long personKey;
-		Tuple2<Integer, PersonCls> asPerson = this.creator.hasPerson(db);
+		Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(db);
 		if (asPerson != null && asPerson.a >= 0) {
 			personKey = asPerson.b.getKey(db);
 		} else {

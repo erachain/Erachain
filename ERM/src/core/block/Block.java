@@ -1337,7 +1337,7 @@ public class Block {
 		return "H:" + this.getHeightByParent(dbSet)
 			+ " W: " + this.calcWinValue(dbSet)
 			+ "WT: " + this.calcWinValueTargeted(dbSet)
-			+ " C: " + this.getCreator().asPerson();
+			+ " C: " + this.getCreator().getPersonAsString();
 	}
 	
 }
