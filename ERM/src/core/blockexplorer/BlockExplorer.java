@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -83,7 +85,8 @@ public class BlockExplorer
 	
 	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
 	private static BlockExplorer blockExplorer;
-	
+	private Locale local = new Locale("ru","RU"); // формат даты
+	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // для формата даты
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 
 
@@ -1483,7 +1486,7 @@ if ( asset_1 == null) {
 		output.put("creator_key", person.getCreator().getPerson().b.getKey());
 		output.put("creator_name", person.getCreator().getPerson().b.getName());
 		output.put("name", person.getName());
-		output.put("birthday", new Date(person.getBirthday()).toString());
+		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
 		output.put("description", person.getDescription());
 		
 		String gender = Lang.getInstance().translate("Man");
@@ -1571,7 +1574,11 @@ if ( asset_1 == null) {
 			
 			my_Person_JSON.put("key", item.getKey());
 			my_Person_JSON.put("name",item.getName());
-			my_Person_JSON.put("date",new Date(my_Issue_Person.getTimestamp()).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
+			
+			
+			
+			
+			my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
 			my_Persons_JSON.put(i, my_Person_JSON);
 			i++;
 		}
