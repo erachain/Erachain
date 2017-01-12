@@ -1791,7 +1791,7 @@ if ( asset_1 == null) {
 				break;
 			}
 		}
-
+		 AssetCls asset = Controller.getInstance().getAsset(key);
 		output.put("Label_Table_Account", Lang.getInstance().translate("Account"));
 		output.put("Label_Table_Balance", Lang.getInstance().translate("Balance"));
 		output.put("Label_Table_Prop", Lang.getInstance().translate("Prop."));
@@ -1800,9 +1800,9 @@ if ( asset_1 == null) {
 		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
-		output.put("allTotal", (all.add(alloreders)).toPlainString());
+		output.put("allTotal",asset.getTotalQuantity());//(all.add(alloreders)).toPlainString());
 		output.put("assetKey", key);
-		output.put("assetName", Controller.getInstance().getAsset(key).getName());
+		output.put("assetName",asset.getName());
 		output.put("limit", limit);
 		output.put("count", couter);
 
@@ -2272,6 +2272,8 @@ if ( asset_1 == null) {
 	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
 		DBSet db = DBSet.getInstance();
+		
+		List<Transaction> tt = db.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
 
 		TreeSet<BlExpUnit> all = new TreeSet<>();
 	

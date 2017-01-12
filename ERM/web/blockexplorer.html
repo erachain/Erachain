@@ -3241,7 +3241,7 @@ output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" 
 
 key =0;
 for(key in data.accounts) {
-output += '<tr><td>'+data.accounts[key].adress+'<td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+'">'+ data.accounts[key].creator  +'</a><tr>';
+output += '<tr><td><a href = "?addr='+data.accounts[key].adress+'">'+data.accounts[key].adress+'</a><td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+'">'+ data.accounts[key].creator  +'</a><tr>';
 
 key ++;
 }
