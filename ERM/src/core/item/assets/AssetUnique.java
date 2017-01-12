@@ -37,6 +37,10 @@ public class AssetUnique extends AssetCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "unique"; }
 
+	public Long getQuantity() {
+		return 1L;
+	}
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static AssetUnique parse(byte[] data, boolean includeReference) throws Exception
