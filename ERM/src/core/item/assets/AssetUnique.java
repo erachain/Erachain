@@ -40,6 +40,9 @@ public class AssetUnique extends AssetCls {
 	public Long getQuantity() {
 		return 1L;
 	}
+	public Long getTotalQuantity() {
+		return 1L;
+	}
 
 	//PARSE
 	// includeReference - TRUE only for store in local DB

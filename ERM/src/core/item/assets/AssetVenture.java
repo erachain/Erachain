@@ -51,7 +51,11 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
-	public Long getQuantity() {
+	public Long getQuantity() {		
+		return this.quantity;
+	}
+
+	public Long getTotalQuantity() {
 		
 		if (this.quantity == 0) {
 			// IF UNLIMIT QIUNTITY
@@ -65,7 +69,7 @@ public class AssetVenture extends AssetCls {
 			return this.quantity;
 		}
 	}
-
+	
 	@Override
 	public boolean isDivisible() {
 		return this.divisible;

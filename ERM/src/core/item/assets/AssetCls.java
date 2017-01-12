@@ -102,6 +102,7 @@ public abstract class AssetCls extends ItemCls {
 	}
 	
 	public abstract Long getQuantity();
+	public abstract Long getTotalQuantity();
 
 	public boolean isDivisible() {
 		return true;
