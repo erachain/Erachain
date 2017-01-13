@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.16.07";
-	private String buildTime = "2017-01-12 12:12:12 UTC";
+	private String version = "2.16.08";
+	private String buildTime = "2017-01-13 12:12:12 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
