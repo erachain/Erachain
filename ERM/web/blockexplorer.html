@@ -1166,9 +1166,18 @@ function mainQuery(data) {
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			
 			output += '<br>';
-			output +='<font size="+1">Standard Account11: <a href="?addr=' + data.address + '">' + data.address + '</a></font>';
+			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + '">' + data.account + '</a></font>';
 			output += '<br><br>';
+			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_confirmations+'<td><b>'+data.label_date+'<td><b>'+ data.label_type_transaction+'<td><b>'+data.label_creator+'<td><b>'+data.label_asset+'<td><b>'+data.label_amount+'<td><b>'+ data.label_recipient+'<td><b>'+ data.label_size+'</tr>';
+			for (key in data.transaction){
+			
+			output += '<tr><td>'+ data.transaction[key].block +'<td>'+data.transaction[key].confirmations+'<td>'+data.transaction[key].date+'<td>'+ data.transaction[key].type+'<td>'+ data.transaction[key].creator +'<td>'+ data.transaction[key].item_name +'<td>'+ data.transaction[key].amount + '<td>'+ data.transaction[key].recipient + '<td>'+ data.transaction[key].size +'</td></tr>';
+			
+			}
+			output +='</table></td></tr></table>';
+			/*
 			if(data.countTx.hasOwnProperty('txsCount'))
 			{
 				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
@@ -1229,7 +1238,7 @@ function mainQuery(data) {
 			}
 
 			output += totalBalance+ '</font></b><br>';
-
+*/
 		}
 
 		if(data.type == 'block')
@@ -1423,7 +1432,8 @@ function mainQuery(data) {
 			output += '<font size="+1">Trade</font><br>';
 		}
 		
-		if(data.type == 'standardAccount' || data.type == 'at')
+		//if(data.type == 'standardAccount' || data.type == 'at')
+		if( data.type == 'at')
 		{
 			output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
 		}	
@@ -2913,7 +2923,8 @@ function mainQuery(data) {
 				}
 			}
 		
-			if(data.type == 'standardAccount' || data.type == 'at')
+		//	if(data.type == 'standardAccount' || data.type == 'at')
+		if(data.type == 'at')
 			{
 				output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
 			}
