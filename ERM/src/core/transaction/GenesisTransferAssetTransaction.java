@@ -267,7 +267,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
 			// SKIP Genesis Block
-			this.recipient.setLastForgingData(db, 2);
+			//this.recipient.setLastForgingData(db, 2);
+			this.recipient.setForgingData(db, 2);
 		}
 
 		if (key < 0) {
@@ -297,7 +298,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// ORPHAN FORGING DATA
-			this.recipient.setLastForgingData(db, -1);
+			////this.recipient.setLastForgingData(db, -1);
+			this.recipient.delForgingData(db, 2);
 		}
 
 		if (key < 0) {

@@ -67,19 +67,49 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 	public void set(String address, int height, int previosHeight) 
 	{
 		// TODO some error here 
-		if (height > previosHeight)
+		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {
+			// err
+			int hh = this.get(address, height);
+			hh++;
+			int hh2 = this.get(address, previosHeight);
+		}
+
+		if (height > previosHeight) {
 			this.set(new Tuple2<String, Integer>(address, height), previosHeight);
+		} else {
+			int rr = 1;
+			rr++;
+		}
+
+		this.setLast(address, height);
+		
 	}	
 	public void delete(String address, int height) 
 	{
-		this.delete(new Tuple2<String, Integer>(address, height));
+		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {
+			// err
+			int hh = this.get(address, height);
+			hh++;
+		}
+				
+		Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
+		int prevHeight = this.get(key);
+		this.delete(key);
+		this.setLast(address, prevHeight);
+		
 	}	
 	public Integer getLast(String address) 
 	{
 		return this.get(new Tuple2<String, Integer>(address, 0));
 	}	
-	public void setLast(String address, int previosHeight) 
+	private void setLast(String address, int previosHeight) 
 	{
+		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {
+			// err
+			int hh = this.getLast(address);
+			hh++;
+		}
+		
 		this.set(new Tuple2<String, Integer>(address, 0), previosHeight);
 	}	
 }

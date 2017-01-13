@@ -241,7 +241,7 @@ public class DBSet implements Observer, IDB {
 	protected DBSet(DBSet parent)
 	{
 		
-		this.uses = 1;
+		this.uses++;
 		
 		//DB database = DBMaker.newMemoryDB().make();
 

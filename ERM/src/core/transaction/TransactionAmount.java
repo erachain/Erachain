@@ -414,7 +414,8 @@ public abstract class TransactionAmount extends Transaction {
 
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 2;
-			this.recipient.setLastForgingData(db, blockHeight);
+			//this.recipient.setLastForgingData(db, blockHeight);
+			this.recipient.setForgingData(db, blockHeight);
 		}
 	}
 
@@ -462,8 +463,8 @@ public abstract class TransactionAmount extends Transaction {
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
 				// if it is first payment ERMO - reset last forging BLOCK
-				//this.recipient.delForgingData(db, blockHeight);
-				this.recipient.setLastForgingData(db, -1);
+				this.recipient.delForgingData(db, blockHeight);
+				////this.recipient.setLastForgingData(db, -1);
 			}
 		}
 	}

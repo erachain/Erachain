@@ -561,7 +561,8 @@ public class BlockTests
 		//ADD TRANSACTION SIGNATURE
 		block.setTransactions(transactions);
 
-		generator.setLastForgingData(db, block.getHeightByParent(db));
+		////generator.setLastForgingData(db, block.getHeightByParent(db));
+		generator.setForgingData(db, block.getHeightByParent(db));
 		block.setCalcGeneratingBalance(db);
 		block.sign(generator);
 		

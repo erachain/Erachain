@@ -678,15 +678,21 @@ public class Account {
 	public void setForgingData(DBSet db, int height, int prevHeight) {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
+	public void setForgingData(DBSet db, int height) {
+		int previousForgingHeight = this.getForgingData(db, height);
+		db.getAddressForging().set(this.address, height, previousForgingHeight);
+	}
 	public void delForgingData(DBSet db, int height) {
 		db.getAddressForging().delete(this.address, height);
 	}
 	public Integer getLastForgingData(DBSet db) {
 		return db.getAddressForging().getLast(this.address);
 	}
+	/*
 	public void setLastForgingData(DBSet db, int prevHeight) {
 		db.getAddressForging().setLast(this.address, prevHeight);
 	}
+	*/
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
 	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
