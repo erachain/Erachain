@@ -5,27 +5,32 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.JTextField;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple6;
 
 import at.AT;
@@ -40,6 +45,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
+import core.item.persons.PersonCls;
 import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransaction;
@@ -49,10 +55,13 @@ import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
+import core.transaction.GenesisIssue_ItemRecord;
+import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
-import core.transaction.R_Send;
+import core.transaction.Issue_ItemRecord;
 import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_Hashes;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
@@ -61,9 +70,12 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.ItemAssetBalanceMap;
 import database.DBSet;
 import database.SortableList;
+import gui.items.persons.TableModelPersons;
+import gui.models.PersonAccountsModel;
+import gui.models.PersonStatusesModel;
+import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 import settings.Settings;
 import utils.BlExpUnit;
@@ -78,7 +90,8 @@ public class BlockExplorer
 	
 	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
 	private static BlockExplorer blockExplorer;
-	
+	private Locale local = new Locale("ru","RU"); // формат даты
+	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // для формата даты
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 
 
@@ -394,6 +407,37 @@ public class BlockExplorer
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
 			}
+			
+			
+			if(info.getQueryParameters().containsKey("persons"))
+			{
+				int start = -1;
+
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+				}
+
+//				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryPersons(start));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			if(info.getQueryParameters().containsKey("person"))
+			{
+				
+
+				output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			
+			
 
 			output.put("queryTimeMs", stopwatchAll.elapsedTime());
 
@@ -409,6 +453,16 @@ public class BlockExplorer
 
 		return output;
 	}
+
+	
+	
+	
+		
+		
+		
+		
+		
+		
 
 
 	public Map jsonQueryHelp()
@@ -1412,6 +1466,251 @@ if ( asset_1 == null) {
 		return output;
 	}
 
+
+	private Map jsonQueryPerson(String first) {
+		// TODO Auto-generated method stub
+		Map output=new LinkedHashMap();
+		TableModelPersons search_Table_Model = new TableModelPersons();
+		
+		PersonCls person = search_Table_Model.getPerson(new Integer(first)-1);
+		byte[] b = person.getImage();
+		String a = Base64.encodeBase64String(b);
+		
+		output.put("Label_key", Lang.getInstance().translate("Key"));
+		output.put("Label_name", Lang.getInstance().translate("Name"));
+		output.put("Label_creator", Lang.getInstance().translate("Creator"));
+		output.put("Label_born", Lang.getInstance().translate("Birthday"));
+		output.put("Label_gender", Lang.getInstance().translate("Gender"));
+		output.put("Label_description", Lang.getInstance().translate("Description"));
+		
+	
+		output.put("img", a);
+		output.put("key", person.getKey());
+		output.put("creator", person.getCreator().getPersonAsString());
+		
+		output.put("creator_key", person.getCreator().getPerson().b.getKey());
+		output.put("creator_name", person.getCreator().getPerson().b.getName());
+		output.put("name", person.getName());
+		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
+		output.put("description", person.getDescription());
+		
+		String gender = Lang.getInstance().translate("Man");
+		if (person.getGender() != 0) gender = Lang.getInstance().translate("Woman");
+		output.put("gender", gender);
+		
+		// statuses
+		output.put("Label_statuses", Lang.getInstance().translate("Statuses"));
+		output.put("Label_Status_table_status", Lang.getInstance().translate("Status"));
+		output.put("Label_Status_table_data", Lang.getInstance().translate("Date"));
+		
+		
+		Map statusesJSON=new LinkedHashMap();
+		
+		 PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
+		int rowCount = statusModel.getRowCount();
+		for (int i = 0; i<rowCount; i++){
+			Map statusJSON=new LinkedHashMap();
+			statusJSON.put("status_name", statusModel.getValueAt(i, 0));
+			statusJSON.put("status_data", statusModel.getValueAt(i, 1));
+			Object creat = statusModel.getValueAt(i, 2);
+			if (!creat.equals("")){
+				statusJSON.put("status_creator", creat.toString());
+				
+				PersonCls pp = (PersonCls) statusModel.getValueAt(i, 3);
+				statusJSON.put("status_creator_name", pp.getName());
+				statusJSON.put("status_creator_key", pp.getKey());
+				} else {
+					statusJSON.put("status_creator", "");
+					statusJSON.put("status_creator_key", "");
+					statusJSON.put("status_creator_name","");
+				}
+			
+			
+			
+			statusesJSON.put(i, statusJSON);	
+		}
+		output.put("statuses", statusesJSON);
+		// accounts
+		output.put("Label_accounts", Lang.getInstance().translate("Accounts"));
+		output.put("Label_accounts_table_adress", Lang.getInstance().translate("Address"));
+		output.put("Label_accounts_table_data", Lang.getInstance().translate("Date"));
+		output.put("Label_accounts_table_creator", Lang.getInstance().translate("Creator"));
+		
+		Map accountsJSON=new LinkedHashMap();
+		
+		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
+		rowCount = personModel.getRowCount();
+		
+		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
+		for (int i = 0; i<rowCount; i++){
+			Map accountJSON=new LinkedHashMap();
+			accountJSON.put("adress", personModel.getValueAt(i, 0));
+			accountJSON.put("data", personModel.getValueAt(i, 1));
+			PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
+			
+			accountJSON.put("creator", personModel.getValueAt(i, 2));
+			accountJSON.put("creator_name", cc.getName());
+			accountJSON.put("creator_key", cc.getKey());
+			accountsJSON.put(i, accountJSON);	
+			
+			String acc = personModel.getValueAt(i, 0).toString();
+			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
+		
+//			trans.addAll(tt); // "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"
+		}
+		output.put("accounts", accountsJSON);
+		
+	// my persons
+		
+		output.put("Label_My_Persons", Lang.getInstance().translate("My Persons"));
+		output.put("Label_My_Person_key", Lang.getInstance().translate("Key"));
+		output.put("Label_My_Persons_Name", Lang.getInstance().translate("Name"));
+			
+		Map my_Persons_JSON=new LinkedHashMap();
+		
+
+		
+		
+		int i = 0;
+		for ( Transaction my_Issue_Person:my_Issue_Persons){
+			Map my_Person_JSON=new LinkedHashMap();
+			Issue_ItemRecord record = (Issue_ItemRecord) my_Issue_Person;
+			ItemCls item = record.getItem();
+			
+			my_Person_JSON.put("key", item.getKey());
+			my_Person_JSON.put("name",item.getName());
+			
+			
+			
+			
+			my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
+			my_Persons_JSON.put(i, my_Person_JSON);
+			i++;
+		}
+		
+		output.put("My_Persons", my_Persons_JSON);
+		
+		
+		
+		
+		
+		
+		
+		
+		return output;
+	}
+	
+	
+	public Map jsonQueryPersons(int start)
+	{
+	/*	Block block;
+		if(start > 0)
+		{
+			block = Controller.getInstance().getBlockByHeight(start);
+		}
+		else
+		{
+			block = getLastBlock();	
+			start = block.getHeight(DBSet.getInstance()); 
+		}
+*/
+		Map output=new LinkedHashMap();
+		TableModelPersons search_Table_Model = new TableModelPersons();
+		
+
+		output.put("row", search_Table_Model.getRowCount());
+
+		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
+		
+		// TODO Lang.getInstance().translate(
+		
+		output.put("Label_key", Lang.getInstance().translate("Key"));
+		output.put("Label_name", Lang.getInstance().translate("Name"));
+		output.put("Label_creator", Lang.getInstance().translate("Creator"));
+		
+	/*	
+		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
+		output.put("Label_Height", "Height");
+		output.put("Label_Time", "Time");
+		output.put("Label_Generator", "Creator");
+		output.put("Label_Gen_balance", "Gen.Balance");
+		output.put("Label_TXs", "TXs");
+		output.put("Label_Fee", "Fee");
+		output.put("Label_AT_Amount", "AT_Amount");
+		output.put("Label_Amount", "Amount");
+		output.put("Label_Later", "Later");
+		output.put("Label_Previous", "Previous");
+		
+		int counter = start; 
+ */
+		
+		
+		int k = search_Table_Model.getRowCount();
+		int i =0;
+		
+		do{
+			
+			PersonCls person = search_Table_Model.getPerson(i);
+			
+			
+			
+			Map blockJSON=new LinkedHashMap();
+			blockJSON.put("key", person.getKey());
+			blockJSON.put("name", person.getName());
+			blockJSON.put("creator",person.getCreator().getAddress());
+			
+	
+		/*	
+			blockJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
+			//blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
+			blockJSON.put("transactionCount", block.getTransactionCount());
+			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
+			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
+			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
+
+			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+			for (Transaction transaction : block.getTransactions()) {
+				for (Account account : transaction.getInvolvedAccounts()) {
+					BigDecimal amount = transaction.getAmount(account); 
+					if(amount.compareTo(BigDecimal.ZERO) > 0)
+					{
+						totalAmount = totalAmount.add(amount);
+					}
+				}
+			}
+
+			blockJSON.put("totalAmount", totalAmount.toPlainString());
+
+			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DBSet.getInstance().getATTransactionMap().getATTransactions(counter);
+
+			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+
+			for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : aTtxs.entrySet())
+			{	
+				totalATAmount = totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount() , 8));
+			}
+
+			blockJSON.put("totalATAmount", totalATAmount.toPlainString());
+			//blockJSON.put("aTfee", block.getATfee().toPlainString());
+
+			output.put(counter, blockJSON);
+
+			counter --;
+			block = block.getParent(DBSet.getInstance());
+		*/	
+			output.put(i, blockJSON);
+			i++;
+		}
+		while(i < k);
+
+
+		return output;
+	}
+
+
+	
+	
 	public Map jsonQueryLastBlock()
 	{
 		Map output=new LinkedHashMap();
@@ -1470,9 +1769,25 @@ if ( asset_1 == null) {
 			}
 			couter ++;
 
+						
+			Account account = new Account(top100.a);
+			
+			Tuple2<Integer, PersonCls> person = account.getPerson();
+			
 			Map balance=new LinkedHashMap();
 			balance.put("address", top100.a);
 			balance.put("balance", top100.b.toPlainString());
+			
+			if (person != null){
+			balance.put("person", person.b.getName());
+			balance.put("person_key", person.b.getKey());
+			} else{
+				balance.put("person", "-");
+				balance.put("person_key", "-");//(String)person.b.getKey());	
+				
+			}
+				
+			
 			balances.put(couter, balance);
 
 			if(couter >= limit && limit != -2 && limit != -1) // -2 = all
@@ -1480,12 +1795,18 @@ if ( asset_1 == null) {
 				break;
 			}
 		}
-
+		 AssetCls asset = Controller.getInstance().getAsset(key);
+		output.put("Label_Table_Account", Lang.getInstance().translate("Account"));
+		output.put("Label_Table_Balance", Lang.getInstance().translate("Balance"));
+		output.put("Label_Table_Prop", Lang.getInstance().translate("Prop."));
+		output.put("Label_Table_person", Lang.getInstance().translate("Owner"));
+		
+		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
-		output.put("allTotal", (all.add(alloreders)).toPlainString());
+		output.put("allTotal",asset.getTotalQuantity());//(all.add(alloreders)).toPlainString());
 		output.put("assetKey", key);
-		output.put("assetName", Controller.getInstance().getAsset(key).getName());
+		output.put("assetName",asset.getName());
 		output.put("limit", limit);
 		output.put("count", couter);
 
@@ -1955,6 +2276,13 @@ if ( asset_1 == null) {
 	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
 		DBSet db = DBSet.getInstance();
+		
+		List<Transaction> tt = db.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
+		
+		
+		
+		
+		
 
 		TreeSet<BlExpUnit> all = new TreeSet<>();
 	
@@ -1963,6 +2291,129 @@ if ( asset_1 == null) {
 		Map error = new LinkedHashMap();
 		
 		Map output = new LinkedHashMap();
+		Map transactionsJSON = new LinkedHashMap();	
+		output.put("account", addresses.get(0));
+		
+		int i1 = 0;
+		for (Transaction trans:tt){
+			Map transactionJSON = new LinkedHashMap();
+				
+					
+					String itemName = "-";
+					Long itemKey = new Long("-1");
+					if (trans instanceof TransactionAmount && trans.getAbsKey() >0)
+					{
+						TransactionAmount transAmo = (TransactionAmount)trans;
+						//recipient = transAmo.getRecipient();
+						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+						if (item==null){
+							itemName = "-";
+							itemKey = (long) -1;
+							
+						}
+						itemName = item.toString();
+						itemKey   = item.getKey();
+					} else if ( trans instanceof GenesisTransferAssetTransaction)
+					{
+						GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)trans;
+						//recipient = transGen.getRecipient();				
+						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+						itemName = item.toString();
+						itemKey  = item.getKey();
+					} else if ( trans instanceof Issue_ItemRecord)
+					{
+						Issue_ItemRecord transIssue = (Issue_ItemRecord)trans;
+						ItemCls item = transIssue.getItem();
+						itemName = item.getShort();
+						itemKey  = item.getKey();
+					} else if ( trans instanceof GenesisIssue_ItemRecord)
+					{
+						GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)trans;
+						ItemCls item = transIssue.getItem();
+						itemName = item.getShort();
+						itemKey  = item.getKey();
+					} else if (trans instanceof R_SertifyPubKeys )
+					{
+						R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)trans;
+						//recipient = transAmo.getRecipient();
+						ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+						if (item == null){
+							itemName = "-";
+							itemKey  = (long) -1;
+							
+						}
+						itemName = item.toString();
+						itemKey  = item.getKey();
+					} else {
+						itemName = trans.viewItemName();
+						itemKey  = (long) -1;
+					}
+					
+					// 
+					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
+					
+					transactionJSON.put("seq",trans.getSeqNo(db));
+					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
+					transactionJSON.put("reference",trans.getReference());
+					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
+					transactionJSON.put("creator",trans.viewCreator());
+					
+					if (trans.getCreator() == null){
+						transactionJSON.put("creator_key","-");
+						}
+					else if (trans.getCreator().getPerson() == null){
+						transactionJSON.put("creator_key","+");
+						
+					}
+					else {
+						transactionJSON.put("creator_key",trans.getCreator().getPerson().b.getKey());
+						}
+					
+					transactionJSON.put("size",trans.viewSize(false));
+					transactionJSON.put("fee",trans.getFee());
+					transactionJSON.put("confirmations",trans.getConfirmations(db));
+					transactionJSON.put("type",Lang.getInstance().translate(trans.viewTypeName()));
+					
+					
+					String amount = "-";
+					if (trans.getAmount() != null) amount = trans.getAmount().toString();
+					
+					
+					transactionJSON.put("item_name",itemName);		
+					transactionJSON.put("item_key",itemKey);
+					
+					
+					transactionJSON.put("key",trans.getKey());
+					
+					if (trans.viewRecipient() == null){transactionJSON.put("recipient","-");}
+					else {transactionJSON.put("recipient",trans.viewRecipient());}
+					
+					transactionJSON.put("amount",amount);
+					
+					
+					transactionsJSON.put(i1, transactionJSON);
+					i1++;
+		}
+		
+		output.put("transaction", transactionsJSON);
+		output.put("type", "standardAccount");
+		output.put("label_block",Lang.getInstance().translate("Block"));
+		output.put("label_date",Lang.getInstance().translate("Date"));
+		output.put("label_type_transaction",Lang.getInstance().translate("Type"));
+		output.put("label_creator",Lang.getInstance().translate("Creator"));
+		output.put("label_asset",Lang.getInstance().translate("Asset"));
+		output.put("label_amount",Lang.getInstance().translate("Amount"));
+		output.put("label_confirmations",Lang.getInstance().translate("Confirmations"));
+		output.put("label_recipient",Lang.getInstance().translate("Recipient"));
+		output.put("label_size",Lang.getInstance().translate("Size"));
+		output.put("label_seq",Lang.getInstance().translate("Seq"));
+		output.put("label_signature",Lang.getInstance().translate("Signature"));
+		output.put("label_reference",Lang.getInstance().translate("Reference"));
+		output.put("label_fee",Lang.getInstance().translate("Fee"));
+		
+		
+		int a = 1;
+		if (a ==1) return output;
 
 		Map<String, Boolean> showOnlyMap = new LinkedHashMap<String, Boolean>();
 		for (String string : showOnly.split(",")) {
@@ -2433,6 +2884,10 @@ if ( asset_1 == null) {
 
 		txCountJSON.put("allCount",  tradesCount + aTTxsCount + totalBlocksGeneratedCount + txsCount);
 
+		
+		
+		
+		
 		output.put("countTx", txCountJSON);
 
 		output.put("txOnPage", txOnPage);

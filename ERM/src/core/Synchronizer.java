@@ -216,6 +216,10 @@ public class Synchronizer
 	
 	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer) throws Exception
 	{
+
+		if (dbSet.isStoped())
+			return;
+
 		/*
 		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
 					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());
@@ -250,6 +254,11 @@ public class Synchronizer
 			{
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
+				
+				if (!this.run) {
+					return;
+				}
+				
 				if (blockFromPeer == null) { // icreator
 					
 					//INVALID BLOCK THROW EXCEPTION
@@ -273,20 +282,33 @@ public class Synchronizer
 			
 			//GET THE BLOCKS FROM SIGNATURES
 			List<Block> blocks = this.getBlocks(dbSet, signatures.b, peer);
-							
+
+			if (!this.run) {
+				return;
+			}
+
 			//SYNCHRONIZE BLOCKS
 			/*
 			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			*/
 			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks, peer);
-			
+			if (!this.run) {
+				return;
+			}
+
 			//SEND ORPHANED TRANSACTIONS TO PEER
 			for(Transaction transaction: orphanedTransactions)
 			{
+				if (!this.run) {
+					return;
+				}
+
 				TransactionMessage transactionMessage = new TransactionMessage(transaction);
 				peer.sendMessage(transactionMessage);
 			}
 		}
+		
+		//dbSet.commitHard();
 	}
 	
 	/*
@@ -411,6 +433,10 @@ public class Synchronizer
 		
 		for(byte[] signature: signatures)
 		{
+			if(!this.run) {
+				return new ArrayList<Block>();
+			}
+
 			//ADD TO LIST
 			Block block = getBlock(signature, peer);
 			// NOW generating balance not was send by NET
@@ -425,6 +451,7 @@ public class Synchronizer
 	
 	public static Block getBlock(byte[] signature, Peer peer) throws Exception
 	{
+		
 		//CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 		

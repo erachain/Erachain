@@ -39,7 +39,7 @@ public class RegisterNameDetailsFrame extends Rec_DetailsFrame
 				
 		//OWNER
 		++detailGBC.gridy;
-		JTextField owner = new JTextField(nameRegistration.getName().getOwner().asPerson());
+		JTextField owner = new JTextField(nameRegistration.getName().getOwner().getPersonAsString());
 		owner.setEditable(false);
 		MenuPopupUtil.installContextMenu(owner);
 		this.add(owner, detailGBC);

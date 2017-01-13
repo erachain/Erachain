@@ -192,7 +192,7 @@ public class BlockGenerator extends Thread implements Observer
 		//int wait_interval_run_gen = wait_interval_flush / 2;
 		int wait_interval = wait_interval_run;
 		
-		while(!dbSet.isStoped())
+		while(!ctrl.isOnStopping() && !dbSet.isStoped())
 		{
 			
 			boolean quickRun = false; 
@@ -206,7 +206,7 @@ public class BlockGenerator extends Thread implements Observer
 				//LOGGER.error(e.getMessage(), e);
 			}
 			
-			if (dbSet.isStoped())
+			if (ctrl.isOnStopping() || dbSet.isStoped())
 				return;
 			
 
@@ -223,6 +223,9 @@ public class BlockGenerator extends Thread implements Observer
 			// NOT NEED isUpToDate! 
 			if(!ctrl.isUpToDate())
 			{
+				if (dbSet.isStoped())
+					return;
+				
 				bchain.clearWaitWinBuffer();
 				ctrl.update();
 				// IF not update by error - try anew update
@@ -261,6 +264,9 @@ public class BlockGenerator extends Thread implements Observer
 						{
 						}
 						
+						if (ctrl.isOnStopping() || dbSet.isStoped())
+							return;
+						
 						syncForgingStatus();
 						if(!ctrl.isUpToDate())
 							continue;
@@ -289,6 +295,9 @@ public class BlockGenerator extends Thread implements Observer
 			catch (InterruptedException e) 
 			{
 			}
+
+			if (ctrl.isOnStopping() || dbSet.isStoped())
+				return;
 
 			syncForgingStatus();
 			if(!ctrl.isUpToDate())
@@ -402,7 +411,7 @@ public class BlockGenerator extends Thread implements Observer
 				}
 
 				LOGGER.info("for height and target: " + height + " : " + target
-						+ " Selected max_winned_value: " + max_winned_value + " " + acc_winner.asPerson());
+						+ " Selected max_winned_value: " + max_winned_value + " " + acc_winner.getPersonAsString());
 				LOGGER.info("wait_new_good_block: " + wait_new_good_block);
 
 				// wait more good new block from NET
@@ -413,6 +422,9 @@ public class BlockGenerator extends Thread implements Observer
 				catch (InterruptedException e) 
 				{
 				}
+
+				if (ctrl.isOnStopping() || dbSet.isStoped())
+					return;
 
 				syncForgingStatus();
 				if(!ctrl.isUpToDate())

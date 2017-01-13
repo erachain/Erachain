@@ -91,7 +91,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 		switch(column)
 		{
 		case COLUMN_ADDRESS:			
-			return account.asPerson();
+			return account.getPersonAsString();
 		case COLUMN_NOTE_KEY:
 			if (this.note == null) return "-";
 			return this.note.getKey(DBSet.getInstance());			

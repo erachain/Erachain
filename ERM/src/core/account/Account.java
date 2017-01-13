@@ -493,7 +493,7 @@ public class Account {
 	@Override
 	public String toString()
 	{
-		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		String personStr;
 		String addressStr;
 		if (personRes == null) {
@@ -514,7 +514,7 @@ public class Account {
 	
 	public String toString(long key)
 	{
-		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		String personStr;
 		String addressStr;
 		if (personRes == null) {
@@ -536,7 +536,7 @@ public class Account {
 	
 	//////////
 	public String viewPerson() {
-		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		if (personRes == null) {
 			return "";
 		} else {
@@ -550,9 +550,9 @@ public class Account {
 		
 	}
 	
-	public String asPerson()
+	public String getPersonAsString()
 	{
-		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		if (personRes == null) {
 			return this.getAddress();
 		}
@@ -567,9 +567,9 @@ public class Account {
 		}
 	}
 
-	public String asPerson_01(boolean shrt)
+	public String getPersonAsString_01(boolean shrt)
 	{
-		Tuple2<Integer, PersonCls> personRes = this.hasPerson();
+		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		if (personRes == null) {
 			return "";
 		}
@@ -628,7 +628,7 @@ public class Account {
 		return true;
 		
 	}
-	public Tuple2<Integer, PersonCls> hasPerson(DBSet db) {
+	public Tuple2<Integer, PersonCls> getPerson(DBSet db) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
 		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
@@ -667,8 +667,8 @@ public class Account {
 		return new Tuple2<Integer, PersonCls>(1, person);
 		
 	}
-	public Tuple2<Integer, PersonCls> hasPerson() {
-		return hasPerson(DBSet.getInstance());
+	public Tuple2<Integer, PersonCls> getPerson() {
+		return getPerson(DBSet.getInstance());
 	}
 	
 	// previous forging block
@@ -678,15 +678,21 @@ public class Account {
 	public void setForgingData(DBSet db, int height, int prevHeight) {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
+	public void setForgingData(DBSet db, int height) {
+		int previousForgingHeight = this.getForgingData(db, height);
+		db.getAddressForging().set(this.address, height, previousForgingHeight);
+	}
 	public void delForgingData(DBSet db, int height) {
 		db.getAddressForging().delete(this.address, height);
 	}
 	public Integer getLastForgingData(DBSet db) {
 		return db.getAddressForging().getLast(this.address);
 	}
+	/*
 	public void setLastForgingData(DBSet db, int prevHeight) {
 		db.getAddressForging().setLast(this.address, prevHeight);
 	}
+	*/
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
 	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {

@@ -108,7 +108,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 			
 		case COLUMN_CREATOR:
 			
-			return order.getCreator().asPerson();
+			return order.getCreator().getPersonAsString();
 			
 		case COLUMN_CONFIRMED:
 			

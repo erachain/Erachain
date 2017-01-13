@@ -964,7 +964,7 @@ if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.getPersonAsString()
 					
 					
 					+"</tr>"
@@ -1002,7 +1002,7 @@ if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Received")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=blue><b>" + amountStr
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("From") + ": " +  this.sender.getPersonAsString()
 					
 					
 					+"</tr>"

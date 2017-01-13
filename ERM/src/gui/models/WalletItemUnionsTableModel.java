@@ -96,7 +96,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 		
 		case COLUMN_ADDRESS:
 			
-			return union.getCreator().asPerson();
+			return union.getCreator().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			

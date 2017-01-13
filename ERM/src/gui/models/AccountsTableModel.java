@@ -109,7 +109,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		switch(column)
 		{
 		case COLUMN_ADDRESS:			
-			return account.asPerson();
+			return account.getPersonAsString();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));

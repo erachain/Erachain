@@ -19,6 +19,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -104,7 +105,7 @@ public abstract class TransactionAmount extends Transaction {
 	// VIEW
 	@Override
 	public String viewRecipient() {
-		return recipient.asPerson();
+		return recipient.getPersonAsString();
 	}
 	
 	@Override
@@ -398,7 +399,14 @@ public abstract class TransactionAmount extends Transaction {
 		}
 
 		if (absKey == Transaction.RIGHTS_KEY
-				&& this.recipient.getLastForgingData(db) == -1) {
+				&& this.recipient.getLastForgingData(db) == -1
+				&& this.amount.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0) {
+			// TODO - если сначала прислать 12 а потом дослать 200000
+			// то будет все время выдавать недостаточное чило моне для форжинга
+			// так как все доначисления буду вычиаться из самого первого
+			// так как ттут нет добавки
+			
+			
 			// update last forging block if it not exist
 			// if exist - it not need - incomes will be negate from forging balance
 
@@ -406,7 +414,8 @@ public abstract class TransactionAmount extends Transaction {
 
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 2;
-			this.recipient.setLastForgingData(db, blockHeight);
+			//this.recipient.setLastForgingData(db, blockHeight);
+			this.recipient.setForgingData(db, blockHeight);
 		}
 	}
 
@@ -454,8 +463,8 @@ public abstract class TransactionAmount extends Transaction {
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
 				// if it is first payment ERMO - reset last forging BLOCK
-				//this.recipient.delForgingData(db, blockHeight);
-				this.recipient.setLastForgingData(db, -1);
+				this.recipient.delForgingData(db, blockHeight);
+				////this.recipient.setLastForgingData(db, -1);
 			}
 		}
 	}

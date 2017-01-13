@@ -22,6 +22,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.item.imprints.ImprintCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -125,7 +126,9 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		if (entry == null || entry.isEmpty() ) return "-";
 		
 		Tuple3<Integer, Integer, Integer> value = entry.peek();
-		
+		int height = value.b;
+		int seq = value.c;
+		Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
 		switch(column)
 		{
 		
@@ -140,14 +143,19 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		
 		case COLUMN_CREATOR:
 			
-			int height = value.b;
-			int seq = value.c;
-			Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+			
+			
 			if (trans == null)
 				return null;
 			
-			return trans.getCreator().asPerson_01(true);
+			return trans.getCreator().getPersonAsString_01(true);
 			
+		case 3:
+			if (trans == null)
+				return null;
+			
+			
+			return trans.getCreator().getPerson().b;
 		}
 		
 		

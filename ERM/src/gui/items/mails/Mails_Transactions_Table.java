@@ -916,8 +916,8 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
 		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
 		//			+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.asPerson()
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.asPerson()
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.getPersonAsString()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.getPersonAsString()
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Confirmation") + ": " +  strconfirmations
 					
 					+"</tr>"
@@ -954,8 +954,8 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Received")
 					//				+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.asPerson()
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.asPerson()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Sender") + ": " +  this.sender.getPersonAsString()
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Recipient") + ": " +  this.recipient.getPersonAsString()
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  + Lang.getInstance().translate("Confirmation") + ": " +  strconfirmations
 					+"</tr>"
 					+"</Table>"

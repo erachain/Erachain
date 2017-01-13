@@ -451,8 +451,8 @@ public class R_SertifyPubKeys extends Transaction {
 			if(!publicAccount.isValid())
 			{
 				return INVALID_PUBLIC_KEY;
-			} else if (publicAccount.hasPerson(db) != null) {
-				LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.hasPerson(db));
+			} else if (publicAccount.getPerson(db) != null) {
+				LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.getPerson(db));
 				return ACCOUNT_ALREADY_PERSONALIZED;
 			}
 		}

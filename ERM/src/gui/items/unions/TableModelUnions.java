@@ -98,7 +98,7 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 		
 		case COLUMN_ADDRESS:
 			
-			return union.getCreator().asPerson();
+			return union.getCreator().getPersonAsString();
 			
 		case COLUMN_FAVORITE:
 			

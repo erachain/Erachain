@@ -83,7 +83,7 @@ public class Model_Hashes_info extends AbstractTableModel {
 		
 			 
 			try {
-				return tt.getCreator().hasPerson().b;
+				return tt.getCreator().getPerson().b;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				return null;

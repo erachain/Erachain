@@ -20,7 +20,10 @@ import org.mapdb.Fun.Tuple5;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.PublicKeyAccount;
 import core.item.imprints.ImprintCls;
+import core.item.statuses.Status;
+import core.transaction.Transaction;
 import database.DBSet;
 import database.ItemStatusMap;
 import database.SortableList;
@@ -30,7 +33,7 @@ import lang.Lang;
 public  class PersonStatusesModel extends  AbstractTableModel implements Observer
 {
 	public static final int COLUMN_TO_DATE = 1;
-	//public static final int COLUMN_NAME = 1;
+	public static final int COLUMN_CREATOR = 2;
 	public static final int COLUMN_STATUS = 0;
 //	public static final int COLUMN_CONFIRMED = 3;
 	
@@ -39,7 +42,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","To Date"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","To Date","Creator"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
 	String to_date_str;
@@ -86,6 +89,9 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	}
 	*/
 	
+		public  Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStatus(int row){
+			return this.statuses.get(row);
+		}
 	
 	@Override
 	public int getColumnCount() 
@@ -131,6 +137,9 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		 Tuple5<Long, Long, byte[], Integer, Integer> value = entry.peek();
 	//	 if (value == null ) return 0;
 		
+		 
+		 
+		
 		 switch(column)
 		{
 		
@@ -151,6 +160,17 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			
 			return from_date_str + " - " + to_date_str;
 			
+		case COLUMN_CREATOR:
+			
+			
+			
+			return statusesMap.get(status_key_value).getCreator().getPersonAsString_01(true);
+		
+		case COLUMN_CREATOR+1:
+			
+			
+			return statusesMap.get(status_key_value).getCreator().getPerson().b;
+		
 		}
 		
 		

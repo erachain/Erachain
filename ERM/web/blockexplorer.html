@@ -182,6 +182,21 @@ function asyncAjax (url, type){
 					document.getElementById('main').innerHTML = topRichest(data);
 				}
 				
+				if (type == 'persons')
+				
+				{
+					document.getElementById('main').innerHTML = persons(data);
+				
+				}
+				
+				if (type == 'person')
+				
+				{
+					document.getElementById('main').innerHTML = person(data);
+				
+				}
+				
+				
 				if(type == 'mainQuery')
 				{
 					document.getElementById('main').innerHTML = mainQuery(data);
@@ -441,11 +456,17 @@ function topRichest(data)
 	}
 	
 	
-	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>Address<td><b>Balance<td><b>Prop.'; 
+	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance+'<td><b>'+data.Label_Table_Prop; 
 
 	for(key in data.top) {
 		table += '<tr>';		
-		table += '<td>'+ key + '<td>' + '<a href=?addr='+data.top[key].address+'>' + data.top[key].address;
+		table += '<td>'+ key + '<td>' + '<a href="?addr='+data.top[key].address+'">' + data.top[key].address + '</a>';
+		
+		if (data.top[key].person_key !='-'){
+		table += '<td><a href="?person='+data.top[key].person_key+'">' + data.top[key].person+ '</a>';
+		}else{
+		table += '<td>' + data.top[key].person;
+		}
 		table += '<td>' + addCommas(data.top[key].balance) + '<td>' +  ((data.top[key].balance / data.allTotal) * 100).toFixed(2) + " %";
 	}
 	table += '</table>';
@@ -1145,9 +1166,27 @@ function mainQuery(data) {
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			
 			output += '<br>';
-			output +='<font size="+1">Standard Account11: <a href="?addr=' + data.address + '">' + data.address + '</a></font>';
+			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + '">' + data.account + '</a></font>';
 			output += '<br><br>';
+			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_signature+'<td><b>'+data.label_type_transaction+'<td><b>'+data.label_reference+'<td><b>'+ data.label_date+'<td><b>'+data.label_creator+'<td><b>'+data.label_size+'<td><b>'+data.label_fee+'<td><b>'+ data.label_confirmations+'</tr>';
+			for (key in data.transaction){
+			
+			
+			output += '<tr><td><a href ="?block='+data.transaction[key].block+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].signature+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
+			if (data.transaction[key].creator_key == '-'){
+			output += '<td>'+data.transaction[key].creator+'</a>'; 
+			}else if (data.transaction[key].creator_key == '+'){
+			output += '<td><a href ="?addr='+data.transaction[key].creator+'">'+data.transaction[key].creator+'</a>';
+			}else{
+			output += '<td><a href ="?person='+data.transaction[key].creator_key+'">'+data.transaction[key].creator+'</a>';
+			}
+			output += '<td>'+ data.transaction[key].size +'<td>'+ data.transaction[key].fee +'<td>'+ data.transaction[key].confirmations + '</td></tr>';
+			
+			}
+			output +='</table></td></tr></table>';
+			/*
 			if(data.countTx.hasOwnProperty('txsCount'))
 			{
 				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
@@ -1208,7 +1247,7 @@ function mainQuery(data) {
 			}
 
 			output += totalBalance+ '</font></b><br>';
-
+*/
 		}
 
 		if(data.type == 'block')
@@ -1283,6 +1322,29 @@ function mainQuery(data) {
 			}
 			
 		}
+		
+		
+			if(data.type == 'person')
+		{
+			if(data.allOnOnePage)
+			{
+				allOnOnePage = '&allOnOnePage';
+			}
+			else
+			{
+				allOnOnePage = '';
+			}
+			
+			urlstart = '?person=' + data.name+'&start=' + data.start + allOnOnePage;
+			url = '?person=' + data.name + allOnOnePage;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Person: <a href=?name='+encodeURIComponent(data.name)+'>' + htmlFilter(data.name) + '</a></font>';
+			
+			output += '<br><br>';
+		}
+	
+		
 		
 		if(data.type == 'name')
 		{
@@ -1379,7 +1441,8 @@ function mainQuery(data) {
 			output += '<font size="+1">Trade</font><br>';
 		}
 		
-		if(data.type == 'standardAccount' || data.type == 'at')
+		//if(data.type == 'standardAccount' || data.type == 'at')
+		if( data.type == 'at')
 		{
 			output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
 		}	
@@ -2869,7 +2932,8 @@ function mainQuery(data) {
 				}
 			}
 		
-			if(data.type == 'standardAccount' || data.type == 'at')
+		//	if(data.type == 'standardAccount' || data.type == 'at')
+		if(data.type == 'at')
 			{
 				output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
 			}
@@ -3157,6 +3221,125 @@ function parseUrlQuery() {
     return data;
 }
 
+
+function person(data)
+{
+
+output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+output += '<tr><td align=left>';
+output += '<table><tr><td>';
+
+
+output += '<img src="data:image/gif;base64,' + data.img+ '"/></td><td style ="padding-left:20px">'; 
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+output +=   data.Label_creator + ': &nbsp&nbsp<a href ="?person='+ data.creator_key+'"><b> ' + data.creator + '</b></a><br>';
+output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
+output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
+output +=   '</table>';
+//output = + '<br> img:' + data.img;
+
+
+//statuses
+output += '<br>'+ data.Label_statuses +':';
+output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+'<td><b>'+ data.Label_accounts_table_creator + '<tr>'; 
+
+key =0;
+for(key in data.statuses) {
+output += '<tr ><td >'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+'">'+ data.statuses[key].status_creator  +'</a><tr>';
+
+key ++;
+}
+output += '</table><br>';
+
+
+// accounts
+
+output +='<br>' + data.Label_accounts + ':';
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_accounts_table_adress+'<td><b>'+data.Label_accounts_table_data+ '<td><b>'+ data.Label_accounts_table_creator+'<tr>'; 
+
+key =0;
+for(key in data.accounts) {
+output += '<tr><td><a href = "?addr='+data.accounts[key].adress+'">'+data.accounts[key].adress+'</a><td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+'">'+ data.accounts[key].creator  +'</a><tr>';
+
+key ++;
+}
+output += '</table><br>';
+
+//my p3ersons
+output +='<br>' + data.Label_My_Persons + ':';
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+ data.Label_accounts_table_data +'<td><b>'+data.Label_My_Person_key+'<td><b>'+data.Label_My_Persons_Name+ '<tr>'; 
+
+
+key =0;
+for(key in data.My_Persons){
+
+output += '<tr><td>'+data.My_Persons[key].date+'<td>'+ data.My_Persons[key].key +'<td><a href ="?person='+data.My_Persons[key].key+'">'+ data.My_Persons[key].name  +'</a><tr>';
+}
+
+output += '</table><br>';
+output += '</table><br>';
+
+return output;
+}
+
+
+function persons(data)
+{
+
+var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<tr><td align=left>';
+	output += '<a href=?unconfirmed>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr><td><b>'+ data.Label_key +' <td><b>'+data.Label_name+'<td><b>'+ data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount; 
+
+	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
+	row = data.row;
+	for(var i = 0; i < row; i++)
+	{
+		output += '<tr>';
+	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
+	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
+	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
+	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key +'>'+data[i].name +'</a><td>'+data[i].creator;
+	}
+	
+	output += '<tr><td colspan=4>';
+/*	if(data.maxHeight != data.lastBlock.height)
+	{
+		if(data.lastBlock.height < data.maxHeight + 21)
+		{
+			output += '<a href=?startBlock='+(data.lastBlock.height)+'>'+data.Label_Later;
+		}
+		else
+		{
+			output += '<a href=?startBlock='+(data.maxHeight+21)+'>'+data.Label_Later;
+		}
+	}
+	
+	output += '<td colspan=4 align=right>';
+	if(minHeight > 1) {
+		output += '<a href=?startBlock='+(data.maxHeight-21)+'>'+data.Label_Previous;
+	}
+*/	
+	return output;
+
+
+
+}
+
+
 function getQueryParams(name) {
    qs = location.search;
 
@@ -3179,6 +3362,8 @@ function buttonSearch() {
 
 function start() {
     
+	
+	
 	document.getElementById('main').innerHTML = '';
 	 
 	document.getElementById('home').href = document.location.pathname;
@@ -3456,6 +3641,8 @@ function start() {
 		return;
 	}
 	
+	
+	
 	if(params.hasOwnProperty('unconfirmed'))
 	{
 		
@@ -3484,6 +3671,29 @@ function start() {
 		
 		return;
 	}
+	
+	if(params.hasOwnProperty('persons'))
+	{
+		asyncAjax('blockexplorer.json?persons' , 'persons');
+
+		document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
+	//	document.getElementById('persons').value = params['persons'];
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('person'))
+	{
+		
+		asyncAjax('blockexplorer.json?person=' + params['person'], 'person');
+//		a =  decodeURIComponent(params['title']);
+		document.title = title ;//+  + decodeURIComponent(params['title']);
+		
+	//	document.getElementById('q').value = decodeURIComponent(params['person']);
+		
+		return;
+	}
+	
 	
 	asyncAjax('blockexplorer.json?blocks', 'blocks');
 	
@@ -3545,10 +3755,11 @@ function start() {
       <div class="row">
         <div class="main-tabs">
           <div class="container">
-            <div class="row">
+            <div class="row" id="main-menu" >
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
 				<li id=menuTop100Richest><a href="?top=100">Top 100 Richest</a></li>
+				<li id=menuPersons><a href="?persons">Persons</a></li>
 				<li id=menuPolls><a href="?polls&asset=1">Polls</a></li>
 				<li id=menuAssets><a href="?assets">Assets</a></li>
 				<li id=menuATs><a href="?aTs">ATs</a></li>				
@@ -3587,4 +3798,5 @@ function start() {
 
 </table>
 </body>
+
 </html>

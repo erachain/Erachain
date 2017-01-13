@@ -1,11 +1,13 @@
 package core.item.assets;
 
+import java.math.BigDecimal;
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
  import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Bytes;
@@ -49,10 +51,25 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
-	public Long getQuantity() {
+	public Long getQuantity() {		
 		return this.quantity;
 	}
 
+	public Long getTotalQuantity() {
+		
+		if (this.quantity == 0) {
+			// IF UNLIMIT QIUNTITY
+			Tuple3<BigDecimal, BigDecimal, BigDecimal> bals = this.getCreator().getBalance(this.getKey());
+			long bal = -bals.a.longValue();
+			if (bal == 0) {
+				bal = 1l;
+			}
+			return bal;
+		} else {
+			return this.quantity;
+		}
+	}
+	
 	@Override
 	public boolean isDivisible() {
 		return this.divisible;

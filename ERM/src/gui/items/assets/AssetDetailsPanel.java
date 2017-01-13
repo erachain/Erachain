@@ -104,7 +104,7 @@ public class AssetDetailsPanel extends JPanel {
 		Account creator = asset.getCreator();
 		//OWNER
 		detailGBC.gridy = gridy;
-		JTextField owner = new JTextField(creator.asPerson());
+		JTextField owner = new JTextField(creator.getPersonAsString());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);		
 		

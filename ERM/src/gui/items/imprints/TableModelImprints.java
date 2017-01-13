@@ -97,7 +97,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 		
 		case COLUMN_ADDRESS:
 			
-			return imprint.getCreator().asPerson();
+			return imprint.getCreator().getPersonAsString();
 			
 		}
 		

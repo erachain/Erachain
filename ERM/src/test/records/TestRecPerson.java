@@ -910,12 +910,12 @@ public class TestRecPerson {
 //		assertEquals( true, Arrays.equals(dbPA.getItem(personKey, userAddress3).c, r_SertifyPubKeys.getSignature()));
 
 		assertEquals(false, userAccount1.isPerson(db));
-		assertEquals(null, userAccount1.hasPerson(db));
+		assertEquals(null, userAccount1.getPerson(db));
 		assertEquals(false, userAccount2.isPerson(db));
 		assertEquals(false, userAccount3.isPerson(db));
 
 		assertEquals(true, userAccount1.isPerson(fork));
-		assertNotEquals(null, userAccount1.hasPerson(fork));
+		assertNotEquals(null, userAccount1.getPerson(fork));
 		assertEquals(true, userAccount2.isPerson(fork));
 		assertEquals(true, userAccount3.isPerson(fork));
 

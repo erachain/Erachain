@@ -105,7 +105,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getCreator().asPerson();
+			return person.getCreator().getPersonAsString();
 			
 		case COLUMN_FAVORITE:
 			

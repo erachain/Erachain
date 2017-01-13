@@ -61,7 +61,7 @@ public class VotesTableModel extends AbstractTableModel
 		{
 		case COLUMN_ADDRESS:
 			
-			return vote.getA().asPerson();
+			return vote.getA().getPersonAsString();
 		
 		case COLUMN_OPTION:
 			

@@ -108,7 +108,7 @@ public class Records_Table_Model extends TableModelCls<byte[], Transaction> impl
 		
 		case COLUMN_ADDRESS:
 			
-			return transaction.getCreator().asPerson();
+			return transaction.getCreator().getPersonAsString();
 			
 		case COLUMN_FAVORITE:
 			

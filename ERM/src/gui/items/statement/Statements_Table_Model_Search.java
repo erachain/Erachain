@@ -241,7 +241,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 			case COLUMN_CREATOR:
 				
 				
-				return record.getCreator().asPerson();
+				return record.getCreator().getPersonAsString();
 			}
 			
 			return null;

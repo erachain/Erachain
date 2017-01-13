@@ -375,6 +375,7 @@ public abstract class Transaction {
 		return this.timestamp + (1000*60*60*24);
 	}
 
+	/// tyutuy jhg jhg jg j
 	/*
 	// TIME
 	public Long viewTime() {
@@ -661,7 +662,7 @@ public abstract class Transaction {
 	}
 
 	public String viewCreator() {
-		return creator==null?"GENESIS":creator.asPerson();
+		return creator==null?"GENESIS":creator.getPersonAsString();
 	}
 	public String viewRecipient() {
 		return "";

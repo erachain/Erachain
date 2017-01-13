@@ -113,7 +113,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			case COLUMN_GENERATOR:
 				
-				return block.getCreator().asPerson();
+				return block.getCreator().getPersonAsString();
 				
 			case COLUMN_BASETARGET:
 

@@ -406,8 +406,8 @@ private JFrame parent;
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}	
-			
-	}
+		
+		}
 
 			@Override
 			public void windowDeactivated(WindowEvent e) {
@@ -445,37 +445,38 @@ private JFrame parent;
 				JsonParser parser = new JsonParser(); 
 				
 				if (!stringFromInternet.isEmpty()){
-				JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+					
+					JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
+					
+					
+			//		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
+					
+			//		parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
+			//		parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
+					
 				
-				
-		//		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
-				
-		//		parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
-		//		parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
-				
-			
-				JsonArray pItem = mainObject.getAsJsonArray("Open Frames"); 
-				if (!pItem.isJsonNull()){
-				for (JsonElement user : pItem) {
-
-				    JsonObject userObject = user.getAsJsonObject(); 
-				  
-				    String str = userObject.get("name").getAsString();
-				  
-				    	try {
-							object  = (JInternalFrame) Class.forName(str).newInstance();
-							object.setLocation(Integer.valueOf( userObject.get("location_X").toString()), Integer.valueOf(userObject.get("location_Y").toString()));
-							object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
-							gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
-						} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+					JsonArray pItem = mainObject.getAsJsonArray("Open Frames");
+					if (pItem!=null && !pItem.isJsonNull()){
+						for (JsonElement user : pItem) {
+		
+						    JsonObject userObject = user.getAsJsonObject(); 
+						  
+						    String str = userObject.get("name").getAsString();
+						  
+					    	try {
+								object  = (JInternalFrame) Class.forName(str).newInstance();
+								object.setLocation(Integer.valueOf( userObject.get("location_X").toString()), Integer.valueOf(userObject.get("location_Y").toString()));
+								object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
+								gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
+							} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
-				}
-				}
+					}
 				}
 			} 
-        });
+        	});
         
         
         

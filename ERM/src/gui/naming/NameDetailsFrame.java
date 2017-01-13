@@ -64,7 +64,7 @@ public class NameDetailsFrame extends JFrame
 		
 		//REGISTRANT
 		detailGBC.gridy = 1;
-		JTextField registrant = new JTextField(name.getOwner().asPerson());
+		JTextField registrant = new JTextField(name.getOwner().getPersonAsString());
 		registrant.setEditable(false);
 		MenuPopupUtil.installContextMenu(registrant);
 		this.add(registrant, detailGBC);
