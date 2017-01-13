@@ -1170,10 +1170,19 @@ function mainQuery(data) {
 			output += '<br><br>';
 			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
-			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_confirmations+'<td><b>'+data.label_date+'<td><b>'+ data.label_type_transaction+'<td><b>'+data.label_creator+'<td><b>'+data.label_asset+'<td><b>'+data.label_amount+'<td><b>'+ data.label_recipient+'<td><b>'+ data.label_size+'</tr>';
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_signature+'<td><b>'+data.label_type_transaction+'<td><b>'+data.label_reference+'<td><b>'+ data.label_date+'<td><b>'+data.label_creator+'<td><b>'+data.label_size+'<td><b>'+data.label_fee+'<td><b>'+ data.label_confirmations+'</tr>';
 			for (key in data.transaction){
 			
-			output += '<tr><td>'+ data.transaction[key].block +'<td>'+data.transaction[key].confirmations+'<td>'+data.transaction[key].date+'<td>'+ data.transaction[key].type+'<td>'+ data.transaction[key].creator +'<td>'+ data.transaction[key].item_name +'<td>'+ data.transaction[key].amount + '<td>'+ data.transaction[key].recipient + '<td>'+ data.transaction[key].size +'</td></tr>';
+			
+			output += '<tr><td><a href ="?block='+data.transaction[key].block+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].signature+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
+			if (data.transaction[key].creator_key == '-'){
+			output += '<td>'+data.transaction[key].creator+'</a>'; 
+			}else if (data.transaction[key].creator_key == '+'){
+			output += '<td><a href ="?addr='+data.transaction[key].creator+'">'+data.transaction[key].creator+'</a>';
+			}else{
+			output += '<td><a href ="?person='+data.transaction[key].creator_key+'">'+data.transaction[key].creator+'</a>';
+			}
+			output += '<td>'+ data.transaction[key].size +'<td>'+ data.transaction[key].fee +'<td>'+ data.transaction[key].confirmations + '</td></tr>';
 			
 			}
 			output +='</table></td></tr></table>';

@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.JTextField;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.net.util.Base64;
@@ -2347,23 +2348,49 @@ if ( asset_1 == null) {
 						itemName = trans.viewItemName();
 						itemKey  = (long) -1;
 					}
+					
+					// 
+					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
+					
+					transactionJSON.put("seq",trans.getSeqNo(db));
+					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
+					transactionJSON.put("reference",trans.getReference());
+					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
+					transactionJSON.put("creator",trans.viewCreator());
+					
+					if (trans.getCreator() == null){
+						transactionJSON.put("creator_key","-");
+						}
+					else if (trans.getCreator().getPerson() == null){
+						transactionJSON.put("creator_key","+");
+						
+					}
+					else {
+						transactionJSON.put("creator_key",trans.getCreator().getPerson().b.getKey());
+						}
+					
+					transactionJSON.put("size",trans.viewSize(false));
+					transactionJSON.put("fee",trans.getFee());
+					transactionJSON.put("confirmations",trans.getConfirmations(db));
+					transactionJSON.put("type",Lang.getInstance().translate(trans.viewTypeName()));
+					
+					
 					String amount = "-";
 					if (trans.getAmount() != null) amount = trans.getAmount().toString();
 					
 					
 					transactionJSON.put("item_name",itemName);		
 					transactionJSON.put("item_key",itemKey);
-					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
-					transactionJSON.put("creator",trans.viewCreator());
+					
+					
 					transactionJSON.put("key",trans.getKey());
-					transactionJSON.put("confirmations",trans.getConfirmations(db));
+					
 					if (trans.viewRecipient() == null){transactionJSON.put("recipient","-");}
 					else {transactionJSON.put("recipient",trans.viewRecipient());}
 					
-					transactionJSON.put("block",trans.getSeqNo(db));
-					transactionJSON.put("type",Lang.getInstance().translate(trans.viewTypeName()));
 					transactionJSON.put("amount",amount);
-					transactionJSON.put("size",trans.viewSize(false));
+					
+					
 					transactionsJSON.put(i1, transactionJSON);
 					i1++;
 		}
@@ -2379,6 +2406,11 @@ if ( asset_1 == null) {
 		output.put("label_confirmations",Lang.getInstance().translate("Confirmations"));
 		output.put("label_recipient",Lang.getInstance().translate("Recipient"));
 		output.put("label_size",Lang.getInstance().translate("Size"));
+		output.put("label_seq",Lang.getInstance().translate("Seq"));
+		output.put("label_signature",Lang.getInstance().translate("Signature"));
+		output.put("label_reference",Lang.getInstance().translate("Reference"));
+		output.put("label_fee",Lang.getInstance().translate("Fee"));
+		
 		
 		int a = 1;
 		if (a ==1) return output;
