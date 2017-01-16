@@ -1174,7 +1174,7 @@ function mainQuery(data) {
 			for (key in data.transaction){
 			
 			
-			output += '<tr><td><a href ="?block='+data.transaction[key].block+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].signature+'</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
+			output += '<tr><td><a href ="?block='+data.transaction[key].block+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'" title = "'+ data.transaction[key].signature  +'">'+data.transaction[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.transaction[key].signature+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
 			if (data.transaction[key].creator_key == '-'){
 			output += '<td>'+data.transaction[key].creator+'</a>'; 
 			}else if (data.transaction[key].creator_key == '+'){
