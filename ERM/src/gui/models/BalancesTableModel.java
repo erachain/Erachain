@@ -22,9 +22,10 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 {
 	private static final int COLUMN_ADDRESS = 0;
 	public static final int COLUMN_BALANCE = 1;
+	public static final int COLUMN_OWN = 2;
 	
 	private long key;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance", "in OWN"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	
@@ -91,6 +92,11 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 		case COLUMN_BALANCE:
 			
 			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
+
+		case COLUMN_OWN:
+			
+			Tuple3<BigDecimal, BigDecimal, BigDecimal> val = account.getBalance(this.key);
+			return NumberAsString.getInstance().numberAsString(val.a);
 		}
 		
 		return null;

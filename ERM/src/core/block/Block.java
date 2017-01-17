@@ -195,7 +195,7 @@ public class Block {
 		if (previousForgingHeight == -1)
 			return 0;
 				
-		if (previousForgingHeight <= height) {
+		if (previousForgingHeight < height) {
 			
 			// for recipient
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
@@ -834,7 +834,7 @@ public class Block {
 		else
 			win_value >>= 11;
 			*/
-		win_value >>= 8;
+		win_value >>= 6;
 		
 		return win_value;
 
