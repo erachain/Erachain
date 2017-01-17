@@ -14,15 +14,17 @@ import database.Item_Map;
 public abstract class StatusCls extends ItemCls {
 
 	// COMMON STATUSES KEYs
-	public static final Long ALIVE_KEY = 1l; // 1- alive, 2 - dead or as set end_date for ALIVE_KEY
-	public static final Long RANK_KEY = 2l;
-	public static final Long RIGHTS_KEY = 3l;	
-	public static final Long MEMBER_KEY = 4l;
+	//public static final Long ALIVE_KEY = 1l; // 1- alive, 2 - dead or as set end_date for ALIVE_KEY
+	//public static final Long RANK_KEY = 2l;
+	public static final Long RIGHTS_KEY = 1l;	
+	public static final Long MEMBER_KEY = 2l;
+	/*
 	public static final Long USER_KEY = 5l;
 	public static final Long MAKER_KEY = 6l;
 	public static final Long DELEGATE_KEY = 7l;
 	public static final Long CERTIFIED_KEY = 8l;
 	public static final Long MARRIED_KEY = 9l;
+	*/
 
 	public static final int STATUS = 1;
 	public static final int TITLE = 2;

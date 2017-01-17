@@ -304,7 +304,7 @@ public abstract class TransactionAmount extends Transaction {
 				if (actionType == 1) {
 					// if asset is unlimited and me is creator of this asset 
 					boolean unLimited = 
-							absKey > AssetCls.DEAL_KEY // not genesis assets!
+							absKey > AssetCls.REAL_KEY // not genesis assets!
 							&& asset.getQuantity().equals(0l)
 							&& asset.getCreator().getAddress().equals(this.creator.getAddress());
 		

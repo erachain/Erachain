@@ -1206,7 +1206,7 @@ public class Block {
 			seq++;
 		}
 
-		if(height_process % Settings.BLOCK_MAX_SIGNATURES == 0) 
+		if(height_process % BlockChain.MAX_SIGNATURES == 0) 
 		{
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}

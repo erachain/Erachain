@@ -54,7 +54,7 @@ public class TestRecPerson {
 	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
-	long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] personReference = new byte[64];
 	long timestamp = NTP.getTime();
@@ -167,7 +167,7 @@ public class TestRecPerson {
 
 		// issue 1 genesis person in init() here
 		//assertEquals( genesisPersonKey + 1, personKey);
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 		
 		//CREATE PERSONALIZE REcORD
 		timestamp += 100;
@@ -572,7 +572,7 @@ public class TestRecPerson {
 		
 		init();
 
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		assertEquals(false, userAccount1.isPerson(db));
 		assertEquals(false, userAccount2.isPerson(db));
@@ -588,7 +588,7 @@ public class TestRecPerson {
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		//assertEquals( genesisPersonKey + 1, personKey);
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -646,11 +646,11 @@ public class TestRecPerson {
 		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
 		// PERSON STATUS ALIVE - beg_date = person birthDay
-		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
+		//assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( (long)Long.MAX_VALUE, (long)dbPS.getItem(personKey, ALIVE_KEY).b);
+		//assertEquals( (long)Long.MAX_VALUE, (long)dbPS.getItem(personKey, ALIVE_KEY).b);
 		//assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
-		assertEquals( (int)dbPS.getItem(personKey, ALIVE_KEY).d, transactionIndex);
+		//assertEquals( (int)dbPS.getItem(personKey, ALIVE_KEY).d, transactionIndex);
 
 		// ADDRESSES
 		assertEquals( (long)personKey, (long)dbAP.getItem(userAddress1).a);
@@ -709,7 +709,7 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE - must not be modified!
-		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
+		//assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -741,7 +741,7 @@ public class TestRecPerson {
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
 		// PERSON STATUS ALIVE - date_begin
-		assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
+		//assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
 
 		assertEquals(abs_end_date, (int)userAccount1.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db));
@@ -775,7 +775,7 @@ public class TestRecPerson {
 		// need .process in DB then .process in FORK - then test DB values!!!
 		init();
 
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		assertEquals(false, userAccount1.isPerson(db));
 		assertEquals(false, userAccount2.isPerson(db));
@@ -791,7 +791,7 @@ public class TestRecPerson {
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE
 		assertEquals(2, personKey);
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -830,7 +830,7 @@ public class TestRecPerson {
 		r_SertifyPubKeys.process(fork, gb, false);
 		int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 		
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		//CHECK BALANCE SENDER
 		assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, db));
@@ -865,12 +865,12 @@ public class TestRecPerson {
 		int to_date = R_SertifyPubKeys.DEFAULT_DURATION + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
 		// PERSON STATUS ALIVE - beg_date = person birthDay
-		assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
-		assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
+		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+		//assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
 		// PERSON STATUS ALIVE - to_date = 0 - permanent alive
-		assertEquals( (long)Long.MAX_VALUE, (long)dbPS_fork.getItem(personKey, ALIVE_KEY).b);
+		//assertEquals( (long)Long.MAX_VALUE, (long)dbPS_fork.getItem(personKey, ALIVE_KEY).b);
 		//assertEquals( true, Arrays.equals(dbPS.getItem(personKey, ALIVE_KEY).c, r_SertifyPubKeys.getSignature()));
-		assertEquals( (int)dbPS_fork.getItem(personKey, ALIVE_KEY).d, transactionIndex);
+		//assertEquals( (int)dbPS_fork.getItem(personKey, ALIVE_KEY).d, transactionIndex);
 
 		// ADDRESSES
 		assertEquals( null, dbAP.getItem(userAddress1));
@@ -945,7 +945,7 @@ public class TestRecPerson {
 		
 		// .a - personKey, .b - end_date, .c - block height, .d - reference
 		// PERSON STATUS ALIVE - must not be modified!
-		assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
+		//assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
 
 		// ADDRESSES
 		assertEquals( null, dbAP_fork.getItem(userAddress1));

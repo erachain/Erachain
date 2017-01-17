@@ -21,6 +21,7 @@ import com.google.common.primitives.Longs;
 
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.BlockChain;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -50,13 +51,13 @@ public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
-	public final static int GENESIS_GENERATING_BALANCE = Settings.GENESIS_ERMO_TOTAL; // starting max volume for generating	
+	public final static int GENESIS_GENERATING_BALANCE = BlockChain.GENESIS_ERMO_TOTAL; // starting max volume for generating	
 	//public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 180;
-	public static final int GENERATING_MAX_BLOCK_TIME = 600;
+	public static final int GENERATING_MIN_BLOCK_TIME = 288;
+	public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 
 	private static byte[] icon = new byte[0];
@@ -77,7 +78,7 @@ public class GenesisBlock extends Block{
 		super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
-		this.generatingBalance = Settings.GENERAL_ERMO_BALANCE;
+		this.generatingBalance = BlockChain.GENERAL_ERMO_BALANCE;
 		
 		Account recipient;
 		BigDecimal bdAmount0;
@@ -89,7 +90,7 @@ public class GenesisBlock extends Block{
 		// ISSUE ITEMS
 		this.initItems();
 		
-		if(genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
+		if(genesisTimestamp != BlockChain.DEFAULT_MAINNET_STAMP) {
 			this.testnetInfo = ""; 
 			
 			//ADD TESTNET GENESIS TRANSACTIONS
@@ -304,14 +305,14 @@ public class GenesisBlock extends Block{
 
 			// 10% 1%
 			float majorPick = (float)0.1;
-			float minorPick = (float)0.001;
-			float investorPick = (float)0.005;
+			float minorPick = (float)0.005;
+			float investorPick = (float)0.01;
 			double generalKoeff0 = (1.0 - majorPick - minorPick) * GENESIS_GENERATING_BALANCE / generalPicked;
-			double generalKoeff1 = asset1.getQuantity() / generalPicked;
+			//double generalKoeff1 = asset1.getQuantity() / generalPicked;
 			double majorKoeff = majorPick * GENESIS_GENERATING_BALANCE / majorPicked;
 			double minorKoeff = minorPick * GENESIS_GENERATING_BALANCE / minorPicked;
 			double investorKoeff = investorPick * GENESIS_GENERATING_BALANCE / investorPicked;
-			double debtorKoeff = 0.5 * GENESIS_GENERATING_BALANCE / debtorPicked;
+			double debtorKoeff = 0.4 * GENESIS_GENERATING_BALANCE / debtorPicked;
 			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
 			
 			//long i = 0;
@@ -491,15 +492,15 @@ public class GenesisBlock extends Block{
 		asset1 = makeAsset(AssetCls.FEE_KEY);
 		transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.DEAL_KEY; i++) 
+		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.REAL_KEY; i++) 
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
-		for (int i = 1; i <= NoteCls.HIRING_KEY; i++) 
+		for (int i = 1; i <= NoteCls.UNHIRING_KEY; i++) 
 			transactions.add(new GenesisIssueNoteRecord(makeNote(i)));
 
 		///// STATUSES
-		for (int i = 1; i <= StatusCls.MARRIED_KEY; i++) 
+		for (int i = 1; i <= StatusCls.MEMBER_KEY; i++)
 			transactions.add(new GenesisIssueStatusRecord(makeStatus(i)));		
 	}
 	
@@ -514,8 +515,8 @@ public class GenesisBlock extends Block{
 			return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:
 			return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0l, (byte)8, true);
-		case (int)AssetCls.DEAL_KEY:
-			return new AssetVenture(CREATOR, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0l, (byte)8, true);
+		//case (int)AssetCls.DEAL_KEY:
+		//	return new AssetVenture(CREATOR, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0l, (byte)8, true);
 		}
 		//return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
 		return new AssetVenture(CREATOR, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, 0l, (byte)0, true);
@@ -525,30 +526,31 @@ public class GenesisBlock extends Block{
 	{
 		switch(key)
 		{
-		case (int)NoteCls.EMPTY_KEY:
-			return new Note(CREATOR, "empty", icon, image, "empty");
-		case (int)NoteCls.ESTABLISH_UNION_KEY:
-			return new Note(CREATOR, "Establish the Union", icon, image, "Union name \"%Company Name%\" in country \"%Country%\"");
 		case (int)NoteCls.MARRIAGE_KEY:
-			return new Note(CREATOR, "Marriage", icon, image, "%person1% marries  %person2%");
+			return new Note(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
+		case (int)NoteCls.UNMARRIAGE_KEY:
+			return new Note(CREATOR, "Заявление о разводе", icon, image, "Я, %person1%, развожусь с %person2%");
 		case (int)NoteCls.HIRING_KEY:
-			return new Note(CREATOR, "Hiring", icon, image, "Hiring to %union%");
+			return new Note(CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
+		case (int)NoteCls.UNHIRING_KEY:
+			return new Note(CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
 		}
-		return new Note(CREATOR, "I", icon, image, "I, Dmitry Ermolaev, date of birth \"1966.08.21\", place of birth \"Vladivostok, Primorsky Krai, Russia\", race \"Slav\", height \"188\", eye color \"light grey\", color \"white\", hair color \"dark brown\", I confirm that I have single-handedly account \"\" and I beg to acknowledge the data signed by this account as my own's handmade signature.");
+		return new Note(CREATOR, "empty", icon, image, "empty");
 	}
 	// make notes
 	public static Status makeStatus(int key)
 	{
-		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR, "Member", icon, image, "Director, Manager, Worker, Member, Holder");
-		else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
-		else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
-		else if (key == StatusCls.USER_KEY) return new Status(CREATOR, "User", icon, image, "Admin, User, Observer");
-		else if (key == StatusCls.MAKER_KEY) return new Status(CREATOR, "Maker", icon, image, "Creator, Designer, Maker");
-		else if (key == StatusCls.DELEGATE_KEY) return new Status(CREATOR, "Delegate", icon, image, "President, Senator, Deputy");
-		else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
-		else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
+		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR,
+				"Членство", icon, image, "Уровень %1 членства в объединении %2");
+		//else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
+		//else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
+		//else if (key == StatusCls.USER_KEY) return new Status(CREATOR, "User", icon, image, "Admin, User, Observer");
+		//else if (key == StatusCls.MAKER_KEY) return new Status(CREATOR, "Maker", icon, image, "Creator, Designer, Maker");
+		//else if (key == StatusCls.DELEGATE_KEY) return new Status(CREATOR, "Delegate", icon, image, "President, Senator, Deputy");
+		//else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
+		//else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
 
-		return new Status(CREATOR, "RIGHTs", icon, image, "Rights");		
+		return new Status(CREATOR, "Права", icon, image, "Уровень %1 прав (власти) в объединении %2");
 	}
 	
 	

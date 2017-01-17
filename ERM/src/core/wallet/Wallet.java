@@ -648,7 +648,7 @@ public class Wallet extends Observable implements Observer
 				this.update(this, new ObserverMessage(ObserverMessage.ADD_BLOCK_TYPE, block));
 				height = block.getHeight(dbSet);
 				
-				if(height % Settings.BLOCK_MAX_SIGNATURES == 0) 
+				if(height % (5 * BlockChain.MAX_SIGNATURES) == 0) 
 				{
 					this.syncHeight = height;
 					

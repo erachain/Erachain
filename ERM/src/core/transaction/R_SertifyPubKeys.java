@@ -547,6 +547,7 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
 				blockIndex, transactionIndex);
 		
+		/*
 		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
 		if (psItem == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
@@ -557,6 +558,7 @@ public class R_SertifyPubKeys extends Transaction {
 							new byte[0],
 							blockIndex, transactionIndex));
 		}
+		*/
 
 		// SET PERSON ADDRESS
 		String address;

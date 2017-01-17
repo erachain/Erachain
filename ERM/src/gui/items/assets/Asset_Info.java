@@ -69,7 +69,7 @@ public  Asset_Info() {
 	
 	
 //читаем таблицу .
-		  Tuple5<Long, Long, byte[], Integer, Integer> t3 = DBSet.getInstance().getAssetStatusMap().getItem(asset.getKey(), StatusCls.ALIVE_KEY); //(Long) assetsTable.getValueAt(assetsTable.getSelectedRow(),0));
+//		  Tuple5<Long, Long, byte[], Integer, Integer> t3 = DBSet.getInstance().getAssetStatusMap().getItem(asset.getKey(), StatusCls.ALIVE_KEY); //(Long) assetsTable.getValueAt(assetsTable.getSelectedRow(),0));
 // преобразование в дату
 
 	message = message + "</html>";

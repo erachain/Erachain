@@ -51,7 +51,7 @@ public class TestRecSetStatusToItem {
 	byte FEE_POWER = (byte)0;
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
-	long status_key = StatusCls.ALIVE_KEY;
+	long status_key = 1l;
 	Long to_date = null;
 	long personkey;
 	

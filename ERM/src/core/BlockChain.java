@@ -25,33 +25,47 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	
-	public static final int TESTNET_PORT = 9055;
-	public static final int MAINNET_PORT = 9056;
-	public static final int DEFAULT_WEB_PORT = 9057;
-	public static final int DEFAULT_RPC_PORT = 9058;
+	public static final int TESTNET_PORT = 9045;
+	public static final int MAINNET_PORT = 9046;
+	public static final int DEFAULT_WEB_PORT = 9047;
+	public static final int DEFAULT_RPC_PORT = 9048;
 
 	//
-	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
+	public static final int MAX_SIGNATURES = 100;
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 8;
 	public static final int REPEAT_WIN = 3;
 	
+	// RIGHTs 
+	public static final int GENESIS_ERMO_TOTAL = 10000000;
+	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERMO_TOTAL / 100;
+	public static final int MAJOR_ERMO_BALANCE = 33000;
+	public static final int MINOR_ERMO_BALANCE = 100;
+
 	public static final int GENESIS_WIN_VALUE = 1000;
 
+	// CHAIN
+	public static final int CONFIRMS_HARD = 5; // for reference by signature 
+	// MAX orphan CHAIN
+	public static final int CONFIRMS_TRUE = MAX_SIGNATURES; // for reference by ITEM_KEY
+
+	//TESTNET 
+	public static final long DEFAULT_MAINNET_STAMP = 1477635567777L; //1465107777777L;
+
 	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
-	public static final int FEE_PER_BYTE = 32;
+	public static final int FEE_PER_BYTE = 64;
 	public static final int FEE_SCALE = 8;
 	public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
 	//
-	public static final int FEE_INVITED_DEEP = 15; // levels foe deep
-	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
-	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
+	public static final int FEE_INVITED_DEEP = 3; // levels for deep
+	public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
+	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 	public static final int FEE_FOR_ANONIMOUSE = 33;
 
 	// issue PORSON
-	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
 	// GIFTS for R_SertifyPubKeys
 	//public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);

@@ -40,7 +40,7 @@ public class TestRecGenesisPerson2 {
 	Long releaserReference = null;
 
 	long FEE_KEY = Transaction.FEE_KEY;
-	long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] packedReference = new byte[64];
 	

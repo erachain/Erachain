@@ -48,15 +48,8 @@ public class Settings {
 	//private static final String[] DEFAULT_PEERS = { };
 	
 	// BLOCK
-	public static final int BLOCK_MAX_SIGNATURES = 500; // blocks load onetime
+	//public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
 
-	// CHAIN
-	public static final int CONFIRMS_HARD = 11; // for reference by signature 
-	// MAX orphan CHAIN
-	public static final int CONFIRMS_TRUE = 333; // for reference by ITEM_KEY
-
-	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1477635567777L; //1465107777777L;
 	private long genesisStamp = -1;
 	
 	//RPC
@@ -78,13 +71,7 @@ public class Settings {
 	//DATA
 	private static final String DEFAULT_DATA_DIR = "data";
 	private static final String DEFAULT_WALLET_DIR = "wallet";
-	
-	// RIGHTs 
-	public static final int GENESIS_ERMO_TOTAL = 10000000;
-	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERMO_TOTAL / 10;
-	public static final int MAJOR_ERMO_BALANCE = 33000;
-	public static final int MINOR_ERMO_BALANCE = 100;
-	
+		
 	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
@@ -459,7 +446,7 @@ public class Settings {
 	}
 	
 	public boolean isTestnet () {
-		return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+		return this.getGenesisStamp() != BlockChain.DEFAULT_MAINNET_STAMP;
 	}
 	
 	public long getGenesisStamp() {
@@ -473,7 +460,7 @@ public class Settings {
 					this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
 				}
 			} else {
-				this.genesisStamp = DEFAULT_MAINNET_STAMP;
+				this.genesisStamp = BlockChain.DEFAULT_MAINNET_STAMP;
 			}
 		}
 		

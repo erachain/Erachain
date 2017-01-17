@@ -18,29 +18,32 @@ public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
 	public static final long ERMO_KEY = 1l;
-	public static final String ERMO_ABBREV = "ERM"; // ERMO (main rights units)
-	public static final String ERMO_NAME = "ERMO";
-	public static final String ERMO_DESCR = "It is the basic unit of Environment Real Management Objects (" + ERMO_NAME + ")";
+	public static final String ERMO_ABBREV = "ERA"; // ERMO (main rights units)
+	public static final String ERMO_NAME = "ЭРА";
+	public static final String ERMO_DESCR = "Основня единица - правовая (" + ERMO_NAME + ")";
 	// FEE KEY
 	public static final long FEE_KEY = 2l;
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
-	public static final String FEE_NAME = "COMPU";
-	public static final String FEE_DESCR = "It is an drops of computation used for deals (" + FEE_NAME + ")";
+	public static final String FEE_NAME = "КОМПУ";
+	public static final String FEE_DESCR = "Единица полезной работы среды (" + FEE_NAME + ")";
 	// TRUST KEY
 	public static final long TRUST_KEY = 3l;
 	public static final String TRUST_ABBREV = "TRU"; // COMPU (compute units)
-	public static final String TRUST_NAME = "TRUST";
-	public static final String TRUST_DESCR = "It is an drops of the trust (" + TRUST_NAME + ")";
+	public static final String TRUST_NAME = "Честь";
+	public static final String TRUST_DESCR = "Честь и доверие (" + TRUST_NAME + ")";
 	// REAL KEY
 	public static final long REAL_KEY = 4l;
 	public static final String REAL_ABBREV = "RIL"; // COMPU (compute units)
-	public static final String REAL_NAME = "REAL";
-	public static final String REAL_DESCR = "It is an drops of the real (" + REAL_NAME + ")";
+	public static final String REAL_NAME = "Польза";
+	public static final String REAL_DESCR = "Труд и польза (" + REAL_NAME + ")";
+
+	/*
 	// DEaL KEY
 	public static final long DEAL_KEY = 5l;
 	public static final String DEAL_ABBREV = "DIL"; // COMPU (compute units)
 	public static final String DEAL_NAME = "DEAL";
 	public static final String DEAL_DESCR = "It is an drops of the deal (" + DEAL_NAME + ")";
+	*/
 	
 	public static final int UNIQUE = 1;
 	public static final int VENTURE = 2;

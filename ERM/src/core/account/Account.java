@@ -55,7 +55,7 @@ public class Account {
 	public static final int ADDRESS_LENGTH = 25;
 	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
 
 
@@ -619,11 +619,14 @@ public class Account {
 
 		// IF PERSON ALIVE
 		Long personKey = addressDuration.a;
-		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
+		// TODO by deth day if 
+		/*
+		//Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		Long end_date = personDuration.b;
 		if (end_date == null ) return true; // permanent active
 		if (end_date < current_time + 86400000 ) return false; // - 1 day
+		*/
 		
 		return true;
 		
@@ -647,6 +650,8 @@ public class Account {
 			return new Tuple2<Integer, PersonCls>(-1, person);
 
 		// IF PERSON is ALIVE
+		// TODO by DEATH day
+		/*
 		Tuple5<Long, Long, byte[], Integer, Integer> personDuration = db.getPersonStatusMap().getItem(personKey, ALIVE_KEY);
 		// TEST TIME and EXPIRE TIME for ALIVE person
 		if (personDuration == null)
@@ -655,14 +660,10 @@ public class Account {
 		if (end_date == null )
 			// permanent active
 			return new Tuple2<Integer, PersonCls>(0, person);
-		/*
-		else if (personDuration.c[0] == (byte)2 )
-			// is DEAD
-			return new Tuple2<Integer, PersonCls>(-2, person);
-			*/
 		else if (end_date < current_time + 86400000 )
 			// ALIVE expired
 			return new Tuple2<Integer, PersonCls>(-1, person);
+		*/
 		
 		return new Tuple2<Integer, PersonCls>(1, person);
 		
