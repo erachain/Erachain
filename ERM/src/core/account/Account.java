@@ -591,6 +591,8 @@ public class Account {
 		if(b instanceof Account)
 		{
 			return this.getAddress().equals(((Account) b).getAddress());
+		} else if (b instanceof String) {
+			return this.getAddress().equals((String) b);			
 		}
 		
 		return false;	

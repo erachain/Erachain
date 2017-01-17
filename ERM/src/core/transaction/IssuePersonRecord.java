@@ -75,8 +75,12 @@ public class IssuePersonRecord extends Issue_ItemRecord
 						
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) {
-			if (res == Transaction.NOT_ENOUGH_FEE) {
+			if (res != Transaction.NOT_ENOUGH_FEE) {
 				return res;
+			} else {
+				// IF balance of FEE < 0 - ERROR 
+				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
+					return Transaction.NOT_ENOUGH_FEE;
 			}
 		}
 		
@@ -94,23 +98,23 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		
 		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
 		
-
-		if (false) {
-			BigDecimal fee_balance = this.creator.getBalance(db, FEE_KEY).a;
-			if (fee_balance.compareTo(BigDecimal.ZERO) >= 0) {
-				// for start - may be 0
-				return VALIDATE_OK;				
+		long count = db.getItemPersonMap().size();
+		if (count < 10) {
+			// FIRST 10 pers only by ME
+			if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5")) {				
 			} else {
-				return Transaction.NOT_ENOUGH_FEE;
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 			}
+		}
+
+		// CHECH MAKER IS PERSON?
+		if (!this.creator.isPerson(db)) {
+				// OR RIGHTS_KEY ENOUGHT
+			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
+						.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE) < 0)
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 		} else {
-			// CHECH MAKER IS PERSON?
-			if (!this.creator.isPerson(db)
-					// OR RIGHTS_KEY ENOUGHT
-					&& this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-							.compareTo(BlockChain.PERSON_MIN_ERM_BALANCE) < 0)
-				
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			
 		}
 		
 		return VALIDATE_OK;

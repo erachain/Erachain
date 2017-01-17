@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -1741,12 +1742,19 @@ if ( asset_1 == null) {
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
 			{
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr);
+				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr.a, key);
 				all = all.add(ball.a);
 
 				top100s.add(Fun.t2(addr.a, ball.a));
 			}
 		}
+
+		/*
+		// LIST to LOG.txt
+		JSONObject listJSON = new JSONObject();
+		listJSON.put("item", top100s);
+		LOGGER.info(listJSON);
+		*/
 
 		Collection<Order> orders = DBSet.getInstance().getOrderMap().getValues();
 

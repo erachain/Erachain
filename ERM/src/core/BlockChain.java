@@ -39,7 +39,7 @@ public class BlockChain
 	// RIGHTs 
 	public static final int GENESIS_ERMO_TOTAL = 10000000;
 	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERMO_TOTAL / 100;
-	public static final int MAJOR_ERMO_BALANCE = 33000;
+	public static final int MAJOR_ERMO_BALANCE = 333000;
 	public static final int MINOR_ERMO_BALANCE = 100;
 
 	public static final int GENESIS_WIN_VALUE = 1000;
@@ -50,9 +50,9 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_SIGNATURES; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1477635567777L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1484659743777L; //1465107777777L;
 
-	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
+	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00050000");
 	public static final int FEE_PER_BYTE = 64;
 	public static final int FEE_SCALE = 8;
 	public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
@@ -67,10 +67,13 @@ public class BlockChain
 	// issue PORSON
 	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
+	// SERTIFY
+	// need RIGHTS for non PERSON account
+	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
+	// need RIGHTS for PERSON account
+	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// GIFTS for R_SertifyPubKeys
-	//public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
-	public static final int GIFTED_COMPU_AMOUNT = 10000 * FEE_PER_BYTE;
-	//public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
+	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;

@@ -56,11 +56,6 @@ public class R_SertifyPubKeys extends Transaction {
 	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
-
-	// need RIGHTS for PERSON account
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
-	// need RIGHTS for non PERSON account
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 	
 	public static final int DEFAULT_DURATION = 2 * 356;
 
@@ -463,13 +458,17 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+		if ( balERM.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
-				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+				if ( balERM.compareTo(BlockChain.PSERT_MIN_ERM_BALANCE)<0 )
 					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5")) {
+					
+				} else {
+					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				}
 
 			}
 		
