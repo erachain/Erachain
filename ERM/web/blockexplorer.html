@@ -469,7 +469,7 @@ function topRichest(data)
 		}
 		table += '<td>' + addCommas(data.top[key].balance);
 		table += '<td>' + addCommas(data.top[key].in_OWN);
-		table += '<td>' +  ((data.top[key].balance / data.allTotal) * 100).toFixed(2) + " %";
+		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + " %";
 	}
 	table += '</table>';
 	

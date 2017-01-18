@@ -1774,7 +1774,7 @@ if ( asset_1 == null) {
 				alloreders = alloreders.add(order.getAmountHaveLeft());
 			}
 		}
-//		Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator())); 
+		Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C())); 
 
 		int couter = 0;
 		for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
@@ -3536,6 +3536,24 @@ if ( asset_1 == null) {
 		}
 
 	}
+	
+	public class BigDecimalComparator_C implements Comparator<Tuple3<String, BigDecimal, BigDecimal>> {
+
+		@Override
+		public int compare(Tuple3<String, BigDecimal, BigDecimal> a, Tuple3<String, BigDecimal, BigDecimal> b) 
+		{	
+			try
+			{
+				return a.c.compareTo(b.c);
+			}
+			catch(Exception e)
+			{
+				return 0;
+			}
+		}
+
+	}
+	
 		
 	public int getHeight() {
 		
