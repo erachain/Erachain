@@ -987,9 +987,10 @@ public class Controller extends Observable {
 						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 						if (isNewWinBlockValid == 0 || isNewWinBlockValid == 4) {
 							lastBlock.orphan(dbSet);
-							this.blockChain.clearWaitWinBuffer();
 							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
-							flushNewBlockGenerated();
+							List<Peer> excludes = new ArrayList<Peer>();
+							excludes.add(message.getSender());
+							this.network.broadcast(message, excludes);
 							return;
 						}
 						
@@ -1011,12 +1012,13 @@ public class Controller extends Observable {
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
 						this.network.broadcast(message, excludes);
+						return;
 					}
 				} else {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
-							+ " code: " + isNewWinBlockValid
-							+ newBlock.toString(dbSet));
+							+ ", code: " + isNewWinBlockValid
+							+ ", " + newBlock.toString(dbSet));
 				}
 
 				break;

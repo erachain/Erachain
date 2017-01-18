@@ -258,7 +258,8 @@ public class BlockGenerator extends Thread implements Observer
 
 						try 
 						{
-							Thread.sleep(quickRun?10000:wait_rand);
+							// IF quickRun ++ SLEEP
+							Thread.sleep(quickRun?13000:wait_rand);
 						} 
 						catch (InterruptedException e) 
 						{
