@@ -1002,7 +1002,6 @@ public class Controller extends Observable {
 				if(isNewWinBlockValid == 0)	{
 					if (blockChain.setWaitWinBuffer(dbSet, newBlock)) {
 						// IF IT WIN
-						
 						/*
 						LOGGER.info(Lang.getInstance().translate("received new valid WIN Block")
 								+ " for Height: " + this.getMyHeight());
@@ -1015,6 +1014,18 @@ public class Controller extends Observable {
 						return;
 					}
 				} else {
+					if (isNewWinBlockValid == 4) {
+						// update peers WH
+						Peer peer = blockWinMessage.getSender();
+						Tuple2<Integer, Long> wh = this.getMyHWeight(false);
+						int peerHeight = blockWinMessage.getHeight();
+						if (peerHeight > this.getMyHeight()) {
+							wh = new Tuple2<Integer, Long>(peerHeight, wh.b + 10000l);
+						} else {
+							wh = new Tuple2<Integer, Long>(peerHeight, wh.b - 10000l);							
+						}
+						this.peerHWeight.put(peer, wh);
+					}
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
 							+ ", code: " + isNewWinBlockValid

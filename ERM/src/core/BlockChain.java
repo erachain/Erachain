@@ -39,8 +39,8 @@ public class BlockChain
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
 	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERA_TOTAL / 100;
-	public static final int MAJOR_ERMO_BALANCE = 333000;
-	public static final int MINOR_ERMO_BALANCE = 100;
+	public static final int MAJOR_ERMO_BALANCE = 33000;
+	public static final int MINOR_ERMO_BALANCE = 1000;
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
@@ -50,7 +50,7 @@ public class BlockChain
 	public static final int GENESIS_WIN_VALUE = 1000;
 
 	// CHAIN
-	public static final int CONFIRMS_HARD = 5; // for reference by signature 
+	public static final int CONFIRMS_HARD = 3; // for reference by signature 
 	// MAX orphan CHAIN
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
@@ -58,6 +58,7 @@ public class BlockChain
 	public static final long DEFAULT_MAINNET_STAMP = 1484659743777L; //1465107777777L;
 
 	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00050000");
+	public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
 	public static final int FEE_SCALE = 8;
 	public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);

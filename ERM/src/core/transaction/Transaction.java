@@ -466,21 +466,18 @@ public abstract class Transaction {
 	public int calcCommonFee()
 	{		
 		int len = this.getDataLength(false);
-		int fee = len + 200;
-		if (false && len > 1000) {
-			// add overheat
-			fee += (len - 1000);
+		if (len < BlockChain.FEE_MIN_BYTES) {
+			len = BlockChain.FEE_MIN_BYTES;
 		}
 
 		// FEE_FOR_ANONIMOUSE !
 		///if (this.getBlockHeightByParent(db))
 		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-		int anonimuus = 0;
-		Controller cnt = Controller.getInstance();
-		BlockChain bchain = cnt.getBlockChain();
-		
+		int anonimuus = 0;		
 		// TODO DBSet get from CHAIN
 		/*
+		Controller cnt = Controller.getInstance();
+		BlockChain bchain = cnt.getBlockChain();
 		for ( Account acc : this.getRecipientAccounts())
 		{
 			//byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
@@ -498,10 +495,10 @@ public abstract class Transaction {
 		*/
 		
 		if ( anonimuus > 0) {
-			fee *= anonimuus;
+			len *= anonimuus;
 		}
 		
-		return (int) fee * BlockChain.FEE_PER_BYTE;
+		return (int) len * BlockChain.FEE_PER_BYTE;
 	}
 	
 	// get fee
