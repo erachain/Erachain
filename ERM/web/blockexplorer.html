@@ -456,7 +456,7 @@ function topRichest(data)
 	}
 	
 	
-	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance+'<td><b>'+data.Label_Table_Prop; 
+	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
 
 	for(key in data.top) {
 		table += '<tr>';		
@@ -467,7 +467,9 @@ function topRichest(data)
 		}else{
 		table += '<td>' + data.top[key].person;
 		}
-		table += '<td>' + addCommas(data.top[key].balance) + '<td>' +  ((data.top[key].balance / data.allTotal) * 100).toFixed(2) + " %";
+		table += '<td>' + addCommas(data.top[key].balance);
+		table += '<td>' + addCommas(data.top[key].in_OWN);
+		table += '<td>' +  ((data.top[key].balance / data.allTotal) * 100).toFixed(2) + " %";
 	}
 	table += '</table>';
 	
@@ -3746,7 +3748,7 @@ function start() {
               <input id="q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link" onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
             </div>
-          </div>
+		   </div>
         </div>
       </div>
     </nav>

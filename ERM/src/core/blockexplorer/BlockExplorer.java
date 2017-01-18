@@ -82,6 +82,7 @@ import settings.Settings;
 import utils.BlExpUnit;
 import utils.DateTimeFormat;
 import utils.GZIP;
+import utils.NumberAsString;
 import utils.Pair;
 import utils.ReverseComparator;
 
@@ -763,6 +764,12 @@ public class BlockExplorer
 			assetJSON.put("operations", orders.size() + trades.size());
 
 			output.put(asset.getKey(), assetJSON);
+			output.put("label_Title",  Lang.getInstance().translate("Assets"));
+			output.put("label_table_key", Lang.getInstance().translate("Key"));
+			output.put("label_table_asset_name", Lang.getInstance().translate("Name"));
+			output.put("label_table_asset_owneк", Lang.getInstance().translate("Owner"));
+			output.put("label_table_asset_movable", Lang.getInstance().translate("Movable"));
+			
 		}
 
 		return output;
@@ -1735,7 +1742,7 @@ if ( asset_1 == null) {
 		BigDecimal all = BigDecimal.ZERO.setScale(8);
 		BigDecimal alloreders = BigDecimal.ZERO.setScale(8);
 
-		List<Tuple2<String, BigDecimal>> top100s = new ArrayList<Tuple2<String, BigDecimal>>();
+		List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
 
 		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getAssetBalanceMap().getKeys();
@@ -1743,9 +1750,12 @@ if ( asset_1 == null) {
 			if(addr.b == key)
 			{
 				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr.a, key);
-				all = all.add(ball.a);
-
-				top100s.add(Fun.t2(addr.a, ball.a));
+			//	all = all.add(ball.a);
+				Account account = new Account(addr.a);
+				 BigDecimal ballans = account.getBalanceUSE(key);
+				 
+				
+				top100s.add(Fun.t3(addr.a, ballans, ball.a));
 			}
 		}
 
@@ -1764,10 +1774,11 @@ if ( asset_1 == null) {
 				alloreders = alloreders.add(order.getAmountHaveLeft());
 			}
 		}
-		Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator())); 
+//		Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator())); 
 
 		int couter = 0;
-		for (Tuple2<String, BigDecimal> top100 : top100s) {
+		for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
+			/*
 			if(limit == -1) // allnotzero
 			{
 				if(top100.b.compareTo(BigDecimal.ZERO) <= 0)
@@ -1775,6 +1786,7 @@ if ( asset_1 == null) {
 					break;
 				}
 			}
+			*/
 			couter ++;
 
 						
@@ -1785,6 +1797,7 @@ if ( asset_1 == null) {
 			Map balance=new LinkedHashMap();
 			balance.put("address", top100.a);
 			balance.put("balance", top100.b.toPlainString());
+			balance.put("in_OWN", top100.c.toPlainString());
 			
 			if (person != null){
 			balance.put("person", person.b.getName());
@@ -1806,6 +1819,7 @@ if ( asset_1 == null) {
 		 AssetCls asset = Controller.getInstance().getAsset(key);
 		output.put("Label_Table_Account", Lang.getInstance().translate("Account"));
 		output.put("Label_Table_Balance", Lang.getInstance().translate("Balance"));
+		output.put("Label_Table_in_OWN", Lang.getInstance().translate("in OWN"));
 		output.put("Label_Table_Prop", Lang.getInstance().translate("Prop."));
 		output.put("Label_Table_person", Lang.getInstance().translate("Owner"));
 		
