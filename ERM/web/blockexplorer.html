@@ -671,14 +671,15 @@ function assets(data)
 
 	output += '<table width="1280" border=0><tr><td align=left><br>';
 	
-	output += '<a href="?assets"><h3 style="display:inline;">Assets</h3></a>';
+	output += '<a href="?assets"><h3 style="display:inline;">'+data.label_Title+'</h3></a>';
 	
 	output += '<br><br>';
 	
 	// style="background: #f4f4f4;"
 	
 	var table = '<table width=100% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-	table += '<td><b>Key<td><b>Assets<td><b>Operations<td><b>Description'; 
+	table += '<td><b>'+data.label_table_key+'<td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
+	table += '<td><b>'+ data.label_table_asset_movable+'<td><b>'+data.label_table_asset_amount+'<td><b>'+data.label_table_asset_divisible;
 
 	for(key in data.assets) {
 		table += '<tr>';
@@ -689,6 +690,10 @@ function assets(data)
 		table += '<td>' + data.assets[key].operations;
 	
 		table += '<td>' + htmlFilter(data.assets[key].description);
+		table += '<td>' + htmlFilter(data.assets[key].owner);
+		table += '<td>' + htmlFilter(data.assets[key].isMovable);
+		table += '<td>' +data.assets[key].quantity;
+		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
 	}
 	table += '</table>';
 

@@ -182,6 +182,14 @@ public class BlockExplorer
 				output.put("lastBlock", jsonQueryLastBlock());
 
 				output.put("assets", jsonQueryAssets());
+				output.put("label_Title",  Lang.getInstance().translate("Assets"));
+				output.put("label_table_key", Lang.getInstance().translate("Key"));
+				output.put("label_table_asset_name", Lang.getInstance().translate("Name"));
+				output.put("label_table_asset_creator", Lang.getInstance().translate("Creator"));
+				output.put("label_table_asset_movable", Lang.getInstance().translate("Movable"));
+				output.put("label_table_asset_description", Lang.getInstance().translate("Description"));
+				output.put("label_table_asset_divisible", Lang.getInstance().translate("Divisible"));
+				output.put("label_table_asset_amount", Lang.getInstance().translate("Amount"));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -755,8 +763,13 @@ public class BlockExplorer
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getCreator().getAddress());
-			assetJSON.put("quantity", asset.getQuantity());
-			assetJSON.put("isDivisible", asset.isDivisible());
+			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
+			String a =  Lang.getInstance().translate("False");
+			if (asset.isDivisible()) a =  Lang.getInstance().translate("True");
+			assetJSON.put("isDivisible", a);
+			a =  Lang.getInstance().translate("False");
+			if (asset.isMovable()) a =  Lang.getInstance().translate("True");
+			assetJSON.put("isMovable", a);
 
 			List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(asset.getKey());
 			List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(asset.getKey());
@@ -764,13 +777,11 @@ public class BlockExplorer
 			assetJSON.put("operations", orders.size() + trades.size());
 
 			output.put(asset.getKey(), assetJSON);
-			output.put("label_Title",  Lang.getInstance().translate("Assets"));
-			output.put("label_table_key", Lang.getInstance().translate("Key"));
-			output.put("label_table_asset_name", Lang.getInstance().translate("Name"));
-			output.put("label_table_asset_owneк", Lang.getInstance().translate("Owner"));
-			output.put("label_table_asset_movable", Lang.getInstance().translate("Movable"));
+			
 			
 		}
+		
+
 
 		return output;
 	}
