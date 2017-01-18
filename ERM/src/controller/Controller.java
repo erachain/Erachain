@@ -449,7 +449,7 @@ public class Controller extends Observable {
 		};
 		
 		this.timerPeerHeightUpdate.schedule(action, 
-				Block.GENERATING_MIN_BLOCK_TIME / 2, Block.GENERATING_MIN_BLOCK_TIME / 2);
+				Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
 
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
@@ -979,6 +979,22 @@ public class Controller extends Observable {
 				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
 				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
+				Block lastBlock = this.blockChain.getLastBlock(dbSet);
+				if (newBlock.getReference().equals(lastBlock.getReference())) {
+					LOGGER.debug("  !! it is concurent !!");
+					if (newBlock.calcWinValue(dbSet) > lastBlock.calcWinValue(dbSet)) {
+						LOGGER.debug("   ++ concurent OK ++");
+						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
+						if (isNewWinBlockValid == 0 || isNewWinBlockValid == 4) {
+							lastBlock.orphan(dbSet);
+							this.blockChain.clearWaitWinBuffer();
+							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
+							flushNewBlockGenerated();
+							return;
+						}
+						
+					}
+				}
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
 				// CHECK IF VALID

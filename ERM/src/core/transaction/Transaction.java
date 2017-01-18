@@ -587,7 +587,7 @@ public abstract class Transaction {
 	// reference in Map - or as signatire or as BlockHeight + seqNo
 	public byte[] getDBRef(DBSet db)
 	{
-		if(this.getConfirmations(db) < BlockChain.MAX_SIGNATURES)
+		if(this.getConfirmations(db) < BlockChain.MAX_ORPHAN)
 		{
 			// soft or hard confirmations
 			return this.signature;

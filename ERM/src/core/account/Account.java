@@ -702,12 +702,12 @@ public class Account {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
 		
-		if(generatingBalance < GenesisBlock.MIN_GENERATING_BALANCE)
+		if(generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
 		
-		/* not NEED - by smal TARGET_WIN
-		if (lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
-			// test repeated win account
+		// test repeated win account
+		if (height < 100 && lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
+			// NEED CHECK ONLY ON START
 			int i = 0;
 			for (Block testBlock: lastBlocksForTarget) {
 				i++;
@@ -717,7 +717,6 @@ public class Account {
 					break;
 			}
 		}
-		*/
 
 		/*
 		// if new block in DB - get next height

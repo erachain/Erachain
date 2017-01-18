@@ -31,23 +31,28 @@ public class BlockChain
 	public static final int DEFAULT_RPC_PORT = 9048;
 
 	//
-	public static final int MAX_SIGNATURES = 100;
+	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 2;
-	public static final int REPEAT_WIN = 3;
+	public static final int REPEAT_WIN = 5;
 	
 	// RIGHTs 
-	public static final int GENESIS_ERMO_TOTAL = 10000000;
-	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERMO_TOTAL / 100;
+	public static final int GENESIS_ERA_TOTAL = 10000000;
+	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERA_TOTAL / 100;
 	public static final int MAJOR_ERMO_BALANCE = 333000;
 	public static final int MINOR_ERMO_BALANCE = 100;
-
+	public static final int MIN_GENERATING_BALANCE = 100;
+	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
+	//public static final int GENERATING_RETARGET = 10;
+	public static final int GENERATING_MIN_BLOCK_TIME = 288; // 300 PER DAY
+	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
+	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 	public static final int GENESIS_WIN_VALUE = 1000;
 
 	// CHAIN
 	public static final int CONFIRMS_HARD = 5; // for reference by signature 
 	// MAX orphan CHAIN
-	public static final int CONFIRMS_TRUE = MAX_SIGNATURES; // for reference by ITEM_KEY
+	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
 	public static final long DEFAULT_MAINNET_STAMP = 1484659743777L; //1465107777777L;
@@ -209,7 +214,7 @@ public class BlockChain
 
 	public int getCheckPoint(DBSet dbSet) {
 		
-		int checkPoint = getHeight(dbSet) - BlockChain.MAX_SIGNATURES; 
+		int checkPoint = getHeight(dbSet) - BlockChain.MAX_ORPHAN; 
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;
 		
@@ -242,7 +247,7 @@ public class BlockChain
 			Block childBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
 			
 			int counter = 0;
-			while(childBlock != null && counter < MAX_SIGNATURES)
+			while(childBlock != null && counter < MAX_ORPHAN)
 			{
 				headers.add(childBlock.getSignature());
 				

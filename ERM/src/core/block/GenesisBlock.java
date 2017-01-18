@@ -3,14 +3,9 @@ package core.block;
 // import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-//import java.sql.Timestamp;
-//import org.mapdb.Fun.Tuple3;
-//import org.mapdb.Fun.Tuple11;
-import java.util.TreeSet;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -41,24 +36,13 @@ import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import database.DBSet;
-import gui.Gui;
-import lang.Lang;
 import settings.Settings;
 import utils.Pair;
-import utils.SysTray;
 
 public class GenesisBlock extends Block{
 	
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
-	public final static int GENESIS_GENERATING_BALANCE = BlockChain.GENESIS_ERMO_TOTAL; // starting max volume for generating	
-	//public static final long MAX_GENERATING_BALANCE = GENESIS_GENERATING_BALANCE / 2;
-	public static final int MIN_GENERATING_BALANCE = 100;
-	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
-	//public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 288;
-	public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 
 	private static byte[] icon = new byte[0];
 	private static byte[] image = new byte[0];
@@ -100,7 +84,7 @@ public class GenesisBlock extends Block{
 
 			this.testnetInfo += "\ngenesisSeed: " + Base58.encode(seed);
 			
-			bdAmount0 = new BigDecimal(GENESIS_GENERATING_BALANCE * 0.1).setScale(8);
+			bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL * 0.1).setScale(8);
 			bdAmount1 = new BigDecimal(asset1.getQuantity() * 0.1).setScale(8);
 			for(int nonce=0; nonce<3; nonce++)
 		    {
@@ -147,7 +131,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "950000"),
 					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "940000"),
 					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "930000"),
-					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "782000")
+					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "905000")
 					);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -229,7 +213,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7Kh5KvHCuWAq8XHioKyUBZxRmbwCJZV5b2", "123152.70936"),
 					Arrays.asList("74Rcp979npxf6Q5zV6ZnpEnsxrsCHdXeNU", "1231.5270936"),
 					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "2463.05418719"),
-					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "123152.70936"),
+					//Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "123152.70936"),
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "1231.5270936"),
 					Arrays.asList("7K4XaDVf98J1fKDdCS8oYofYgFgoezFEAA", "1231.5270936"),
 					Arrays.asList("7Cy2J5ST6ukHSJVWtQd7eH4wbhbSBbMbZD", "1231.5270936"),
@@ -256,7 +240,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", "1231.5270936")
 					);
 
-			// genesis users
+			// GENESIS FORGERS
 			List<List<Object>> genesisDebtors = Arrays.asList(
 					Arrays.asList("7MdXzNcKgWXvy7unJ7WPLmp3LQvUdiNEAz", 2),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", 2),
@@ -373,10 +357,10 @@ public class GenesisBlock extends Block{
 			}			
 
 			// FOR DEBROTS
-			int nonce = 0;
+			int nonce = 100;
 			int i = 0;
-			int pickDebt = 19000;
-			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
+			int pickDebt = 54000;
+			BigDecimal limitOwned = new BigDecimal( pickDebt * 3 ).setScale(8);
 
 			Account bufferCreditor = sends_toUsers.get(i).a;
 			BigDecimal bufferAmount = sends_toUsers.get(i).b.subtract(limitOwned);
@@ -389,7 +373,7 @@ public class GenesisBlock extends Block{
 					recipient = new Account((String)item.get(0));
 				}
 				
-				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce++).setScale(8);
+				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce--).setScale(8);
 
 				do {
 					if (bufferAmount.compareTo(bdAmount0) < 0) {

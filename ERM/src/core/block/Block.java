@@ -23,7 +23,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import utils.Converter;
-import utils.ReverseComparator;
 import at.AT_API_Platform_Impl;
 import at.AT_Block;
 import at.AT_Constants;
@@ -32,14 +31,11 @@ import at.AT_Exception;
 import at.AT_Transaction;
 import controller.Controller;
 import core.BlockChain;
-import core.BlockGenerator;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
-import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.assets.Order;
 import core.transaction.DeployATTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
@@ -47,15 +43,13 @@ import core.transaction.TransactionFactory;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 
 import database.DBSet;
-import lang.Lang;
 
 
 public class Block {
 
-	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
+	public static final int GENERATING_MIN_BLOCK_TIME = BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
 	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
@@ -73,7 +67,7 @@ public class Block {
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
-	public static final int MAX_TRANSACTION_BYTES = GenesisBlock.MAX_BLOCK_BYTES - BASE_LENGTH;
+	public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
 
 	protected int version;
 	protected byte[] reference;
@@ -789,7 +783,7 @@ public class Block {
 		if (generatingBalance == 0) {
 			return 1;
 		}
-		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance );
+		int times = BlockChain.GENESIS_ERA_TOTAL / (generatingBalance );
 		
 		if (times < 100) {
 			if (len > times * 7)
@@ -1012,14 +1006,18 @@ public class Block {
 			return false;
 		}
 		
-		/*
-		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
-			if (testBlock.getCreator().equals(this.creator)) {
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
-				return false;
+		// STOP IF SO RAPIDLY
+		if (height < 100) {
+			// NEED CHECK ONLY ON START
+			Block testBlock = this.getParent(db);
+			for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
+				if (testBlock.getCreator().equals(this.creator)) {
+					LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
+					return false;
+				}
+				testBlock = testBlock.getChild(db);
 			}
 		}
-		*/
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
 		{
@@ -1193,7 +1191,7 @@ public class Block {
 
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 		if (blockChain != null) {
-			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_SIGNATURES);
+			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_ORPHAN);
 		}
 
 		//PROCESS TRANSACTIONS
@@ -1206,7 +1204,7 @@ public class Block {
 			seq++;
 		}
 
-		if(height_process % BlockChain.MAX_SIGNATURES == 0) 
+		if(height_process % BlockChain.MAX_ORPHAN == 0) 
 		{
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
