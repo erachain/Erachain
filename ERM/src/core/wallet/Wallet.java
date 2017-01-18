@@ -1209,21 +1209,22 @@ public class Wallet extends Observable implements Observer
 			//KEEP TRACK OF UNCONFIRMED BALANCE
 			//PROCESS FEE
 			BigDecimal blockFee = block.getTotalFeeForProcess();
+			BigDecimal blockTotalFee = block.getTotalFee(DBSet.getInstance());
 
-			if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
 				// find rich account
 				String rich = Account.getRich(Transaction.FEE_KEY);
 				if (!rich.equals(blockGeneratorStr)) {
 
-					blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+					blockFee = blockTotalFee;
 					
 					if(this.accountExists(rich)) {
 
-						BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
 						Account richAccount = new Account(rich);				
 						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
-								.subtract(bonus_fee);
+								.subtract(bonus_fee.divide(new BigDecimal(2)));
 						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
 					}
 				}
@@ -1253,21 +1254,22 @@ public class Wallet extends Observable implements Observer
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
 			BigDecimal blockFee = block.getTotalFeeForProcess();
+			BigDecimal blockTotalFee = block.getTotalFee(DBSet.getInstance());
 
-			if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
 				// find rich account
 				String rich = Account.getRich(Transaction.FEE_KEY);
 				if (!rich.equals(blockGeneratorStr)) {
 
-					blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+					blockFee = blockTotalFee;
 					
 					if(this.accountExists(rich)) {
 
-						BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
+						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
 						Account richAccount = new Account(rich);				
 						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
-								.add(bonus_fee);
+								.add(bonus_fee.divide(new BigDecimal(2)));
 						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
 					}
 				}

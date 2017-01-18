@@ -69,6 +69,11 @@ public abstract class Issue_ItemRecord extends Transaction
 	{
 		return item.toString();
 	}
+	
+	@Override
+	public boolean hasPublicText() {
+		return true;	
+	}
 
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)

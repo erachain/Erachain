@@ -130,6 +130,16 @@ public class R_Send extends TransactionAmount {
 		return (Arrays.equals(this.encrypted,new byte[1]))?false:true;
 	}
 	
+	@Override
+	public boolean hasPublicText() {
+		if (data == null || data.length == 0)
+			return false;
+		if (Arrays.equals(this.encrypted,new byte[0]))
+			return false;
+		
+		return true;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

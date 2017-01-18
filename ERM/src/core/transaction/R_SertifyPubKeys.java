@@ -464,7 +464,7 @@ public class R_SertifyPubKeys extends Transaction {
 				if ( balERM.compareTo(BlockChain.PSERT_MIN_ERM_BALANCE)<0 )
 					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5")) {
+				if (this.creator.equals(BlockChain.PSERT_GENERAL_ERM_BALANCE)) {
 					
 				} else {
 					return Transaction.ACCOUNT_NOT_PERSONALIZED;

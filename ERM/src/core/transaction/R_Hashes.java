@@ -125,6 +125,20 @@ public class R_Hashes extends Transaction {
 	{
 		return this.hashes;
 	}
+	
+	@Override
+	public boolean hasPublicText() {
+		if (url != null && url.length != 0)
+			return true;
+			
+		if (data == null || data.length == 0)
+			return false;
+		//if (Arrays.equals(this.encrypted,new byte[0]))
+		//	return false;
+		
+		return true;
+	
+	}
 
 	public static byte[] findRecord(DBSet db, byte[] hash) 
 	{

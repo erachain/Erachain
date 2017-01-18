@@ -69,6 +69,14 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	
 	//public String getName() { return "Issue Person"; }
 	
+	@Override
+	public boolean hasPublicText() {
+		if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+			return false;
+		}
+		return true;
+	}
+
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) 
 	{
@@ -99,9 +107,10 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
 		
 		long count = db.getItemPersonMap().size();
-		if (count < 10) {
-			// FIRST 10 pers only by ME
-			if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5")) {				
+		if (count < 3) {
+			// FIRST Persons only by ME
+			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+				return VALIDATE_OK;
 			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 			}

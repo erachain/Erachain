@@ -256,17 +256,30 @@ public class Block {
 		return this.creator;
 	}
 
-	public BigDecimal getTotalFee()
+	public BigDecimal getTotalFee(DBSet db)
 	{
 		BigDecimal fee = this.getTotalFeeForProcess();
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
 
-		if ( fee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) 
-			fee = BlockChain.MIN_FEE_IN_BLOCK;
+		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
+		BigDecimal two = new BigDecimal(2);
+		int height = this.getHeightByParent(db);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 10)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 20)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 40)
+			minFee = minFee.divide(two).setScale(8);
+			
+		if ( fee.compareTo(minFee) < 0) 
+			fee = minFee;
 
 		return fee;
+	}
+	public BigDecimal getTotalFee() {
+		return getTotalFee(DBSet.getInstance());
 	}
 	
 	public BigDecimal getTotalFeeForProcess()
@@ -1154,19 +1167,21 @@ public class Block {
 
 		//PROCESS FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess();
+		BigDecimal blockTotalFee = getTotalFee(dbSet);
 
-		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+		
+		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
 			String rich = Account.getRich(Transaction.FEE_KEY);
 			if (!rich.equals(this.creator.getAddress())) {
 			
-				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
-				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+				blockFee = blockTotalFee;
 				Account richAccount = new Account(rich);
 			
 				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).subtract(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee);
+				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 				
 			}
 		}
@@ -1250,19 +1265,20 @@ public class Block {
 
 		//REMOVE FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess();
+		BigDecimal blockTotalFee = getTotalFee(dbSet); 
 
-		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
 			String rich = Account.getRich(Transaction.FEE_KEY);
 
 			if (!rich.equals(this.creator.getAddress())) {
-				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
-				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+				blockFee = blockTotalFee;
 
 				Account richAccount = new Account(rich);
 				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).add(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee);
+				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 				
 			}
 		}

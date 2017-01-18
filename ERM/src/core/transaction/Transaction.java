@@ -462,13 +462,15 @@ public abstract class Transaction {
 		return true;
 	}			
 
+	public boolean hasPublicText()
+	{
+		return false;
+	}
+
 	
 	public int calcCommonFee()
 	{		
 		int len = this.getDataLength(false);
-		if (len < BlockChain.FEE_MIN_BYTES) {
-			len = BlockChain.FEE_MIN_BYTES;
-		}
 
 		// FEE_FOR_ANONIMOUSE !
 		///if (this.getBlockHeightByParent(db))
@@ -845,7 +847,11 @@ public abstract class Transaction {
 		{
 			return NOT_ENOUGH_FEE;
 		}
-						
+		
+		if (this.hasPublicText() && this.creator.isPerson(db)) {
+			return ACCOUNT_NOT_PERSONALIZED;
+		}
+					
 		return VALIDATE_OK;
 
 	}
