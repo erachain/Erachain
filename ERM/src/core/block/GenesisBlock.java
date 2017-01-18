@@ -136,16 +136,19 @@ public class GenesisBlock extends Block{
 			List<Tuple2<Account, BigDecimal>> sends_toUsers = new ArrayList<Tuple2<Account, BigDecimal>>();
 			
 			/*
-			 * 7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ	4,950,013.00000000	8,950,000.00000000
-			 * 78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5	1,213,379.00000000	1,123,153.00000000
 			 */
 			///////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
-					Arrays.asList(11, new PersonHuman(new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"),
-							"-", "1966-08-21", null, 
-							(byte)10, "-", (float)0.0, (float)0.0,
-							"-", "-", "-", (int) 188, icon, image, "-"))
-				);
+					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "1000000"),
+					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "990000"),
+					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "980000"),
+					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "970000"),
+					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "960000"),
+					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "950000"),
+					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "940000"),
+					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "930000"),
+					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "782000")
+					);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
 					/*
@@ -322,146 +325,25 @@ public class GenesisBlock extends Block{
 					);
 
 			// TRANSFERS
-
-			// summ picks
-			long generalPicked = 0;
-			for(List<Object> item: generalGenesisUsers)
-			{
-				generalPicked += (int)item.get(0);
-			}
-
-			long majorPicked = 0;
-			for(List<Object> item: majorGenesisUsers)
-			{
-				majorPicked += (int)item.get(0);
-			}
-
-			long minorPicked = 0;
-			for(List<Object> item: minorGenesisUsers)
-			{
-				minorPicked += (int)item.get(0);
-			}
-
-			long debtorPicked = 0;
-			for(List<Object> item: genesisDebtors)
-			{
-				debtorPicked += (int)item.get(1);
-			}
-
 			// 
-			float majorPick = (float)0.0; // NONE
-			float minorPick = (float)0.000; // NONE
-			float investorPick = (float)0.1;
-			float activistPick = (float)0.05;
-			double generalKoeff0 = (1.0 - majorPick - minorPick - investorPick - activistPick)
-					* GENESIS_GENERATING_BALANCE / generalPicked;
-			
-			//double generalKoeff1 = asset1.getQuantity() / generalPicked;
-			double majorKoeff = majorPick * GENESIS_GENERATING_BALANCE / majorPicked;
-			double minorKoeff = minorPick * GENESIS_GENERATING_BALANCE / minorPicked;
-			double debtorKoeff = 0.6 * GENESIS_GENERATING_BALANCE / debtorPicked;
-			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
-			
-			//long i = 0;
-			int pick;
-			double d_pick;
 
-			int nonce = 0;
+			
 			for(List<Object> item: generalGenesisUsers)
 			{
 				
-				pick = (int)item.get(0);
-				user = (PersonHuman)item.get(1);
+				recipient = new Account((String)item.get(0));
 				
-				recipient = user.getCreator();
-				
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user));
-
-				bdAmount0 = new BigDecimal(pick * Math.round(generalKoeff0) - nonce++).setScale(8);
-				//bal0 = bal0.add(bdAmount0).setScale(8);
+				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 				
 				// buffer for CREDIT sends
 				sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 
-				//bdAmount1 = new BigDecimal(Math.round(pick * generalKoeff1)).setScale(8);
 				bdAmount1 = BigDecimal.ONE.setScale(8);
-				//bal1 = bal1.add(bdAmount1).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
-
 			}
 
-			// IN RENT
-			Account rentOwner = new Account("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz");
-			for(List<Object> item: majorGenesisUsers)
-			{
-				
-				pick = (int)item.get(0);
-				user = (PersonHuman)item.get(1);
-				
-				recipient = user.getCreator();
-				
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user));
-
-				bdAmount0 = new BigDecimal(Math.round(pick * majorKoeff) - nonce++).setScale(8);
-				//bal0 = bal0.add(bdAmount0).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0, rentOwner));
-
-				// buffer for CREDIT sends
-				sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
-
-				bdAmount1 = new BigDecimal("0.001").setScale(8);
-				//bal1 = bal1.add(bdAmount1).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
-
-				// CERTIFY PERSON
-				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
-
-			}
-
-			for(List<Object> item: minorGenesisUsers)
-			{
-				
-				d_pick = (double)item.get(0);
-				user = (PersonHuman)item.get(1);
-				
-				recipient = user.getCreator();
-				
-				//CREATE ISSUE PERSON TRANSACTION
-				//this.addTransaction(new GenesisIssuePersonRecord(user));
-
-				bdAmount0 = new BigDecimal(d_pick * minorKoeff).setScale(8);
-				//bal0 = bal0.add(bdAmount0).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
-
-				// buffer for CREDIT sends
-				sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
-
-				bdAmount1 = new BigDecimal("0.001").setScale(8);
-				//bal1 = bal1.add(bdAmount1).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
-
-				// CERTIFY PERSON
-				//this.addTransaction(new GenesisCertifyPersonRecord(recipient, i++));
-
-			}
-
-			// PERSONALIZED USERS
-			for(PersonCls person: personGenesisUsers)
-			{				
-				//CREATE ISSUE PERSON TRANSACTION
-				GenesisIssuePersonRecord tr = new GenesisIssuePersonRecord(person);
-				if (Transaction.VALIDATE_OK != tr.isValid(null))
-				{
-					//throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
-					LOGGER.error(Lang.getInstance().translate("Genesis person error"));
-				} else {
-					//this.addTransaction(new GenesisIssuePersonRecord(person));
-				}
-			}
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
 			for(List<Object> item: genesisInvestors)
@@ -477,9 +359,6 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
-				bdAmount1 = new BigDecimal("0.001").setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
-
 			}			
 
 			// ACTIVITES
@@ -494,21 +373,23 @@ public class GenesisBlock extends Block{
 			}			
 
 			// FOR DEBROTS
-			nonce = 0;
+			int nonce = 0;
 			int i = 0;
+			int pickDebt = 19000;
+			BigDecimal limitOwned = new BigDecimal( 0.001 * GENESIS_GENERATING_BALANCE).setScale(8);
+
 			Account bufferCreditor = sends_toUsers.get(i).a;
 			BigDecimal bufferAmount = sends_toUsers.get(i).b.subtract(limitOwned);
 			for(List<Object> item: genesisDebtors)
 			{
 				
-				pick = (int)item.get(1);
 				if (((String)item.get(0)).length() > 36 ) {
 					recipient = new PublicKeyAccount((String)item.get(0));					
 				} else {
 					recipient = new Account((String)item.get(0));
 				}
 				
-				bdAmount0 = new BigDecimal(Math.round(pick * debtorKoeff) + nonce++).setScale(8);
+				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce++).setScale(8);
 
 				do {
 					if (bufferAmount.compareTo(bdAmount0) < 0) {
