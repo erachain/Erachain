@@ -362,24 +362,8 @@ public class IssuePersonPanel extends JPanel
 			gender = (byte) (this.txtGender.getSelectedIndex());
 			
 			parse++;
-			  Date date = this.txtBirthday.getCalendar().getTime();
-			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			if (str.length() < 11) str = str + " 12:12:12 UTC";
-			birthday = Timestamp.valueOf(str).getTime();
-try{
-			parse++;
-			date = this.txtDeathday.getCalendar().getTime();
-			//str = this.txtDeathday.getDate().toString();
-			str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			
-				if (str.length() < 11) str = str + " 12:12:12 UTC";
-				deathday = Timestamp.valueOf(str).getTime();
-			
-}
-catch(Exception e3){
-	deathday = birthday -1;
-	
-}
+			birthday = this.txtBirthday.getCalendar().getTimeInMillis() + 60000;
+
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			

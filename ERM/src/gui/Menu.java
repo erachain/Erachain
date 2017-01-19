@@ -33,7 +33,6 @@ import gui.items.accounts.Account_Take_Hold_Dialog;
 import gui.items.assets.IssueAssetDialog;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
-import gui.items.persons.IssuePersonDialog;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.RIPPersonFrame;
 import gui.items.statuses.MainStatusesFrame;
@@ -300,22 +299,6 @@ public class Menu extends JMenuBar
         });
         personsMenu.add(allPersonsMenu);  
         
-        // issue Person menu
-        JMenuItem issuePersonMenu = new JMenuItem(Lang.getInstance().translate("Issue Person"));
-        issuePersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Issue Person"));
-   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        issuePersonMenu.addActionListener(new ActionListener()
-        {
-        	public void actionPerformed(ActionEvent e)
-        	{
-             
-        		//selectOrAdd( new IssuePersonFrame(), MainFrame.desktopPane.getAllFrames());
-        		new IssuePersonDialog();
-        		
-        	}
-        });
-  //      personsMenu.add(issuePersonMenu);  
-
         // issue Person menu
         JMenuItem ripPersonMenu = new JMenuItem(Lang.getInstance().translate("R.I.P. Person"));
         ripPersonMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("RIP Person"));
