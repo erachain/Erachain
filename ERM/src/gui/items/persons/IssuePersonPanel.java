@@ -437,11 +437,6 @@ public class IssuePersonPanel extends JPanel
 			 imgButes = null;
 			 iconButton.setIcon(null);
 			
-			
-			
-		
-			
-			
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}

@@ -262,7 +262,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			if (str.equals("0000-00-00")) 
 				fromDate = Long.MIN_VALUE;
 			else {
-				if (str.length() < 11) str = str + " 12:12:12 UTC";
+				if (str.length() < 11) str = str + " 12:12:12";
 				fromDate = Timestamp.valueOf(str).getTime();
 			}
 
@@ -272,7 +272,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			if (str.equals("0000-00-00")) 
 				toDate = Long.MAX_VALUE;
 			else {
-				if (str.length() < 11) str = str + " 12:12:12 UTC";
+				if (str.length() < 11) str = str + " 12:12:12";
 				toDate = Timestamp.valueOf(str).getTime();
 			}
 
