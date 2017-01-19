@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -1510,6 +1512,12 @@ if ( asset_1 == null) {
 		output.put("creator_key", person.getCreator().getPerson().b.getKey());
 		output.put("creator_name", person.getCreator().getPerson().b.getName());
 		output.put("name", person.getName());
+
+		Date ddd = new Date(person.getBirthday());
+        DateFormat timeFormat = new SimpleDateFormat("YYYY.MM.DD");
+        timeFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        String dataStr = timeFormat.format(ddd);
+
 		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
 		output.put("description", person.getDescription());
 		
