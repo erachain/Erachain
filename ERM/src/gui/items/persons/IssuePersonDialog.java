@@ -380,7 +380,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 			//birthday = Long.parseLong(this.txtBirthday.getText());
 			// 1970-08-12 03:05:07
 			String str = this.txtBirthday.getText();
-			if (str.length() < 11) str = str + " 00:00:00";
+			if (str.length() < 11) str = str + " 12:12:12 UTC"; // GMT+3
 			birthday = Timestamp.valueOf(str).getTime();
 
 			parse++;
@@ -388,7 +388,7 @@ public class IssuePersonDialog extends JDialog //JFrame
 			if (str.equals("0000-00-00")) {
 				deathday = birthday -1;
 			} else {
-				if (str.length() < 11) str = str + " 00:00:00";
+				if (str.length() < 11) str = str + " 12:12:12 UTC"; // GMT+5
 				deathday = Timestamp.valueOf(str).getTime();
 			}
 

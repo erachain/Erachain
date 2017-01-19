@@ -364,7 +364,7 @@ public class IssuePersonPanel extends JPanel
 			parse++;
 			  Date date = this.txtBirthday.getCalendar().getTime();
 			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			if (str.length() < 11) str = str + " 00:00:00";
+			if (str.length() < 11) str = str + " 12:12:12 UTC";
 			birthday = Timestamp.valueOf(str).getTime();
 try{
 			parse++;
@@ -372,7 +372,7 @@ try{
 			//str = this.txtDeathday.getDate().toString();
 			str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
 			
-				if (str.length() < 11) str = str + " 00:00:00";
+				if (str.length() < 11) str = str + " 12:12:12 UTC";
 				deathday = Timestamp.valueOf(str).getTime();
 			
 }

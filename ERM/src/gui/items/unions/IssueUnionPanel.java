@@ -329,7 +329,7 @@ public class IssueUnionPanel extends JPanel
 			//birthday = Long.parseLong(this.txtBirthday.getText());
 			// 1970-08-12 03:05:07
 			String bd = this.txtBirthday.getText();
-			if (bd.length() < 11) bd = bd + " 00:00:00";
+			if (bd.length() < 11) bd = bd + " 12:12:12 UTC";
 			Timestamp ts = Timestamp.valueOf(bd);
 			birthday = ts.getTime();
 
