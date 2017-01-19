@@ -70,6 +70,10 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Imprint"; }
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	@Override
 	public boolean isReferenced()
 	{
