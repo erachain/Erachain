@@ -57,7 +57,7 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1484803431444L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1484854430444L; //1465107777777L;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
