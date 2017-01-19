@@ -60,6 +60,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference);
 	}
 
+	public boolean hasPublicText() {
+		return true;
+	}
+
 	// PARSE CONVERT
 
 	public static Transaction Parse(byte[] data) throws Exception {

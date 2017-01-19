@@ -63,6 +63,10 @@ public class SellNameTransaction extends Transaction
 		return this.nameSale;
 	}
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception

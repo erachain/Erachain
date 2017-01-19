@@ -84,6 +84,10 @@ public class VoteOnPollTransaction extends Transaction
 		return this.option;
 	}
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//PARSE CONVERT
 	
 	@SuppressWarnings("unchecked")

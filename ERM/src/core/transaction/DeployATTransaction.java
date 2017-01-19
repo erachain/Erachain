@@ -87,6 +87,10 @@ public class DeployATTransaction extends Transaction
 
 	//PARSE/CONVERT
 	//public static String getName() { return "OLD: Deploy AT"; }
+	public boolean hasPublicText() {
+		return true;
+	}
+
 
 	public static Transaction Parse(byte[] data) throws Exception 
 	{

@@ -206,6 +206,15 @@ public class IssueStatementRecord extends Transaction {
 		return items;
 	}
 
+	public boolean hasPublicText() {
+		if (data == null || data.length == 0)
+			return false;
+		if (!Arrays.equals(this.encrypted,new byte[1]))
+			return false;
+		
+		return true;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

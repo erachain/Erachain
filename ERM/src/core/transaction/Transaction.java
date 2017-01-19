@@ -462,10 +462,7 @@ public abstract class Transaction {
 		return true;
 	}			
 
-	public boolean hasPublicText()
-	{
-		return false;
-	}
+	public abstract boolean hasPublicText();
 
 	
 	public int calcCommonFee()
@@ -848,10 +845,10 @@ public abstract class Transaction {
 			return NOT_ENOUGH_FEE;
 		}
 		
-		if (this.hasPublicText() && this.creator.isPerson(db)) {
+		if (this.hasPublicText() && !this.creator.isPerson(db)) {
 			return ACCOUNT_NOT_PERSONALIZED;
 		}
-					
+
 		return VALIDATE_OK;
 
 	}

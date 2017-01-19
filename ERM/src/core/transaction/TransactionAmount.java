@@ -356,6 +356,10 @@ public abstract class TransactionAmount extends Transaction {
 				}
 			}
 		}
+		
+		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+			return ACCOUNT_NOT_PERSONALIZED;
+		}
 
 		return VALIDATE_OK;
 	}		

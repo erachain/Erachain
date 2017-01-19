@@ -189,6 +189,11 @@ public class R_SertifyPubKeys extends Transaction {
 	{
 		return typeBytes[2];
 	}
+	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 			
 	//////// VIEWS
 	@Override

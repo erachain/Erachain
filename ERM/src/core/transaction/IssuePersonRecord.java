@@ -106,7 +106,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		
 		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
 		
-		long count = db.getItemPersonMap().size();
+		long count = db.getItemPersonMap().getSize();
 		if (count < 3) {
 			// FIRST Persons only by ME
 			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {

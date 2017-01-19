@@ -58,6 +58,10 @@ public class UpdateNameTransaction extends Transaction
 		return this.name;
 	}
 	
+	public boolean hasPublicText() {
+		return true;
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception
