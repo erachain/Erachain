@@ -262,15 +262,22 @@ public class Block {
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
+		int inDay = BlockChain.BLOCKS_PER_DAY;
 
 		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
 		BigDecimal two = new BigDecimal(2);
 		int height = this.getHeightByParent(db);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 10)
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * inDay)
 			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 20)
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 2 * inDay)
 			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 40)
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 4 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 8 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 16 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 32 * inDay)
 			minFee = minFee.divide(two).setScale(8);
 			
 		if ( fee.compareTo(minFee) < 0) 
