@@ -218,7 +218,6 @@
 	"Expiration should be at least 20":"",
 	"Expire after:":"",
 	"Failed to connect to : ":"Не удалось подключиться к : ",
-	"False":"Нет",
 	"Favorite":"Избранные",
 	"Fee":"Сбор",
 	"Fee below the minimum for this size of a transaction!":"Сбор ниже минимального для такого размера сделки!",
@@ -595,7 +594,6 @@
 	"Total Votes":"Всего Голосов",
 	"Trade History":"История Торгов",
 	"Trade":"Торг",
-	"True":"Да",
 	"To Date":"По Дату"
 	"To do":"Действительно до",
 	"To sell":"Продать",

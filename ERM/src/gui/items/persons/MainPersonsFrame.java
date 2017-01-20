@@ -244,7 +244,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 			//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
 			////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 			
-			Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+			Person_Info_002 info_panel = new Person_Info_002(person, false);
 			info_panel.setPreferredSize(new Dimension(search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().width-50,search_Person_SplitPanel.jScrollPane_jPanel_RightPanel.getSize().height-50));
 			my_Person_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 		}
