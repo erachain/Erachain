@@ -965,6 +965,14 @@ public class Block {
 	{
 		
 		int height = this.getHeightByParent(db);
+
+		//CHECK IF PARENT EXISTS
+		// FOR PROBE START !!!
+		if(height > 1000)
+		{
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] is PROBE");
+			return false;
+		}
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{

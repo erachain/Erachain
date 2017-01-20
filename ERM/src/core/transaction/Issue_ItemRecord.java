@@ -155,6 +155,16 @@ public abstract class Issue_ItemRecord extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 				
+		long count = this.item.getDBMap(db).getSize();
+		if (count < 10) {
+			// FIRST Persons only by ME
+			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+				return VALIDATE_OK;
+			} else {
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			}
+		}
+
 		return super.isValid(db, releaserReference);
 	
 	}

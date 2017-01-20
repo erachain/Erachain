@@ -84,15 +84,9 @@ public class Account {
 	}
 	
 	//BALANCE
-	
-	// GET in_OWN or in_RENT if key <0
-	public BigDecimal getUnconfirmedBalance(long key)
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(long key)
 	{
 		return Controller.getInstance().getUnconfirmedBalance(this, key);
-	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(long key)
-	{
-		return Controller.getInstance().getUnconfirmedBalance3(this, key);
 	}
 	/*
 	public BigDecimal getConfirmedBalance()
@@ -328,7 +322,7 @@ public class Account {
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
 		{
-			return this.getUnconfirmedBalance3(key);
+			return this.getUnconfirmedBalance(key);
 		}
 		
 		//IF 1 CONFIRMATION

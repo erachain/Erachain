@@ -178,15 +178,17 @@ public class Wallet extends Observable implements Observer
 	//{
 	//	return this.database.getAccountMap().getUnconfirmedBalance(address, key);
 	//}
+	/*
 	public BigDecimal getUnconfirmedBalance(Account account, long key)
 	{
 		
 		return this.database.getAccountMap().getUnconfirmedBalance(account, key);
 	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(Account account, long key)
+	*/
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key)
 	{
 		
-		return this.database.getAccountMap().getUnconfirmedBalance3(account, key);
+		return this.database.getAccountMap().getBalance(account, key);
 	}
 	
 	public List<PrivateKeyAccount> getprivateKeyAccounts()
@@ -600,8 +602,8 @@ public class Wallet extends Observable implements Observer
 		{
 			for(Tuple2<Account, Long> account_asset: accounts_assets)
 			{
-				this.database.getAccountMap().update(
-						account_asset.a, account_asset.b, account_asset.a.getBalance(account_asset.b));
+				this.database.getAccountMap().changeBalance(
+						account_asset.a.getAddress(), false, account_asset.b, BigDecimal.ZERO);
 			}
 		}
 
@@ -1040,31 +1042,28 @@ public class Wallet extends Observable implements Observer
 		//UPDATE UNCONFIRMED BALANCE for ASSET
 		// TODO: fee doubled?
 		long key = transaction.getAssetKey();
-		BigDecimal fee = asOrphan?BigDecimal.ZERO.subtract(transaction.getFee(account)):transaction.getFee(account);
-		if (key != 0)
+		long absKey = key<0?-key:key;
+		String address = account.getAddress();
+		
+		BigDecimal fee = transaction.getFee(account);
+		if (absKey != 0)
 		{
 			// ASSET TRANSFERED + FEE
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(account, key);
-			BigDecimal amount = asOrphan?BigDecimal.ZERO.subtract(transaction.getAmount(account)):transaction.getAmount(account);
-			unconfirmedBalance = unconfirmedBalance.add(amount);
+			BigDecimal amount = transaction.getAmount(account);
 
 			if (fee.compareTo(BigDecimal.ZERO) != 0)
 			{
-				if (key == FEE_KEY)
+				if (absKey == FEE_KEY)
 				{
-					unconfirmedBalance = unconfirmedBalance.subtract(fee);
-				} else {
-					this.database.getAccountMap().update(account, FEE_KEY,
-						this.getUnconfirmedBalance(account, FEE_KEY).subtract(fee));
+					amount = amount.subtract(fee);
 				}
 			}
-			this.database.getAccountMap().update(account, key, unconfirmedBalance);
+			this.database.getAccountMap().changeBalance(address, !asOrphan, key, amount);
 		} else {
 			// ONLY FEE
 			if (fee.compareTo(BigDecimal.ZERO) != 0)
 			{
-				this.database.getAccountMap().update(account, FEE_KEY,
-					this.getUnconfirmedBalance(account, FEE_KEY).subtract(fee));
+				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee);
 			}
 		}
 
@@ -1115,9 +1114,8 @@ public class Wallet extends Observable implements Observer
 				//if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
 				if(atTx.b.getRecipient() == account.getAddress() )
 				{				
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
-								account, atTx.b.getKey()).add(BigDecimal.valueOf(atTx.b.getAmount(),8));
-						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
+						this.database.getAccountMap().changeBalance(
+								account.getAddress(), false, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount(),8));
 					
 				}
 			}
@@ -1169,10 +1167,8 @@ public class Wallet extends Observable implements Observer
 				//CHECK IF INVOLVED
 				if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
 				{				
-						BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(
-								account, atTx.b.getKey()).subtract( BigDecimal.valueOf(atTx.b.getAmount(),8));
-						this.database.getAccountMap().update(account, atTx.b.getKey(), unconfirmedBalance);
-					
+					this.database.getAccountMap().changeBalance(
+							account.getAddress(), true, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount(),8));
 				}
 			}
 		}
@@ -1222,16 +1218,15 @@ public class Wallet extends Observable implements Observer
 					if(this.accountExists(rich)) {
 
 						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-						Account richAccount = new Account(rich);				
-						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
-								.subtract(bonus_fee.divide(new BigDecimal(2)));
-						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
+						Account richAccount = new Account(rich);	
+						this.database.getAccountMap().changeBalance(
+								richAccount.getAddress(), true, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 					}
 				}
 			}
 			
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(blockGenerator, FEE_KEY).add(blockFee);
-			this.database.getAccountMap().update(blockGenerator, FEE_KEY, unconfirmedBalance);
+			this.database.getAccountMap().changeBalance(
+					blockGenerator.getAddress(), false, FEE_KEY, blockFee);
 		}
 	}
 
@@ -1267,16 +1262,15 @@ public class Wallet extends Observable implements Observer
 					if(this.accountExists(rich)) {
 
 						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-						Account richAccount = new Account(rich);				
-						BigDecimal unconfirmedBalanceRich = this.getUnconfirmedBalance(richAccount, FEE_KEY)
-								.add(bonus_fee.divide(new BigDecimal(2)));
-						this.database.getAccountMap().update(richAccount, FEE_KEY, unconfirmedBalanceRich);
+						Account richAccount = new Account(rich);
+						this.database.getAccountMap().changeBalance(
+								richAccount.getAddress(), false, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 					}
 				}
 			}
 
-			BigDecimal unconfirmedBalance = this.getUnconfirmedBalance(blockGenerator, FEE_KEY).subtract(blockFee);
-			this.database.getAccountMap().update(blockGenerator, FEE_KEY, unconfirmedBalance);
+			this.database.getAccountMap().changeBalance(
+					blockGenerator.getAddress(), true, FEE_KEY, blockFee);
 		}
 	}
 	
@@ -1586,22 +1580,24 @@ public class Wallet extends Observable implements Observer
 				Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 						.get(person.getReference()));
 				// GET FEE from that record
-				long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-				BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+				transPersonIssue.calcFee(); // RECALC FEE if from DB
+				BigDecimal issueFEE_BD = transPersonIssue.getFee();
+				//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+				//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 				BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 	
 				// GIFTs
 				if(this.accountExists(creator.getAddress()))
 				{
-					this.database.getAccountMap().update(creator, FEE_KEY,
-							this.getUnconfirmedBalance(creator, FEE_KEY).subtract(issueGIFT_FEE_BD));
+					this.database.getAccountMap().changeBalance(
+							creator.getAddress(), false, FEE_KEY, issueGIFT_FEE_BD);
 				}
 				
 				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 				if(this.accountExists(pkAccount.getAddress())) 
 				{
-					this.database.getAccountMap().update(pkAccount, FEE_KEY,
-							this.getUnconfirmedBalance(pkAccount, FEE_KEY).add(issueFEE_BD));
+					this.database.getAccountMap().changeBalance(
+							pkAccount.getAddress(), false, FEE_KEY, issueFEE_BD);
 				}
 			}
 		}
@@ -1637,22 +1633,24 @@ public class Wallet extends Observable implements Observer
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			transPersonIssue.calcFee(); // RECALC FEE if from DB
+			BigDecimal issueFEE_BD = transPersonIssue.getFee();
+			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 
 			// GIFTs
 			if(this.accountExists(creator.getAddress()))
 			{
-				this.database.getAccountMap().update(creator, FEE_KEY,
-						this.getUnconfirmedBalance(creator, FEE_KEY).add(issueGIFT_FEE_BD));
+				this.database.getAccountMap().changeBalance(
+						creator.getAddress(), true, FEE_KEY, issueGIFT_FEE_BD);
 			}
 			
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 			if(this.accountExists(creator.getAddress())) 
 			{
-				this.database.getAccountMap().update(pkAccount, FEE_KEY,
-						this.getUnconfirmedBalance(pkAccount, FEE_KEY).subtract(issueFEE_BD));
+				this.database.getAccountMap().changeBalance(
+						pkAccount.getAddress(), true, FEE_KEY, issueFEE_BD);
 			}
 		}
 	}

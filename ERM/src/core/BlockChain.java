@@ -57,7 +57,7 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1484854430444L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1484949935444L; //1465107777777L;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -67,7 +67,7 @@ public class BlockChain
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
 	//
-	public static final int FEE_INVITED_DEEP = 3; // levels for deep
+	public static final int FEE_INVITED_DEEP = 4; // levels for deep
 	public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 	public static final int FEE_FOR_ANONIMOUSE = 33;

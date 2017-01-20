@@ -1548,11 +1548,8 @@ public class Controller extends Observable {
 	//public BigDecimal getUnconfirmedBalance(String address, long key) {
 	//	return this.wallet.getUnconfirmedBalance(address, key);
 	//}
-	public BigDecimal getUnconfirmedBalance(Account account, long key) {
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
 		return this.wallet.getUnconfirmedBalance(account, key);
-	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(Account account, long key) {
-		return this.wallet.getUnconfirmedBalance3(account, key);
 	}
 
 	public void addWalletListener(Observer o) {

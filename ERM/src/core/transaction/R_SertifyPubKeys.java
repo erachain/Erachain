@@ -521,22 +521,24 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong();
+			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			//long issueFEE = transPersonIssue.getFeeLong();
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;
 			
 			// ISSUE NEW COMPU in chain
-			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueFEE_BD = transPersonIssue.getFee();
 			// GIFT from CREATOR to TARGET
 			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs			
 			//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(issueGIFT_FEE_BD), db);						
-			this.creator.changeBalance(db, true, FEE_KEY, giftFEE_BD);
-			//pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(db, Transaction.FEE_KEY).add(issueFEE_BD), db);
-			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+			this.creator.changeBalance(db, false, FEE_KEY, giftFEE_BD);
+			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
 
-			GenesisBlock.CREATOR.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
+			// ADD to EMISSION
+			GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issueFEE_BD.add(giftFEE_BD));
 
 		}
 		
@@ -615,20 +617,23 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;
 
 			// ISSUE NEW COMPU in chain
-			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueFEE_BD = transPersonIssue.getFee();
+			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 			// GIFT from CREATOR to TARGET
 			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs			
-			this.creator.changeBalance(db, false, FEE_KEY, giftFEE_BD);
-			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+			this.creator.changeBalance(db, true, FEE_KEY, giftFEE_BD);
+			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
 
-			GenesisBlock.CREATOR.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
+			// ADD to EMISSION
+			GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issueFEE_BD.add(giftFEE_BD));
 
 		}
 

@@ -20,6 +20,7 @@ import com.google.common.primitives.UnsignedBytes;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
+import database.DBSet;
 import utils.ObserverMessage;
 
 // UNCONFIRMED balances for accounts in owner wallet only
@@ -178,11 +179,61 @@ public class AccountMap extends Observable {
 		return null;
 	}
 
-	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalanceNull() {
+	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalanceNull() {
 		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8));
 	}
 	
-	
+	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount) 
+	{
+		
+		int type = core.account.Account.actionType(key, amount);
+		long absKey;
+		if (key > 0) {
+			absKey = key;
+		} else {
+			absKey = -key;
+		}
+
+		Tuple2<String, Long> k = new Tuple2<String, Long>(address, absKey);
+		
+		if(!this.assetsBalanceMap.containsKey(k))
+			return getBalanceNull();
+
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.assetsBalanceMap.get(k);
+
+		if (type == 1) {
+			// OWN + property
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					subtract?balance.a.subtract(amount):balance.a.add(amount),
+					balance.b, balance.c
+					);
+		} else if (type == 2) {
+			// DEBT + CREDIT
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a,
+					subtract?balance.b.subtract(amount):balance.b.add(amount),
+					balance.c
+					);
+		} else if(type == 3) {
+			// HOLD + STOCK
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a, balance.b,
+					subtract?balance.c.subtract(amount):balance.c.add(amount)
+					);
+		} else {
+			// TODO - SPEND + PRODUCE
+			balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
+					balance.a, balance.b,
+					subtract?balance.c.subtract(amount):balance.c.add(amount)
+					);
+		}
+		
+		this.assetsBalanceMap.put(k, balance);
+		return balance;
+	}	
+
+	/*
 	private BigDecimal getUnconfirmedBalance(String address, Long key) 
 	{
 		
@@ -209,8 +260,9 @@ public class AccountMap extends Observable {
 	{		
 		return getUnconfirmedBalance(account.getAddress(), key);
 	}
+	*/
 
-	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(String address, Long key) 
+	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(String address, Long key) 
 	{
 		
 		if (key < 0) {
@@ -220,13 +272,13 @@ public class AccountMap extends Observable {
 		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
 		
 		if(!this.assetsBalanceMap.containsKey(k))
-			return getUnconfirmedBalanceNull();
+			return getBalanceNull();
 
 		return this.assetsBalanceMap.get(k);
 	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal>  getUnconfirmedBalance3(Account account, Long key) 
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal>  getBalance(Account account, Long key) 
 	{		
-		return getUnconfirmedBalance3(account.getAddress(), key);
+		return getBalance(account.getAddress(), key);
 	}
 
 	/*
@@ -259,6 +311,7 @@ public class AccountMap extends Observable {
 		}
 	}
 	
+	/*
 	public void update(Account account, long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfirmedBalance) 
 	{		
 		this.assetsBalanceMap.put(new Tuple2<String, Long>(account.getAddress(), key), unconfirmedBalance);	
@@ -296,8 +349,9 @@ public class AccountMap extends Observable {
 		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 		
 	}
+	*/
 	
-	// dekete all assets for this account
+	// delete all assets for this account
 	public void delete(PublicKeyAccount account)
 	{
 

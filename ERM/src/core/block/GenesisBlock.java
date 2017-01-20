@@ -123,15 +123,15 @@ public class GenesisBlock extends Block{
 			 */
 			///////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
-					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "1000000"),
-					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "990000"),
-					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "980000"),
-					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "970000"),
-					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "960000"),
-					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "950000"),
-					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "940000"),
-					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "930000"),
-					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "905000")
+					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "850000"),
+					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "840000"),
+					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "830000"),
+					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "820000"),
+					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "810000"),
+					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "805000"),
+					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "804000"),
+					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "803000"),
+					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "802000")
 					);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -162,6 +162,12 @@ public class GenesisBlock extends Block{
 
 			////////// INVESTORS ICO 10%
 			List<List<Object>> genesisInvestors = Arrays.asList(
+					////					
+					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "333000"),
+					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "323000"),
+					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "313000"),
+					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "303000"),
+					////
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "43.84966285"),
 					Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1289.69596627"),
@@ -171,7 +177,6 @@ public class GenesisBlock extends Block{
 					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "257.93919325"),
 					Arrays.asList("7Cp622VhpUwpzWnzDV3XyPepVM5AF682UF", "1289.69596627"),
 					Arrays.asList("76UjGyQ4TG9buoK8yQ1PmW2GE6PoPAEDZw", "1289.69596627"),
-					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "92858.1095712"),
 					Arrays.asList("7ANHQck4rANJ5K2RsF1aAGYYTyshpFP4cM", "1131.83718"),
 					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "257.93919325"),
 					Arrays.asList("CmmGpEbumf3FspKEC9zTzpFTk86ibLRwEbqxZ3GuAykL", "154.76351595"),
@@ -241,7 +246,11 @@ public class GenesisBlock extends Block{
 					);
 
 			// GENESIS FORGERS
-			List<List<Object>> genesisDebtors = Arrays.asList(
+			//ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(arr));
+			// NEED foe .add() ::
+			ArrayList<List<Object>> genesisDebtors = new ArrayList<List<Object>> ( Arrays.asList(
+					Arrays.asList("7LPhKZXmd6miLE9XxWZciabydoC8vf4f64", 3),
+					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", 3),
 					Arrays.asList("7MdXzNcKgWXvy7unJ7WPLmp3LQvUdiNEAz", 2),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", 2),
 					Arrays.asList("8Q7zyxx1rYKBbiKVfs66H5G16Vtsag54wCHnV2tHY5nA", 2),
@@ -306,7 +315,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
 					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1),
 					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 2)
-					);
+					));
 
 			// TRANSFERS
 			// 
@@ -328,6 +337,8 @@ public class GenesisBlock extends Block{
 
 			}
 
+			int pickDebt = 43000;
+			BigDecimal pickDebt_DB = new BigDecimal(pickDebt);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
 			for(List<Object> item: genesisInvestors)
@@ -343,27 +354,34 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
+				/*
+				if (bdAmount0.compareTo(pickDebt_DB) < 0) {
+					genesisDebtors.add(Arrays.asList(recipient.getAddress(), 1));
+				}
+				*/
+
 			}			
 
 			// ACTIVITES
+			int nonce = genesisActivists.size()>>1;
 			for(List<Object> item: genesisActivists)
 			{
 				
 				recipient = new Account((String)item.get(0));
 				
-				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
+				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
 			}			
 
 			// FOR DEBROTS
-			int nonce = 100;
+			nonce = genesisDebtors.size()>>1;
 			int i = 0;
-			int pickDebt = 54000;
 			BigDecimal limitOwned = new BigDecimal( pickDebt * 3 ).setScale(8);
 
 			Account bufferCreditor = sends_toUsers.get(i).a;
 			BigDecimal bufferAmount = sends_toUsers.get(i).b.subtract(limitOwned);
+			
 			for(List<Object> item: genesisDebtors)
 			{
 				
@@ -396,7 +414,6 @@ public class GenesisBlock extends Block{
 						break;
 					}
 				} while (true);
-
 			}			
 		}
 		
