@@ -1545,8 +1545,20 @@ if ( asset_1 == null) {
 		output.put("key", person.getKey());
 		output.put("creator", person.getCreator().getPersonAsString());
 		
-		output.put("creator_key", person.getCreator().getPerson().b.getKey());
-		output.put("creator_name", person.getCreator().getPerson().b.getName());
+		try {
+			output.put("creator_key", person.getCreator().getPerson().b.getKey());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			output.put("creator_key", "");
+			e.printStackTrace();
+		}
+		try {
+			output.put("creator_name", person.getCreator().getPerson().b.getName());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			output.put("creator_name", "");
+			e.printStackTrace();
+		}
 		output.put("name", person.getName());
 		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
 		output.put("description", person.getDescription());
@@ -1565,6 +1577,7 @@ if ( asset_1 == null) {
 		
 		 PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
 		int rowCount = statusModel.getRowCount();
+		if (rowCount > 0 ){
 		for (int i = 0; i<rowCount; i++){
 			Map statusJSON=new LinkedHashMap();
 			statusJSON.put("status_name", statusModel.getValueAt(i, 0));
@@ -1586,7 +1599,11 @@ if ( asset_1 == null) {
 			
 			statusesJSON.put(i, statusJSON);	
 		}
+		 
+			
+		
 		output.put("statuses", statusesJSON);
+		}
 		// accounts
 		output.put("Label_accounts", translate_web("Accounts"));
 		output.put("Label_accounts_table_adress", translate_web("Address"));
@@ -1597,23 +1614,44 @@ if ( asset_1 == null) {
 		
 		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
 		rowCount = personModel.getRowCount();
+		Map accountJSON=new LinkedHashMap();
 		
 		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
+		if (rowCount >0){
 		for (int i = 0; i<rowCount; i++){
-			Map accountJSON=new LinkedHashMap();
+			
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
 			accountJSON.put("data", personModel.getValueAt(i, 1));
-			PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
+			try {
+				PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
+				
+				accountJSON.put("creator", personModel.getValueAt(i, 2));
+				accountJSON.put("creator_name", cc.getName());
+				accountJSON.put("creator_key", cc.getKey());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				accountJSON.put("creator", "");
+				accountJSON.put("creator_name", "");
+				accountJSON.put("creator_key", "");
+				
+				
+				e.printStackTrace();
+			}
 			
-			accountJSON.put("creator", personModel.getValueAt(i, 2));
-			accountJSON.put("creator_name", cc.getName());
-			accountJSON.put("creator_key", cc.getKey());
+			
+			
+			
 			accountsJSON.put(i, accountJSON);	
 			
 			String acc = personModel.getValueAt(i, 0).toString();
 			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
 		
 //			trans.addAll(tt); // "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"
+		}
+		}else{
+			accountJSON.put("creator", "");
+			accountJSON.put("creator_name", "");
+			accountJSON.put("creator_key", "");	
 		}
 		output.put("accounts", accountsJSON);
 		
