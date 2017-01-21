@@ -1043,7 +1043,8 @@ public class Block {
 					LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
 					return false;
 				}
-				testBlock = testBlock.getChild(db);
+				//testBlock = testBlock.getChild(db);
+				testBlock = testBlock.getParent(db);
 			}
 		}
 
