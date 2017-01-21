@@ -380,16 +380,29 @@ public class Synchronizer
 		// GENESIS block nake ERROR in network.Peer.sendMessage(Message) -> this.out.write(message.toBytes());
 		// TODO fix it error
 		byte[] checkPointHeightSignature;
-		Block checkPointHeightCommonBlock;
+		Block checkPointHeightCommonBlock = null;
 		if (checkPointHeight == 1) {
 			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock();						
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
 			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
-			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);			
+			if (checkPointHeightSignature == null) {
+				Controller.getInstance().onError(peer);
+				throw new Exception("Dishonest peer - COMMON Block == null for PEER: " + peer.toString());
+			} else {
+				try {
+					// try get common block from PEER
+					checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
+				} catch (Exception e) {
+					Controller.getInstance().onDisconnect(peer);
+					throw new Exception("Dishonest peer - error in PEER: " + peer.toString());
+				}
+			}
+
 		}
 
-		if (checkPointHeightSignature == null) {
+		if (checkPointHeightCommonBlock == null
+				|| checkPointHeightSignature == null) {
 			throw new Exception("Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found");			
 		}
