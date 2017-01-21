@@ -128,10 +128,10 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "830000"),
 					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "820000"),
 					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "810000"),
-					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "805000"),
-					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "804000"),
-					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "803000"),
-					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "802000")
+					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "825000"),
+					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "824000"),
+					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "843000"),
+					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "803000")
 					);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -247,7 +247,7 @@ public class GenesisBlock extends Block{
 
 			// GENESIS FORGERS
 			//ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(arr));
-			// NEED foe .add() ::
+			// NEED for .add() ::
 			ArrayList<List<Object>> genesisDebtors = new ArrayList<List<Object>> ( Arrays.asList(
 					Arrays.asList("7LPhKZXmd6miLE9XxWZciabydoC8vf4f64", 3),
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", 3),
@@ -337,8 +337,9 @@ public class GenesisBlock extends Block{
 
 			}
 
-			int pickDebt = 43000;
+			int pickDebt = 28000;
 			BigDecimal pickDebt_DB = new BigDecimal(pickDebt);
+			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(8);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
 			for(List<Object> item: genesisInvestors)
@@ -354,11 +355,9 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
-				/*
-				if (bdAmount0.compareTo(pickDebt_DB) < 0) {
-					genesisDebtors.add(Arrays.asList(recipient.getAddress(), 1));
+				if (bdAmount0.compareTo(pickDebt_DB) < 1) {
+					addDebt(recipient.getAddress(), 1, genesisDebtors);
 				}
-				*/
 
 			}			
 
@@ -372,15 +371,16 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 
+				addDebt(recipient.getAddress(), 1, genesisDebtors);
+
 			}			
 
 			// FOR DEBROTS
 			nonce = genesisDebtors.size()>>1;
-			int i = 0;
-			BigDecimal limitOwned = new BigDecimal( pickDebt * 3 ).setScale(8);
 
+			int i = 0;
 			Account bufferCreditor = sends_toUsers.get(i).a;
-			BigDecimal bufferAmount = sends_toUsers.get(i).b.subtract(limitOwned);
+			BigDecimal bufferAmount = sends_toUsers.get(i).b;
 			
 			for(List<Object> item: genesisDebtors)
 			{
@@ -394,18 +394,23 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce--).setScale(8);
 
 				do {
-					if (bufferAmount.compareTo(bdAmount0) < 0) {
+					if (//bufferAmount.compareTo(bdAmount0) < 0
+						bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
 						// REST for investor!
 						////transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
 						////		bufferAmount, bufferCreditor));
-						bdAmount0 = bdAmount0.subtract(bufferAmount);
 						i++;
+						bufferCreditor = sends_toUsers.get(i).a;
+						bufferAmount = sends_toUsers.get(i).b;
+						/*
+						bdAmount0 = bdAmount0.subtract(bufferAmount);
 						bufferCreditor = sends_toUsers.get(i).a;
 						bufferAmount = sends_toUsers.get(i).b;
 						// TRY rest limit for self
 						if (bufferAmount.compareTo(limitOwned) > 0) {
 							bufferAmount = bufferAmount.subtract(limitOwned);
 						}
+						*/
 						continue;
 					} else {
 						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
@@ -496,6 +501,38 @@ public class GenesisBlock extends Block{
 	}
 	
 	
+	private void addDebt(String address, int val, List<List<Object>> genesisDebtors)
+	{
+		
+		Account recipient;
+		if (address.equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
+			|| address.equals("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap")
+			)
+			return;
+				
+		//int i = 0;
+		for(int i=0; i < genesisDebtors.size(); i++)
+		{
+			
+			List<Object> item = genesisDebtors.get(i);
+			String address_deb = (String)item.get(0);
+			
+			if (address_deb.length() > 36 ) {
+				recipient = new PublicKeyAccount(address_deb);					
+			} else {
+				recipient = new Account(address_deb);
+			}
+			
+			if (recipient.equals(address)) {
+				val += (int)item.get(1);
+				genesisDebtors.set(i, Arrays.asList(address_deb, val));
+				return;
+			}
+			i++;
+		}
+		genesisDebtors.add(Arrays.asList(address, val));
+	}
+
 	//GETTERS
 
 	@Override
