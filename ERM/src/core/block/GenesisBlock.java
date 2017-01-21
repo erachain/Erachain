@@ -339,8 +339,7 @@ public class GenesisBlock extends Block{
 
 			}
 
-			int pickDebt = 28000;
-			BigDecimal pickDebt_DB = new BigDecimal(pickDebt);
+			int pickDebt = 30000;
 			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(8);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
@@ -358,10 +357,13 @@ public class GenesisBlock extends Block{
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
-				if (bdAmount0.compareTo(pickDebt_DB) < 1) {
-					addDebt(recipient.getAddress(), 1, genesisDebtors);
-				}
 
+				if (bdAmount0.compareTo(limitOwned) < 1) {
+					addDebt(recipient.getAddress(), 1, genesisDebtors);
+				} else {
+					// buffer for CREDIT sends
+					sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
+				}
 			}			
 
 			// ACTIVITES
