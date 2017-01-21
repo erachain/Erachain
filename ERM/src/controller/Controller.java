@@ -104,11 +104,12 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.17.01";
-	private String buildTime = "2017-01-19 12:12:12 UTC";
+	private String version = "2.17.03";
+	private String buildTime = "2017-01-21 12:12:12 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
+	// for reset DB if DB PROTOCOL is CHANGED
 	public static final String releaseVersion = "2.06.01";
 
 //	TODO ENUM would be better here
