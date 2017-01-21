@@ -123,15 +123,15 @@ public class GenesisBlock extends Block{
 			 */
 			///////// GENEGAL
 			List<List<Object>> generalGenesisUsers = Arrays.asList(
-					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "850000"),
-					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "840000"),
-					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "830000"),
-					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "820000"),
-					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "810000"),
-					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "825000"),
-					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "824000"),
-					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "843000"),
-					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "803000")
+					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "800000"),
+					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "800000"),
+					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "800000"),
+					Arrays.asList("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC", "800000"),
+					Arrays.asList("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy", "800000"),
+					Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "800000"),
+					Arrays.asList("7R4jwh5C83HLj7C1FiSbsGptMHqfAirr8R", "800000"),
+					Arrays.asList("75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12", "800000"),
+					Arrays.asList("7Dwjk4TUB74CqW6PqfDQF1siXquK48HSPB", "800000")
 					);
 			/////////// MAJOR
 			List<List<Object>> majorGenesisUsers = Arrays.asList(
@@ -164,9 +164,9 @@ public class GenesisBlock extends Block{
 			List<List<Object>> genesisInvestors = Arrays.asList(
 					////					
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "333000"),
-					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "323000"),
-					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "313000"),
-					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "303000"),
+					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "333000"),
+					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "333000"),
+					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "333000"),
 					////
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "43.84966285"),
@@ -320,6 +320,7 @@ public class GenesisBlock extends Block{
 			// TRANSFERS
 			// 
 
+			BigDecimal totalSended = BigDecimal.ZERO;
 			
 			for(List<Object> item: generalGenesisUsers)
 			{
@@ -328,6 +329,7 @@ public class GenesisBlock extends Block{
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				totalSended = totalSended.add(bdAmount0);
 				
 				// buffer for CREDIT sends
 				sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
@@ -354,6 +356,7 @@ public class GenesisBlock extends Block{
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				totalSended = totalSended.add(bdAmount0);
 
 				if (bdAmount0.compareTo(pickDebt_DB) < 1) {
 					addDebt(recipient.getAddress(), 1, genesisDebtors);
@@ -370,10 +373,17 @@ public class GenesisBlock extends Block{
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				totalSended = totalSended.add(bdAmount0);
 
 				addDebt(recipient.getAddress(), 1, genesisDebtors);
 
 			}			
+
+			// ADJUST end
+			transactions.add(new GenesisTransferAssetTransaction(
+					new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"), AssetCls.ERMO_KEY,
+					new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(8)));
+
 
 			// FOR DEBROTS
 			nonce = genesisDebtors.size()>>1;
@@ -394,23 +404,17 @@ public class GenesisBlock extends Block{
 				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce--).setScale(8);
 
 				do {
-					if (//bufferAmount.compareTo(bdAmount0) < 0
-						bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
-						// REST for investor!
-						////transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
-						////		bufferAmount, bufferCreditor));
+					if (bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
+						// use  MIN BALANCE investor!
+						BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
+						bdAmount0 = bdAmount0.subtract(diffLimit);
+						
+						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
+								diffLimit, bufferCreditor));
 						i++;
+						limitOwned = limitOwned.subtract(BigDecimal.ONE);
 						bufferCreditor = sends_toUsers.get(i).a;
 						bufferAmount = sends_toUsers.get(i).b;
-						/*
-						bdAmount0 = bdAmount0.subtract(bufferAmount);
-						bufferCreditor = sends_toUsers.get(i).a;
-						bufferAmount = sends_toUsers.get(i).b;
-						// TRY rest limit for self
-						if (bufferAmount.compareTo(limitOwned) > 0) {
-							bufferAmount = bufferAmount.subtract(limitOwned);
-						}
-						*/
 						continue;
 					} else {
 						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
