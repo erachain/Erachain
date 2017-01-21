@@ -66,6 +66,8 @@ public class BlockChain
 	public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
+	public static final int ISSUE_MULT_FEE = 1<<10;
+	public static final int ISSUE_ASSET_MULT_FEE = 1<<8;
 	//
 	public static final int FEE_INVITED_DEEP = 4; // levels for deep
 	public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter

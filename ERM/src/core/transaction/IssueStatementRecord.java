@@ -465,6 +465,7 @@ public class IssueStatementRecord extends Transaction {
 		return false;
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee();
 	}

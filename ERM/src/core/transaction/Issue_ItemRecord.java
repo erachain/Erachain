@@ -223,14 +223,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	}
 
 	@Override
-	public int calcBaseFee() {
-		
-		int add_fee = 0;
-		int len = this.getItem().getName().length();
-		if (len < 10) {
-			add_fee = 3^(10-len) * 100;
-		}
-	
-		return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
+	public int calcBaseFee() {		
+		return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_MULT_FEE;
 	}
 }
