@@ -56,11 +56,6 @@ public class R_SertifyPubKeys extends Transaction {
 	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
-
-	// need RIGHTS for PERSON account
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
-	// need RIGHTS for non PERSON account
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 	
 	public static final int DEFAULT_DURATION = 2 * 356;
 
@@ -194,6 +189,11 @@ public class R_SertifyPubKeys extends Transaction {
 	{
 		return typeBytes[2];
 	}
+	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 			
 	//////// VIEWS
 	@Override
@@ -463,13 +463,17 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
+		if ( balERM.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE)<0 )
 			if ( this.creator.isPerson(db) )
 			{
-				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+				if ( balERM.compareTo(BlockChain.PSERT_MIN_ERM_BALANCE)<0 )
 					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				if (this.key < 20 && this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+					return Transaction.VALIDATE_OK;					
+				} else {
+					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				}
 
 			}
 		
@@ -517,22 +521,24 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong();
+			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			//long issueFEE = transPersonIssue.getFeeLong();
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;
 			
 			// ISSUE NEW COMPU in chain
-			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueFEE_BD = transPersonIssue.getFee();
 			// GIFT from CREATOR to TARGET
 			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs			
 			//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(issueGIFT_FEE_BD), db);						
-			this.creator.changeBalance(db, true, FEE_KEY, giftFEE_BD);
-			//pkAccount.setBalance(Transaction.FEE_KEY, pkAccount.getBalance(db, Transaction.FEE_KEY).add(issueFEE_BD), db);
-			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+			this.creator.changeBalance(db, false, FEE_KEY, giftFEE_BD);
+			pkAccount.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
 
-			GenesisBlock.CREATOR.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
+			// ADD to EMISSION
+			GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issueFEE_BD.add(giftFEE_BD));
 
 		}
 		
@@ -547,6 +553,7 @@ public class R_SertifyPubKeys extends Transaction {
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
 				blockIndex, transactionIndex);
 		
+		/*
 		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
 		if (psItem == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
@@ -557,6 +564,7 @@ public class R_SertifyPubKeys extends Transaction {
 							new byte[0],
 							blockIndex, transactionIndex));
 		}
+		*/
 
 		// SET PERSON ADDRESS
 		String address;
@@ -609,20 +617,23 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
+			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;
 
 			// ISSUE NEW COMPU in chain
-			BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
+			BigDecimal issueFEE_BD = transPersonIssue.getFee();
+			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
 			// GIFT from CREATOR to TARGET
 			BigDecimal giftFEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 		
 			// GIVE GIFTs			
-			this.creator.changeBalance(db, false, FEE_KEY, giftFEE_BD);
-			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD.add(giftFEE_BD));
+			this.creator.changeBalance(db, true, FEE_KEY, giftFEE_BD);
+			pkAccount.changeBalance(db, true, Transaction.FEE_KEY, issueFEE_BD);
 
-			GenesisBlock.CREATOR.changeBalance(db, false, Transaction.FEE_KEY, issueFEE_BD);
+			// ADD to EMISSION
+			GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issueFEE_BD.add(giftFEE_BD));
 
 		}
 

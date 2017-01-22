@@ -100,6 +100,10 @@ public class R_Vouch extends Transaction {
 		}
 	}
 
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

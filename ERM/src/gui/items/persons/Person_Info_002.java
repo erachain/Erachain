@@ -12,7 +12,13 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -28,6 +34,7 @@ import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
+import utils.DateTimeFormat;
 import utils.TableMenuPopupUtil;
 
 /**
@@ -150,8 +157,22 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
         jPanel3.add(jLabel_Date_Born, gridBagConstraints);
 
+        
+        //////////////////////////////
+        /*
+        Date ddd = new Date(person.getBirthday());
+        DateFormat timeFormat = new SimpleDateFormat("YYYY.MM.DD");
+        timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String dataStr = timeFormat.format(ddd);
+        
+    	Locale local = new Locale("ru","RU"); // формат даты
+    	DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // для формата даты
+    	String dataStrLoc = df.format(ddd).toString();
+    	String dataStrLoc1 = df.format(new Date(person.getBirthday())).toString();
+    	*/
+        
         jTextField_Date_Born.setEditable(false);
-        jTextField_Date_Born.setText(new Date (person.getBirthday())+"");
+        jTextField_Date_Born.setText(new Date(person.getBirthday())+ "");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -160,6 +181,10 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         jPanel3.add(jTextField_Date_Born, gridBagConstraints);
 
+		///TimeZone.setDefault(tz);
+		////////////////////////
+
+		
         jLabel_Gender.setText(Lang.getInstance().translate("Gender")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

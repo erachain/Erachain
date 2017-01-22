@@ -72,6 +72,10 @@ public class RecordReleasePack extends Transaction {
 		return this.transactions;
 	}
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//PARSE/CONVERT
 
 	@SuppressWarnings("unchecked")

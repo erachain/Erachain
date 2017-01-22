@@ -76,7 +76,11 @@ public class CreateOrderTransaction extends Transaction
 	{
 		return this.order;
 	}
-	
+
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{

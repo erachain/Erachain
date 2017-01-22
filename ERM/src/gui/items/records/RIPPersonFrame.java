@@ -231,6 +231,8 @@ public class RIPPersonFrame extends JInternalFrame  {
 			personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
 			// IF PERSON DEAD
+			// TODO by DATH day
+			/*
 			Tuple5<Long, Long, byte[], Integer, Integer> aliveStatus = DBSet.getInstance().getPersonStatusMap().getItem(person.getKey(), StatusCls.ALIVE_KEY);
 			if (aliveStatus == null) {}
 			else if (aliveStatus != null && aliveStatus.c[0] == (byte)2)
@@ -253,6 +255,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 					else personDetails += "<br>" + Lang.getInstance().translate("Person is still alive %days%").replace("%days%", ""+daysLeft);
 				}
 			}
+			*/
 			
 			pubKeyDetails.setText("<html>" + personDetails + "</html>");
 			
@@ -307,6 +310,9 @@ public class RIPPersonFrame extends JInternalFrame  {
 		byte[] data = null;//  new byte[]{2}; // set ALIVE status to DEAD
 		long refParent = 0l;
 		
+		// TODO as PERSON date
+		/*
+		 * 
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 52);
 		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
 				feePow, StatusCls.ALIVE_KEY, person,
@@ -322,6 +328,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
+		*/
 		
 		//ENABLE
 		Button_Confirm.setEnabled(true);

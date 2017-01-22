@@ -258,7 +258,8 @@ public class BlockGenerator extends Thread implements Observer
 
 						try 
 						{
-							Thread.sleep(quickRun?1000:wait_rand);
+							// IF quickRun ++ SLEEP
+							Thread.sleep(quickRun?13000:wait_rand);
 						} 
 						catch (InterruptedException e) 
 						{
@@ -275,7 +276,7 @@ public class BlockGenerator extends Thread implements Observer
 					}
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
-						wait_interval = 500;
+						wait_interval = 1000;
 						quickRun = true;
 					} else {
 						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush - wait_rand);					

@@ -25,38 +25,65 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	
-	public static final int TESTNET_PORT = 9055;
-	public static final int MAINNET_PORT = 9056;
-	public static final int DEFAULT_WEB_PORT = 9057;
-	public static final int DEFAULT_RPC_PORT = 9058;
+	public static final int TESTNET_PORT = 9045;
+	public static final int MAINNET_PORT = 9046;
+	public static final int DEFAULT_WEB_PORT = 9047;
+	public static final int DEFAULT_RPC_PORT = 9048;
 
 	//
-	public static final int MAX_SIGNATURES = Settings.BLOCK_MAX_SIGNATURES;
+	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
-	public static final int BASE_TARGET = 1024 * 8;
-	public static final int REPEAT_WIN = 3;
+	public static final int BASE_TARGET = 1024 * 3;
+	public static final int REPEAT_WIN = 30;
 	
+	// RIGHTs 
+	public static final int GENESIS_ERA_TOTAL = 10000000;
+	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
+	public static final int MAJOR_ERM_BALANCE = 33000;
+	public static final int MINOR_ERM_BALANCE = 1000;
+	public static final int MIN_GENERATING_BALANCE = 100;
+	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
+	//public static final int GENERATING_RETARGET = 10;
+	public static final int GENERATING_MIN_BLOCK_TIME = 288; // 300 PER DAY
+	public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
+	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
+	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 	public static final int GENESIS_WIN_VALUE = 1000;
+	public static final String GENESIS_ADMIN = "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
 
-	public static final BigDecimal MIN_FEE_IN_BLOCK = new BigDecimal("0.00010000");
-	public static final int FEE_PER_BYTE = 32;
+	// CHAIN
+	public static final int CONFIRMS_HARD = 3; // for reference by signature 
+	// MAX orphan CHAIN
+	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
+
+	//TESTNET 
+	public static final long DEFAULT_MAINNET_STAMP = 1485146684444L; //1465107777777L;
+
+	//public static final int FEE_MIN_BYTES = 200;
+	public static final int FEE_PER_BYTE = 64;
 	public static final int FEE_SCALE = 8;
 	public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
+	public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
+	public static final int ISSUE_MULT_FEE = 1<<10;
+	public static final int ISSUE_ASSET_MULT_FEE = 1<<8;
 	//
-	public static final int FEE_INVITED_DEEP = 15; // levels foe deep
-	public static final int FEE_INVITED_SHIFT = 3; // total FEE -> fee for Forger and fee for Inviter
-	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 2;
+	public static final int FEE_INVITED_DEEP = 4; // levels for deep
+	public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
+	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 	public static final int FEE_FOR_ANONIMOUSE = 33;
 
 	// issue PORSON
-	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
+	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
+	// SERTIFY
+	// need RIGHTS for non PERSON account
+	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
+	// need RIGHTS for PERSON account
+	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// GIFTS for R_SertifyPubKeys
-	//public static final BigDecimal GIFTED_ERMO_AMOUNT = new BigDecimal(1000);
-	public static final int GIFTED_COMPU_AMOUNT = 10000 * FEE_PER_BYTE;
-	//public static final BigDecimal GIFTED_COMPU_AMOUNT = new BigDecimal("0.00010000");
+	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
@@ -192,7 +219,7 @@ public class BlockChain
 
 	public int getCheckPoint(DBSet dbSet) {
 		
-		int checkPoint = getHeight(dbSet) - BlockChain.MAX_SIGNATURES; 
+		int checkPoint = getHeight(dbSet) - BlockChain.MAX_ORPHAN; 
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;
 		
@@ -225,7 +252,7 @@ public class BlockChain
 			Block childBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
 			
 			int counter = 0;
-			while(childBlock != null && counter < MAX_SIGNATURES)
+			while(childBlock != null && counter < MAX_ORPHAN)
 			{
 				headers.add(childBlock.getSignature());
 				

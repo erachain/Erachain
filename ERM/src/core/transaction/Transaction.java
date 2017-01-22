@@ -218,7 +218,7 @@ public abstract class Transaction {
 	//public static final int JSON_TRANSACTION = 27;
 
 	// FEE PARAMETERS
-	public static final long RIGHTS_KEY = AssetCls.ERMO_KEY;
+	public static final long RIGHTS_KEY = AssetCls.ERM_KEY;
 
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 
@@ -462,25 +462,21 @@ public abstract class Transaction {
 		return true;
 	}			
 
+	public abstract boolean hasPublicText();
+
 	
 	public int calcCommonFee()
 	{		
 		int len = this.getDataLength(false);
-		int fee = len + 200;
-		if (false && len > 1000) {
-			// add overheat
-			fee += (len - 1000);
-		}
 
 		// FEE_FOR_ANONIMOUSE !
 		///if (this.getBlockHeightByParent(db))
 		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-		int anonimuus = 0;
-		Controller cnt = Controller.getInstance();
-		BlockChain bchain = cnt.getBlockChain();
-		
+		int anonimuus = 0;		
 		// TODO DBSet get from CHAIN
 		/*
+		Controller cnt = Controller.getInstance();
+		BlockChain bchain = cnt.getBlockChain();
 		for ( Account acc : this.getRecipientAccounts())
 		{
 			//byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
@@ -498,10 +494,10 @@ public abstract class Transaction {
 		*/
 		
 		if ( anonimuus > 0) {
-			fee *= anonimuus;
+			len *= anonimuus;
 		}
 		
-		return (int) fee * BlockChain.FEE_PER_BYTE;
+		return (int) len * BlockChain.FEE_PER_BYTE;
 	}
 	
 	// get fee
@@ -587,7 +583,7 @@ public abstract class Transaction {
 	// reference in Map - or as signatire or as BlockHeight + seqNo
 	public byte[] getDBRef(DBSet db)
 	{
-		if(this.getConfirmations(db) < BlockChain.MAX_SIGNATURES)
+		if(this.getConfirmations(db) < BlockChain.MAX_ORPHAN)
 		{
 			// soft or hard confirmations
 			return this.signature;
@@ -681,8 +677,7 @@ public abstract class Transaction {
 		return getDataLength(asPack);
 	}
 	public String viewFee() {
-		return fee.multiply(new BigDecimal(1000)).setScale(5)
-				.toPlainString() + "[" + feePow + "]";
+		return feePow +":" + this.fee.unscaledValue().longValue();
 	}
 
 	public String viewItemName() {
@@ -848,7 +843,11 @@ public abstract class Transaction {
 		{
 			return NOT_ENOUGH_FEE;
 		}
-						
+		
+		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+			return ACCOUNT_NOT_PERSONALIZED;
+		}
+
 		return VALIDATE_OK;
 
 	}
@@ -871,10 +870,15 @@ public abstract class Transaction {
 		long personKey = personDuration.a;
 		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
 		ItemCls person = db.getItemPersonMap().get(personKey);
-		Account invitedAccount = person.getCreator(); 
+		Account invitedAccount = person.getCreator();
+		if (creator.equals(invitedAccount)) {
+			// IT IS ME - all fee!
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
+			return;			
+		}
 
 		int fee_gift_next;
-		if (fee_gift > 10)
+		if (fee_gift > 2)
 			fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
 		else
 			fee_gift_next = fee_gift - 1;
@@ -884,7 +888,7 @@ public abstract class Transaction {
 		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE));
 		
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
-			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
+			process_gifts(db, ++level, fee_gift_next, invitedAccount, asOrphan);
 		}
 	}
 

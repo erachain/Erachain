@@ -214,6 +214,10 @@ public class R_SetStatusToItem extends Transaction {
 		return this.description;
 	}
 
+	public boolean hasPublicText() {
+		return true;
+	}
+
 	
 	// pack values for DB
 	public byte[] packData()
@@ -311,6 +315,8 @@ public class R_SetStatusToItem extends Transaction {
 	{
 		return this.ref_to_parent;
 	}
+	
+	// VIEWS
 	public String viewRefParent()
 	{
 		byte[] bytes = Longs.toByteArray(this.ref_to_parent);

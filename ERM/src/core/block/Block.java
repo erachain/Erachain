@@ -23,7 +23,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import utils.Converter;
-import utils.ReverseComparator;
+import utils.TransactionTimestampComparator;
 import at.AT_API_Platform_Impl;
 import at.AT_Block;
 import at.AT_Constants;
@@ -32,14 +32,11 @@ import at.AT_Exception;
 import at.AT_Transaction;
 import controller.Controller;
 import core.BlockChain;
-import core.BlockGenerator;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
-import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.assets.Order;
 import core.transaction.DeployATTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
@@ -47,15 +44,13 @@ import core.transaction.TransactionFactory;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 
 import database.DBSet;
-import lang.Lang;
 
 
 public class Block {
 
-	public static final int GENERATING_MIN_BLOCK_TIME = GenesisBlock.GENERATING_MIN_BLOCK_TIME * 1000;
+	public static final int GENERATING_MIN_BLOCK_TIME = BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
 	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
@@ -73,7 +68,7 @@ public class Block {
 	//private static final int AT_FEES_LENGTH = 8;
 	//private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
-	public static final int MAX_TRANSACTION_BYTES = GenesisBlock.MAX_BLOCK_BYTES - BASE_LENGTH;
+	public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
 
 	protected int version;
 	protected byte[] reference;
@@ -195,7 +190,7 @@ public class Block {
 		if (previousForgingHeight == -1)
 			return 0;
 				
-		if (previousForgingHeight <= height) {
+		if (previousForgingHeight < height) {
 			
 			// for recipient
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
@@ -227,7 +222,7 @@ public class Block {
 			for(Transaction transaction: txs)
 			{				
 				if (false && transaction instanceof R_SertifyPubKeys) {
-				//	amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
+				//	amount = BlockChain.GIFTED_ERM_AMOUNT.intValue();
 				//	incomed_amount += amount;
 				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
 					int amo_sign = transaction.getAmount().signum();
@@ -262,17 +257,37 @@ public class Block {
 		return this.creator;
 	}
 
-	public BigDecimal getTotalFee()
+	public BigDecimal getTotalFee(DBSet db)
 	{
 		BigDecimal fee = this.getTotalFeeForProcess();
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
+		int inDay = BlockChain.BLOCKS_PER_DAY;
 
-		if ( fee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) 
-			fee = BlockChain.MIN_FEE_IN_BLOCK;
+		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
+		BigDecimal two = new BigDecimal(2);
+		int height = this.getHeightByParent(db);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 2 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 4 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 8 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 16 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 32 * inDay)
+			minFee = minFee.divide(two).setScale(8);
+			
+		if ( fee.compareTo(minFee) < 0) 
+			fee = minFee;
 
 		return fee;
+	}
+	public BigDecimal getTotalFee() {
+		return getTotalFee(DBSet.getInstance());
 	}
 	
 	public BigDecimal getTotalFeeForProcess()
@@ -789,7 +804,7 @@ public class Block {
 		if (generatingBalance == 0) {
 			return 1;
 		}
-		int times = GenesisBlock.GENESIS_GENERATING_BALANCE / (generatingBalance );
+		int times = BlockChain.GENESIS_ERA_TOTAL / (generatingBalance );
 		
 		if (times < 100) {
 			if (len > times * 7)
@@ -834,7 +849,7 @@ public class Block {
 		else
 			win_value >>= 11;
 			*/
-		win_value >>= 8;
+		win_value >>= 6;
 		
 		return win_value;
 
@@ -951,6 +966,16 @@ public class Block {
 	{
 		
 		int height = this.getHeightByParent(db);
+
+		/*
+		// FOR PROBE START !!!
+		if(height > 1000)
+		{
+			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] is PROBE");
+			return false;
+		}
+		*/
+		
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
@@ -1012,14 +1037,19 @@ public class Block {
 			return false;
 		}
 		
-		/*
-		for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
-			if (testBlock.getCreator().equals(this.creator)) {
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
-				return false;
+		// STOP IF SO RAPIDLY
+		if (true || height < 100) {
+			// NEED CHECK ONLY ON START
+			Block testBlock = this.getParent(db);
+			for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
+				if (testBlock.getCreator().equals(this.creator)) {
+					LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
+					return false;
+				}
+				//testBlock = testBlock.getChild(db);
+				testBlock = testBlock.getParent(db);
 			}
 		}
-		*/
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
 		{
@@ -1156,19 +1186,21 @@ public class Block {
 
 		//PROCESS FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess();
+		BigDecimal blockTotalFee = getTotalFee(dbSet);
 
-		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+		
+		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
 			String rich = Account.getRich(Transaction.FEE_KEY);
 			if (!rich.equals(this.creator.getAddress())) {
 			
-				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
-				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+				blockFee = blockTotalFee;
 				Account richAccount = new Account(rich);
 			
 				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).subtract(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee);
+				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 				
 			}
 		}
@@ -1193,12 +1225,19 @@ public class Block {
 
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 		if (blockChain != null) {
-			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_SIGNATURES);
+			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_ORPHAN);
 		}
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
-		for(Transaction transaction: this.getTransactions())
+
+		List<Transaction> blockTransactions = this.getTransactions();
+
+		//SORT THEM BY TIMESTAMP
+		// for correct reference
+		Collections.sort(blockTransactions, new TransactionTimestampComparator());
+
+		for(Transaction transaction: blockTransactions)
 		{
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height_process, seq);
 			dbSet.getTransactionFinalMap().set( key, transaction);
@@ -1206,7 +1245,7 @@ public class Block {
 			seq++;
 		}
 
-		if(height_process % Settings.BLOCK_MAX_SIGNATURES == 0) 
+		if(height_process % BlockChain.MAX_ORPHAN == 0) 
 		{
 			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
 		}
@@ -1252,19 +1291,20 @@ public class Block {
 
 		//REMOVE FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess();
+		BigDecimal blockTotalFee = getTotalFee(dbSet); 
 
-		if (blockFee.compareTo(BlockChain.MIN_FEE_IN_BLOCK) < 0) {
+		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
 			String rich = Account.getRich(Transaction.FEE_KEY);
 
 			if (!rich.equals(this.creator.getAddress())) {
-				BigDecimal bonus_fee = BlockChain.MIN_FEE_IN_BLOCK.subtract(blockFee);
-				blockFee = BlockChain.MIN_FEE_IN_BLOCK;
+				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+				blockFee = blockTotalFee;
 
 				Account richAccount = new Account(rich);
 				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).add(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee);
+				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 				
 			}
 		}

@@ -45,13 +45,11 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	{
 		super(parent, null);
 		
-		this.key = parent.getKey();
+		this.key = parent.getSize();
 	}
 	
-	
-	public long getKey()
-	{
-		
+	public long getSize()
+	{	
 		return this.key;
 	}
 

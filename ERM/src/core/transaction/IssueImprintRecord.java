@@ -16,6 +16,7 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -70,6 +71,10 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Imprint"; }
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	@Override
 	public boolean isReferenced()
 	{
@@ -184,10 +189,8 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//PROCESS/ORPHAN
 
 	@Override
-	public int calcBaseFee() {
-		// + name length ^ 2
-		int length = this.getItem().getName().getBytes().length;
-		return calcCommonFee() + length * 10 ;
+	public int calcBaseFee() {		
+		return calcCommonFee() >>3;
 	}
 
 

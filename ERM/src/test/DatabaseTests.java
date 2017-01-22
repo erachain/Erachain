@@ -48,7 +48,7 @@ public class DatabaseTests {
 	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
-	long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] personReference = new byte[Crypto.SIGNATURE_LENGTH];
 	long timestamp = NTP.getTime();

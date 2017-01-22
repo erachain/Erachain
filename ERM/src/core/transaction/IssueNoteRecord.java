@@ -133,9 +133,11 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	
 	//PROCESS/ORPHAN
 
+	/*
 	@Override
 	public int calcBaseFee() {
 		return 10 * (calcCommonFee() + BlockChain.FEE_PER_BYTE * 1000);
 	}
+	*/
 
 }

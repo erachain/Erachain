@@ -104,11 +104,12 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.16.07";
-	private String buildTime = "2017-01-12 12:12:12 UTC";
+	private String version = "2.17.04";
+	private String buildTime = "2017-01-22 17:36:12 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
+	// for reset DB if DB PROTOCOL is CHANGED
 	public static final String releaseVersion = "2.06.01";
 
 //	TODO ENUM would be better here
@@ -235,10 +236,14 @@ public class Controller extends Observable {
 				getMyHWeight(false)));
 	}
 	
+	public TransactionCreator getTransactionCreator() {
+		return  transactionCreator;
+	}
+
 	public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
 		return peerHWeight;
 	}
-	
+
 	public Tuple2<Integer, Long> getHWeightOfPeer(Peer peer) {
 		if(peerHWeight!=null && peerHWeight.containsKey(peer)){
 			return peerHWeight.get(peer);
@@ -449,7 +454,7 @@ public class Controller extends Observable {
 		};
 		
 		this.timerPeerHeightUpdate.schedule(action, 
-				Block.GENERATING_MIN_BLOCK_TIME / 2, Block.GENERATING_MIN_BLOCK_TIME / 2);
+				Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
 
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
@@ -979,13 +984,29 @@ public class Controller extends Observable {
 				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
 				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
+				Block lastBlock = this.blockChain.getLastBlock(dbSet);
+				if (newBlock.getReference().equals(lastBlock.getReference())) {
+					LOGGER.debug("  !! it is concurent !!");
+					if (newBlock.calcWinValue(dbSet) > lastBlock.calcWinValue(dbSet)) {
+						LOGGER.debug("   ++ concurent OK ++");
+						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
+						if (isNewWinBlockValid == 0 || isNewWinBlockValid == 4) {
+							lastBlock.orphan(dbSet);
+							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
+							List<Peer> excludes = new ArrayList<Peer>();
+							excludes.add(message.getSender());
+							this.network.broadcast(message, excludes);
+							return;
+						}
+						
+					}
+				}
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
 				// CHECK IF VALID
 				if(isNewWinBlockValid == 0)	{
 					if (blockChain.setWaitWinBuffer(dbSet, newBlock)) {
 						// IF IT WIN
-						
 						/*
 						LOGGER.info(Lang.getInstance().translate("received new valid WIN Block")
 								+ " for Height: " + this.getMyHeight());
@@ -995,12 +1016,20 @@ public class Controller extends Observable {
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
 						this.network.broadcast(message, excludes);
+						return;
 					}
 				} else {
+					if (isNewWinBlockValid == 4) {
+						// update peers WH
+						Peer peer = blockWinMessage.getSender();
+						int peerHeight = blockWinMessage.getHeight();
+						updatePeerHeight(peer, peerHeight);
+						return;
+					}
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
-							+ " code: " + isNewWinBlockValid
-							+ newBlock.toString(dbSet));
+							+ ", code: " + isNewWinBlockValid
+							+ ", " + newBlock.toString(dbSet));
 				}
 
 				break;
@@ -1045,7 +1074,7 @@ public class Controller extends Observable {
 				int isNewBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				if (isNewBlockValid == 4) {
 					// fork branch! disconnect!
-					this.onDisconnect(message.getSender());
+					//// NOT !!! this.onDisconnect(message.getSender());
 					return;
 				} else if (isNewBlockValid != 0) {
 					return;
@@ -1239,6 +1268,9 @@ public class Controller extends Observable {
 		}
 
 		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
+		if (maxHW.c == null)
+			return true;
+		
 		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeight(dbSet, false);
 		if (maxHW.a > thisHW.a ) {
 			return false;
@@ -1263,7 +1295,7 @@ public class Controller extends Observable {
 					}
 				} catch (Exception e) {
 					// error on peer - disconnect!
-					this.onDisconnect(maxHW.c);
+					this.onError(maxHW.c);
 				}
 			}
 		}
@@ -1324,7 +1356,7 @@ public class Controller extends Observable {
 			int tryes = 0;
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
-				peer = this.getMaxWeightPeer();
+				peer = this.getMaxPeerHWeight().c;
 				if (peer == null) {
 					tryes++;
 					if (tryes > 3) {
@@ -1369,9 +1401,12 @@ public class Controller extends Observable {
 
 	}
 
+	/*
 	private Peer getMaxWeightPeer() {
 		Peer highestPeer = null;
-		long weight = 0;
+		
+		// NOT USE GenesisBlocks
+		long weight = BlockChain.BASE_TARGET + BlockChain.BASE_TARGET>>1;
 
 		try {
 			synchronized (this.peerHWeight) {
@@ -1399,27 +1434,30 @@ public class Controller extends Observable {
 
 		return highestPeer;
 	}
+	*/
 
 	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight() {
 		
-		int height = 0;
-		long weight = 0;
+		Tuple2<Integer, Long> myHWeight = this.getMyHWeight(false);
+		int height = myHWeight.a;
+		long weight = myHWeight.b;
 		Peer maxPeer = null;
 
 		try {
 			synchronized (this.peerHWeight) {
 				for (Peer peer : this.peerHWeight.keySet()) {
-					if (weight < this.peerHWeight.get(peer).b) {
-						height = this.peerHWeight.get(peer).a;
-						weight = this.peerHWeight.get(peer).b;
+					Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+					if (height < whPeer.a
+							&& weight < whPeer.b) {
+						height = whPeer.a;
+						weight = whPeer.b;
 						maxPeer = peer;
 					}
 				}
 
+				/* NOT NEED !!! so small PEERS cant't START
 				// CLOSE all my connections to PEER with small Height 
-				if (height > 0) {
-					//int myHeight = this.getMyHeight();
-					//int maxHeight = myHeight
+				if (maxPeer != null) {
 					int currHeight = 0;
 					for (Peer peer : this.peerHWeight.keySet()) {
 						if (peer.isWhite()) {
@@ -1430,6 +1468,7 @@ public class Controller extends Observable {
 						}
 					}
 				}
+				*/
 
 			}
 		} catch (Exception e) {
@@ -1437,6 +1476,21 @@ public class Controller extends Observable {
 		}
 
 		return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
+	}
+
+	public void updatePeerHeight(Peer peer, int peerHeight) {
+		Tuple2<Integer, Long> hWeightMy = this.getMyHWeight(false);
+		if (peerHeight > hWeightMy.a) {
+			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b + 10000l);
+		} else {
+			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b - 10000l);							
+		}
+		this.peerHWeight.put(peer, hWeightMy);
+		blockchainSyncStatusUpdate(this.getMyHeight());
+	}
+	public void updateMyWeight(long weight) {
+		dbSet.getBlockSignsMap().setFullWeight(weight);
+		blockchainSyncStatusUpdate(this.getMyHeight());
 	}
 
 	// WALLET
@@ -1519,11 +1573,8 @@ public class Controller extends Observable {
 	//public BigDecimal getUnconfirmedBalance(String address, long key) {
 	//	return this.wallet.getUnconfirmedBalance(address, key);
 	//}
-	public BigDecimal getUnconfirmedBalance(Account account, long key) {
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
 		return this.wallet.getUnconfirmedBalance(account, key);
-	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance3(Account account, long key) {
-		return this.wallet.getUnconfirmedBalance3(account, key);
 	}
 
 	public void addWalletListener(Observer o) {
@@ -2128,7 +2179,7 @@ public class Controller extends Observable {
 		}
 	}
 	
-	public Pair<Transaction, Integer> issueAsset(PrivateKeyAccount creator,
+	public Transaction issueAsset(PrivateKeyAccount creator,
 			String name, String description, boolean movable, long quantity, byte scale, boolean divisible,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME

@@ -69,6 +69,11 @@ public abstract class Issue_ItemRecord extends Transaction
 	{
 		return item.toString();
 	}
+	
+	@Override
+	public boolean hasPublicText() {
+		return true;	
+	}
 
 	//@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack)
@@ -124,7 +129,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 3)
+		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 12)
 		{
 			return INVALID_NAME_LENGTH;
 		}
@@ -150,6 +155,16 @@ public abstract class Issue_ItemRecord extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 				
+		long count = this.item.getDBMap(db).getSize();
+		if (count < 10) {
+			// FIRST Persons only by ME
+			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+				return VALIDATE_OK;
+			} else {
+				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			}
+		}
+
 		return super.isValid(db, releaserReference);
 	
 	}
@@ -208,14 +223,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	}
 
 	@Override
-	public int calcBaseFee() {
-		
-		int add_fee = 0;
-		int len = this.getItem().getName().length();
-		if (len < 10) {
-			add_fee = 3^(10-len) * 100;
-		}
-	
-		return calcCommonFee() + BlockChain.FEE_PER_BYTE * (500 + add_fee);
+	public int calcBaseFee() {		
+		return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_MULT_FEE;
 	}
 }

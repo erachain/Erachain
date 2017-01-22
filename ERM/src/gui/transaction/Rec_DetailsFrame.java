@@ -181,8 +181,9 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 						
 		//FEE POWER
 		detailGBC.gridy = componentLevel;
-		JTextField feePow = new JTextField(String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow()) + ": "
-				+ record.getFee().toPlainString());
+		JTextField feePow = new JTextField(
+				String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow()) + ": "
+				+ record.getFee().toPlainString() + " " + core.item.assets.AssetCls.FEE_ABBREV);
 		feePow.setEditable(false);
 		MenuPopupUtil.installContextMenu(feePow);
 		this.add(feePow, detailGBC);	

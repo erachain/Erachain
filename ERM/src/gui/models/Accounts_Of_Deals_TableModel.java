@@ -77,7 +77,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		ss = ss.add(account.getBalance(this.asset.getKey(DBSet.getInstance())).a);	
 		
 		
-		sW = sW.add(account.getUnconfirmedBalance3(this.asset.getKey(DBSet.getInstance())).a);
+		sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance())).a);
 		
 		
 		}
@@ -176,7 +176,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance3(this.asset.getKey(DBSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a));
 				//	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 				//	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();

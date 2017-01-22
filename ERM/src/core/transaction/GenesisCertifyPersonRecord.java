@@ -173,7 +173,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 					(timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
 
 		// SET ALIVE PERSON for DURATION permanent
-		db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
+		///db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
 
 		// SET PERSON ADDRESS - end date as timestamp
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
@@ -190,7 +190,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 								
 		// UNDO ALIVE PERSON for DURATION
-		db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
+		//db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
 		//UPDATE RECIPIENT
 		db.getAddressPersonMap().removeItem(this.recipient.getAddress());

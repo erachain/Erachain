@@ -46,12 +46,12 @@ public class TestRecSetStatusToItem {
 	Long releaserReference = null;
 
 	boolean asPack = false;
-	long ERM_KEY = AssetCls.ERMO_KEY;
+	long ERM_KEY = AssetCls.ERM_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
-	long status_key = StatusCls.ALIVE_KEY;
+	long status_key = 1l;
 	Long to_date = null;
 	long personkey;
 	

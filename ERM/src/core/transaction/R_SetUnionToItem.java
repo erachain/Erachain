@@ -131,6 +131,10 @@ public class R_SetUnionToItem extends Transaction {
 		return this.end_date;
 	}
 
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJson() 

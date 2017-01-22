@@ -73,6 +73,10 @@ public class BuyNameTransaction extends Transaction
 		return this.seller;
 	}
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception

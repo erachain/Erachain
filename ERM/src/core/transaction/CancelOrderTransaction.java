@@ -57,6 +57,10 @@ public class CancelOrderTransaction extends Transaction
 		return this.order;
 	}
 	
+	public boolean hasPublicText() {
+		return false;
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception

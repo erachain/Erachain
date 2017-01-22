@@ -13,10 +13,11 @@ import lang.Lang;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import settings.Settings;
-import utils.SysTray;
 import api.ApiClient;
 import controller.Controller;
+import core.BlockChain;
+import settings.Settings;
+import utils.SysTray;
 
 public class Start {
 	
@@ -71,7 +72,7 @@ public class Start {
 							
 						Settings.getInstance().setGenesisStamp(testnetstamp);
 					} catch(Exception e) {
-						Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
+						Settings.getInstance().setGenesisStamp(BlockChain.DEFAULT_MAINNET_STAMP);
 					}
 				}
 			}

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -161,6 +162,39 @@ public class Lang {
         
         return lngList;
 	}
+	
+	
+	public List<Tuple2<String,String>> getLangListToWeb()
+	{
+		
+		
+		List<Tuple2<String,String>> lngList = new ArrayList<>();
+		
+
+		List<String> fileList = getFileListAvailable();
+		
+		lngList.add(new Tuple2<String, String>("en", new LangFile().getName() ));
+
+        for(int i=0; i<fileList.size(); i++)           
+        {
+        	if(!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json"))
+        	{
+        		try {
+        			JSONObject langFile = openLangFile(fileList.get(i));
+        			if (langFile.size() == 0)
+        				continue;
+        			
+        			lngList.add( new Tuple2<String, String>(fileList.get(i).replaceAll(".json", ""), (String)langFile.get("_lang_name_") ));
+        			
+        		} catch (Exception e) {
+        			LOGGER.error(e.getMessage(),e);
+        		}
+        	}
+        }
+        
+        return lngList;
+	}
+	
 	
 	public List<String> getFileListAvailable()
 	{

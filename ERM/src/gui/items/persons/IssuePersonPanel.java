@@ -4,6 +4,8 @@ import gui.PasswordPane;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
+import ntp.NTP;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +20,9 @@ import java.io.InputStream;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -139,25 +143,7 @@ public class IssuePersonPanel extends JPanel
         	};	
        	txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(items));
        	
-       	
-       	
-       	
-      // 	txtBirthday.setText("1970-12-08");
-       	
-       
-       	
-       	
-       	
-
-       	
-       	
-  //     	txtDeathday.setText("0000-00-00");
-       	
-       	
-       	
-       	
-       	
-       	txtRace.setText("-");
+       	txtRace.setText("");
        	this.txtBirthLatitude.setText("45.123");
        	this.txtBirthLongitude.setText("12.123");
        	this.txtHeight.setText("170");
@@ -362,24 +348,14 @@ public class IssuePersonPanel extends JPanel
 			gender = (byte) (this.txtGender.getSelectedIndex());
 			
 			parse++;
-			  Date date = this.txtBirthday.getCalendar().getTime();
-			String str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			if (str.length() < 11) str = str + " 00:00:00";
-			birthday = Timestamp.valueOf(str).getTime();
-		try{
+
+			birthday = this.txtBirthday.getCalendar().getTimeInMillis();
+
 			parse++;
-			date = this.txtDeathday.getCalendar().getTime();
-			//str = this.txtDeathday.getDate().toString();
-			str = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			
-				if (str.length() < 11) str = str + " 00:00:00";
-				deathday = Timestamp.valueOf(str).getTime();
-			
-		}
-		catch(Exception e3){
-			deathday = birthday -1;
-			
-		}
+			// END DATE
+			deathday = birthday - 1;
+			// deathday = this.txtDeathday.getCalendar().getTimeInMillis();
+
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			
@@ -461,11 +437,6 @@ public class IssuePersonPanel extends JPanel
 			 imgButes = null;
 			 iconButton.setIcon(null);
 			
-			
-			
-		
-			
-			
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
@@ -513,8 +484,13 @@ public class IssuePersonPanel extends JPanel
         issueButton = new javax.swing.JButton();
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
+        
+        // SET ONE TIME ZONE for Birthday 
+		TimeZone tz  = TimeZone.getDefault();
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         txtBirthday =  new JDateChooser("yyyy-MM-dd","####-##-##", '_');
         txtDeathday = new JDateChooser("yyyy-MM-dd","####-##-##", '_');
+		TimeZone.setDefault(tz);
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -837,7 +813,7 @@ public class IssuePersonPanel extends JPanel
         JFormattedTextField txtBirthday = new JFormattedTextField(AccFormat);    
     */    
          
-        txtBirthday.setDateFormatString("yyyy-MM-dd");
+        //txtBirthday.setDateFormatString("yyyy-MM-dd");
       
         
    //     txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));

@@ -42,7 +42,7 @@ public class TestRecHash {
 
 	boolean asPack = false;
 	long FEE_KEY = AssetCls.FEE_KEY;
-	long VOTE_KEY = AssetCls.ERMO_KEY;
+	long VOTE_KEY = AssetCls.ERM_KEY;
 	byte FEE_POWER = (byte)1;
 	long timestamp = NTP.getTime();
 	

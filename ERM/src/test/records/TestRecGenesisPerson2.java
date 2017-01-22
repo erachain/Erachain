@@ -40,7 +40,7 @@ public class TestRecGenesisPerson2 {
 	Long releaserReference = null;
 
 	long FEE_KEY = Transaction.FEE_KEY;
-	long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] packedReference = new byte[64];
 	
@@ -74,7 +74,7 @@ public class TestRecGenesisPerson2 {
 		//CREATE PERSON
 		//person = GenesisBlock.makePerson(0);
 		long bd = -106185600;
-		person = new PersonHuman(maker, "ERMOLAEV DMITRII SERGEEVICH", bd, bd -1, 
+		person = new PersonHuman(maker, "ERMLAEV DMITRII SERGEEVICH", bd, bd -1, 
 				(byte)1, "Slav", (float)1.1, (float)1.1,
 				"white", "gray", "dark", (int) 188, icon, image, "icreator");
 		//byte[] rawPerson = person.toBytes(true); // reference is new byte[64]
@@ -150,7 +150,7 @@ public class TestRecGenesisPerson2 {
 		}
 		
 		//CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-		person = new PersonHuman(maker, "ERMOLAEV DMITRII SERGEEVICH", 0L, -1L, 
+		person = new PersonHuman(maker, "ERMLAEV DMITRII SERGEEVICH", 0L, -1L, 
 				(byte)1, "Slav", (float)111.1, (float)1.1,
 				"white", "gray", "dark", (int) 188, icon, image, "icreator");
 		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);	

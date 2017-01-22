@@ -71,6 +71,10 @@ public class MultiPaymentTransaction extends Transaction {
 		return this.payments;
 	}
 	
+	public boolean hasPublicText() {
+		return true;
+	}
+
 	//PARSE/CONVERT
 	
 	@SuppressWarnings("unchecked")

@@ -19,7 +19,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
+import core.BlockChain;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -304,7 +304,7 @@ public abstract class TransactionAmount extends Transaction {
 				if (actionType == 1) {
 					// if asset is unlimited and me is creator of this asset 
 					boolean unLimited = 
-							absKey > AssetCls.DEAL_KEY // not genesis assets!
+							absKey > AssetCls.REAL_KEY // not genesis assets!
 							&& asset.getQuantity().equals(0l)
 							&& asset.getCreator().getAddress().equals(this.creator.getAddress());
 		
@@ -356,6 +356,10 @@ public abstract class TransactionAmount extends Transaction {
 				}
 			}
 		}
+		
+		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+			return ACCOUNT_NOT_PERSONALIZED;
+		}
 
 		return VALIDATE_OK;
 	}		
@@ -400,7 +404,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (absKey == Transaction.RIGHTS_KEY
 				&& this.recipient.getLastForgingData(db) == -1
-				&& this.amount.compareTo(GenesisBlock.MIN_GENERATING_BALANCE_BD) >= 0) {
+				&& this.amount.compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) >= 0) {
 			// TODO - если сначала прислать 12 а потом дослать 200000
 			// то будет все время выдавать недостаточное чило моне для форжинга
 			// так как все доначисления буду вычиаться из самого первого
@@ -462,7 +466,7 @@ public abstract class TransactionAmount extends Transaction {
 			// Parent BLOCK is still in MAP!
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
-				// if it is first payment ERMO - reset last forging BLOCK
+				// if it is first payment ERM - reset last forging BLOCK
 				this.recipient.delForgingData(db, blockHeight);
 				////this.recipient.setLastForgingData(db, -1);
 			}

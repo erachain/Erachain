@@ -67,6 +67,10 @@ public class CreatePollTransaction extends Transaction
 		return this.poll;
 	}
 
+	public boolean hasPublicText() {
+		return true;
+	}
+
 	//PARSE CONVERT
 	
 	public static Transaction Parse(byte[] data) throws Exception

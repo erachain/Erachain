@@ -2,6 +2,7 @@ package gui.items.assets;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -29,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 //import settings.Settings;
@@ -38,6 +40,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
+import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -362,9 +365,9 @@ public class IssueAssetPanel extends JPanel
          //gridBagConstraints.gridy = gridy;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-         add(feeLabel, gridBagConstraints);
+    //     add(feeLabel, gridBagConstraints);
       	
-    //  	this.add(feeLabel, labelGBC);
+  ;
       		
       	//TXT FEE
   //    	txtGBC.gridy = 6;
@@ -377,8 +380,8 @@ public class IssueAssetPanel extends JPanel
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
          gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-         add(this.txtFeePow, gridBagConstraints);
-  //      this.add(this.txtFeePow, txtGBC);
+   //      add(this.txtFeePow, gridBagConstraints);
+ 
 		           
         //BUTTON Register
         
@@ -470,14 +473,45 @@ public class IssueAssetPanel extends JPanel
 			
 			//READ QUANTITY
 			parse = 1;
-			long quantity = Long.parseLong(this.txtQuantity.getText());		
+			long quantity = Long.parseLong(this.txtQuantity.getText());
+			boolean asPack = false;
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);
+			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);			
+
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			 String text = "<HTML>";
+			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.viewItemName()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Description")+":&nbsp;"+ issueAssetTransaction.getItem().getDescription()+"<br>";
+			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
+			    text += "&nbsp;&nbsp; <b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.viewFee()+"</b><br>";
+			    
+			    UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
+			    UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));
+		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			
+			int s = JOptionPane.showConfirmDialog(new JFrame(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+		//	JOptionPane.OK_OPTION
+			if (s!= JOptionPane.OK_OPTION)	{
+				
+				this.issueButton.setEnabled(true);
+				
+				return;
+			}
+			
+					
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asPack);
+			
+			
+
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
+			switch(result)
 			{
 			case Transaction.VALIDATE_OK:
 				
@@ -524,7 +558,7 @@ public class IssueAssetPanel extends JPanel
 			default:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;		
 				
 			}

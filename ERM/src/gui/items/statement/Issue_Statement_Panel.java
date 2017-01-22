@@ -6,6 +6,7 @@ import gui.PasswordPane;
 import gui.items.ComboBoxModelItems;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;
 
@@ -421,7 +422,15 @@ public class Issue_Statement_Panel extends JPanel
 
 		//READ SENDER
 		Account sender = (Account) cbxFrom.getSelectedItem();
-				
+			
+		int feePow = 0;
+		String message = null;
+		boolean isTextB = true;
+		byte[] messageBytes;
+		long key = 0;
+		byte[] isTextByte;
+		byte[] encrypted;
+		
 		int parsing = 0;
 		try
 		{
@@ -430,14 +439,12 @@ public class Issue_Statement_Panel extends JPanel
 			
 			//READ FEE
 			parsing = 2;
-			int feePow = Integer.parseInt(txtFeePow.getText());			
+			feePow = Integer.parseInt(txtFeePow.getText());			
 			
-			String message = txtMessage.getText();
+			message = txtMessage.getText();
 			
-			boolean isTextB = isText.isSelected();
-			
-			byte[] messageBytes;
-			
+			isTextB = isText.isSelected();
+						
 			if ( isTextB )
 			{
 				messageBytes = message.getBytes( Charset.forName("UTF-8") );
@@ -471,63 +478,17 @@ public class Issue_Statement_Panel extends JPanel
 			
 			//Pair<Transaction, Integer> result;
 
-			byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
+			isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 
-			boolean encryptMessage = encrypted.isSelected();			
-			byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
+			boolean encryptMessage = this.encrypted.isSelected();			
+			encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
 			
 			//READ NOTE
 			parsing = 5;
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			NoteCls note = (NoteCls) this.cbxFavorites.getSelectedItem();
-			long key = note.getKey(); 
+			key = note.getKey(); 
 
-			//CREATE TX MESSAGE
-			result = Controller.getInstance().signNote(asPack,
-					Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
-					feePow, key, messageBytes, isTextByte, encrypted);
-			
-			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
-			{
-			case Transaction.VALIDATE_OK:
-				
-				//RESET FIELDS
-				
-				this.txtMessage.setText("");
-				return result;
-							
-			case Transaction.INVALID_ADDRESS:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid address!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.NEGATIVE_AMOUNT:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be positive!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.NO_BALANCE:
-			
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.ITEM_NOTE_NOT_EXIST:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			}
 		}
 		catch(Exception e)
 		{
@@ -549,9 +510,21 @@ public class Issue_Statement_Panel extends JPanel
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Note not exist!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 			}
+			return null;
 		}
+
+		//CREATE TX MESSAGE
+		result = Controller.getInstance().signNote(asPack,
+				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
+				feePow, key, messageBytes, isTextByte, encrypted);
 		
-		return null;
+		//CHECK VALIDATE MESSAGE
+		if (result.getB() == Transaction.VALIDATE_OK) {
+			return result;
+		} else {		
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
 		
 	}
 

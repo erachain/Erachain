@@ -363,6 +363,8 @@ public class PersonConfirmDialog extends JDialog  {
 
 				// IF PERSON ALIVE
 				Long personKey = addressDuration.a;
+				// TODO 
+				/*
 				Tuple5<Long, Long, byte[], Integer, Integer> aliveDuration = DBSet.getInstance().getPersonStatusMap().getItem(personKey, StatusCls.ALIVE_KEY);
 				if (aliveDuration != null) {
 					daysLeft = (int)((aliveDuration.b - current_time) / (long)86400000);	
@@ -371,8 +373,9 @@ public class PersonConfirmDialog extends JDialog  {
 				} else {
 					personDetails = personDetails + "<br> ?";
 				}
+				*/
+				personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive");
 				
-				//personDetails = personDetails; 
 			}
 
 			pubKeyDetails.setText("<html><h3>" + personDetails + "</h3>" + account.toString(Transaction.FEE_KEY) + "</html>");
