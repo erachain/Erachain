@@ -677,8 +677,7 @@ public abstract class Transaction {
 		return getDataLength(asPack);
 	}
 	public String viewFee() {
-		return fee.multiply(new BigDecimal(1000)).setScale(5)
-				.toPlainString() + "[" + feePow + "]";
+		return feePow +":" + this.fee.unscaledValue().longValue();
 	}
 
 	public String viewItemName() {
