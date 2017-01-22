@@ -2,6 +2,7 @@ package gui.items.assets;
 
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -29,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 //import settings.Settings;
@@ -478,8 +480,35 @@ public class IssueAssetPanel extends JPanel
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);			
 
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			 String text = "<HTML>";
+			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.viewItemName()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Description")+":&nbsp;"+ issueAssetTransaction.getItem().getDescription()+"<br>";
+			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
+			    text += "&nbsp;&nbsp; <b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.viewFee()+"</b><br>";
+			    
+			    UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
+			    UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));
+		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+		//	    UIManager.put("OptionPane.okButtonText", "Готово");
+			
+			int s = JOptionPane.showConfirmDialog(new JFrame(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+		//	JOptionPane.OK_OPTION
+			if (s!= JOptionPane.OK_OPTION)	{
+				
+				this.issueButton.setEnabled(true);
+				
+				return;
+			}
+			
+					
 			//VALIDATE AND PROCESS
 			int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asPack);
+			
+			
 
 			//CHECK VALIDATE MESSAGE
 			switch(result)
