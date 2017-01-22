@@ -870,10 +870,15 @@ public abstract class Transaction {
 		long personKey = personDuration.a;
 		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
 		ItemCls person = db.getItemPersonMap().get(personKey);
-		Account invitedAccount = person.getCreator(); 
+		Account invitedAccount = person.getCreator();
+		if (creator.equals(invitedAccount)) {
+			// IT IS ME - all fee!
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
+			return;			
+		}
 
 		int fee_gift_next;
-		if (fee_gift > 10)
+		if (fee_gift > 2)
 			fee_gift_next = fee_gift>>BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
 		else
 			fee_gift_next = fee_gift - 1;
@@ -883,7 +888,7 @@ public abstract class Transaction {
 		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE));
 		
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
-			process_gifts(db, level++, fee_gift_next, invitedAccount, asOrphan);
+			process_gifts(db, ++level, fee_gift_next, invitedAccount, asOrphan);
 		}
 	}
 
