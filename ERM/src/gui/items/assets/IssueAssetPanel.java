@@ -38,6 +38,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
+import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -470,14 +471,18 @@ public class IssueAssetPanel extends JPanel
 			
 			//READ QUANTITY
 			parse = 1;
-			long quantity = Long.parseLong(this.txtQuantity.getText());		
+			long quantity = Long.parseLong(this.txtQuantity.getText());
+			boolean asPack = false;
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);
-			
+			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);			
+
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asPack);
+
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
+			switch(result)
 			{
 			case Transaction.VALIDATE_OK:
 				
@@ -524,7 +529,7 @@ public class IssueAssetPanel extends JPanel
 			default:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;		
 				
 			}

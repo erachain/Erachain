@@ -145,7 +145,7 @@ public class TransactionCreator
 		nameRegistration.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		return this.afterCreate(nameRegistration, false);
+		return new Pair<Transaction, Integer>(nameRegistration, this.afterCreate(nameRegistration, false));
 	}
 
 	public Pair<Transaction, Integer> createNameUpdate(PrivateKeyAccount creator, Name name, int feePow)
@@ -161,7 +161,7 @@ public class TransactionCreator
 		nameUpdate.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		return this.afterCreate(nameUpdate, false);
+		return new Pair<Transaction, Integer>(nameUpdate, this.afterCreate(nameUpdate, false));
 	}
 	public Pair<Transaction, Integer> createNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow)
 	{
@@ -176,7 +176,7 @@ public class TransactionCreator
 		nameSaleTransaction.sign(creator, false);
 				
 		//VALIDATE AND PROCESS
-		return this.afterCreate(nameSaleTransaction, false);
+		return new Pair<Transaction, Integer>(nameSaleTransaction, this.afterCreate(nameSaleTransaction, false));
 	}
 	public Pair<Transaction, Integer> createCancelNameSale(PrivateKeyAccount creator, NameSale nameSale, int feePow)
 	{
@@ -191,7 +191,7 @@ public class TransactionCreator
 		cancelNameSaleTransaction.sign(creator, false);
 				
 		//VALIDATE AND PROCESS
-		return this.afterCreate(cancelNameSaleTransaction, false);
+		return new Pair<Transaction, Integer>(cancelNameSaleTransaction, this.afterCreate(cancelNameSaleTransaction, false));
 	}
 
 	public Pair<Transaction, Integer> createNamePurchase(PrivateKeyAccount creator, NameSale nameSale, int feePow)
@@ -207,7 +207,7 @@ public class TransactionCreator
 		namePurchase.sign(creator, false);
 				
 		//VALIDATE AND PROCESS
-		return this.afterCreate(namePurchase, false);
+		return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, false));
 	}
 		
 	public Pair<Transaction, Integer> createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) 
@@ -223,7 +223,7 @@ public class TransactionCreator
 		pollCreation.sign(creator, false);
 						
 		//VALIDATE AND PROCESS
-		return this.afterCreate(pollCreation, false);
+		return new Pair<Transaction, Integer>(pollCreation, this.afterCreate(pollCreation, false));
 	}
 	
 
@@ -241,7 +241,7 @@ public class TransactionCreator
 		pollVote.sign(creator, false);
 						
 		//VALIDATE AND PROCESS
-		return this.afterCreate(pollVote, false);
+		return new Pair<Transaction, Integer>(pollVote, this.afterCreate(pollVote, false));
 	}
 	
 	
@@ -258,11 +258,11 @@ public class TransactionCreator
 		arbitraryTransaction.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		return this.afterCreate(arbitraryTransaction, false);
+		return new Pair<Transaction, Integer>(arbitraryTransaction, this.afterCreate(arbitraryTransaction, false));
 	}
 	
 	
-	public Pair<Transaction, Integer> createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, boolean movable, long quantity, byte scale, boolean divisible, int feePow) 
+	public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, boolean movable, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		// all unconfirmed records insert in FORK for calc last account REFERENCE 
@@ -274,11 +274,10 @@ public class TransactionCreator
 		AssetCls asset = new AssetVenture(creator, name, icon, image, description, movable, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));										
 		issueAssetTransaction.sign(creator, false);
-										
-		//VALIDATE AND PROCESS
-		return this.afterCreate(issueAssetTransaction, false);
+
+		return issueAssetTransaction;
 	}
 
 	public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
@@ -296,7 +295,7 @@ public class TransactionCreator
 		issueImprintRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return this.afterCreate(issueImprintRecord, false);
+		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
 
 	public Pair<Transaction, Integer> createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
@@ -314,7 +313,7 @@ public class TransactionCreator
 		issueNoteRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return this.afterCreate(issueNoteRecord, false);
+		return new Pair<Transaction, Integer>(issueNoteRecord, this.afterCreate(issueNoteRecord, false));
 	}
 
 	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
@@ -337,7 +336,7 @@ public class TransactionCreator
 		issuePersonRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return this.afterCreate(issuePersonRecord, false);
+		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, false));
 	}
 
 	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
@@ -355,7 +354,7 @@ public class TransactionCreator
 		issueStatusRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return this.afterCreate(issueStatusRecord, false);
+		return new Pair<Transaction, Integer>(issueStatusRecord, this.afterCreate(issueStatusRecord, false));
 	}
 
 	public Pair<Transaction, Integer> createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
@@ -373,7 +372,7 @@ public class TransactionCreator
 		issueUnionRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return this.afterCreate(issueUnionRecord, false);
+		return new Pair<Transaction, Integer>(issueUnionRecord, this.afterCreate(issueUnionRecord, false));
 	}
 
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
@@ -394,7 +393,7 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		createOrderTransaction.sign(creator, false);
 		
-		return this.afterCreate(createOrderTransaction, false);
+		return new Pair<Transaction, Integer>(createOrderTransaction, this.afterCreate(createOrderTransaction, false));
 	}
 		
 	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow)
@@ -410,7 +409,7 @@ public class TransactionCreator
 		cancelOrderTransaction.sign(creator, false);
 								
 		//VALIDATE AND PROCESS
-		return this.afterCreate(cancelOrderTransaction, false);
+		return new Pair<Transaction, Integer>(cancelOrderTransaction, this.afterCreate(cancelOrderTransaction, false));
 	}
 		
 	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow)
@@ -426,7 +425,7 @@ public class TransactionCreator
 		multiPayment.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		return this.afterCreate(multiPayment, false);
+		return new Pair<Transaction, Integer>(multiPayment, this.afterCreate(multiPayment, false));
 	}
 	
 	public Pair<Transaction, Integer> deployATTransaction(PrivateKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal amount, int feePow )
@@ -441,7 +440,7 @@ public class TransactionCreator
 		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte)feePow, time, creator.getLastReference(this.fork));
 		deployAT.sign(creator, false);
 		
-		return this.afterCreate(deployAT, false);
+		return new Pair<Transaction, Integer>(deployAT, this.afterCreate(deployAT, false));
 		
 	}
 	
@@ -459,7 +458,7 @@ public class TransactionCreator
 		messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
-		return afterCreate(messageTx, false);
+		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 
 	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount creator,
@@ -476,7 +475,7 @@ public class TransactionCreator
 		messageTx = new R_Send(version, creator, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
-		return afterCreate(messageTx, false);
+		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 	
 	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount creator,
@@ -493,7 +492,7 @@ public class TransactionCreator
 		recordNoteTx = new R_SignNote(creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
 			
-		return afterCreate(recordNoteTx, asPack);
+		return new Pair<Transaction, Integer>(recordNoteTx, afterCreate(recordNoteTx, asPack));
 	}
 
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,
@@ -514,7 +513,7 @@ public class TransactionCreator
 				add_day,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return afterCreate(record, asPack);
+		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
 	}
 
 	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
@@ -534,7 +533,7 @@ public class TransactionCreator
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return afterCreate(record, asPack);
+		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
 	}
 
 	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
@@ -558,7 +557,7 @@ public class TransactionCreator
 		messageTx = new R_Hashes(creator, (byte)feePow, url, data, hashes, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
-		return afterCreate(messageTx, false);
+		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
 			String urlStr, String dataStr, String hashesStr) {
@@ -620,7 +619,7 @@ public class TransactionCreator
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return afterCreate(record, asPack);
+		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
 	}
 
 	/*
@@ -687,10 +686,10 @@ public class TransactionCreator
 		}
 		
 		//VALIDATE AND PROCESS
-		return this.afterCreate(transaction, false);
+		return new Pair<Transaction, Integer>(transaction, this.afterCreate(transaction, false));
 	}
 	
-	private Pair<Transaction, Integer> afterCreate(Transaction transaction, boolean asPack)
+	public Integer afterCreate(Transaction transaction, boolean asPack)
 	{
 		//CHECK IF PAYMENT VALID
 		int valid = transaction.isValid(this.fork, null);
@@ -714,7 +713,7 @@ public class TransactionCreator
 		}
 				
 		//RETURN
-		return new Pair<Transaction, Integer>(transaction, valid);
+		return valid;
 	}
 	
 	

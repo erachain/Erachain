@@ -23,6 +23,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import utils.Converter;
+import utils.TransactionTimestampComparator;
 import at.AT_API_Platform_Impl;
 import at.AT_Block;
 import at.AT_Constants;
@@ -1229,7 +1230,13 @@ public class Block {
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
-		for(Transaction transaction: this.getTransactions())
+
+		//SORT THEM BY TIMESTAMP
+		// for correct reference
+		List<Transaction> accountTransactions = new ArrayList<Transaction>();
+		Collections.sort(this.getTransactions(), new TransactionTimestampComparator());
+
+		for(Transaction transaction: accountTransactions)
 		{
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height_process, seq);
 			dbSet.getTransactionFinalMap().set( key, transaction);

@@ -236,10 +236,14 @@ public class Controller extends Observable {
 				getMyHWeight(false)));
 	}
 	
+	public TransactionCreator getTransactionCreator() {
+		return  transactionCreator;
+	}
+
 	public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
 		return peerHWeight;
 	}
-	
+
 	public Tuple2<Integer, Long> getHWeightOfPeer(Peer peer) {
 		if(peerHWeight!=null && peerHWeight.containsKey(peer)){
 			return peerHWeight.get(peer);
@@ -2155,7 +2159,7 @@ public class Controller extends Observable {
 		}
 	}
 	
-	public Pair<Transaction, Integer> issueAsset(PrivateKeyAccount creator,
+	public Transaction issueAsset(PrivateKeyAccount creator,
 			String name, String description, boolean movable, long quantity, byte scale, boolean divisible,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
