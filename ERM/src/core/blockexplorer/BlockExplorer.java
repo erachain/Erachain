@@ -122,7 +122,7 @@ public class BlockExplorer
 
 		Map output = new LinkedHashMap();
 
-	//	try {
+	
 		
 		
 		
@@ -155,7 +155,15 @@ public class BlockExplorer
 		}
 		output.put("Lang", lang_list);
 		
+		output.put("id_home2", translate_web("Blocks"));
+		output.put("id_menu_top_100", translate_web("Top 100 Richest"));
+		output.put("id_menu_percons", translate_web("Persons"));
+		output.put("id_menu_pals_asset", translate_web("Polls"));
+		output.put("id_menu_assets", translate_web("Assets"));
+		output.put("id_menu_aTs", translate_web("ATs"));
 		
+	
+	
 		
 		
 

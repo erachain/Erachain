@@ -172,6 +172,24 @@ function asyncAjax (url, type){
 			if(xmlhttp.status == 200) {
 				var data = JSON.parse(xmlhttp.responseText);
 				
+				
+				
+				
+		
+	
+		
+	
+				
+		$(home2).text(data.id_home2);
+	$(menu_top_100).text(data.id_menu_top_100);
+	$(menu_percons).text(data.id_menu_percons);
+	$(menu_pals_asset).text(data.id_menu_pals_asset);
+	$(menu_assets).text(data.id_menu_assets);
+	$(menu_aTs).text(data.id_menu_aTs);			
+				
+				
+				
+				
 				document.getElementById('Langs').innerHTML = langs(data);
 
 				if(type == 'blocks')
@@ -3415,13 +3433,7 @@ function start() {
 	document.getElementById('menu_pals_asset').href ='?polls&asset=1&lang='+ params['lang'] ;
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
 	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
-	//document.getElementById('icon_href').href ='/index/main.html&lang='+ params['lang'] ;
-	
-
-			//	<li id=menuPersons><a href="?persons" id =menu_percons>Persons</a></li>
-			//	<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset>Polls</a></li>
-			//	<li id=menuAssets><a href="?assets" id =menu_assets>Assets</a></li>
-			//	<li id=menuATs><a href="?aTs" id =menu_aTs>ATs</a></li>				
+				
 	
 	document.getElementById('menuBlocks').setAttribute('class', '');
 	document.getElementById('menuTop100Richest').setAttribute('class', '');
