@@ -1231,12 +1231,13 @@ public class Block {
 		//PROCESS TRANSACTIONS
 		int seq = 1;
 
+		List<Transaction> blockTransactions = this.getTransactions();
+
 		//SORT THEM BY TIMESTAMP
 		// for correct reference
-		List<Transaction> accountTransactions = new ArrayList<Transaction>();
-		Collections.sort(this.getTransactions(), new TransactionTimestampComparator());
+		Collections.sort(blockTransactions, new TransactionTimestampComparator());
 
-		for(Transaction transaction: accountTransactions)
+		for(Transaction transaction: blockTransactions)
 		{
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height_process, seq);
 			dbSet.getTransactionFinalMap().set( key, transaction);
