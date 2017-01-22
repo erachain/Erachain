@@ -365,9 +365,9 @@ public class IssueAssetPanel extends JPanel
          //gridBagConstraints.gridy = gridy;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-         add(feeLabel, gridBagConstraints);
+    //     add(feeLabel, gridBagConstraints);
       	
-    //  	this.add(feeLabel, labelGBC);
+  ;
       		
       	//TXT FEE
   //    	txtGBC.gridy = 6;
@@ -380,8 +380,8 @@ public class IssueAssetPanel extends JPanel
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
          gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-         add(this.txtFeePow, gridBagConstraints);
-  //      this.add(this.txtFeePow, txtGBC);
+   //      add(this.txtFeePow, gridBagConstraints);
+ 
 		           
         //BUTTON Register
         
