@@ -1,6 +1,7 @@
 package core.item.assets;
 
 
+import core.BlockChain;
 import core.account.Account;
 import core.item.ItemCls;
 
@@ -10,32 +11,49 @@ import database.DBSet;
 import database.Item_Map;
 import database.Issue_ItemMap;
 import database.wallet.WalletDatabase;
+import lang.Lang;
 import database.wallet.FavoriteItem;
-
 
 
 public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
-	public static final long ERMO_KEY = 1l;
-	public static final String ERMO_ABBREV = "ERA"; // ERMO (main rights units)
-	public static final String ERMO_NAME = "ЭРА";
-	public static final String ERMO_DESCR = "Основня единица - правовая (" + ERMO_NAME + ")";
+	public static final long ERM_KEY = 1l;
+	public static final String ERM_ABBREV = "ERN"; // ERM (main rights units)
+	public static final String ERM_NAME = "Eranna";
+	public static final String ERM_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
+			+ ERM_NAME + "(" + ERM_ABBREV + "). "
+			+ "Именно единицы Эранны позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
+			+ ". "
+			+ ("Более чем %MIN% ЭРН, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
+				.replace("%MIN%", "" + BlockChain.MIN_GENERATING_BALANCE)
+				.replace("%MINOR%", "" + BlockChain.MINOR_ERM_BALANCE))
+			+ ". "
+			+ "Число единиц %GENERAL% Эранны дает права создавать новые статусы и другие сущности в среде"
+			.replace("%GENERAL%", "" + BlockChain.GENERAL_ERM_BALANCE)
+			+ "."
+			;
+
 	// FEE KEY
 	public static final long FEE_KEY = 2l;
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
-	public static final String FEE_NAME = "КОМПУ";
-	public static final String FEE_DESCR = "Единица полезной работы среды (" + FEE_NAME + ")";
+	public static final String FEE_NAME = "Compu";
+	public static final String FEE_DESCR = "Основная учётная единица среды, используемая для оплаты комиссий за внесение записей в среду - \"рабочая\", \"оплатная\"" + ": "
+			+ FEE_NAME + "(" + FEE_ABBREV + "). ";
+			
 	// TRUST KEY
 	public static final long TRUST_KEY = 3l;
-	public static final String TRUST_ABBREV = "TRU"; // COMPU (compute units)
-	public static final String TRUST_NAME = "Честь";
-	public static final String TRUST_DESCR = "Честь и доверие (" + TRUST_NAME + ")";
+	public static final String TRUST_ABBREV = "HNR"; // COMPU (compute units)
+	public static final String TRUST_NAME = "Honor";
+	public static final String TRUST_DESCR = "Честь, доблесть и доверие" + ": "
+			+ TRUST_NAME + "(" + TRUST_ABBREV + "). ";
+
 	// REAL KEY
 	public static final long REAL_KEY = 4l;
-	public static final String REAL_ABBREV = "RIL"; // COMPU (compute units)
-	public static final String REAL_NAME = "Польза";
-	public static final String REAL_DESCR = "Труд и польза (" + REAL_NAME + ")";
+	public static final String REAL_ABBREV = "AVL"; // COMPU (compute units)
+	public static final String REAL_NAME = "Avail";
+	public static final String REAL_DESCR = "Труд, заслуги и польза" + ": "
+		+ REAL_NAME + "(" + REAL_ABBREV + "). ";
 
 	/*
 	// DEaL KEY

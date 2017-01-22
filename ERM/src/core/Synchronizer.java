@@ -76,8 +76,8 @@ public class Synchronizer
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
 				if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getParentHeight(fork)) {
-					cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
-							+ lastCommonBlock.getHeight(fork) + "]"); // icreator
+					//cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
+					//		+ lastCommonBlock.getHeight(fork) + "]"); // icreator
 
 					throw new Exception("Dishonest peer by not valid lastCommonBlock["
 							+ lastCommonBlock.getHeight(fork) + "]");
@@ -134,7 +134,7 @@ public class Synchronizer
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 
-				cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
+				//cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
 
 				//INVALID BLOCK THROW EXCEPTION
 				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
@@ -229,6 +229,9 @@ public class Synchronizer
 				
 		// FIND HEADERS for common CHAIN
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
+		if (signatures.b.size() == 0) {
+			throw new Exception("Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress());
+		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
 		Block common = dbSet.getBlockMap().get(signatures.a);
@@ -382,23 +385,21 @@ public class Synchronizer
 		byte[] checkPointHeightSignature;
 		Block checkPointHeightCommonBlock = null;
 		if (checkPointHeight == 1) {
-			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock();						
+			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock().getChild(dbSet);
+			if (checkPointHeightCommonBlock == null) {
+				return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);				
+			}
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
 			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
-			if (checkPointHeightSignature == null) {
-				Controller.getInstance().onError(peer);
-				throw new Exception("Dishonest peer - COMMON Block == null for PEER: " + peer.toString());
-			} else {
-				try {
-					// try get common block from PEER
-					checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
-				} catch (Exception e) {
-					Controller.getInstance().onDisconnect(peer);
-					throw new Exception("Dishonest peer - error in PEER: " + peer.toString());
-				}
-			}
-
+		}
+		
+		try {
+			// try get common block from PEER
+			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
+		} catch (Exception e) {
+			Controller.getInstance().onDisconnect(peer);
+			throw new Exception("Dishonest peer - error in PEER: " + peer.getAddress().getHostAddress());
 		}
 
 		if (checkPointHeightCommonBlock == null
@@ -408,36 +409,35 @@ public class Synchronizer
 		}
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
-		int steep = 16;
+		int steep = BlockChain.MAX_ORPHAN>>2;
+		byte[] lastBlockSignatureCommon;
 		do {
 			maxChainHeight -= steep;
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
-				lastBlockSignature = checkPointHeightCommonBlock.getSignature();
+				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastBlockSignature = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
+				lastBlockSignatureCommon = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
 			}
 				
-			headers = this.getBlockSignatures(lastBlockSignature, peer);
+			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
 			if (headers.size() > 0)
 				break;
 			// x2
-			steep <<= 1;
+			//steep <<= 1;
 			
 		} while ( maxChainHeight > checkPointHeight && headers.isEmpty());
 
 		// CLEAR head of common headers
 		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
-			lastBlockSignature = headers.remove(0);
+			lastBlockSignatureCommon = headers.remove(0);
 		}
 		if (headers.isEmpty()) {
-			if (true) {
-				throw new Exception("Dishonest peer by headers.size==0 " + peer.toString());
-			}
+			throw new Exception("Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress());
 		}
 
 		
-		return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
+		return new Tuple2<byte[], List<byte[]>>(lastBlockSignatureCommon, headers);
 	}
 
 	private List<Block> getBlocks(DBSet dbSet, List<byte[]> signatures, Peer peer) throws Exception {

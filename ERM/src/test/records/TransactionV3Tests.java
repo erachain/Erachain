@@ -32,7 +32,7 @@ public class TransactionV3Tests {
 
 	Long releaserReference = null;
 
-	long ERMO_KEY = AssetCls.ERMO_KEY;
+	long ERM_KEY = AssetCls.ERM_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] assetReference = new byte[64];
@@ -67,7 +67,7 @@ public class TransactionV3Tests {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(8));
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 	}
@@ -82,7 +82,7 @@ public class TransactionV3Tests {
 		R_Send messageTransactionV3 = new R_Send(
 				maker, FEE_POWER, //	ATFunding 
 				recipient, 
-				ERMO_KEY, 
+				ERM_KEY, 
 				amount,
 				data,
 				isText,
@@ -96,8 +96,8 @@ public class TransactionV3Tests {
 		messageTransactionV3.process(db, gb, false);
 		
 		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERMO_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERMO_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERM_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
 		int dd = messageTransactionV3.getDataLength(false);

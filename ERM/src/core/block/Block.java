@@ -222,7 +222,7 @@ public class Block {
 			for(Transaction transaction: txs)
 			{				
 				if (false && transaction instanceof R_SertifyPubKeys) {
-				//	amount = BlockChain.GIFTED_ERMO_AMOUNT.intValue();
+				//	amount = BlockChain.GIFTED_ERM_AMOUNT.intValue();
 				//	incomed_amount += amount;
 				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
 					int amo_sign = transaction.getAmount().signum();
@@ -1038,7 +1038,7 @@ public class Block {
 		}
 		
 		// STOP IF SO RAPIDLY
-		if (height < 100) {
+		if (true || height < 100) {
 			// NEED CHECK ONLY ON START
 			Block testBlock = this.getParent(db);
 			for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {

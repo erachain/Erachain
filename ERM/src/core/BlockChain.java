@@ -33,14 +33,14 @@ public class BlockChain
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
-	public static final int BASE_TARGET = 1024 * 2;
-	public static final int REPEAT_WIN = 5;
+	public static final int BASE_TARGET = 1024 * 3;
+	public static final int REPEAT_WIN = 30;
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
-	public static final int GENERAL_ERMO_BALANCE = GENESIS_ERA_TOTAL / 100;
-	public static final int MAJOR_ERMO_BALANCE = 33000;
-	public static final int MINOR_ERMO_BALANCE = 1000;
+	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
+	public static final int MAJOR_ERM_BALANCE = 33000;
+	public static final int MINOR_ERM_BALANCE = 1000;
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
@@ -57,7 +57,7 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1484949935444L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1485095630444L; //1465107777777L;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;

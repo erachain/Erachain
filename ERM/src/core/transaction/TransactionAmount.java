@@ -466,7 +466,7 @@ public abstract class TransactionAmount extends Transaction {
 			// Parent BLOCK is still in MAP!
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
-				// if it is first payment ERMO - reset last forging BLOCK
+				// if it is first payment ERM - reset last forging BLOCK
 				this.recipient.delForgingData(db, blockHeight);
 				////this.recipient.setLastForgingData(db, -1);
 			}

@@ -30,7 +30,7 @@ import database.DBSet;
 public class OrderTestsMy 
 {
 	Long releaserReference = null;
-	long ERMO_KEY = Transaction.RIGHTS_KEY;
+	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
@@ -97,11 +97,11 @@ public class OrderTestsMy
 		
 		// FEE FUND
 		accountA.setLastReference(gb.getTimestamp(db), db);
-		accountA.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		accountA.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(8));
 		accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 
 		accountB.setLastReference(gb.getTimestamp(db), db);
-		accountB.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(100).setScale(8));
+		accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(8));
 		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 
     	assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", false, 50000L, (byte)2, true);
@@ -156,7 +156,7 @@ public class OrderTestsMy
 						
 		//CHECK VALID
 		long timeStamp = System.currentTimeMillis();
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERMO_KEY, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
+		CreateOrderTransaction orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERM_KEY, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION HAVE EQUALS WANT
@@ -166,13 +166,13 @@ public class OrderTestsMy
 		assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION NOT ENOUGH BALANCE
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERMO_KEY, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERM_KEY, BigDecimal.valueOf(50001).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERMO_KEY, BigDecimal.valueOf(-50.0).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
+		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERM_KEY, BigDecimal.valueOf(-50.0).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(db, releaserReference));
@@ -183,7 +183,7 @@ public class OrderTestsMy
     	keyA = assetA.getKey(db);
 
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERMO_KEY, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
+		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERM_KEY, BigDecimal.valueOf(50.01).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db));		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.INVALID_AMOUNT, orderCreation.isValid(db, releaserReference));
@@ -196,7 +196,7 @@ public class OrderTestsMy
 		assertEquals(Transaction.INVALID_RETURN, orderCreation.isValid(db, releaserReference));
 
 		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-		orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERMO_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db), new byte[64]);		
+		orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERM_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
@@ -208,7 +208,7 @@ public class OrderTestsMy
 		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE ORDER CREATION INVALID REFERENCE
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERMO_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERM_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		
 			
 		//CHECK IF  ORDER CREATION IS INVALID
 		assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(db, releaserReference));

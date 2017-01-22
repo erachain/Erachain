@@ -25,7 +25,7 @@ public class WalletTests {
 
 	boolean asPack = false;
 	long FEE_KEY = AssetCls.FEE_KEY;
-	long VOTE_KEY = AssetCls.ERMO_KEY;
+	long VOTE_KEY = AssetCls.ERM_KEY;
 	byte FEE_POWER = (byte)1;
 	byte[] noteReference = new byte[64];
 	long timestamp = NTP.getTime();

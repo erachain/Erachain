@@ -42,7 +42,7 @@ public class TestRec_Vouch {
 
 	Long releaserReference = null;
 
-	long ERMO_KEY = AssetCls.ERMO_KEY;
+	long ERM_KEY = AssetCls.ERM_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
@@ -68,7 +68,7 @@ public class TestRec_Vouch {
 		
 		// FEE FUND
 		maker.setLastReference(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, ERMO_KEY, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 	}

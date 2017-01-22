@@ -62,7 +62,7 @@ public class GenesisBlock extends Block{
 		super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 		
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
-		this.generatingBalance = BlockChain.GENERAL_ERMO_BALANCE;
+		this.generatingBalance = BlockChain.GENERAL_ERM_BALANCE;
 		
 		Account recipient;
 		BigDecimal bdAmount0;
@@ -109,7 +109,7 @@ public class GenesisBlock extends Block{
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
 
 				// SEND GENESIS ASSETS
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 		    }
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
@@ -167,7 +167,11 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "333000"),
 					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "333000"),
 					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "333000"),
+					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "100000"),
+					
 					////
+					Arrays.asList("7Mr6qTY2vN1int3Byo6NmZQDRmH7zuLEZ7", "1800"),
+					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "43.84966285"),
 					Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1289.69596627"),
@@ -206,6 +210,9 @@ public class GenesisBlock extends Block{
 
 			////////// ACTIVISTS
 			List<List<Object>> genesisActivists = Arrays.asList(
+					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "1231.5270936"),
+					Arrays.asList("76Um7KRBKDjoLWbLDWMdbtmBJkxjW9GNpZ", "1231.5270936"),
+					Arrays.asList("76u1ywTpSTdZvpq9bNk5GdnwTxD5uNo6dF", "1231.5270936"),
 					Arrays.asList("7KcBS1bmK1NiYwJD1mgwhz1ZFWESviQthG", "1231.5270936"),
 					Arrays.asList("78Eo2dL898wzqXBn6zbGanEnwXtdDF2BWV", "1231.5270936"),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "1231.5270936"),
@@ -328,7 +335,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account((String)item.get(0));
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 				
 				// buffer for CREDIT sends
@@ -354,7 +361,7 @@ public class GenesisBlock extends Block{
 				}
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
 
@@ -374,7 +381,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account((String)item.get(0));
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERMO_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
 				addDebt(recipient.getAddress(), 1, genesisDebtors);
@@ -383,7 +390,7 @@ public class GenesisBlock extends Block{
 
 			// ADJUST end
 			transactions.add(new GenesisTransferAssetTransaction(
-					new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"), AssetCls.ERMO_KEY,
+					new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7"), AssetCls.ERM_KEY,
 					new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(8)));
 
 
@@ -411,7 +418,7 @@ public class GenesisBlock extends Block{
 						BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
 						bdAmount0 = bdAmount0.subtract(diffLimit);
 						
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
+						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERM_KEY,
 								diffLimit, bufferCreditor));
 						i++;
 						limitOwned = limitOwned.subtract(BigDecimal.ONE);
@@ -419,7 +426,7 @@ public class GenesisBlock extends Block{
 						bufferAmount = sends_toUsers.get(i).b;
 						continue;
 					} else {
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERMO_KEY,
+						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERM_KEY,
 								bdAmount0, bufferCreditor));
 						bufferAmount = bufferAmount.subtract(bdAmount0);
 						break;
@@ -439,7 +446,7 @@ public class GenesisBlock extends Block{
 		
 		///// ASSETS
 		//CREATE ERM ASSET
-		asset0 = makeAsset(AssetCls.ERMO_KEY);
+		asset0 = makeAsset(AssetCls.ERM_KEY);
 		transactions.add(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
 		asset1 = makeAsset(AssetCls.FEE_KEY);
@@ -471,8 +478,8 @@ public class GenesisBlock extends Block{
 		//case (int)AssetCls.DEAL_KEY:
 		//	return new AssetVenture(CREATOR, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0l, (byte)8, true);
 		}
-		//return new AssetVenture(genesisGenerator, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
-		return new AssetVenture(CREATOR, AssetCls.ERMO_NAME, icon, image, AssetCls.ERMO_DESCR, false, 0l, (byte)0, true);
+		//return new AssetVenture(genesisGenerator, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
+		return new AssetVenture(CREATOR, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, 0l, (byte)8, true);
 	}
 	// make notes
 	public static Note makeNote(int key) 
@@ -494,7 +501,7 @@ public class GenesisBlock extends Block{
 	public static Status makeStatus(int key)
 	{
 		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR,
-				"Членство", icon, image, "Уровень %1 членства в объединении %2");
+				"Членство %1 ур. в объед. %2", icon, image, "Уровень %1 членства в объединении %2");
 		//else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
 		//else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
 		//else if (key == StatusCls.USER_KEY) return new Status(CREATOR, "User", icon, image, "Admin, User, Observer");
@@ -503,7 +510,7 @@ public class GenesisBlock extends Block{
 		//else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
 		//else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
 
-		return new Status(CREATOR, "Права", icon, image, "Уровень %1 прав (власти) в объединении %2");
+		return new Status(CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2");
 	}
 	
 	
