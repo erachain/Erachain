@@ -1545,20 +1545,17 @@ if ( asset_1 == null) {
 		output.put("key", person.getKey());
 		output.put("creator", person.getCreator().getPersonAsString());
 		
-		try {
+		if (person.getCreator().getPerson() != null){
 			output.put("creator_key", person.getCreator().getPerson().b.getKey());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			output.put("creator_key", "");
-			e.printStackTrace();
-		}
-		try {
 			output.put("creator_name", person.getCreator().getPerson().b.getName());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		}else{
+			output.put("creator_key", "");
 			output.put("creator_name", "");
-			e.printStackTrace();
 		}
+		
+			
+			
+		
 		output.put("name", person.getName());
 		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
 		output.put("description", person.getDescription());
@@ -1622,21 +1619,19 @@ if ( asset_1 == null) {
 			
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
 			accountJSON.put("data", personModel.getValueAt(i, 1));
-			try {
 				PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
 				
 				accountJSON.put("creator", personModel.getValueAt(i, 2));
+				if (cc != null){
 				accountJSON.put("creator_name", cc.getName());
 				accountJSON.put("creator_key", cc.getKey());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				accountJSON.put("creator", "");
-				accountJSON.put("creator_name", "");
-				accountJSON.put("creator_key", "");
+				}else{
+					accountJSON.put("creator_name", "");
+					accountJSON.put("creator_key", "");	
+					
 				
-				
-				e.printStackTrace();
-			}
+				}
+			
 			
 			
 			
