@@ -15,7 +15,7 @@ public class PeerManager {
 
 	private static PeerManager instance;
 	private Map<String, Long> blacListeddWait = new TreeMap<String, Long>(); // bat not time
-	private final static long banTime = 12 * 60 * 60 * 1000;
+	private final static long banTime = 3 * 60 * 60 * 1000;
 
 	
 	public static PeerManager getInstance()
