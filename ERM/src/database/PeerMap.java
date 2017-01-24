@@ -356,7 +356,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 							// REMOVE from this PLACE
 							peers.remove(found);
 							// ADD in TOP
-							peers.add(insertIndex, knownPeer);
+							if (peers.size() > insertIndex) {
+								peers.add(insertIndex, knownPeer);
+							} else {
+								peers.add(knownPeer);
+							}
 						}
 						insertIndex++;
 						

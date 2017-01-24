@@ -89,7 +89,7 @@ public class ConnectionCreator extends Thread {
 						if (!this.isRun)
 							return;
 
-						
+						/*
 						LOGGER.info(
 								Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
 									.replace("%peer%", peer.getAddress().getHostAddress())
@@ -97,7 +97,7 @@ public class ConnectionCreator extends Thread {
 									.replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
 									.replace("%activeConnections%", String.valueOf(callback.getActivePeers(false).size()))
 									);
-									
+									*/
 
 						//CONNECT
 						//CHECK IF ALREADY CONNECTED TO PEER
@@ -177,7 +177,7 @@ public class ConnectionCreator extends Thread {
 								if (!this.isRun)
 									return;
 								
-								
+								/*
 								int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
 								LOGGER.info(
 									Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
@@ -188,7 +188,7 @@ public class ConnectionCreator extends Thread {
 										.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
 										.replace("%activeConnections%", String.valueOf(callback.getActivePeers(false).size()))
 										);
-										
+										*/
 
 								
 								//CONNECT
@@ -214,8 +214,6 @@ public class ConnectionCreator extends Thread {
 			catch(Exception e)
 			{
 				//LOGGER.error(e.getMessage(),e);
-				
-				LOGGER.info("Error creating new connection - " + e.getMessage());			
 			}					
 		}
 	}
