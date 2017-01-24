@@ -300,8 +300,9 @@ public class Peer extends Thread{
 			{
 				//LOGGER.error(e.getMessage(), e);
 				
-				//DISCONNECT
-				callback.onError(this, "readFully wrong - " + e.getMessage());
+				// DISCONNECT and BAN
+				// "readFully wrong - " + e.getMessage()
+				callback.onDisconnect(this);
 				try {
 					Thread.sleep(10);
 				}
@@ -323,8 +324,8 @@ public class Peer extends Thread{
 				{
 					//LOGGER.error(e.getMessage(), e);
 					
-					//DISCONNECT
-					callback.onError(this, "parse message wrong - " + e.getMessage());
+					//DISCONNECT and BAN
+					callback.banOnError(this, "parse message wrong - " + e.getMessage());
 					try {
 						Thread.sleep(10);
 					}
@@ -355,9 +356,7 @@ public class Peer extends Thread{
 					{
 						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
-						//this.onPingFail("onMessage error");
-						callback.onError(this, "onMessage wrong - " + e.getMessage());
-						//callback.onDisconnect(this); // ICREATOR
+						callback.onDisconnect(this);
 						try {
 							Thread.sleep(10);
 						}
@@ -370,8 +369,8 @@ public class Peer extends Thread{
 			}
 			else
 			{
-				//ERROR
-				callback.onError(this, "received message with wrong magic");
+				//ERROR and BAN
+				callback.banOnError(this, "received message with wrong magic");
 				try {
 					Thread.sleep(10);
 				}
@@ -391,7 +390,8 @@ public class Peer extends Thread{
 			if(!this.socket.isConnected())
 			{
 				//ERROR
-				callback.onError(this, "socket not still alive");
+				// "socket not still alive"
+				callback.onDisconnect(this);
 				
 				return false;
 			}
@@ -410,8 +410,7 @@ public class Peer extends Thread{
 		{
 			//ERROR
 			//LOGGER.error(e.getMessage(),e);
-
-			callback.onError(this, "sendMessage - " + e.getMessage());
+			callback.onDisconnect(this);
 			
 			//RETURN
 			return false;
@@ -456,7 +455,8 @@ public class Peer extends Thread{
 	// call from ping
 	public void onPingFail(String mess)
 	{
-		this.callback.onError(this, "onPingFail : " + this.address.getHostAddress() + " - " + mess);
+		// , "onPingFail : " + this.address.getHostAddress() + " - " + mess
+		this.callback.onDisconnect(this);
 	}
 	
 

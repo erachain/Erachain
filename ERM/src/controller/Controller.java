@@ -1137,7 +1137,7 @@ public class Controller extends Observable {
 				if (transaction.getCreator() != null 
 						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
-					this.network.onError(message.getSender(), "invalid transaction signature");
+					banPeerOnError(message.getSender(), "invalid transaction signature");
 
 					return;
 				}
@@ -1184,8 +1184,8 @@ public class Controller extends Observable {
 		}
 	}
 
-	public void closePeerOnError(Peer peer, String mess) {
-		this.network.onError(peer, "closePeerOnError - " + mess);
+	public void banPeerOnError(Peer peer, String mess) {
+		this.network.banOnError(peer, "closePeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1377,7 +1377,7 @@ public class Controller extends Observable {
 
 			if (peer != null) {
 				// DISHONEST PEER
-				this.network.onError(peer, "update error - " + e.getMessage());
+				this.onError(peer);
 			}
 		}
 
@@ -1454,22 +1454,6 @@ public class Controller extends Observable {
 						maxPeer = peer;
 					}
 				}
-
-				/* NOT NEED !!! so small PEERS cant't START
-				// CLOSE all my connections to PEER with small Height 
-				if (maxPeer != null) {
-					int currHeight = 0;
-					for (Peer peer : this.peerHWeight.keySet()) {
-						if (peer.isWhite()) {
-							currHeight = this.peerHWeight.get(peer).a;
-							if (height > currHeight + 50) {
-								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
-							}
-						}
-					}
-				}
-				*/
-
 			}
 		} catch (Exception e) {
 			// PEER REMOVED WHILE ITERATING

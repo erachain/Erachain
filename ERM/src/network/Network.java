@@ -130,7 +130,7 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 	
 	@Override
-	public void onError(Peer peer, String error) {
+	public void banOnError(Peer peer, String error) {
 		
 		//LOGGER.info("onError - Connection error : " + peer.getAddress() + " : " + error);
 		
