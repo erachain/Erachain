@@ -15,6 +15,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 
@@ -132,6 +133,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		private long whiteConnectTime;
 		private long grayConnectTime;
 		private long whitePingCouner;
+		private long banTime;
 		
 		public byte[] getAddress(){
 			return address;
@@ -156,10 +158,16 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		public long getWhitePingCouner(){
 			return whitePingCouner;
 		}
+		public long getBanTime(){
+			return banTime;
+		}
+		public void setBanTime(long toTime){
+			banTime = toTime;
+		}
 
-		public PeerInfo(byte[] address, byte[] data){
-			if(data != null && data.length == 2 + TIMESTAMP_LENGTH * 4)
-			{
+		public PeerInfo(byte[] address, byte[] data) {
+			
+			if(data != null && data.length == STATUS_LENGTH + TIMESTAMP_LENGTH * 5) {
 				int position = 0;
 				
 				byte[] statusBytes = Arrays.copyOfRange(data, position, position + STATUS_LENGTH);
@@ -179,13 +187,18 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				
 				byte[] whitePingCounerBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 				long longWhitePingCouner = Longs.fromByteArray(whitePingCounerBytes);
-				
+				position += TIMESTAMP_LENGTH;
+
+				byte[] banMinitsBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+
 				this.address = address;
 				this.status = statusBytes;
 				this.findingTime = longFindTime;
 				this.whiteConnectTime = longWhiteConnectTime;
 				this.grayConnectTime = longGrayConnectTime;
 				this.whitePingCouner = longWhitePingCouner;
+				this.banTime = Longs.fromByteArray(banMinitsBytes);
+				
 			} else if (Arrays.equals(data, BYTE_NOTFOUND)) {
 				this.address = address;
 				this.status = BYTE_NOTFOUND;
@@ -193,17 +206,22 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				this.whiteConnectTime = 0;
 				this.grayConnectTime = 0;
 				this.whitePingCouner = 0;
+				this.banTime = 0;
 				
 				this.updateFindingTime();
-			} else {				
+				
+			} else if (Arrays.equals(data, BYTE_WHITELISTED)) {
 				this.address = address;
 				this.status = BYTE_WHITELISTED;
 				this.findingTime = 0;
 				this.whiteConnectTime = 0;
 				this.grayConnectTime = 0;
 				this.whitePingCouner = 0;
+				this.banTime = 0;
 				
 				this.updateFindingTime();
+				
+			} else {
 			}
 		} 
 		
@@ -417,7 +435,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 	}
 	
 	
-	public void addPeer(Peer peer)
+	public void addPeer(Peer peer, int banMinutes)
 	{
 		if(this.map == null){
 			return;
@@ -437,6 +455,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			peerInfo = new PeerInfo(address, null);
 		}
 		
+		if(banMinutes > 0) {
+			// add ban timer by minutes
+			peerInfo.setBanTime(NTP.getTime() + banMinutes * 60000);
+		}
+		
 		if(peer.getPingCounter() > 1)
 		{
 			if(peer.isWhite())
@@ -452,25 +475,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		
 		//ADD PEER INTO DB
 		this.map.put(address, peerInfo.toBytes());
-	}
-	
-	public void blacklistPeer(Peer peer)
-	{
-
-		try
-		{
-			//ADD PEER INTO DB
-			this.map.put(peer.getAddress().getAddress(), BYTE_BLACKLISTED);
-				
-			//COMMIT
-			if(this.parent == null)
-			{
-				this.databaseSet.commit();
-			}
-		}
-		catch(Exception e)
-		{
-		}
 	}
 	
 	public PeerInfo getInfo(InetAddress address) 
@@ -495,7 +499,14 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		//CHECK IF PEER IS BLACKLISTED
 		if(this.contains(key))
 		{
-			return Arrays.equals(this.get(key), BYTE_BLACKLISTED);
+			byte[] data = this.map.get(key);			
+			PeerInfo peerInfo = new PeerInfo(key, data);
+			
+			if (Arrays.equals(new byte[]{data[0], data[1]}, BYTE_BLACKLISTED)) {
+				if (peerInfo.getBanTime() < NTP.getTime()) {
+					return true;
+				}
+			}
 		}
 			
 		return false;

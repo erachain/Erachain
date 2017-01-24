@@ -51,22 +51,13 @@ public class PeerManager {
 		return knownPeers;
 	}
 	
-	public void addPeer(Peer peer)
+	public void addPeer(Peer peer, int banForMinutes)
 	{
 		//ADD TO DATABASE
 		if(!DBSet.getInstance().isStoped()){
-			DBSet.getInstance().getPeerMap().addPeer(peer);
+			DBSet.getInstance().getPeerMap().addPeer(peer, banForMinutes);
 		}
 	}
-	
-	public void blacklistPeer(Peer peer)
-	{
-		DBSet.getInstance().getPeerMap().blacklistPeer(peer);
-		// set timer for ban
-		blacListeddWait.put(peer.getAddress().getHostAddress(), NTP.getTime());
-	}
-	
-	//private Set<<byte[], Long> blacklisted;
 	
 	public boolean isBlacklisted(InetAddress address)
 	{

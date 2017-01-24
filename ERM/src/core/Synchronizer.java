@@ -398,7 +398,6 @@ public class Synchronizer
 			// try get common block from PEER
 			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
 		} catch (Exception e) {
-			Controller.getInstance().onDisconnect(peer);
 			throw new Exception("Dishonest peer - error in PEER: " + peer.getAddress().getHostAddress());
 		}
 

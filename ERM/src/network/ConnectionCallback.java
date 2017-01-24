@@ -9,8 +9,8 @@ import network.message.Message;
 public interface ConnectionCallback {
 
 	void onConnect(Peer peer, boolean asNew);
-	void onDisconnect(Peer peer);
-	void banOnError(Peer peer, String error);
+	void tryDisconnect(Peer peer, int banForMinutes, String error);
+	//void banOnError(Peer peer, String error);
 	boolean isKnownAddress(InetAddress address, boolean andUsed);
 	boolean isKnownPeer(Peer peer, boolean andUsed);
 	List<Peer> getActivePeers(boolean onlyWhite);

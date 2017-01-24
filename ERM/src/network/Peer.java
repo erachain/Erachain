@@ -227,8 +227,8 @@ public class Peer extends Thread{
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
 			if (steep != 1) {
-				//LOGGER.error(e.getMessage(), e);
-				//LOGGER.info("Failed to connect to : " + address + " on steep: " + steep);
+				LOGGER.error(e.getMessage(), e);
+				LOGGER.info("Failed to connect to : " + address + " on steep: " + steep);
 			}
 		}
 	}
@@ -268,7 +268,7 @@ public class Peer extends Thread{
 					//LOGGER.error(e.getMessage(), e);
 					
 					//DISCONNECT
-					callback.onDisconnect(this);
+					callback.tryDisconnect(this, 1, null);
 					try {
 						Thread.sleep(10);
 					}
@@ -291,7 +291,6 @@ public class Peer extends Thread{
 						Thread.sleep(10);
 					}
 					catch (Exception e) {
-						
 					}
 					continue;
 				}
@@ -301,8 +300,7 @@ public class Peer extends Thread{
 				//LOGGER.error(e.getMessage(), e);
 				
 				// DISCONNECT and BAN
-				// "readFully wrong - " + e.getMessage()
-				callback.onDisconnect(this);
+				callback.tryDisconnect(this, 0, "readFully wrong - " + e.getMessage());
 				try {
 					Thread.sleep(10);
 				}
@@ -325,7 +323,7 @@ public class Peer extends Thread{
 					//LOGGER.error(e.getMessage(), e);
 					
 					//DISCONNECT and BAN
-					callback.banOnError(this, "parse message wrong - " + e.getMessage());
+					callback.tryDisconnect(this, 600, "parse message wrong - " + e.getMessage());
 					try {
 						Thread.sleep(10);
 					}
@@ -356,7 +354,7 @@ public class Peer extends Thread{
 					{
 						LOGGER.error(e.getMessage(), e);
 						//DISCONNECT
-						callback.onDisconnect(this);
+						callback.tryDisconnect(this, 0, null);
 						try {
 							Thread.sleep(10);
 						}
@@ -370,7 +368,7 @@ public class Peer extends Thread{
 			else
 			{
 				//ERROR and BAN
-				callback.banOnError(this, "received message with wrong magic");
+				callback.tryDisconnect(this, 3600, "received message with wrong magic");
 				try {
 					Thread.sleep(10);
 				}
@@ -390,8 +388,7 @@ public class Peer extends Thread{
 			if(!this.socket.isConnected())
 			{
 				//ERROR
-				// "socket not still alive"
-				callback.onDisconnect(this);
+				callback.tryDisconnect(this, 0, "socket not still alive");
 				
 				return false;
 			}
@@ -410,7 +407,7 @@ public class Peer extends Thread{
 		{
 			//ERROR
 			//LOGGER.error(e.getMessage(),e);
-			callback.onDisconnect(this);
+			callback.tryDisconnect(this, 0, null);
 			
 			//RETURN
 			return false;
@@ -444,7 +441,7 @@ public class Peer extends Thread{
 		} 
 		catch (InterruptedException e)
 		{
-			//this.callback.onDisconnect(this); // icreator
+			//this.callback.tryDisconnect(this); // icreator
 			//NO MESSAGE RECEIVED WITHIN TIME;
 			//LOGGER.error(e.getMessage(), e);
 
@@ -455,8 +452,8 @@ public class Peer extends Thread{
 	// call from ping
 	public void onPingFail(String mess)
 	{
-		// , "onPingFail : " + this.address.getHostAddress() + " - " + mess
-		this.callback.onDisconnect(this);
+		// , 
+		this.callback.tryDisconnect(this, 10, "onPingFail : " + this.address.getHostAddress() + " - " + mess);
 	}
 	
 
@@ -477,8 +474,7 @@ public class Peer extends Thread{
 	}
 	
 	public void close() 
-	{
-		
+	{	
 		
 		if (!runed) {
 			return;
@@ -486,7 +482,7 @@ public class Peer extends Thread{
 		
 		runed = false;
 		
-		//LOGGER.info("Try close peer : " + address);
+		LOGGER.info("Try close peer : " + address.getHostAddress());
 		
 		try
 		{
@@ -524,28 +520,5 @@ public class Peer extends Thread{
 	
 		}		
 	}
-	
-	// icreator - wair is DB is busy
-	// https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
-	//
-	public void goInterrupt_old()
-	{
-		DBSet dbSet = DBSet.getInstance();
-		//int i = 0;
-		while( dbSet.isBusy() || dbSet.getBlockMap().isProcessing()) {
-			try {
-				LOGGER.info(" PEER.goInterrupt wait DB : " + address);
-				Thread.sleep(50);
-			}
-			catch (Exception e) {
-			}
-			/*
-			i++;
-			if (i > 20) 
-				break;
-				*/
-		}
-		this.interrupt();
-	}
-	
+		
 }

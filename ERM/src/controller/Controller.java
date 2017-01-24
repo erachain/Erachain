@@ -825,7 +825,8 @@ public class Controller extends Observable {
 				ObserverMessage.FORGING_STATUS, status));
 	}
 
-	public void onDisconnect(Peer peer) {
+	// used from NETWORK
+	public void afterDisconnect(Peer peer) {
 		synchronized (this.peerHWeight) {
 			
 			this.peerHWeight.remove(peer);
@@ -849,10 +850,6 @@ public class Controller extends Observable {
 						ObserverMessage.NETWORK_STATUS, this.status));
 			}
 		}
-	}
-
-	public void onError(Peer peer) {
-		this.onDisconnect(peer);
 	}
 
 	public List<byte[]> getNextHeaders(byte[] signature) {
@@ -1185,7 +1182,7 @@ public class Controller extends Observable {
 	}
 
 	public void banPeerOnError(Peer peer, String mess) {
-		this.network.banOnError(peer, "closePeerOnError - " + mess);
+		this.network.tryDisconnect(peer, 600, "closePeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1295,7 +1292,7 @@ public class Controller extends Observable {
 					}
 				} catch (Exception e) {
 					// error on peer - disconnect!
-					this.onError(maxHW.c);
+					this.network.tryDisconnect(maxHW.c, 0, e.getMessage());
 				}
 			}
 		}
@@ -1373,11 +1370,11 @@ public class Controller extends Observable {
 			} while (!this.isUpToDate());
 			
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
+			//LOGGER.error(e.getMessage(), e);
 
 			if (peer != null) {
 				// DISHONEST PEER
-				this.onError(peer);
+				this.network.tryDisconnect(peer, 10, e.getMessage());
 			}
 		}
 

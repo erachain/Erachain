@@ -78,7 +78,7 @@ public class Pinger extends Thread
 				this.peer.addPingCounter();
 								
 				if(!DBSet.getInstance().isStoped()){
-						DBSet.getInstance().getPeerMap().addPeer(this.peer);
+						DBSet.getInstance().getPeerMap().addPeer(this.peer, 0);
 				}
 			}
 			catch(Exception e)

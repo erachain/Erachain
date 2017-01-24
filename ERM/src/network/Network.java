@@ -75,7 +75,7 @@ public class Network extends Observable implements ConnectionCallback {
 				this.knownPeers.add(peer);
 			}
 			//ADD TO WHITELIST
-			PeerManager.getInstance().addPeer(peer);
+			PeerManager.getInstance().addPeer(peer, 0);
 			
 		}
 		
@@ -91,35 +91,22 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 
 	@Override
-	public void onDisconnect(Peer peer) {
+	public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 		
-		/*
-		//REMOVE FROM CONNECTED PEERS
-		synchronized(this.connectedPeers)
-		{
-			this.connectedPeers.remove(peer);
+		LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress());
+		if (banForMinutes != 0) { 
+			LOGGER.info("     ban for minutes: " + banForMinutes);
+			//ADD TO BLACKLIST
+			PeerManager.getInstance().addPeer(peer, banForMinutes);
 		}
-		*/
-
-		//LOGGER.info("onDisconnect - Connection close : " + peer.getAddress());
+		if (error != null) 
+			LOGGER.info("     mess: " + error);
 		
 		//PASS TO CONTROLLER
-		Controller.getInstance().onDisconnect(peer);
-		
+		Controller.getInstance().afterDisconnect(peer);
+
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
-		
-		//peer.goInterrupt();
-		/*
-		synchronized (peer) {
-			try {
-				peer.wait();
-			} catch(Exception e) {
-				
-			}
-		}
-		*/
-
 		
 		//NOTIFY OBSERVERS
 		this.setChanged();
@@ -128,49 +115,7 @@ public class Network extends Observable implements ConnectionCallback {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
-	
-	@Override
-	public void banOnError(Peer peer, String error) {
 		
-		//LOGGER.info("onError - Connection error : " + peer.getAddress() + " : " + error);
-		
-		peer.addError();
-		if (peer.getErrors() < 3)
-			return;
-		
-		/*
-		//REMOVE FROM CONNECTED PEERS
-		synchronized(this.connectedPeers)
-		{
-			this.connectedPeers.remove(peer);
-		}
-		*/
-		
-		//ADD TO BLACKLIST
-		PeerManager.getInstance().blacklistPeer(peer);
-		
-		//PASS TO CONTROLLER
-		Controller.getInstance().onError(peer);
-		
-		//CLOSE CONNECTION IF STILL ACTIVE
-		peer.close();
-		//peer.goInterrupt();
-		/*
-		try {
-			peer.wait();
-		} catch(Exception e) {
-			
-		}
-		*/
-					
-		//NOTIFY OBSERVERS
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
-		
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
-	}
-	
 	@Override
 	public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 		
@@ -376,10 +321,7 @@ public class Network extends Observable implements ConnectionCallback {
 				//LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
-				//LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
-				// delete from peersHW
-				Controller.getInstance().onDisconnect(message.getSender());
-				message.getSender().close();
+				tryDisconnect(message.getSender(), 99999, null);
 			}
 			
 			break;
