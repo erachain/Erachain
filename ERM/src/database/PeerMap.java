@@ -521,6 +521,28 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		//CHECK IF PEER IS BLACKLISTED
 		return isBlacklisted(address.getAddress());
 	}
+	public int getBanMinutes(Peer peer)
+	{
+		
+		byte[] key = peer.getAddress().getAddress();
+		
+		//CHECK IF PEER IS BLACKLISTED
+		if(this.contains(key))
+		{
+			byte[] data = this.map.get(key);			
+			PeerInfo peerInfo = new PeerInfo(key, data);
+			
+			if (Arrays.equals(new byte[]{data[0], data[1]}, BYTE_BLACKLISTED)) {
+				if (peerInfo.getBanTime() > NTP.getTime()) {
+					return (int)((peerInfo.getBanTime() - NTP.getTime()) / 60000);
+				} else {
+					return 0;
+				}
+			}
+		}
+			
+		return 0;
+	}
 	
 	public boolean isBad(InetAddress address)
 	{

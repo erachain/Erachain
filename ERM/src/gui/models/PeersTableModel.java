@@ -128,7 +128,12 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 
 			case COLUMN_HEIGHT:
 				if(!peer.isUsed()) {
-					return Lang.getInstance().translate("Broken");
+					int banMinutes = DBSet.getInstance().getPeerMap().getBanMinutes(peer);
+					if (banMinutes > 0) {
+						return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+					} else {
+						return Lang.getInstance().translate("Broken");
+					}
 				}
 				Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
 				if(res == null) {
