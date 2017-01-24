@@ -304,36 +304,47 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			}
 			
 			if(allFromSettings) {
-				//LOGGER.info("Peers loaded from database : " + peers.size());
+				LOGGER.info("Peers loaded from database : " + peers.size());
 			}
 
 			List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
 			
 			if(allFromSettings) {
-				//LOGGER.info("Peers loaded from settings : " + knownPeers.size());
-			}
+				LOGGER.info("Peers loaded from settings : " + knownPeers.size());
 				
-			for (Peer knownPeer : knownPeers) {
-				try
-				{
-					if(!allFromSettings && peers.size() >= amount)
-						break;
-					
-					boolean found = false;
-					for (Peer peer : peers) {
-						if(peer.getAddress().equals(knownPeer.getAddress()))
-						{
-							found = true;
+				int insertIndex = 0;
+				for (Peer knownPeer : knownPeers) {
+					try
+					{
+						if(!allFromSettings && peers.size() >= amount)
 							break;
+						
+						int i = 0;
+						int found = -1;
+						for (Peer peer : peers) {
+							if(peer.getAddress().equals(knownPeer.getAddress()))
+							{
+								found = i;
+								break;
+							}
+							i++;
 						}
-					}
 					
-					if (!found){
-						//ADD TO LIST
-						peers.add(knownPeer);
+						if (found == -1){
+							//ADD TO LIST
+							peers.add(insertIndex, knownPeer);
+							//peers.add(knownPeer);
+						} else {
+							// REMOVE from this PLACE
+							peers.remove(found);
+							// ADD in TOP
+							peers.add(insertIndex, knownPeer);
+						}
+						insertIndex++;
+						
+					} catch (Exception e) {
+						LOGGER.error(e.getMessage(),e);
 					}
-				} catch (Exception e) {
-					LOGGER.error(e.getMessage(),e);
 				}
 				
 			}
@@ -479,15 +490,21 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		return new PeerInfo(addressByte, BYTE_NOTFOUND);
 	}
 	
-	public boolean isBlacklisted(InetAddress address)
+	public boolean isBlacklisted(byte[] key)
 	{
 		//CHECK IF PEER IS BLACKLISTED
-		if(this.contains(address.getAddress()))
+		if(this.contains(key))
 		{
-			return Arrays.equals(this.get(address.getAddress()), BYTE_BLACKLISTED);
+			return Arrays.equals(this.get(key), BYTE_BLACKLISTED);
 		}
 			
 		return false;
+	}
+
+	public boolean isBlacklisted(InetAddress address)
+	{
+		//CHECK IF PEER IS BLACKLISTED
+		return isBlacklisted(address.getAddress());
 	}
 	
 	public boolean isBad(InetAddress address)

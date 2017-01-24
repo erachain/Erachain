@@ -43,7 +43,7 @@ public class ConnectionCreator extends Thread {
 					//GET LIST OF KNOWN PEERS
 					List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
 					
-					//int knownPeersCounter = 0;
+					int knownPeersCounter = 0;
 										
 					//ITERATE knownPeers
 					for(Peer peer: knownPeers)
@@ -52,7 +52,7 @@ public class ConnectionCreator extends Thread {
 							continue;
 						}
 							
-						//knownPeersCounter ++;
+						knownPeersCounter ++;
 	
 						if(!this.isRun)
 							return;
@@ -89,15 +89,13 @@ public class ConnectionCreator extends Thread {
 						if (!this.isRun)
 							return;
 
-						/*
 						LOGGER.info(
 								Lang.getInstance().translate("Connecting to known peer %peer% :: %knownPeersCounter% / %allKnownPeers% :: Connections: %activeConnections%")
 									.replace("%peer%", peer.getAddress().getHostAddress())
 									.replace("%knownPeersCounter%", String.valueOf(knownPeersCounter))
 									.replace("%allKnownPeers%", String.valueOf(knownPeers.size()))
-									.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
+									.replace("%activeConnections%", String.valueOf(callback.getActivePeers(false).size()))
 									);
-						*/
 
 						//CONNECT
 						//CHECK IF ALREADY CONNECTED TO PEER
@@ -178,7 +176,6 @@ public class ConnectionCreator extends Thread {
 									return;
 								
 								
-								/*
 								int maxReceivePeersForPrint = (maxReceivePeers > peersMessage.getPeers().size()) ? peersMessage.getPeers().size() : maxReceivePeers;  
 								LOGGER.info(
 									Lang.getInstance().translate("Connecting to peer %newpeer% proposed by %peer% :: %foreignPeersCounter% / %maxReceivePeersForPrint% / %allReceivePeers% :: Connections: %activeConnections%")
@@ -187,9 +184,8 @@ public class ConnectionCreator extends Thread {
 										.replace("%foreignPeersCounter%", String.valueOf(foreignPeersCounter))
 										.replace("%maxReceivePeersForPrint%", String.valueOf(maxReceivePeersForPrint))
 										.replace("%allReceivePeers%", String.valueOf(peersMessage.getPeers().size()))
-										.replace("%activeConnections%", String.valueOf(callback.getActiveConnections().size()))
+										.replace("%activeConnections%", String.valueOf(callback.getActivePeers(false).size()))
 										);
-								*/
 
 								
 								//CONNECT

@@ -3,13 +3,20 @@ package network;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import database.DBSet;
+import ntp.NTP;
 import settings.Settings;
+import utils.Pair;
 
 public class PeerManager {
 
 	private static PeerManager instance;
+	private Map<String, Long> blacListeddWait = new TreeMap<String, Long>(); // bat not time
+	private final static long banTime = 12 * 60 * 60 * 1000;
+
 	
 	public static PeerManager getInstance()
 	{
@@ -55,20 +62,35 @@ public class PeerManager {
 	public void blacklistPeer(Peer peer)
 	{
 		DBSet.getInstance().getPeerMap().blacklistPeer(peer);
+		// set timer for ban
+		blacListeddWait.put(peer.getAddress().getHostAddress(), NTP.getTime());
 	}
 	
 	//private Set<<byte[], Long> blacklisted;
 	
 	public boolean isBlacklisted(InetAddress address)
 	{
-		return false;
-		/*
-		if(!DBSet.getInstance().isStoped()){
-			return DBSet.getInstance().getPeerMap().isBlacklisted(address);
-		}else{
+		if(DBSet.getInstance().isStoped())
 			return true;
+			
+		byte[] key = address.getAddress();
+		String keyStr = address.getHostAddress();
+		if(DBSet.getInstance().getPeerMap().isBlacklisted(key)) {
+			// THIS address in MAP
+			
+			if( blacListeddWait.containsKey(keyStr)) {
+				long startBan = blacListeddWait.get(keyStr);
+				if (NTP.getTime() - startBan < banTime) {
+					return true;
+				}
+				blacListeddWait.remove(keyStr);
+				DBSet.getInstance().getPeerMap().delete(key);
+			}
+
 		}
-		*/
+		
+		
+		return false;
 	}
 	
 	public boolean isBlacklisted(Peer peer)
