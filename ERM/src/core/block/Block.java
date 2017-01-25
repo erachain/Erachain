@@ -1022,14 +1022,13 @@ public class Block {
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version AT invalid");
 			return false;
 		}
-					
-		// TEST repeated win for CREATOR
+		
+		
+		// TEST STRONG of win Valwue
+		// TODO START + 1/8
 		int base;			
-		if (false &&  height < 10) {
-			base = (BlockChain.BASE_TARGET>>2) + (BlockChain.BASE_TARGET>>3);
-		} else {
-			base = BlockChain.BASE_TARGET>>1;
-		}
+		base = (BlockChain.BASE_TARGET>>1); // + (BlockChain.BASE_TARGET>>8);
+		
 		int targetedWinValue = this.calcWinValueTargeted(db); 
 		if (base > targetedWinValue) {
 			targetedWinValue = this.calcWinValueTargeted(db);
@@ -1038,16 +1037,21 @@ public class Block {
 		}
 		
 		// STOP IF SO RAPIDLY
-		if (true || height < 100) {
+		if (height < BlockChain.TARGET_COUNT<<1) {
 			// NEED CHECK ONLY ON START
-			Block testBlock = this.getParent(db);
-			for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
-				if (testBlock.getCreator().equals(this.creator)) {
-					LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
-					return false;
+			List<Block> lastBlocksForTarget = Controller.getInstance().getBlockChain().getLastBlocksForTarget(db);
+			// test repeated win account
+			if (lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
+				// NEED CHECK ONLY ON START
+				int i = 0;
+				for (Block testBlock: lastBlocksForTarget) {
+					i++;
+					if (testBlock.getCreator().equals(this)) {
+						LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
+						return false;
+					} else if ( i > BlockChain.REPEAT_WIN)
+						break;
 				}
-				//testBlock = testBlock.getChild(db);
-				testBlock = testBlock.getParent(db);
 			}
 		}
 

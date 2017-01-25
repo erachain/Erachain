@@ -254,8 +254,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			
 			byte[] whitePingCounerBytes = Longs.toByteArray(this.whitePingCouner);
 			whitePingCounerBytes = Bytes.ensureCapacity(whitePingCounerBytes, TIMESTAMP_LENGTH, 0);
-			
-			return Bytes.concat(BYTE_WHITELISTED, findTimeBytes, whiteConnectTimeBytes, grayConnectTimeBytes, whitePingCounerBytes);	
+
+			byte[] banTimeBytes = Longs.toByteArray(this.banTime);
+			banTimeBytes = Bytes.ensureCapacity(banTimeBytes, TIMESTAMP_LENGTH, 0);
+
+			return Bytes.concat(BYTE_WHITELISTED, findTimeBytes, whiteConnectTimeBytes, grayConnectTimeBytes, whitePingCounerBytes, banTimeBytes);	
 		}
 	}
 

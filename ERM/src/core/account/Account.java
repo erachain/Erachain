@@ -700,14 +700,14 @@ public class Account {
 			return 0l;
 		
 		// test repeated win account
-		if (height < 100 && lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
+		if (height < (BlockChain.TARGET_COUNT<<1) && lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
 			// NEED CHECK ONLY ON START
 			int i = 0;
 			for (Block testBlock: lastBlocksForTarget) {
 				i++;
 				if (testBlock.getCreator().equals(this)) {
 					return 0l;
-				} else if ( i > bchain.REPEAT_WIN)
+				} else if ( i > BlockChain.REPEAT_WIN)
 					break;
 			}
 		}
