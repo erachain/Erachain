@@ -92,7 +92,10 @@ public class Network extends Observable implements ConnectionCallback {
 
 	@Override
 	public void tryDisconnect(Peer peer, int banForMinutes, String error) {
-		
+
+		if (!peer.isUsed())
+			return;
+
 		LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress());
 		if (banForMinutes != 0) { 
 			LOGGER.info("     ban for minutes: " + banForMinutes);
@@ -321,7 +324,7 @@ public class Network extends Observable implements ConnectionCallback {
 				//LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
-				tryDisconnect(message.getSender(), 99999, null);
+				tryDisconnect(message.getSender(), 9999, null);
 			}
 			
 			break;

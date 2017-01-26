@@ -1119,7 +1119,9 @@ public class Controller extends Observable {
 					excludes.add(message.getSender());
 					this.network.broadcast(message, excludes);
 
-				} 
+				} else {
+					banPeerOnError(message.getSender(), "Block (" + newBlock.toString(dbSet) + ") is Invalid");
+				}
 				
 				break;
 
@@ -1182,7 +1184,7 @@ public class Controller extends Observable {
 	}
 
 	public void banPeerOnError(Peer peer, String mess) {
-		this.network.tryDisconnect(peer, 600, "ban PeerOnError - " + mess);
+		this.network.tryDisconnect(peer, 30, "ban PeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {

@@ -140,7 +140,7 @@ public class Synchronizer
 
 				//INVALID BLOCK THROW EXCEPTION
 				String mess = "Dishonest peer by not valid block.heigh: " + heigh;
-				peer.ban(600, mess);
+				peer.ban(60, mess);
 				throw new Exception(mess);
 			}
 		}
