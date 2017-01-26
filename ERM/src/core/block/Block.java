@@ -1028,12 +1028,7 @@ public class Block {
 			return false;
 		}
 		
-		// STOP IF SO RAPIDLY
-		int repeat_win = 0;
-		if (height < BlockChain.TARGET_COUNT<<2) {
-			repeat_win = BlockChain.REPEAT_WIN;
-		}
-			
+		// STOP IF SO RAPIDLY			
 		if (isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db))) {
 			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
