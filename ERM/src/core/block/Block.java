@@ -983,27 +983,6 @@ public class Block {
 			return false;
 		}
 
-		/*
-		 * OLD TIME
-		//if (false) {
-		if (!noTime) {
-			//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-			if(true & (this.timestamp - 500 > NTP.getTime()
-					|| this.timestamp < this.getParent(db).timestamp))
-			{
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp invalid");
-				return false;
-			}
-	
-			//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
-			if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
-			{
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp % 1000 invalid");
-				return false;
-			}
-		}
-		 */
-		
 		// TODO - show it to USER
 		if(this.getTimestamp(db) - 10000 > NTP.getTime()) {
 			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
@@ -1024,10 +1003,15 @@ public class Block {
 		}
 		
 		
-		// TEST STRONG of win Valwue
-		// TODO START + 1/8
-		int base;			
-		base = (BlockChain.BASE_TARGET>>1); // + (BlockChain.BASE_TARGET>>8);
+		// TEST STRONG of win Value
+		// TODO START (1/2 + 1/4)
+		int base;
+		if ( height < BlockChain.TARGET_COUNT>>1)
+			base = BlockChain.BASE_TARGET;
+		else if ( height < BlockChain.TARGET_COUNT)
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
 		
 		int targetedWinValue = this.calcWinValueTargeted(db); 
 		if (base > targetedWinValue) {
@@ -1037,7 +1021,12 @@ public class Block {
 		}
 		
 		// STOP IF SO RAPIDLY
-		if (height < BlockChain.TARGET_COUNT<<1) {
+		int repeat_win = 0;
+		if (height < BlockChain.TARGET_COUNT<<2) {
+			repeat_win = BlockChain.REPEAT_WIN;
+		}
+			
+		if (repeat_win > 0) {
 			// NEED CHECK ONLY ON START
 			List<Block> lastBlocksForTarget = Controller.getInstance().getBlockChain().getLastBlocksForTarget(db);
 			// test repeated win account
@@ -1049,7 +1038,7 @@ public class Block {
 					if (testBlock.getCreator().equals(this)) {
 						LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
 						return false;
-					} else if ( i > BlockChain.REPEAT_WIN)
+					} else if ( i > repeat_win)
 						break;
 				}
 			}

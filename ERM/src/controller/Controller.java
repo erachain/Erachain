@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.17.05";
-	private String buildTime = "2017-01-24 08:32:22 UTC";
+	private String version = "2.18.01";
+	private String buildTime = "2017-01-26 10:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -1182,7 +1182,7 @@ public class Controller extends Observable {
 	}
 
 	public void banPeerOnError(Peer peer, String mess) {
-		this.network.tryDisconnect(peer, 600, "closePeerOnError - " + mess);
+		this.network.tryDisconnect(peer, 600, "ban PeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1374,7 +1374,7 @@ public class Controller extends Observable {
 
 			if (peer != null) {
 				// DISHONEST PEER
-				this.network.tryDisconnect(peer, 10, e.getMessage());
+				this.network.tryDisconnect(peer, 60, e.getMessage());
 			}
 		}
 

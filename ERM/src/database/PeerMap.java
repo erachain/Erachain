@@ -199,17 +199,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				this.whitePingCouner = longWhitePingCouner;
 				this.banTime = Longs.fromByteArray(banMinitsBytes);
 				
-			} else if (Arrays.equals(data, BYTE_NOTFOUND)) {
-				this.address = address;
-				this.status = BYTE_NOTFOUND;
-				this.findingTime = 0;
-				this.whiteConnectTime = 0;
-				this.grayConnectTime = 0;
-				this.whitePingCouner = 0;
-				this.banTime = 0;
-				
-				this.updateFindingTime();
-				
 			} else if (Arrays.equals(data, BYTE_WHITELISTED)) {
 				this.address = address;
 				this.status = BYTE_WHITELISTED;
@@ -222,6 +211,15 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				this.updateFindingTime();
 				
 			} else {
+				this.address = address;
+				this.status = BYTE_NOTFOUND;
+				this.findingTime = 0;
+				this.whiteConnectTime = 0;
+				this.grayConnectTime = 0;
+				this.whitePingCouner = 0;
+				this.banTime = 0;
+				
+				this.updateFindingTime();
 			}
 		} 
 		
@@ -422,7 +420,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			{
 				//GET ADDRESS
 				byte[] addressBI = iterator.next();
-				byte [] data = this.get(addressBI);
+				byte[] data = this.get(addressBI);
 				
 				peers.add(new PeerInfo(addressBI, data));
 			}
@@ -454,7 +452,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		if(this.map.containsKey(address))
 		{
 			byte[] data = this.map.get(address);
-			
 			peerInfo = new PeerInfo(address, data);
 		}
 		else
@@ -509,8 +506,9 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			byte[] data = this.map.get(key);			
 			PeerInfo peerInfo = new PeerInfo(key, data);
 			
-			if (Arrays.equals(new byte[]{data[0], data[1]}, BYTE_BLACKLISTED)) {
+			if (Arrays.equals(peerInfo.getStatus(), BYTE_BLACKLISTED)) {
 				if (peerInfo.getBanTime() < NTP.getTime()) {
+					peerInfo.setBanTime(0);
 					return true;
 				}
 			}
@@ -535,7 +533,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			byte[] data = this.map.get(key);			
 			PeerInfo peerInfo = new PeerInfo(key, data);
 			
-			if (Arrays.equals(new byte[]{data[0], data[1]}, BYTE_BLACKLISTED)) {
+			if (Arrays.equals(peerInfo.getStatus(), BYTE_BLACKLISTED)) {
 				if (peerInfo.getBanTime() > NTP.getTime()) {
 					return (int)((peerInfo.getBanTime() - NTP.getTime()) / 60000);
 				} else {
