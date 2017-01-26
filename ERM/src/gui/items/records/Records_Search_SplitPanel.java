@@ -70,6 +70,7 @@ import gui.models.Renderer_Boolean;
 import gui.models.TransactionsTableModel;
 import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
+import gui.records.VouchRecordDialog;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
@@ -118,6 +119,35 @@ import lang.Lang;
 		    	//TRANSACTIONS TABLE MODEL
 				this.transactionsTableModel = new TransactionsTableModel();
 				this.jTable_jScrollPanel_LeftPanel = new JTable(this.transactionsTableModel);
+				
+				
+				
+				// MENU
+				JPopupMenu mainMenu = new JPopupMenu();
+				
+				JMenuItem vouch_menu= new JMenuItem(Lang.getInstance().translate("Vouch"));
+				vouch_menu.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+						row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+						Transaction trans = transactionsTableModel.getTransaction(row);
+						DBSet db = DBSet.getInstance();
+						new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
+						
+					}
+				});
+				
+				mainMenu.add(vouch_menu);
+				
+				this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
+				
+				this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Object.class, new Renderer_Right()); // set renderer
+				//this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+				
+				
+				
+				
 				
 				this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 				
