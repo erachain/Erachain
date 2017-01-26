@@ -102,12 +102,12 @@ public class Network extends Observable implements ConnectionCallback {
 		if (error != null) 
 			LOGGER.info("     mess: " + error);
 		
-		//PASS TO CONTROLLER
-		Controller.getInstance().afterDisconnect(peer);
-
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
 		
+		//PASS TO CONTROLLER
+		Controller.getInstance().afterDisconnect(peer);
+
 		//NOTIFY OBSERVERS
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		

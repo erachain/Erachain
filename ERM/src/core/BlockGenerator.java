@@ -381,7 +381,7 @@ public class BlockGenerator extends Thread implements Observer
 					{
 						
 						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height, target);
-						if(winned_value == 0l)
+						if(winned_value < 1l)
 							continue;
 						
 						if (winned_value > max_winned_value) {

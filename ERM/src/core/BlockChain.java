@@ -465,20 +465,18 @@ public class BlockChain
 		return getTarget(dbSet, this.getLastBlock(dbSet));
 	}
 
-	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 
-		// not use small values
-		if (height < 100) {
-			if ((target>>1) > winned_value)
-				return false;
-		} else if (height < 1000) {
-			if ((target>>1) > winned_value)
-				return false;
-		} else {
-			if ((target>>1) > winned_value)
-				return false;
-		}
-		
-		return true;
+	// GET MIN TARGET
+	public static int getMinTarget(int height) {
+		int base;
+		if ( height < BlockChain.TARGET_COUNT>>1)
+			base = BlockChain.BASE_TARGET;
+		else if ( height < BlockChain.TARGET_COUNT)
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+
+		return base;
+
 	}
 	
 }

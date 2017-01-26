@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.18.01";
-	private String buildTime = "2017-01-26 10:33:33 UTC";
+	private static final String version = "2.18.01";
+	private static final String buildTime = "2017-01-26 18:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -150,7 +150,7 @@ public class Controller extends Observable {
 		this.processingWalletSynchronize = isPocessing;
 	}
 	
-	public String getVersion() {
+	public static String getVersion() {
 		return version;
 	}
 	public void setDBSet(DBSet db) {
@@ -1372,9 +1372,9 @@ public class Controller extends Observable {
 		} catch (Exception e) {
 			//LOGGER.error(e.getMessage(), e);
 
-			if (peer != null) {
+			if (peer != null && peer.isUsed()) {
 				// DISHONEST PEER
-				this.network.tryDisconnect(peer, 60, e.getMessage());
+				this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
 			}
 		}
 

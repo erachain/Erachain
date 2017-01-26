@@ -700,29 +700,16 @@ public class Account {
 			return 0l;
 		
 		// test repeated win account
-		if (height < (BlockChain.TARGET_COUNT<<1) && lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
-			// NEED CHECK ONLY ON START
-			int i = 0;
-			for (Block testBlock: lastBlocksForTarget) {
-				i++;
-				if (testBlock.getCreator().equals(this)) {
-					return 0l;
-				} else if ( i > BlockChain.REPEAT_WIN)
-					break;
-			}
+		if (Block.isSoRapidly(height, this, lastBlocksForTarget)) {
+			return 0l;
 		}
-
-		/*
-		// if new block in DB - get next height
-		if (this.getForgingData(dbSet, height) != -1) {
-			height++;
-		}
-		*/
 		
+		// TEST STRONG of win Value
 		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
-		
-		// not use small values
-		if (!bchain.isGoodWinForTarget(height, winned_value, target)) {
+
+		int base = BlockChain.getMinTarget(height);
+		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 
+		if (base > targetedWinValue) {
 			return 0l;
 		}
 
