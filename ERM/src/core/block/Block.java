@@ -835,21 +835,14 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
-		/*
-		if (height < 40)
-			win_value >>= 6;
-		else if (height < 100)
-			win_value >>= 7;
-		else if (height < 1000)
-			win_value >>= 8;
-		else if (height < 3000)
-			win_value >>= 9;
-		else if (height < 100000)
-			win_value >>= 10;
+		if (height <4)
+			win_value >>= 3;
+		else if (height < BlockChain.TARGET_COUNT>>2)
+			win_value >>= 4;
+		else if (height < BlockChain.TARGET_COUNT)
+			win_value >>= 5;
 		else
-			win_value >>= 11;
-			*/
-		win_value >>= 6;
+			win_value >>= 6;
 		
 		return win_value;
 

@@ -468,7 +468,7 @@ public class BlockChain
 	// GET MIN TARGET
 	public static int getMinTarget(int height) {
 		int base;
-		if ( height < BlockChain.TARGET_COUNT>>1)
+		if ( height < 3)
 			base = BlockChain.BASE_TARGET;
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
