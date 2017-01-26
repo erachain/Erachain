@@ -472,7 +472,12 @@ public class Peer extends Thread{
 	{
 		return DBSet.getInstance().getPeerMap().isBad(this.getAddress()); 
 	}
+	public boolean isBanned()
+	{
+		return DBSet.getInstance().getPeerMap().isBanned(address.getAddress());
+	}
 	
+
 	public void ban(int banForMinutes, String mess)
 	{
 		this.callback.tryDisconnect(this, banForMinutes, mess); 

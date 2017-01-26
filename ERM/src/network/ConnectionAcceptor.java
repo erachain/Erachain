@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import controller.Controller;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.status.WalletStatus;
 import lang.Lang;
 import ntp.NTP;
@@ -80,7 +81,10 @@ public class ConnectionAcceptor extends Thread{
 							)
 							||
 							*/
-							PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress()))
+							DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
+							// || PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress())
+							)
+						
 					{
 						//DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
 						connectionSocket.close();

@@ -83,7 +83,7 @@ public class ConnectionCreator extends Thread {
 							continue;
 						}
 						
-						if (PeerManager.getInstance().isBlacklisted(peer.getAddress()))
+						if (peer.isBanned())
 							continue;
 
 						if (!this.isRun)
@@ -171,7 +171,7 @@ public class ConnectionCreator extends Thread {
 								// TODO small height not use
 								//Controller.getInstance().getMyHeight();
 								// newPeer.
-								if (PeerManager.getInstance().isBlacklisted(newPeer.getAddress()))
+								if (newPeer.isBanned())
 									continue;
 									
 								if (!this.isRun)

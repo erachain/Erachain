@@ -360,7 +360,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 					
 						if (found == -1){
 							//ADD TO LIST
-							peers.add(insertIndex, knownPeer);
+							if (peers.size() > insertIndex) {
+								peers.add(insertIndex, knownPeer);
+							} else {
+								peers.add(knownPeer);
+							}
 							//peers.add(knownPeer);
 						} else {
 							// REMOVE from this PLACE
@@ -507,7 +511,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		return new PeerInfo(addressByte, BYTE_NOTFOUND);
 	}
 	
-	public boolean isBlacklisted(byte[] key)
+	public boolean isBanned(byte[] key)
 	{
 		//CHECK IF PEER IS BLACKLISTED
 		if(this.contains(key))
@@ -529,7 +533,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 	public boolean isBlacklisted(InetAddress address)
 	{
 		//CHECK IF PEER IS BLACKLISTED
-		return isBlacklisted(address.getAddress());
+		return isBanned(address.getAddress());
 	}
 	public int getBanMinutes(Peer peer)
 	{

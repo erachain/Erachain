@@ -14,8 +14,8 @@ import utils.Pair;
 public class PeerManager {
 
 	private static PeerManager instance;
-	private Map<String, Long> blacListeddWait = new TreeMap<String, Long>(); // bat not time
-	private final static long banTime = 3 * 60 * 60 * 1000;
+	//private Map<String, Long> blacListeddWait = new TreeMap<String, Long>(); // bat not time
+	//private final static long banTime = 3 * 60 * 60 * 1000;
 
 	
 	public static PeerManager getInstance()
@@ -59,6 +59,7 @@ public class PeerManager {
 		}
 	}
 	
+	/*
 	public boolean isBlacklisted(InetAddress address)
 	{
 		if(DBSet.getInstance().isStoped())
@@ -83,6 +84,7 @@ public class PeerManager {
 		
 		return false;
 	}
+	*/
 	
 	public boolean isBlacklisted(Peer peer)
 	{

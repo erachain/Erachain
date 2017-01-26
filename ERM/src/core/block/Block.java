@@ -1020,7 +1020,6 @@ public class Block {
 		
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
-		
 		int targetedWinValue = this.calcWinValueTargeted(db); 
 		if (base > targetedWinValue) {
 			targetedWinValue = this.calcWinValueTargeted(db);
