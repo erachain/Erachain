@@ -120,7 +120,7 @@ import lang.Lang;
 				this.transactionsTableModel = new TransactionsTableModel();
 				this.jTable_jScrollPanel_LeftPanel = new JTable(this.transactionsTableModel);
 				
-				
+				this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 				
 				// MENU
 				JPopupMenu mainMenu = new JPopupMenu();
