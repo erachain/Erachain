@@ -41,7 +41,7 @@ public class Settings {
 	private static final int DEFAULT_MIN_CONNECTIONS = 8; // for OWN maked connections
 	private static final int DEFAULT_MAX_CONNECTIONS = 20;
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 40;
-	private static final int DEFAULT_MAX_SENT_PEERS = 20;
+	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
 	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = 60000;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;

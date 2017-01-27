@@ -277,15 +277,17 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			List<Peer> peers = new ArrayList<Peer>();
 			List<PeerInfo> listPeerInfo = new ArrayList<PeerInfo>();
 			
+			//////// GET first all WHITE PEERS
 			try
 			{
 				//GET ITERATOR
 				Iterator<byte[]> iterator = this.getKeys().iterator();
 				
 				//ITERATE AS LONG AS:
+
 				// 1. we have not reached the amount of peers
 				// 2. we have read all records
-				while(iterator.hasNext() && peers.size() < amount)
+				while(iterator.hasNext() && listPeerInfo.size() < amount)
 				{
 					//GET ADDRESS
 					byte[] addressBI = iterator.next();
@@ -298,8 +300,12 @@ public class PeerMap extends DBMap<byte[], byte[]>
 					{
 						PeerInfo peerInfo = new PeerInfo(addressBI, data);
 						
-						if(Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED))
-						{
+						InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
+						//CHECK IF SOCKET IS NOT LOCALHOST
+						if(Settings.getInstance().isLocalAddress(address))
+							continue;
+						
+						if(Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED)) {
 							listPeerInfo.add(peerInfo);
 						}
 					} catch (Exception e) {
@@ -312,32 +318,10 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				LOGGER.error(e.getMessage(),e);
 			}
 			
-			for (PeerInfo peer : listPeerInfo) {
-				InetAddress address = InetAddress.getByAddress(peer.getAddress());
-
-				//CHECK IF SOCKET IS NOT LOCALHOST
-				if(!Settings.getInstance().isLocalAddress(address))
-				{
-					if(peers.size() >= amount)
-					{
-						if(allFromSettings)
-							break;
-						else
-							return peers;
-					}
-				
-					//ADD TO LIST
-					peers.add(new Peer(address));
-				}	
-			}
+			LOGGER.info("Peers loaded from database : " + peers.size());
 			
 			if(allFromSettings) {
-				LOGGER.info("Peers loaded from database : " + peers.size());
-			}
-
-			List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
-			
-			if(allFromSettings) {
+				List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
 				LOGGER.info("Peers loaded from settings : " + knownPeers.size());
 				
 				int insertIndex = 0;
@@ -385,6 +369,46 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				
 			}
 			
+			//////// GET in end all  PEERS in DB
+
+			//GET ITERATOR
+			Iterator<byte[]> iterator = this.getKeys().iterator();
+			
+			//ITERATE AS LONG AS:
+
+			// 1. we have not reached the amount of peers
+			// 2. we have read all records
+			while(iterator.hasNext() && peers.size() < amount)
+			{
+				//GET ADDRESS
+				byte[] addressBI = iterator.next();
+				boolean found = false;
+				for (Peer peer: peers) {
+					if (Arrays.equals(peer.getAddress().getAddress(), addressBI)) {
+						found = true;
+						break;
+					}
+				}
+				
+				if (found)
+					continue;
+				
+				//CHECK IF ADDRESS IS NOT BANNED
+				
+				byte[] data = this.get(addressBI);
+				
+				try
+				{
+					PeerInfo peerInfo = new PeerInfo(addressBI, data);
+					if(peerInfo.banTime < NTP.getTime()) {
+						InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
+						peers.add(new Peer(address));
+					}
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage(),e);
+				}
+			}
+
 			//RETURN
 			return peers;
 		}
@@ -520,7 +544,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			PeerInfo peerInfo = new PeerInfo(key, data);
 			
 			if (Arrays.equals(peerInfo.getStatus(), BYTE_BLACKLISTED)) {
-				if (peerInfo.getBanTime() < NTP.getTime()) {
+				if (peerInfo.banTime < NTP.getTime()) {
 					peerInfo.setBanTime(0);
 					return true;
 				}

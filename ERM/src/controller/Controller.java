@@ -157,12 +157,16 @@ public class Controller extends Observable {
 		this.dbSet = db;
 	}
 
+
 	public int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {
 			return BlockChain.TESTNET_PORT;
 		} else {
 			return BlockChain.MAINNET_PORT;
 		}
+	}
+	public boolean isTestNet() {
+		return Settings.getInstance().isTestnet();
 	}
 	
 	public String getBuildDateTimeString(){
@@ -330,7 +334,6 @@ public class Controller extends Observable {
 		
 		this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
 		
-		this.status = STATUS_NO_CONNECTIONS;
 		this.transactionCreator = new TransactionCreator();
 
 		// OPENING DATABASES
@@ -456,6 +459,9 @@ public class Controller extends Observable {
 		this.timerPeerHeightUpdate.schedule(action, 
 				Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
 
+		if( Settings.getInstance().isTestnet()) 
+			this.status = STATUS_OK;
+		
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
 		this.addObserver(this.dbSet);
@@ -841,7 +847,10 @@ public class Controller extends Observable {
 				}
 				
 				// UPDATE STATUS
-				this.status = STATUS_NO_CONNECTIONS;
+				if (isTestNet())
+					this.status = STATUS_OK;
+				else
+					this.status = STATUS_NO_CONNECTIONS;
 
 				
 				// NOTIFY
@@ -1262,6 +1271,10 @@ public class Controller extends Observable {
 	// SYNCHRONIZE
 
 	public boolean isUpToDate() {
+		
+		if (isTestNet())
+			return true;
+		
 		if (this.peerHWeight.size() == 0) {
 			return false;
 		}

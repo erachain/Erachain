@@ -696,11 +696,11 @@ public class Account {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
 		
-		if(generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
+		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
 		
 		// test repeated win account
-		if (Block.isSoRapidly(height, this, lastBlocksForTarget)) {
+		if (!Controller.getInstance().isTestNet() && Block.isSoRapidly(height, this, lastBlocksForTarget)) {
 			return 0l;
 		}
 		
@@ -709,7 +709,7 @@ public class Account {
 
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 
-		if (base > targetedWinValue) {
+		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			return 0l;
 		}
 

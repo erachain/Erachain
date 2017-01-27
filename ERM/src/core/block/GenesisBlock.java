@@ -84,8 +84,8 @@ public class GenesisBlock extends Block{
 
 			this.testnetInfo += "\ngenesisSeed: " + Base58.encode(seed);
 			
-			bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL * 0.1).setScale(8);
-			bdAmount1 = new BigDecimal(asset1.getQuantity() * 0.1).setScale(8);
+			bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL>>2).setScale(8);
+			bdAmount1 = new BigDecimal(100).setScale(8);
 			for(int nonce=0; nonce<3; nonce++)
 		    {
 				byte[] accountSeed = generateAccountSeed(seed, nonce);

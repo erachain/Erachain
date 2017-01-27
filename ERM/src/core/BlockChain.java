@@ -132,7 +132,7 @@ public class BlockChain
 
         }
 	}
-
+	
 	public GenesisBlock getGenesisBlock() {
 		return this.genesisBlock;
 	}

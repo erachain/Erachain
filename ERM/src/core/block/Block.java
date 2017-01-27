@@ -1021,14 +1021,14 @@ public class Block {
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = this.calcWinValueTargeted(db); 
-		if (base > targetedWinValue) {
+		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			targetedWinValue = this.calcWinValueTargeted(db);
 			LOGGER.error("*** Block[" + height + "] targeted WIN_VALUE < 1/2 TARGET");
 			return false;
 		}
 		
 		// STOP IF SO RAPIDLY			
-		if (isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db))) {
+		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db))) {
 			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
