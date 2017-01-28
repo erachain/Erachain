@@ -22,6 +22,8 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
 	
 	My_Accounts_SplitPanel my_Accounts_SplitPanel;
 	Search_Accounts_SplitPanel search_Accounts;
+	My_Loans_SplitPanel my_Loans;
+	My_Credits_SplitPanel my_Credits;
 	
 	public Main_Accounts_Frame(){
 		
@@ -54,7 +56,13 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
 		search_Accounts = new Search_Accounts_SplitPanel();
 		this.jTabbedPane.add(search_Accounts);
 	
+	// Search Accounts
+		my_Loans = new My_Loans_SplitPanel();
+		this.jTabbedPane.add(my_Loans);
 	
+	// Search Accounts
+		my_Credits = new My_Credits_SplitPanel();
+		this.jTabbedPane.add(my_Credits);	
 	
 	
 	this.pack();
