@@ -81,6 +81,7 @@ import core.web.WebNameStorageHistoryHelper;
 import core.web.blog.BlogEntry;
 import database.DBSet;
 import database.NameMap;
+import lang.Lang;
 import settings.Settings;
 import utils.AccountBalanceComparator;
 import utils.BlogUtils;
@@ -193,15 +194,47 @@ public class WebResource {
 	@Path("index/blockexplorer.html")
 	@GET
 	public Response blockexplorerhtml() {
+		String content;
+		JSONObject langObj;
+		String lang = request.getParameter("lang");
 		try {
-			String content = readFile("web/blockexplorer.html",
+			content = readFile("web/blockexplorer.html",
 					StandardCharsets.UTF_8);
-
-			return Response.ok(content, "text/html; charset=utf-8").build();
+			
+			
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(),e);
 			return error404(request, null);
 		}
+		
+		Document doc = null;
+		
+		doc = Jsoup.parse(content);
+		
+	//	Element element = doc.getElementById("menu_top_100_");
+	//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
+		
+//		
+		
+		if (lang !=null){
+			
+			langObj = Lang.getInstance().openLangFile(lang+".json");
+			
+		
+					Elements el = doc.select("a");
+			for (Element e:el){
+			e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
+				
+			}			
+		
+			
+		}
+		
+		
+		
+		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
+		
+		
 	}
 
 	@Path("index/blogsearch.html")

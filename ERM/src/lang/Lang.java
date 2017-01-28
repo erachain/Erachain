@@ -220,4 +220,32 @@ public class Lang {
         
         return lngFileList;
 	}
+	
+	public String translate_from_langObj(String message, JSONObject langObj1) 
+	{
+		//COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
+		String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", ""); 
+		messageWithoutComment = messageWithoutComment.replace("\\#", "#");
+		
+		if (langObj1 == null) { 
+			//noTranslate(message);
+			return messageWithoutComment;
+		}
+
+		if(!langObj1.containsKey(message)) {
+		//	noTranslate(message);
+			//IF NO SUITABLE TRANSLATION WITH THE COMMENT THEN RETURN WITHOUT COMMENT
+			if(!langObj1.containsKey(messageWithoutComment)) {
+				return messageWithoutComment;
+			} else {
+				return langObj1.get(messageWithoutComment).toString();
+			}
+		}
+		// if "message" = isNull  - return message
+		// if "massage" = "any string"  - return "any string" 
+		String res = langObj1.get(message).toString();
+		if (res.isEmpty()) return (message);
+		return res;		
+	}
+	
 }
