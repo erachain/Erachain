@@ -906,11 +906,14 @@ public abstract class Transaction {
 				this.creator.changeBalance(db, true, FEE_KEY, this.fee);
 
 			}
-			
+						
 			if (!db.isFork()) {
 				// calc INVITED FEE if its not a FORK
 				process_gifts(db, 0, getInvitedFee(), this.creator, false);
 			}
+
+			db.getAddressTime_SignatureMap().set(creator, signature); // for quick search public keys
+			db.getAddressTime_SignatureMap().set(creator, timestamp, signature); // for search records by time
 
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() )
@@ -922,6 +925,7 @@ public abstract class Transaction {
 	
 	public void orphan(DBSet db, boolean asPack)
 	{
+		
 		if (!asPack) {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).add(this.fee), db);
@@ -934,10 +938,15 @@ public abstract class Transaction {
 				process_gifts(db, 0, getInvitedFee(), this.creator, true);
 			}
 
+			db.getAddressTime_SignatureMap().delete(creator, timestamp);
+			db.getAddressTime_SignatureMap().set(creator, db.getAddressTime_SignatureMap().get(creator, reference));
+
 			//UPDATE REFERENCE OF SENDER
-			if (this.isReferenced() )
+			if (this.isReferenced() ) {
 				// IT IS REFERENCED RECORD?
 				this.creator.setLastReference(this.reference, db);
+				// set last transaction signature for this ACCOUNT
+			}
 		}
 	}
 

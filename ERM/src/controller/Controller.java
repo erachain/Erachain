@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private static final String version = "2.18.02";
-	private static final String buildTime = "2017-01-26 19:33:33 UTC";
+	private static final String version = "2.18.03";
+	private static final String buildTime = "2017-01-28 09:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -1676,10 +1676,9 @@ public class Controller extends Observable {
 	}
 	
 	// by account addres + timestamp get signature
-	public byte[] getSignatureByAddrTime(DBSet database, String address, Long timestamp) {
+	public byte[] getSignatureByAddrTime(DBSet dbSet, String address, Long timestamp) {
 
-		//return database.getTransactionRef_BlockRef_Map().getParent(signature);
-		return null;
+		return dbSet.getAddressTime_SignatureMap().get(address, timestamp);
 	}
 	
 	public Transaction getTransaction(byte[] signature, DBSet database) {
@@ -2417,13 +2416,18 @@ public class Controller extends Observable {
 		}
 
 		DBSet db = this.dbSet;
-		if (!db.getReferenceMap().contains(address)) {
+		// get last transaction from this address
+		byte[] sign = db.getAddressTime_SignatureMap().get(address);
+		if (sign == null) {
 			return null;
 		}
 
-		byte[] sign = getSignatureByAddrTime(db, address, db.getReferenceMap().get(address));
+		/*
+		long lastReference = db.getReferenceMap().get(address);
+		byte[] sign = getSignatureByAddrTime(db, address, lastReference);
 		if (sign == null)
 			return null;
+			*/
 				
 		Transaction transaction = cntr.getTransaction(sign);
 		if (transaction == null) {
