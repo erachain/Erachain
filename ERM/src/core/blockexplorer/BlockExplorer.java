@@ -74,11 +74,13 @@ import core.voting.PollOption;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
+import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
 import lang.LangFile;
+import network.Peer;
 import settings.Settings;
 import utils.BlExpUnit;
 import utils.DateTimeFormat;
@@ -93,8 +95,8 @@ public class BlockExplorer
 	private JSONObject langObj;
 	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
 	private static BlockExplorer blockExplorer;
-	private Locale local = new Locale("ru","RU"); // С„РѕСЂРјР°С‚ РґР°С‚С‹
-	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // РґР»СЏ С„РѕСЂРјР°С‚Р° РґР°С‚С‹
+	private Locale local = new Locale("ru","RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ Р Т‘Р В°РЎвЂљРЎвЂ№
+	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	private String lang; 
 	public static final String  LANG_DEFAULT = "en";
@@ -304,6 +306,25 @@ public class BlockExplorer
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
 			}
+			
+			if(info.getQueryParameters().containsKey("peers"))
+			{
+				int start = 0;
+
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+				}
+
+				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryPeers(start));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			
 
 			if(info.getQueryParameters().containsKey("lastBlock"))
 			{
@@ -2003,7 +2024,7 @@ if ( asset_1 == null) {
 			Transaction transaction = (Transaction)unit;
 
 			transactionDataJSON = transaction.toJson();
-			//transactionDataJSON.put("РµС€СЊСѓС‹РµС„", GZIP.webDecompress(transactionDataJSON.get("value").toString()));	
+			//transactionDataJSON.put("Р ВµРЎв‚¬РЎРЉРЎС“РЎвЂ№Р ВµРЎвЂћ", GZIP.webDecompress(transactionDataJSON.get("value").toString()));	
 
 			if(transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION)
 			{
@@ -3231,6 +3252,38 @@ if ( asset_1 == null) {
 
 		output.put("assetNames", assetNames.getMap());
 
+		return output;
+	}
+	
+	public Map jsonQueryPeers(int start)
+	{
+		
+		
+		Map output=new LinkedHashMap();
+		PeersTableModel model_Peers =  new PeersTableModel();
+		int rowCount = start+20;
+		int column_Count = model_Peers.getColumnCount();
+		
+		for (int column=0; column < column_Count; column++ ){
+				
+			output.put("Label_"+ model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'),  Lang.getInstance().translate_from_langObj(model_Peers.getColumnNameNO_Translate(column),langObj));
+		}
+		
+		Map out_peers=new LinkedHashMap();
+	//	if (rowCount> model_Peers.getRowCount()) rowCount = model_Peers.getRowCount();
+		rowCount = model_Peers.getRowCount();
+		for (int row = 0; row< rowCount; row++ ){
+			Map out_peer=new LinkedHashMap();
+			
+			for (int column=0; column < column_Count; column++ ){
+				out_peer.put(model_Peers.getColumnNameNO_Translate(column).replace(' ', '_'), model_Peers.getValueAt(row, column).toString());	
+				
+			}
+			out_peers.put(row, out_peer);			
+		}
+//		output.put("rowCount", rowCount);
+//		output.put("start", start);
+		output.put("Peers", out_peers);
 		return output;
 	}
 
