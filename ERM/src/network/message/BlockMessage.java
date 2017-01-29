@@ -53,6 +53,9 @@ public class BlockMessage extends Message{
 	{
 		byte[] data = new byte[0];
 		
+		if (this.block == null) {
+			return data;
+		}
 		//WRITE BLOCK HEIGHT
 		byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DBSet.getInstance()));
 		data = Bytes.concat(data, heightBytes);
@@ -69,7 +72,7 @@ public class BlockMessage extends Message{
 	
 	protected int getDataLength()
 	{
-		return HEIGHT_LENGTH + this.block.getDataLength(false);
+		return HEIGHT_LENGTH + (this.block==null?0:this.block.getDataLength(false));
 	}
 	
 }

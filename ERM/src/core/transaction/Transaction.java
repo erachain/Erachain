@@ -472,7 +472,7 @@ public abstract class Transaction {
 		// FEE_FOR_ANONIMOUSE !
 		///if (this.getBlockHeightByParent(db))
 		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-		int anonimuus = 0;		
+		int anonimous = 0;		
 		// TODO DBSet get from CHAIN
 		/*
 		Controller cnt = Controller.getInstance();
@@ -493,8 +493,8 @@ public abstract class Transaction {
 		}
 		*/
 		
-		if ( anonimuus > 0) {
-			len *= anonimuus;
+		if ( anonimous > 0) {
+			len *= anonimous;
 		}
 		
 		return (int) len * BlockChain.FEE_PER_BYTE;

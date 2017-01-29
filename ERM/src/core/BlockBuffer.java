@@ -88,8 +88,9 @@ public class BlockBuffer extends Thread
 					return;
 				}
 				
+				Block block = response.getBlock();
 				//CHECK BLOCK SIGNATURE
-				if(!response.getBlock().isSignatureValid())
+				if(block == null || !block.isSignatureValid())
 				{
 					error = true;
 					return;

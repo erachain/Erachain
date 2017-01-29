@@ -34,7 +34,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
 
-	public static final int MAX_IMAGE_LENGTH = 10249;
+	public static final int MAX_IMAGE_LENGTH = 20480;
 	
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
@@ -104,7 +104,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		//int ii = Math.abs(person.getHeight());
 		if (Math.abs(person.getHeight()) < 0) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
-		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
+		if (person.getImage().length < (MAX_IMAGE_LENGTH - MAX_IMAGE_LENGTH>>2)
+				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
 		
 		long count = db.getItemPersonMap().getSize();
 		if (count < 20) {
@@ -200,7 +201,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 	@Override
 	public int calcBaseFee() {
-		return calcCommonFee();
+		int fee = calcCommonFee()>>1; 
+		return fee;
 	}
 
 }

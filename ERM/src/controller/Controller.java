@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private static final String version = "2.19.01";
-	private static final String buildTime = "2017-01-29 15:33:33 UTC";
+	private static final String version = "2.19.02";
+	private static final String buildTime = "2017-01-29 22:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -959,13 +959,6 @@ public class Controller extends Observable {
 				newBlock = this.blockChain
 						.getBlock(dbSet, getBlockMessage.getSignature());
 
-				/*
-				if (newBlock != null)
-					LOGGER.error("response: " + newBlock.toString());
-				else
-					LOGGER.error("response: NOT FOUND");
-				*/
-
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(
 						newBlock);
@@ -974,6 +967,11 @@ public class Controller extends Observable {
 				// SEND RESPONSE BACK WITH SAME ID
 				message.getSender().sendMessage(response);
 
+				if (newBlock == null) {
+					String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+					banPeerOnError(message.getSender(), mess);
+				}
+				
 				break;
 
 			case Message.WIN_BLOCK_TYPE:

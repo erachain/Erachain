@@ -496,6 +496,11 @@ public class Block {
 
 	public static Block parse(byte[] data, boolean forDB) throws Exception
 	{
+		if(data.length == 0)
+		{
+			return null;
+		}
+		
 		//CHECK IF WE HAVE MINIMUM BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{

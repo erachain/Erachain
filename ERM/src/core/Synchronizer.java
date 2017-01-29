@@ -495,8 +495,15 @@ public class Synchronizer
 		}
 		
 		Block block = response.getBlock();
+		if(block == null)
+		{
+			String mess = "*** Block is NULL";
+			peer.ban(600, mess);
+			throw new Exception(mess);
+		}
+		
 		//CHECK BLOCK SIGNATURE
-		if(!block.isSignatureValid())
+		if(block == null || !block.isSignatureValid())
 		{
 			String mess = "*** Invalid block --signature";
 			peer.ban(600, mess);
