@@ -82,11 +82,11 @@ public class ConnectionAcceptor extends Thread{
 							||
 							*/
 							DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
-							// || PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress())
 							)
 						
 					{
 						//DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
+						// or BANNED
 						connectionSocket.close();
 					}
 					else
