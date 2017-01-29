@@ -81,7 +81,7 @@ public class ConnectionAcceptor extends Thread{
 							)
 							||
 							*/
-							DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
+							!DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
 							// || PeerManager.getInstance().isBlacklisted(connectionSocket.getInetAddress())
 							)
 						

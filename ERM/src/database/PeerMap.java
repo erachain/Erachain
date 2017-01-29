@@ -28,7 +28,7 @@ import utils.ReverseComparator;
 public class PeerMap extends DBMap<byte[], byte[]> 
 {
 	private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
-	private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
+	//private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
 	private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -163,12 +163,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		}
 		public void setBanTime(long toTime){
 			banTime = toTime;
-			if (this.banTime > NTP.getTime()) {
-				this.status = BYTE_BLACKLISTED;
-			} else { 
-				this.status = BYTE_NOTFOUND;
-			}
-
 		}
 
 		public PeerInfo(byte[] address, byte[] data) {
@@ -204,9 +198,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				this.grayConnectTime = longGrayConnectTime;
 				this.whitePingCouner = longWhitePingCouner;
 				this.banTime = Longs.fromByteArray(banTimeBytes);
-				if (this.banTime > NTP.getTime()) {
-					this.status = BYTE_BLACKLISTED;
-				}
 				
 			} else if (Arrays.equals(data, BYTE_WHITELISTED)) {
 				this.address = address;
@@ -305,7 +296,8 @@ public class PeerMap extends DBMap<byte[], byte[]>
 						if(Settings.getInstance().isLocalAddress(address))
 							continue;
 						
-						if(Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED)) {
+						if(Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED)
+								&& peerInfo.banTime < NTP.getTime()) {
 							listPeerInfo.add(peerInfo);
 						}
 					} catch (Exception e) {
@@ -318,11 +310,19 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				LOGGER.error(e.getMessage(),e);
 			}
 			
-			LOGGER.info("Peers loaded from database : " + peers.size());
+			for (PeerInfo peerInfo: listPeerInfo) {
+				InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
+				peers.add(new Peer(address));				
+			}
+			
+			int cnt = peers.size();
+			// show for mySelp in start only
+			if (cnt > 0 && allFromSettings)
+				LOGGER.info("White peers loaded from database : " + cnt);
 			
 			if(allFromSettings) {
 				List<Peer> knownPeers = Settings.getInstance().getKnownPeers();
-				LOGGER.info("Peers loaded from settings : " + knownPeers.size());
+				LOGGER.info("Peers loaded from settings and internet: " + knownPeers.size());
 				
 				int insertIndex = 0;
 				for (Peer knownPeer : knownPeers) {
@@ -371,6 +371,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			
 			//////// GET in end all  PEERS in DB
 
+			cnt = peers.size();			
 			//GET ITERATOR
 			Iterator<byte[]> iterator = this.getKeys().iterator();
 			
@@ -400,14 +401,16 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				try
 				{
 					PeerInfo peerInfo = new PeerInfo(addressBI, data);
-					if(peerInfo.banTime < NTP.getTime()) {
-						InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
-						peers.add(new Peer(address));
-					}
+					InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
+					peers.add(new Peer(address));
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(),e);
 				}
 			}
+
+			// Show only for mySelf on start
+			if(allFromSettings)
+				LOGGER.info("Peers loaded from database : " + (peers.size() - cnt));
 
 			//RETURN
 			return peers;
@@ -498,7 +501,9 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		
 		if(banMinutes > 0) {
 			// add ban timer by minutes
-			peerInfo.setBanTime(NTP.getTime() + banMinutes * 60000);
+			peerInfo.banTime = NTP.getTime() + banMinutes * 60000;
+		} else {
+			peerInfo.banTime = 0;		
 		}
 		
 		if(peer.getPingCounter() > 1)
@@ -543,11 +548,11 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			byte[] data = this.map.get(key);			
 			PeerInfo peerInfo = new PeerInfo(key, data);
 			
-			if (Arrays.equals(peerInfo.getStatus(), BYTE_BLACKLISTED)) {
-				if (peerInfo.banTime < NTP.getTime()) {
-					peerInfo.setBanTime(0);
-					return true;
-				}
+			if (peerInfo.banTime < NTP.getTime()) {
+				peerInfo.setBanTime(0);
+				return false;
+			} else {
+				return true;
 			}
 		}
 			
@@ -570,12 +575,10 @@ public class PeerMap extends DBMap<byte[], byte[]>
 			byte[] data = this.map.get(key);			
 			PeerInfo peerInfo = new PeerInfo(key, data);
 			
-			if (Arrays.equals(peerInfo.getStatus(), BYTE_BLACKLISTED)) {
-				if (peerInfo.getBanTime() > NTP.getTime()) {
-					return (int)((peerInfo.getBanTime() - NTP.getTime()) / 60000);
-				} else {
-					return 0;
-				}
+			if (peerInfo.getBanTime() > NTP.getTime()) {
+				return (int)((peerInfo.getBanTime() - NTP.getTime()) / 60000);
+			} else {
+				return 0;
 			}
 		}
 			

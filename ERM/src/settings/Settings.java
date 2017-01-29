@@ -40,7 +40,8 @@ public class Settings {
 	//NETWORK
 	private static final int DEFAULT_MIN_CONNECTIONS = 8; // for OWN maked connections
 	private static final int DEFAULT_MAX_CONNECTIONS = 20;
-	private static final int DEFAULT_MAX_RECEIVE_PEERS = 40;
+	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
+	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
 	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = 60000;

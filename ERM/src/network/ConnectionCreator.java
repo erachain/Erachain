@@ -28,22 +28,24 @@ public class ConnectionCreator extends Thread {
 	{
 		this.isRun = true;
 
+		int sleep_time = 0;
+		//GET LIST OF KNOWN PEERS
+		List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
+
 		while(isRun)
 		{
+			
 			try
 			{	
-
-				Thread.sleep(50);	
 
 				int maxReceivePeers = Settings.getInstance().getMaxReceivePeers();
 				
 				//CHECK IF WE NEED NEW CONNECTIONS
 				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
 				{			
-					//GET LIST OF KNOWN PEERS
-					List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
 					
-					int knownPeersCounter = 0;
+					// try update banned peers each minute 
+					knownPeers = PeerManager.getInstance().getKnownPeers();
 										
 					//ITERATE knownPeers
 					for(Peer peer: knownPeers)
@@ -51,19 +53,13 @@ public class ConnectionCreator extends Thread {
 						if (Network.isMyself(peer.getAddress())) {
 							continue;
 						}
-							
-						knownPeersCounter ++;
 	
 						if(!this.isRun)
 							return;
 						
-						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS
-						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1) {
-							try {
-								Thread.sleep(10);
-							}
-							catch (Exception e) {		
-							}
+						//CHECK IF WE ALREADY HAVE MIN CONNECTIONS
+						if(Settings.getInstance().getMinConnections() <= callback.getActivePeers(true).size()) {
+							// stop use KNOWN peers
 							break;
 						}
 												
@@ -106,7 +102,8 @@ public class ConnectionCreator extends Thread {
 				}
 				
 				//CHECK IF WE STILL NEED NEW CONNECTIONS
-				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
+				// USE unknown peers from known peers
+				if(this.isRun && Settings.getInstance().getMaxConnections() >= callback.getActivePeers(true).size())
 				{
 					//OLD SCHOOL ITERATE activeConnections
 					//avoids Exception when adding new elements
@@ -198,15 +195,14 @@ public class ConnectionCreator extends Thread {
 					}
 				}			
 				//SLEEP
-				int sleep_time = 1;
-				if (callback.getActivePeers(true).size()<3)
+				int cnt = callback.getActivePeers(true).size();
+				int maxCnt = Settings.getInstance().getMaxConnections();
+				if (cnt< maxCnt)
+					// BANNES PEERS update each minute
 					sleep_time = 1;
-				else if (callback.getActivePeers(true).size()< (Settings.getInstance().getMaxConnections()>>2))
-					sleep_time = 5;
-				else if (callback.getActivePeers(true).size()< Settings.getInstance().getMaxConnections()>>1)
+				else
+					// sleep
 					sleep_time = 10;
-				else 
-					sleep_time = 20;
 					
 				Thread.sleep(sleep_time * 1000);
 

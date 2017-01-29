@@ -938,15 +938,15 @@ public abstract class Transaction {
 				process_gifts(db, 0, getInvitedFee(), this.creator, true);
 			}
 
-			db.getAddressTime_SignatureMap().delete(creator, timestamp);
-			db.getAddressTime_SignatureMap().set(creator, db.getAddressTime_SignatureMap().get(creator, reference));
-
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() ) {
 				// IT IS REFERENCED RECORD?
 				this.creator.setLastReference(this.reference, db);
 				// set last transaction signature for this ACCOUNT
 			}
+			db.getAddressTime_SignatureMap().set(creator, db.getAddressTime_SignatureMap().get(creator, reference));
+			db.getAddressTime_SignatureMap().delete(creator, timestamp);
+
 		}
 	}
 
