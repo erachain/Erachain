@@ -43,8 +43,13 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.json.simple.JSONObject;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import database.DBSet;
+import database.Issue_ItemMap;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
@@ -53,6 +58,7 @@ import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemImprintsTableModel;
+import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 public class Search_Assets_Tab extends Split_Panel {
@@ -315,6 +321,27 @@ public class Search_Assets_Tab extends Split_Panel {
 		}
 	});
 	
+		
+	JMenuItem vouch_menu= new JMenuItem(Lang.getInstance().translate("Vouch"));
+	vouch_menu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			
+			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+			AssetCls asset = tableModelItemAssets.getAsset(row);
+			
+			DBSet db = DBSet.getInstance();
+			Transaction trans = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+								.get(asset.getReference()));
+		
+			new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
+			
+		}
+	});
+	
+	
+	
+	
 	nameSalesMenu.addSeparator();
 	nameSalesMenu.add(buy);
 	
@@ -322,7 +349,11 @@ public class Search_Assets_Tab extends Split_Panel {
 	nameSalesMenu.addSeparator();
 	
 	nameSalesMenu.add(favorite);
-
+	
+	nameSalesMenu.addSeparator();
+	
+	nameSalesMenu.add(vouch_menu);
+	
 	assetsTable.setComponentPopupMenu(nameSalesMenu);
 	assetsTable.addMouseListener(new MouseAdapter() {
 		@Override

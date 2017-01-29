@@ -6,6 +6,7 @@ import java.util.Observer;
 import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.item.statuses.StatusCls;
 import database.DBSet;
@@ -82,7 +83,11 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 			return null;
 		}
 		
-		StatusCls status = this.statuses.get(row).getB();
+		Pair<Tuple2<String, String>, StatusCls> res = this.statuses.get(row);
+		if (res == null)
+			return null;
+		
+		StatusCls status = res.getB();
 		
 		switch(column)
 		{

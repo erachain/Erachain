@@ -111,6 +111,9 @@ public class Start {
 					LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
 				}
 				
+				//Controller.getInstance().isTestnet();
+
+				
 			} catch(Exception e) {
 				
 				LOGGER.error(e.getMessage(),e);

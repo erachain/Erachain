@@ -835,21 +835,14 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
-		/*
-		if (height < 40)
-			win_value >>= 6;
-		else if (height < 100)
-			win_value >>= 7;
-		else if (height < 1000)
-			win_value >>= 8;
-		else if (height < 3000)
-			win_value >>= 9;
-		else if (height < 100000)
-			win_value >>= 10;
+		if (height <4)
+			win_value >>= 3;
+		else if (height < BlockChain.REPEAT_WIN)
+			win_value >>= 4;
+		else if (height < BlockChain.TARGET_COUNT)
+			win_value >>= 5;
 		else
-			win_value >>= 11;
-			*/
-		win_value >>= 6;
+			win_value >>= 6;
 		
 		return win_value;
 
@@ -877,7 +870,7 @@ public class Block {
 	}
 
 
-	public int calcWinValueTargeted2(long win_value, long target)
+	public static int calcWinValueTargeted2(long win_value, long target)
 	{
 
 		if (target == 0l) {
@@ -902,11 +895,6 @@ public class Block {
 		
 	}
 	
-	public long getTarget(DBSet dbSet)
-	{	
-		return BlockChain.getTarget(dbSet, this);
-	}
-
 	public int calcWinValueTargeted(DBSet dbSet)
 	{
 		
@@ -916,8 +904,7 @@ public class Block {
 		}
 		
 		long win_value = this.calcWinValue(dbSet);
-		long target = this.getTarget(dbSet);
-		LOGGER.info("Target: " + target);
+		long target = BlockChain.getTarget(dbSet, this);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -962,6 +949,34 @@ public class Block {
 		*/
 	}
 
+	public static boolean isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
+		
+		int repeat_win = 0;
+		if (height < BlockChain.TARGET_COUNT<<2) {
+			repeat_win = BlockChain.REPEAT_WIN;
+		} else {
+			return false;
+		}
+		
+		// NEED CHECK ONLY ON START
+		// test repeated win account
+		if (lastBlocksForTarget == null || lastBlocksForTarget.isEmpty()) {
+			return false;
+		}
+		// NEED CHECK ONLY ON START
+		int i = 0;
+		for (Block testBlock: lastBlocksForTarget) {
+			i++;
+			if (testBlock.getCreator().equals(accountCreator)) {
+				return true;
+			} else if ( i > repeat_win) {
+				return false;
+			}
+		}
+	
+	return false;
+
+	}
 	public boolean isValid(DBSet db)
 	{
 		
@@ -979,34 +994,13 @@ public class Block {
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].reference invalid");
+			LOGGER.error("*** Block[" + height + "].reference invalid");
 			return false;
 		}
 
-		/*
-		 * OLD TIME
-		//if (false) {
-		if (!noTime) {
-			//CHECK IF TIMESTAMP IS VALID -500 MS ERROR MARGIN TIME
-			if(true & (this.timestamp - 500 > NTP.getTime()
-					|| this.timestamp < this.getParent(db).timestamp))
-			{
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp invalid");
-				return false;
-			}
-	
-			//CHECK IF TIMESTAMP REST SAME AS PARENT TIMESTAMP REST
-			if(this.timestamp % 1000 != this.getParent(db).timestamp % 1000)
-			{
-				LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].timestamp % 1000 invalid");
-				return false;
-			}
-		}
-		 */
-		
 		// TODO - show it to USER
 		if(this.getTimestamp(db) - 10000 > NTP.getTime()) {
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
+			LOGGER.error("*** Block[" + height + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
 					+ " this.getTimestamp(db):" + this.getTimestamp(db) + " > NTP.getTime():" + NTP.getTime());
 			return false;			
 		}
@@ -1014,41 +1008,29 @@ public class Block {
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version invalid");
+			LOGGER.error("*** Block[" + height + "].version invalid");
 			return false;
 		}
 		if(this.version < 2 && this.atBytes != null && this.atBytes.length > 0) // || this.atFees != 0))
 		{
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "].version AT invalid");
-			return false;
-		}
-					
-		// TEST repeated win for CREATOR
-		int base;			
-		if (false &&  height < 10) {
-			base = (BlockChain.BASE_TARGET>>2) + (BlockChain.BASE_TARGET>>3);
-		} else {
-			base = BlockChain.BASE_TARGET>>1;
-		}
-		int targetedWinValue = this.calcWinValueTargeted(db); 
-		if (base > targetedWinValue) {
-			targetedWinValue = this.calcWinValueTargeted(db);
-			LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] targeted WIN_VALUE < 1/2 TARGET");
+			LOGGER.error("*** Block[" + height + "].version AT invalid");
 			return false;
 		}
 		
-		// STOP IF SO RAPIDLY
-		if (true || height < 100) {
-			// NEED CHECK ONLY ON START
-			Block testBlock = this.getParent(db);
-			for (int i=0; i < BlockChain.REPEAT_WIN && testBlock != null; i++) {
-				if (testBlock.getCreator().equals(this.creator)) {
-					LOGGER.error("*** Block[" + this.getHeightByParent(db) + "] REPEATED WIN invalid");
-					return false;
-				}
-				//testBlock = testBlock.getChild(db);
-				testBlock = testBlock.getParent(db);
-			}
+		
+		// TEST STRONG of win Value
+		int base = BlockChain.getMinTarget(height);
+		int targetedWinValue = this.calcWinValueTargeted(db); 
+		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
+			targetedWinValue = this.calcWinValueTargeted(db);
+			LOGGER.error("*** Block[" + height + "] targeted WIN_VALUE < 1/2 TARGET");
+			return false;
+		}
+		
+		// STOP IF SO RAPIDLY			
+		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db))) {
+			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
+			return false;
 		}
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
@@ -1086,7 +1068,7 @@ public class Block {
 				
 				if(!transaction.isSignatureValid()) {
 					// 
-					LOGGER.error("*** Block[" + this.getHeightByParent(fork)
+					LOGGER.error("*** Block[" + height
 					+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 					+ transaction.viewFullTypeName() + "]"
 					+ "invalid code: " + transaction.isValid(fork, null));
@@ -1106,13 +1088,13 @@ public class Block {
 					DeployATTransaction atTx = (DeployATTransaction)transaction;
 					if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 					{
-						LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].atTx invalid");
+						LOGGER.error("*** Block[" + height + "].atTx invalid");
 						return false;
 					}
 				}
 				else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 				{
-					LOGGER.error("*** Block[" + this.getHeightByParent(fork)
+					LOGGER.error("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
 						+ "invalid code: " + transaction.isValid(fork, null));
@@ -1124,7 +1106,7 @@ public class Block {
 				if( transactionTimestamp > timestampEnd
 						|| transaction.getDeadline() <= timestampBeg)
 				{
-					LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].TX.timestamp invalid");
+					LOGGER.error("*** Block[" + height + "].TX.timestamp invalid");
 					return false;
 				}
 	
@@ -1134,7 +1116,7 @@ public class Block {
 					transaction.process(fork, this, false);
 					
 				} catch (Exception e) {
-                    LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].TX.process ERROR", e);
+                    LOGGER.error("*** Block[" + height + "].TX.process ERROR", e);
                     return false;                    
 				}
 				
@@ -1143,7 +1125,7 @@ public class Block {
 			
 			transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
 			if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-				LOGGER.error("*** Block[" + this.getHeightByParent(fork) + "].digest(transactionsSignatures) invalid");
+				LOGGER.error("*** Block[" + height + "].digest(transactionsSignatures) invalid");
 				return false;
 			}
 		}

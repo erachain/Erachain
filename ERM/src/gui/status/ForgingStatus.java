@@ -48,52 +48,57 @@ public class ForgingStatus extends JLabel implements Observer {
 		ToolTipManager.sharedInstance().setDismissDelay( (int) TimeUnit.SECONDS.toMillis(5));
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent mEvt) {
+				
+				long winBalance = 0;
+				Account winAccount = null;
+				BlockChain bchain = Controller.getInstance().getBlockChain();
+				List<Block> lastBlocksForTarget = bchain.getLastBlocksForTarget(DBSet.getInstance());
+				int newHeight = bchain.getHeight(DBSet.getInstance()) + 1;
+				long target = bchain.getTarget(DBSet.getInstance());
+				if (target == 0l)
+					target = 1000l;
+
+				DBSet dbSet = DBSet.getInstance();
+	            for(Account account: Controller.getInstance().getAccounts())
+		        {
+	            	long win_value = account.calcWinValue(dbSet, bchain, lastBlocksForTarget, newHeight, target);
+	            	if (win_value > winBalance) {
+	            		winBalance = win_value;
+	            		winAccount = account;
+	            	}
+		        }
+	            
+		        String timeForge = "";
+		        if(winAccount != null)
+		        {
+		        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
+		        	timeForge = (BlockChain.BASE_TARGET * winBalance / target) + " " + winAccount.getAddress();
+		        	timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
+		        }
+		        else
+		        {
+		        	timeForge = Lang.getInstance().translate("infinity");
+		        }
+		        
+
 				if(Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING)
 				{
-		           	
-					long winBalance = 0;
-					Account winAccount = null;
-					BlockChain bchain = Controller.getInstance().getBlockChain();
-					int newHeight = bchain.getHeight(DBSet.getInstance()) + 1;
-					long target = bchain.getTarget(DBSet.getInstance());
-					if (target == 0l)
-						target = 1000l;
-
-					DBSet dbSet = DBSet.getInstance();
-		            for(Account account: Controller.getInstance().getAccounts())
-			        {
-		            	long win_value = account.calcWinValue(dbSet, bchain, null, newHeight, 0l);
-		            	if (win_value > winBalance) {
-		            		winBalance = win_value;
-		            		winAccount = account;
-		            	}
-			        }
-		            
-			        String timeForge = "";
-			        if(winAccount != null)
-			        {
-			        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
-			        	timeForge = (BlockChain.BASE_TARGET * winBalance / target) + " " + winAccount.getAddress();
-			        	
-			        }
-			        else
-			        {
-			        	timeForge = Lang.getInstance().translate("infinity");
-			        }
-			        
-		            setToolTipText(Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge));
+		            setToolTipText(timeForge);
 				}
 				else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_DISABLED && Controller.getInstance().getStatus() == Controller.STATUS_OK) 
 				{
-					setToolTipText(Lang.getInstance().translate("To start forging you need to unlock the wallet."));
+					setToolTipText(Lang.getInstance().translate("To start forging you need to unlock the wallet."
+							+ " " + timeForge));
 				}
 				else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT && Controller.getInstance().getStatus() == Controller.STATUS_OK) 
 				{
-					setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer."));
+					setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer."
+							+ " " + timeForge));
 				}
 				else
 				{
-					setToolTipText(Lang.getInstance().translate("For forging wallet must be online and fully synchronized."));
+					setToolTipText(Lang.getInstance().translate("For forging wallet must be online and fully synchronized."
+							+ " " + timeForge));
 				}
 				
 	    }});

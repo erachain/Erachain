@@ -696,33 +696,20 @@ public class Account {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
 		
-		if(generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
+		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
 		
 		// test repeated win account
-		if (height < 100 && lastBlocksForTarget != null && !lastBlocksForTarget.isEmpty()) {
-			// NEED CHECK ONLY ON START
-			int i = 0;
-			for (Block testBlock: lastBlocksForTarget) {
-				i++;
-				if (testBlock.getCreator().equals(this)) {
-					return 0l;
-				} else if ( i > bchain.REPEAT_WIN)
-					break;
-			}
+		if (!Controller.getInstance().isTestNet() && Block.isSoRapidly(height, this, lastBlocksForTarget)) {
+			return 0l;
 		}
-
-		/*
-		// if new block in DB - get next height
-		if (this.getForgingData(dbSet, height) != -1) {
-			height++;
-		}
-		*/
 		
+		// TEST STRONG of win Value
 		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
-		
-		// not use small values
-		if (!bchain.isGoodWinForTarget(height, winned_value, target)) {
+
+		int base = BlockChain.getMinTarget(height);
+		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 
+		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			return 0l;
 		}
 

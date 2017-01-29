@@ -79,8 +79,10 @@ public class Synchronizer
 					//cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
 					//		+ lastCommonBlock.getHeight(fork) + "]"); // icreator
 
-					throw new Exception("Dishonest peer by not valid lastCommonBlock["
-							+ lastCommonBlock.getHeight(fork) + "]");
+					String mess = "Dishonest peer by not valid lastCommonBlock["
+							+ lastCommonBlock.getHeight(fork) + "]";
+					peer.ban(5 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+					throw new Exception(mess);
 				}
 				lastBlock.orphan(fork);
 				lastBlock = fork.getBlockMap().getLastBlock();
@@ -137,7 +139,9 @@ public class Synchronizer
 				//cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
 
 				//INVALID BLOCK THROW EXCEPTION
-				throw new Exception("Dishonest peer by not valid block.heigh: " + heigh);
+				String mess = "Dishonest peer by not valid block.heigh: " + heigh;
+				peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+				throw new Exception(mess);
 			}
 		}
 
@@ -230,7 +234,9 @@ public class Synchronizer
 		// FIND HEADERS for common CHAIN
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
-			throw new Exception("Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress());
+			String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
+			peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+			throw new Exception(mess);
 		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
@@ -265,7 +271,9 @@ public class Synchronizer
 				if (blockFromPeer == null) { // icreator
 					
 					//INVALID BLOCK THROW EXCEPTION
-					throw new Exception("Dishonest peer on block null");
+					String mess = "Dishonest peer on block null";
+					peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+					throw new Exception(mess);
 				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
 				
@@ -273,7 +281,9 @@ public class Synchronizer
 				if(!this.process(dbSet, blockFromPeer))
 				{
 					//INVALID BLOCK THROW EXCEPTION
-					throw new Exception("Dishonest peer on block " + blockFromPeer.getHeight(dbSet));
+					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dbSet);
+					peer.ban(10 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+					throw new Exception(mess);
 				}
 			}
 			
@@ -398,14 +408,18 @@ public class Synchronizer
 			// try get common block from PEER
 			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
 		} catch (Exception e) {
-			Controller.getInstance().onDisconnect(peer);
-			throw new Exception("Dishonest peer - error in PEER: " + peer.getAddress().getHostAddress());
+			String mess = "Dishonest peer - error in PEER: " + peer.getAddress().getHostAddress();
+			peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+			throw new Exception(mess);
 		}
 
 		if (checkPointHeightCommonBlock == null
 				|| checkPointHeightSignature == null) {
-			throw new Exception("Dishonest peer: my block[" + checkPointHeight
-					+ "\n -> common BLOCK not found");			
+			String mess = "Dishonest peer: my block[" + checkPointHeight
+					+ "\n -> common BLOCK not found";
+			peer.ban(10 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+
+			throw new Exception(mess);
 		}
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
@@ -433,7 +447,9 @@ public class Synchronizer
 			lastBlockSignatureCommon = headers.remove(0);
 		}
 		if (headers.isEmpty()) {
-			throw new Exception("Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress());
+			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
+			peer.ban(0 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+			throw new Exception(mess);
 		}
 
 		
@@ -482,7 +498,9 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!block.isSignatureValid())
 		{
-			throw new Exception("*** Invalid block --signature");
+			String mess = "*** Invalid block --signature";
+			peer.ban(600, mess);
+			throw new Exception(mess);
 		}
 		
 		//ADD TO LIST

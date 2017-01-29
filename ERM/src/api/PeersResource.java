@@ -74,7 +74,7 @@ public class PeersResource
 					ApiErrorFactory.ERROR_INVALID_NETWORK_ADDRESS);
 		}
 		peer.addPingCounter();
-		DBSet.getInstance().getPeerMap().addPeer(peer);
+		DBSet.getInstance().getPeerMap().addPeer(peer, 0);
 		
 		return "OK";
 	}

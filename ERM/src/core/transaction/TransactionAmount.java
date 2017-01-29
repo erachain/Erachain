@@ -291,8 +291,8 @@ public abstract class TransactionAmount extends Transaction {
 				boolean confiscate_credit = typeBytes[1] == 1; 
 				if (actionType == 2 && confiscate_credit) {
 					// CONFISCATE CREDIT
-					Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
-							this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+					Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+							this.creator.getAddress(), absKey, this.recipient.getAddress()); 
 					BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
 					if (creditAmount.compareTo(amount) < 1) {
 						// NOT ENOUGHT DEBT from recipient to creator
@@ -385,8 +385,8 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (confiscate_credit) {
 			// 
-			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
-					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+					this.creator.getAddress(), absKey, this.recipient.getAddress()); 
 			BigDecimal creditAmount = db.getCredit_AddressesMap().add(creditKey, this.amount);
 		}
 		
@@ -444,8 +444,8 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (confiscate_credit) {
 			// 
-			Tuple3<String, String, Long> creditKey = new Tuple3<String, String, Long>(
-					this.creator.getAddress(), this.recipient.getAddress(), absKey); 
+			Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+					this.creator.getAddress(), absKey, this.recipient.getAddress()); 
 			BigDecimal creditAmount = db.getCredit_AddressesMap().sub(creditKey, this.amount);
 		}
 

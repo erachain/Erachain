@@ -34,10 +34,10 @@ public class BlockChain
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 30;
+	public static final int REPEAT_WIN = 30; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
-	public static final int GENESIS_ERA_TOTAL = 10000000;
+	public static final int GENESIS_ERA_TOTAL = 9999999;
 	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
 	public static final int MAJOR_ERM_BALANCE = 33000;
 	public static final int MINOR_ERM_BALANCE = 1000;
@@ -57,7 +57,7 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1485146684444L; //1465107777777L;
+	public static final long DEFAULT_MAINNET_STAMP = 1485184444444L; //1465107777777L;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -132,7 +132,7 @@ public class BlockChain
 
         }
 	}
-
+	
 	public GenesisBlock getGenesisBlock() {
 		return this.genesisBlock;
 	}
@@ -465,20 +465,19 @@ public class BlockChain
 		return getTarget(dbSet, this.getLastBlock(dbSet));
 	}
 
-	public boolean isGoodWinForTarget(int height, long winned_value, long target) { 
-		// not use small values
-		if (height < 100) {
-			if ((target>>1) > winned_value)
-				return false;
-		} else if (height < 1000) {
-			if ((target>>1) > winned_value)
-				return false;
-		} else {
-			if ((target>>1) > winned_value)
-				return false;
-		}
-		
-		return true;
+	// GET MIN TARGET
+	public static int getMinTarget(int height) {
+		int base;
+		if ( height < BlockChain.REPEAT_WIN)
+			// FOR not repeated WINS - not need check BASE_TARGET
+			base = BlockChain.BASE_TARGET>>1;
+		else if ( height < BlockChain.TARGET_COUNT)
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+
+		return base;
+
 	}
 	
 }

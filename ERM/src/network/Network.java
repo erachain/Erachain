@@ -74,103 +74,52 @@ public class Network extends Observable implements ConnectionCallback {
 			{
 				this.knownPeers.add(peer);
 			}
-			//ADD TO WHITELIST
-			PeerManager.getInstance().addPeer(peer);
 			
 		}
+		
+		//ADD TO DATABASE
+		PeerManager.getInstance().addPeer(peer, 0);
 		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onConnect(peer);
 		
 		//NOTIFY OBSERVERS
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		
 		
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
 
 	@Override
-	public void onDisconnect(Peer peer) {
-		
-		/*
-		//REMOVE FROM CONNECTED PEERS
-		synchronized(this.connectedPeers)
-		{
-			this.connectedPeers.remove(peer);
-		}
-		*/
+	public void tryDisconnect(Peer peer, int banForMinutes, String error) {
 
-		//LOGGER.info("onDisconnect - Connection close : " + peer.getAddress());
-		
-		//PASS TO CONTROLLER
-		Controller.getInstance().onDisconnect(peer);
-		
-		//CLOSE CONNECTION IF STILL ACTIVE
-		peer.close();
-		
-		//peer.goInterrupt();
-		/*
-		synchronized (peer) {
-			try {
-				peer.wait();
-			} catch(Exception e) {
-				
-			}
-		}
-		*/
-
-		
-		//NOTIFY OBSERVERS
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
-		
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
-	}
-	
-	@Override
-	public void onError(Peer peer, String error) {
-		
-		//LOGGER.info("onError - Connection error : " + peer.getAddress() + " : " + error);
-		
-		peer.addError();
-		if (peer.getErrors() < 3)
+		if (!peer.isUsed())
 			return;
-		
-		/*
-		//REMOVE FROM CONNECTED PEERS
-		synchronized(this.connectedPeers)
-		{
-			this.connectedPeers.remove(peer);
+
+		LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress());
+		if (banForMinutes != 0) { 
+			LOGGER.info("     ban for minutes: " + banForMinutes);
+			//ADD TO BLACKLIST
+			PeerManager.getInstance().addPeer(peer, banForMinutes);
 		}
-		*/
-		
-		//ADD TO BLACKLIST
-		PeerManager.getInstance().blacklistPeer(peer);
-		
-		//PASS TO CONTROLLER
-		Controller.getInstance().onError(peer);
+		if (error != null) 
+			LOGGER.info("     mess: " + error);
 		
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
-		//peer.goInterrupt();
-		/*
-		try {
-			peer.wait();
-		} catch(Exception e) {
-			
-		}
-		*/
-					
+		
+		//PASS TO CONTROLLER
+		Controller.getInstance().afterDisconnect(peer);
+
 		//NOTIFY OBSERVERS
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		
 		
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
 	}
-	
+		
 	@Override
 	public boolean isKnownAddress(InetAddress address, boolean andUsed) {
 		
@@ -269,10 +218,11 @@ public class Network extends Observable implements ConnectionCallback {
 				}
 			}
 		}
+		
 		// ADD new peer
 		int maxPeers = Settings.getInstance().getMaxConnections(); 
 		if (maxPeers > this.knownPeers.size()) {
-			// use empty slots
+			// make NEW PEER and use empty slots
 			return new Peer(this, socket);
 		}
 		if (maxPeers > this.getActivePeers(false).size()) {
@@ -280,7 +230,8 @@ public class Network extends Observable implements ConnectionCallback {
 			synchronized(this.knownPeers) {
 				for (Peer knownPeer: this.knownPeers) {
 					if (!knownPeer.isUsed()
-							|| Network.isMyself(knownPeer.getAddress())) {
+							//|| !Network.isMyself(knownPeer.getAddress())
+							) {
 						knownPeer.reconnect(socket);
 						return knownPeer;
 					}
@@ -376,10 +327,7 @@ public class Network extends Observable implements ConnectionCallback {
 				//LOGGER.info("network.onMessage - Connected to self. Disconnection.");
 				
 				Network.myselfAddress = message.getSender().getAddress(); 
-				//LOGGER.info("myselfAddress: " + Network.myselfAddress.getHostAddress());
-				// delete from peersHW
-				Controller.getInstance().onDisconnect(message.getSender());
-				message.getSender().close();
+				tryDisconnect(message.getSender(), 9999, null);
 			}
 			
 			break;

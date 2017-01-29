@@ -104,8 +104,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private String version = "2.17.04";
-	private String buildTime = "2017-01-22 17:36:12 UTC";
+	private static final String version = "2.19.01";
+	private static final String buildTime = "2017-01-29 15:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -150,12 +150,13 @@ public class Controller extends Observable {
 		this.processingWalletSynchronize = isPocessing;
 	}
 	
-	public String getVersion() {
+	public static String getVersion() {
 		return version;
 	}
 	public void setDBSet(DBSet db) {
 		this.dbSet = db;
 	}
+
 
 	public int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {
@@ -163,6 +164,9 @@ public class Controller extends Observable {
 		} else {
 			return BlockChain.MAINNET_PORT;
 		}
+	}
+	public boolean isTestNet() {
+		return Settings.getInstance().isTestnet();
 	}
 	
 	public String getBuildDateTimeString(){
@@ -330,7 +334,6 @@ public class Controller extends Observable {
 		
 		this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
 		
-		this.status = STATUS_NO_CONNECTIONS;
 		this.transactionCreator = new TransactionCreator();
 
 		// OPENING DATABASES
@@ -456,6 +459,9 @@ public class Controller extends Observable {
 		this.timerPeerHeightUpdate.schedule(action, 
 				Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
 
+		if( Settings.getInstance().isTestnet()) 
+			this.status = STATUS_OK;
+		
 		// REGISTER DATABASE OBSERVER
 		this.addObserver(this.dbSet.getTransactionMap());
 		this.addObserver(this.dbSet);
@@ -825,7 +831,8 @@ public class Controller extends Observable {
 				ObserverMessage.FORGING_STATUS, status));
 	}
 
-	public void onDisconnect(Peer peer) {
+	// used from NETWORK
+	public void afterDisconnect(Peer peer) {
 		synchronized (this.peerHWeight) {
 			
 			this.peerHWeight.remove(peer);
@@ -840,7 +847,10 @@ public class Controller extends Observable {
 				}
 				
 				// UPDATE STATUS
-				this.status = STATUS_NO_CONNECTIONS;
+				if (isTestNet())
+					this.status = STATUS_OK;
+				else
+					this.status = STATUS_NO_CONNECTIONS;
 
 				
 				// NOTIFY
@@ -849,10 +859,6 @@ public class Controller extends Observable {
 						ObserverMessage.NETWORK_STATUS, this.status));
 			}
 		}
-	}
-
-	public void onError(Peer peer) {
-		this.onDisconnect(peer);
 	}
 
 	public List<byte[]> getNextHeaders(byte[] signature) {
@@ -1122,7 +1128,9 @@ public class Controller extends Observable {
 					excludes.add(message.getSender());
 					this.network.broadcast(message, excludes);
 
-				} 
+				} else {
+					banPeerOnError(message.getSender(), "Block (" + newBlock.toString(dbSet) + ") is Invalid");
+				}
 				
 				break;
 
@@ -1137,7 +1145,7 @@ public class Controller extends Observable {
 				if (transaction.getCreator() != null 
 						& !transaction.isSignatureValid()) {
 					// DISHONEST PEER
-					this.network.onError(message.getSender(), "invalid transaction signature");
+					banPeerOnError(message.getSender(), "invalid transaction signature");
 
 					return;
 				}
@@ -1184,8 +1192,8 @@ public class Controller extends Observable {
 		}
 	}
 
-	public void closePeerOnError(Peer peer, String mess) {
-		this.network.onError(peer, "closePeerOnError - " + mess);
+	public void banPeerOnError(Peer peer, String mess) {
+		this.network.tryDisconnect(peer, 30, "ban PeerOnError - " + mess);
 	}
 
 	public void addActivePeersObserver(Observer o) {
@@ -1263,6 +1271,10 @@ public class Controller extends Observable {
 	// SYNCHRONIZE
 
 	public boolean isUpToDate() {
+		
+		if (isTestNet())
+			return true;
+		
 		if (this.peerHWeight.size() == 0) {
 			return false;
 		}
@@ -1295,7 +1307,7 @@ public class Controller extends Observable {
 					}
 				} catch (Exception e) {
 					// error on peer - disconnect!
-					this.onError(maxHW.c);
+					this.network.tryDisconnect(maxHW.c, 0, e.getMessage());
 				}
 			}
 		}
@@ -1373,11 +1385,11 @@ public class Controller extends Observable {
 			} while (!this.isUpToDate());
 			
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
+			//LOGGER.error(e.getMessage(), e);
 
-			if (peer != null) {
+			if (peer != null && peer.isUsed()) {
 				// DISHONEST PEER
-				this.network.onError(peer, "update error - " + e.getMessage());
+				this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
 			}
 		}
 
@@ -1454,22 +1466,6 @@ public class Controller extends Observable {
 						maxPeer = peer;
 					}
 				}
-
-				/* NOT NEED !!! so small PEERS cant't START
-				// CLOSE all my connections to PEER with small Height 
-				if (maxPeer != null) {
-					int currHeight = 0;
-					for (Peer peer : this.peerHWeight.keySet()) {
-						if (peer.isWhite()) {
-							currHeight = this.peerHWeight.get(peer).a;
-							if (height > currHeight + 50) {
-								this.network.onError(peer, "getMaxPeerHWeight: Peer height so small");
-							}
-						}
-					}
-				}
-				*/
-
 			}
 		} catch (Exception e) {
 			// PEER REMOVED WHILE ITERATING
@@ -1680,10 +1676,9 @@ public class Controller extends Observable {
 	}
 	
 	// by account addres + timestamp get signature
-	public byte[] getSignatureByAddrTime(DBSet database, String address, Long timestamp) {
+	public byte[] getSignatureByAddrTime(DBSet dbSet, String address, Long timestamp) {
 
-		//return database.getTransactionRef_BlockRef_Map().getParent(signature);
-		return null;
+		return dbSet.getAddressTime_SignatureMap().get(address, timestamp);
 	}
 	
 	public Transaction getTransaction(byte[] signature, DBSet database) {
@@ -2421,13 +2416,18 @@ public class Controller extends Observable {
 		}
 
 		DBSet db = this.dbSet;
-		if (!db.getReferenceMap().contains(address)) {
+		// get last transaction from this address
+		byte[] sign = db.getAddressTime_SignatureMap().get(address);
+		if (sign == null) {
 			return null;
 		}
 
-		byte[] sign = getSignatureByAddrTime(db, address, db.getReferenceMap().get(address));
+		/*
+		long lastReference = db.getReferenceMap().get(address);
+		byte[] sign = getSignatureByAddrTime(db, address, lastReference);
 		if (sign == null)
 			return null;
+			*/
 				
 		Transaction transaction = cntr.getTransaction(sign);
 		if (transaction == null) {

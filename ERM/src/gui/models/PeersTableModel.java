@@ -36,7 +36,8 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 	
 	private List<Peer> peers;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
+	String[] columnNames = new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"};
+	// String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,false,false,false,false,false,false,false};
 	
 	public PeersTableModel()
@@ -70,17 +71,20 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		return item==null? null : item.getClass();
     }
 	
-	// читаем колонки которые изменяем высоту	   
+	// С‡РёС‚Р°РµРј РєРѕР»РѕРЅРєРё РєРѕС‚РѕСЂС‹Рµ РёР·РјРµРЅСЏРµРј РІС‹СЃРѕС‚Сѓ	   
 		public Boolean[] get_Column_AutoHeight(){
 			
 			return this.column_AutuHeight;
 		}
-	// устанавливаем колонки которым изменить высоту	
+	// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєРѕР»РѕРЅРєРё РєРѕС‚РѕСЂС‹Рј РёР·РјРµРЅРёС‚СЊ РІС‹СЃРѕС‚Сѓ	
 		public void set_get_Column_AutoHeight( Boolean[] arg0){
 			this.column_AutuHeight = arg0;	
 		}
 		
 	
+		 public Peer get_Peers(int row){
+			return peers.get(row);
+		 }
 	@Override
 	public int getColumnCount() 
 	{
@@ -89,6 +93,11 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 
 	@Override
 	public String getColumnName(int index) 
+	{
+		return Lang.getInstance().translate(columnNames[index]);
+	}
+	
+	public String getColumnNameNO_Translate(int index) 
 	{
 		return columnNames[index];
 	}
@@ -128,7 +137,12 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 
 			case COLUMN_HEIGHT:
 				if(!peer.isUsed()) {
-					return Lang.getInstance().translate("Broken");
+					int banMinutes = DBSet.getInstance().getPeerMap().getBanMinutes(peer);
+					if (banMinutes > 0) {
+						return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+					} else {
+						return Lang.getInstance().translate("Broken");
+					}
 				}
 				Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
 				if(res == null) {

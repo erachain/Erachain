@@ -41,6 +41,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import controller.Controller;
 import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.documents.Main_Hash_Document_Frame;
@@ -75,10 +76,12 @@ private JFrame parent;
 	{
 		
 		//CREATE FRAME
-		super(Lang.getInstance().translate("DATACHAINS.world"));
+		super(Lang.getInstance().translate("ERM4" +  " v." + Controller.getVersion()));
 		this.setVisible(false);
 		if(Settings.getInstance().isTestnet()) {
-			setTitle(Lang.getInstance().translate("DATACHAINS.world TestNet ") + Settings.getInstance().getGenesisStamp());
+			setTitle(Lang.getInstance().translate("ERM4 TestNet ")
+					 +  "v." + Controller.getVersion()
+					 + " TS:" + Settings.getInstance().getGenesisStamp());
 		}
 		
 		//ICON
