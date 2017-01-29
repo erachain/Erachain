@@ -13,7 +13,7 @@ import lang.Lang;
 // панель моих адресов
 public class My_Credits_SplitPanel extends Split_Panel {
 	
-	public Accounts_Panel accountPanel;
+	public Credits_Panel accountPanel;
 	public Accounts_Right_Panel rightPanel;
 	public My_Credits_SplitPanel(){
 		
@@ -32,7 +32,7 @@ public class My_Credits_SplitPanel extends Split_Panel {
 		PanelGBC.gridx = 0;	
 		PanelGBC.gridy= 0;	
 		
-		accountPanel = new Accounts_Panel();
+		accountPanel = new Credits_Panel();
 		rightPanel = new Accounts_Right_Panel();
 		
 		this.leftPanel.add( accountPanel, PanelGBC);
@@ -56,7 +56,7 @@ public class My_Credits_SplitPanel extends Split_Panel {
 			AssetCls asset = (AssetCls) accountPanel.cbxFavorites.getSelectedItem();
 			Account account = null;
 			if (accountPanel.table.getSelectedRow() >= 0 )
-				account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
+	//			account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
 			//info1.show_001(person);
 			rightPanel.jTable1.Search_Accoutnt_Transaction_From_Asset(account, asset);
 //			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();
