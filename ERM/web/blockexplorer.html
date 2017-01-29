@@ -489,12 +489,12 @@ function peers(data)
 //	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
 	
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr><td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
+	output += '<tr><td><b>'+ data.Label_No+'<td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 	for(var i  in data.Peers)
 	{
-		output += '<tr>';
+		output += '<tr><td>'+ i;
 		output += '<td>'+ data.Peers[i].IP+'<td>'+data.Peers[i].Height+'<td>'+data.Peers[i].Ping_mc;
 		output += '<td>'+ data.Peers[i].Reliable+'<td>'+data.Peers[i].Initiator;
 		output += '<td>'+ data.Peers[i].Finding_ago+'<td>'+data.Peers[i].Online_Time +'<td>'+data.Peers[i].Version;
