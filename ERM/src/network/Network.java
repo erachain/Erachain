@@ -74,10 +74,11 @@ public class Network extends Observable implements ConnectionCallback {
 			{
 				this.knownPeers.add(peer);
 			}
-			//ADD TO WHITELIST
-			PeerManager.getInstance().addPeer(peer, 0);
 			
 		}
+		
+		//ADD TO DATABASE
+		PeerManager.getInstance().addPeer(peer, 0);
 		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onConnect(peer);
@@ -217,10 +218,11 @@ public class Network extends Observable implements ConnectionCallback {
 				}
 			}
 		}
+		
 		// ADD new peer
 		int maxPeers = Settings.getInstance().getMaxConnections(); 
 		if (maxPeers > this.knownPeers.size()) {
-			// use empty slots
+			// make NEW PEER and use empty slots
 			return new Peer(this, socket);
 		}
 		if (maxPeers > this.getActivePeers(false).size()) {
@@ -228,7 +230,8 @@ public class Network extends Observable implements ConnectionCallback {
 			synchronized(this.knownPeers) {
 				for (Peer knownPeer: this.knownPeers) {
 					if (!knownPeer.isUsed()
-							|| Network.isMyself(knownPeer.getAddress())) {
+							//|| !Network.isMyself(knownPeer.getAddress())
+							) {
 						knownPeer.reconnect(socket);
 						return knownPeer;
 					}

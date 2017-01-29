@@ -559,7 +559,7 @@ public class PeerMap extends DBMap<byte[], byte[]>
 		return false;
 	}
 
-	public boolean isBlacklisted(InetAddress address)
+	public boolean isBanned(InetAddress address)
 	{
 		//CHECK IF PEER IS BLACKLISTED
 		return isBanned(address.getAddress());

@@ -29,8 +29,6 @@ public class ConnectionCreator extends Thread {
 		this.isRun = true;
 
 		int sleep_time = 0;
-		//GET LIST OF KNOWN PEERS
-		List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
 
 		while(isRun)
 		{
@@ -45,7 +43,8 @@ public class ConnectionCreator extends Thread {
 				{			
 					
 					// try update banned peers each minute 
-					knownPeers = PeerManager.getInstance().getKnownPeers();
+					//GET LIST OF KNOWN PEERS
+					List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
 										
 					//ITERATE knownPeers
 					for(Peer peer: knownPeers)
@@ -97,13 +96,14 @@ public class ConnectionCreator extends Thread {
 
 						//CONNECT
 						//CHECK IF ALREADY CONNECTED TO PEER
-						peer.connect(callback);							
+						peer.connect(callback);
+						
 					}
 				}
 				
 				//CHECK IF WE STILL NEED NEW CONNECTIONS
 				// USE unknown peers from known peers
-				if(this.isRun && Settings.getInstance().getMaxConnections() >= callback.getActivePeers(true).size())
+				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
 				{
 					//OLD SCHOOL ITERATE activeConnections
 					//avoids Exception when adding new elements
@@ -112,10 +112,10 @@ public class ConnectionCreator extends Thread {
 						if (!this.isRun)
 							return;
 
-						Peer peer = callback.getActivePeers(true).get(i);
+						Peer peer = callback.getActivePeers(false).get(i);
 	
 						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE					
-						if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1)
+						if(Settings.getInstance().getMinConnections() <= callback.getActivePeers(true).size()<<1)
 							break;
 						
 						//ASK PEER FOR PEERS
@@ -136,7 +136,7 @@ public class ConnectionCreator extends Thread {
 									continue;
 								}
 								//CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-								if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(true).size()<<1)
+								if(Settings.getInstance().getMinConnections() <= callback.getActivePeers(true).size()<<1)
 									break;
 
 								if(foreignPeersCounter >= maxReceivePeers) {
@@ -146,7 +146,7 @@ public class ConnectionCreator extends Thread {
 								foreignPeersCounter ++;
 								
 								//CHECK IF THAT PEER IS NOT BLACKLISTED
-								if(PeerManager.getInstance().isBlacklisted(newPeer))
+								if(PeerManager.getInstance().isBanned(newPeer))
 									continue;
 								
 								//CHECK IF SOCKET IS NOT LOCALHOST
@@ -193,18 +193,19 @@ public class ConnectionCreator extends Thread {
 							}
 						}
 					}
-				}			
+				}
+				
 				//SLEEP
 				int cnt = callback.getActivePeers(true).size();
-				int maxCnt = Settings.getInstance().getMaxConnections();
-				if (cnt< maxCnt)
+				int minCnt = Settings.getInstance().getMinConnections();
+				if (cnt< minCnt)
 					// BANNES PEERS update each minute
 					sleep_time = 1;
 				else
 					// sleep
 					sleep_time = 10;
 					
-				Thread.sleep(sleep_time * 1000);
+				Thread.sleep(sleep_time * 60000);
 
 			}
 			catch(Exception e)

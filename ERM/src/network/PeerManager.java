@@ -58,36 +58,9 @@ public class PeerManager {
 			DBSet.getInstance().getPeerMap().addPeer(peer, banForMinutes);
 		}
 	}
-	
-	/*
-	public boolean isBlacklisted(InetAddress address)
-	{
-		if(DBSet.getInstance().isStoped())
-			return true;
-			
-		byte[] key = address.getAddress();
-		String keyStr = address.getHostAddress();
-		if(DBSet.getInstance().getPeerMap().isBlacklisted(key)) {
-			// THIS address in MAP
-			
-			if( blacListeddWait.containsKey(keyStr)) {
-				long startBan = blacListeddWait.get(keyStr);
-				if (NTP.getTime() - startBan < banTime) {
-					return true;
-				}
-				blacListeddWait.remove(keyStr);
-				DBSet.getInstance().getPeerMap().delete(key);
-			}
-
-		}
 		
-		
-		return false;
-	}
-	*/
-	
-	public boolean isBlacklisted(Peer peer)
+	public boolean isBanned(Peer peer)
 	{
-		return DBSet.getInstance().getPeerMap().isBlacklisted(peer.getAddress());
+		return DBSet.getInstance().getPeerMap().isBanned(peer.getAddress());
 	}
 }
