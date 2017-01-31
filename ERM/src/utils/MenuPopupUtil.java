@@ -10,6 +10,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultEditorKit;
 
+import lang.Lang;
+
 public class MenuPopupUtil {
 
 	// https://github.com/jrwalsh/CycTools/blob/master/src/edu/iastate/cyctools/externalSourceCode/MenuPopupUtil.java
@@ -37,18 +39,18 @@ public class MenuPopupUtil {
 					final JPopupMenu menu = new JPopupMenu();
 					JMenuItem item;
 					item = new JMenuItem(new DefaultEditorKit.CopyAction());
-					item.setText("Copy");
+					item.setText(Lang.getInstance().translate("Copy"));
 					item.setEnabled(component.getSelectionStart() != component
 							.getSelectionEnd());
 					menu.add(item);
 					item = new JMenuItem(new DefaultEditorKit.CutAction());
-					item.setText("Cut");
+					item.setText(Lang.getInstance().translate("Cut"));
 					item.setEnabled(component.isEditable()
 							&& component.getSelectionStart() != component
 									.getSelectionEnd());
 					menu.add(item);
 					item = new JMenuItem(new DefaultEditorKit.PasteAction());
-					item.setText("Paste");
+					item.setText(Lang.getInstance().translate("Paste"));
 					item.setEnabled(component.isEditable());
 					menu.add(item);
 					menu.show(e.getComponent(), e.getX(), e.getY());
@@ -80,18 +82,18 @@ public class MenuPopupUtil {
 					final JPopupMenu menu = new JPopupMenu();
 					JMenuItem item;
 					item = new JMenuItem(new DefaultEditorKit.CopyAction());
-					item.setText("Copy");
+					item.setText(Lang.getInstance().translate("Copy"));
 					item.setEnabled(component.getSelectionStart() != component
 							.getSelectionEnd());
 					menu.add(item);
 					item = new JMenuItem(new DefaultEditorKit.CutAction());
-					item.setText("Cut");
+					item.setText(Lang.getInstance().translate("Cut"));
 					item.setEnabled(component.isEditable()
 							&& component.getSelectionStart() != component
 									.getSelectionEnd());
 					menu.add(item);
 					item = new JMenuItem(new DefaultEditorKit.PasteAction());
-					item.setText("Paste");
+					item.setText(Lang.getInstance().translate("Paste"));
 					item.setEnabled(component.isEditable());
 					menu.add(item);
 					menu.show(e.getComponent(), e.getX(), e.getY());
