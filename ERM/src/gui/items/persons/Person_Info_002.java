@@ -38,6 +38,7 @@ import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
 import utils.DateTimeFormat;
+import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
 
 /**
@@ -129,7 +130,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
         jTextField_Name.setEditable(false);
         jTextField_Name.setText(person.getName());
-        
+        MenuPopupUtil.installContextMenu(jTextField_Name);
         jTextField_Name.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField_NameActionPerformed(evt);
@@ -209,6 +210,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
     //    jTextArea_Description.setColumns(20);
         jTextArea_Description.setRows(5);
         
+        MenuPopupUtil.installContextMenu(jTextArea_Description);
         jTextArea_Description.setEditable(false);
         jTextArea_Description.setText(person.getDescription());
        
