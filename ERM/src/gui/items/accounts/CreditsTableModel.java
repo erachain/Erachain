@@ -13,52 +13,68 @@ import org.mapdb.Fun.Tuple3;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
+import database.DBMap;
 import database.DBSet;
+import database.SortableList;
+import database.wallet.TransactionMap;
+import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel extends AbstractTableModel implements Observer
+public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer
 {
 	private static final int COLUMN_ADDRESS = 0;
-//	public static final int COLUMN_BALANCE = 1;
+	public static final int COLUMN_AMOUNT = 1;
+	public static final int COLUMN_TRANSACTION = 2;
 //	public static final int COLUMN_CONFIRMED_BALANCE = 1;
 //	public static final int COLUMN_WAINTING_BALANCE = 2;
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
 //	public static final int COLUMN_FEE_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;
 	private Account account;
-	long key;
+	long asset_Key;
 	List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred ;
+	private SortableList<Tuple2<String, String>, Transaction> transactions;
+	private List<Tuple2<Tuple2<String, String>, Transaction>> transactions_Asset;
 	
+	@SuppressWarnings("unchecked")
 	public CreditsTableModel()
 	{
+		 this.transactions_Asset = new ArrayList <Tuple2<Tuple2<String, String>, Transaction>>();
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
-		this.key = key;
+	
+		
+		
 		 cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
 		for (PublicKeyAccount account:this.publicKeyAccounts){
 			
-			
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), 1));
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -1));	
+			asset_Key=1;	
+		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
+		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
 			
 			
 		}
 		
+		Controller.getInstance().addWalletListener(this);
+		Controller.getInstance().addObserver(this);
 //		int a = 1;
 		
 	}
 	
+	@Override
+	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
+		return this.transactions;
+	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
@@ -86,15 +102,52 @@ public class CreditsTableModel extends AbstractTableModel implements Observer
 	
 	public void setAsset(AssetCls asset) 
 	{
+		
+		
+		
+		
+		asset_Key = asset.getKey();
 		cred.clear();
 		for (PublicKeyAccount account:this.publicKeyAccounts){
 			
 			
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset.getKey()));
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset.getKey()));	
+			List<Transaction> trans = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
+			
+			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
+			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
 				
 				
 			}
+/*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
+			long a = trans.getB().getAssetKey();
+			this.transactions_Asset.clear();
+				if (a == asset_Key){
+					
+					this.transactions_Asset.add(trans);		
+					
+					
+				}
+			
+				
+			}
+*/		
+		this.transactions_Asset.clear();;
+		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
+		long a = trans.getB().getAssetKey();
+		Tuple2<Tuple2<String, String>, Transaction> ss = null;
+			if (a == asset_Key ||  a == -asset_Key){
+				
+				ss = new Tuple2(trans.getA(), trans.getB());
+				
+				
+				this.transactions_Asset.add(ss);		
+				
+				
+			}
+		
+			
+		}
+		
 		
 		this.fireTableDataChanged();
 	}
@@ -115,14 +168,14 @@ public class CreditsTableModel extends AbstractTableModel implements Observer
 	public int getRowCount() 
 	{
 		
-		return cred.size();
+		return transactions_Asset.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
 		
-		if (cred.size() == 0) return null;
+		if (transactions_Asset.size() == 0) return null;
 		
 	/*	if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
 		{
@@ -139,7 +192,11 @@ public class CreditsTableModel extends AbstractTableModel implements Observer
 		switch(column)
 		{
 		case COLUMN_ADDRESS:			
-			return cred.get(row).toString();
+			return transactions_Asset.get(row).b.getKey();
+		case COLUMN_AMOUNT:
+			return transactions_Asset.get(row).b.getAmount().toPlainString();
+		case COLUMN_TRANSACTION:
+			return Lang.getInstance().translate(transactions_Asset.get(row).b.viewTypeName());
 	/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
@@ -191,9 +248,49 @@ public class CreditsTableModel extends AbstractTableModel implements Observer
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
+		
+		
+		//CHECK IF NEW LIST
+				if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+				{
+					if(this.transactions == null)
+					{
+						this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+						this.transactions.registerObserver();
+						this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+						
+						this.transactions_Asset.clear();;
+						for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
+						long a = trans.getB().getAssetKey();
+						Tuple2<Tuple2<String, String>, Transaction> ss = null;
+							if (a == asset_Key ||  a == -asset_Key){
+								
+								ss = new Tuple2(trans.getA(), trans.getB());
+								
+								
+								this.transactions_Asset.add(ss);		
+								
+								
+							}
+						
+							
+						}
+						
+						
+						
+						
+					}
+					
+					this.fireTableDataChanged();
+				}
+		
+		
+		
+		
 		
 		if( message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK ) {
 			
@@ -204,17 +301,29 @@ public class CreditsTableModel extends AbstractTableModel implements Observer
 			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
 			{
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+				cred.clear();
+				for (PublicKeyAccount account:this.publicKeyAccounts){
+					
+					
+					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(),asset_Key));
+					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));	
+						
+						
+					}
 				
 				
-				this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
+				this.fireTableDataChanged();
+				
+			//	this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
 			}
-			
+			/*
 			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 			{
 	// обновляем данные
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				this.fireTableDataChanged();
 			}
+			*/
 		}
 	
 		

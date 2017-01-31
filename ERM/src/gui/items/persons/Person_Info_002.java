@@ -26,8 +26,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.table.TableColumn;
 
+import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.persons.PersonCls;
+import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.models.PersonAccountsModel;
@@ -261,6 +264,22 @@ public class Person_Info_002 extends javax.swing.JPanel {
   		});
   		 creator_Meny.add(copy_Creator_Address1);
   		 
+  		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getCreator().getAddress());
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		creator_Meny.add(copyPublicKey);
+  		 
+  		 
 
    		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
    		Send_Coins_Crator.addActionListener(new ActionListener()
@@ -477,6 +496,24 @@ public class Person_Info_002 extends javax.swing.JPanel {
   		});
   		menu.add(copyAddress);
   		
+  		JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+  		menu_copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Sign.getSelectedRow();
+  				row = jTable_Sign.convertRowIndexToModel(row);
+  				      				
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(personModel.getAccount_String(row));
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		menu.add(menu_copyPublicKey);
+  		
   		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
   		copy_Creator_Address.addActionListener(new ActionListener()
   		{
@@ -491,6 +528,25 @@ public class Person_Info_002 extends javax.swing.JPanel {
   			}
   		});
   		menu.add(copy_Creator_Address);
+  		
+  		
+  		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
+  		menu_copy_Creator_PublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Sign.getSelectedRow();
+  				row = jTable_Sign.convertRowIndexToModel(row);
+  				      				
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(personModel.get_Creator_Account(row));
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		menu.add(menu_copy_Creator_PublicKey);
   		
   		
   		
