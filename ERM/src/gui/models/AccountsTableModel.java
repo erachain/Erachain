@@ -22,14 +22,16 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class AccountsTableModel extends AbstractTableModel implements Observer
 {
-	private static final int COLUMN_ADDRESS = 0;
+	public final int COLUMN_NO = 0;
+	private static final int COLUMN_ADDRESS = 1;
 //	public static final int COLUMN_BALANCE = 1;
-	public static final int COLUMN_CONFIRMED_BALANCE = 1;
+	public static final int COLUMN_CONFIRMED_BALANCE = 2;
 //	public static final int COLUMN_WAINTING_BALANCE = 2;
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
-	public static final int COLUMN_FEE_BALANCE = 2;
+	public static final int COLUMN_FEE_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
+	
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Address", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;
@@ -102,6 +104,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		
 		account = this.publicKeyAccounts.get(row);
 		
+		
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
 		String str;
@@ -127,7 +130,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			*/
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
+			return account.getBalanceUSE(Transaction.FEE_KEY);
+			
+			
+		case	COLUMN_NO:
+			return row+1;
 			
 			
 		/*	

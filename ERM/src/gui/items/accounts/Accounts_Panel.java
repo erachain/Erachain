@@ -2,8 +2,9 @@ package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.items.persons.Person_info_panel_001;
-
+import gui.items.persons.TableModelPersons;
 import gui.models.AccountsTableModel;
+import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import lang.Lang;
@@ -22,6 +23,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -35,6 +37,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import utils.BigDecimalStringComparator;
@@ -105,13 +108,26 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		 table = Gui.createSortableTable(tableModel, 1);
 		
 		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-		sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
-//		sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
-		sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
+		//sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
+		//sorter.setComparator(AccountsTableModel.COLUMN_NO, new BigDecimalStringComparator());
+		//sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 		
 		// render
-		table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		
+		table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+		table.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
 		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
+		
+		// column size
+		
+		TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);	
+		column_No.setMinWidth(50);
+		column_No.setMaxWidth(150);
+		column_No.setPreferredWidth(50);
+		column_No.setWidth(50);
+		column_No.sizeWidthToFit();
+		
+		
 		
 		//ON FAVORITES CHANGE
 		cbxFavorites.addItemListener(new ItemListener(){
