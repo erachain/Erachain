@@ -1363,32 +1363,30 @@ public class Controller extends Observable {
 		
 		try {
 			// WHILE NOT UPTODATE
-			int tryes = 0;
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
-				peer = this.getMaxPeerHWeight().c;
-				if (peer == null) {
-					tryes++;
-					if (tryes > 3) {
-						break;
-					}
-					Thread.sleep(1000);
-					continue;
-				}
-				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-						+ " WH: " + getHWeightOfPeer(peer));
+				Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight();				
+				if (peerHW != null) {
+					peer = peerHW.c;
+					if (peer != null) {
+						LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+								+ " WH: " + getHWeightOfPeer(peer));
 
-				// SYNCHRONIZE FROM PEER
-				this.synchronizer.synchronize(dbSet, checkPointHeight, peer);
+						// SYNCHRONIZE FROM PEER
+						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
+					}
+				}
 			} while (!this.isUpToDate());
 			
 		} catch (Exception e) {
-			//LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 
+			/*
 			if (peer != null && peer.isUsed()) {
 				// DISHONEST PEER
 				this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
 			}
+			*/
 		}
 
 		if (this.peerHWeight.size() == 0

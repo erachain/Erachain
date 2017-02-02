@@ -430,6 +430,7 @@ public class Synchronizer
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
 				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
+				break;
 			} else {
 				lastBlockSignatureCommon = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
 			}
@@ -446,8 +447,10 @@ public class Synchronizer
 		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignatureCommon = headers.remove(0);
 		}
+
 		if (headers.isEmpty()) {
 			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
+			
 			peer.ban(0 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
 			throw new Exception(mess);
 		}
