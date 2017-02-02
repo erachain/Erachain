@@ -36,6 +36,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import database.AddressTime_SignatureMap;
 import database.DBSet;
 import settings.Settings;
 //import lang.Lang;
@@ -912,8 +913,12 @@ public abstract class Transaction {
 				process_gifts(db, 0, getInvitedFee(), this.creator, false);
 			}
 
-			db.getAddressTime_SignatureMap().set(creator, signature); // for quick search public keys
-			db.getAddressTime_SignatureMap().set(creator, timestamp, signature); // for search records by time
+			String creatorAddress = this.creator.getAddress();
+			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
+			if (!dbASmap.contains(creatorAddress)) {
+				dbASmap.set(creatorAddress, signature); // for quick search public keys
+			}
+			dbASmap.set(creatorAddress, timestamp, signature); // for search records by time
 
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() )
@@ -944,7 +949,7 @@ public abstract class Transaction {
 				this.creator.setLastReference(this.reference, db);
 				// set last transaction signature for this ACCOUNT
 			}
-			db.getAddressTime_SignatureMap().set(creator, db.getAddressTime_SignatureMap().get(creator, reference));
+
 			db.getAddressTime_SignatureMap().delete(creator, timestamp);
 
 		}
