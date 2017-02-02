@@ -553,7 +553,9 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 					}
 				}
 		
-				Account account = messageBufs.get(row).getSender();	
+				
+				Account account = Controller.getInstance().getAccountByAddress( messageBufs.get(row).getSender().getAddress());
+				
 				
 				byte[] privateKey = null; 
 				byte[] publicKey = null;
