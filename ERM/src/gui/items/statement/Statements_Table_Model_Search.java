@@ -54,7 +54,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
+	private String[] columnNames =new String[]{"Timestamp", "Creator", "Template", "Statement"};//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
@@ -183,7 +183,12 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	@Override
 	public String getColumnName(int index) 
 	{
-		return this.columnNames[index];
+		return Lang.getInstance().translate(columnNames[index]);
+	}
+	
+	public String getColumnNameNO_Translate(int index) 
+	{
+		return columnNames[index];
 	}
 
 	@Override

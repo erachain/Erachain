@@ -74,6 +74,7 @@ import core.voting.PollOption;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
+import gui.items.statement.Statements_Table_Model_Search;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
@@ -164,6 +165,7 @@ public class BlockExplorer
 		output.put("id_menu_assets", Lang.getInstance().translate_from_langObj("Assets",langObj));
 		output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs",langObj));
 		
+	
 	
 	
 		
@@ -508,6 +510,24 @@ public class BlockExplorer
 				
 
 				output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			
+			if(info.getQueryParameters().containsKey("statements"))
+			{
+				int start = -1;
+
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+				}
+
+//				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryStatements(start));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -3285,6 +3305,37 @@ if ( asset_1 == null) {
 //		output.put("start", start);
 		output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
 		output.put("Peers", out_peers);
+		return output;
+	}
+	
+	
+	public Map jsonQueryStatements (int start){
+		Map output=new LinkedHashMap();
+		Statements_Table_Model_Search model_Statements =  new Statements_Table_Model_Search();
+		int rowCount = start+20;
+		int column_Count = model_Statements.getColumnCount();
+		
+		for (int column=0; column < column_Count; column++ ){
+				
+			output.put("Label_"+ model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'),  Lang.getInstance().translate_from_langObj(model_Statements.getColumnNameNO_Translate(column),langObj));
+		}
+		
+		Map out_Statements=new LinkedHashMap();
+	//	if (rowCount> model_Peers.getRowCount()) rowCount = model_Peers.getRowCount();
+		rowCount = model_Statements.getRowCount();
+		for (int row = 0; row< rowCount; row++ ){
+			Map out_statement=new LinkedHashMap();
+			
+			for (int column=0; column < column_Count; column++ ){
+				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), model_Statements.getValueAt(row, column).toString());	
+				
+			}
+			out_Statements.put(row, out_statement);			
+		}
+//		output.put("rowCount", rowCount);
+//		output.put("start", start);
+		output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
+		output.put("Statements", out_Statements);
 		return output;
 	}
 

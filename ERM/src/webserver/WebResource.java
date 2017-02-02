@@ -221,7 +221,7 @@ public class WebResource {
 			langObj = Lang.getInstance().openLangFile(lang+".json");
 			
 		
-					Elements el = doc.select("a");
+					Elements el = doc.select("translate");
 			for (Element e:el){
 			e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
 				
@@ -1181,6 +1181,19 @@ public class WebResource {
 
 		if (file.exists()) {
 			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	
+	@Path("index/libs/js/explorerStatements.js")
+	@GET
+	public Response explorerStatements() {
+		File file = new File("web/libs/js/explorerStatements.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerStatements").build();
 		} else {
 			return error404(request, null);
 		}
