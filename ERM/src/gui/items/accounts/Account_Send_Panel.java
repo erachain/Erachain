@@ -583,33 +583,15 @@ public class Account_Send_Panel extends JPanel
 		Account sender = (Account) cbxFrom.getSelectedItem();
 		
 		//READ RECIPIENT
-		String recipientAddress = txtTo.getText();
-		
-		Account recipient;
-		
-		//ORDINARY RECIPIENT
-		if(Crypto.getInstance().isValidAddress(recipientAddress))
-		{
-			recipient = new Account(recipientAddress);
+		Tuple2<Account, String> resultRecipient = Account.tryMakeAccount(txtTo.getText());
+		if (resultRecipient.b != null) {
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate(resultRecipient.b),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;			
 		}
-		else
-		{
-			//IS IS NAME of RECIPIENT - resolve ADDRESS
-			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-			
-			if(result.getB() == NameResult.OK)
-			{
-				recipient = result.getA();
-			}
-			else		
-			{
-				JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage() , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				return;
-			}
-		}
+		Account recipient = resultRecipient.a;
 		
 		int parsing = 0;
 		int feePow = 0;
