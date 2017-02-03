@@ -46,6 +46,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.mapdb.Fun.Tuple2;
+
 //import settings.Settings;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -56,6 +58,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -176,34 +179,16 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 		Account sender = (Account) cbxFrom.getSelectedItem();
 		
 		//READ RECIPIENT
-		String recipientAddress = txtTo.getText();
-		
-		Account recipient;
-		
-		//ORDINARY RECIPIENT
-		if(Crypto.getInstance().isValidAddress(recipientAddress))
-		{
-			recipient = new Account(recipientAddress);
+		Tuple2<Account, String> resultRecipient = Account.tryMakeAccount(txtTo.getText());
+		if (resultRecipient.b != null) {
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate(resultRecipient.b),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;			
 		}
-		else
-		{
-			//IS IS NAME of RECIPIENT - resolve ADDRESS
-			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-			
-			if(result.getB() == NameResult.OK)
-			{
-				recipient = result.getA();
-			}
-			else		
-			{
-				JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage() , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				return;
-			}
-		}
-		
+		Account recipient = resultRecipient.a;
+				
 		int parsing = 0;
 		int feePow = 0;
 		BigDecimal amount = null; 

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.swing.JOptionPane;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -26,6 +29,7 @@ import at.AT_Transaction;
 import database.Item_Map;
 import database.DBSet;
 import database.NameMap;
+import lang.Lang;
 import controller.Controller;
 import core.BlockChain;
 //import core.account.PublicKeyAccount;
@@ -34,6 +38,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.Order;
 import core.item.persons.PersonCls;
@@ -53,7 +58,7 @@ import utils.NameUtils.NameResult;
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
-	private static final long ERM_KEY = Transaction.RIGHTS_KEY;
+	//private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
@@ -72,12 +77,48 @@ public class Account {
 	public Account(String address)
 	{
 
-		// test address
+		// ///test address
 		assert(Base58.decode(address) instanceof byte[] );
-
+		
 		this.address = address;
 	}
 	
+	public static Tuple2<Account, String> tryMakeAccount(String address) {
+		
+		boolean isBase58 = false;
+		try
+		{
+			Base58.decode(address);
+			isBase58 = true;
+		}
+		catch(Exception e)
+		{
+			
+		}
+
+		if (isBase58) {
+			//ORDINARY RECIPIENT
+			if(Crypto.getInstance().isValidAddress(address)) {
+				return new Tuple2<Account, String>(new Account(address), null);
+			} else if (PublicKeyAccount.isValidPublicKey(address)) {
+				return new Tuple2<Account, String>(new PublicKeyAccount(address), null);
+			} else {
+				return new Tuple2<Account, String>(null, "Wrong Address or PublickKey");
+			}
+		} else {
+			//IT IS NAME - resolve ADDRESS
+			Pair<Account, NameResult> result = NameUtils.nameToAdress(address);
+			
+			if(result.getB() == NameResult.OK)
+			{
+				return new Tuple2<Account, String>(result.getA(), null);
+			} else		
+			{
+				return new Tuple2<Account, String>(null, "The name is not registered");
+			}
+		}
+
+	}
 	public String getAddress()
 	{
 		return address;
