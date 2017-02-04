@@ -407,7 +407,7 @@ public class Peer extends Thread{
 		{
 			//ERROR
 			//LOGGER.debug(e.getMessage(),e);
-			callback.tryDisconnect(this, 30, null);
+			callback.tryDisconnect(this, 10, e.getMessage());
 			
 			//RETURN
 			return false;

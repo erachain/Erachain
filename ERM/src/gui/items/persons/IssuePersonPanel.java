@@ -7,6 +7,8 @@ import lang.Lang;
 import ntp.NTP;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -44,6 +46,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.crypto.Base58;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
@@ -70,6 +73,7 @@ public class IssuePersonPanel extends JPanel
 	protected JTextField txtEyeColor;
 	protected JTextField txtHairСolor;
 	protected JTextField txtHeight;
+    protected javax.swing.JButton copyButton;
     protected javax.swing.JButton issueButton;
     protected javax.swing.JLabel jLabel_Fee;
     protected javax.swing.JLabel jLabel9;
@@ -155,10 +159,21 @@ public class IssuePersonPanel extends JPanel
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		        onIssueClick();
+		        onIssueClick(true);
 		    }
 		});
- // add icin
+        
+       	this.copyButton.setText(Lang.getInstance().translate("Copy"));
+        this.copyButton.setPreferredSize(new Dimension(120, 30));
+        this.copyButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick(false);
+		    }
+		});
+
+// add icin
         iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
         		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
         		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
@@ -290,19 +305,21 @@ public class IssuePersonPanel extends JPanel
 	}
 
 	@SuppressWarnings("deprecation")
-	public void onIssueClick()
+	public void onIssueClick(boolean forIssue)
 	{
 		//DISABLE
 		this.issueButton.setEnabled(false);
+		this.copyButton.setEnabled(false);
 	
 		//CHECK IF NETWORK OK
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		if(forIssue && Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			//NETWORK NOT OK
 			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			//ENABLE
 			this.issueButton.setEnabled(true);
+			this.copyButton.setEnabled(true);
 			
 			return;
 		}
@@ -396,6 +413,7 @@ public class IssuePersonPanel extends JPanel
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			this.issueButton.setEnabled(true);
+			this.copyButton.setEnabled(true);
 			return;
 		}
 						
@@ -405,6 +423,7 @@ public class IssuePersonPanel extends JPanel
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
+				forIssue,
 				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
@@ -414,12 +433,20 @@ public class IssuePersonPanel extends JPanel
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+					forIssue?"Person issue has been sent!":"Person issue has been copy to buffer!"),
+					Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 		//	this.dispose();
 		
+			if (!forIssue) {
+				String base58str = Base58.encode(result.getA().toBytes(true, null));
+				// This method writes a string to the system clipboard.
+				// otherwise it returns null.
+			    StringSelection sss = new StringSelection(base58str);
+			    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sss, null);				
+			}
 			
-			
-			txtFeePow.setText("0");
+			//txtFeePow.setText("0");
 			txtName.setText("");
 			txtareaDescription.setText("");
 			//txtBirthday.setText("0000-00-00");
@@ -443,6 +470,7 @@ public class IssuePersonPanel extends JPanel
 		
 		//ENABLE
 		this.issueButton.setEnabled(true);
+		this.copyButton.setEnabled(true);
 	}
 
                              
@@ -482,6 +510,7 @@ public class IssuePersonPanel extends JPanel
         jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         issueButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
         
@@ -767,8 +796,11 @@ public class IssuePersonPanel extends JPanel
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
+        copyButton.setText("jButton2");
+        jPanel2.add(copyButton, new java.awt.GridBagConstraints());
         issueButton.setText("jButton1");
         jPanel2.add(issueButton, new java.awt.GridBagConstraints());
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

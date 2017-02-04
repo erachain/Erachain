@@ -138,8 +138,11 @@ public class Synchronizer
 
 				//cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
 
+				block.isValid(fork);
+				block.isSignatureValid();
+				
 				//INVALID BLOCK THROW EXCEPTION
-				String mess = "Dishonest peer by not valid block.heigh: " + heigh;
+				String mess = "Dishonest peer by not is Valid block, heigh: " + heigh;
 				peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
 				throw new Exception(mess);
 			}

@@ -36,7 +36,7 @@ public class ConnectionCreator extends Thread {
 			try
 			{	
 
-				int maxReceivePeers = Settings.getInstance().getMaxReceivePeers();
+				int maxReceivePeers = 4; // Settings.getInstance().getMaxReceivePeers();
 				
 				//CHECK IF WE NEED NEW CONNECTIONS
 				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeers(true).size())
@@ -97,7 +97,6 @@ public class ConnectionCreator extends Thread {
 						//CONNECT
 						//CHECK IF ALREADY CONNECTED TO PEER
 						peer.connect(callback);
-						
 					}
 				}
 				
@@ -107,12 +106,14 @@ public class ConnectionCreator extends Thread {
 				{
 					//OLD SCHOOL ITERATE activeConnections
 					//avoids Exception when adding new elements
-					for(int i=0; i<callback.getActivePeers(true).size(); i++)
+					for(int i=0; i<callback.getActivePeers(false).size(); i++)
 					{
 						if (!this.isRun)
 							return;
 
 						Peer peer = callback.getActivePeers(false).get(i);
+						if (peer.isBanned())
+							continue;
 	
 						//CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE					
 						if(Settings.getInstance().getMinConnections() <= callback.getActivePeers(true).size()<<1)
@@ -140,10 +141,9 @@ public class ConnectionCreator extends Thread {
 									break;
 
 								if(foreignPeersCounter >= maxReceivePeers) {
+									// FROM EACH peer get only maxReceivePeers
 									break;
 								}
-
-								foreignPeersCounter ++;
 								
 								//CHECK IF THAT PEER IS NOT BLACKLISTED
 								if(PeerManager.getInstance().isBanned(newPeer))
@@ -190,6 +190,9 @@ public class ConnectionCreator extends Thread {
 								
 								//CONNECT
 								newPeer.connect(callback);
+								if (newPeer.isUsed()) {
+									foreignPeersCounter ++;
+								}
 							}
 						}
 					}
@@ -198,7 +201,9 @@ public class ConnectionCreator extends Thread {
 				//SLEEP
 				int cnt = callback.getActivePeers(true).size();
 				int minCnt = Settings.getInstance().getMinConnections();
-				if (cnt< minCnt)
+				if (cnt < 4)
+					continue;
+				else if (cnt < minCnt)
 					// BANNES PEERS update each minute
 					sleep_time = 1;
 				else

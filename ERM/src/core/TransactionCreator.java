@@ -316,13 +316,17 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(issueNoteRecord, this.afterCreate(issueNoteRecord, false));
 	}
 
-	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
-					byte gender, String race, float birthLatitude, float birthLongitude,
-					String skinColor, String eyeColor, String hairСolor, int height,
-					byte[] icon, byte[] image, String description) 
+	public Pair<Transaction, Integer> createIssuePersonTransaction(
+			boolean forIssue,
+			PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
+			byte gender, String race, float birthLatitude, float birthLongitude,
+			String skinColor, String eyeColor, String hairСolor, int height,
+			byte[] icon, byte[] image, String description) 
 	{
 		//CHECK FOR UPDATES
-		this.checkUpdate();
+		if (true || forIssue) {
+			this.checkUpdate();
+		}
 								
 		//TIME
 		long time = NTP.getTime();
@@ -334,9 +338,10 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, creator.getLastReference(this.fork));
 		issuePersonRecord.sign(creator, false);
-										
+		
 		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, false));
+		boolean asPack = !forIssue;
+		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
 	}
 
 	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 

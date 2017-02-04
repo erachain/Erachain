@@ -86,6 +86,10 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 	
 	public Trade getTrade(int row)
 	{
+		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(row);
+		if (rec == null)
+			return null;
+		
 		return this.trades.get(row).getB();
 	}
 	

@@ -67,6 +67,10 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 	
 	public Order getOrder(int row)
 	{
+		Pair<BigInteger, Order> rec = this.orders.get(row);
+		if (rec == null)
+			return null;
+		
 		return this.orders.get(row).getB();
 	}
 	
