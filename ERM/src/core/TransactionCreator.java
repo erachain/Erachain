@@ -324,7 +324,7 @@ public class TransactionCreator
 			byte[] icon, byte[] image, String description) 
 	{
 		//CHECK FOR UPDATES
-		if (true || forIssue) {
+		if (forIssue) {
 			this.checkUpdate();
 		}
 								
@@ -334,14 +334,29 @@ public class TransactionCreator
 		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, icon, image, description);
-							
+
+		long lastReference;
+		if (forIssue) {
+			lastReference = creator.getLastReference(this.fork);
+		} else {
+			lastReference = time - 1000l;
+		}
 		//CREATE ISSUE NOTE TRANSACTION
-		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, creator.getLastReference(this.fork));
+		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		boolean asPack = !forIssue;
-		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		if (forIssue) {
+			boolean asPack = false;
+			return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		} else {
+			// for COPY -
+			int valid = issuePersonRecord.isValid(DBSet.getInstance(), lastReference);
+			if (valid == Transaction.NOT_ENOUGH_FEE) {
+				valid = Transaction.VALIDATE_OK;
+			}
+			return new Pair<Transaction, Integer>(issuePersonRecord, valid);
+		}
 	}
 
 	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 

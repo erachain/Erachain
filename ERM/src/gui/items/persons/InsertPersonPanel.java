@@ -1,9 +1,14 @@
 package gui.items.persons;
 
 import java.awt.GridBagConstraints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -13,6 +18,10 @@ import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
 
 import core.account.Account;
+import core.crypto.Base58;
+import core.item.persons.PersonCls;
+import core.transaction.IssuePersonRecord;
+import core.transaction.TransactionFactory;
 import lang.Lang;
 
 public class InsertPersonPanel extends IssuePersonPanel{
@@ -44,6 +53,25 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		
 	}
 	
+	 public String getClipboardContents() {
+	    String result = "";
+	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    //odd: the Object param of getContents is not currently used
+	    Transferable contents = clipboard.getContents(null);
+	    boolean hasTransferableText =
+	      (contents != null) &&
+	      contents.isDataFlavorSupported(DataFlavor.stringFlavor)
+	    ;
+	    if (hasTransferableText) {
+	      try {
+	        result = (String)contents.getTransferData(DataFlavor.stringFlavor);
+	      }
+	      catch (Exception e){
+	      }
+	    }
+	    return result;
+	  }
+	 
 @SuppressWarnings("deprecation")
 private void install(){
 	
@@ -58,21 +86,21 @@ private void install(){
 	
 	
 	super.cbxFrom.setEnabled(false);
-	super.txtFeePow.setEditable(false);
-	super.txtName.setEditable(false);
-	super.txtareaDescription.setEditable(false);
-	super.txtBirthday.enable(false);
-	super.txtDeathday.enable(false);
-	super.iconButton.setEnabled(false);
-	super.txtGender.setEnabled(false);
-	super.txtRace.setEditable(false);
-	super.txtBirthLatitude.setEditable(false);
-	super.txtBirthLongitude.setEditable(false);
-	super.txtSkinColor.setEditable(false);
-	super.txtEyeColor.setEditable(false);
-	super.txtHairСolor.setEditable(false);
-	super.txtHeight.setEditable(false);
-	super.issueButton.setVisible(false);
+	txtFeePow.setEditable(false);
+	txtName.setEditable(false);
+	txtareaDescription.setEditable(false);
+	txtBirthday.enable(false);
+	txtDeathday.enable(false);
+	iconButton.setEnabled(false);
+	txtGender.setEnabled(false);
+	txtRace.setEditable(false);
+	txtBirthLatitude.setEditable(false);
+	txtBirthLongitude.setEditable(false);
+	txtSkinColor.setEditable(false);
+	txtEyeColor.setEditable(false);
+	txtHairСolor.setEditable(false);
+	txtHeight.setEditable(false);
+	issueButton.setVisible(false);
 	
 	
 	
@@ -111,11 +139,6 @@ private void install(){
      add(txt_public_key, gridBagConstraints);
      
      
-     
-     
-	
-	
-	
 	 pasteButton = new JButton();
      pasteButton.setText(Lang.getInstance().translate("Paste") +"...");
      pasteButton.addActionListener(new ActionListener(){
@@ -123,7 +146,19 @@ private void install(){
  		@Override
  		public void actionPerformed(ActionEvent arg0) {
  			// TODO Auto-generated method stub
- 			
+ 			String base58str = getClipboardContents();
+ 			byte[] dataTrans = Base58.decode(base58str);
+ 			IssuePersonRecord issuePersonRecord;
+ 			try {
+ 				issuePersonRecord = (IssuePersonRecord)TransactionFactory.getInstance().parse(dataTrans, null);
+ 			} catch (Exception ee) {
+ 				return;
+ 			}
+ 			PersonCls person = (PersonCls)issuePersonRecord.getItem();
+ 			txtName.setText(person.getName());
+ 			txtareaDescription.setText(person.getDescription());
+ 			//InsertPersonPanel.txtBirthday.setDate(arg0);
+ 			iconButton.setIcon(new ImageIcon(person.getImage()));
  		}
      	 
      	 
