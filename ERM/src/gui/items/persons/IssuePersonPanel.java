@@ -53,47 +53,47 @@ import gui.transaction.OnDealClick;
 public class IssuePersonPanel extends JPanel 
 {
 	
-	private  MaskFormatter AccFormat;
-	private JComboBox<Account> cbxFrom;
-	private JTextField txtFeePow;
-	private JTextField txtName;
-	private JTextArea txtareaDescription;
-	private JDateChooser txtBirthday;
-	private JDateChooser txtDeathday;
-	private JButton iconButton;
+	protected  MaskFormatter AccFormat;
+	protected JComboBox<Account> cbxFrom;
+	protected JTextField txtFeePow;
+	protected JTextField txtName;
+	protected JTextArea txtareaDescription;
+	protected JDateChooser txtBirthday;
+	protected JDateChooser txtDeathday;
+	protected JButton iconButton;
 	@SuppressWarnings("rawtypes")
-	private JComboBox txtGender;
-	private JTextField txtRace;
-	private JTextField txtBirthLatitude;
-	private JTextField txtBirthLongitude;
-	private JTextField txtSkinColor;
-	private JTextField txtEyeColor;
-	private JTextField txtHairСolor;
-	private JTextField txtHeight;
-    private javax.swing.JButton issueButton;
-    private javax.swing.JLabel jLabel_Fee;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabel_Account;
-    private javax.swing.JLabel jLabel_BirthLatitude;
-    private javax.swing.JLabel jLabel_BirthLongitude;
-    private javax.swing.JLabel jLabel_Born;
-    private javax.swing.JLabel jLabel_Dead;
-    private javax.swing.JLabel jLabel_Description;
-    private javax.swing.JLabel jLabel_EyeColor;
-    private javax.swing.JLabel jLabel_Gender;
-    private javax.swing.JLabel jLabel_HairСolor;
-    private javax.swing.JLabel jLabel_Height;
-    private javax.swing.JLabel jLabel_Name;
-    private javax.swing.JLabel jLabel_Race;
-    private javax.swing.JLabel jLabel_SkinColor;
-    private javax.swing.JLabel jLabel_Title;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
+	protected JComboBox txtGender;
+	protected JTextField txtRace;
+	protected JTextField txtBirthLatitude;
+	protected JTextField txtBirthLongitude;
+	protected JTextField txtSkinColor;
+	protected JTextField txtEyeColor;
+	protected JTextField txtHairСolor;
+	protected JTextField txtHeight;
+    protected javax.swing.JButton issueButton;
+    protected javax.swing.JLabel jLabel_Fee;
+    protected javax.swing.JLabel jLabel9;
+    protected javax.swing.JLabel jLabel_Account;
+    protected javax.swing.JLabel jLabel_BirthLatitude;
+    protected javax.swing.JLabel jLabel_BirthLongitude;
+    protected javax.swing.JLabel jLabel_Born;
+    protected javax.swing.JLabel jLabel_Dead;
+    protected javax.swing.JLabel jLabel_Description;
+    protected javax.swing.JLabel jLabel_EyeColor;
+    protected javax.swing.JLabel jLabel_Gender;
+    protected javax.swing.JLabel jLabel_HairСolor;
+    protected javax.swing.JLabel jLabel_Height;
+    protected javax.swing.JLabel jLabel_Name;
+    protected javax.swing.JLabel jLabel_Race;
+    protected javax.swing.JLabel jLabel_SkinColor;
+    protected javax.swing.JLabel jLabel_Title;
+    protected javax.swing.JPanel jPanel1;
+    protected javax.swing.JPanel jPanel2;
+    protected javax.swing.JScrollPane jScrollPane1;
   
     // End of variables declaration
 	
-	private byte[] imgButes;
+	protected byte[] imgButes;
 
 	@SuppressWarnings({ "unchecked" })
 	public IssuePersonPanel()
@@ -189,7 +189,7 @@ public class IssuePersonPanel extends JPanel
 	
 	
     @SuppressWarnings("resource")
-	private static byte[] getBytesFromFile(File file) throws IOException {
+	protected static byte[] getBytesFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
         long length = file.length();
         if (length > Integer.MAX_VALUE) {
@@ -209,7 +209,7 @@ public class IssuePersonPanel extends JPanel
         return bytes;
     }
     
-    private void initLabelsText(){
+    protected void initLabelsText(){
     	
     	jLabel_Title.setText("");
 		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":")	;
@@ -400,7 +400,7 @@ public class IssuePersonPanel extends JPanel
 		}
 						
 		//CREATE ASSET
-		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+		//protectedKeyAccount creator, String fullName, int feePow, long birthday,
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -448,7 +448,7 @@ public class IssuePersonPanel extends JPanel
                              
     @SuppressWarnings({ "unchecked", "null" })
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
+    protected void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel_Gender = new javax.swing.JLabel();
