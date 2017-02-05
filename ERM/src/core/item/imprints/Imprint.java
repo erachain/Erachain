@@ -10,6 +10,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -19,15 +20,15 @@ public class Imprint extends ImprintCls {
 	private static final int TYPE_ID = ImprintCls.IMPRINT;
 	private static final int CUTTED_REFERENCE_LENGTH = 20;
 
-	public Imprint(Account creator, String name, byte[] icon, byte[] image, String description)
+	public Imprint(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, creator, name, icon, image, description);
+		super(TYPE_ID, owner, name, icon, image, description);
 		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 
 	}
-	public Imprint(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public Imprint(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 		this.reference = Bytes.ensureCapacity(Base58.decode(name), REFERENCE_LENGTH, 0);
 	}
 
@@ -55,9 +56,9 @@ public class Imprint extends ImprintCls {
 		int position = TYPE_LENGTH;
 		
 		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
-		position += CREATOR_LENGTH;
+		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+		PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+		position += OWNER_LENGTH;
 		
 		//READ NAME
 		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -124,7 +125,7 @@ public class Imprint extends ImprintCls {
 		}
 		
 		//RETURN
-		Imprint imprint = new Imprint(typeBytes, creator, name, icon, image, description);
+		Imprint imprint = new Imprint(typeBytes, owner, name, icon, image, description);
 		if (includeReference)
 		{
 			imprint.setReference(reference);

@@ -10,40 +10,62 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.transaction.Transaction;
 import utils.ByteArrayUtils;
 
+//  typeBytes[1] ::: ownerSignature==null?(byte)0:(byte)1
 public class PersonHuman extends PersonCls {
 	
 	private static final int TYPE_ID = PersonCls.HUMAN;
 
-	public PersonHuman(Account creator, String fullName, long birthday, long deathday,
+	// for personal data owner - his signature 
+	protected byte[] ownerSignature; 
+
+	public PersonHuman(PublicKeyAccount owner, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
+			byte[] ownerSignature)
 	{
-		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
+		super(new byte[]{(byte)TYPE_ID, ownerSignature==null?(byte)0:(byte)1}, owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
+		this.ownerSignature = ownerSignature;
 	}
-	public PersonHuman(Account creator, String fullName, String birthday, String deathday,
+	public PersonHuman(PublicKeyAccount owner, String fullName, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
+			byte[] ownerSignature)
 	{
-		super(new byte[]{(byte)TYPE_ID, 0}, creator, fullName, birthday, deathday,
+		super(new byte[]{(byte)TYPE_ID, ownerSignature==null?(byte)0:(byte)1}, owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
+		this.ownerSignature = ownerSignature;
 	}
-	public PersonHuman(byte[] typeBytes, Account creator, String fullName, long birthday, long deathday,
+	public PersonHuman(byte[] typeBytes, PublicKeyAccount owner, String fullName, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description)
+			String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description, byte[] ownerSignature)
 	{
-		super(typeBytes, creator, fullName, birthday, deathday,
+		super(typeBytes, owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
+		this.ownerSignature = ownerSignature;
 	}
 
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "human"; }
+
+	public byte[] getOwnerSignature() { return ownerSignature; }
+
+	public byte[] toBytes(boolean includeReference) {
+		byte[] data = super.toBytes(includeReference);
+		if (this.typeBytes[1] == 1) {
+			data = Bytes.concat(data, this.ownerSignature);
+		}
+		
+		return data;
+	}
 
 	//PARSE
 	// TODO - когда нулевая длдлинна и ошибка - но в ГУИ ошибка нне высветилась и создалась плоая запись и она развалила сеть
@@ -56,9 +78,9 @@ public class PersonHuman extends PersonCls {
 		int position = TYPE_LENGTH;
 		
 		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
-		position += CREATOR_LENGTH;
+		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+		PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+		position += OWNER_LENGTH;
 		
 		//READ FULL NAME
 		int fullNameLength = Byte.toUnsignedInt(data[position]);
@@ -199,16 +221,33 @@ public class PersonHuman extends PersonCls {
 		byte height = data[position];
 		position ++;
 
+		byte[] ownerSignature;
+		if (typeBytes[1] == 1) {
+			// with signature
+			//READ SIGNATURE
+			ownerSignature = Arrays.copyOfRange(data, position, position + Transaction.SIGNATURE_LENGTH);
+			position += Transaction.SIGNATURE_LENGTH;
+		} else {
+			ownerSignature = null;
+		}
+
 		//RETURN
-		PersonHuman personHuman = new PersonHuman(typeBytes, creator, fullName, birthday, deathday,
+		PersonHuman personHuman = new PersonHuman(typeBytes, owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, icon, image, description);
+				skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
+		
 		if (includeReference)
 		{
 			personHuman.setReference(reference);
 		}
 
 		return personHuman;
+	}
+	
+	public int getDataLength(boolean includeReference) 
+	{
+		return super.getDataLength(includeReference)
+				+ (typeBytes[1] == 1?Transaction.SIGNATURE_LENGTH:0);
 	}
 	
 }

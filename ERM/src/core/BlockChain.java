@@ -25,16 +25,16 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	
-	public static final int TESTNET_PORT = 9045;
-	public static final int MAINNET_PORT = 9046;
-	public static final int DEFAULT_WEB_PORT = 9047;
-	public static final int DEFAULT_RPC_PORT = 9048;
+	public static final int TESTNET_PORT = 9035;
+	public static final int MAINNET_PORT = 9036;
+	public static final int DEFAULT_WEB_PORT = 9037;
+	public static final int DEFAULT_RPC_PORT = 9038;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 30; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = 5; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 9999999;

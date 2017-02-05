@@ -61,6 +61,7 @@ public class TestRecPerson {
 	
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[2000]; // default value
+	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -121,7 +122,7 @@ public class TestRecPerson {
 		long birthDay = timestamp - 12345678;
 		personGeneral = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 		//personGeneral.setKey(genesisPersonKey);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
@@ -138,7 +139,7 @@ public class TestRecPerson {
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//person.setKey(genesisPersonKey + 1);
 		//CREATE ISSUE PERSON TRANSACTION
@@ -249,7 +250,7 @@ public class TestRecPerson {
 		}
 		assertEquals(rawPerson.length, person.getDataLength(false));
 		assertEquals(parsedPerson.getHeight(), person.getHeight());
-		assertEquals(person.getCreator().getAddress(), parsedPerson.getCreator().getAddress());
+		assertEquals(person.getOwner().getAddress(), parsedPerson.getOwner().getAddress());
 		assertEquals(person.getName(), parsedPerson.getName());
 		assertEquals(person.getDescription(), parsedPerson.getDescription());
 		assertEquals(person.getItemTypeStr(), parsedPerson.getItemTypeStr());
@@ -299,7 +300,7 @@ public class TestRecPerson {
 		parsedPerson = (PersonHuman)parsedIssuePersonRecord.getItem();
 
 		//CHECK OWNER
-		assertEquals(person.getCreator().getAddress(), parsedPerson.getCreator().getAddress());
+		assertEquals(person.getOwner().getAddress(), parsedPerson.getOwner().getAddress());
 		
 		//CHECK NAME
 		assertEquals(person.getName(), parsedPerson.getName());

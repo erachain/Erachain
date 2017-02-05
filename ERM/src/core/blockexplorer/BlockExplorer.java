@@ -849,7 +849,7 @@ public class BlockExplorer
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", asset.getDescription());
-			assetJSON.put("owner", asset.getCreator().getAddress());
+			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
@@ -1222,12 +1222,12 @@ if ( asset_1 == null) {
 		assetJSON.put("key", asset.getKey());
 		assetJSON.put("name", asset.getName());
 		assetJSON.put("description", asset.getDescription());
-		assetJSON.put("owner", asset.getCreator().getAddress());
+		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
 		assetJSON.put("isDivisible", asset.isDivisible());
 
 		
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getCreator().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction)transaction);
 			if(issueAssetTransaction.getItem().getName().equals(asset.getName()))
@@ -1308,8 +1308,8 @@ if ( asset_1 == null) {
 		AssetCls assetHave = Controller.getInstance().getAsset(have);
 		AssetCls assetWant = Controller.getInstance().getAsset(want);
 
-		output.put("assetHaveOwner", assetHave.getCreator().getAddress());
-		output.put("assetWantOwner", assetWant.getCreator().getAddress());
+		output.put("assetHaveOwner", assetHave.getOwner().getAddress());
+		output.put("assetWantOwner", assetWant.getOwner().getAddress());
 
 		output.put("assetHave", assetHave.getKey());
 		output.put("assetHaveName", assetHave.getName());
@@ -1592,11 +1592,11 @@ if ( asset_1 == null) {
 	
 		output.put("img", a);
 		output.put("key", person.getKey());
-		output.put("creator", person.getCreator().getPersonAsString());
+		output.put("creator", person.getOwner().getPersonAsString());
 		
-		if (person.getCreator().getPerson() != null){
-			output.put("creator_key", person.getCreator().getPerson().b.getKey());
-			output.put("creator_name", person.getCreator().getPerson().b.getName());
+		if (person.getOwner().getPerson() != null){
+			output.put("creator_key", person.getOwner().getPerson().b.getKey());
+			output.put("creator_name", person.getOwner().getPerson().b.getName());
 		}else{
 			output.put("creator_key", "");
 			output.put("creator_name", "");
@@ -1796,7 +1796,7 @@ if ( asset_1 == null) {
 			Map blockJSON=new LinkedHashMap();
 			blockJSON.put("key", person.getKey());
 			blockJSON.put("name", person.getName());
-			blockJSON.put("creator",person.getCreator().getAddress());
+			blockJSON.put("creator",person.getOwner().getAddress());
 			
 	
 		/*	

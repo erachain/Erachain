@@ -96,7 +96,7 @@ public class NoteDetailsPanel extends JPanel {
 				
 		//OWNER
 		detailGBC.gridy = 4;
-		JTextField owner = new JTextField(note.getCreator().getPersonAsString());
+		JTextField owner = new JTextField(note.getOwner().getPersonAsString());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
 								

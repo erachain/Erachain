@@ -101,7 +101,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		
 		case COLUMN_ADDRESS:
 			
-			return asset.getCreator().getPersonAsString();
+			return asset.getOwner().getPersonAsString();
 			
 		case COLUMN_MOVABLE:
 			
@@ -121,7 +121,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		
 		case COLUMN_I_OWNER:
 			
-			if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress()))	return true;
+			if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))	return true;
 			return false;
 		}
 		

@@ -96,11 +96,11 @@ public class UnionDetailsPanel extends JPanel {
 				
 		//OWNER
 		++detailGBC.gridy;
-		JTextField owner = new JTextField(union.getCreator().getAddress());
+		JTextField owner = new JTextField(union.getOwner().getAddress());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
 		
-		String unionStr = union.getCreator().viewPerson();
+		String unionStr = union.getOwner().viewPerson();
 		if (unionStr.length()>0) {
 			//LABEL UNION
 			++labelGBC.gridy;

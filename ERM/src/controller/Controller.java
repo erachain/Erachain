@@ -104,7 +104,7 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private static final String version = "2.19.03";
+	private static final String version = "2.20.01";
 	private static final String buildTime = "2017-02-02 01:33:33 UTC";
 	private long buildTimestamp;
 	
@@ -2204,7 +2204,8 @@ public class Controller extends Observable {
 			long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height,
-			byte[] icon, byte[] image, String description) {
+			byte[] icon, byte[] image, String description,
+			PublicKeyAccount owner, byte[] ownerSignature) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssuePersonTransaction(
@@ -2212,7 +2213,8 @@ public class Controller extends Observable {
 					creator, fullName, feePow, birthday, deathday,
 					gender, race, birthLatitude, birthLongitude,
 					skinColor, eyeColor, hairСolor, height,
-					icon, image, description);
+					icon, image, description,
+					owner, ownerSignature);
 		}
 	}
 

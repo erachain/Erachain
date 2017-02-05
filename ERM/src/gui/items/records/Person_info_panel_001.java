@@ -385,7 +385,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(jLabel13, gridBagConstraints);
 
         jTextField13.setEditable(false);
-        jTextField13.setText(person.getCreator().toString());
+        jTextField13.setText(person.getOwner().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 26;

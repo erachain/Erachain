@@ -1,6 +1,6 @@
 package core.item.statuses;
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 
 //import java.math.BigDecimal;
@@ -32,13 +32,13 @@ public abstract class StatusCls extends ItemCls {
 	
 	public static final int INITIAL_FAVORITES = 0;
 
-	public StatusCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public StatusCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 	}
-	public StatusCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public StatusCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 

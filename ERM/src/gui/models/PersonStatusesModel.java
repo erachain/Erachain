@@ -164,12 +164,12 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			
 			
 			
-			return statusesMap.get(status_key_value).getCreator().getPersonAsString_01(true);
+			return statusesMap.get(status_key_value).getOwner().getPersonAsString_01(true);
 		
 		case COLUMN_CREATOR+1:
 			
 			
-			return statusesMap.get(status_key_value).getCreator().getPerson().b;
+			return statusesMap.get(status_key_value).getOwner().getPerson().b;
 		
 		}
 		

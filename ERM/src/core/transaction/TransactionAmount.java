@@ -306,7 +306,7 @@ public abstract class TransactionAmount extends Transaction {
 					boolean unLimited = 
 							absKey > AssetCls.REAL_KEY // not genesis assets!
 							&& asset.getQuantity().equals(0l)
-							&& asset.getCreator().getAddress().equals(this.creator.getAddress());
+							&& asset.getOwner().getAddress().equals(this.creator.getAddress());
 		
 					//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
 					if (unLimited) {
@@ -357,7 +357,7 @@ public abstract class TransactionAmount extends Transaction {
 				}
 			}
 		} else {
-			if (this.getBlockHeightByParent(db) > 3000) {
+			if (true || this.getBlockHeightByParent(db) > 3000) {
 				// TODO first records is BAD already ((
 				//CHECK IF CREATOR HAS ENOUGH FEE MONEY
 				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)

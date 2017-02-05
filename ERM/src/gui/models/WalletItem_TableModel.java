@@ -90,7 +90,7 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 		
 		case COLUMN_ADDRESS:
 			
-			return item.getCreator().getPersonAsString();
+			return item.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			

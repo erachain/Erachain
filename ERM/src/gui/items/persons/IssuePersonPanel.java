@@ -46,7 +46,9 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.item.persons.PersonCls;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
@@ -426,14 +428,15 @@ public class IssuePersonPanel extends JPanel
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		PublicKeyAccount owner = (PublicKeyAccount)creator;
 		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
 				forIssue,
 				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height,
-				null, this.imgButes, this.txtareaDescription.getText()
-				);
+				null, this.imgButes, this.txtareaDescription.getText(),
+				owner, null);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
@@ -443,7 +446,9 @@ public class IssuePersonPanel extends JPanel
 		//	this.dispose();
 		
 			if (!forIssue) {
-				String base58str = Base58.encode(result.getA().toBytes(true, null));
+				IssuePersonRecord issuePersonRecord = (IssuePersonRecord)result.getA();
+				PersonCls person = (PersonCls)issuePersonRecord.getItem();				
+				String base58str = Base58.encode(person.toBytes(false));
 				// This method writes a string to the system clipboard.
 				// otherwise it returns null.
 			    StringSelection sss = new StringSelection(base58str);

@@ -21,6 +21,8 @@ import com.toedter.calendar.JDateChooser;
 import core.account.Account;
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonFactory;
+import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.TransactionFactory;
 import lang.Lang;
@@ -42,8 +44,8 @@ public class InsertPersonPanel extends IssuePersonPanel{
     protected javax.swing.JPanel jPanel_Paste;
     protected javax.swing.JButton pasteButton;
     
-    protected IssuePersonRecord issuePersonRecord;
-    protected PersonCls person;
+    //protected IssuePersonRecord issuePersonRecord;
+    protected PersonHuman person;
 	
 	InsertPersonPanel(){
 		
@@ -115,22 +117,22 @@ private void init(){
 	
 	
 	label_Sign.setText( Lang.getInstance().translate("Signature")+ ":");
-     GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-     gridBagConstraints.gridx = 0;
-     gridBagConstraints.gridy = 17;
-     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-     gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-     add(label_Sign, gridBagConstraints);
-     gridBagConstraints = new java.awt.GridBagConstraints();
-     gridBagConstraints.gridx = 2;
-     gridBagConstraints.gridy = 17;
-     gridBagConstraints.gridwidth = 3;
-     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-     gridBagConstraints.weightx = 0.2;
-     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
-     txt_Sign.setEditable(false);
-     add(txt_Sign, gridBagConstraints);
+    GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 17;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+    add(label_Sign, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 17;
+    gridBagConstraints.gridwidth = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+    gridBagConstraints.weightx = 0.2;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
+    txt_Sign.setEditable(false);
+    add(txt_Sign, gridBagConstraints);
 	
      label_public_key.setText( Lang.getInstance().translate("Public Key")+ ":");
      gridBagConstraints.gridx = 0;
@@ -156,19 +158,18 @@ private void init(){
  		@Override
  		public void actionPerformed(ActionEvent arg0) {
  			// TODO Auto-generated method stub
- 			issuePersonRecord = null;
  			person = null;
- 			super.
- 			init(); 
+ 			reset();
  			
  			String base58str = getClipboardContents();
- 			byte[] dataTrans = Base58.decode(base58str);
+ 			byte[] dataPerson = Base58.decode(base58str);
  			try {
- 				issuePersonRecord = (IssuePersonRecord)TransactionFactory.getInstance().parse(dataTrans, null);
+ 				person = (PersonHuman)PersonFactory.getInstance().parse(dataPerson, false);
+ 				
  			} catch (Exception ee) {
  				return;
  			}
- 			person = (PersonCls)issuePersonRecord.getItem();
+ 			//person = (PersonCls)issuePersonRecord.getItem();
  			
  			txtName.setText(person.getName());
  			iconButton.setIcon(new ImageIcon(person.getImage()));
@@ -198,45 +199,46 @@ private void init(){
  				txtHairСolor.setText(person.getHairСolor());
  			txtHeight.setText("" + person.getHeight());
 
- 			txt_Sign.setText(Base58.encode(issuePersonRecord.getSignature()));
- 			txt_public_key.setText(Base58.encode(issuePersonRecord.getCreator().getPublicKey()));
+ 			
+ 			txt_Sign.setText(Base58.encode(person.getOwnerSignature()));
+ 			txt_public_key.setText(Base58.encode(person.getOwner().getPublicKey()));
 
  		}
      	 
 	     	 
-	      });
+      });
 	
-	     GridBagConstraints gridBagConstraints1 = new java.awt.GridBagConstraints();
-	     gridBagConstraints1.gridx = 4;
-	     gridBagConstraints1.gridy = 19;
-	  //   gridBagConstraints1.gridwidth = ;
-	     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-	     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
-	     add(pasteButton, gridBagConstraints1);
-		
-     
-     
-	    
-	     trans_Button = new JButton();
-	     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
-	     trans_Button.addActionListener(new ActionListener(){
+     GridBagConstraints gridBagConstraints1 = new java.awt.GridBagConstraints();
+     gridBagConstraints1.gridx = 4;
+     gridBagConstraints1.gridy = 19;
+  //   gridBagConstraints1.gridwidth = ;
+     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
+     add(pasteButton, gridBagConstraints1);
 	
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+ 
+ 
+    
+     trans_Button = new JButton();
+     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
+     trans_Button.addActionListener(new ActionListener(){
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+    	 
 	    	 
-	    	 
-	     });
+     });
 	
 	  
-	     gridBagConstraints1.gridx = 6;
-	     gridBagConstraints1.gridy = 19;
-	 //    gridBagConstraints1.gridwidth = 15;
-	     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-	     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
-	     add(trans_Button, gridBagConstraints1);
+     gridBagConstraints1.gridx = 6;
+     gridBagConstraints1.gridy = 19;
+ //    gridBagConstraints1.gridwidth = 15;
+     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
+     add(trans_Button, gridBagConstraints1);
 	
 		
 		
@@ -249,16 +251,16 @@ private void init(){
 		//txtBirthday.setText("0000-00-00");
 		//txtDeathday.setText("0000-00-00");
 		
-		//txtGender.setSelectedIndex(2);
+		txtGender.setSelectedIndex(2);
 		txtRace.setText("");
-		 txtBirthLatitude.setText("");
-		 txtBirthLongitude.setText("");
-		 txtSkinColor.setText("");
-		 txtEyeColor.setText("");
-		 txtHairСolor.setText("");
-		 txtHeight.setText("");
-		 imgButes = null;
-		 iconButton.setIcon(null);
+		txtBirthLatitude.setText("");
+		txtBirthLongitude.setText("");
+		txtSkinColor.setText("");
+		txtEyeColor.setText("");
+		txtHairСolor.setText("");
+		txtHeight.setText("");
+		imgButes = null;
+		iconButton.setIcon(null);
 	
 	}
 

@@ -321,7 +321,8 @@ public class TransactionCreator
 			PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height,
-			byte[] icon, byte[] image, String description) 
+			byte[] icon, byte[] image, String description,
+			PublicKeyAccount owner, byte[] ownerSignature)
 	{
 		//CHECK FOR UPDATES
 		if (forIssue) {
@@ -331,9 +332,9 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 
-		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
+		PersonCls person = new PersonHuman(owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, icon, image, description);
+				skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
 
 		long lastReference;
 		if (forIssue) {

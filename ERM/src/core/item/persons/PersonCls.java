@@ -13,7 +13,7 @@ import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.naming.Name;
 import database.DBSet;
@@ -62,11 +62,11 @@ public abstract class PersonCls extends ItemCls {
 	protected String hairСolor; // First Name|Middle Name|Last Name	
 	protected byte height;
 	
-	public PersonCls(byte[] typeBytes, Account creator, String name, long birthday, long deathday,
+	public PersonCls(byte[] typeBytes, PublicKeyAccount owner, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 		this.birthday = birthday;
 		this.deathday = deathday;
 		this.gender = gender;
@@ -79,11 +79,11 @@ public abstract class PersonCls extends ItemCls {
 		this.height = height;
 	}
 	
-	public PersonCls(byte[] typeBytes, Account creator, String name, String birthday, String deathday,
+	public PersonCls(byte[] typeBytes, PublicKeyAccount owner, String name, String birthday, String deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
-		this(typeBytes, creator, name, 0, 0,
+		this(typeBytes, owner, name, 0, 0,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, (byte)height, icon, image, description);
 		
@@ -94,11 +94,11 @@ public abstract class PersonCls extends ItemCls {
 		this.deathday = deathday==null? Long.MIN_VALUE: Timestamp.valueOf(deathday).getTime();
 	}
 	
-	public PersonCls(int type, Account creator, String name, long birthday, long deathday,
+	public PersonCls(int type, PublicKeyAccount owner, String name, long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[]{(byte)type}, creator, name, birthday, deathday,
+		this(new byte[]{(byte)type}, owner, name, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
 				skinColor, eyeColor, hairСolor, height, icon, image, description);
 	}

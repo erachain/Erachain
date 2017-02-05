@@ -46,11 +46,11 @@ public class Status_Info extends JTextPane {
 		
 		message += "<div>" + status.getDescription() + "</div>";
 
-		String creator = status.getCreator().getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)?
+		String creator = status.getOwner().getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)?
 				"GENESIS":
-					status.getCreator().getPersonAsString_01(false);
+					status.getOwner().getPersonAsString_01(false);
 
-		message += "<div> Creator: " + (creator.length()==0?status.getCreator().getAddress():creator) + "</div>";
+		message += "<div> Creator: " + (creator.length()==0?status.getOwner().getAddress():creator) + "</div>";
 
 		return message;
 	}

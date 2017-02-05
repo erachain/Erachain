@@ -57,6 +57,7 @@ public class TestRecSetStatusToItem {
 	
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet db;
@@ -90,7 +91,7 @@ public class TestRecSetStatusToItem {
 		long birthDay =  timestamp - 12345678;
 		person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
 				(byte)1, "Slav", (float)128.12345, (float)33.7777,
-				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -190,7 +191,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(item.getName(), itemParsed.getName());
 			
 		//CHECK OWNER
-		assertEquals(item.getCreator().getAddress(), itemParsed.getCreator().getAddress());
+		assertEquals(item.getOwner().getAddress(), itemParsed.getOwner().getAddress());
 		
 		//CHECK DESCRIPTION
 		assertEquals(item.getDescription(), itemParsed.getDescription());

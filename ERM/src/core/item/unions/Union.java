@@ -10,19 +10,20 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 
 public class Union extends UnionCls {
 	
 	private static final int TYPE_ID = UnionCls.UNION;
 
-	public Union(Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
+	public Union(PublicKeyAccount owner, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, creator, name, birthday, parent, icon, image, description);
+		super(TYPE_ID, owner, name, birthday, parent, icon, image, description);
 	}
-	public Union(byte[] typeBytes, Account creator, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
+	public Union(byte[] typeBytes, PublicKeyAccount owner, String name, long birthday, long parent, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, birthday, parent, icon, image, description);
+		super(typeBytes, owner, name, birthday, parent, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -38,9 +39,9 @@ public class Union extends UnionCls {
 		int position = TYPE_LENGTH;
 		
 		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
-		position += CREATOR_LENGTH;
+		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+		PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+		position += OWNER_LENGTH;
 		
 		//READ NAME
 		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -117,7 +118,7 @@ public class Union extends UnionCls {
 		}
 		
 		//RETURN
-		Union note = new Union(typeBytes, creator, name, birthday, parent, icon, image, description);
+		Union note = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
 		if (includeReference)
 		{
 			note.setReference(reference);

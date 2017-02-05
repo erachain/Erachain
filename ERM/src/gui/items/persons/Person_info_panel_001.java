@@ -403,7 +403,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(jLabel13, gridBagConstraints);
 
         jTextField13.setEditable(false);
-        jTextField13.setText(person.getCreator().toString());
+        jTextField13.setText(person.getOwner().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 26;
@@ -422,7 +422,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
   				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-  				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  				StringSelection value = new StringSelection(person.getOwner().getAddress().toString());
   			    clipboard.setContents(value, null);
   			}
   		});
@@ -434,7 +434,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -445,7 +445,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
    			public void actionPerformed(ActionEvent e) 
    			{
    			
-   				new Mail_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);

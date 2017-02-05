@@ -11,7 +11,7 @@ public class Info_Notes extends javax.swing.JPanel {
      */
     public Info_Notes(NoteCls note) {
         initComponents();
-        jTextField_Account_Creator.setText(note.getCreator().getAddress());
+        jTextField_Account_Creator.setText(note.getOwner().getAddress());
         jTextField_Title.setText(note.getName());
         jTextArea_Content.setText(note.getDescription());
     

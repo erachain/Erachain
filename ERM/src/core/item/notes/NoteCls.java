@@ -1,7 +1,7 @@
 package core.item.notes;
 
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 //import database.DBMap;
 import database.DBSet;
@@ -26,14 +26,14 @@ public abstract class NoteCls extends ItemCls {
 
 	public static final int INITIAL_FAVORITES = 0;
 
-	public NoteCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public NoteCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 		
 	}
-	public NoteCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public NoteCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 

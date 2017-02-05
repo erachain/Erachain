@@ -104,7 +104,7 @@ public class MultiPaymentFrame extends JFrame
       		
       	//TXT ACCOUNT
       	txtGBC.gridy = 0;
-      	this.txtAccount = new JTextField(asset.getCreator().getAddress());
+      	this.txtAccount = new JTextField(asset.getOwner().getAddress());
       	this.txtAccount.setEditable(false);
         this.add(this.txtAccount, txtGBC);
         
@@ -200,7 +200,7 @@ public class MultiPaymentFrame extends JFrame
 			int feePow = Integer.parseInt(txtFeePow.getText());
 			
 			//CREATE MULTI PAYMENT
-			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getCreator().getAddress()), this.payments, feePow);
+			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(Controller.getInstance().getPrivateKeyAccountByAddress(this.asset.getOwner().getAddress()), this.payments, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			switch(result.getB())

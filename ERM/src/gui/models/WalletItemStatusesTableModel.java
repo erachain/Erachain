@@ -101,7 +101,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		
 		case COLUMN_ADDRESS:
 			
-			return status.getCreator().getPersonAsString();
+			return status.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			

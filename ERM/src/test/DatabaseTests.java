@@ -55,6 +55,7 @@ public class DatabaseTests {
 	
 	private byte[] icon = new byte[0]; // default value
 	private byte[] image = new byte[0]; // default value
+	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
 	private DBSet dbSet;
@@ -91,7 +92,7 @@ public class DatabaseTests {
 		long birthDay = timestamp - 12345678;
 		personGeneral = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
 		genesis_issue_person.process(dbSet, gb, false);
@@ -104,7 +105,7 @@ public class DatabaseTests {
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
-				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей");
+				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(dbSet));

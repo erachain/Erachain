@@ -239,7 +239,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(person.getCreator().toString());
+        jTextField_Creator.setText(person.getOwner().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -260,7 +260,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
   				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-  				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  				StringSelection value = new StringSelection(person.getOwner().getAddress().toString());
   			    clipboard.setContents(value, null);
   			}
   		});
@@ -273,7 +273,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			{
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
   				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
-  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getCreator().getAddress());
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
   				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
   				StringSelection value = new StringSelection(public_Account.getBase58());
   				 clipboard.setContents(value, null);
@@ -288,7 +288,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -299,7 +299,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    			public void actionPerformed(ActionEvent e) 
    			{
    			
-   				new Mail_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);

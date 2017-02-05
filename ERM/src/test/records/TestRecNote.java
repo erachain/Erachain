@@ -169,7 +169,7 @@ public class TestRecNote {
 			assertEquals(issueNoteRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueNoteRecord.getItem().getCreator().getAddress(), parsedIssueNoteTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueNoteRecord.getItem().getOwner().getAddress(), parsedIssueNoteTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueNoteRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());

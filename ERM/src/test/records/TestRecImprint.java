@@ -148,7 +148,7 @@ public class TestRecImprint {
 			assertEquals(issueImprintRecord.getCreator().getAddress(), parsedIssueImprintTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueImprintRecord.getItem().getCreator().getAddress(), parsedIssueImprintTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueImprintRecord.getItem().getOwner().getAddress(), parsedIssueImprintTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueImprintRecord.getItem().getName(), parsedIssueImprintTransaction.getItem().getName());

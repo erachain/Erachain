@@ -267,7 +267,7 @@ public class CreateOrderTransaction extends Transaction
 			
 			// if asset is unlimited and me is creator of this asset 
 			boolean unLimited = haveAsset.getQuantity().equals(0l)
-					&& haveAsset.getCreator().getAddress().equals(this.creator.getAddress());
+					&& haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
 
 			if( !unLimited && this.creator.getBalance(db, have).a.compareTo(
 					this.order.getAmountHave()) == -1)

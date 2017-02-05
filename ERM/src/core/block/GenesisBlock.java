@@ -68,7 +68,7 @@ public class GenesisBlock extends Block{
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[Crypto.HASH_LENGTH]);
-		PersonCls user;
+		//PersonCls user;
 		
 
 		// ISSUE ITEMS
@@ -92,12 +92,15 @@ public class GenesisBlock extends Block{
 				
 				Pair<byte[], byte[]> keyPair = Crypto.getInstance().createKeyPair(accountSeed);
 				byte[] publicKey = keyPair.getB();
-				String address = Crypto.getInstance().getAddress(publicKey);
-				recipient = new Account(address);
+				//String address = Crypto.getInstance().getAddress(publicKey);
+				recipient = new PublicKeyAccount(publicKey);
+				String address = recipient.getAddress();
 
+				/*
 				user = new PersonHuman(recipient,
 						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.0, (float)0.0,
-						"-", "-", "-", (int) 188, icon, image, "-");
+						"-", "-", "-", (int) 188, icon, image, "-", null);
+						*/
 				
 
 				//CREATE ISSUE PERSON TRANSACTION
@@ -278,69 +281,68 @@ public class GenesisBlock extends Block{
 					Arrays.asList("73UxSPEhB9R5deSxL62c8ckCKvQdCALBcu", 4), //
 					
 					Arrays.asList("7LPhKZXmd6miLE9XxWZciabydoC8vf4f64", 3), //
-					//Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", 3),
-					//Arrays.asList("7MdXzNcKgWXvy7unJ7WPLmp3LQvUdiNEAz", 2),
+					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", 1),
+					Arrays.asList("7MdXzNcKgWXvy7unJ7WPLmp3LQvUdiNEAz", 1),
 					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", 2), //
 					Arrays.asList("8Q7zyxx1rYKBbiKVfs66H5G16Vtsag54wCHnV2tHY5nA", 2),
-					//Arrays.asList("74fCzX79v5etyt1pjtfAQhyrLCRSVfm6AM", 2),
-					//Arrays.asList("7BbrDtJWt9WYfoFQg9VV4aW2yVdaQpsjH9", 2),
-					//Arrays.asList("7NZAQieFR3Qyzzj8iZhWHHPZJ9D2TPW7uR", 2),
+					Arrays.asList("74fCzX79v5etyt1pjtfAQhyrLCRSVfm6AM", 1),
+					Arrays.asList("7BbrDtJWt9WYfoFQg9VV4aW2yVdaQpsjH9", 1),
+					Arrays.asList("7NZAQieFR3Qyzzj8iZhWHHPZJ9D2TPW7uR", 1),
 					Arrays.asList("73shRmoD4YNAtMKzF8ZnFtsYVx4hx9cShi", 2), //
 					Arrays.asList("7EwDnU3F8znwp3bsFq1W5NA1b3YiEwYt7N", 3), //
 					Arrays.asList("3r1fXZPBcVf2acj5ELhEZ4uYGPdZoYFwY4bYS4qeG22F", 1),
 					Arrays.asList("7QF8kYdmv1dqT548S6HjSvgdtF7txncvbr", 2), //
 					Arrays.asList("3dLWtiRPb9PYDXbb6t1P9jmVqDkmZnBiMtYsCSJWWw3S", 1),
-					//Arrays.asList("7FXqM9Lq9wGJkjpduXoYuBqLzrkHQqhH78", 2),
+					Arrays.asList("7FXqM9Lq9wGJkjpduXoYuBqLzrkHQqhH78", 1),
 					Arrays.asList("74Rcp979npxf6Q5zV6ZnpEnsxrsCHdXeNU", 2), //
-					//Arrays.asList("7APgaQe1uiG8Vgzz5bZCTPw39mTwjPfgLF", 2),
+					Arrays.asList("7APgaQe1uiG8Vgzz5bZCTPw39mTwjPfgLF", 1),
 					Arrays.asList("79VxiuxRgFTp8cUTRDBAoZPGXEdqY7hD8h", 3), //
 					Arrays.asList("2B8NRmXsVJ3zSxS5Px78h7qieb5Yvp3XRnyzzK2qk8kq", 2),
-					//Arrays.asList("7JJjBJqpySJmoJws6xSDsvwRo5yKS7wneg", 2),
+					Arrays.asList("7JJjBJqpySJmoJws6xSDsvwRo5yKS7wneg", 1),
 					Arrays.asList("78KCkgNeSvxwtnVJTyzLFGGzmP8SUUuN1J", 3), //
-					//Arrays.asList("76JECepZ1DYWqbF4Vb2VZMBs4A6WsvrN53", 1),
+					Arrays.asList("76JECepZ1DYWqbF4Vb2VZMBs4A6WsvrN53", 1),
 					Arrays.asList("7J3M8xwJeG5gyBC5kLPb5c2kVHoTsMT5MK", 3), //
-					//Arrays.asList("7KstpqkbQrCiAuVD3WBQSitbDvoCUTh2D6", 2),
+					Arrays.asList("7KstpqkbQrCiAuVD3WBQSitbDvoCUTh2D6", 1),
 					Arrays.asList("7CPGk25mTFGhANaBCiV4LqrowcUfrfLcRe", 3), //
 					Arrays.asList("7HLmWov2KYx4MBBceN1KqYom6m97ppp2wF", 2), //
-					//Arrays.asList("7JRYHaNtKshTbAMdbGALjmScB2c1NksKD4", 2),
+					Arrays.asList("7JRYHaNtKshTbAMdbGALjmScB2c1NksKD4", 1),
 					Arrays.asList("7AXey16ivPRCQoFWzkMU4Q7V8FZugqjYUX", 4), //
 					Arrays.asList("77GYw61CPhDhdHsHg8oYCaKhenq2izAps8", 5), //
 					Arrays.asList("7JAmAzeehdP5JWspXodhQR31dVqhKDR8sj", 2), //
 					Arrays.asList("77Atk56iAvdFgayLyC6EbfkBLmcJNBQzrh", 1), //
-					//Arrays.asList("73yfeCDiSciBF1vc3PG8uyJMty4jRDxxL9", 4),
-					//Arrays.asList("78F5m5oUf1N4iZB7XPdWmQJdwMT3tWMQ2j", 2),
+					Arrays.asList("73yfeCDiSciBF1vc3PG8uyJMty4jRDxxL9", 2),
+					Arrays.asList("78F5m5oUf1N4iZB7XPdWmQJdwMT3tWMQ2j", 1),
 					Arrays.asList("7MoR3qqs959XAnDQ8mDr11sBnKs4woogkK", 2), //
-					//Arrays.asList("7C17PgbPTJeju3yJPbw4Wmus9gj8Jeo3TF", 2),
+					Arrays.asList("7C17PgbPTJeju3yJPbw4Wmus9gj8Jeo3TF", 1),
 					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", 2), //
-					//Arrays.asList("https://vk.com/away.php?to=http%3A%2F%2Fdatachains.world%2Fs", 2),
 					Arrays.asList("7CqCmqYwCqCDe599vHeWLdL4YSi1ShYg2r", 2), //
-					//Arrays.asList("75Uej5KmQVmmqHusKfj3zP3AoZ5wkyyu7E", 2),
-					//Arrays.asList("7McczL4B1xfNnDRhjqrgQKdtXVp7YdKYVM", 2),
+					Arrays.asList("75Uej5KmQVmmqHusKfj3zP3AoZ5wkyyu7E", 1),
+					Arrays.asList("7McczL4B1xfNnDRhjqrgQKdtXVp7YdKYVM", 1),
 					Arrays.asList("75R3LayKe3orQrtZnMWR1VdadBdypj2NWW", 3), //
 					Arrays.asList("741kxf9sRgRk2JZfEpxt2D9NcooUCRAj2m", 2), //
-					//Arrays.asList("7Luf2TRvoQuxaQriWmB1G9DgsZ6b1Pfith", 1),
-					//Arrays.asList("7FPm2tet9HTVmBMe5xvRzp4sWoS6d8PgWZ", 1),
+					Arrays.asList("7Luf2TRvoQuxaQriWmB1G9DgsZ6b1Pfith", 1),
+					Arrays.asList("7FPm2tet9HTVmBMe5xvRzp4sWoS6d8PgWZ", 1),
 					Arrays.asList("7G9QBw7TBgB9DLVcmDARmCBLX2yaLNnzXS", 2), //
 					Arrays.asList("7SErqYci2YesFsg4zcxowJ62G9LDk6mic3", 2), //
 					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", 2), //
 					Arrays.asList("7DwK6UC648aGPKyGboQeU6WMCNhUSYAxHb", 2), //
-					//Arrays.asList("7MKdGrRFzrmy3KLNmcrS7PmfJn6KYerR3G", 2),
-					//Arrays.asList("7LDPFrsPUFedgGsomXACwh7qM2qdcRGso7", 1),
+					Arrays.asList("7MKdGrRFzrmy3KLNmcrS7PmfJn6KYerR3G", 1),
+					Arrays.asList("7LDPFrsPUFedgGsomXACwh7qM2qdcRGso7", 1),
 					Arrays.asList("7KVfBqULZJx2DgbBHrkf1pZzkJMVDru8pB", 2), //
 					Arrays.asList("ByVNbfq6xp7AFqEH1bbacFr9eTVPGnxLQboyv46WqZra", 3),
-					//Arrays.asList("7PPpw4H1UQm865jxe9FpTKBzC3fBULXN1w", 4),
+					Arrays.asList("7PPpw4H1UQm865jxe9FpTKBzC3fBULXN1w", 2),
 					Arrays.asList("EFLHKpYpQXZYUaJJ1mgMZ8H7i1jwoGXRojVV84rTA49h", 2),
-					//Arrays.asList("7S1LnztovJEgYWS4MKLNyccZVriaFiJjUL", 2),
+					Arrays.asList("7S1LnztovJEgYWS4MKLNyccZVriaFiJjUL", 1),
 					Arrays.asList("75rEoNUknMU3qYGjS3wriY53n1aRUznFus", 2), //
 					Arrays.asList("75v2xRHKypQqqSM4pwQs9pq49ZL9rxYg8B", 2), //
-					//Arrays.asList("7PrskypEaZWX4nqN19BJQkssKEdaJcvaVu", 1),
-					//Arrays.asList("7HgZk85BA5VxATncBRqgYRZ84mWDFpD8jS", 1),
+					Arrays.asList("7PrskypEaZWX4nqN19BJQkssKEdaJcvaVu", 1),
+					Arrays.asList("7HgZk85BA5VxATncBRqgYRZ84mWDFpD8jS", 1),
 					Arrays.asList("7AAyNfFFGipUXVdRLwWJnhUwfj9FDqnJ2z", 2), //
 					Arrays.asList("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs", 3), //
-					//Arrays.asList("7NLEQV71W4X9YqopA15k5VNk2WFiKc3ePE", 2),
-					//Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
-					//Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1),
-					//Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 2)
+					Arrays.asList("7NLEQV71W4X9YqopA15k5VNk2WFiKc3ePE", 1),
+					Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
+					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1),
+					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 1),
 					Arrays.asList("7RSLd62fpgBW5PyaGHLNh8rHZQbmRqcret", 2) //
 					));
 
@@ -366,7 +368,7 @@ public class GenesisBlock extends Block{
 
 			}
 
-			int pickDebt = 31500;
+			int pickDebt = 28000;
 			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(8);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%

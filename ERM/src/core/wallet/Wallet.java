@@ -1519,7 +1519,7 @@ public class Wallet extends Observable implements Observer
 		//CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
 		//item.resolveKey(DBSet.getInstance());
-		Account creator = item.getCreator();
+		Account creator = item.getOwner();
 		if (creator == null) return;
 		
 		if(this.accountExists(creator.getAddress()))
@@ -1539,7 +1539,7 @@ public class Wallet extends Observable implements Observer
 		
 		//CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
-		Account creator = item.getCreator();
+		Account creator = item.getOwner();
 		if (creator == null) return;
 		
 		if(this.accountExists(creator.getAddress()))

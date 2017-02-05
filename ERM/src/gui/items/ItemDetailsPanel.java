@@ -96,7 +96,7 @@ public class ItemDetailsPanel extends JPanel {
 				
 		//OWNER
 		detailGBC.gridy = 4;
-		JTextField owner = new JTextField(item.getCreator().getPersonAsString());
+		JTextField owner = new JTextField(item.getOwner().getPersonAsString());
 		owner.setEditable(false);
 		this.add(owner, detailGBC);
 						

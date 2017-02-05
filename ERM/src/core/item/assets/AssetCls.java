@@ -2,7 +2,7 @@ package core.item.assets;
 
 
 import core.BlockChain;
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 
 // import org.apache.log4j.Logger;
@@ -69,13 +69,13 @@ public abstract class AssetCls extends ItemCls {
 	
 	public static final int INITIAL_FAVORITES = 4;
 		
-	public AssetCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 	}
-	public AssetCls(int type, byte pars, Account creator, String name, byte[] icon, byte[] image, String description)
+	public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 		this.typeBytes[1] = pars;
 	}

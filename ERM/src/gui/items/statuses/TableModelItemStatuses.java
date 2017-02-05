@@ -95,7 +95,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		
 		case COLUMN_ADDRESS:
 			
-			return status.getCreator().getAddress();
+			return status.getOwner().getAddress();
 			
 		case COLUMN_FAVORITE:
 			

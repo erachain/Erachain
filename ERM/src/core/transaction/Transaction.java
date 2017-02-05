@@ -871,7 +871,7 @@ public abstract class Transaction {
 		long personKey = personDuration.a;
 		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
 		ItemCls person = db.getItemPersonMap().get(personKey);
-		Account invitedAccount = person.getCreator();
+		Account invitedAccount = person.getOwner();
 		if (creator.equals(invitedAccount)) {
 			// IT IS ME - all fee!
 			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));

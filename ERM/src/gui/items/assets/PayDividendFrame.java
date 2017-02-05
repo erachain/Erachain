@@ -115,7 +115,7 @@ public class PayDividendFrame extends JFrame
       		
       	//TXT ACCOUNT
       	txtGBC.gridy = 1;
-      	this.txtAccount = new JTextField(asset.getCreator().getAddress());
+      	this.txtAccount = new JTextField(asset.getOwner().getAddress());
       	this.txtAccount.setEditable(false);
         this.add(this.txtAccount, txtGBC);
         
@@ -127,7 +127,7 @@ public class PayDividendFrame extends JFrame
       	//CBX ASSET TO PAY
       	txtGBC.gridy = 2;
       	this.cbxAssetToPay = new JComboBox<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>
-      		(new BalancesComboBoxModel(asset.getCreator()));
+      		(new BalancesComboBoxModel(asset.getOwner()));
       	this.cbxAssetToPay.setRenderer(new BalanceRenderer());
         this.add(this.cbxAssetToPay, txtGBC);
       	
