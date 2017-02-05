@@ -346,7 +346,7 @@ public class TransactionCreator
 		issuePersonRecord.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		if (forIssue) {
+		if (false && forIssue) {
 			boolean asPack = false;
 			return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
 		} else {

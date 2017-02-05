@@ -367,11 +367,15 @@ public class IssuePersonPanel extends JPanel
 			parse++;
 
 			birthday = this.txtBirthday.getCalendar().getTimeInMillis();
+			this.txtBirthday.getCalendar().setTimeInMillis(birthday);
 
 			parse++;
 			// END DATE
-			deathday = birthday - 1;
-			// deathday = this.txtDeathday.getCalendar().getTimeInMillis();
+			try {
+				deathday = this.txtDeathday.getCalendar().getTimeInMillis();
+			} catch(Exception ed1) {
+				deathday = birthday - 1;
+			}
 
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
@@ -445,24 +449,8 @@ public class IssuePersonPanel extends JPanel
 			    StringSelection sss = new StringSelection(base58str);
 			    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sss, null);				
 			}
-			
-			//txtFeePow.setText("0");
-			txtName.setText("");
-			txtareaDescription.setText("");
-			//txtBirthday.setText("0000-00-00");
-			//txtDeathday.setText("0000-00-00");
-			
-			//txtGender.setSelectedIndex(2);
-			//txtRace.setText("");
-			 //txtBirthLatitude.setText("");
-			 //txtBirthLongitude.setText("");
-			 //txtSkinColor.setText("");
-			 //txtEyeColor.setText("");
-			 //txtHairСolor.setText("");
-			 //txtHeight.setText("");
-			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
-			 imgButes = null;
-			 iconButton.setIcon(null);
+
+			reset();
 			
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -473,6 +461,28 @@ public class IssuePersonPanel extends JPanel
 		this.copyButton.setEnabled(true);
 	}
 
+	protected void reset() {
+		//txtFeePow.setText("0");
+		txtName.setText("");
+		txtareaDescription.setText("");
+		//txtBirthday.setText("0000-00-00");
+		//txtDeathday.setText("0000-00-00");
+		
+		//txtGender.setSelectedIndex(2);
+		//txtRace.setText("");
+		//txtBirthLatitude.setText("");
+		//txtBirthLongitude.setText("");
+		//txtSkinColor.setText("");
+		//txtEyeColor.setText("");
+		//txtHairСolor.setText("");
+		//txtHeight.setText("");
+		iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
+		imgButes = null;
+		iconButton.setIcon(null);
+
+	}
                              
     @SuppressWarnings({ "unchecked", "null" })
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
@@ -700,7 +710,9 @@ public class IssuePersonPanel extends JPanel
         jPanel1Layout.rowHeights = new int[] {0, 4, 0, 4, 0};
         jPanel1.setLayout(jPanel1Layout);
 
-        iconButton.setText("Add image");
+        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
         iconButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
      //           iconButtonActionPerformed(evt);

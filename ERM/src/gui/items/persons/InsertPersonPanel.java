@@ -7,6 +7,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,9 +32,6 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	
-	
-	
 	protected JTextField txt_Sign;
 	protected JTextField txt_public_key;
 	protected JTextField txt_info;
@@ -44,12 +42,14 @@ public class InsertPersonPanel extends IssuePersonPanel{
     protected javax.swing.JPanel jPanel_Paste;
     protected javax.swing.JButton pasteButton;
     
+    protected IssuePersonRecord issuePersonRecord;
+    protected PersonCls person;
 	
 	InsertPersonPanel(){
 		
-	install();	
+		super();
 		
-		
+		init();	
 		
 	}
 	
@@ -73,24 +73,34 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	  }
 	 
 @SuppressWarnings("deprecation")
-private void install(){
+private void init(){
 	
 	
 	txt_Sign  = new javax.swing.JTextField();
 	txt_public_key = new javax.swing.JTextField();
 	txt_info = new javax.swing.JTextField();
+
 	
 	label_Sign= new javax.swing.JLabel();
 	label_public_key= new javax.swing.JLabel();
 	label_info= new javax.swing.JLabel();
 	
+	//txtBirthday = new javax.swing.JTextField();
+	//txtDeathday = new javax.swing.JTextField();
+
+   	txtRace.setText("");
+   	this.txtBirthLatitude.setText("");
+   	this.txtBirthLongitude.setText("");
+   	this.txtHeight.setText("");
+   	this.txtFeePow.setText("");
+
 	
-	super.cbxFrom.setEnabled(false);
+	cbxFrom.setEnabled(false);
 	txtFeePow.setEditable(false);
 	txtName.setEditable(false);
 	txtareaDescription.setEditable(false);
-	txtBirthday.enable(false);
-	txtDeathday.enable(false);
+	txtBirthday.setVisible(false); //setEnabled(false);
+	txtDeathday.setVisible(false); //setEnabled(false);
 	iconButton.setEnabled(false);
 	txtGender.setEnabled(false);
 	txtRace.setEditable(false);
@@ -146,58 +156,111 @@ private void install(){
  		@Override
  		public void actionPerformed(ActionEvent arg0) {
  			// TODO Auto-generated method stub
+ 			issuePersonRecord = null;
+ 			person = null;
+ 			super.
+ 			init(); 
+ 			
  			String base58str = getClipboardContents();
  			byte[] dataTrans = Base58.decode(base58str);
- 			IssuePersonRecord issuePersonRecord;
  			try {
  				issuePersonRecord = (IssuePersonRecord)TransactionFactory.getInstance().parse(dataTrans, null);
  			} catch (Exception ee) {
  				return;
  			}
- 			PersonCls person = (PersonCls)issuePersonRecord.getItem();
+ 			person = (PersonCls)issuePersonRecord.getItem();
+ 			
  			txtName.setText(person.getName());
- 			txtareaDescription.setText(person.getDescription());
- 			//InsertPersonPanel.txtBirthday.setDate(arg0);
  			iconButton.setIcon(new ImageIcon(person.getImage()));
+
+ 			String sss = "";
+ 			sss += new Date(person.getBirthday())+ "";
+ 			long dayTimestamp = person.getDeathday();
+ 			if ( dayTimestamp > person.getBirthday()) {
+ 				sss += " ... " + new Date(person.getDeathday());
+ 			}
+ 			sss += "\n\n";
+ 			
+			//error (( txtDeathday.getCalendar().setTimeInMillis(dayTimestamp);
+
+ 			txtareaDescription.setText(sss + (person.getDescription()==null?"":person.getDescription()));
+
+ 			txtGender.setSelectedIndex(person.getGender());
+ 			if (person.getRace() != null)
+ 				txtRace.setText(person.getRace());
+ 			txtBirthLatitude.setText("" + person.getBirthLatitude());
+ 			txtBirthLongitude.setText("" + person.getBirthLongitude());
+ 			if (person.getSkinColor()!= null)
+ 				txtSkinColor.setText(person.getSkinColor());
+ 			if (person.getEyeColor() != null)
+ 				txtEyeColor.setText(person.getEyeColor());
+ 			if (person.getHairСolor() != null)
+ 				txtHairСolor.setText(person.getHairСolor());
+ 			txtHeight.setText("" + person.getHeight());
+
+ 			txt_Sign.setText(Base58.encode(issuePersonRecord.getSignature()));
+ 			txt_public_key.setText(Base58.encode(issuePersonRecord.getCreator().getPublicKey()));
+
  		}
      	 
-     	 
-      });
-
-     GridBagConstraints gridBagConstraints1 = new java.awt.GridBagConstraints();
-     gridBagConstraints1.gridx = 4;
-     gridBagConstraints1.gridy = 19;
-  //   gridBagConstraints1.gridwidth = ;
-     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
-     add(pasteButton, gridBagConstraints1);
+	     	 
+	      });
 	
+	     GridBagConstraints gridBagConstraints1 = new java.awt.GridBagConstraints();
+	     gridBagConstraints1.gridx = 4;
+	     gridBagConstraints1.gridy = 19;
+	  //   gridBagConstraints1.gridwidth = ;
+	     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+	     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
+	     add(pasteButton, gridBagConstraints1);
+		
      
      
-    
-     trans_Button = new JButton();
-     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
-     trans_Button.addActionListener(new ActionListener(){
+	    
+	     trans_Button = new JButton();
+	     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
+	     trans_Button.addActionListener(new ActionListener(){
+	
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	    	 
+	    	 
+	     });
+	
+	  
+	     gridBagConstraints1.gridx = 6;
+	     gridBagConstraints1.gridy = 19;
+	 //    gridBagConstraints1.gridwidth = 15;
+	     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+	     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
+	     add(trans_Button, gridBagConstraints1);
+	
+		
+		
+	}
+	
+	protected void reset() {
+		//txtFeePow.setText("0");
+		txtName.setText("");
+		txtareaDescription.setText("");
+		//txtBirthday.setText("0000-00-00");
+		//txtDeathday.setText("0000-00-00");
+		
+		//txtGender.setSelectedIndex(2);
+		txtRace.setText("");
+		 txtBirthLatitude.setText("");
+		 txtBirthLongitude.setText("");
+		 txtSkinColor.setText("");
+		 txtEyeColor.setText("");
+		 txtHairСolor.setText("");
+		 txtHeight.setText("");
+		 imgButes = null;
+		 iconButton.setIcon(null);
+	
+	}
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    	 
-    	 
-     });
-
-  
-     gridBagConstraints1.gridx = 6;
-     gridBagConstraints1.gridy = 19;
- //    gridBagConstraints1.gridwidth = 15;
-     gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-     gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
-     add(trans_Button, gridBagConstraints1);
-	
-	
-	
-}
 
 }
