@@ -9,9 +9,12 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.transaction.Transaction;
 import utils.ByteArrayUtils;
 
@@ -250,4 +253,39 @@ public class PersonHuman extends PersonCls {
 				+ (typeBytes[1] == 1?Transaction.SIGNATURE_LENGTH:0);
 	}
 	
+	//
+	public void sign(PrivateKeyAccount owner, boolean includeReference)
+	{
+		
+		if (!Arrays.equals(owner.getPublicKey(), this.owner.getPublicKey())) {
+			this.typeBytes[1] = (byte)0;
+			return;
+		}
+
+		// not use SIGNATURE here
+		byte[] data = super.toBytes(includeReference);
+		if ( data == null ) {
+			this.typeBytes[1] = (byte)0;
+			return;
+		}
+		
+		this.ownerSignature = Crypto.getInstance().sign(owner, data);
+		this.typeBytes[1] = (byte)1;
+
+	}
+	
+	public boolean isSignatureValid(boolean includeReference) {
+
+		if ( this.ownerSignature == null || this.ownerSignature.length != Crypto.SIGNATURE_LENGTH
+				|| Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
+			return false;
+		
+		// not use SIGNATURE here
+		byte[] data = super.toBytes(includeReference);
+		if ( data == null )
+			return false;
+		
+		return Crypto.getInstance().verify(this.owner.getPublicKey(), this.ownerSignature, data);
+	}
+
 }

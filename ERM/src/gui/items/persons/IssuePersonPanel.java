@@ -49,6 +49,7 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
@@ -369,7 +370,6 @@ public class IssuePersonPanel extends JPanel
 			parse++;
 
 			birthday = this.txtBirthday.getCalendar().getTimeInMillis();
-			this.txtBirthday.getCalendar().setTimeInMillis(birthday);
 
 			parse++;
 			// END DATE
@@ -440,14 +440,13 @@ public class IssuePersonPanel extends JPanel
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
-					forIssue?"Person issue has been sent!":"Person issue has been copy to buffer!"),
-					Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-		//	this.dispose();
 		
 			if (!forIssue) {
 				IssuePersonRecord issuePersonRecord = (IssuePersonRecord)result.getA();
-				PersonCls person = (PersonCls)issuePersonRecord.getItem();				
+				PersonHuman person = (PersonHuman)issuePersonRecord.getItem();
+				// SIGN
+				person.sign(creator, false);
+				
 				String base58str = Base58.encode(person.toBytes(false));
 				// This method writes a string to the system clipboard.
 				// otherwise it returns null.
@@ -455,6 +454,9 @@ public class IssuePersonPanel extends JPanel
 			    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sss, null);				
 			}
 
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+					forIssue?"Person issue has been sent!":"Person issue has been copy to buffer!"),
+					Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			reset();
 			
 		} else {		

@@ -801,7 +801,8 @@ public abstract class Transaction {
 	public boolean isSignatureValid() {
 
 		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
-				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH]) return false;
+				|| Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
+			return false;
 		
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );

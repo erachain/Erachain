@@ -347,13 +347,14 @@ public class TransactionCreator
 		issuePersonRecord.sign(creator, false);
 		
 		//VALIDATE AND PROCESS
-		if (false && forIssue) {
+		if (forIssue) {
 			boolean asPack = false;
 			return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
 		} else {
 			// for COPY -
 			int valid = issuePersonRecord.isValid(DBSet.getInstance(), lastReference);
-			if (valid == Transaction.NOT_ENOUGH_FEE) {
+			if (valid == Transaction.NOT_ENOUGH_FEE
+					|| valid == Transaction.ACCOUNT_NOT_PERSONALIZED) {
 				valid = Transaction.VALIDATE_OK;
 			}
 			return new Pair<Transaction, Integer>(issuePersonRecord, valid);

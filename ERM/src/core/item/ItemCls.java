@@ -16,6 +16,7 @@ import com.google.common.primitives.Ints;
 
 import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -294,8 +295,8 @@ public abstract class ItemCls {
 				+ this.image.length
 				+ this.description.getBytes(StandardCharsets.UTF_8).length
 				+ (includeReference? REFERENCE_LENGTH: 0);
-	}	
-	
+	}
+
 	//OTHER
 	
 	public String toString(DBSet db)

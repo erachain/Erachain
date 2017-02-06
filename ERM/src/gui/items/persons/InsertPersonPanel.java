@@ -223,14 +223,7 @@ private void init(){
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.weightx = 0.05;
      jPanel1.add(iconLabel, gridBagConstraints);
- 	
- 	
- 	
-     
-     
-     
-     
-     
+ 	 
      
 	 pasteButton = new JButton();
      pasteButton.setText(Lang.getInstance().translate("Paste") +"...");
@@ -245,36 +238,21 @@ private void init(){
  			String base58str = getClipboardContents();
  			byte[] dataPerson = Base58.decode(base58str);
  			try {
- 				person = (PersonHuman)PersonFactory.getInstance().parse(dataPerson, false);
- 				
+ 				person = (PersonHuman)PersonFactory.getInstance().parse(dataPerson, false);		
  			} catch (Exception ee) {
  				return;
  			}
- 			//person = (PersonCls)issuePersonRecord.getItem();
  			
  			txtName.setText(person.getName());
  			iconLabel.setIcon(new ImageIcon(person.getImage()));
 
- 			String sss = "";
- 			sss += new Date(person.getBirthday())+ "";
  			txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			long dayTimestamp = person.getDeathday();
  			if ( dayTimestamp > person.getBirthday()) {
- 				sss += " ... " + new Date(person.getDeathday());
  				txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
  			}
- 			sss += "\n\n";
- 			
- 			
- 			
- 			
- 			
- 			
- 			
- 			
-			//error (( txtDeathday.getCalendar().setTimeInMillis(dayTimestamp);
-
- 			txtareaDescription.setText(sss + (person.getDescription()==null?"":person.getDescription()));
+ 
+ 			txtareaDescription.setText(person.getDescription()==null?"":person.getDescription());
 
  			txtGender.setSelectedIndex(person.getGender());
  			txtGenderTxt.setText(txtGender.getSelectedItem().toString());
