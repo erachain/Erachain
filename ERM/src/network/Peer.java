@@ -354,7 +354,7 @@ public class Peer extends Thread{
 					{
 						LOGGER.debug(e.getMessage(), e);
 						//DISCONNECT
-						callback.tryDisconnect(this, 30, e.getMessage());
+						callback.tryDisconnect(this, 10, e.getMessage());
 						try {
 							Thread.sleep(10);
 						}
@@ -407,7 +407,7 @@ public class Peer extends Thread{
 		{
 			//ERROR
 			//LOGGER.debug(e.getMessage(),e);
-			callback.tryDisconnect(this, 10, e.getMessage());
+			callback.tryDisconnect(this, 0, e.getMessage());
 			
 			//RETURN
 			return false;
