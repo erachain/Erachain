@@ -150,12 +150,12 @@ public abstract class PersonCls extends ItemCls {
 		return db.getIssuePersonMap();
 	}
 
-	// PARSE
-	public byte[] toBytes(boolean includeReference)
+	// to BYTES
+	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
 	{
 		
-		byte[] data = super.toBytes(includeReference);
-				
+		byte[] data = super.toBytes(includeReference, forOwnerSign);
+		
 		// WRITE BIRTHDAY
 		byte[] birthdayBytes = Longs.toByteArray(this.birthday);
 		birthdayBytes = Bytes.ensureCapacity(birthdayBytes, BIRTHDAY_LENGTH, 0);

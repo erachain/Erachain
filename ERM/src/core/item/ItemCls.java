@@ -223,65 +223,74 @@ public abstract class ItemCls {
 		return Controller.getInstance().isItemFavorite(this);
 	}
 
-	public byte[] toBytes(boolean includeReference)
+	// forOwnerSign - use only DATA needed for making signature
+	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
 	{
 
 		byte[] data = new byte[0];
+		boolean useAll = !forOwnerSign;
 		
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
+		if (useAll) {
+			//WRITE TYPE
+			data = Bytes.concat(data, this.typeBytes);
+		}
 
-		//WRITE OWNER
-		try
-		{
-			data = Bytes.concat(data, this.owner.getPublicKey());
+		if (useAll) {
+			//WRITE OWNER
+			try
+			{
+				data = Bytes.concat(data, this.owner.getPublicKey());
+			}
+			catch(Exception e)
+			{
+				//DECODE EXCEPTION
+			}
 		}
-		catch(Exception e)
-		{
-			//DECODE EXCEPTION
-		}
-		
-		//WRITE NAME SIZE
+
 		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
-		data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
+		if (useAll) {
+			//WRITE NAME SIZE
+			data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
+		}
 		
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
 
-		//WRITE ICON SIZE - 2 bytes = 64kB max
-		int iconLength = this.icon.length;
-		byte[] iconLengthBytes = Ints.toByteArray(iconLength);
-		data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
-				
-		//WRITE ICON
-		data = Bytes.concat(data, this.icon);
+		if (useAll) {
+			//WRITE ICON SIZE - 2 bytes = 64kB max
+			int iconLength = this.icon.length;
+			byte[] iconLengthBytes = Ints.toByteArray(iconLength);
+			data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+					
+			//WRITE ICON
+			data = Bytes.concat(data, this.icon);
+		}
 
-		//WRITE IMAGE SIZE
-		int imageLength = this.image.length;
-		byte[] imageLengthBytes = Ints.toByteArray(imageLength);
-		data = Bytes.concat(data, imageLengthBytes);
+		if (useAll) {
+			//WRITE IMAGE SIZE
+			int imageLength = this.image.length;
+			byte[] imageLengthBytes = Ints.toByteArray(imageLength);
+			data = Bytes.concat(data, imageLengthBytes);
+		}
 				
 		//WRITE IMAGE
 		data = Bytes.concat(data, this.image);
 		
-		//WRITE DESCRIPTION SIZE
 		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
-		int descriptionLength = descriptionBytes.length;
-		byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
-		data = Bytes.concat(data, descriptionLengthBytes);
+		if (useAll) {
+			//WRITE DESCRIPTION SIZE
+			int descriptionLength = descriptionBytes.length;
+			byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
+			data = Bytes.concat(data, descriptionLengthBytes);
+		}
 				
 		//WRITE DESCRIPTION
 		data = Bytes.concat(data, descriptionBytes);
 		
-		if(includeReference)
+		if(useAll && includeReference)
 		{
 			//WRITE REFERENCE
 			data = Bytes.concat(data, this.reference);
-		}
-		else
-		{
-			//WRITE EMPTY REFERENCE
-			// data = Bytes.concat(data, new byte[Crypto.SIGNATURE_LENGTH]);
 		}
 		
 		return data;

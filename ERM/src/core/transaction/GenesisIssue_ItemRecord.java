@@ -91,7 +91,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 
 		//WRITE ITEM
 		// without reference
-		data = Bytes.concat(data, this.item.toBytes(false));
+		data = Bytes.concat(data, this.item.toBytes(false, false));
 				
 		return data;
 	}

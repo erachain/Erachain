@@ -238,7 +238,7 @@ public class TestRecGenesisPerson2 {
 		assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 		
 		//CHECK PERSON IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(true), person.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(true, false), person.toBytes(true, false)));
 		
 		/////////////////
 		///// ORPHAN ////

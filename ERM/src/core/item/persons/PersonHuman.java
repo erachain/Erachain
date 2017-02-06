@@ -61,8 +61,8 @@ public class PersonHuman extends PersonCls {
 
 	public byte[] getOwnerSignature() { return ownerSignature; }
 
-	public byte[] toBytes(boolean includeReference) {
-		byte[] data = super.toBytes(includeReference);
+	public byte[] toBytes(boolean includeReference, boolean onlyBody) {
+		byte[] data = super.toBytes(includeReference, onlyBody);
 		if (this.typeBytes[1] == 1) {
 			data = Bytes.concat(data, this.ownerSignature);
 		}
@@ -264,7 +264,8 @@ public class PersonHuman extends PersonCls {
 
 		boolean includeReference = false;
 		// not use SIGNATURE here
-		byte[] data = super.toBytes(includeReference);
+		boolean forOwnerSign = true;
+		byte[] data = super.toBytes(includeReference, forOwnerSign);
 		if ( data == null ) {
 			this.typeBytes[1] = (byte)0;
 			return;
@@ -282,8 +283,9 @@ public class PersonHuman extends PersonCls {
 			return false;
 		
 		boolean includeReference = false;
+		boolean forOwnerSign = true;
 		// not use SIGNATURE here
-		byte[] data = super.toBytes(includeReference);
+		byte[] data = super.toBytes(includeReference, forOwnerSign);
 		if ( data == null )
 			return false;
 		

@@ -26,7 +26,7 @@ public class ItemSerializer implements Serializer<ItemCls>, Serializable
 	public void serialize(DataOutput out, ItemCls value) throws IOException 
 	{
 		out.writeInt(value.getDataLength(true));
-        out.write(value.toBytes(true));
+        out.write(value.toBytes(true, false));
     }
 
     @Override

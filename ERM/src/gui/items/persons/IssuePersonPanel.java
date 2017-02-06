@@ -447,7 +447,7 @@ public class IssuePersonPanel extends JPanel
 				// SIGN
 				person.sign(creator);
 				
-				String base58str = Base58.encode(person.toBytes(false));
+				String base58str = Base58.encode(person.toBytes(false, false));
 				// This method writes a string to the system clipboard.
 				// otherwise it returns null.
 			    StringSelection sss = new StringSelection(base58str);

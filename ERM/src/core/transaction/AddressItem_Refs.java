@@ -94,7 +94,7 @@ public abstract class AddressItem_Refs extends Transaction
 		byte[] data = super.toBytes(withSign, releaserReference);
 		
 		// without reference
-		data = Bytes.concat(data, this.item.toBytes(false));
+		data = Bytes.concat(data, this.item.toBytes(false, false));
 				
 		return data;
 	}

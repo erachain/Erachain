@@ -182,9 +182,9 @@ public class AssetVenture extends AssetCls {
 
 		return venture;
 	}
-	public byte[] toBytes(boolean includeReference)
+	public byte[] toBytes(boolean includeReference, boolean onlyBody)
 	{
-		byte[] data = super.toBytes(includeReference);
+		byte[] data = super.toBytes(includeReference, onlyBody);
 		
 		//WRITE QUANTITY
 		byte[] quantityBytes = Longs.toByteArray(this.quantity);

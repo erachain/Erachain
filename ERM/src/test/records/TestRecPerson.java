@@ -230,13 +230,13 @@ public class TestRecPerson {
 
 		// PARSE PERSON
 		
-		byte [] rawPerson = person.toBytes(false);
+		byte [] rawPerson = person.toBytes(false, false);
 		assertEquals(rawPerson.length, person.getDataLength(false));
 		person.setReference(new byte[64]);
-		rawPerson = person.toBytes(true);
+		rawPerson = person.toBytes(true, false);
 		assertEquals(rawPerson.length, person.getDataLength(true));
 		
-		rawPerson = person.toBytes(false);
+		rawPerson = person.toBytes(false, false);
 		PersonCls parsedPerson = null;
 		try 
 		{	
@@ -368,7 +368,7 @@ public class TestRecPerson {
 		assertEquals(true, db.getItemPersonMap().contains(key));
 		
 		//CHECK PERSON IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(key).toBytes(true), person.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemPersonMap().get(key).toBytes(true, false), person.toBytes(true, false)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(issuePersonTransaction.getTimestamp(), certifier.getLastReference(db));
@@ -964,6 +964,25 @@ public class TestRecPerson {
 		assertEquals(false, userAccount1.isPerson(fork));
 		assertEquals(false, userAccount2.isPerson(fork));
 		assertEquals(false, userAccount3.isPerson(fork));
+	}
+
+	@Test
+	public void validatePersonHumanRecord() 
+	{	
+		
+		init();
+				
+		/*
+		PersonCls person = new PersonHuman((PublicKeyAccount)certifier, "person 123456789", 1111, 3333,
+				"", "", 22, 33,
+				"", "", "", 170, icon, image, "", ownerSignature);
+				
+		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
+		genesis_issue_person.process(db, gb, false);
+		//genesisPersonKey = db.getIssuePersonMap().size();
+		genesisPersonKey = genesis_issue_person.getAssetKey(db);
+		*/ 
+
 	}
 
 }

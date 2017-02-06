@@ -210,13 +210,13 @@ public class TestRecUnion {
 
 		// PARSE UNION
 		
-		byte [] rawUnion = union.toBytes(false);
+		byte [] rawUnion = union.toBytes(false, false);
 		assertEquals(rawUnion.length, union.getDataLength(false));
 		union.setReference(new byte[64]);
-		rawUnion = union.toBytes(true);
+		rawUnion = union.toBytes(true, false);
 		assertEquals(rawUnion.length, union.getDataLength(true));
 		
-		rawUnion = union.toBytes(false);
+		rawUnion = union.toBytes(false, false);
 		UnionCls parsedUnion = null;
 		try 
 		{	
@@ -330,7 +330,7 @@ public class TestRecUnion {
 		assertEquals(true, db.getItemUnionMap().contains(key));
 		
 		//CHECK UNION IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true), union.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true, false), union.toBytes(true, false)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastReference(db));

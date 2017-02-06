@@ -114,7 +114,7 @@ public class TestRecStatus {
 		init();
 		
 		StatusCls status = new Status(maker, "test132", icon, image, "12345678910strontje");
-		byte[] raw = status.toBytes(false);
+		byte[] raw = status.toBytes(false, false);
 		assertEquals(raw.length, status.getDataLength(false));
 				
 		//CREATE ISSUE STATUS TRANSACTION
@@ -200,7 +200,7 @@ public class TestRecStatus {
 		assertEquals(mapSize + 1, statusMap.size());
 		
 		//CHECK STATUS IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true), status.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true, false), status.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(issueStatusRecord.getTimestamp(), maker.getLastReference(db));
