@@ -840,14 +840,21 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
+		
 		if (height <4)
 			win_value >>= 3;
-		else if (height < BlockChain.REPEAT_WIN)
-			win_value >>= 4;
-		else if (height < BlockChain.TARGET_COUNT)
-			win_value >>= 5;
+		else if (height < BlockChain.TARGET_COUNT>>1)
+			win_value = win_value >>3 - win_value >>4;
+		else if (true || height < BlockChain.TARGET_COUNT)
+			win_value = win_value >>4;
+		else if (height < BlockChain.TARGET_COUNT<<1)
+			win_value = win_value >>4 - win_value >>5;
+		else if (height < BlockChain.TARGET_COUNT<<1)
+			win_value = win_value >>5;
+		else if (height < BlockChain.TARGET_COUNT<<2)
+			win_value = win_value >>5 - win_value >>6;
 		else
-			win_value >>= 6;
+			win_value = win_value >>6;
 		
 		return win_value;
 
@@ -957,7 +964,7 @@ public class Block {
 	public static boolean isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
 		
 		int repeat_win = 0;
-		if (height < BlockChain.TARGET_COUNT<<2) {
+		if (height < BlockChain.REPEAT_WIN<<1) {
 			repeat_win = BlockChain.REPEAT_WIN;
 		} else {
 			return false;

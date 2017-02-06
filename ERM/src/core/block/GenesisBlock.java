@@ -167,10 +167,11 @@ public class GenesisBlock extends Block{
 			List<List<Object>> genesisInvestors = Arrays.asList(
 					////					
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "333000"),
-					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "333000"),
-					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "333000"),
-					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "333000"),
+					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "300000"),
+					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "300000"),
+					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "300000"),
 					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "100000"),
+					Arrays.asList("7QuuSeJqTsuNBUsTfrfqHgRZTZ6ymKxYoJ", "100000"),
 					
 					////
 					Arrays.asList("7Mr6qTY2vN1int3Byo6NmZQDRmH7zuLEZ7", "1800"),
@@ -206,7 +207,11 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7EM7P1neMZkw2EXr2kn15XMixfYVVTwvWF", "1418.66556289"),
 					Arrays.asList("7LcwdEBZWVyFyaFhFoGC3SUxyqH5Uo9Zrq", "1432.85221852"),
 					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", "502.98142684"),
-					Arrays.asList("7MRWHqXZRmNYL7TUHkVht9CQcime3K4Cm3", "253.451")
+					Arrays.asList("7MRWHqXZRmNYL7TUHkVht9CQcime3K4Cm3", "253.451"),
+					Arrays.asList("7677tDJSjTSHnjDe3msjVmJYhWMZZED2jj", "2000"),
+					Arrays.asList("75R3LayKe3orQrtZnMWR1VdadBdypj2NWW", "1001")
+					
+					
 					);
 
 			////////// ACTIVISTS
@@ -226,7 +231,6 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7Kh5KvHCuWAq8XHioKyUBZxRmbwCJZV5b2", "123152.70936"),
 					Arrays.asList("74Rcp979npxf6Q5zV6ZnpEnsxrsCHdXeNU", "1231.5270936"),
 					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "2463.05418719"),
-					//Arrays.asList("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "123152.70936"),
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "1231.5270936"), //
 					Arrays.asList("7K4XaDVf98J1fKDdCS8oYofYgFgoezFEAA", "1231.5270936"),
 					Arrays.asList("7Cy2J5ST6ukHSJVWtQd7eH4wbhbSBbMbZD", "1231.5270936"),
@@ -343,6 +347,13 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
 					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1),
 					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 1),
+					
+					Arrays.asList("7RVngd4icw21J1ePCg8977sBetgQFARBUL", 1),
+					Arrays.asList("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r", 1),
+					Arrays.asList("7DWxrA51FMESx73rJ7xQcgZ3vJBye3oKdt", 1),
+					Arrays.asList("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7", 1),
+					Arrays.asList("7BGULg8nCwQWTkDRVc8dTD47DqbMcmeYpE", 1),
+					//
 					Arrays.asList("7RSLd62fpgBW5PyaGHLNh8rHZQbmRqcret", 2) //
 					));
 

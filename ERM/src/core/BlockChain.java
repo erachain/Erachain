@@ -34,7 +34,7 @@ public class BlockChain
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 3; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = 6; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 9999999;
@@ -57,6 +57,7 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
+	// 1486444444444l
 	public static final long DEFAULT_MAINNET_STAMP = 1486361041333l; //1485184444444l;
 
 	//public static final int FEE_MIN_BYTES = 200;
