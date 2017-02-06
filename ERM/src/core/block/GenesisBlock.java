@@ -349,9 +349,9 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 1),
 					
 					Arrays.asList("7RVngd4icw21J1ePCg8977sBetgQFARBUL", 1),
-					Arrays.asList("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r", 1),
+					Arrays.asList("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r", 3),
 					Arrays.asList("7DWxrA51FMESx73rJ7xQcgZ3vJBye3oKdt", 1),
-					Arrays.asList("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7", 1),
+					Arrays.asList("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7", 3),
 					Arrays.asList("7BGULg8nCwQWTkDRVc8dTD47DqbMcmeYpE", 1),
 					//
 					Arrays.asList("7RSLd62fpgBW5PyaGHLNh8rHZQbmRqcret", 2) //
@@ -379,7 +379,7 @@ public class GenesisBlock extends Block{
 
 			}
 
-			int pickDebt = 28000;
+			int pickDebt = 27000;
 			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(8);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
