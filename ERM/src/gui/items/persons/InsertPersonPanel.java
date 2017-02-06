@@ -125,7 +125,7 @@ private void init(){
 	txtBirthdayTxt.setEnabled(false);
 	txtDeathdayTxt.setEnabled(false);
 	
-	
+	copyButton.setVisible(false);
 	
 	
 	iconButton.setVisible(false);
