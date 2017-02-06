@@ -37,12 +37,22 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	protected JTextField txt_Sign;
 	protected JTextField txt_public_key;
 	protected JTextField txt_info;
-    protected javax.swing.JButton trans_Button;
+	protected JTextField txtGenderTxt;
+	protected JTextField txtBirthdayTxt;
+	protected JTextField txtDeathdayTxt;
+	
+	
+	
+	protected javax.swing.JButton trans_Button;
     protected javax.swing.JLabel label_Sign;
     protected javax.swing.JLabel label_public_key;
     protected javax.swing.JLabel label_info;
+    protected javax.swing.JLabel iconLabel;
     protected javax.swing.JPanel jPanel_Paste;
     protected javax.swing.JButton pasteButton;
+    
+    
+    
     
     //protected IssuePersonRecord issuePersonRecord;
     protected PersonHuman person;
@@ -81,11 +91,20 @@ private void init(){
 	txt_Sign  = new javax.swing.JTextField();
 	txt_public_key = new javax.swing.JTextField();
 	txt_info = new javax.swing.JTextField();
-
+	txtGenderTxt = new javax.swing.JTextField();
+	txtBirthdayTxt = new javax.swing.JTextField();
+	txtDeathdayTxt = new javax.swing.JTextField();
 	
+	
+	
+	
+	
+	iconLabel = new javax.swing.JLabel();
 	label_Sign= new javax.swing.JLabel();
 	label_public_key= new javax.swing.JLabel();
 	label_info= new javax.swing.JLabel();
+	
+	
 	
 	//txtBirthday = new javax.swing.JTextField();
 	//txtDeathday = new javax.swing.JTextField();
@@ -97,14 +116,21 @@ private void init(){
    	this.txtFeePow.setText("");
 
 	
-	cbxFrom.setEnabled(false);
+//	cbxFrom.setEnabled(false);
 	txtFeePow.setEditable(false);
 	txtName.setEditable(false);
 	txtareaDescription.setEditable(false);
 	txtBirthday.setVisible(false); //setEnabled(false);
 	txtDeathday.setVisible(false); //setEnabled(false);
-	iconButton.setEnabled(false);
-	txtGender.setEnabled(false);
+	txtBirthdayTxt.setEnabled(false);
+	txtDeathdayTxt.setEnabled(false);
+	
+	
+	
+	
+	iconButton.setVisible(false);
+	txtGender.setVisible(false);
+	txtGenderTxt.setEditable(false);
 	txtRace.setEditable(false);
 	txtBirthLatitude.setEditable(false);
 	txtBirthLongitude.setEditable(false);
@@ -150,6 +176,61 @@ private void init(){
      gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
      add(txt_public_key, gridBagConstraints);
      
+     gridBagConstraints = new java.awt.GridBagConstraints();
+     gridBagConstraints.gridx = 2;
+     gridBagConstraints.gridy = 8;
+     gridBagConstraints.gridwidth = 3;
+     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+     gridBagConstraints.weightx = 0.1;
+     add(txtGenderTxt, gridBagConstraints);
+     
+     
+    // txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+     gridBagConstraints = new java.awt.GridBagConstraints();
+     gridBagConstraints.gridx = 2;
+     gridBagConstraints.gridy = 6;
+     gridBagConstraints.gridwidth = 3;
+     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+     gridBagConstraints.weightx = 0.2;
+     add( txtBirthdayTxt, gridBagConstraints);
+
+//      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+//      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
+//           public void actionPerformed(java.awt.event.ActionEvent evt) {
+//               txtDeathdayActionPerformed(evt);
+//           }
+//       });
+     
+ //    txtDeathday.setDateFormatString("yyyy-MM-dd");
+     gridBagConstraints = new java.awt.GridBagConstraints();
+     gridBagConstraints.gridx = 8;
+     gridBagConstraints.gridy = 6;
+     gridBagConstraints.gridwidth = 7;
+     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+     gridBagConstraints.weightx = 0.2;
+     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+     add(txtDeathdayTxt, gridBagConstraints);
+     
+     
+     gridBagConstraints = new java.awt.GridBagConstraints();
+     gridBagConstraints.gridx = 0;
+     gridBagConstraints.gridy = 0;
+     gridBagConstraints.gridwidth = 7;
+     gridBagConstraints.gridheight = 5;
+     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+     gridBagConstraints.weightx = 0.05;
+     jPanel1.add(iconLabel, gridBagConstraints);
+ 	
+ 	
+ 	
+     
+     
+     
+     
+     
      
 	 pasteButton = new JButton();
      pasteButton.setText(Lang.getInstance().translate("Paste") +"...");
@@ -172,21 +253,33 @@ private void init(){
  			//person = (PersonCls)issuePersonRecord.getItem();
  			
  			txtName.setText(person.getName());
- 			iconButton.setIcon(new ImageIcon(person.getImage()));
+ 			iconLabel.setIcon(new ImageIcon(person.getImage()));
 
  			String sss = "";
  			sss += new Date(person.getBirthday())+ "";
+ 			txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			long dayTimestamp = person.getDeathday();
  			if ( dayTimestamp > person.getBirthday()) {
  				sss += " ... " + new Date(person.getDeathday());
+ 				txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
  			}
  			sss += "\n\n";
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
  			
 			//error (( txtDeathday.getCalendar().setTimeInMillis(dayTimestamp);
 
  			txtareaDescription.setText(sss + (person.getDescription()==null?"":person.getDescription()));
 
  			txtGender.setSelectedIndex(person.getGender());
+ 			txtGenderTxt.setText(txtGender.getSelectedItem().toString());
+ 			
+ 			
  			if (person.getRace() != null)
  				txtRace.setText(person.getRace());
  			txtBirthLatitude.setText("" + person.getBirthLatitude());
@@ -252,6 +345,7 @@ private void init(){
 		//txtDeathday.setText("0000-00-00");
 		
 		txtGender.setSelectedIndex(2);
+		txtGenderTxt.setText("");
 		txtRace.setText("");
 		txtBirthLatitude.setText("");
 		txtBirthLongitude.setText("");
