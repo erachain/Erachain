@@ -29,7 +29,9 @@ import javax.swing.table.TableColumn;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
@@ -52,7 +54,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
      */
     public Person_Info_002(PersonCls person, boolean full) {
     	
-        initComponents(person, full);
+        initComponents((PersonHuman)person, full);
     }
 
     /**
@@ -62,7 +64,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents(PersonCls person, boolean full) {
+    private void initComponents(PersonHuman person, boolean full) {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel3 = new javax.swing.JPanel();
@@ -212,7 +214,15 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         MenuPopupUtil.installContextMenu(jTextArea_Description);
         jTextArea_Description.setEditable(false);
-        jTextArea_Description.setText(person.getDescription());
+        
+        String sss = "";
+        if (person.getOwner() != null) {
+        	sss += "Owner: " + person.getOwner().toString() + "\n";
+        }
+        if (person.getOwnerSignature() != null) {
+        	sss += "Owner Signature: " + Base58.encode(person.getOwnerSignature()) + "\n";        	
+        }
+        jTextArea_Description.setText(sss + "\n" + person.getDescription());
        
 
         

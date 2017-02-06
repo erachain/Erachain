@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,20 +13,28 @@ import java.sql.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.toedter.calendar.JDateChooser;
 
+import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
+import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import gui.transaction.OnDealClick;
 import lang.Lang;
+import utils.Pair;
 
 public class InsertPersonPanel extends IssuePersonPanel{
 
@@ -113,11 +122,11 @@ private void init(){
    	this.txtBirthLatitude.setText("");
    	this.txtBirthLongitude.setText("");
    	this.txtHeight.setText("");
-   	this.txtFeePow.setText("");
+   	this.txtFeePow.setText("0");
 
 	
 //	cbxFrom.setEnabled(false);
-	txtFeePow.setEditable(false);
+	//txtFeePow.setEditable(false);
 	txtName.setEditable(false);
 	txtareaDescription.setEditable(false);
 	txtBirthday.setVisible(false); //setEnabled(false);
@@ -231,7 +240,11 @@ private void init(){
 
  		@Override
  		public void actionPerformed(ActionEvent arg0) {
- 			// TODO Auto-generated method stub
+
+			issueButton.setEnabled(false);
+			copyButton.setEnabled(false);
+
+			// TODO Auto-generated method stub
  			person = null;
  			reset();
  			
@@ -296,8 +309,62 @@ private void init(){
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+
+			issueButton.setEnabled(false);
+			copyButton.setEnabled(false);
+
+			//READ CREATOR
+			Account creatorAccount = (Account) cbxFrom.getSelectedItem();
+
+			int parse = 0;
+			int feePow = 0;
+
+			try
+			{
+				
+				//READ FEE POW
+				feePow = Integer.parseInt(txtFeePow.getText());				
+				//String b = txtFeePow.getText();
+				
+			}
+			catch(Exception e)
+			{
+				String mess = "Invalid pars... " + parse;
+				switch(parse)
+				{
+				case 0:
+					mess = "Invalid fee power 0..6";
+					break;
+				}
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				
+				issueButton.setEnabled(true);
+				copyButton.setEnabled(true);
+				return;
+			}
+
 			// TODO Auto-generated method stub
+			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(creatorAccount.getAddress());
+			//PublicKeyAccount owner = (PublicKeyAccount)creator;
+			Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(
+					creator, feePow, person);
 			
+			//CHECK VALIDATE MESSAGE
+			if (result.getB() == Transaction.VALIDATE_OK) {
+			
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+						"Person issue has been sent!"),
+						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				reset();
+				
+			} else {		
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
+			
+			//ENABLE
+			issueButton.setEnabled(true);
+			copyButton.setEnabled(true);
+
 		}
     	 
 	    	 

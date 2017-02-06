@@ -144,6 +144,7 @@ public abstract class Transaction {
 	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 125;
 	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 126;
 	public static final int ITEM_PERSON_HEIGHT_ERROR = 127;
+	public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 128;
 
 	public static final int INVALID_UPDATE_VALUE = 140;
 

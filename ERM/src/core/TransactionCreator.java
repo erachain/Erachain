@@ -361,6 +361,28 @@ public class TransactionCreator
 		}
 	}
 
+	public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
+			PrivateKeyAccount creator, int feePow, PersonHuman human)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+
+		long lastReference;
+		lastReference = creator.getLastReference(this.fork);
+
+		//CREATE ISSUE NOTE TRANSACTION
+		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte)feePow, time, lastReference);
+		issuePersonRecord.sign(creator, false);
+		
+		//VALIDATE AND PROCESS
+		boolean asPack = false;
+		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		
+	}
+
 	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
 	{
 		//CHECK FOR UPDATES

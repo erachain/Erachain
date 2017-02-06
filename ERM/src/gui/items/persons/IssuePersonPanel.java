@@ -445,7 +445,7 @@ public class IssuePersonPanel extends JPanel
 				IssuePersonRecord issuePersonRecord = (IssuePersonRecord)result.getA();
 				PersonHuman person = (PersonHuman)issuePersonRecord.getItem();
 				// SIGN
-				person.sign(creator, false);
+				person.sign(creator);
 				
 				String base58str = Base58.encode(person.toBytes(false));
 				// This method writes a string to the system clipboard.

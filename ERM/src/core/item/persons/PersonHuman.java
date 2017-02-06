@@ -254,7 +254,7 @@ public class PersonHuman extends PersonCls {
 	}
 	
 	//
-	public void sign(PrivateKeyAccount owner, boolean includeReference)
+	public void sign(PrivateKeyAccount owner)
 	{
 		
 		if (!Arrays.equals(owner.getPublicKey(), this.owner.getPublicKey())) {
@@ -262,6 +262,7 @@ public class PersonHuman extends PersonCls {
 			return;
 		}
 
+		boolean includeReference = false;
 		// not use SIGNATURE here
 		byte[] data = super.toBytes(includeReference);
 		if ( data == null ) {
@@ -274,12 +275,13 @@ public class PersonHuman extends PersonCls {
 
 	}
 	
-	public boolean isSignatureValid(boolean includeReference) {
+	public boolean isSignatureValid() {
 
 		if ( this.ownerSignature == null || this.ownerSignature.length != Crypto.SIGNATURE_LENGTH
 				|| Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
 			return false;
 		
+		boolean includeReference = false;
 		// not use SIGNATURE here
 		byte[] data = super.toBytes(includeReference);
 		if ( data == null )

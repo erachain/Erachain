@@ -64,6 +64,7 @@ import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
 import core.naming.Name;
@@ -2215,6 +2216,14 @@ public class Controller extends Observable {
 					skinColor, eyeColor, hairСolor, height,
 					icon, image, description,
 					owner, ownerSignature);
+		}
+	}
+	public Pair<Transaction, Integer> issuePersonHuman(
+			PrivateKeyAccount creator, int feePow, PersonHuman human) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssuePersonHumanTransaction(
+					creator, feePow, human);
 		}
 	}
 

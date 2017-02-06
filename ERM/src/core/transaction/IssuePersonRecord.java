@@ -25,6 +25,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
+import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
 //import database.ItemMap;
 import database.DBSet;
@@ -106,7 +107,19 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		
 		if (person.getImage().length < (MAX_IMAGE_LENGTH - MAX_IMAGE_LENGTH>>2)
 				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
-		
+
+		if (!Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
+			// OWNER of personal INFO not is CREATOR
+			PersonHuman human = (PersonHuman)person;
+			if (human.getOwnerSignature() == null) {
+				return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+			}
+			if (!human.isSignatureValid()) {
+				return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
+			}
+			
+		}
+
 		long count = db.getItemPersonMap().getSize();
 		if (count < 20) {
 			// FIRST Persons only by ME
