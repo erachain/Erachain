@@ -67,12 +67,13 @@ public class PersonAddressMap extends DBMap<
 	}
 		
 	///////////////////////////////
+	@SuppressWarnings("unchecked")
 	public void addItem(Long person, String address, Tuple3<Integer, Integer, Integer> item)
 	{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
 		
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -81,13 +82,22 @@ public class PersonAddressMap extends DBMap<
 		}
 
 		Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
-		if (stack == null)
+		if (stack == null) {
 			stack = new Stack<Tuple3<Integer, Integer, Integer>>();
-		
-		stack.push(item);
-
-		value_new.put(address, stack);
-		
+			stack.push(item);
+			value_new.put(address, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);
+				value_new.put(address, stack);				
+			} else {
+				Stack<Tuple3<Integer, Integer, Integer>> stack_new;
+				stack_new = (Stack<Tuple3<Integer, Integer, Integer>>)stack.clone();
+				stack_new.push(item);
+				value_new.put(address, stack_new);								
+			}
+		}
+				
 		this.set(person, value_new);
 		
 	}
@@ -107,12 +117,13 @@ public class PersonAddressMap extends DBMap<
 		return stack.size()> 0? stack.peek(): null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void removeItem(Long person, String address)
 	{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value = this.get(person);
 		
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -123,9 +134,15 @@ public class PersonAddressMap extends DBMap<
 		Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
 		if (stack==null || stack.size() == 0) return;
 
-		stack.pop();
-
-		value_new.put(address, stack);
+		if (this.parent == null) {
+			stack.pop();
+			value_new.put(address, stack);			
+		} else {
+			Stack<Tuple3<Integer, Integer, Integer>> stack_new;
+			stack_new = (Stack<Tuple3<Integer, Integer, Integer>>)stack.clone();
+			stack_new.pop();
+			value_new.put(address, stack_new);						
+		}
 		
 		this.set(person, value_new);
 		

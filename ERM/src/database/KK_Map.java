@@ -86,13 +86,14 @@ public class KK_Map extends DBMap<
 		return this.observableData;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void putItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
 	{
 
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -103,47 +104,53 @@ public class KK_Map extends DBMap<
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
 		if (stack == null) {
 			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
-			//stack.add(item);
 			stack.push(item);
-		}
-		else {
-			if (item.a == null || item.b == null) {
-				// item has NULL values id dates - reset it by last values
-				Long valA;
-				Long valB;
-				Tuple5<Long, Long, byte[], Integer, Integer> lastItem = stack.peek();
-				if (item.a == null) {
-					// if input item Begin Date = null - take date from stack (last value)
-					valA = lastItem.a;
-				} else {
-					valA = item.a;					
-				}
-				if (item.b == null) {
-					// if input item End Date = null - take date from stack (last value)
-					valB = lastItem.b;
-				} else {
-					valB = item.b;					
-				}
-				stack.push(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
-			} else {
+			value_new.put(itemKey, stack);
+		} else {
+			if (this.parent == null) {
 				stack.push(item);
+				value_new.put(itemKey, stack);
+			} else {
+				Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+				stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+				if (item.a == null || item.b == null) {
+					// item has NULL values id dates - reset it by last values
+					Long valA;
+					Long valB;
+					Tuple5<Long, Long, byte[], Integer, Integer> lastItem = stack_new.peek();
+					if (item.a == null) {
+						// if input item Begin Date = null - take date from stack (last value)
+						valA = lastItem.a;
+					} else {
+						valA = item.a;					
+					}
+					if (item.b == null) {
+						// if input item End Date = null - take date from stack (last value)
+						valB = lastItem.b;
+					} else {
+						valB = item.b;					
+					}
+					stack_new.push(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
+				} else {
+					stack_new.push(item);
+				}
+				value_new.put(itemKey, stack_new);
 			}
 		}
 
-		value_new.put(itemKey, stack);
 		
 		this.set(key, value_new);
 	}
 
 	// NOT UPDATE UNIQUE STATUS FOR ITEM - ADD NEW STATUS FOR ITEM + DATA
+	@SuppressWarnings("unchecked")
 	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
 	{
-
 
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -153,12 +160,20 @@ public class KK_Map extends DBMap<
 
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
 		if (stack == null) {
-			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
+			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();			
+			stack.push(item);
+			value_new.put(itemKey, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);
+				value_new.put(itemKey, stack);
+			} else {
+				Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+				stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+				stack_new.push(item);
+				value_new.put(itemKey, stack_new);
+			}
 		}
-		
-		stack.push(item);
-
-		value_new.put(itemKey, stack);
 		
 		this.set(key, value_new);
 	}
@@ -171,12 +186,13 @@ public class KK_Map extends DBMap<
 	}
 	
 	// remove only last item from stack for this key of itemKey
+	@SuppressWarnings("unchecked")
 	public void removeItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
@@ -186,9 +202,16 @@ public class KK_Map extends DBMap<
 		if (stack==null || stack.size() == 0)
 			return;
 
-		stack.pop();
+		if (this.parent == null) {
+			stack.pop();
+			value_new.put(itemKey, stack);
+		} else {
+			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+			stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+			stack_new.pop();
+			value_new.put(itemKey, stack_new);
+		}
 
-		value_new.put(itemKey, stack);
 		this.set(key, value_new);
 	}
 }

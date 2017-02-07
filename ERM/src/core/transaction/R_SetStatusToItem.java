@@ -617,7 +617,9 @@ public class R_SetStatusToItem extends Transaction {
 	public int isValid(DBSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
-		if (result != Transaction.VALIDATE_OK) return result; 
+		if (result != Transaction.VALIDATE_OK) {
+			return result; 
+		}
 
 		if (this.data_1 != null ) {
 			//CHECK DATA SIZE

@@ -59,7 +59,9 @@ public class BlockChain
 
 	//TESTNET 
 	// 1486444444444l
-	public static final long DEFAULT_MAINNET_STAMP = 1486361041333l; //1485184444444l;
+	//public static final long DEFAULT_MAINNET_STAMP = 1486361041333l; //1485184444444l;
+	public static final long DEFAULT_MAINNET_STAMP = 1486490444444l; //1485184444444l;
+	
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
