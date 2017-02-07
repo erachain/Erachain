@@ -72,8 +72,10 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	
 	@Override
 	public boolean hasPublicText() {
-		if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
-			return false;
+		for ( String admin: BlockChain.GENESIS_ADMINS) {
+			if (this.creator.equals(admin)) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -125,7 +127,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		long count = db.getItemPersonMap().getSize();
 		if (count < 20) {
 			// FIRST Persons only by ME
-			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
+			if (this.creator.equals(BlockChain.GENESIS_ADMINS)
+					|| this.creator.equals("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC")) {
 				return VALIDATE_OK;
 			} else {
 				return Transaction.ACCOUNT_NOT_PERSONALIZED;

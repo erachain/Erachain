@@ -469,10 +469,18 @@ public class R_SertifyPubKeys extends Transaction {
 				if ( balERM.compareTo(BlockChain.PSERT_MIN_ERM_BALANCE)<0 )
 					return Transaction.NOT_ENOUGH_RIGHTS;
 			} else {
-				if (this.key < 20 && this.creator.equals(BlockChain.GENESIS_ADMIN)) {
-					return Transaction.VALIDATE_OK;					
-				} else {
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				if (this.key < 20) {
+					// FIRST Persons only by ADMINS
+					boolean notAdmin = true;
+					for ( String admin: BlockChain.GENESIS_ADMINS) {
+						if (this.creator.equals(admin)) {
+							notAdmin = false;
+							break;
+						}
+					}
+					if (notAdmin) {
+						return Transaction.ACCOUNT_NOT_PERSONALIZED;
+					}
 				}
 
 			}

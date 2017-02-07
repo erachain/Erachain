@@ -49,7 +49,8 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 	public static final int GENESIS_WIN_VALUE = 1000;
-	public static final String GENESIS_ADMIN = "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
+	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
 	// CHAIN
 	public static final int CONFIRMS_HARD = 3; // for reference by signature 
