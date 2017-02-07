@@ -699,15 +699,26 @@ public class R_SetStatusToItem extends Transaction {
 					this.getBlockHeight(db), this.getSeqNo(db)
 				);
 
-		// SET ALIVE PERSON for DURATION
-		// TODO set STATUSES by reference of it record - not by key!
-		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
-		if (this.itemType == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().addItem(this.itemKey, this.key, itemP);
-		else if (this.itemType == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().addItem(this.itemKey, this.key, itemP);
-		else if (this.itemType == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().addItem(this.itemKey, this.key, itemP);
+		StatusCls status = (StatusCls)db.getItemStatusMap().get(this.key);
+		if (status.isUnique()) {	
+			// SET STATUS of ITEM for DURATION
+			// TODO set STATUSES by reference of it record - not by key!
+			/// or add MAP by reference as signature - as IssueAsset - for orphans delete
+			if (this.itemType == ItemCls.PERSON_TYPE)
+				db.getPersonStatusMap().putItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.ASSET_TYPE)
+				db.getAssetStatusMap().putItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.UNION_TYPE)
+				db.getUnionStatusMap().putItem(this.itemKey, this.key, itemP);
+		} else {
+			if (this.itemType == ItemCls.PERSON_TYPE)
+				db.getPersonStatusMap().addItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.ASSET_TYPE)
+				db.getAssetStatusMap().addItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.UNION_TYPE)
+				db.getUnionStatusMap().addItem(this.itemKey, this.key, itemP);
+			
+		}
 
 	}
 

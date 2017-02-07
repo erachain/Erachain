@@ -26,12 +26,6 @@ public class KK_Map extends DBMap<
 
 					byte[], // any additional data
 					
-					/*
-public Block getBlockByHeight(int parseInt) {
-		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);
-		return DBSet.getInstance().getBlockMap().get(b);
-	}
-					 */
 					Integer, // block.getHeight() -> db.getBlockMap(db.getHeightMap().getBlockByHeight(index))
 					Integer // block.getTransaction(transaction.getSignature()) -> block.getTransaction(index)
 				>>>>
@@ -92,7 +86,7 @@ public Block getBlockByHeight(int parseInt) {
 		return this.observableData;
 	}
 
-	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
+	public void putItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
 	{
 
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
@@ -109,7 +103,8 @@ public Block getBlockByHeight(int parseInt) {
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
 		if (stack == null) {
 			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
-			stack.add(item);
+			//stack.add(item);
+			stack.push(item);
 		}
 		else {
 			if (item.a == null || item.b == null) {
@@ -129,9 +124,9 @@ public Block getBlockByHeight(int parseInt) {
 				} else {
 					valB = item.b;					
 				}
-				stack.add(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
+				stack.push(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
 			} else {
-				stack.add(item);
+				stack.push(item);
 			}
 		}
 
@@ -139,7 +134,35 @@ public Block getBlockByHeight(int parseInt) {
 		
 		this.set(key, value_new);
 	}
-	
+
+	// NOT UPDATE UNIQUE STATUS FOR ITEM - ADD NEW STATUS FOR ITEM + DATA
+	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
+	{
+
+
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
+		if (false && this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		}
+
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
+		if (stack == null) {
+			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
+		}
+		
+		stack.push(item);
+
+		value_new.put(itemKey, stack);
+		
+		this.set(key, value_new);
+	}
+
 	public Tuple5<Long, Long, byte[], Integer, Integer> getItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);

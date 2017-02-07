@@ -535,7 +535,7 @@ public class GenesisBlock extends Block{
 	public static Status makeStatus(int key)
 	{
 		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR,
-				"Членство %1 ур. в объед. %2", icon, image, "Уровень %1 членства в объединении %2");
+				"Членство %1 ур. в объед. %2", icon, image, "Уровень %1 членства в объединении %2", false);
 		//else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
 		//else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
 		//else if (key == StatusCls.USER_KEY) return new Status(CREATOR, "User", icon, image, "Admin, User, Observer");
@@ -544,7 +544,7 @@ public class GenesisBlock extends Block{
 		//else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
 		//else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
 
-		return new Status(CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2");
+		return new Status(CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2", false);
 	}
 	
 	

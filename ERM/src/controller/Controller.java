@@ -2228,11 +2228,11 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> issueStatus(PrivateKeyAccount creator,
-			String name, String description, int feePow) {
+			String name, String description, boolean unique, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueStatusTransaction(creator,
-					name, description, feePow);
+					name, description, unique, feePow);
 		}
 	}
 

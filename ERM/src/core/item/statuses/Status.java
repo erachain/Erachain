@@ -14,9 +14,9 @@ public class Status extends StatusCls {
 	
 	private static final int TYPE_ID = StatusCls.STATUS;
 
-	public Status(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public Status(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique)
 	{
-		super(TYPE_ID, owner, name, icon, image, description);
+		super(TYPE_ID, owner, name, icon, image, description, unique);
 	}
 	public Status(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{

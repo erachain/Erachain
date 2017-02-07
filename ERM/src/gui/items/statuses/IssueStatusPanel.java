@@ -300,9 +300,11 @@ public class IssueStatusPanel extends JPanel
 		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
+		boolean unique = jCheck_Unique.isSelected();
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Pair<Transaction, Integer> result = Controller.getInstance().issueStatus(
-				creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow
+				creator, this.txtName.getText(), this.txtareaDescription.getText(),
+				unique, feePow
 				);
 		
 		//CHECK VALIDATE MESSAGE

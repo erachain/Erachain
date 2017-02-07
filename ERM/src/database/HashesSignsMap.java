@@ -78,7 +78,7 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 		// need for updates only in fork - not in parent DB
 		value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
 
-		value_new.add(item);
+		value_new.push(item);
 		
 		this.set(hash, value_new);
 		

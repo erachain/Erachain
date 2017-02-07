@@ -100,7 +100,7 @@ public class KN_Map extends DBMap<
 			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
 		
 		
-		stack.add(item);
+		stack.push(item);
 
 		value_new.put(nameKey, stack);
 		

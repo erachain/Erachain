@@ -383,7 +383,8 @@ public class TransactionCreator
 		
 	}
 
-	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
+			boolean unique, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -391,7 +392,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		StatusCls status = new Status(creator, name, icon, image, description);
+		StatusCls status = new Status(creator, name, icon, image, description, unique);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));

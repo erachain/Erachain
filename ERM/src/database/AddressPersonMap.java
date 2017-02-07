@@ -83,7 +83,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 			value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>)value.clone();
 		}
 
-		value_new.add(item);
+		value_new.push(item);
 		
 		this.set(address, value_new);
 		
