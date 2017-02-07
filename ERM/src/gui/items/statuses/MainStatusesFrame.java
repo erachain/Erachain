@@ -117,15 +117,22 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		columnModel.getColumn(0).setMaxWidth((100));
 		//Custom renderer for the String column;
 		statusesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		statusesTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		statusesTable.setDefaultRenderer(String.class, new Renderer_Left(statusesTable.getFontMetrics(statusesTable.getFont()),tableModelItemStatuses.get_Column_AutoHeight())); // set renderer
 		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelItemStatuses.COLUMN_FAVORITE);
 			
 	
-		favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
+	//	favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 		favoriteColumn.setMinWidth(50);
 		favoriteColumn.setMaxWidth(90);
 		favoriteColumn.setPreferredWidth(90);//.setWidth(30);
+		
+		TableColumn isUniqueColumn = statusesTable.getColumnModel().getColumn(TableModelItemStatuses.COLUMN_UNIQUE);
+		isUniqueColumn.setMinWidth(50);
+		isUniqueColumn.setMaxWidth(90);
+		isUniqueColumn.setPreferredWidth(90);//.setWidth(30);
+		
 		//	statusesTable.setAutoResizeMode(5);//.setAutoResizeMode(mode);.setAutoResizeMode(0);
 		//Sorter
 		RowSorter sorter =   new TableRowSorter(this.tableModelItemStatuses);
@@ -534,7 +541,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			//Custom renderer for the String column;
 			table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 			table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()),statusesModel.get_Column_AutoHeight())); // set renderer
-			
+			table.setDefaultRenderer(Boolean.class, new Renderer_Boolean());
 			
 			TableRowSorter sorter1 = new TableRowSorter(statusesModel);
 			table.setRowSorter(sorter1);
@@ -544,11 +551,17 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = table.getColumnModel().getColumn(WalletItemStatusesTableModel.COLUMN_CONFIRMED);
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			confirmedColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
+	//		confirmedColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
 			confirmedColumn.setMinWidth(50);
 			confirmedColumn.setMaxWidth(90);
 			confirmedColumn.setPreferredWidth(90);//.setWidth(30);
 			
+			TableColumn isUniqueColumn1 = table.getColumnModel().getColumn(WalletItemStatusesTableModel.COLUMN_UNIQUE);
+			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+	//		confirmedColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
+			isUniqueColumn1.setMinWidth(50);
+			isUniqueColumn1.setMaxWidth(90);
+			isUniqueColumn1.setPreferredWidth(90);//.setWidth(30);
 			
 			//CHECKBOX FOR FAVORITE
 			favoriteColumn = table.getColumnModel().getColumn(WalletItemStatusesTableModel.COLUMN_FAVORITE);
