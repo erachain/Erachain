@@ -24,6 +24,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -668,15 +669,24 @@ public class R_SetStatusToItem extends Transaction {
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 		
-		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-			if ( this.creator.isPerson(db) )
-			{
-				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-					return Transaction.NOT_ENOUGH_RIGHTS;
-			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		if (this.key < 10) {
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return VALIDATE_OK;
+				}
 			}
+		} else {
+			BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 ) {
+				if ( this.creator.isPerson(db) )
+				{
+					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+						return Transaction.NOT_ENOUGH_RIGHTS;
+				} else {
+					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				}
+			}
+		}
 		
 		return Transaction.VALIDATE_OK;
 	}
