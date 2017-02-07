@@ -127,11 +127,11 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		long count = db.getItemPersonMap().getSize();
 		if (count < 20) {
 			// FIRST Persons only by ME
-			if (this.creator.equals(BlockChain.GENESIS_ADMINS)
-					|| this.creator.equals("7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC")) {
-				return VALIDATE_OK;
-			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			// FIRST Persons only by ADMINS
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return VALIDATE_OK;
+				}
 			}
 		}
 

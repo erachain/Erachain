@@ -158,15 +158,10 @@ public abstract class Issue_ItemRecord extends Transaction
 		long count = this.item.getDBMap(db).getSize();
 		if (count < 10) {
 			// FIRST Persons only by ADMINS
-			boolean notAdmin = true;
 			for ( String admin: BlockChain.GENESIS_ADMINS) {
 				if (this.creator.equals(admin)) {
-					notAdmin = false;
-					break;
+					return Transaction.VALIDATE_OK;
 				}
-			}
-			if (notAdmin) {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
 			}
 		}
 
