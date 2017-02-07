@@ -149,6 +149,7 @@ private void init(){
 	txtHeight.setEditable(false);
 	issueButton.setVisible(false);
 	
+	txt_public_key.setEditable(false);
 	
 	
 	label_Sign.setText( Lang.getInstance().translate("Signature")+ ":");
