@@ -201,8 +201,10 @@ public class ConnectionCreator extends Thread {
 				//SLEEP
 				int cnt = callback.getActivePeers(true).size();
 				int minCnt = Settings.getInstance().getMinConnections();
-				if (cnt < 4)
+				if (cnt < 4) {
+					Thread.sleep(30000);
 					continue;
+				}
 				else if (cnt < minCnt)
 					// BANNES PEERS update each minute
 					sleep_time = 1;
