@@ -57,9 +57,14 @@ public class PersonHuman extends PersonCls {
 	}
 
 	//GETTERS/SETTERS
+
 	public String getItemSubType() { return "human"; }
 
 	public byte[] getOwnerSignature() { return ownerSignature; }
+
+	public boolean isMustBeSigned() {
+		return typeBytes[1]==(byte)1;
+	}
 
 	public byte[] toBytes(boolean includeReference, boolean onlyBody) {
 		byte[] data = super.toBytes(includeReference, onlyBody);
@@ -258,7 +263,7 @@ public class PersonHuman extends PersonCls {
 	{
 		
 		if (!Arrays.equals(owner.getPublicKey(), this.owner.getPublicKey())) {
-			this.typeBytes[1] = (byte)0;
+			//this.typeBytes[1] = (byte)0;
 			return;
 		}
 
@@ -267,7 +272,7 @@ public class PersonHuman extends PersonCls {
 		boolean forOwnerSign = true;
 		byte[] data = super.toBytes(includeReference, forOwnerSign);
 		if ( data == null ) {
-			this.typeBytes[1] = (byte)0;
+			//this.typeBytes[1] = (byte)0;
 			return;
 		}
 		

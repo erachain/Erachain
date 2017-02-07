@@ -108,16 +108,18 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (person.getImage().length < (MAX_IMAGE_LENGTH - MAX_IMAGE_LENGTH>>2)
 				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
 
-		if (!Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
-			// OWNER of personal INFO not is CREATOR
-			PersonHuman human = (PersonHuman)person;
-			if (human.getOwnerSignature() == null) {
-				return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+		if (person instanceof PersonHuman) {
+			PersonHuman human = (PersonHuman) person;
+			if (human.isMustBeSigned()
+				&& !Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
+				// OWNER of personal INFO not is CREATOR
+				if (human.getOwnerSignature() == null) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+				}
+				if (!human.isSignatureValid()) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
+				}
 			}
-			if (!human.isSignatureValid()) {
-				return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
-			}
-			
 		}
 
 		long count = db.getItemPersonMap().getSize();

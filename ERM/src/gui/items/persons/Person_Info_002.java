@@ -54,7 +54,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
      */
     public Person_Info_002(PersonCls person, boolean full) {
     	
-        initComponents((PersonHuman)person, full);
+        initComponents(person, full);
     }
 
     /**
@@ -64,7 +64,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents(PersonHuman person, boolean full) {
+    private void initComponents(PersonCls person, boolean full) {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel3 = new javax.swing.JPanel();
@@ -216,13 +216,18 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jTextArea_Description.setEditable(false);
         
         String sss = "";
-        if (person.getOwner() != null) {
-        	sss += "Owner: " + person.getOwner().toString() + "\n";
+        if (person instanceof PersonHuman) {
+        	PersonHuman human = (PersonHuman) person;
+        	if (human.isMustBeSigned()) {
+            	sss += "Owner: " + person.getOwner().toString() + "\n";
+	            if (human.isSignatureValid()) {
+	            	sss += "Owner Signature: " + Base58.encode(human.getOwnerSignature()) + "\n";        	
+	        	} else {
+	        		sss = "Wrong signaryte for owner: " + person.getOwner().toString() + "\n";
+	            }
+        	}
         }
-        if (person.getOwnerSignature() != null) {
-        	sss += "Owner Signature: " + Base58.encode(person.getOwnerSignature()) + "\n";        	
-        }
-        jTextArea_Description.setText(sss + "\n" + person.getDescription());
+        jTextArea_Description.setText(sss + person.getDescription());
        
 
         
