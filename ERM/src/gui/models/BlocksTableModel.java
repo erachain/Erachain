@@ -9,6 +9,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.block.Block;
 import core.transaction.Transaction;
 import database.BlockMap;
@@ -119,7 +120,8 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 					
 				}
 				
-				return block.getHeight(DBSet.getInstance()) + " " + winValue;
+				return block.getHeight(dbSet)
+						 + " " + BlockChain.getTarget(dbSet, block);
 				
 			case COLUMN_TIMESTAMP:
 				

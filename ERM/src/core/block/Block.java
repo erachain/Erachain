@@ -101,6 +101,7 @@ public class Block {
 		this.atBytes = atBytes;
 		
 		//this.setGeneratingBalance(dbSet);
+		//BlockChain.getTarget();
 
 	}
 
@@ -132,11 +133,22 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 		
-		int height = db.getBlockSignsMap().get(this.signature).a;		
+		int height = db.getBlockSignsMap().get(this.signature).a;
 		return height;
 
 	}
 	
+	/*
+	protected long targetValue;
+	public long getTargetValue() {
+		return targetValue;
+	}
+	public void setTargetValue(long target) {
+		if (targetValue == 0)
+			targetValue = target;
+	}
+	*/
+
 	// TODO - on orphan = -1 for parent on resolve new chain
 	public int getParentHeight(DBSet db)
 	{

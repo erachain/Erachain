@@ -94,6 +94,7 @@ public class BlockChain
 	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
+	//private int target = 0;
 
 	
 	//private DBSet dbSet;
@@ -414,51 +415,61 @@ public class BlockChain
 		
 		return list;
 	}
-
 	
 	// ignore BIG win_values
 	public static long getTarget(DBSet dbSet, Block block)
 	{
 		
+		/*
+		int height = block.getParentHeight(dbSet);
+		if (block.getTargetValue() > 0)
+			return block.getTargetValue();
+		 */
+		
+		long min_value = 0;
 		long win_value = 0;
 		Block parent = block.getParent(dbSet);
 		int i = 0;
+		long value = 0;
 		
 		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
 			i++;
-			win_value += parent.calcWinValue(dbSet);
+			value = parent.calcWinValue(dbSet);
+			if (min_value==0
+					|| min_value > value) {
+				min_value = value;
+			}
 			
-			
+			if (min_value + (min_value<<1) < value)
+				value = min_value + (min_value<<1);
+
 			parent = parent.getParent(dbSet);
 		}
 		
 		if (i == 0) {
 			return block.calcWinValue(dbSet);
-		}
+		}		
 
-		
-		long average = win_value / i;
-		average = average + (average>>2);
+		int height = block.getParentHeight(dbSet);
+		min_value = min_value<<1;
 
-		// remove bigger values
-		win_value = 0;
 		parent = block.getParent(dbSet);
 		i = 0;
 		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
 			i++;
-			long value = parent.calcWinValue(dbSet);
-			if (value > (average)) {
-				value = average;
-			}
-			win_value += parent.calcWinValue(dbSet);
+			value = parent.calcWinValue(dbSet);
+			if (height > TARGET_COUNT && min_value < value)
+				value = min_value;
+			win_value += value;
 			
 			parent = parent.getParent(dbSet);
 		}
+
+		long target = win_value / i;
 		
-		return win_value / i;
-		
+		return target;
 	}
 
 	// calc Target by last blocks in chain
@@ -468,6 +479,7 @@ public class BlockChain
 	}
 
 	// GET MIN TARGET
+	// TODO GENESIS_CHAIN
 	public static int getMinTarget(int height) {
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)
