@@ -166,15 +166,22 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 									
 		case COLUMN_PERIOD:
 			
+			boolean meedle = true;
 			dte = value.b.a;
-			if (dte == null || dte == Long.MIN_VALUE) from_date_str = "-> ";
+			if (dte == null || dte == Long.MIN_VALUE) {
+				from_date_str = "-> ";
+				meedle = false;
+			}
 			else from_date_str = formatDate.format( new Date(dte));
 			
 			dte = value.b.b;
-			if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ->";
+			if (dte == null || dte == Long.MAX_VALUE) {
+				to_date_str = " ->";
+				meedle = false;
+			}
 			else to_date_str = formatDate.format( new Date(dte));
 			
-			return from_date_str + " - " + to_date_str;
+			return from_date_str + (meedle?" - ":"") + to_date_str;
 			
 		case COLUMN_MAKER:
 
