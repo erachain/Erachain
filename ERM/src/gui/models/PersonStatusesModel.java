@@ -63,8 +63,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		Controller.getInstance().addWalletListener(this);
 		statuses = dbSet.getPersonStatusMap().get(itemKey);
 		statusesMap = dbSet.getItemStatusMap();
-		statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
-		addRows(statuses);
+		setRows();
 	}
 
 	
@@ -168,7 +167,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			int block = value.b.d;
 			int recNo = value.b.e;
 			Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
-			return record==null?block + "/" + recNo:((Account)record.getCreator()).getPersonAsString();
+			return record==null?null:((Account)record.getCreator()).getPersonAsString();
 		
 		}
 		
@@ -199,7 +198,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			if(this.statuses == null)
 			{
 				this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-				addRows(this.statuses);
+				setRows();
 			}
 			
 			this.fireTableDataChanged();
@@ -215,14 +214,16 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			statuses= dbSet.getPersonStatusMap().get(itemKey);
-			addRows(statuses);
+			setRows();
 			this.fireTableDataChanged();
 		}	
 	}
 
-	public void addRows(TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statusesIn) {
-		for ( long statusKey: statusesIn.keySet()) {
-			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statusesIn.get(statusKey);
+	public void setRows() {
+		statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
+
+		for ( long statusKey: statuses.keySet()) {
+			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statuses.get(statusKey);
 			if (statusStack == null || statusStack.size() == 0) {
 				return;
 			}
