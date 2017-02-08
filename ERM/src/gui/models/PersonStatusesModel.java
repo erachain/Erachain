@@ -6,6 +6,8 @@ import javax.swing.table.AbstractTableModel;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 ////////
@@ -31,6 +33,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 import database.ItemStatusMap;
 import database.SortableList;
+import gui.models.Send_TableModel.MessageBuf;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -254,6 +257,25 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 					statusesRows.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusItem));
 				}
 			}
+			
+			Comparator<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> comparator = new Comparator<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>() {
+			    public int compare(Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> c1, Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> c2) {
+			    	if (c1.b.d > c2.b.d)
+			    		return 1;
+			    	else if (c1.b.d < c2.b.d)
+			    		return -1;
+			        
+			    	if (c1.b.e > c2.b.e)
+			    		return 1;
+			    	else if (c1.b.e < c2.b.e)
+			    		return -1;
+			    	
+			    	return 0;
+			    }
+			};
+			
+			Collections.sort(statusesRows, comparator);
+			
 		}
 	}
 
