@@ -427,7 +427,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         jTable_Statuses.setDefaultRenderer(String.class, new Renderer_Left(jTable_Statuses.getFontMetrics(jTable_Statuses.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
         //CHECKBOX FOR FAVORITE
-        		TableColumn to_Date_Column1 = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_TO_DATE);	
+        		TableColumn to_Date_Column1 = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
         		to_Date_Column1.setMinWidth(80);
         		to_Date_Column1.setMaxWidth(200);

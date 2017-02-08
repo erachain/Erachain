@@ -36,10 +36,11 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public  class PersonStatusesModel extends  AbstractTableModel implements Observer
 {
-	public static final int COLUMN_TO_DATE = 1;
-	public static final int COLUMN_CREATOR = 2;
-	public static final int COLUMN_STATUS = 0;
-//	public static final int COLUMN_CONFIRMED = 3;
+	public static final int COLUMN_MAKE_DATA = 0;
+	public static final int COLUMN_STATUS_NAME = 1;
+	public static final int COLUMN_PERIOD = 2;
+	public static final int COLUMN_MAKER = 3;
+	public static final int COLUMN_RECORD_NO = 4;
 	
 	TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
 	List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
@@ -48,7 +49,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 
 	private DBSet dbSet = DBSet.getInstance();
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","To Date","Creator"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Maked", "Status","Period","Creator", "RecNo"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
 	String to_date_str;
@@ -142,33 +143,49 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		}
 		
 		Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+		int block;
+		int recNo;
+		Transaction record;
 		
 		 switch(column)
 		{
-		
-		case COLUMN_STATUS:
+
+		case COLUMN_MAKE_DATA:
 			
-			return statusesMap.get(value.a).toString(dbSet, value.b.c);//addrses_key_value;
+			block = value.b.d;
+			recNo = value.b.e;
+			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			return record==null?null:record.viewTimestamp();
+		
+		case COLUMN_STATUS_NAME:
+			
+			return statusesMap.get(value.a).toString(dbSet, value.b.c);
 									
-		case COLUMN_TO_DATE:
+		case COLUMN_PERIOD:
 			
 			dte = value.b.a;
-			if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
+			if (dte == null || dte == Long.MIN_VALUE) from_date_str = "-> ";
 			else from_date_str = formatDate.format( new Date(dte));
 			
 			dte = value.b.b;
-			if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
+			if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ->";
 			else to_date_str = formatDate.format( new Date(dte));
 			
 			return from_date_str + " - " + to_date_str;
 			
-		case COLUMN_CREATOR:
+		case COLUMN_MAKER:
 
-			int block = value.b.d;
-			int recNo = value.b.e;
-			Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			block = value.b.d;
+			recNo = value.b.e;
+			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
 			return record==null?null:((Account)record.getCreator()).getPersonAsString();
-		
+
+		case COLUMN_RECORD_NO:
+
+			block = value.b.d;
+			recNo = value.b.e;
+			return block>0? block+"-"+recNo:"???";
+
 		}
 		
 		return null;
