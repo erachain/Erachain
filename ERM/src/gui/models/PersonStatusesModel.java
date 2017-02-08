@@ -5,6 +5,8 @@ import javax.swing.table.AbstractTableModel;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 ////////
 import java.util.Observable;
@@ -23,6 +25,7 @@ import controller.Controller;
 import core.account.PublicKeyAccount;
 import core.item.imprints.ImprintCls;
 import core.item.statuses.Status;
+import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.ItemStatusMap;
@@ -38,25 +41,29 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 //	public static final int COLUMN_CONFIRMED = 3;
 	
 	TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
+	List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
 	
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-	
+
+	private DBSet dbSet = DBSet.getInstance();
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","To Date","Creator"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
 	String to_date_str;
 	Long dte;
 	ItemStatusMap statusesMap;
-	long status_this;
+	long itemKey;
 	
 	public PersonStatusesModel(long person_Key)
 	{
-		status_this = person_Key;
+		
+		itemKey = person_Key;
 		Controller.getInstance().addWalletListener(this);
-	//	addresses = DBSet.getInstance().getPersonAddressMap().getItems(person_Key);
-		statuses= DBSet.getInstance().getPersonStatusMap().get(status_this);
-		statusesMap = DBSet.getInstance().getItemStatusMap();
+		statuses = dbSet.getPersonStatusMap().get(itemKey);
+		statusesMap = dbSet.getItemStatusMap();
+		statusesRows = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();
+		addRows(statuses);
 	}
 
 	
@@ -65,34 +72,28 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	}
 	
 
+
 // set class
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
 		return o==null?null:o.getClass();
-		   }
+	}
 		   
 	// читаем колонки которые изменяем высоту	   
-		public Boolean[] get_Column_AutoHeight(){
-			
-			return this.column_AutuHeight;
-		}
-	// устанавливаем колонки которым изменить высоту	
-		public void set_get_Column_AutoHeight( Boolean[] arg0){
-			this.column_AutuHeight = arg0;	
-		}
-		
-	/*
-	public ImprintCls getItem(int row)
-	{
-		return this.address.get(row).getB();
+	public Boolean[] get_Column_AutoHeight(){	
+		return this.column_AutuHeight;
 	}
-	*/
 	
-		public  Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStatus(int row){
-			return this.statuses.get(row);
-		}
+	// устанавливаем колонки которым изменить высоту	
+	public void set_get_Column_AutoHeight( Boolean[] arg0){
+		this.column_AutuHeight = arg0;	
+	}	
 	
+	public  Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStatus(int row){
+		return this.statuses.get(row);
+	}
+
 	@Override
 	public int getColumnCount() 
 	{
@@ -108,20 +109,18 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	@Override
 	public int getRowCount() 
 	{
-		
-		 TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> a = statuses;
-		return  statuses.size();
+		return  statusesRows.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
+		/*
 		if( statuses == null || row >  statuses.size() - 1 )
 		{
 			return null;
 		}
 		
-		//Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry  =  records.entrySet();
 		Long status_key_value = 0l;
 		int i = 0;
 		for ( Long status_key: statuses.keySet()) {
@@ -135,26 +134,29 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		if (entry == null || entry.isEmpty() ) return 0;
 		
 		 Tuple5<Long, Long, byte[], Integer, Integer> value = entry.peek();
-	//	 if (value == null ) return 0;
+		 
+		 */
+		if( statusesRows == null || row >  statusesRows.size() - 1 )
+		{
+			return null;
+		}
 		
-		 
-		 
+		Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
 		
 		 switch(column)
 		{
 		
 		case COLUMN_STATUS:
 			
-			return statusesMap.get(status_key_value).toString(DBSet.getInstance(), value.c);//addrses_key_value;
+			return statusesMap.get(value.a).toString(dbSet, value.b.c);//addrses_key_value;
 									
 		case COLUMN_TO_DATE:
 			
-			
-			dte = value.a;
+			dte = value.b.a;
 			if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
 			else from_date_str = formatDate.format( new Date(dte));
 			
-			dte = value.b;
+			dte = value.b.b;
 			if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
 			else to_date_str = formatDate.format( new Date(dte));
 			
@@ -162,18 +164,13 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			
 		case COLUMN_CREATOR:
 			
-			
-			
-			return statusesMap.get(status_key_value).getOwner().getPersonAsString_01(true);
+			return statusesMap.get(value.a).getOwner().getPersonAsString_01(true);
 		
 		case COLUMN_CREATOR+1:
 			
-			
-			return statusesMap.get(status_key_value).getOwner().getPerson().b;
+			return statusesMap.get(value.a).getOwner().getPerson().b;
 		
 		}
-		
-		
 		
 		return null;
 	}
@@ -202,8 +199,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			if(this.statuses == null)
 			{
 				this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			//	this.statusesMap .registerObserver();
-				//this.imprints.sort(PollMap.NAME_INDEX);
+				addRows(this.statuses);
 			}
 			
 			this.fireTableDataChanged();
@@ -218,15 +214,25 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 				|| message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			statuses= DBSet.getInstance().getPersonStatusMap().get(status_this);
+			statuses= dbSet.getPersonStatusMap().get(itemKey);
+			addRows(statuses);
 			this.fireTableDataChanged();
 		}	
 	}
-	
 
-//	@Override
-//	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		
-//	}
+	public void addRows(TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statusesIn) {
+		for ( long statusKey: statusesIn.keySet()) {
+			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statusesIn.get(statusKey);
+			StatusCls status = (StatusCls)statusesMap.get(statusKey);
+			if (status.isUnique()) {
+				// UNIQUE - only on TOP of STACK
+				statusesRows.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusStack.peek()));
+			} else {
+				for (Tuple5<Long, Long, byte[], Integer, Integer> statusItem: statusStack) {
+					statusesRows.add(new Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, statusItem));
+				}
+			}
+		}
+	}
+
 }
