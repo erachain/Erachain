@@ -553,6 +553,25 @@ public abstract class Transaction {
 		return block;
 	}
 	
+	public Tuple2<Integer, Integer> getHeightSeqNo(DBSet db, Block block) {
+		int transactionIndex = -1;
+		int blockIndex = -1;
+		if (block == null) {
+			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+		} else {
+			blockIndex = block.getHeight(db);
+			if (blockIndex < 1 ) {
+				// if block not is confirmed - get last block + 1
+				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+			}
+			//transactionIndex = this.getSeqNo(db);
+			transactionIndex = block.getTransactionSeq(signature);
+		}
+		
+		return new Tuple2<Integer, Integer>(blockIndex, transactionIndex);
+
+	}
+	
 	public int getBlockHeight(DBSet db)
 	{
 		if(this.isConfirmed(db))
@@ -602,7 +621,7 @@ public abstract class Transaction {
 		
 	}
 	
-	public static Transaction findByIntInt(DBSet db, int height, int seq) {
+	public static Transaction findByHeightSeqNo(DBSet db, int height, int seq) {
 		return db.getTransactionFinalMap().getTransaction(height, seq);
 	}
 

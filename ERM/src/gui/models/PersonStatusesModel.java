@@ -22,6 +22,7 @@ import org.mapdb.Fun.Tuple5;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.imprints.ImprintCls;
 import core.item.statuses.Status;
@@ -163,12 +164,11 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			return from_date_str + " - " + to_date_str;
 			
 		case COLUMN_CREATOR:
-			
-			return statusesMap.get(value.a).getOwner().getPersonAsString_01(true);
-		
-		case COLUMN_CREATOR+1:
-			
-			return statusesMap.get(value.a).getOwner().getPerson().b;
+
+			int block = value.b.d;
+			int recNo = value.b.e;
+			Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			return record==null?block + "/" + recNo:((Account)record.getCreator()).getPersonAsString();
 		
 		}
 		
@@ -223,6 +223,10 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	public void addRows(TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statusesIn) {
 		for ( long statusKey: statusesIn.keySet()) {
 			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statusesIn.get(statusKey);
+			if (statusStack == null || statusStack.size() == 0) {
+				return;
+			}
+			
 			StatusCls status = (StatusCls)statusesMap.get(statusKey);
 			if (status.isUnique()) {
 				// UNIQUE - only on TOP of STACK

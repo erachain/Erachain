@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
@@ -703,12 +704,14 @@ public class R_SetStatusToItem extends Transaction {
 		// pack additional data
 		byte[] add_data = packData();
 
+		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo(db, block);
+		
 		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
 				new Tuple5<Long, Long, byte[], Integer, Integer>
 				(
 					beg_date, end_date,
 					add_data,
-					this.getBlockHeight(db), this.getSeqNo(db)
+					heightSeqNo.a, heightSeqNo.b
 				);
 
 		StatusCls status = (StatusCls)db.getItemStatusMap().get(this.key);
