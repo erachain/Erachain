@@ -184,6 +184,11 @@ public class KK_Map extends DBMap<
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
+	public Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStack(Long key, Long itemKey)
+	{
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		return value.get(itemKey);
+	}
 	
 	// remove only last item from stack for this key of itemKey
 	@SuppressWarnings("unchecked")
