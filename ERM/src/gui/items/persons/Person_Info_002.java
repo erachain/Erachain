@@ -26,12 +26,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.table.TableColumn;
 
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
+import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
@@ -225,25 +228,21 @@ public class Person_Info_002 extends javax.swing.JPanel {
         MenuPopupUtil.installContextMenu(jTextArea_Description);
         jTextArea_Description.setEditable(false);
         
-        String sss = "";
+        jTextArea_Description.setText(person.getDescription());
+                
+        jScrollPane1.setViewportView(jTextArea_Description);
+
         human = null;
+        PublicKeyAccount owner = null;
+        byte[] recordReference = person.getReference();
+        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+        PublicKeyAccount creator = issue_record.getCreator();
         if (person instanceof PersonHuman) {
         	human = (PersonHuman) person;
         	if (human.isMustBeSigned()) {
-            	sss += "Owner: " + person.getOwner().toString() + "\n";
-	            if (human.isSignatureValid()) {
-	            	sss += "Owner Signature: " + Base58.encode(human.getOwnerSignature()) + "\n";        	
-	        	} else {
-	        		sss = "Wrong signaryte for owner: " + person.getOwner().toString() + "\n";
-	            }
+        		owner = person.getOwner();
         	}
         }
-        jTextArea_Description.setText(sss + person.getDescription());
-       
-
-        
-        
-        jScrollPane1.setViewportView(jTextArea_Description);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -265,7 +264,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(person.getOwner().toString());
+        jTextField_Creator.setText(creator.toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -275,63 +274,58 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
         jPanel3.add(jTextField_Creator, gridBagConstraints);
+                
         
+        if (human.isMustBeSigned() && owner != null
+        		&& !owner.equals(creator)) {
         
+	        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 10;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+	        jPanel3.add(jLabel_Owner, gridBagConstraints);
+	
+	        jTextField_Owner.setEditable(false);
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 11;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.weightx = 0.2;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+	        
+	        jTextField_Owner.setText(owner.toString());
+	        jPanel3.add(jTextField_Owner, gridBagConstraints);
+	
         
-        
-        
-        if (human.isMustBeSigned()) {
-        
-        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
-        jPanel3.add(jLabel_Owner, gridBagConstraints);
-
-        jTextField_Owner.setEditable(false);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-        
-        jTextField_Owner.setText(person.getOwner().toString());
-        jPanel3.add(jTextField_Owner, gridBagConstraints);
-
-        
-        if (human != null  &&  human.isSignatureValid()){
-        jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign")+":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
-        jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
-
-        jTextField_Owner_Sign.setEditable(false);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-        
-        jTextField_Owner_Sign.setText(Base58.encode(human.getOwnerSignature()));
-        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
+	        jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+	        jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
+	
+	        jTextField_Owner_Sign.setEditable(false);
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 13;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.weightx = 0.2;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+	        
+	        jTextField_Owner_Sign.setText(human.isSignatureValid()?
+	        		Base58.encode(human.getOwnerSignature()):
+        			Lang.getInstance().translate("Wrong signaryte for data owner"));
+	        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
-        }
-        
-        
-        
         
         
         JPopupMenu creator_Meny = new JPopupMenu();

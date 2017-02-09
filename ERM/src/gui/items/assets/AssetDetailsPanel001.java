@@ -6,7 +6,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import core.account.Account;
+import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
+import core.transaction.Issue_ItemRecord;
+import core.transaction.Transaction;
+import database.DBSet;
 import gui.models.BalancesTableModel;
 import lang.Lang;
 
@@ -97,9 +101,8 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField1, gridBagConstraints);
-        
-        
-		jLabel_Block.setText(Lang.getInstance().translate("Block") + ":");
+                
+		jLabel_Block.setText(Lang.getInstance().translate("Block-SeqNo") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -107,7 +110,8 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         jPanel2.add(jLabel_Block, gridBagConstraints);
 
-        jTextField_Block.setText("000000000000000000");
+        Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
+        jTextField_Block.setText(record.viewHeightSeq(DBSet.getInstance()));
         jTextField_Block.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -168,8 +172,9 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel2.add(jLabel4, gridBagConstraints);
 
-        Account creator = asset.getOwner();
-        jTextField3.setText(creator.getPersonAsString());
+        Account owner = asset.getOwner();
+        jTextField3.setText(GenesisBlock.CREATOR.equals(owner)?"GENESIS":owner.getPersonAsString());
+
         jTextField3.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;

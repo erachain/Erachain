@@ -50,8 +50,8 @@ public class GenesisBlock extends Block{
 	private String testnetInfo; 
 	private long genesisTimestamp;
 	
-	AssetVenture asset0;
-	AssetVenture asset1;
+	//AssetVenture asset0;
+	//AssetVenture asset1;
 	List<Transaction> transactions = new ArrayList<Transaction>();
 	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 
@@ -484,13 +484,13 @@ public class GenesisBlock extends Block{
 		
 		///// ASSETS
 		//CREATE ERM ASSET
-		asset0 = makeAsset(AssetCls.ERM_KEY);
-		transactions.add(new GenesisIssueAssetTransaction(asset0));
+		//asset0 = makeAsset(AssetCls.ERM_KEY);
+		//transactions.add(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
-		asset1 = makeAsset(AssetCls.FEE_KEY);
-		transactions.add(new GenesisIssueAssetTransaction(asset1));
+		//asset1 = makeAsset(AssetCls.FEE_KEY);
+		//transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = (int)AssetCls.FEE_KEY + 1; i <= AssetCls.REAL_KEY; i++) 
+		for (int i = 1; i <= AssetCls.REAL_KEY + 4; i++) 
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
@@ -507,17 +507,32 @@ public class GenesisBlock extends Block{
 	{
 		switch((int)key)
 		{
+		case (int)AssetCls.ERM_KEY:
+			return new AssetVenture(CREATOR, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.FEE_KEY:
 			return new AssetVenture(CREATOR, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:
 			return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY:
 			return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0l, (byte)8, true);
-		//case (int)AssetCls.DEAL_KEY:
-		//	return new AssetVenture(CREATOR, AssetCls.DEAL_NAME, icon, image, AssetCls.DEAL_DESCR, false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 1:
+			return new AssetVenture(
+					new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
+					"A", icon, image, "ARONICLE.COM shares", false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 2:
+			return new AssetVenture(
+					CREATOR,
+					"NeuroCredits", icon, image, "RuNeuro users can distribute 100 NeuroCredits (NCR) monthly to rate each other's proposals and opinions in messaging apps.\n NeuroCredits are ensured by every member's 100 billion neurons. The members’ neuroactivity is considered to be the greatest value, therefore it is knit to NCR.", false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 3:
+			return new AssetVenture(
+					CREATOR,
+					"NeuroCurrency", icon, image, "User earns NeuroCurrency (NCU) by providing proposals and receiving evaluations from other users. NCU is calculated by platform system algorithms summarizing NCR collected from the other users in accordance with their NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 4:
+			return new AssetVenture(
+					CREATOR,
+					"NeuroPower", icon, image, " NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 9999999999l, (byte)8, true);
 		}
-		//return new AssetVenture(genesisGenerator, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, GENESIS_GENERATING_BALANCE, (byte)0, true);
-		return new AssetVenture(CREATOR, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, 0l, (byte)8, true);
+		return null;
 	}
 	// make notes
 	public static Note makeNote(int key) 

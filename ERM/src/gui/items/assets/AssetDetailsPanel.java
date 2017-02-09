@@ -17,7 +17,10 @@ import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
 import core.account.Account;
+import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import database.DBSet;
 import lang.Lang;
 
 public class AssetDetailsPanel extends JPanel {
@@ -72,6 +75,17 @@ public class AssetDetailsPanel extends JPanel {
 		txtKey.setEditable(false);
 		this.add(txtKey, detailGBC);	
 		
+		//LABEL SEQ-NO
+		labelGBC.gridy = ++gridy;
+		this.add(new JLabel(Lang.getInstance().translate("Block-SeqNo") + ":"), labelGBC);
+
+		// SEQ-NO
+        Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
+		detailGBC.gridy = gridy;
+		JTextField txtSeqNo = new JTextField(record.viewHeightSeq(DBSet.getInstance()));
+		txtSeqNo.setEditable(false);
+		this.add(txtSeqNo, detailGBC);	
+
 		//LABEL NAME
 		labelGBC.gridy = ++gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
@@ -101,14 +115,14 @@ public class AssetDetailsPanel extends JPanel {
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(ownerLabel, labelGBC);
 		
-		Account creator = asset.getOwner();
 		//OWNER
+		Account owner = asset.getOwner();
 		detailGBC.gridy = gridy;
-		JTextField owner = new JTextField(creator.getPersonAsString());
-		owner.setEditable(false);
-		this.add(owner, detailGBC);		
+		JTextField ownerTxt = new JTextField(GenesisBlock.CREATOR.equals(owner)?"GENESIS":owner.getAddress());
+		ownerTxt.setEditable(false);
+		this.add(ownerTxt, detailGBC);		
 		
-		String personStr = creator.viewPerson();
+		String personStr = owner.viewPerson();
 		if (personStr.length()>0) {
 			//LABEL PERSON
 			detailGBC.gridy = ++gridy;

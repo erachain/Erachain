@@ -1,5 +1,6 @@
 package gui.items.notes;
 
+import core.block.GenesisBlock;
 import core.item.notes.NoteCls;
 import lang.Lang;
 
@@ -11,7 +12,8 @@ public class Info_Notes extends javax.swing.JPanel {
      */
     public Info_Notes(NoteCls note) {
         initComponents();
-        jTextField_Account_Creator.setText(note.getOwner().getAddress());
+        String addr = note.getOwner().getAddress();
+        jTextField_Account_Creator.setText(GenesisBlock.CREATOR.equals(addr)?"GENESIS":addr);
         jTextField_Title.setText(note.getName());
         jTextArea_Content.setText(note.getDescription());
     
