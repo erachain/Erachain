@@ -264,7 +264,9 @@ public class BlockMap extends DBMap<byte[], Block>
 		
 			// ORPHAN FORGING DATA
 			int height = parent.getHeight(dbSet) + 1;
-			dbSet.getBlockHeightsMap().delete(height);
+			if (height > 2) {
+				dbSet.getBlockHeightsMap().delete(height);
+			}
 			
 			PublicKeyAccount creator = block.getCreator();
 			// INITIAL forging DATA no need remove!
