@@ -275,7 +275,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		{
 			this.fireTableDataChanged();
 		}	
-		
+
+		//
 		if(Controller.getInstance().getStatus() == Controller.STATUS_OK && (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE ||  message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE))
 		{		
 			if(DBSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
