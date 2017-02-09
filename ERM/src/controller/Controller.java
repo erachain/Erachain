@@ -64,6 +64,7 @@ import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
 import core.naming.Name;
@@ -104,8 +105,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
-	private static final String version = "2.19.01";
-	private static final String buildTime = "2017-01-29 15:33:33 UTC";
+	private static final String version = "3.01.01";
+	private static final String buildTime = "2017-02-06 09:33:33 UTC";
 	private long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -959,13 +960,6 @@ public class Controller extends Observable {
 				newBlock = this.blockChain
 						.getBlock(dbSet, getBlockMessage.getSignature());
 
-				/*
-				if (newBlock != null)
-					LOGGER.error("response: " + newBlock.toString());
-				else
-					LOGGER.error("response: NOT FOUND");
-				*/
-
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(
 						newBlock);
@@ -974,6 +968,11 @@ public class Controller extends Observable {
 				// SEND RESPONSE BACK WITH SAME ID
 				message.getSender().sendMessage(response);
 
+				if (newBlock == null) {
+					String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
+					banPeerOnError(message.getSender(), mess);
+				}
+				
 				break;
 
 			case Message.WIN_BLOCK_TYPE:
@@ -1365,32 +1364,30 @@ public class Controller extends Observable {
 		
 		try {
 			// WHILE NOT UPTODATE
-			int tryes = 0;
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
-				peer = this.getMaxPeerHWeight().c;
-				if (peer == null) {
-					tryes++;
-					if (tryes > 3) {
-						break;
-					}
-					Thread.sleep(1000);
-					continue;
-				}
-				LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-						+ " WH: " + getHWeightOfPeer(peer));
+				Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight();				
+				if (peerHW != null) {
+					peer = peerHW.c;
+					if (peer != null) {
+						LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+								+ " WH: " + getHWeightOfPeer(peer));
 
-				// SYNCHRONIZE FROM PEER
-				this.synchronizer.synchronize(dbSet, checkPointHeight, peer);
+						// SYNCHRONIZE FROM PEER
+						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
+					}
+				}
 			} while (!this.isUpToDate());
 			
 		} catch (Exception e) {
-			//LOGGER.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 
+			/*
 			if (peer != null && peer.isUsed()) {
 				// DISHONEST PEER
 				this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
 			}
+			*/
 		}
 
 		if (this.peerHWeight.size() == 0
@@ -2202,26 +2199,40 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, String fullName, int feePow,
+	public Pair<Transaction, Integer> issuePerson(
+			boolean forIssue,
+			PrivateKeyAccount creator, String fullName, int feePow,
 			long birthday, long deathday,
 			byte gender, String race, float birthLatitude, float birthLongitude,
 			String skinColor, String eyeColor, String hairСolor, int height,
-			byte[] icon, byte[] image, String description) {
+			byte[] icon, byte[] image, String description,
+			PublicKeyAccount owner, byte[] ownerSignature) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssuePersonTransaction(creator, fullName, feePow, birthday, deathday,
+			return this.transactionCreator.createIssuePersonTransaction(
+					forIssue,
+					creator, fullName, feePow, birthday, deathday,
 					gender, race, birthLatitude, birthLongitude,
 					skinColor, eyeColor, hairСolor, height,
-					icon, image, description);
+					icon, image, description,
+					owner, ownerSignature);
+		}
+	}
+	public Pair<Transaction, Integer> issuePersonHuman(
+			PrivateKeyAccount creator, int feePow, PersonHuman human) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssuePersonHumanTransaction(
+					creator, feePow, human);
 		}
 	}
 
 	public Pair<Transaction, Integer> issueStatus(PrivateKeyAccount creator,
-			String name, String description, int feePow) {
+			String name, String description, boolean unique, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueStatusTransaction(creator,
-					name, description, feePow);
+					name, description, unique, feePow);
 		}
 	}
 

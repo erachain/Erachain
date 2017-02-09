@@ -2331,7 +2331,7 @@ public class TransactionTests {
 			assertEquals(issueAssetTransaction.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueAssetTransaction.getItem().getCreator().getAddress(), parsedIssueAssetTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueAssetTransaction.getItem().getOwner().getAddress(), parsedIssueAssetTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueAssetTransaction.getItem().getName(), parsedIssueAssetTransaction.getItem().getName());
@@ -2406,7 +2406,7 @@ public class TransactionTests {
 		assertEquals(true, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true), asset.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER
 		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity())) == 0);

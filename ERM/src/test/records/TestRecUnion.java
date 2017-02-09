@@ -210,13 +210,13 @@ public class TestRecUnion {
 
 		// PARSE UNION
 		
-		byte [] rawUnion = union.toBytes(false);
+		byte [] rawUnion = union.toBytes(false, false);
 		assertEquals(rawUnion.length, union.getDataLength(false));
 		union.setReference(new byte[64]);
-		rawUnion = union.toBytes(true);
+		rawUnion = union.toBytes(true, false);
 		assertEquals(rawUnion.length, union.getDataLength(true));
 		
-		rawUnion = union.toBytes(false);
+		rawUnion = union.toBytes(false, false);
 		UnionCls parsedUnion = null;
 		try 
 		{	
@@ -229,7 +229,7 @@ public class TestRecUnion {
 			fail("Exception while parsing transaction.  : " + e);
 		}
 		assertEquals(rawUnion.length, union.getDataLength(false));
-		assertEquals(union.getCreator().getAddress(), parsedUnion.getCreator().getAddress());
+		assertEquals(union.getOwner().getAddress(), parsedUnion.getOwner().getAddress());
 		assertEquals(union.getName(), parsedUnion.getName());
 		assertEquals(union.getDescription(), parsedUnion.getDescription());
 		assertEquals(union.getItemTypeStr(), parsedUnion.getItemTypeStr());
@@ -270,7 +270,7 @@ public class TestRecUnion {
 		parsedUnion = (Union)parsedIssueUnionRecord.getItem();
 
 		//CHECK OWNER
-		assertEquals(union.getCreator().getAddress(), parsedUnion.getCreator().getAddress());
+		assertEquals(union.getOwner().getAddress(), parsedUnion.getOwner().getAddress());
 		
 		//CHECK NAME
 		assertEquals(union.getName(), parsedUnion.getName());
@@ -330,7 +330,7 @@ public class TestRecUnion {
 		assertEquals(true, db.getItemUnionMap().contains(key));
 		
 		//CHECK UNION IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true), union.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true, false), union.toBytes(true, false)));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastReference(db));

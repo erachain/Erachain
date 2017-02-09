@@ -6,6 +6,7 @@ import java.math.BigInteger;
 //import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 //import java.util.List;
@@ -36,6 +37,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import database.AddressTime_SignatureMap;
 import database.DBSet;
 import settings.Settings;
 //import lang.Lang;
@@ -143,6 +145,7 @@ public abstract class Transaction {
 	public static final int ITEM_PERSON_EYE_COLOR_ERROR = 125;
 	public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 126;
 	public static final int ITEM_PERSON_HEIGHT_ERROR = 127;
+	public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 128;
 
 	public static final int INVALID_UPDATE_VALUE = 140;
 
@@ -472,7 +475,7 @@ public abstract class Transaction {
 		// FEE_FOR_ANONIMOUSE !
 		///if (this.getBlockHeightByParent(db))
 		// TODO FEE_FOR_ANONIMOUSE + is PERSON + DB
-		int anonimuus = 0;		
+		int anonimous = 0;		
 		// TODO DBSet get from CHAIN
 		/*
 		Controller cnt = Controller.getInstance();
@@ -493,8 +496,8 @@ public abstract class Transaction {
 		}
 		*/
 		
-		if ( anonimuus > 0) {
-			len *= anonimuus;
+		if ( anonimous > 0) {
+			len *= anonimous;
 		}
 		
 		return (int) len * BlockChain.FEE_PER_BYTE;
@@ -551,6 +554,25 @@ public abstract class Transaction {
 		return block;
 	}
 	
+	public Tuple2<Integer, Integer> getHeightSeqNo(DBSet db, Block block) {
+		int transactionIndex = -1;
+		int blockIndex = -1;
+		if (block == null) {
+			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+		} else {
+			blockIndex = block.getHeight(db);
+			if (blockIndex < 1 ) {
+				// if block not is confirmed - get last block + 1
+				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+			}
+			//transactionIndex = this.getSeqNo(db);
+			transactionIndex = block.getTransactionSeq(signature);
+		}
+		
+		return new Tuple2<Integer, Integer>(blockIndex, transactionIndex);
+
+	}
+	
 	public int getBlockHeight(DBSet db)
 	{
 		if(this.isConfirmed(db))
@@ -600,7 +622,7 @@ public abstract class Transaction {
 		
 	}
 	
-	public static Transaction findByIntInt(DBSet db, int height, int seq) {
+	public static Transaction findByHeightSeqNo(DBSet db, int height, int seq) {
 		return db.getTransactionFinalMap().getTransaction(height, seq);
 	}
 
@@ -800,7 +822,8 @@ public abstract class Transaction {
 	public boolean isSignatureValid() {
 
 		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
-				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH]) return false;
+				|| Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
+			return false;
 		
 		// validation with reference - not as a pack in toBytes - in any case!
 		byte[] data = this.toBytes( false, null );
@@ -845,6 +868,11 @@ public abstract class Transaction {
 		}
 		
 		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return VALIDATE_OK;
+				}
+			}
 			return ACCOUNT_NOT_PERSONALIZED;
 		}
 
@@ -870,7 +898,7 @@ public abstract class Transaction {
 		long personKey = personDuration.a;
 		//ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
 		ItemCls person = db.getItemPersonMap().get(personKey);
-		Account invitedAccount = person.getCreator();
+		Account invitedAccount = person.getOwner();
 		if (creator.equals(invitedAccount)) {
 			// IT IS ME - all fee!
 			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
@@ -912,8 +940,12 @@ public abstract class Transaction {
 				process_gifts(db, 0, getInvitedFee(), this.creator, false);
 			}
 
-			db.getAddressTime_SignatureMap().set(creator, signature); // for quick search public keys
-			db.getAddressTime_SignatureMap().set(creator, timestamp, signature); // for search records by time
+			String creatorAddress = this.creator.getAddress();
+			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
+			if (!dbASmap.contains(creatorAddress)) {
+				dbASmap.set(creatorAddress, signature); // for quick search public keys
+			}
+			dbASmap.set(creatorAddress, timestamp, signature); // for search records by time
 
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() )
@@ -944,7 +976,7 @@ public abstract class Transaction {
 				this.creator.setLastReference(this.reference, db);
 				// set last transaction signature for this ACCOUNT
 			}
-			db.getAddressTime_SignatureMap().set(creator, db.getAddressTime_SignatureMap().get(creator, reference));
+
 			db.getAddressTime_SignatureMap().delete(creator, timestamp);
 
 		}
@@ -961,7 +993,6 @@ public abstract class Transaction {
 			return null;
 		}	
 	}
-
 	
 	//REST
 		

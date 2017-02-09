@@ -74,6 +74,7 @@ import core.voting.PollOption;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
+import gui.items.statement.Statements_Table_Model_Search;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
@@ -164,6 +165,7 @@ public class BlockExplorer
 		output.put("id_menu_assets", Lang.getInstance().translate_from_langObj("Assets",langObj));
 		output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs",langObj));
 		
+	
 	
 	
 		
@@ -514,6 +516,24 @@ public class BlockExplorer
 			}
 			
 			
+			if(info.getQueryParameters().containsKey("statements"))
+			{
+				int start = -1;
+
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+				}
+
+//				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryStatements(start));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			
 			
 
 			output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -829,7 +849,7 @@ public class BlockExplorer
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", asset.getDescription());
-			assetJSON.put("owner", asset.getCreator().getAddress());
+			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
@@ -1202,12 +1222,12 @@ if ( asset_1 == null) {
 		assetJSON.put("key", asset.getKey());
 		assetJSON.put("name", asset.getName());
 		assetJSON.put("description", asset.getDescription());
-		assetJSON.put("owner", asset.getCreator().getAddress());
+		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
 		assetJSON.put("isDivisible", asset.isDivisible());
 
 		
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getCreator().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction)transaction);
 			if(issueAssetTransaction.getItem().getName().equals(asset.getName()))
@@ -1288,8 +1308,8 @@ if ( asset_1 == null) {
 		AssetCls assetHave = Controller.getInstance().getAsset(have);
 		AssetCls assetWant = Controller.getInstance().getAsset(want);
 
-		output.put("assetHaveOwner", assetHave.getCreator().getAddress());
-		output.put("assetWantOwner", assetWant.getCreator().getAddress());
+		output.put("assetHaveOwner", assetHave.getOwner().getAddress());
+		output.put("assetWantOwner", assetWant.getOwner().getAddress());
 
 		output.put("assetHave", assetHave.getKey());
 		output.put("assetHaveName", assetHave.getName());
@@ -1572,11 +1592,11 @@ if ( asset_1 == null) {
 	
 		output.put("img", a);
 		output.put("key", person.getKey());
-		output.put("creator", person.getCreator().getPersonAsString());
+		output.put("creator", person.getOwner().getPersonAsString());
 		
-		if (person.getCreator().getPerson() != null){
-			output.put("creator_key", person.getCreator().getPerson().b.getKey());
-			output.put("creator_name", person.getCreator().getPerson().b.getName());
+		if (person.getOwner().getPerson() != null){
+			output.put("creator_key", person.getOwner().getPerson().b.getKey());
+			output.put("creator_name", person.getOwner().getPerson().b.getName());
 		}else{
 			output.put("creator_key", "");
 			output.put("creator_name", "");
@@ -1776,7 +1796,7 @@ if ( asset_1 == null) {
 			Map blockJSON=new LinkedHashMap();
 			blockJSON.put("key", person.getKey());
 			blockJSON.put("name", person.getName());
-			blockJSON.put("creator",person.getCreator().getAddress());
+			blockJSON.put("creator",person.getOwner().getAddress());
 			
 	
 		/*	
@@ -3283,7 +3303,39 @@ if ( asset_1 == null) {
 		}
 //		output.put("rowCount", rowCount);
 //		output.put("start", start);
+		output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
 		output.put("Peers", out_peers);
+		return output;
+	}
+	
+	
+	public Map jsonQueryStatements (int start){
+		Map output=new LinkedHashMap();
+		Statements_Table_Model_Search model_Statements =  new Statements_Table_Model_Search();
+		int rowCount = start+20;
+		int column_Count = model_Statements.getColumnCount();
+		
+		for (int column=0; column < column_Count; column++ ){
+				
+			output.put("Label_"+ model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'),  Lang.getInstance().translate_from_langObj(model_Statements.getColumnNameNO_Translate(column),langObj));
+		}
+		
+		Map out_Statements=new LinkedHashMap();
+	//	if (rowCount> model_Peers.getRowCount()) rowCount = model_Peers.getRowCount();
+		rowCount = model_Statements.getRowCount();
+		for (int row = 0; row< rowCount; row++ ){
+			Map out_statement=new LinkedHashMap();
+			
+			for (int column=0; column < column_Count; column++ ){
+				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), model_Statements.getValueAt(row, column).toString());	
+				
+			}
+			out_Statements.put(row, out_statement);			
+		}
+//		output.put("rowCount", rowCount);
+//		output.put("start", start);
+		output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
+		output.put("Statements", out_Statements);
 		return output;
 	}
 

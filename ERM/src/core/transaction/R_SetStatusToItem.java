@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
@@ -24,6 +25,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -616,7 +618,9 @@ public class R_SetStatusToItem extends Transaction {
 	public int isValid(DBSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
-		if (result != Transaction.VALIDATE_OK) return result; 
+		if (result != Transaction.VALIDATE_OK) {
+			return result; 
+		}
 
 		if (this.data_1 != null ) {
 			//CHECK DATA SIZE
@@ -668,15 +672,24 @@ public class R_SetStatusToItem extends Transaction {
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 		
-		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-			if ( this.creator.isPerson(db) )
-			{
-				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-					return Transaction.NOT_ENOUGH_RIGHTS;
-			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+		if (this.key < 10) {
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return VALIDATE_OK;
+				}
 			}
+		} else {
+			BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 ) {
+				if ( this.creator.isPerson(db) )
+				{
+					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+						return Transaction.NOT_ENOUGH_RIGHTS;
+				} else {
+					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				}
+			}
+		}
 		
 		return Transaction.VALIDATE_OK;
 	}
@@ -691,23 +704,36 @@ public class R_SetStatusToItem extends Transaction {
 		// pack additional data
 		byte[] add_data = packData();
 
+		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo(db, block);
+		
 		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
 				new Tuple5<Long, Long, byte[], Integer, Integer>
 				(
 					beg_date, end_date,
 					add_data,
-					this.getBlockHeight(db), this.getSeqNo(db)
+					heightSeqNo.a, heightSeqNo.b
 				);
 
-		// SET ALIVE PERSON for DURATION
-		// TODO set STATUSES by reference of it record - not by key!
-		/// or add MAP by reference as signature - as IssueAsset - for orphans delete
-		if (this.itemType == ItemCls.PERSON_TYPE)
-			db.getPersonStatusMap().addItem(this.itemKey, this.key, itemP);
-		else if (this.itemType == ItemCls.ASSET_TYPE)
-			db.getAssetStatusMap().addItem(this.itemKey, this.key, itemP);
-		else if (this.itemType == ItemCls.UNION_TYPE)
-			db.getUnionStatusMap().addItem(this.itemKey, this.key, itemP);
+		StatusCls status = (StatusCls)db.getItemStatusMap().get(this.key);
+		if (status.isUnique()) {	
+			// SET STATUS of ITEM for DURATION
+			// TODO set STATUSES by reference of it record - not by key!
+			/// or add MAP by reference as signature - as IssueAsset - for orphans delete
+			if (this.itemType == ItemCls.PERSON_TYPE)
+				db.getPersonStatusMap().putItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.ASSET_TYPE)
+				db.getAssetStatusMap().putItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.UNION_TYPE)
+				db.getUnionStatusMap().putItem(this.itemKey, this.key, itemP);
+		} else {
+			if (this.itemType == ItemCls.PERSON_TYPE)
+				db.getPersonStatusMap().addItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.ASSET_TYPE)
+				db.getAssetStatusMap().addItem(this.itemKey, this.key, itemP);
+			else if (this.itemType == ItemCls.UNION_TYPE)
+				db.getUnionStatusMap().addItem(this.itemKey, this.key, itemP);
+			
+		}
 
 	}
 

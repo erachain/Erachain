@@ -17,11 +17,12 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_FAVORITE = 3;
+	public static final int COLUMN_UNIQUE = 3;
+	public static final int COLUMN_FAVORITE = 4;
 
 	private SortableList<Long, StatusCls> statuses;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
 	public TableModelItemStatuses()
@@ -95,11 +96,15 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		
 		case COLUMN_ADDRESS:
 			
-			return status.getCreator().getAddress();
+			return status.getOwner().getAddress();
 			
 		case COLUMN_FAVORITE:
 			
 			return status.isFavorite();
+			
+		case COLUMN_UNIQUE:
+			
+			return status.isUnique();
 
 		}
 		

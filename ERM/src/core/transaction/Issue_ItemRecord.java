@@ -105,7 +105,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		byte[] data = super.toBytes(withSign, releaserReference);
 		
 		// without reference
-		data = Bytes.concat(data, this.item.toBytes(false));
+		data = Bytes.concat(data, this.item.toBytes(false, false));
 				
 		return data;
 	}
@@ -157,11 +157,11 @@ public abstract class Issue_ItemRecord extends Transaction
 				
 		long count = this.item.getDBMap(db).getSize();
 		if (count < 10) {
-			// FIRST Persons only by ME
-			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
-				return VALIDATE_OK;
-			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			// FIRST Persons only by ADMINS
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return Transaction.VALIDATE_OK;
+				}
 			}
 		}
 

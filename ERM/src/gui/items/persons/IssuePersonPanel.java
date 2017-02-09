@@ -7,6 +7,8 @@ import lang.Lang;
 import ntp.NTP;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -44,6 +46,10 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
+import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 
@@ -53,47 +59,48 @@ import gui.transaction.OnDealClick;
 public class IssuePersonPanel extends JPanel 
 {
 	
-	private  MaskFormatter AccFormat;
-	private JComboBox<Account> cbxFrom;
-	private JTextField txtFeePow;
-	private JTextField txtName;
-	private JTextArea txtareaDescription;
-	private JDateChooser txtBirthday;
-	private JDateChooser txtDeathday;
-	private JButton iconButton;
+	protected  MaskFormatter AccFormat;
+	protected JComboBox<Account> cbxFrom;
+	protected JTextField txtFeePow;
+	protected JTextField txtName;
+	protected JTextArea txtareaDescription;
+	protected JDateChooser txtBirthday;
+	protected JDateChooser txtDeathday;
+	protected JButton iconButton;
 	@SuppressWarnings("rawtypes")
-	private JComboBox txtGender;
-	private JTextField txtRace;
-	private JTextField txtBirthLatitude;
-	private JTextField txtBirthLongitude;
-	private JTextField txtSkinColor;
-	private JTextField txtEyeColor;
-	private JTextField txtHairСolor;
-	private JTextField txtHeight;
-    private javax.swing.JButton issueButton;
-    private javax.swing.JLabel jLabel_Fee;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabel_Account;
-    private javax.swing.JLabel jLabel_BirthLatitude;
-    private javax.swing.JLabel jLabel_BirthLongitude;
-    private javax.swing.JLabel jLabel_Born;
-    private javax.swing.JLabel jLabel_Dead;
-    private javax.swing.JLabel jLabel_Description;
-    private javax.swing.JLabel jLabel_EyeColor;
-    private javax.swing.JLabel jLabel_Gender;
-    private javax.swing.JLabel jLabel_HairСolor;
-    private javax.swing.JLabel jLabel_Height;
-    private javax.swing.JLabel jLabel_Name;
-    private javax.swing.JLabel jLabel_Race;
-    private javax.swing.JLabel jLabel_SkinColor;
-    private javax.swing.JLabel jLabel_Title;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
+	protected JComboBox txtGender;
+	protected JTextField txtRace;
+	protected JTextField txtBirthLatitude;
+	protected JTextField txtBirthLongitude;
+	protected JTextField txtSkinColor;
+	protected JTextField txtEyeColor;
+	protected JTextField txtHairСolor;
+	protected JTextField txtHeight;
+    protected javax.swing.JButton copyButton;
+    protected javax.swing.JButton issueButton;
+    protected javax.swing.JLabel jLabel_Fee;
+    protected javax.swing.JLabel jLabel9;
+    protected javax.swing.JLabel jLabel_Account;
+    protected javax.swing.JLabel jLabel_BirthLatitude;
+    protected javax.swing.JLabel jLabel_BirthLongitude;
+    protected javax.swing.JLabel jLabel_Born;
+    protected javax.swing.JLabel jLabel_Dead;
+    protected javax.swing.JLabel jLabel_Description;
+    protected javax.swing.JLabel jLabel_EyeColor;
+    protected javax.swing.JLabel jLabel_Gender;
+    protected javax.swing.JLabel jLabel_HairСolor;
+    protected javax.swing.JLabel jLabel_Height;
+    protected javax.swing.JLabel jLabel_Name;
+    protected javax.swing.JLabel jLabel_Race;
+    protected javax.swing.JLabel jLabel_SkinColor;
+    protected javax.swing.JLabel jLabel_Title;
+    protected javax.swing.JPanel jPanel1;
+    protected javax.swing.JPanel jPanel2;
+    protected javax.swing.JScrollPane jScrollPane1;
   
     // End of variables declaration
 	
-	private byte[] imgButes;
+	protected byte[] imgButes;
 
 	@SuppressWarnings({ "unchecked" })
 	public IssuePersonPanel()
@@ -155,12 +162,23 @@ public class IssuePersonPanel extends JPanel
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		        onIssueClick();
+		        onIssueClick(true);
 		    }
 		});
- // add icin
+        
+       	this.copyButton.setText(Lang.getInstance().translate("Copy"));
+        this.copyButton.setPreferredSize(new Dimension(120, 30));
+        this.copyButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick(false);
+		    }
+		});
+
+// add icin
         iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
-        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH >>1))
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
         		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
         iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -189,7 +207,7 @@ public class IssuePersonPanel extends JPanel
 	
 	
     @SuppressWarnings("resource")
-	private static byte[] getBytesFromFile(File file) throws IOException {
+	protected static byte[] getBytesFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
         long length = file.length();
         if (length > Integer.MAX_VALUE) {
@@ -209,7 +227,7 @@ public class IssuePersonPanel extends JPanel
         return bytes;
     }
     
-    private void initLabelsText(){
+    protected void initLabelsText(){
     	
     	jLabel_Title.setText("");
 		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":")	;
@@ -290,19 +308,21 @@ public class IssuePersonPanel extends JPanel
 	}
 
 	@SuppressWarnings("deprecation")
-	public void onIssueClick()
+	public void onIssueClick(boolean forIssue)
 	{
 		//DISABLE
 		this.issueButton.setEnabled(false);
+		this.copyButton.setEnabled(false);
 	
 		//CHECK IF NETWORK OK
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		if(forIssue && Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			//NETWORK NOT OK
 			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			//ENABLE
 			this.issueButton.setEnabled(true);
+			this.copyButton.setEnabled(true);
 			
 			return;
 		}
@@ -353,8 +373,11 @@ public class IssuePersonPanel extends JPanel
 
 			parse++;
 			// END DATE
-			deathday = birthday - 1;
-			// deathday = this.txtDeathday.getCalendar().getTimeInMillis();
+			try {
+				deathday = this.txtDeathday.getCalendar().getTimeInMillis();
+			} catch(Exception ed1) {
+				deathday = birthday - 1;
+			}
 
 			parse++;
 			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
@@ -396,46 +419,45 @@ public class IssuePersonPanel extends JPanel
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			this.issueButton.setEnabled(true);
+			this.copyButton.setEnabled(true);
 			return;
 		}
 						
 		//CREATE ASSET
-		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
+		//protectedKeyAccount creator, String fullName, int feePow, long birthday,
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		PublicKeyAccount owner = (PublicKeyAccount)creator;
 		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
+				forIssue,
 				creator, this.txtName.getText(), feePow, birthday, deathday,
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height,
-				null, this.imgButes, this.txtareaDescription.getText()
-				);
+				null, this.imgButes, this.txtareaDescription.getText(),
+				owner, null);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-		//	this.dispose();
 		
-			
-			
-			txtFeePow.setText("0");
-			txtName.setText("");
-			txtareaDescription.setText("");
-			//txtBirthday.setText("0000-00-00");
-			//txtDeathday.setText("0000-00-00");
-			
-			//txtGender.setSelectedIndex(2);
-			//txtRace.setText("");
-			 //txtBirthLatitude.setText("");
-			 //txtBirthLongitude.setText("");
-			 //txtSkinColor.setText("");
-			 //txtEyeColor.setText("");
-			 //txtHairСolor.setText("");
-			 //txtHeight.setText("");
-			 iconButton.setText(Lang.getInstance().translate("Add Image..."));
-			 imgButes = null;
-			 iconButton.setIcon(null);
+			if (!forIssue) {
+				IssuePersonRecord issuePersonRecord = (IssuePersonRecord)result.getA();
+				PersonHuman person = (PersonHuman)issuePersonRecord.getItem();
+				// SIGN
+				person.sign(creator);
+				
+				String base58str = Base58.encode(person.toBytes(false, false));
+				// This method writes a string to the system clipboard.
+				// otherwise it returns null.
+			    StringSelection sss = new StringSelection(base58str);
+			    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(sss, null);				
+			}
+
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+					forIssue?"Person issue has been sent!":"Person issue has been copy to buffer!"),
+					Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			reset();
 			
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -443,12 +465,35 @@ public class IssuePersonPanel extends JPanel
 		
 		//ENABLE
 		this.issueButton.setEnabled(true);
+		this.copyButton.setEnabled(true);
 	}
 
+	protected void reset() {
+		//txtFeePow.setText("0");
+		txtName.setText("");
+		txtareaDescription.setText("");
+		//txtBirthday.setText("0000-00-00");
+		//txtDeathday.setText("0000-00-00");
+		
+		//txtGender.setSelectedIndex(2);
+		//txtRace.setText("");
+		//txtBirthLatitude.setText("");
+		//txtBirthLongitude.setText("");
+		//txtSkinColor.setText("");
+		//txtEyeColor.setText("");
+		//txtHairСolor.setText("");
+		//txtHeight.setText("");
+		iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
+		imgButes = null;
+		iconButton.setIcon(null);
+
+	}
                              
     @SuppressWarnings({ "unchecked", "null" })
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
+    protected void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel_Gender = new javax.swing.JLabel();
@@ -482,6 +527,7 @@ public class IssuePersonPanel extends JPanel
         jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         issueButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
         
@@ -671,7 +717,9 @@ public class IssuePersonPanel extends JPanel
         jPanel1Layout.rowHeights = new int[] {0, 4, 0, 4, 0};
         jPanel1.setLayout(jPanel1Layout);
 
-        iconButton.setText("Add image");
+        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
         iconButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
      //           iconButtonActionPerformed(evt);
@@ -767,8 +815,11 @@ public class IssuePersonPanel extends JPanel
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
+        copyButton.setText("jButton2");
+        jPanel2.add(copyButton, new java.awt.GridBagConstraints());
         issueButton.setText("jButton1");
         jPanel2.add(issueButton, new java.awt.GridBagConstraints());
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

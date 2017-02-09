@@ -26,12 +26,6 @@ public class KK_Map extends DBMap<
 
 					byte[], // any additional data
 					
-					/*
-public Block getBlockByHeight(int parseInt) {
-		byte[] b = DBSet.getInstance().getHeightMap().getBlockByHeight(parseInt);
-		return DBSet.getInstance().getBlockMap().get(b);
-	}
-					 */
 					Integer, // block.getHeight() -> db.getBlockMap(db.getHeightMap().getBlockByHeight(index))
 					Integer // block.getTransaction(transaction.getSignature()) -> block.getTransaction(index)
 				>>>>
@@ -92,13 +86,14 @@ public Block getBlockByHeight(int parseInt) {
 		return this.observableData;
 	}
 
-	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
+	@SuppressWarnings("unchecked")
+	public void putItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
 	{
 
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -109,51 +104,100 @@ public Block getBlockByHeight(int parseInt) {
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
 		if (stack == null) {
 			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();
-			stack.add(item);
-		}
-		else {
-			if (item.a == null || item.b == null) {
-				// item has NULL values id dates - reset it by last values
-				Long valA;
-				Long valB;
-				Tuple5<Long, Long, byte[], Integer, Integer> lastItem = stack.peek();
-				if (item.a == null) {
-					// if input item Begin Date = null - take date from stack (last value)
-					valA = lastItem.a;
-				} else {
-					valA = item.a;					
-				}
-				if (item.b == null) {
-					// if input item End Date = null - take date from stack (last value)
-					valB = lastItem.b;
-				} else {
-					valB = item.b;					
-				}
-				stack.add(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
+			stack.push(item);
+			value_new.put(itemKey, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);
+				value_new.put(itemKey, stack);
 			} else {
-				stack.add(item);
+				Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+				stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+				if (item.a == null || item.b == null) {
+					// item has NULL values id dates - reset it by last values
+					Long valA;
+					Long valB;
+					Tuple5<Long, Long, byte[], Integer, Integer> lastItem = stack_new.peek();
+					if (item.a == null) {
+						// if input item Begin Date = null - take date from stack (last value)
+						valA = lastItem.a;
+					} else {
+						valA = item.a;					
+					}
+					if (item.b == null) {
+						// if input item End Date = null - take date from stack (last value)
+						valB = lastItem.b;
+					} else {
+						valB = item.b;					
+					}
+					stack_new.push(new Tuple5<Long, Long, byte[], Integer, Integer>(valA, valB, item.c, item.d, item.e));
+				} else {
+					stack_new.push(item);
+				}
+				value_new.put(itemKey, stack_new);
 			}
 		}
 
-		value_new.put(itemKey, stack);
 		
 		this.set(key, value_new);
 	}
-	
+
+	// NOT UPDATE UNIQUE STATUS FOR ITEM - ADD NEW STATUS FOR ITEM + DATA
+	@SuppressWarnings("unchecked")
+	public void addItem(Long key, Long itemKey, Tuple5<Long, Long, byte[], Integer, Integer> item)
+	{
+
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
+		}
+
+		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
+		if (stack == null) {
+			stack = new Stack<Tuple5<Long, Long, byte[], Integer, Integer>>();			
+			stack.push(item);
+			value_new.put(itemKey, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);
+				value_new.put(itemKey, stack);
+			} else {
+				Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+				stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+				stack_new.push(item);
+				value_new.put(itemKey, stack_new);
+			}
+		}
+		
+		this.set(key, value_new);
+	}
+
 	public Tuple5<Long, Long, byte[], Integer, Integer> getItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
 		return stack != null? stack.size()> 0? stack.peek(): null : null;
 	}
+	public Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStack(Long key, Long itemKey)
+	{
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
+		return value.get(itemKey);
+	}
 	
 	// remove only last item from stack for this key of itemKey
+	@SuppressWarnings("unchecked")
 	public void removeItem(Long key, Long itemKey)
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			value_new = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>)value.clone();
@@ -163,9 +207,16 @@ public Block getBlockByHeight(int parseInt) {
 		if (stack==null || stack.size() == 0)
 			return;
 
-		stack.pop();
+		if (this.parent == null) {
+			stack.pop();
+			value_new.put(itemKey, stack);
+		} else {
+			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack_new;
+			stack_new = (Stack<Tuple5<Long, Long, byte[], Integer, Integer>>)stack.clone();
+			stack_new.pop();
+			value_new.put(itemKey, stack_new);
+		}
 
-		value_new.put(itemKey, stack);
 		this.set(key, value_new);
 	}
 }

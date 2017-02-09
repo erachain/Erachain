@@ -306,11 +306,12 @@ public abstract class TransactionAmount extends Transaction {
 					boolean unLimited = 
 							absKey > AssetCls.REAL_KEY // not genesis assets!
 							&& asset.getQuantity().equals(0l)
-							&& asset.getCreator().getAddress().equals(this.creator.getAddress());
+							&& asset.getOwner().getAddress().equals(this.creator.getAddress());
 		
 					//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
 					if (unLimited) {
-						return VALIDATE_OK;
+						// not make RETURN - check validate next
+						//
 					} else if (absKey == FEE_KEY) {
 						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.amount.add(this.fee) ) < 0) {
 							return NO_BALANCE;
@@ -355,9 +356,26 @@ public abstract class TransactionAmount extends Transaction {
 					}
 				}
 			}
+		} else {
+			if (true || this.getBlockHeightByParent(db) > 3000) {
+				// TODO first records is BAD already ((
+				//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+				{
+					return NOT_ENOUGH_FEE;
+				}				
+			}
+	
 		}
 		
-		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+		boolean isPerson = this.creator.isPerson(db);
+		// PUBLICK TEXT only from PERSONS
+		if (this.hasPublicText() && !isPerson) {
+			return ACCOUNT_NOT_PERSONALIZED;
+		}
+		
+		// IF send from PERSON to ANONIMOUSE
+		if (isPerson && !this.recipient.isPerson(db)) {
 			return ACCOUNT_NOT_PERSONALIZED;
 		}
 

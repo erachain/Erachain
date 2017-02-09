@@ -103,8 +103,8 @@ public class ConnectionAcceptor extends Thread{
 			}
 			catch(Exception e)
 			{
-				//LOGGER.error(e.getMessage(),e);
-				LOGGER.warn(Lang.getInstance().translate("Error accepting new connection"));			
+				LOGGER.info(e.getMessage(),e);
+				LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
 			}
 		}
 	}

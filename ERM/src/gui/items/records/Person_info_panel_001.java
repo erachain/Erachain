@@ -385,7 +385,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(jLabel13, gridBagConstraints);
 
         jTextField13.setEditable(false);
-        jTextField13.setText(person.getCreator().toString());
+        jTextField13.setText(person.getOwner().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 26;
@@ -411,7 +411,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         jTable1.setDefaultRenderer(String.class, new Renderer_Left(jTable1.getFontMetrics(jTable1.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
         //CHECKBOX FOR FAVORITE
-        		TableColumn to_Date_Column1 = jTable1.getColumnModel().getColumn( PersonStatusesModel.COLUMN_TO_DATE);	
+        		TableColumn to_Date_Column1 = jTable1.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
         		to_Date_Column1.setMinWidth(80);
         		to_Date_Column1.setMaxWidth(200);

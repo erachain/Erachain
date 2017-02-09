@@ -89,7 +89,7 @@ public class TestRecStatus {
 		init();
 		
 		//CREATE STATUS
-		Status status = new Status(maker, "test", icon, image, "strontje");
+		Status status = new Status(maker, "test", icon, image, "strontje", true);
 				
 		//CREATE ISSUE STATUS TRANSACTION
 		Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -113,8 +113,8 @@ public class TestRecStatus {
 		
 		init();
 		
-		StatusCls status = new Status(maker, "test132", icon, image, "12345678910strontje");
-		byte[] raw = status.toBytes(false);
+		StatusCls status = new Status(maker, "test132", icon, image, "12345678910strontje", true);
+		byte[] raw = status.toBytes(false, false);
 		assertEquals(raw.length, status.getDataLength(false));
 				
 		//CREATE ISSUE STATUS TRANSACTION
@@ -144,7 +144,7 @@ public class TestRecStatus {
 			assertEquals(issueStatusRecord.getCreator().getAddress(), parsedIssueStatusTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueStatusRecord.getItem().getCreator().getAddress(), parsedIssueStatusTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueStatusRecord.getItem().getOwner().getAddress(), parsedIssueStatusTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueStatusRecord.getItem().getName(), parsedIssueStatusTransaction.getItem().getName());
@@ -175,7 +175,7 @@ public class TestRecStatus {
 		
 		init();				
 		
-		Status status = new Status(maker, "test", icon, image, "strontje");
+		Status status = new Status(maker, "test", icon, image, "strontje", true);
 				
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
@@ -191,7 +191,7 @@ public class TestRecStatus {
 		long key = db.getIssueStatusMap().get(issueStatusRecord);
 		assertEquals(true, db.getItemStatusMap().contains(key));
 		
-		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje");				
+		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje", true);				
 		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
 		issueStatusTransaction_2.sign(maker, false);
 		issueStatusTransaction_2.process(db, gb, false);
@@ -200,7 +200,7 @@ public class TestRecStatus {
 		assertEquals(mapSize + 1, statusMap.size());
 		
 		//CHECK STATUS IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true), status.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true, false), status.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(issueStatusRecord.getTimestamp(), maker.getLastReference(db));

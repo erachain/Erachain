@@ -14,6 +14,7 @@ import com.google.common.primitives.Longs;
 
 import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 
@@ -21,17 +22,17 @@ public class AssetUnique extends AssetCls {
 	
 	private static final int TYPE_ID = AssetCls.UNIQUE;
 
-	public AssetUnique(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 	}
-	public AssetUnique(int props, Account creator, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)props}, creator, name, icon, image, description);
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description);
 	}
-	public AssetUnique(Account creator, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)0}, creator, name, icon, image, description);
+		this(new byte[]{(byte)TYPE_ID, (byte)0}, owner, name, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -54,9 +55,9 @@ public class AssetUnique extends AssetCls {
 		int position = TYPE_LENGTH;
 	
 		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
-		position += CREATOR_LENGTH;
+		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+		PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+		position += OWNER_LENGTH;
 		
 		//READ NAME
 		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -115,7 +116,7 @@ public class AssetUnique extends AssetCls {
 		position += descriptionLength;
 				
 		//RETURN
-		AssetUnique statement = new AssetUnique(typeBytes, creator, name, icon, image, description);
+		AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description);
 
 		if (includeReference)
 		{

@@ -118,7 +118,7 @@ public class TestRecImprint {
 		
 		init();
 		
-		byte[] raw = imprint.toBytes(false);
+		byte[] raw = imprint.toBytes(false, false);
 		assertEquals(raw.length, imprint.getDataLength(false));
 				
 		//CREATE ISSUE IMPRINT TRANSACTION
@@ -148,7 +148,7 @@ public class TestRecImprint {
 			assertEquals(issueImprintRecord.getCreator().getAddress(), parsedIssueImprintTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueImprintRecord.getItem().getCreator().getAddress(), parsedIssueImprintTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueImprintRecord.getItem().getOwner().getAddress(), parsedIssueImprintTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueImprintRecord.getItem().getName(), parsedIssueImprintTransaction.getItem().getName());
@@ -207,7 +207,7 @@ public class TestRecImprint {
 		assertEquals(0, mapSize - 1);
 		
 		//CHECK IMPRINT IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true), imprint.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true, false), imprint.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
 		//assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));

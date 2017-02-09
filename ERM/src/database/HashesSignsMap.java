@@ -74,11 +74,16 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
 		
 		Stack<Tuple3<Long, Integer, Integer>> value_new;
-		// !!!! NEEED .clone() !!!
-		// need for updates only in fork - not in parent DB
-		value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
 
-		value_new.add(item);
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
+		}
+
+		value_new.push(item);
 		
 		this.set(hash, value_new);
 		
@@ -97,9 +102,13 @@ public class HashesSignsMap extends DBMap<byte[], Stack<Tuple3<
 		if (value==null || value.size() == 0) return;
 
 		Stack<Tuple3<Long, Integer, Integer>> value_new;
-		// !!!! NEEED .clone() !!!
-		// need for updates only in fork - not in parent DB
-		value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
+		if (this.parent == null)
+			value_new = value;
+		else {
+			// !!!! NEEED .clone() !!!
+			// need for updates only in fork - not in parent DB
+			value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
+		}
 
 		value_new.pop();
 		

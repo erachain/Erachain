@@ -82,13 +82,15 @@ public class KKN_Map extends DBMap<
 		return this.observableData;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addItem(Long key, String nameKey, Tuple3<Long, Integer, byte[]> item)
 	{
 
 		TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		
 		TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-		if (false && this.parent == null)
+		
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -97,12 +99,22 @@ public class KKN_Map extends DBMap<
 		}
 
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(nameKey);
-		if (stack == null) stack = new Stack<Tuple3<Long, Integer, byte[]>>();
-		
-		stack.add(item);
-
-		value_new.put(nameKey, stack);
-		
+		if (stack == null) {
+			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
+			stack.push(item);
+			value_new.put(nameKey, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);
+				value_new.put(nameKey, stack);
+			} else {
+				Stack<Tuple3<Long, Integer, byte[]>> stack_new;
+				stack_new = (Stack<Tuple3<Long, Integer, byte[]>>)stack.clone();
+				stack_new.push(item);
+				value_new.put(nameKey, stack_new);
+			}
+		}
+				
 		this.set(key, value_new);
 
 	}
@@ -115,6 +127,7 @@ public class KKN_Map extends DBMap<
 	}
 	
 	// remove only last item from stack for this key of nameKey
+	@SuppressWarnings("unchecked")
 	public void removeItem(Long key, String nameKey)
 	{
 		TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
@@ -131,9 +144,15 @@ public class KKN_Map extends DBMap<
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(nameKey);
 		if (stack==null || stack.size() == 0) return;
 
-		stack.pop();
-
-		value_new.put(nameKey, stack);
+		if (this.parent == null) {
+			stack.pop();
+			value_new.put(nameKey, stack);
+		} else {
+			Stack<Tuple3<Long, Integer, byte[]>> stack_new;
+			stack_new = (Stack<Tuple3<Long, Integer, byte[]>>)stack.clone();
+			stack_new.pop();
+			value_new.put(nameKey, stack_new);
+		}
 		
 		this.set(key, value_new);
 		

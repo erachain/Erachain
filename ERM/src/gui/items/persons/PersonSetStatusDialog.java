@@ -119,31 +119,31 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	
 	            	
-	            	 Date date = jFormattedTextField_fromDate.getCalendar().getTime();
-		     			String str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-		     			
-		     			String str_jFormattedTextField_toDate;
-			     			
+	            	Date date;
+					String str_jFormattedTextField_fromDate;
+					try {
+						date = jFormattedTextField_fromDate.getCalendar().getTime();
+						str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+					}
+			     	catch(Exception e2){
+			     		str_jFormattedTextField_fromDate = null;
+			     		
+			     	}
+								     			
+					String str_jFormattedTextField_toDate;
 			     	try{
-			     				 date = jFormattedTextField_toDate.getCalendar().getTime();
-					     		 str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+	     				 date = jFormattedTextField_toDate.getCalendar().getTime();
+			     		 str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
 			     				
 			     	}
 			     	catch(Exception e3){
-			     		str_jFormattedTextField_toDate = "3000-12-31";
+			     		str_jFormattedTextField_toDate = null;
 			     		
 			     	}   			
-			     			
-			     			
-		            	
-		            	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
-		            			(StatusCls)jComboBox_Status.getSelectedItem(),
-		            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
-	            	
-	            	
-	            	
-	            	
-	            	
+
+			     	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
+	            			(StatusCls)jComboBox_Status.getSelectedItem(),
+	            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
 	            	
 	            }
 	        });
@@ -259,7 +259,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			//READ FROM DATE
 			parse++;
 			String str = str_jFormattedTextField_fromDate;
-			if (str.equals("0000-00-00")) 
+			if (str == null || str.equals("0000-00-00")) 
 				fromDate = Long.MIN_VALUE;
 			else {
 				if (str.length() < 11) str = str + " 12:12:12";
@@ -269,7 +269,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			//READ TO DATE
 			parse++;
 			str = str_jFormattedTextField_toDate;
-			if (str.equals("0000-00-00")) 
+			if (str == null || str.equals("0000-00-00")) 
 				toDate = Long.MAX_VALUE;
 			else {
 				if (str.length() < 11) str = str + " 12:12:12";

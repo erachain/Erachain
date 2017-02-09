@@ -8,6 +8,7 @@
 	<link href="/index/libs/css/style.css" rel="stylesheet">
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
+	<script src="/index/libs/js/explorerStatements.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 	<style type="text/css">
@@ -200,6 +201,11 @@ function asyncAjax (url, type){
 				if(type == 'peers')
 				{
 					document.getElementById('main').innerHTML = peers(data);
+				}
+				
+				if(type == 'statements')
+				{
+					document.getElementById('main').innerHTML = statements(data);
 				}
 				
 				
@@ -489,12 +495,12 @@ function peers(data)
 //	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
 	
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr><td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
+	output += '<tr><td><b>'+ data.Label_No+'<td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 	for(var i  in data.Peers)
 	{
-		output += '<tr>';
+		output += '<tr><td>'+ i;
 		output += '<td>'+ data.Peers[i].IP+'<td>'+data.Peers[i].Height+'<td>'+data.Peers[i].Ping_mc;
 		output += '<td>'+ data.Peers[i].Reliable+'<td>'+data.Peers[i].Initiator;
 		output += '<td>'+ data.Peers[i].Finding_ago+'<td>'+data.Peers[i].Online_Time +'<td>'+data.Peers[i].Version;
@@ -520,6 +526,10 @@ function peers(data)
 	
 	return output;
 }
+
+
+
+
 
 
 
@@ -3492,6 +3502,9 @@ function start() {
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
 	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
 	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
+	document.getElementById('menu_statements').href ='?statements&lang='+ params['lang'] ;
+	
+	
 				
 	
 	document.getElementById('menuBlocks').setAttribute('class', '');
@@ -3808,37 +3821,29 @@ function start() {
 	if(params.hasOwnProperty('persons'))
 	{
 		asyncAjax('blockexplorer.json?persons'+'&lang='+params['lang'] , 'persons');
-
 		document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
-	//	document.getElementById('persons').value = params['persons'];
-		
 		return;
 	}
 	
 	if(params.hasOwnProperty('person'))
 	{
-		
 		asyncAjax('blockexplorer.json?person=' + params['person']+'&lang='+params['lang'], 'person');
-//		a =  decodeURIComponent(params['title']);
-		document.title = title ;//+  + decodeURIComponent(params['title']);
-		
-	//	document.getElementById('q').value = decodeURIComponent(params['person']);
-		
+		document.title = title ;
 		return;
 	}
 	
 	if(params.hasOwnProperty('peers'))
 	{
-		
 		asyncAjax('blockexplorer.json?peers&lang='+params['lang'], 'peers');
-//		a =  decodeURIComponent(params['title']);
-		document.title = title ;//+  + decodeURIComponent(params['title']);
-		
-	//	document.getElementById('q').value = decodeURIComponent(params['person']);
-		
+		document.title = title ;
 		return;
 	}	
-	
+	if(params.hasOwnProperty('statements'))
+	{
+		asyncAjax('blockexplorer.json?statements&lang='+params['lang'], 'statements');
+		document.title = title ;
+		return;
+	}	
 	asyncAjax('blockexplorer.json?blocks'+'&lang='+params['lang'], 'blocks');
 	
 	document.title = title;
@@ -3939,12 +3944,13 @@ function Lang_setting(){
             <div class="row" id="main-menu" >
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
-				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100>Top 100 Richest</a></li>
-				<li id=menuPersons><a href="?persons" id =menu_percons>Persons</a></li>
-				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset>Polls</a></li>
-				<li id=menuAssets><a href="?assets" id =menu_assets>Assets</a></li>
-				<li id=menuATs><a href="?aTs" id =menu_aTs>ATs</a></li>	
-				<li id=menuBlocks><a href="?peers" id=menu_peers>Peers</a></li>				
+				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100><translate>Top 100 Richest</translate></a></li>
+				<li id=menuPersons><a href="?persons" id =menu_percons><translate>Persons</translate></a></li>
+				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
+				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
+				<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	
+				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
+				<li id=menustatements><a href="?statements" id=menu_statements><translate>Statements</translate></a></li>		
               </ul>
             </div>
           </div>

@@ -101,7 +101,7 @@ public class TestNoteAsPack {
 		init();
 		
 		NoteCls note = new Note(maker, "test132", icon, image, "12345678910strontje");
-		byte[] raw = note.toBytes(includeReference);
+		byte[] raw = note.toBytes(includeReference, false);
 		assertEquals(raw.length, note.getDataLength(includeReference));
 				
 		//CREATE ISSUE NOTE TRANSACTION
@@ -131,7 +131,7 @@ public class TestNoteAsPack {
 			assertEquals(issueNoteRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueNoteRecord.getItem().getCreator().getAddress(), parsedIssueNoteTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueNoteRecord.getItem().getOwner().getAddress(), parsedIssueNoteTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueNoteRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());
@@ -181,7 +181,7 @@ public class TestNoteAsPack {
 		assertEquals(0, mapSize - 4);
 		
 		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(includeReference), note.toBytes(includeReference)));
+		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(includeReference, false), note.toBytes(includeReference, false)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals((long)makerReference, (long)maker.getLastReference(db));

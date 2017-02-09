@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
@@ -29,6 +30,7 @@ import database.DBSet;
 //import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import ntp.NTP;
 import utils.Pair;
@@ -38,7 +40,7 @@ public class VouchRecordDialog extends JDialog  {
 	private static final long serialVersionUID = 2717571093561259483L;
 	
 	private static Transaction record;
-	private static Record_Info infoPanel;
+	
 
 	public VouchRecordDialog(Integer block_No, Integer rec_No) {
 		super();
@@ -87,15 +89,17 @@ public class VouchRecordDialog extends JDialog  {
 		}
 
 		if (record == null) {
-			infoPanel.show_mess(Lang.getInstance().translate("Error - use signature of record or blockNo-recNo"));
-	        jLabel_RecordInfo.setViewportView(infoPanel);
+		//	infoPanel.show_mess(Lang.getInstance().translate("Error - use signature of record or blockNo-recNo"));
+	    //    jLabel_RecordInfo.setViewportView(infoPanel);
 			return record;
 		}
 		
 		//ENABLE
 		jButton_Confirm.setEnabled(true);
-
-		infoPanel.show_001(record);
+		
+		   JPanel infoPanel = TransactionDetailsFactory.getInstance().createTransactionDetail(record);
+		   jLabel_Name_Records.setText( Lang.getInstance().translate(record.viewTypeName()));
+	//	infoPanel.show_001(record);
 		//infoPanel.setFocusable(false);
         jLabel_RecordInfo.setViewportView(infoPanel);
 
@@ -174,6 +178,7 @@ public class VouchRecordDialog extends JDialog  {
 	        jButton_Confirm = new javax.swing.JButton();
 	        jLabel_Fee_Check = new javax.swing.JLabel();
 	        jLabel_Title = new javax.swing.JLabel();
+	        jLabel_Name_Records= new javax.swing.JLabel();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	        setMinimumSize(new java.awt.Dimension(650, 23));
@@ -234,7 +239,8 @@ public class VouchRecordDialog extends JDialog  {
 		    
 	        
 	        jLabel_RecordInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-	        infoPanel = new Record_Info(); 
+	     //   infoPanel = new Record_Info(); 
+	     
 	        //info.show_001(record);
 	        //infoPanel.setFocusable(false);
 	        //jLabel_RecordInfo.setViewportView(infoPanel);
@@ -345,11 +351,28 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.weightx = 1.0;
 	    //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
 	        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-	        getContentPane().add(jLabel_Title, gridBagConstraints);
+	  //      getContentPane().add(jLabel_Title, gridBagConstraints);
 	        jLabel_Title.setText(Lang.getInstance().translate("Information about the record"));
 	        getContentPane().add(jLabel_Title, gridBagConstraints);
 
-	        pack();
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 2;
+	        gridBagConstraints.gridwidth = 7;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 1.0;
+	    //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
+	        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
+	  //      getContentPane().add(jLabel_Title, gridBagConstraints);
+	       
+	        getContentPane().add(jLabel_Name_Records, gridBagConstraints);
+
+	        
+	        
+	        
+	        
+	    //    pack();
 	    }// <
 	  
 
@@ -367,6 +390,7 @@ public class VouchRecordDialog extends JDialog  {
 	    private javax.swing.JTextField jTextField_recordID;
 
 	    private javax.swing.JLabel jLabel_Title;
+	    private javax.swing.JLabel jLabel_Name_Records;
 	    private javax.swing.JLabel jLabel_YourAddress;
 	    // End of variables declaration                   
 	

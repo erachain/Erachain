@@ -316,30 +316,75 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(issueNoteRecord, this.afterCreate(issueNoteRecord, false));
 	}
 
-	public Pair<Transaction, Integer> createIssuePersonTransaction(PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
-					byte gender, String race, float birthLatitude, float birthLongitude,
-					String skinColor, String eyeColor, String hairСolor, int height,
-					byte[] icon, byte[] image, String description) 
+	public Pair<Transaction, Integer> createIssuePersonTransaction(
+			boolean forIssue,
+			PrivateKeyAccount creator, String fullName, int feePow, long birthday, long deathday,
+			byte gender, String race, float birthLatitude, float birthLongitude,
+			String skinColor, String eyeColor, String hairСolor, int height,
+			byte[] icon, byte[] image, String description,
+			PublicKeyAccount owner, byte[] ownerSignature)
 	{
 		//CHECK FOR UPDATES
-		this.checkUpdate();
+		if (forIssue) {
+			this.checkUpdate();
+		}
 								
 		//TIME
 		long time = NTP.getTime();
 
-		PersonCls person = new PersonHuman(creator, fullName, birthday, deathday,
+		PersonCls person = new PersonHuman(owner, fullName, birthday, deathday,
 				gender, race, birthLatitude, birthLongitude,
-				skinColor, eyeColor, hairСolor, height, icon, image, description);
-							
+				skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
+
+		long lastReference;
+		if (forIssue) {
+			lastReference = creator.getLastReference(this.fork);
+		} else {
+			lastReference = time - 1000l;
+		}
 		//CREATE ISSUE NOTE TRANSACTION
-		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, creator.getLastReference(this.fork));
+		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
-										
+		
 		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, false));
+		if (forIssue) {
+			boolean asPack = false;
+			return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		} else {
+			// for COPY -
+			int valid = issuePersonRecord.isValid(DBSet.getInstance(), lastReference);
+			if (valid == Transaction.NOT_ENOUGH_FEE
+					|| valid == Transaction.ACCOUNT_NOT_PERSONALIZED) {
+				valid = Transaction.VALIDATE_OK;
+			}
+			return new Pair<Transaction, Integer>(issuePersonRecord, valid);
+		}
 	}
 
-	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
+			PrivateKeyAccount creator, int feePow, PersonHuman human)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+								
+		//TIME
+		long time = NTP.getTime();
+
+		long lastReference;
+		lastReference = creator.getLastReference(this.fork);
+
+		//CREATE ISSUE NOTE TRANSACTION
+		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte)feePow, time, lastReference);
+		issuePersonRecord.sign(creator, false);
+		
+		//VALIDATE AND PROCESS
+		boolean asPack = false;
+		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		
+	}
+
+	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
+			boolean unique, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -347,7 +392,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		StatusCls status = new Status(creator, name, icon, image, description);
+		StatusCls status = new Status(creator, name, icon, image, description, unique);
 							
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));

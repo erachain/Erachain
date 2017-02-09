@@ -112,6 +112,16 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		  Issue_Person_Panel.setName(Lang.getInstance().translate("Issue Person"));
 		  Issue_Person_Panel.add(new IssuePersonPanel());
 		  Issue_Person_Panel.setViewportView(new IssuePersonPanel());
+		  
+// insert Person
+		  
+		  JScrollPane insert_Person_Panel = new JScrollPane();
+		  insert_Person_Panel.setName(Lang.getInstance().translate("Insert Person"));
+		  insert_Person_Panel.add(new InsertPersonPanel());
+		  insert_Person_Panel.setViewportView(new InsertPersonPanel());
+		  
+		  
+		  
 	
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -120,6 +130,7 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 		
 		this.jTabbedPane.add(search_Person_SplitPanel);
 		this.jTabbedPane.add(Issue_Person_Panel);
+		this.jTabbedPane.add(insert_Person_Panel);
 		
 		this.pack();
 		//	this.setSize(800,600);

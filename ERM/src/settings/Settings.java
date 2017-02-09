@@ -371,7 +371,7 @@ public class Settings {
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
-			LOGGER.debug(e.getMessage(), e);
+			//LOGGER.debug(e.getMessage(), e);
 			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 						
 			return this.cacheInternetPeers;

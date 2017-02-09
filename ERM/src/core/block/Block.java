@@ -101,6 +101,7 @@ public class Block {
 		this.atBytes = atBytes;
 		
 		//this.setGeneratingBalance(dbSet);
+		//BlockChain.getTarget();
 
 	}
 
@@ -132,11 +133,22 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 		
-		int height = db.getBlockSignsMap().get(this.signature).a;		
+		int height = db.getBlockSignsMap().get(this.signature).a;
 		return height;
 
 	}
 	
+	/*
+	protected long targetValue;
+	public long getTargetValue() {
+		return targetValue;
+	}
+	public void setTargetValue(long target) {
+		if (targetValue == 0)
+			targetValue = target;
+	}
+	*/
+
 	// TODO - on orphan = -1 for parent on resolve new chain
 	public int getParentHeight(DBSet db)
 	{
@@ -496,6 +508,11 @@ public class Block {
 
 	public static Block parse(byte[] data, boolean forDB) throws Exception
 	{
+		if(data.length == 0)
+		{
+			return null;
+		}
+		
 		//CHECK IF WE HAVE MINIMUM BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{
@@ -835,12 +852,19 @@ public class Block {
 
 		long win_value = generatingBalance * winValueHeight2;
 
+		
 		if (height <4)
 			win_value >>= 3;
-		else if (height < BlockChain.REPEAT_WIN)
-			win_value >>= 4;
+		else if (true || height < BlockChain.TARGET_COUNT>>1)
+			win_value = (win_value >>3) - (win_value >>5);
 		else if (height < BlockChain.TARGET_COUNT)
+			win_value >>= 4;
+		else if (height < BlockChain.TARGET_COUNT<<1)
+			win_value = (win_value >>4) - (win_value >>6);
+		else if (height < BlockChain.TARGET_COUNT<<1)
 			win_value >>= 5;
+		else if (height < BlockChain.TARGET_COUNT<<2)
+			win_value = (win_value >>5) - (win_value >>7);
 		else
 			win_value >>= 6;
 		
@@ -952,7 +976,7 @@ public class Block {
 	public static boolean isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
 		
 		int repeat_win = 0;
-		if (height < BlockChain.TARGET_COUNT<<2) {
+		if (height < BlockChain.REPEAT_WIN<<1) {
 			repeat_win = BlockChain.REPEAT_WIN;
 		} else {
 			return false;

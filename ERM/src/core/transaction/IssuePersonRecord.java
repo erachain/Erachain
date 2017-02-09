@@ -25,6 +25,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
+import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
 //import database.ItemMap;
 import database.DBSet;
@@ -34,7 +35,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_PERSON_TRANSACTION;
 	private static final String NAME_ID = "Issue Person";
 
-	public static final int MAX_IMAGE_LENGTH = 10249;
+	public static final int MAX_IMAGE_LENGTH = 20480;
 	
 	public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference) 
 	{
@@ -71,8 +72,10 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	
 	@Override
 	public boolean hasPublicText() {
-		if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
-			return false;
+		for ( String admin: BlockChain.GENESIS_ADMINS) {
+			if (this.creator.equals(admin)) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -104,15 +107,31 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		//int ii = Math.abs(person.getHeight());
 		if (Math.abs(person.getHeight()) < 0) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
-		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1) || person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
-		
+		if (person.getImage().length < (MAX_IMAGE_LENGTH - MAX_IMAGE_LENGTH>>2)
+				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
+
+		if (person instanceof PersonHuman) {
+			PersonHuman human = (PersonHuman) person;
+			if (human.isMustBeSigned()
+				&& !Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
+				// OWNER of personal INFO not is CREATOR
+				if (human.getOwnerSignature() == null) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+				}
+				if (!human.isSignatureValid()) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
+				}
+			}
+		}
+
 		long count = db.getItemPersonMap().getSize();
 		if (count < 20) {
 			// FIRST Persons only by ME
-			if (this.creator.equals(BlockChain.GENESIS_ADMIN)) {
-				return VALIDATE_OK;
-			} else {
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+			// FIRST Persons only by ADMINS
+			for ( String admin: BlockChain.GENESIS_ADMINS) {
+				if (this.creator.equals(admin)) {
+					return VALIDATE_OK;
+				}
 			}
 		}
 
@@ -200,7 +219,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 	@Override
 	public int calcBaseFee() {
-		return calcCommonFee();
+		int fee = calcCommonFee()>>1; 
+		return fee;
 	}
 
 }

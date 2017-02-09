@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,13 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
 import utils.TransactionFeeComparator;
+import utils.TransactionTimestampComparator;
 import at.AT_Block;
 import at.AT_Constants;
 import at.AT_Controller;
@@ -514,7 +517,9 @@ public class BlockGenerator extends Thread implements Observer
 					
 		//ORDER TRANSACTIONS BY FEE PER BYTE
 		List<Transaction> orderedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
+		
 		Collections.sort(orderedTransactions, new TransactionFeeComparator());
+		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
@@ -562,11 +567,13 @@ public class BlockGenerator extends Thread implements Observer
                         break;                    
 					}
 				}
-						
 			}
 		}
 		while(transactionProcessed == true);
-		
+
+		// sort by TIMESTAMP
+		Collections.sort(transactionsList,  new TransactionTimestampComparator());
+
 		return transactionsList;
 	}
 	

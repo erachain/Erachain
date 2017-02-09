@@ -101,7 +101,7 @@ public class AssetDetailsPanel extends JPanel {
 		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
 		this.add(ownerLabel, labelGBC);
 		
-		Account creator = asset.getCreator();
+		Account creator = asset.getOwner();
 		//OWNER
 		detailGBC.gridy = gridy;
 		JTextField owner = new JTextField(creator.getPersonAsString());

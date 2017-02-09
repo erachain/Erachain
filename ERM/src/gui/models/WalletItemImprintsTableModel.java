@@ -93,7 +93,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		
 		case COLUMN_ADDRESS:
 			
-			return imprint.getCreator().getPersonAsString();
+			return imprint.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			

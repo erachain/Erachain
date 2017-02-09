@@ -139,7 +139,7 @@ public class TestRecNote {
 		init();
 		
 		NoteCls note = new Note(maker, "test132", icon, image, "12345678910strontje");
-		byte[] raw = note.toBytes(false);
+		byte[] raw = note.toBytes(false, false);
 		assertEquals(raw.length, note.getDataLength(false));
 				
 		//CREATE ISSUE NOTE TRANSACTION
@@ -169,7 +169,7 @@ public class TestRecNote {
 			assertEquals(issueNoteRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueNoteRecord.getItem().getCreator().getAddress(), parsedIssueNoteTransaction.getItem().getCreator().getAddress());
+			assertEquals(issueNoteRecord.getItem().getOwner().getAddress(), parsedIssueNoteTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
 			assertEquals(issueNoteRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());
@@ -226,7 +226,7 @@ public class TestRecNote {
 		assertEquals(mapSize, noteMap.size());
 		
 		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true), note.toBytes(true)));
+		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true, false), note.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
 		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));

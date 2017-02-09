@@ -16,6 +16,7 @@ import com.google.common.primitives.Ints;
 
 import controller.Controller;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -39,7 +40,7 @@ public abstract class ItemCls {
 	public static final int UNION_TYPE = 6;
 
 	protected static final int TYPE_LENGTH = 2;
-	protected static final int CREATOR_LENGTH = Account.ADDRESS_LENGTH;
+	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	protected static final int NAME_SIZE_LENGTH = 1;
 	public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
 	protected static final int ICON_SIZE_LENGTH = 2;
@@ -48,7 +49,7 @@ public abstract class ItemCls {
 	public static final int MAX_IMAGE_LENGTH = (int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
-	protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
+	protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 		
 	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
@@ -57,7 +58,7 @@ public abstract class ItemCls {
 	
 	protected String TYPE_NAME = "unknown";
 	protected byte[] typeBytes;
-	protected Account creator;
+	protected PublicKeyAccount owner;
 	protected String name;
 	protected String description;
 	protected long key = 0;
@@ -65,19 +66,19 @@ public abstract class ItemCls {
 	protected byte[] icon;
 	protected byte[] image;
 	
-	public ItemCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		this.typeBytes = typeBytes;
-		this.creator = creator;
+		this.owner = owner;
 		this.name = name;
 		this.description = description;
 		this.icon = icon == null? new byte[0]: icon;
 		this.image = image == null? new byte[0]: image;
 		
 	}
-	public ItemCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public ItemCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 
@@ -153,8 +154,8 @@ public abstract class ItemCls {
 		this.typeBytes[1] = props;
 	}
 
-	public Account getCreator() {
-		return this.creator;
+	public PublicKeyAccount getOwner() {
+		return this.owner;
 	}
 	
 	public String getName() {
@@ -222,65 +223,74 @@ public abstract class ItemCls {
 		return Controller.getInstance().isItemFavorite(this);
 	}
 
-	public byte[] toBytes(boolean includeReference)
+	// forOwnerSign - use only DATA needed for making signature
+	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
 	{
 
 		byte[] data = new byte[0];
+		boolean useAll = !forOwnerSign;
 		
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
+		if (useAll) {
+			//WRITE TYPE
+			data = Bytes.concat(data, this.typeBytes);
+		}
 
-		//WRITE CREATOR
-		try
-		{
-			data = Bytes.concat(data, Base58.decode(this.creator.getAddress()));
+		if (useAll) {
+			//WRITE OWNER
+			try
+			{
+				data = Bytes.concat(data, this.owner.getPublicKey());
+			}
+			catch(Exception e)
+			{
+				//DECODE EXCEPTION
+			}
 		}
-		catch(Exception e)
-		{
-			//DECODE EXCEPTION
-		}
-		
-		//WRITE NAME SIZE
+
 		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
-		data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
+		if (useAll) {
+			//WRITE NAME SIZE
+			data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
+		}
 		
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
 
-		//WRITE ICON SIZE - 2 bytes = 64kB max
-		int iconLength = this.icon.length;
-		byte[] iconLengthBytes = Ints.toByteArray(iconLength);
-		data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
-				
-		//WRITE ICON
-		data = Bytes.concat(data, this.icon);
+		if (useAll) {
+			//WRITE ICON SIZE - 2 bytes = 64kB max
+			int iconLength = this.icon.length;
+			byte[] iconLengthBytes = Ints.toByteArray(iconLength);
+			data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+					
+			//WRITE ICON
+			data = Bytes.concat(data, this.icon);
+		}
 
-		//WRITE IMAGE SIZE
-		int imageLength = this.image.length;
-		byte[] imageLengthBytes = Ints.toByteArray(imageLength);
-		data = Bytes.concat(data, imageLengthBytes);
+		if (useAll) {
+			//WRITE IMAGE SIZE
+			int imageLength = this.image.length;
+			byte[] imageLengthBytes = Ints.toByteArray(imageLength);
+			data = Bytes.concat(data, imageLengthBytes);
+		}
 				
 		//WRITE IMAGE
 		data = Bytes.concat(data, this.image);
 		
-		//WRITE DESCRIPTION SIZE
 		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
-		int descriptionLength = descriptionBytes.length;
-		byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
-		data = Bytes.concat(data, descriptionLengthBytes);
+		if (useAll) {
+			//WRITE DESCRIPTION SIZE
+			int descriptionLength = descriptionBytes.length;
+			byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
+			data = Bytes.concat(data, descriptionLengthBytes);
+		}
 				
 		//WRITE DESCRIPTION
 		data = Bytes.concat(data, descriptionBytes);
 		
-		if(includeReference)
+		if(useAll && includeReference)
 		{
 			//WRITE REFERENCE
 			data = Bytes.concat(data, this.reference);
-		}
-		else
-		{
-			//WRITE EMPTY REFERENCE
-			// data = Bytes.concat(data, new byte[Crypto.SIGNATURE_LENGTH]);
 		}
 		
 		return data;
@@ -294,14 +304,14 @@ public abstract class ItemCls {
 				+ this.image.length
 				+ this.description.getBytes(StandardCharsets.UTF_8).length
 				+ (includeReference? REFERENCE_LENGTH: 0);
-	}	
-	
+	}
+
 	//OTHER
 	
 	public String toString(DBSet db)
 	{		
 		long key = this.getKey(db);
-		String creator = this.creator.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.creator.getPersonAsString_01(false);
+		String creator = this.owner.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.owner.getPersonAsString_01(false);
 		return (key==0?"?:":key
 				//+ "." + this.typeBytes[0]
 				+ " ") + this.getName()  
@@ -336,7 +346,7 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		String creator = this.creator.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.creator.getPersonAsString_01(true);
+		String creator = this.owner.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.owner.getPersonAsString_01(true);
 		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300))
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
@@ -358,7 +368,7 @@ public abstract class ItemCls {
 		itemJSON.put("key", this.key);
 		itemJSON.put("name", this.name);
 		itemJSON.put("description", this.description);
-		itemJSON.put("creator", this.creator.getAddress());
+		itemJSON.put("creator", this.owner.getAddress());
 		itemJSON.put("isConfirmed", this.isConfirmed());
 		itemJSON.put("reference", Base58.encode(this.reference));
 		

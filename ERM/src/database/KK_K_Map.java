@@ -83,6 +83,7 @@ public class KK_K_Map extends DBMap<
 		return this.observableData;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addItem(Long key1, Long key2, Long itemKey, Tuple3<Long, Integer, byte[]> item)
 	{
 
@@ -91,7 +92,7 @@ public class KK_K_Map extends DBMap<
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -100,12 +101,21 @@ public class KK_K_Map extends DBMap<
 		}
 
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
-		if (stack == null)
+		if (stack == null) {
 			stack = new Stack<Tuple3<Long, Integer, byte[]>>();
-		
-		stack.add(item);
-		
-		value_new.put(itemKey, stack);
+			stack.push(item);			
+			value_new.put(itemKey, stack);
+		} else {
+			if (this.parent == null) {
+				stack.push(item);			
+				value_new.put(itemKey, stack);				
+			} else {
+				Stack<Tuple3<Long, Integer, byte[]>> stack_new;
+				stack_new = (Stack<Tuple3<Long, Integer, byte[]>>)stack.clone();		
+				stack_new.push(item);			
+				value_new.put(itemKey, stack_new);				
+			}
+		}
 		
 		this.set(key, value_new);
 
@@ -123,6 +133,7 @@ public class KK_K_Map extends DBMap<
 	}
 	
 	// remove only last item from stack for this key of itemKey
+	@SuppressWarnings("unchecked")
 	public void removeItem(Long key1, Long key2, Long itemKey)
 	{
 		Tuple2<Long, Long> key = new Tuple2<Long, Long>(key1, key2);
@@ -130,7 +141,7 @@ public class KK_K_Map extends DBMap<
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		
 		TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-		if (false && this.parent == null)
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -141,9 +152,16 @@ public class KK_K_Map extends DBMap<
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
 		if (stack==null || stack.size() == 0) return;
 
-		stack.pop();
+		if (this.parent == null) {
+			stack.pop();
+			value_new.put(itemKey, stack);
+		} else {
+			Stack<Tuple3<Long, Integer, byte[]>> stack_new;
+			stack_new = (Stack<Tuple3<Long, Integer, byte[]>>)stack.clone();
+			stack_new.pop();
+			value_new.put(itemKey, stack_new);
+		}
 
-		value_new.put(itemKey, stack);
 		this.set(key, value_new);
 		
 	}

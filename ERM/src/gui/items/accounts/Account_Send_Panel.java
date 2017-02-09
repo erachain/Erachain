@@ -43,6 +43,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.mapdb.Fun.Tuple2;
+
 //import settings.Settings;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -69,19 +71,19 @@ public class Account_Send_Panel extends JPanel
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     
-	private JComboBox<Account> cbxFrom;
-	private JComboBox cbx_To;
-	private JTextField txtTo;
-	private JTextField txtAmount;
-	private JTextField txtFeePow;
-	public JTextArea txtMessage;
-	private JCheckBox encrypted;
-	private JCheckBox isText;
-	private JButton sendButton;
-	private AccountsComboBoxModel accountsModel;
-	private JComboBox<AssetCls> cbxFavorites;
-	private JTextField txtRecDetails;
-	private JLabel messageLabel;
+	protected JComboBox<Account> cbxFrom;
+	protected JComboBox cbx_To;
+	protected JTextField txtTo;
+	protected JTextField txtAmount;
+	protected JTextField txtFeePow;
+	protected JTextArea txtMessage;
+	protected JCheckBox encrypted;
+	protected JCheckBox isText;
+	protected JButton sendButton;
+	protected AccountsComboBoxModel accountsModel;
+	protected JComboBox<AssetCls> cbxFavorites;
+	protected JTextField txtRecDetails;
+	protected JLabel messageLabel;
 	
 	public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
@@ -517,33 +519,13 @@ public class Account_Send_Panel extends JPanel
 			return;
 		}
 		
-		Account account = null;
-		
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(toValue))
-		{
-			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-					
-			if(nameToAdress.getB() == NameResult.OK)
-			{
-				account = nameToAdress.getA();
+		//READ RECIPIENT
+		Tuple2<Account, String> resultAccount = Account.tryMakeAccount(txtTo.getText());
+		Account account = resultAccount.a;
+		if (account == null) {
+			txtRecDetails.setText(Lang.getInstance().translate(resultAccount.b));
+		} else {
 				txtRecDetails.setText(account.toString(asset.getKey()));
-			}
-			else
-			{
-				txtRecDetails.setText(nameToAdress.getB().getShortStatusMessage());
-			}
-		} else
-		{
-			account = new Account(toValue);
-			
-			txtRecDetails.setText(account.toString(asset.getKey()));
-			
-			if(account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-					&& account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0)
-			{
-				txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
-			}
 		}
 		
 		if(false && account!=null && account.getAddress().startsWith(wrongFirstCharOfAddress))
@@ -601,33 +583,15 @@ public class Account_Send_Panel extends JPanel
 		Account sender = (Account) cbxFrom.getSelectedItem();
 		
 		//READ RECIPIENT
-		String recipientAddress = txtTo.getText();
-		
-		Account recipient;
-		
-		//ORDINARY RECIPIENT
-		if(Crypto.getInstance().isValidAddress(recipientAddress))
-		{
-			recipient = new Account(recipientAddress);
+		Tuple2<Account, String> resultRecipient = Account.tryMakeAccount(txtTo.getText());
+		if (resultRecipient.b != null) {
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate(resultRecipient.b),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;			
 		}
-		else
-		{
-			//IS IS NAME of RECIPIENT - resolve ADDRESS
-			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-			
-			if(result.getB() == NameResult.OK)
-			{
-				recipient = result.getA();
-			}
-			else		
-			{
-				JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage() , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				return;
-			}
-		}
+		Account recipient = resultRecipient.a;
 		
 		int parsing = 0;
 		int feePow = 0;

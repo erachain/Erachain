@@ -27,7 +27,7 @@ import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer
+public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer
 {
 	private static final int COLUMN_ADDRESS = 0;
 	public static final int COLUMN_AMOUNT = 1;
@@ -45,25 +45,23 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 	long asset_Key;
 	List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred ;
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
-	private List<Tuple2<Tuple2<String, String>, Transaction>> transactions_Asset;
+	private List<Transaction> transactions_Asset;
+	//private  Account_Cls account;
 	
 	@SuppressWarnings("unchecked")
-	public CreditsTableModel()
+	public Model_Account_Transactions()
 	{
-		 this.transactions_Asset = new ArrayList <Tuple2<Tuple2<String, String>, Transaction>>();
+		 this.transactions_Asset = new ArrayList <Transaction>();
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 	
 		
 		
 		 cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
-		for (PublicKeyAccount account:this.publicKeyAccounts){
-			
+			account = new Account("");
 			asset_Key=1;	
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
+		
 			
-			
-		}
+		
 		
 		Controller.getInstance().addWalletListener(this);
 		Controller.getInstance().addObserver(this);
@@ -100,47 +98,25 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		return publicKeyAccounts.get(row);
 	}
 	
-	public void setAsset(AssetCls asset) 
+	public void setParam(AssetCls asset, Account account) 
 	{
-		
-		
-		
-		
+	 if (account != null) this.account = account;
+	if (asset !=null){
 		asset_Key = asset.getKey();
-		cred.clear();
-		for (PublicKeyAccount account:this.publicKeyAccounts){
+		this.asset = asset;
+	}	
+		
 			
 			
-			List<Transaction> trans = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
+			List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
 			
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
-				
-				
-			}
-/*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
-			long a = trans.getB().getAssetKey();
-			this.transactions_Asset.clear();
-				if (a == asset_Key){
-					
-					this.transactions_Asset.add(trans);		
-					
-					
-				}
 			
-				
-			}
-*/		
 		this.transactions_Asset.clear();;
-		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
-		long a = trans.getB().getAssetKey();
-		Tuple2<Tuple2<String, String>, Transaction> ss = null;
-			if (a == asset_Key ||  a == -asset_Key){
+		for (Transaction trans1:transactions){
+		long a = trans1.getAssetKey();
+			if ((a == asset_Key ||  a == -asset_Key)){	
 				
-				ss = new Tuple2(trans.getA(), trans.getB());
-				
-				
-				this.transactions_Asset.add(ss);		
+				this.transactions_Asset.add(trans1);		
 				
 				
 			}
@@ -192,11 +168,11 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		switch(column)
 		{
 		case COLUMN_ADDRESS:			
-			return transactions_Asset.get(row).b.getKey();
+			return transactions_Asset.get(row).getKey();
 		case COLUMN_AMOUNT:
-			return transactions_Asset.get(row).b.getAmount().toPlainString();
+			return transactions_Asset.get(row).getAmount().toPlainString();
 		case COLUMN_TRANSACTION:
-			return Lang.getInstance().translate(transactions_Asset.get(row).b.viewTypeName());
+			return Lang.getInstance().translate(transactions_Asset.get(row).viewTypeName());
 	/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
@@ -266,13 +242,11 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 						this.transactions_Asset.clear();;
 						for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
 						long a = trans.getB().getAssetKey();
+						Transaction trans1 = trans.getB();
 						Tuple2<Tuple2<String, String>, Transaction> ss = null;
-							if (a == asset_Key ||  a == -asset_Key){
-								
-								ss = new Tuple2(trans.getA(), trans.getB());
-								
-								
-								this.transactions_Asset.add(ss);		
+							
+								if ((a == asset_Key ||  a == -asset_Key)&& (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())){
+								this.transactions_Asset.add(trans.getB());		
 								
 								
 							}

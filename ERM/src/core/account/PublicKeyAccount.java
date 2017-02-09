@@ -26,7 +26,7 @@ import utils.NameUtils.NameResult;
 public class PublicKeyAccount extends Account {
 
 	public static final int PUBLIC_KEY_LENGTH = Crypto.HASH_LENGTH;
-	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
+	//public static final int STIRNG_PUBLIC_KEY_LENGTH = Base58.encode(new byte[PUBLIC_KEY_LENGTH]).length();
 	protected byte[] publicKey;
 	
 	public PublicKeyAccount(byte[] publicKey)
@@ -57,12 +57,21 @@ public class PublicKeyAccount extends Account {
 	//CHECK IF IS VALID PUBLIC KEY and MAKE NEW
 	public static boolean isValidPublicKey(byte[] publicKey)
 	{
-		if (publicKey.length != PUBLIC_KEY_LENGTH) return false;
+		if (publicKey == null
+				|| publicKey.length != PUBLIC_KEY_LENGTH)
+			return false;
 		return true;
 	}
 	public static boolean isValidPublicKey(String publicKey)
 	{
-		return isValidPublicKey(Base58.decode(publicKey));
+		
+		byte[] pk = null;
+		try {
+			pk = Base58.decode(publicKey);
+		} catch(Exception e) {
+			return false;
+		}
+		return isValidPublicKey(pk);
 	}
 	public boolean isValid()
 	{

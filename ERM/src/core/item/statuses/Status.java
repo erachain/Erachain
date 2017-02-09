@@ -7,19 +7,20 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 
 public class Status extends StatusCls {
 	
 	private static final int TYPE_ID = StatusCls.STATUS;
 
-	public Status(Account creator, String name, byte[] icon, byte[] image, String description)
+	public Status(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique)
 	{
-		super(TYPE_ID, creator, name, icon, image, description);
+		super(TYPE_ID, owner, name, icon, image, description, unique);
 	}
-	public Status(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public Status(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
@@ -36,9 +37,9 @@ public class Status extends StatusCls {
 		int position = TYPE_LENGTH;
 		
 		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
-		position += CREATOR_LENGTH;
+		byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+		PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+		position += OWNER_LENGTH;
 		
 		//READ NAME
 		//byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -105,7 +106,7 @@ public class Status extends StatusCls {
 		}
 		
 		//RETURN
-		Status status = new Status(typeBytes, creator, name, icon, image, description);
+		Status status = new Status(typeBytes, owner, name, icon, image, description);
 		if (includeReference)
 		{
 			status.setReference(reference);

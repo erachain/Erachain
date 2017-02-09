@@ -19,12 +19,13 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_CONFIRMED = 3;
-	public static final int COLUMN_FAVORITE = 4;
+	public static final int COLUMN_UNIQUE = 3;
+	public static final int COLUMN_CONFIRMED = 4;
+	public static final int COLUMN_FAVORITE = 5;
 	
 	private SortableList<Tuple2<String, String>, StatusCls> statuses;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Confirmed", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator","Unique", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
 	public WalletItemStatusesTableModel()
@@ -101,7 +102,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		
 		case COLUMN_ADDRESS:
 			
-			return status.getCreator().getPersonAsString();
+			return status.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			
@@ -110,6 +111,10 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		case COLUMN_FAVORITE:
 			
 			return status.isFavorite();
+		
+		case COLUMN_UNIQUE:
+			
+			return status.isUnique();
 			
 		}
 		

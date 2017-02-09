@@ -26,8 +26,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.table.TableColumn;
 
+import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.persons.PersonCls;
+import core.item.persons.PersonHuman;
+import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.models.PersonAccountsModel;
@@ -35,6 +40,7 @@ import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
 import utils.DateTimeFormat;
+import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
 
 /**
@@ -126,7 +132,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
         jTextField_Name.setEditable(false);
         jTextField_Name.setText(person.getName());
-        
+        MenuPopupUtil.installContextMenu(jTextField_Name);
         jTextField_Name.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField_NameActionPerformed(evt);
@@ -206,8 +212,22 @@ public class Person_Info_002 extends javax.swing.JPanel {
     //    jTextArea_Description.setColumns(20);
         jTextArea_Description.setRows(5);
         
+        MenuPopupUtil.installContextMenu(jTextArea_Description);
         jTextArea_Description.setEditable(false);
-        jTextArea_Description.setText(person.getDescription());
+        
+        String sss = "";
+        if (person instanceof PersonHuman) {
+        	PersonHuman human = (PersonHuman) person;
+        	if (human.isMustBeSigned()) {
+            	sss += "Owner: " + person.getOwner().toString() + "\n";
+	            if (human.isSignatureValid()) {
+	            	sss += "Owner Signature: " + Base58.encode(human.getOwnerSignature()) + "\n";        	
+	        	} else {
+	        		sss = "Wrong signaryte for owner: " + person.getOwner().toString() + "\n";
+	            }
+        	}
+        }
+        jTextArea_Description.setText(sss + person.getDescription());
        
 
         
@@ -234,7 +254,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(person.getCreator().toString());
+        jTextField_Creator.setText(person.getOwner().toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -255,11 +275,27 @@ public class Person_Info_002 extends javax.swing.JPanel {
   				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-  				StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  				StringSelection value = new StringSelection(person.getOwner().getAddress().toString());
   			    clipboard.setContents(value, null);
   			}
   		});
   		 creator_Meny.add(copy_Creator_Address1);
+  		 
+  		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		creator_Meny.add(copyPublicKey);
+  		 
   		 
 
    		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
@@ -267,7 +303,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				new Account_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -278,7 +314,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    			public void actionPerformed(ActionEvent e) 
    			{
    			
-   				new Mail_Send_Dialog(null, null, new Account(person.getCreator().getAddress().toString()),null);
+   				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);
@@ -391,7 +427,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         jTable_Statuses.setDefaultRenderer(String.class, new Renderer_Left(jTable_Statuses.getFontMetrics(jTable_Statuses.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
         //CHECKBOX FOR FAVORITE
-        		TableColumn to_Date_Column1 = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_TO_DATE);	
+        		TableColumn to_Date_Column1 = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
         		to_Date_Column1.setMinWidth(80);
         		to_Date_Column1.setMaxWidth(200);
@@ -477,6 +513,24 @@ public class Person_Info_002 extends javax.swing.JPanel {
   		});
   		menu.add(copyAddress);
   		
+  		JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+  		menu_copyPublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Sign.getSelectedRow();
+  				row = jTable_Sign.convertRowIndexToModel(row);
+  				      				
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(personModel.getAccount_String(row));
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		menu.add(menu_copyPublicKey);
+  		
   		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
   		copy_Creator_Address.addActionListener(new ActionListener()
   		{
@@ -491,6 +545,25 @@ public class Person_Info_002 extends javax.swing.JPanel {
   			}
   		});
   		menu.add(copy_Creator_Address);
+  		
+  		
+  		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
+  		menu_copy_Creator_PublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Sign.getSelectedRow();
+  				row = jTable_Sign.convertRowIndexToModel(row);
+  				      				
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(personModel.get_Creator_Account(row));
+  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+  				StringSelection value = new StringSelection(public_Account.getBase58());
+  				 clipboard.setContents(value, null);
+			}
+		});
+		menu.add(menu_copy_Creator_PublicKey);
   		
   		
   		

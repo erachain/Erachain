@@ -25,16 +25,16 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	
-	public static final int TESTNET_PORT = 9045;
-	public static final int MAINNET_PORT = 9046;
-	public static final int DEFAULT_WEB_PORT = 9047;
-	public static final int DEFAULT_RPC_PORT = 9048;
+	public static final int TESTNET_PORT = 9035;
+	public static final int MAINNET_PORT = 9036;
+	public static final int DEFAULT_WEB_PORT = 9037;
+	public static final int DEFAULT_RPC_PORT = 9038;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 30; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = 6; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 9999999;
@@ -49,7 +49,8 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
 	public static final int GENESIS_WIN_VALUE = 1000;
-	public static final String GENESIS_ADMIN = "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
+	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
 	// CHAIN
 	public static final int CONFIRMS_HARD = 3; // for reference by signature 
@@ -57,7 +58,10 @@ public class BlockChain
 	public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
 
 	//TESTNET 
-	public static final long DEFAULT_MAINNET_STAMP = 1485184444444L; //1465107777777L;
+	// 1486444444444l
+	//public static final long DEFAULT_MAINNET_STAMP = 1486361041333l; //1485184444444l;
+	public static final long DEFAULT_MAINNET_STAMP = 1486490444444l; //1485184444444l;
+	
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -92,6 +96,7 @@ public class BlockChain
 	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
+	//private int target = 0;
 
 	
 	//private DBSet dbSet;
@@ -412,51 +417,61 @@ public class BlockChain
 		
 		return list;
 	}
-
 	
 	// ignore BIG win_values
 	public static long getTarget(DBSet dbSet, Block block)
 	{
 		
+		/*
+		int height = block.getParentHeight(dbSet);
+		if (block.getTargetValue() > 0)
+			return block.getTargetValue();
+		 */
+		
+		long min_value = 0;
 		long win_value = 0;
 		Block parent = block.getParent(dbSet);
 		int i = 0;
+		long value = 0;
 		
 		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
 			i++;
-			win_value += parent.calcWinValue(dbSet);
+			value = parent.calcWinValue(dbSet);
+			if (min_value==0
+					|| min_value > value) {
+				min_value = value;
+			}
 			
-			
+			if (min_value + (min_value<<1) < value)
+				value = min_value + (min_value<<1);
+
 			parent = parent.getParent(dbSet);
 		}
 		
 		if (i == 0) {
 			return block.calcWinValue(dbSet);
-		}
+		}		
 
-		
-		long average = win_value / i;
-		average = average + (average>>2);
+		int height = block.getParentHeight(dbSet);
+		min_value = min_value<<1;
 
-		// remove bigger values
-		win_value = 0;
 		parent = block.getParent(dbSet);
 		i = 0;
 		while (parent != null && parent.getVersion() > 0 && i < BlockChain.TARGET_COUNT)
 		{
 			i++;
-			long value = parent.calcWinValue(dbSet);
-			if (value > (average)) {
-				value = average;
-			}
-			win_value += parent.calcWinValue(dbSet);
+			value = parent.calcWinValue(dbSet);
+			if (height > TARGET_COUNT && min_value < value)
+				value = min_value;
+			win_value += value;
 			
 			parent = parent.getParent(dbSet);
 		}
+
+		long target = win_value / i;
 		
-		return win_value / i;
-		
+		return target;
 	}
 
 	// calc Target by last blocks in chain
@@ -466,6 +481,7 @@ public class BlockChain
 	}
 
 	// GET MIN TARGET
+	// TODO GENESIS_CHAIN
 	public static int getMinTarget(int height) {
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)

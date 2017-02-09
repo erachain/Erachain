@@ -11,6 +11,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -38,6 +39,7 @@ public class IssueStatusPanel extends JPanel
 	private JTextField txtName;
 	private JTextArea txtareaDescription;
 	private JButton issueButton;
+	private JCheckBox jCheck_Unique;
 
 	//@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssueStatusPanel()
@@ -188,7 +190,17 @@ public class IssueStatusPanel extends JPanel
       	this.txtFeePow = new JTextField();
       	this.txtFeePow.setText("0");
         this.add(this.txtFeePow, txtGBC);
-		           
+		
+        // JCheckBox jCheck_Unique;
+        labelGBC.gridy = gridy;
+        JLabel unoqueLabel = new JLabel(Lang.getInstance().translate("Unique") + ":");
+      	this.add(unoqueLabel, labelGBC);
+      	
+      	txtGBC.gridy = gridy++;
+      	 jCheck_Unique = new JCheckBox();
+         this.add(this.jCheck_Unique, txtGBC);
+        
+        
         //BUTTON Register
         buttonGBC.gridy = gridy++;
         buttonGBC.gridx = 1;
@@ -288,9 +300,11 @@ public class IssueStatusPanel extends JPanel
 		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
+		boolean unique = jCheck_Unique.isSelected();
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Pair<Transaction, Integer> result = Controller.getInstance().issueStatus(
-				creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow
+				creator, this.txtName.getText(), this.txtareaDescription.getText(),
+				unique, feePow
 				);
 		
 		//CHECK VALIDATE MESSAGE

@@ -74,8 +74,8 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 		
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-		if (false && this.parent == null)
-			// !!!! NEEED .clone() !!! TOO
+		
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!
@@ -83,7 +83,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 			value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>)value.clone();
 		}
 
-		value_new.add(item);
+		value_new.push(item);
 		
 		this.set(address, value_new);
 		
@@ -102,8 +102,7 @@ public class AddressPersonMap extends DBMap<String, Stack<Tuple4<
 		if (value==null || value.size() == 0) return;
 
 		Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-		if (false && this.parent == null)
-			// !!!! NEEED .clone() !!! TOO
+		if (this.parent == null)
 			value_new = value;
 		else {
 			// !!!! NEEED .clone() !!!

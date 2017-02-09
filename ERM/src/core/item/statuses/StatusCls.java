@@ -1,6 +1,6 @@
 package core.item.statuses;
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 
 //import java.math.BigDecimal;
@@ -31,20 +31,24 @@ public abstract class StatusCls extends ItemCls {
 	public static final int POSITION = 3;
 	
 	public static final int INITIAL_FAVORITES = 0;
-
-	public StatusCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	
+	public StatusCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 	}
-	public StatusCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public StatusCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
+		this.typeBytes[1] = unique?(byte)1:(byte)0;
+		
 	}
 
 	//GETTERS/SETTERS
 	public int getItemTypeInt() { return ItemCls.STATUS_TYPE; }
 	public String getItemTypeStr() { return "status"; }
+
+	public boolean isUnique() { return this.typeBytes[1]==(byte)1; }
 
 	// DB
 	public Item_Map getDBMap(DBSet db)

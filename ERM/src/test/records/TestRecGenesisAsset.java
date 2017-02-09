@@ -222,7 +222,7 @@ public class TestRecGenesisAsset {
 		assertEquals(true, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET IS CORRECT
-		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true), asset.toBytes(true)));
+		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER - null
 		//assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);

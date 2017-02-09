@@ -138,8 +138,11 @@ public class Synchronizer
 
 				//cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
 
+				block.isValid(fork);
+				block.isSignatureValid();
+				
 				//INVALID BLOCK THROW EXCEPTION
-				String mess = "Dishonest peer by not valid block.heigh: " + heigh;
+				String mess = "Dishonest peer by not is Valid block, heigh: " + heigh;
 				peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
 				throw new Exception(mess);
 			}
@@ -430,6 +433,7 @@ public class Synchronizer
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
 				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
+				break;
 			} else {
 				lastBlockSignatureCommon = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
 			}
@@ -446,8 +450,10 @@ public class Synchronizer
 		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignatureCommon = headers.remove(0);
 		}
+
 		if (headers.isEmpty()) {
 			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
+			
 			peer.ban(0 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
 			throw new Exception(mess);
 		}
@@ -495,8 +501,15 @@ public class Synchronizer
 		}
 		
 		Block block = response.getBlock();
+		if(block == null)
+		{
+			String mess = "*** Block is NULL";
+			peer.ban(600, mess);
+			throw new Exception(mess);
+		}
+		
 		//CHECK BLOCK SIGNATURE
-		if(!block.isSignatureValid())
+		if(block == null || !block.isSignatureValid())
 		{
 			String mess = "*** Invalid block --signature";
 			peer.ban(600, mess);

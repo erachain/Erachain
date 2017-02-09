@@ -38,7 +38,7 @@ public class PersonFactory {
 			
 			//PARSE SIMPLE NOTE
 			return PersonHuman.parse(data, includeReference);
-						
+
 		case PersonCls.DOG:
 				
 			//

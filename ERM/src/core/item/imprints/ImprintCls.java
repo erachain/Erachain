@@ -1,7 +1,7 @@
 package core.item.imprints;
 
 
-import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 //import database.DBMap;
 import database.DBSet;
@@ -13,14 +13,14 @@ public abstract class ImprintCls extends ItemCls {
 		
 	protected static final int IMPRINT = 1;
 
-	public ImprintCls(byte[] typeBytes, Account creator, String name, byte[] icon, byte[] image, String description)
+	public ImprintCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(typeBytes, creator, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description);
 		
 	}
-	public ImprintCls(int type, Account creator, String name, byte[] icon, byte[] image, String description)
+	public ImprintCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		this(new byte[TYPE_LENGTH], creator, name, icon, image, description);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
 	}
 
