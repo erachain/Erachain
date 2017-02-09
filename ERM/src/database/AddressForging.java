@@ -90,11 +90,14 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 
 	public void delete(String address, int height) 
 	{
+		/*
+		// test
 		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {
 			// err
 			int hh = this.get(address, height);
 			hh++;
 		}
+		*/
 				
 		Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
 		int prevHeight = this.get(key);
