@@ -52,6 +52,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
     /**
      * Creates new form Person_Info_002
      */
+	
+	private PersonHuman human;
+	
     public Person_Info_002(PersonCls person, boolean full) {
     	
         initComponents(person, full);
@@ -90,6 +93,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jLabel_Sign = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable_Sign = new javax.swing.JTable();
+        jLabel_Owner = new javax.swing.JLabel();
+        jLabel_Seg_No = new javax.swing.JLabel();
+        jTextField_Owner = new javax.swing.JTextField();
+        jTextField_Seg_No = new javax.swing.JTextField();
+        jLabel_Owner_Sign = new javax.swing.JLabel();
+        jTextField_Owner_Sign = new javax.swing.JTextField();
+        
 
         
         
@@ -216,8 +226,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jTextArea_Description.setEditable(false);
         
         String sss = "";
+        human = null;
         if (person instanceof PersonHuman) {
-        	PersonHuman human = (PersonHuman) person;
+        	human = (PersonHuman) person;
         	if (human.isMustBeSigned()) {
             	sss += "Owner: " + person.getOwner().toString() + "\n";
 	            if (human.isSignatureValid()) {
@@ -264,6 +275,63 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
         jPanel3.add(jTextField_Creator, gridBagConstraints);
+        
+        
+        
+        
+        
+        if (human.isMustBeSigned()) {
+        
+        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        jPanel3.add(jLabel_Owner, gridBagConstraints);
+
+        jTextField_Owner.setEditable(false);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        
+        jTextField_Owner.setText(person.getOwner().toString());
+        jPanel3.add(jTextField_Owner, gridBagConstraints);
+
+        
+        if (human != null  &&  human.isSignatureValid()){
+        jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign")+":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+        jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
+
+        jTextField_Owner_Sign.setEditable(false);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        
+        jTextField_Owner_Sign.setText(Base58.encode(human.getOwnerSignature()));
+        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
+        }
+        }
+        
+        
+        
         
         
         JPopupMenu creator_Meny = new JPopupMenu();
@@ -655,5 +723,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Date_Born;
     private javax.swing.JTextField jTextField_Gender;
     private javax.swing.JTextField jTextField_Name;
+    private javax.swing.JLabel jLabel_Owner;
+    private javax.swing.JLabel jLabel_Seg_No;
+    private javax.swing.JTextField jTextField_Owner;
+    private javax.swing.JTextField jTextField_Seg_No;
+    
+    private javax.swing.JLabel jLabel_Owner_Sign;
+    private javax.swing.JTextField jTextField_Owner_Sign;
+    
     // End of variables declaration                   
 }
