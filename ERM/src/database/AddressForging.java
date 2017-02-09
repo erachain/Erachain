@@ -64,15 +64,8 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 	{
 		return this.get(new Tuple2<String, Integer>(address, height));
 	}	
-	public void set(String address, int height, int previosHeight) 
+	private void set(String address, int height, int previosHeight) 
 	{
-		// TODO some error here 
-		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {
-			// err
-			int hh = this.get(address, height);
-			hh++;
-			int hh2 = this.get(address, previosHeight);
-		}
 
 		if (height > previosHeight) {
 			this.set(new Tuple2<String, Integer>(address, height), previosHeight);
@@ -84,6 +77,17 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 		this.setLast(address, height);
 		
 	}	
+	public void set(String address, int height) 
+	{
+
+		int previosHeight = this.getLast(address);
+		if (previosHeight == -1) {
+			//previosHeight = height - 1;
+		}
+		this.set(address, height, previosHeight);
+		
+	}	
+
 	public void delete(String address, int height) 
 	{
 		if (address.equals("77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy")) {

@@ -230,9 +230,7 @@ public class BlockMap extends DBMap<byte[], Block>
 			//
 			// PROCESS FORGING DATA
 			PublicKeyAccount creator = block.getCreator();
-			Integer prevHeight = creator.getLastForgingData(dbSet);
-			creator.setForgingData(dbSet, height, prevHeight);
-			//creator.setLastForgingData(dbSet, height);
+			creator.setForgingData(dbSet, height);
 		}
 
 		this.setLastBlockSignature(signature);
@@ -269,20 +267,16 @@ public class BlockMap extends DBMap<byte[], Block>
 			dbSet.getBlockHeightsMap().delete(height);
 			
 			PublicKeyAccount creator = block.getCreator();
-			Integer prevHeight = creator.getForgingData(dbSet, height);
-			// TODO
-			Integer prevHeight2 = creator.getForgingData(dbSet, prevHeight);
-			if (prevHeight > 1) {
-				// INITIAL forging DATA no need remove!
-				creator.delForgingData(dbSet, height);
-				///creator.setLastForgingData(dbSet, prevHeight);
-			}
+			// INITIAL forging DATA no need remove!
+			creator.delForgingData(dbSet, height);
 			
+			/*
 			int hh = creator.getForgingData(dbSet, height);
 			int hh2 = creator.getForgingData(dbSet, prevHeight);
 			if (hh < 0) {
 				hh++;
 			}
+			*/
 
 		}
 

@@ -186,7 +186,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7Cp622VhpUwpzWnzDV3XyPepVM5AF682UF", "1289.69596627"),
 					Arrays.asList("76UjGyQ4TG9buoK8yQ1PmW2GE6PoPAEDZw", "1289.69596627"),
 					Arrays.asList("7ANHQck4rANJ5K2RsF1aAGYYTyshpFP4cM", "1131.83718"),
-					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "257.93919325"),
+					// sold out Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "257.93919325"),
 					Arrays.asList("CmmGpEbumf3FspKEC9zTzpFTk86ibLRwEbqxZ3GuAykL", "154.76351595"),
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "141866.556289"), //
 					Arrays.asList("7EMFYDJW2mxBAPDgWsVbAULMSx5BzhC9tq", "1870.05915109"),
@@ -209,8 +209,8 @@ public class GenesisBlock extends Block{
 					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", "502.98142684"),
 					Arrays.asList("7MRWHqXZRmNYL7TUHkVht9CQcime3K4Cm3", "253.451"),
 					Arrays.asList("7677tDJSjTSHnjDe3msjVmJYhWMZZED2jj", "2000"),
-					Arrays.asList("75R3LayKe3orQrtZnMWR1VdadBdypj2NWW", "1001")
-					
+					Arrays.asList("75R3LayKe3orQrtZnMWR1VdadBdypj2NWW", "1001"),
+					Arrays.asList("7JwZCVyg4gZiwpV5Qa9nWGvmvT7ESD83Rk", "150")					
 					
 					);
 
@@ -355,7 +355,8 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7BGULg8nCwQWTkDRVc8dTD47DqbMcmeYpE", 1),
 					Arrays.asList("74ZeQaNvhkpfhcPDXbpQMwmySqdaVhhi6S", 1),
 					Arrays.asList("7FMY7yG5sWf6YLvch1WvuB9tASotcRburU", 1),
-					
+					Arrays.asList("2Rdm5J5Ha5pzogvFvbF8Kufid4LTxat5Lmo7G4ANVbpy", 1),
+
 					// 7NqEspTguift9AwRDDmGivUjzFQdkA4TBF 2
 					//
 					Arrays.asList("7RSLd62fpgBW5PyaGHLNh8rHZQbmRqcret", 2) //
