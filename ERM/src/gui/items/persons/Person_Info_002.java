@@ -140,7 +140,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         	
         }
         
-        jLabel_Title.setText(Lang.getInstance().translate("Person"));
+        jLabel_Title.setText(Lang.getInstance().translate(""));
         
         
         
