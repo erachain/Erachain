@@ -1621,14 +1621,15 @@ if ( asset_1 == null) {
 		
 		Map statusesJSON=new LinkedHashMap();
 		
-		 PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
+		  WEB_PersonStatusesModel statusModel = new WEB_PersonStatusesModel (person.getKey());
 		int rowCount = statusModel.getRowCount();
 		if (rowCount > 0 ){
 		for (int i = 0; i<rowCount; i++){
 			Map statusJSON=new LinkedHashMap();
 			statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
 			statusJSON.put("status_data", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATA));
-			Object creat = statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
+			 Object creat = statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
+			
 			if (!creat.equals("")){
 				statusJSON.put("status_creator", creat.toString());
 				statusJSON.put("status_creator_key", "");
