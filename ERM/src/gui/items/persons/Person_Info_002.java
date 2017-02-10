@@ -224,7 +224,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Gender, gridBagConstraints);
 
         jTextField_Gender.setEditable(false);
-        jTextField_Gender.setText(person.getGender()+"");
+        if(person.getGender() == 0) jTextField_Gender.setText(Lang.getInstance().translate("Male"));
+        if(person.getGender() ==1) jTextField_Gender.setText(Lang.getInstance().translate("Female"));
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -266,7 +268,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.6;
         jPanel3.add(jScrollPane1, gridBagConstraints);
 
-        jLabel_Creator.setText(Lang.getInstance().translate("Creator")+":");
+        jLabel_Creator.setText(Lang.getInstance().translate("Publisher")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
