@@ -4,6 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -55,7 +59,7 @@ public class License_JFrame extends JFrame {
 	        gridBagConstraints.gridy = 2;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 	        gridBagConstraints.insets = new java.awt.Insets(6, 8, 6, 0);
-	        getContentPane().add(jCheckBox1, gridBagConstraints);
+	        if (parent != null) getContentPane().add(jCheckBox1, gridBagConstraints);
 	        
 	        jCheckBox1.addItemListener(new ItemListener() {
 	           
@@ -75,7 +79,8 @@ public class License_JFrame extends JFrame {
 	        gridBagConstraints.gridy = 3;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 8, 0);
-	        getContentPane().add(jButton1, gridBagConstraints);
+	        
+	        if (parent != null)   getContentPane().add(jButton1, gridBagConstraints);
 	        
 	        jButton1.addActionListener(new ActionListener(){
 
@@ -99,7 +104,7 @@ public class License_JFrame extends JFrame {
 	        gridBagConstraints.gridy = 3;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 6, 8, 8);
-	        getContentPane().add(jButton2, gridBagConstraints);
+	        if (parent != null) getContentPane().add(jButton2, gridBagConstraints);
 	        
 	        
 	        jButton2.addActionListener(new ActionListener(){
@@ -125,8 +130,11 @@ public class License_JFrame extends JFrame {
 	        {
 	            public void windowClosing(WindowEvent e)
 	            {
+	            	
+	            	 if (parent == null) return;
 	            	Controller.getInstance().stopAll();
 	            	System.exit(0);
+	            	 
 	            }
 	        });
 	        
@@ -135,9 +143,30 @@ public class License_JFrame extends JFrame {
 
 	    //    jTextArea1.setColumns(20);
 	        jTextArea1.setLineWrap(true);
+	        jTextArea1.setEditable(false);
 	        jTextArea1.setRows(5);
 	        jTextArea1.setText(status.getDescription());
 	        jScrollPane1.setViewportView(jTextArea1);
+	        
+	        
+	        this.jTextArea1.addMouseListener(new MouseAdapter() {
+	            @Override
+	            public void mouseClicked(MouseEvent e) {
+	            	if(parent != null) return;
+	            	setVisible(false);
+	                dispose();
+	            }
+	        });
+	        
+	        this.addKeyListener(new KeyAdapter() {
+			    public void keyPressed(KeyEvent e) {
+			    	if(parent != null) return;
+			    	setVisible(false);
+	                dispose();
+			    }
+			});
+	        
+	        
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
@@ -159,10 +188,11 @@ public class License_JFrame extends JFrame {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 	        gridBagConstraints.weightx = 0.1;
 	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
-	        getContentPane().add(jLabel1, gridBagConstraints);
+	        if (parent != null) getContentPane().add(jLabel1, gridBagConstraints);
 
 	        
 	   //     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+	      if(parent == null)  this.setUndecorated(true);
 	        pack();
 	        this.setLocationRelativeTo(null);
 	        this.setVisible(true);
