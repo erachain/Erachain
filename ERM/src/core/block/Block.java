@@ -1261,11 +1261,11 @@ public class Block {
 	public void orphan(DBSet dbSet)
 	{
 
-		int i=0;
-		if (Controller.getInstance().isAddressIsMine(this.getCreator().getAddress())) {
-			i++;
-		}
 		int height = this.getHeight(dbSet);
+		if (height == 1) {
+			// GENESIS BLOCK cannot be orphanED
+			return;
+		}
 				
 		//ORPHAN AT TRANSACTIONS
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);

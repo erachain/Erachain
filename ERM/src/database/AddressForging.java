@@ -98,7 +98,11 @@ public class AddressForging extends DBMap<Tuple2<String, Integer>, Integer>
 			hh++;
 		}
 		*/
-				
+		
+		if (height < 3) {
+			// not delete GENESIS forging data for all accounts
+			return;
+		}
 		Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
 		int prevHeight = this.get(key);
 		this.delete(key);
