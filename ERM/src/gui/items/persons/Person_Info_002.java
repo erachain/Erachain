@@ -22,8 +22,12 @@ import java.util.TimeZone;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import org.mapdb.Fun.Tuple2;
@@ -57,6 +61,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
      */
 	
 	private PersonHuman human;
+	private JPanel jPanel_Tab_Status;
+	private JScrollPane jScrollPane_Tab_Status;
+	private JTable jTable_Tab_Status;
+	private JLabel jLabel_Tab_Status;
+	private JPanel jPanel_Tab_Accounts;
+	private JTable jTable_Tab_Accounts;
+	private JLabel jLabel_Tab_Accounts;
 	
     public Person_Info_002(PersonCls person, boolean full) {
     	
@@ -472,15 +483,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         
 
-        jLabel_Statuses.setText(Lang.getInstance().translate("Statuses"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 10, 0, 0);
-        add(jLabel_Statuses, gridBagConstraints);
 
              
         
@@ -499,7 +501,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
                
         
-        jScrollPane2.setViewportView(jTable_Statuses);
+     //   jScrollPane2.setViewportView(jTable_Statuses);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -510,19 +512,60 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
-        add(jScrollPane2, gridBagConstraints);
+       // add(jScrollPane2, gridBagConstraints);
+        
+        
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        
+        add(jTabbedPane1, gridBagConstraints);
+        
+        
+        
+        
+       
+        jPanel_Tab_Status = new javax.swing.JPanel();
+        jScrollPane_Tab_Status = new javax.swing.JScrollPane();
+       
+        jLabel_Tab_Status = new javax.swing.JLabel();
+        jPanel_Tab_Accounts = new javax.swing.JPanel();
+        javax.swing.JScrollPane jScrollPane_Tab_Accounts = new javax.swing.JScrollPane();
+        jTable_Tab_Accounts = new javax.swing.JTable();
+        jLabel_Tab_Accounts = new javax.swing.JLabel();
 
-        jLabel_Sign.setText(Lang.getInstance().translate("Accounts"));
+     //   setLayout(new java.awt.GridBagLayout());
+
+        jPanel_Tab_Status.setLayout(new java.awt.GridBagLayout());
+
+       
+        jScrollPane_Tab_Status.setViewportView(jTable_Statuses);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Status.add(jScrollPane_Tab_Status, gridBagConstraints);
+
+        jLabel_Tab_Status.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
-        add(jLabel_Sign, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+      //  jPanel_Tab_Status.add(jLabel_Tab_Status, gridBagConstraints);
 
-                
+        jTabbedPane1.addTab(Lang.getInstance().translate("Statuses"), jPanel_Tab_Status);
+
+        jPanel_Tab_Accounts.setLayout(new java.awt.GridBagLayout());
+
+       
+        
+        
         PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
         jTable_Sign.setModel(personModel);
         
@@ -534,28 +577,54 @@ public class Person_Info_002 extends javax.swing.JPanel {
       		to_Date_Column.setMaxWidth(200);
       		to_Date_Column.setPreferredWidth(80);//.setWidth(30);
         
+        
+        
+        jScrollPane_Tab_Accounts.setViewportView(jTable_Sign);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Accounts.add(jScrollPane_Tab_Accounts, gridBagConstraints);
+
+        jLabel_Tab_Accounts.setText("jLabel2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+  //      jPanel_Tab_Accounts.add(jLabel_Tab_Accounts, gridBagConstraints);
+        
+       
+
+        jTabbedPane1.addTab( Lang.getInstance().translate("Accounts"), jPanel_Tab_Accounts);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+     
+      
+        
        
       
 
         
         
         
-        jScrollPane3.setViewportView(jTable_Sign);
-        
-        
         
         
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        add(jScrollPane3, gridBagConstraints);
+     
    
     
         JPopupMenu menu = new JPopupMenu();	
