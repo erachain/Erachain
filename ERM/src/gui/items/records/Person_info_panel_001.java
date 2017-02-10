@@ -221,7 +221,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(deathday_jTextField, gridBagConstraints);
 
         if (full) {
-	        jLabel6.setText(Lang.getInstance().translate("Race")+":");
+	        jLabel6.setText(Lang.getInstance().translate("Person number")+":");
 	        jLabel6.setAlignmentY(0.2F);
 	        jLabel6.setAutoscrolls(true);
 	        gridBagConstraints = new java.awt.GridBagConstraints();

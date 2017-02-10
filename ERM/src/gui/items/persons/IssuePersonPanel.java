@@ -242,7 +242,7 @@ public class IssuePersonPanel extends JPanel
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
     	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Birth Longitude") + ":");
     	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Birth Latitude") + ":");
-    	jLabel_Race.setText(Lang.getInstance().translate("Race") + ":");
+    	jLabel_Race.setText(Lang.getInstance().translate("Person number") + ":");
     	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
     	
     }
@@ -567,7 +567,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(jLabel_Dead, gridBagConstraints);
 
-        jLabel_Race.setText("Race");
+        jLabel_Race.setText("Person number");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 8;
