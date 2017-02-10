@@ -26,7 +26,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 	public static final int COLUMN_NOTE_NAME = 2;
 	public static final int COLUMN_TEXT = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Note Key", "Note Name", "Own Text"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Note Key", "Note Name", "Own Text"});
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private NoteCls note;
 	

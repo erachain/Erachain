@@ -227,7 +227,7 @@ public class UnionConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
 	        getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-	        jLabel_Address1.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address1.setText(Lang.getInstance().translate("Account") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 6;
@@ -268,7 +268,7 @@ public class UnionConfirmDialog extends JDialog  {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jTextField_Address1, gridBagConstraints);
 
-	        jLabel_Address2.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address2.setText(Lang.getInstance().translate("Account") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 8;
@@ -306,7 +306,7 @@ public class UnionConfirmDialog extends JDialog  {
 	        getContentPane().add(jTextField_Address2, gridBagConstraints);
 
 	
-	        jLabel_Address3.setText(Lang.getInstance().translate("Address") +":");
+	        jLabel_Address3.setText(Lang.getInstance().translate("Account") +":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 10;

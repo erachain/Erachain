@@ -68,7 +68,7 @@ public class ATDetailsFrame extends JFrame {
 
 		//LABEL ADDRESS
 		labelGBC.gridy = 0;
-		JLabel addressLabel = new JLabel(Lang.getInstance().translate("Address") + ":");
+		JLabel addressLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(addressLabel, labelGBC);
 
 		//OWNER

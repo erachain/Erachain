@@ -33,7 +33,7 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 	private String type;
 	private boolean initiators;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Description", "Address", "Creator", "Amount", "Lock", "Recipient", "Expiration Block"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Description", "Account", "Creator", "Amount", "Lock", "Recipient", "Expiration Block"});
 	
 	public AcctTableModel(String type, boolean initiators)
 	{
