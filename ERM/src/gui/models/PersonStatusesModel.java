@@ -188,7 +188,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			block = value.b.d;
 			recNo = value.b.e;
 			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
-			return record==null?null:((Account)record.getCreator()).getPersonAsString();
+			return record==null?"":((Account)record.getCreator()).getPersonAsString();
 
 		case COLUMN_RECORD_NO:
 
