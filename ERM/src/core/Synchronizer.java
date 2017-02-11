@@ -39,7 +39,7 @@ public class Synchronizer
 		this.run = true;
 	}
 	
-	static boolean USE_AT_ORPHAN = true;
+	static boolean USE_AT_ORPHAN = false;
 	
 	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
