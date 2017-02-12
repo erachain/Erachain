@@ -1,5 +1,5 @@
-# ERM base 
-Public GIT for the ERM blockchain project.
+# ARONICLE base 
+GIT for the ARONICLE datachain (blockchain 3.0) project.
 
 * [Website](http://datachains.world)
 * [API](http://datachains.world)
