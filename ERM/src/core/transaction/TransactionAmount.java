@@ -254,6 +254,8 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
+		boolean isPerson = this.creator.isPerson(db);
+
 		//CHECK IF AMOUNT AND ASSET
 		if (this.amount != null) {
 			long absKey = this.key;
@@ -355,30 +357,29 @@ public abstract class TransactionAmount extends Transaction {
 						}
 					}
 				}
+				
 			}
+
+			// IF send from PERSON to ANONIMOUSE
+			if (isPerson && !this.recipient.isPerson(db)) {
+				return ACCOUNT_NOT_PERSONALIZED;
+			}
+
 		} else {
-			if (true || this.getBlockHeightByParent(db) > 3000) {
-				// TODO first records is BAD already ((
-				//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
-				{
-					return NOT_ENOUGH_FEE;
-				}				
-			}
+			// TODO first records is BAD already ((
+			//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+			{
+				return NOT_ENOUGH_FEE;
+			}				
 	
 		}
 		
-		boolean isPerson = this.creator.isPerson(db);
 		// PUBLICK TEXT only from PERSONS
 		if (this.hasPublicText() && !isPerson) {
 			return ACCOUNT_NOT_PERSONALIZED;
 		}
 		
-		// IF send from PERSON to ANONIMOUSE
-		if (isPerson && !this.recipient.isPerson(db)) {
-			return ACCOUNT_NOT_PERSONALIZED;
-		}
-
 		return VALIDATE_OK;
 	}		
 
