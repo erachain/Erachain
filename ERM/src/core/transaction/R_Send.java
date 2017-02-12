@@ -304,7 +304,7 @@ public class R_Send extends TransactionAmount {
 		
 		if (this.data != null ) {
 			//CHECK DATA SIZE
-			if(data.length > 4000 || data.length < 1)
+			if(data.length > Integer.MAX_VALUE)
 			{
 				return INVALID_DATA_LENGTH;
 			}

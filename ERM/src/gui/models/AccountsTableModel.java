@@ -23,7 +23,7 @@ import lang.Lang;
 public class AccountsTableModel extends AbstractTableModel implements Observer
 {
 	public final int COLUMN_NO = 0;
-	private static final int COLUMN_ADDRESS = 1;
+	public static final int COLUMN_ADDRESS = 1;
 //	public static final int COLUMN_BALANCE = 1;
 	public static final int COLUMN_CONFIRMED_BALANCE = 2;
 //	public static final int COLUMN_WAINTING_BALANCE = 2;
@@ -31,7 +31,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	public static final int COLUMN_FEE_BALANCE = 3;
 	
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Address", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Account", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;

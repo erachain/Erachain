@@ -1,5 +1,5 @@
 package gui.items.mails;
-// 30/03
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -36,6 +35,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
 import core.account.Account;
@@ -595,7 +595,9 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				}
 				else
 				{
-					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() ) ? new String(decrypt, Charset.forName("UTF-8")) : Converter.toHex(decrypt));
+					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() )?
+							Processor.process(new String(decrypt, Charset.forName("UTF-8")))
+							: Converter.toHex(decrypt));
 					messageBufs.get(row).setOpend(true);
 					menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
 				}
@@ -701,7 +703,9 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				}
 				if( !this.encrypted )
 				{
-					this.decryptedMessage = ( isText ) ? new String( this.rawMessage, Charset.forName("UTF-8") ) : Converter.toHex( this.rawMessage );
+					this.decryptedMessage = ( isText )?
+							Processor.process(new String( this.rawMessage, Charset.forName("UTF-8")))
+							: Converter.toHex( this.rawMessage );
 				}
 			}
 			return this.decryptedMessage;

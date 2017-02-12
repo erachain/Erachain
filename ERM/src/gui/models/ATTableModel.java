@@ -25,7 +25,7 @@ public class ATTableModel extends TableModelCls<Long, AT> implements Observer
 	
 	private SortableList<Long, AT> ats;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Type/Domain", "Address", "Name", "Description", "Quantity", "Creator"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Type/Domain", "Account", "Name", "Description", "Quantity", "Creator"});
 	
 	public ATTableModel()
 	{

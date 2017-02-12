@@ -19,8 +19,8 @@ public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
 	public static final long ERM_KEY = 1l;
-	public static final String ERM_ABBREV = "ERN"; // ERM (main rights units)
-	public static final String ERM_NAME = "Eranna";
+	public static final String ERM_ABBREV = "ERA"; // ERM (main rights units)
+	public static final String ERM_NAME = "Era";
 	public static final String ERM_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
 			+ ERM_NAME + "(" + ERM_ABBREV + "). "
 			+ "Именно единицы Эранны позволяют собирать блоки и получать комиссию с упакованных в них транзакций"

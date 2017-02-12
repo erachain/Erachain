@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import gui.AccountsFrame;
 import gui.Send_Frame;
+import gui.create.License_JFrame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
 import gui.items.accounts.Account_Repay_Debt_Dialog;
@@ -217,6 +218,21 @@ public class Menu extends JMenuBar
         	}
         });
         fileMenu.add(aboutItem);
+        
+        //ABOUT
+        JMenuItem licisceItem = new JMenuItem(Lang.getInstance().translate("License"));
+    //    licisceItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+    //    licisceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+        licisceItem.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+                new License_JFrame(null) ;
+        	}
+        });
+        fileMenu.add(licisceItem);
+        
+        
         
         //SEPARATOR
         fileMenu.addSeparator();

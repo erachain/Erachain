@@ -37,7 +37,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
 //	public static final int COLUMN_FEE_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;

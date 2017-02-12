@@ -19,7 +19,7 @@ public class VotesTableModel extends AbstractTableModel
 	private static final int COLUMN_OPTION = 1;
 	public static final int COLUMN_VOTES = 2;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Option", "Votes"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Option", "Votes"});
 	private List<Pair<Account, PollOption>> votes;
 	private AssetCls asset;
 	

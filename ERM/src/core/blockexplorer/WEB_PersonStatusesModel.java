@@ -1,4 +1,4 @@
-package gui.models;
+package core.blockexplorer;
 import java.util.Map.Entry;
 
 import javax.swing.table.AbstractTableModel;
@@ -37,7 +37,7 @@ import gui.models.Send_TableModel.MessageBuf;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public  class PersonStatusesModel extends  AbstractTableModel implements Observer
+public  class WEB_PersonStatusesModel extends  AbstractTableModel implements Observer
 {
 	public static final int COLUMN_MAKE_DATA = 0;
 	public static final int COLUMN_STATUS_NAME = 1;
@@ -60,7 +60,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	ItemStatusMap statusesMap;
 	long itemKey;
 	
-	public PersonStatusesModel(long person_Key)
+	public WEB_PersonStatusesModel(long person_Key)
 	{
 		
 		itemKey = person_Key;

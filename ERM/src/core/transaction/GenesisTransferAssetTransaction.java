@@ -287,7 +287,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	@Override
 	public void orphan(DBSet db, boolean asPack) 
 	{
-			
+		
+		/* IT CANNOT BE orphanED !!!
+		 * 
 		long key = this.key;
 		//UPDATE RECIPIENT
 		//this.recipient.setBalance(key, this.recipient.getBalance(db, key).subtract(this.amount), db);
@@ -299,7 +301,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// ORPHAN FORGING DATA
 			////this.recipient.setLastForgingData(db, -1);
-			this.recipient.delForgingData(db, 2);
+			//this.recipient.delForgingData(db, 2);
 		}
 
 		if (key < 0) {
@@ -312,6 +314,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			// CREATOR update
 			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);			
 		}
+		*/
 
 	}
 

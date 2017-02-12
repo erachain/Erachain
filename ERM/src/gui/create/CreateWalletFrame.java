@@ -179,7 +179,7 @@ public class CreateWalletFrame extends JFrame {
 	private void onNextClick() 
 	{		
 		//OPEN CONFIRM SEED FRAME
-		this.setVisible(false);
+		
 		new ConfirmSeedFrame(this);	
 	}
 	

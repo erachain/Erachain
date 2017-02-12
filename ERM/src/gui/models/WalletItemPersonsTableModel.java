@@ -23,7 +23,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
 	public WalletItemPersonsTableModel()

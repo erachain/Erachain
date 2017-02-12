@@ -1,12 +1,25 @@
 package gui.items.records;
 
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Map;
+import java.util.TreeMap;
+
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
+import core.transaction.Transaction;
+import database.TransactionMap;
+import gui.CoreRowSorter;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
+import gui.models.Debug_Transactions_Table_Model;
+import gui.models.TransactionsTableModel;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 
@@ -16,6 +29,15 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 
 	Split_Panel search_Records_SplitPanel;
 	Split_Panel my_Records_SplitPanel;
+
+
+	private Debug_Transactions_Table_Model transactionsTableModel;
+
+
+	private JTable transactionsTable;
+
+
+	private Records_UnConfirmed_Panel unConfirmed_Records_SplitPanel;
 	
 
 
@@ -42,11 +64,26 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 	
 		
 ///////////////////////////////////////////////////////////////////////
+		
+	// unconfirmed Records
+		
+		unConfirmed_Records_SplitPanel = new Records_UnConfirmed_Panel();
 ////////////////////////////////////////////////////////////////////////
 		
 		this.jTabbedPane.add(my_Records_SplitPanel);
 		
 		this.jTabbedPane.add(search_Records_SplitPanel);
+		
+		this.jTabbedPane.add(unConfirmed_Records_SplitPanel);
+		
+		
+	
+		
+		
+		
+		
+		
+		
 			
 		this.pack();
 		

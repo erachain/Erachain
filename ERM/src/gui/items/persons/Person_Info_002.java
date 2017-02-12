@@ -22,9 +22,15 @@ import java.util.TimeZone;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.TableColumn;
+
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -32,6 +38,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
+import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
@@ -52,6 +59,16 @@ public class Person_Info_002 extends javax.swing.JPanel {
     /**
      * Creates new form Person_Info_002
      */
+	
+	private PersonHuman human;
+	private JPanel jPanel_Tab_Status;
+	private JScrollPane jScrollPane_Tab_Status;
+	private JTable jTable_Tab_Status;
+	private JLabel jLabel_Tab_Status;
+	private JPanel jPanel_Tab_Accounts;
+	private JTable jTable_Tab_Accounts;
+	private JLabel jLabel_Tab_Accounts;
+	
     public Person_Info_002(PersonCls person, boolean full) {
     	
         initComponents(person, full);
@@ -90,6 +107,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jLabel_Sign = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable_Sign = new javax.swing.JTable();
+        jLabel_Owner = new javax.swing.JLabel();
+        jLabel_Seg_No = new javax.swing.JLabel();
+        jTextField_Owner = new javax.swing.JTextField();
+        jTextField_Seg_No = new javax.swing.JTextField();
+        jLabel_Owner_Sign = new javax.swing.JLabel();
+        jTextField_Owner_Sign = new javax.swing.JTextField();
+        
 
         
         
@@ -116,7 +140,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         	
         }
         
-        jLabel_Title.setText(Lang.getInstance().translate("Person"));
+        jLabel_Title.setText(Lang.getInstance().translate(""));
         
         
         
@@ -200,7 +224,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Gender, gridBagConstraints);
 
         jTextField_Gender.setEditable(false);
-        jTextField_Gender.setText(person.getGender()+"");
+        if(person.getGender() == 0) jTextField_Gender.setText(Lang.getInstance().translate("Male"));
+        if(person.getGender() ==1) jTextField_Gender.setText(Lang.getInstance().translate("Female"));
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -215,24 +241,21 @@ public class Person_Info_002 extends javax.swing.JPanel {
         MenuPopupUtil.installContextMenu(jTextArea_Description);
         jTextArea_Description.setEditable(false);
         
-        String sss = "";
+        jTextArea_Description.setText(person.getDescription());
+                
+        jScrollPane1.setViewportView(jTextArea_Description);
+
+        human = null;
+        PublicKeyAccount owner = null;
+        byte[] recordReference = person.getReference();
+        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+        PublicKeyAccount creator = issue_record.getCreator();
         if (person instanceof PersonHuman) {
-        	PersonHuman human = (PersonHuman) person;
+        	human = (PersonHuman) person;
         	if (human.isMustBeSigned()) {
-            	sss += "Owner: " + person.getOwner().toString() + "\n";
-	            if (human.isSignatureValid()) {
-	            	sss += "Owner Signature: " + Base58.encode(human.getOwnerSignature()) + "\n";        	
-	        	} else {
-	        		sss = "Wrong signaryte for owner: " + person.getOwner().toString() + "\n";
-	            }
+        		owner = person.getOwner();
         	}
         }
-        jTextArea_Description.setText(sss + person.getDescription());
-       
-
-        
-        
-        jScrollPane1.setViewportView(jTextArea_Description);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -245,7 +268,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.6;
         jPanel3.add(jScrollPane1, gridBagConstraints);
 
-        jLabel_Creator.setText(Lang.getInstance().translate("Creator")+":");
+        jLabel_Creator.setText(Lang.getInstance().translate("Publisher")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -254,7 +277,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(person.getOwner().toString());
+        jTextField_Creator.setText(creator.toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -264,6 +287,58 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
         jPanel3.add(jTextField_Creator, gridBagConstraints);
+                
+        
+        if (human.isMustBeSigned() && owner != null
+        		&& !owner.equals(creator)) {
+        
+	        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 10;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+	        jPanel3.add(jLabel_Owner, gridBagConstraints);
+	
+	        jTextField_Owner.setEditable(false);
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 11;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.weightx = 0.2;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+	        
+	        jTextField_Owner.setText(owner.toString());
+	        jPanel3.add(jTextField_Owner, gridBagConstraints);
+	
+        
+	        jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign")+":");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 12;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+	        jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
+	
+	        jTextField_Owner_Sign.setEditable(false);
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 13;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+	        gridBagConstraints.weightx = 0.2;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+	        
+	        jTextField_Owner_Sign.setText(human.isSignatureValid()?
+	        		Base58.encode(human.getOwnerSignature()):
+        			Lang.getInstance().translate("Wrong signaryte for data owner"));
+	        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
+        }
         
         
         JPopupMenu creator_Meny = new JPopupMenu();
@@ -410,15 +485,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         
 
-        jLabel_Statuses.setText(Lang.getInstance().translate("Statuses"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(2, 10, 0, 0);
-        add(jLabel_Statuses, gridBagConstraints);
 
              
         
@@ -437,7 +503,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
                
         
-        jScrollPane2.setViewportView(jTable_Statuses);
+     //   jScrollPane2.setViewportView(jTable_Statuses);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -448,19 +514,60 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
-        add(jScrollPane2, gridBagConstraints);
+       // add(jScrollPane2, gridBagConstraints);
+        
+        
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        
+        add(jTabbedPane1, gridBagConstraints);
+        
+        
+        
+        
+       
+        jPanel_Tab_Status = new javax.swing.JPanel();
+        jScrollPane_Tab_Status = new javax.swing.JScrollPane();
+       
+        jLabel_Tab_Status = new javax.swing.JLabel();
+        jPanel_Tab_Accounts = new javax.swing.JPanel();
+        javax.swing.JScrollPane jScrollPane_Tab_Accounts = new javax.swing.JScrollPane();
+        jTable_Tab_Accounts = new javax.swing.JTable();
+        jLabel_Tab_Accounts = new javax.swing.JLabel();
 
-        jLabel_Sign.setText(Lang.getInstance().translate("Accounts"));
+     //   setLayout(new java.awt.GridBagLayout());
+
+        jPanel_Tab_Status.setLayout(new java.awt.GridBagLayout());
+
+       
+        jScrollPane_Tab_Status.setViewportView(jTable_Statuses);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Status.add(jScrollPane_Tab_Status, gridBagConstraints);
+
+        jLabel_Tab_Status.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
-        add(jLabel_Sign, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+      //  jPanel_Tab_Status.add(jLabel_Tab_Status, gridBagConstraints);
 
-                
+        jTabbedPane1.addTab(Lang.getInstance().translate("Statuses"), jPanel_Tab_Status);
+
+        jPanel_Tab_Accounts.setLayout(new java.awt.GridBagLayout());
+
+       
+        
+        
         PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
         jTable_Sign.setModel(personModel);
         
@@ -472,28 +579,54 @@ public class Person_Info_002 extends javax.swing.JPanel {
       		to_Date_Column.setMaxWidth(200);
       		to_Date_Column.setPreferredWidth(80);//.setWidth(30);
         
+        
+        
+        jScrollPane_Tab_Accounts.setViewportView(jTable_Sign);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Accounts.add(jScrollPane_Tab_Accounts, gridBagConstraints);
+
+        jLabel_Tab_Accounts.setText("jLabel2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+  //      jPanel_Tab_Accounts.add(jLabel_Tab_Accounts, gridBagConstraints);
+        
+       
+
+        jTabbedPane1.addTab( Lang.getInstance().translate("Accounts"), jPanel_Tab_Accounts);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+     
+      
+        
        
       
 
         
         
         
-        jScrollPane3.setViewportView(jTable_Sign);
-        
-        
         
         
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        add(jScrollPane3, gridBagConstraints);
+     
    
     
         JPopupMenu menu = new JPopupMenu();	
@@ -655,5 +788,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Date_Born;
     private javax.swing.JTextField jTextField_Gender;
     private javax.swing.JTextField jTextField_Name;
+    private javax.swing.JLabel jLabel_Owner;
+    private javax.swing.JLabel jLabel_Seg_No;
+    private javax.swing.JTextField jTextField_Owner;
+    private javax.swing.JTextField jTextField_Seg_No;
+    
+    private javax.swing.JLabel jLabel_Owner_Sign;
+    private javax.swing.JTextField jTextField_Owner_Sign;
+    
     // End of variables declaration                   
 }

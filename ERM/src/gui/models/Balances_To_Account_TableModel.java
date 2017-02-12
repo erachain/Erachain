@@ -24,7 +24,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
 	public static final int COLUMN_BALANCE = 1;
 	
 	private long key;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	

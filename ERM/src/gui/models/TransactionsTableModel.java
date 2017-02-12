@@ -27,16 +27,18 @@ import lang.Lang;
 // IN gui.DebugTabPane used
 public class TransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
 	
-	public static final int COLUMN_TIMESTAMP = 0;
-	public static final int COLUMN_TYPE = 1;
-	public static final int COLUMN_AMOUNT = 2;
-	public static final int COLUMN_FEE = 3;
+	public static final int COLUMN_NO = 0;
+	public static final int COLUMN_TIMESTAMP = 1;
+	public static final int COLUMN_TYPE = 2;
+	public static final int COLUMN_AMOUNT = 3;
+	public static final int COLUMN_FEE = 4;
 	
 	//private SortableList<byte[], Transaction> transactions;
 	private Integer blockNo = null;
 	Long block_Height;
+	Integer block_No;
 	List<Transaction> transactions;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
@@ -70,9 +72,19 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public void Set_Block_Namber(String string){
 		
-		 byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-		 Block block = DBSet.getInstance().getBlockMap().get(block_key);
-		 transactions = block.getTransactions();	
+		// byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
+		// Block block = DBSet.getInstance().getBlockMap().get(block_key);
+		// transactions = block.getTransactions();	
+		
+		try {
+			block_No = Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			return;
+		}
+		
+		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
 		 this.fireTableDataChanged();
 		
 	}
@@ -120,12 +132,11 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				return null;
 			}
 			
-			Transaction data = transactions.get(row);
-			if (data == null)  {
+			Transaction transaction = transactions.get(row);
+			if (transaction == null)  {
 				return null;
 			}
 
-			Transaction transaction = data;
 			
 			switch(column)
 			{
@@ -141,12 +152,16 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				
 			case COLUMN_AMOUNT:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
+				return transaction.viewAmount();//.getAmount(transaction.getCreator()));
 				
 			case COLUMN_FEE:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getFee());		
+				return transaction.viewFee();//.getFee());		
+			
+			case COLUMN_NO:
+				return row;
 			}
+		
 			
 			return null;
 			

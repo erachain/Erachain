@@ -16,6 +16,7 @@ import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
 import gui.models.BlocksTableModel;
+import gui.models.Debug_Transactions_Table_Model;
 import gui.models.PeersTableModel;
 import gui.models.TransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
@@ -29,7 +30,7 @@ public class DebugTabPane extends JTabbedPane{
 
 
 	private PeersTableModel peersTableModel;
-	private TransactionsTableModel transactionsTableModel;
+	private Debug_Transactions_Table_Model transactionsTableModel;
 	private BlocksTableModel blocksTableModel;
 	private LoggerTextArea loggerTextArea;
 	private JTable transactionsTable;
@@ -49,7 +50,7 @@ public class DebugTabPane extends JTabbedPane{
 		this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new JTable(this.peersTableModel)));
         
 		//TRANSACTIONS TABLE MODEL
-		this.transactionsTableModel = new TransactionsTableModel();
+		this.transactionsTableModel = new Debug_Transactions_Table_Model();
 		this.transactionsTable = new JTable(this.transactionsTableModel);
 		
 		//TRANSACTIONS SORTER

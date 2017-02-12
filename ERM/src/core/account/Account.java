@@ -714,12 +714,13 @@ public class Account {
 	public Integer getForgingData(DBSet db, int height) {
 		return db.getAddressForging().get(this.address, height);
 	}
+	/*
 	public void setForgingData(DBSet db, int height, int prevHeight) {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
+	*/
 	public void setForgingData(DBSet db, int height) {
-		int previousForgingHeight = this.getForgingData(db, height);
-		db.getAddressForging().set(this.address, height, previousForgingHeight);
+		db.getAddressForging().set(this.address, height);
 	}
 	public void delForgingData(DBSet db, int height) {
 		db.getAddressForging().delete(this.address, height);

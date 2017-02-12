@@ -25,7 +25,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 	public static final int COLUMN_OWN = 2;
 	
 	private long key;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Balance", "in OWN"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance", "in OWN"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 	

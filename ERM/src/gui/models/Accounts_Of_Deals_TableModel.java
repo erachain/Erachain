@@ -29,7 +29,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
 	public static final int COLUMN_FEE_BALANCE = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Address", "Confirmed Balance", "Waiting"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Confirmed Balance", "Waiting"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;

@@ -176,28 +176,18 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		}
 
 		//LABEL CREATOR PUBLIC KEY
-				componentLevel ++;
-				labelGBC.gridy = componentLevel;
-				JLabel creator_Pub_keyLabel = new JLabel(Lang.getInstance().translate("Creator Publick Key") + ":");
-				this.add(creator_Pub_keyLabel, labelGBC);
-				
-				//CREATOR
-				detailGBC.gridy = componentLevel;
-				
-				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(record.getCreator().getAddress());
-  				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-  			//	  StringSelection value1 = new StringSelection(public_Account.getBase58());
-  			//	String value = value1.toString();
-				
-				
-				JTextField creator_Pub_key = new JTextField(public_Account.getBase58());
-				creator_Pub_key.setEditable(false);
-				MenuPopupUtil.installContextMenu(creator_Pub_key);
-				this.add(creator_Pub_key, detailGBC);
-
-				
+		componentLevel ++;
+		labelGBC.gridy = componentLevel;
+		JLabel creator_Pub_keyLabel = new JLabel(Lang.getInstance().translate("Creator Publick Key") + ":");
+		this.add(creator_Pub_keyLabel, labelGBC);
 		
-		
+		//CREATOR
+		detailGBC.gridy = componentLevel;
+						
+		JTextField creator_Pub_key = new JTextField(record.getCreator().getBase58());
+		creator_Pub_key.setEditable(false);
+		MenuPopupUtil.installContextMenu(creator_Pub_key);
+		this.add(creator_Pub_key, detailGBC);
 		
 		//LABEL FEE POWER
 		componentLevel ++;

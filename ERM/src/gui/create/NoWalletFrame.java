@@ -155,8 +155,8 @@ public class NoWalletFrame extends JFrame {
 		{
 			//OPEN CREATE WALLET FRAME
 			this.setVisible(false);
+			new License_JFrame(this);
 			
-			new CreateWalletFrame(this);
 		}
 		
 		if(recoverButton.isSelected())

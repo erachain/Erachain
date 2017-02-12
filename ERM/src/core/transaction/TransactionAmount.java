@@ -254,6 +254,8 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
+		boolean isPerson = this.creator.isPerson(db);
+
 		//CHECK IF AMOUNT AND ASSET
 		if (this.amount != null) {
 			long absKey = this.key;
@@ -355,30 +357,29 @@ public abstract class TransactionAmount extends Transaction {
 						}
 					}
 				}
+				
 			}
+
+			// IF send from PERSON to ANONIMOUSE
+			if (isPerson && !this.recipient.isPerson(db)) {
+				return ACCOUNT_NOT_PERSONALIZED;
+			}
+
 		} else {
-			if (true || this.getBlockHeightByParent(db) > 3000) {
-				// TODO first records is BAD already ((
-				//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
-				{
-					return NOT_ENOUGH_FEE;
-				}				
-			}
+			// TODO first records is BAD already ((
+			//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+			{
+				return NOT_ENOUGH_FEE;
+			}				
 	
 		}
 		
-		boolean isPerson = this.creator.isPerson(db);
 		// PUBLICK TEXT only from PERSONS
 		if (this.hasPublicText() && !isPerson) {
 			return ACCOUNT_NOT_PERSONALIZED;
 		}
 		
-		// IF send from PERSON to ANONIMOUSE
-		if (isPerson && !this.recipient.isPerson(db)) {
-			return ACCOUNT_NOT_PERSONALIZED;
-		}
-
 		return VALIDATE_OK;
 	}		
 
@@ -435,7 +436,7 @@ public abstract class TransactionAmount extends Transaction {
 			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 2;
+			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
 			//this.recipient.setLastForgingData(db, blockHeight);
 			this.recipient.setForgingData(db, blockHeight);
 		}
@@ -479,14 +480,16 @@ public abstract class TransactionAmount extends Transaction {
 			}
 		}
 	
-		if (absKey == Transaction.RIGHTS_KEY) {
-			
+		if (absKey == Transaction.RIGHTS_KEY) {			
 			// Parent BLOCK is still in MAP!
 			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
-			if (this.recipient.getForgingData(db, blockHeight) == -1 ) {
-				// if it is first payment ERM - reset last forging BLOCK
-				this.recipient.delForgingData(db, blockHeight);
-				////this.recipient.setLastForgingData(db, -1);
+			int lastForgingHeight = this.recipient.getLastForgingData(db);
+			if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
+				int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);
+				if (prevForgingHeight == -1 ) {
+					// if it is first payment ERM - reset last forging BLOCK
+					this.recipient.delForgingData(db, blockHeight);
+				}
 			}
 		}
 	}

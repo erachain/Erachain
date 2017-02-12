@@ -115,5 +115,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="libs/txtmark-0.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
