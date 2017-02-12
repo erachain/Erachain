@@ -36,6 +36,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	//private SortableList<byte[], Transaction> transactions;
 	private Integer blockNo = null;
 	Long block_Height;
+	Integer block_No;
 	List<Transaction> transactions;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
 	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
@@ -71,9 +72,19 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public void Set_Block_Namber(String string){
 		
-		 byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
-		 Block block = DBSet.getInstance().getBlockMap().get(block_key);
-		 transactions = block.getTransactions();	
+		// byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
+		// Block block = DBSet.getInstance().getBlockMap().get(block_key);
+		// transactions = block.getTransactions();	
+		
+		try {
+			block_No = Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+			return;
+		}
+		
+		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
 		 this.fireTableDataChanged();
 		
 	}

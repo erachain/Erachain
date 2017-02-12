@@ -25,6 +25,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import core.account.Account;
+import core.block.Block;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import database.serializer.TransactionSerializer;
@@ -45,6 +46,9 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 	private NavigableSet recipientKey;
 	@SuppressWarnings("rawtypes")
 	private NavigableSet typeKey;
+
+	@SuppressWarnings("rawtypes")
+	private NavigableSet block_Key;
 	
 	public TransactionFinalMap(DBSet databaseSet, DB database)
 	{
@@ -84,6 +88,20 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 				return account == null? "genesis": account.getAddress();
 			}
 		});
+		
+		this.block_Key = database.createTreeSet("Block_txs")
+				.comparator(Fun.COMPARATOR)
+				.makeOrGet();
+		
+		Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer,Integer>, Transaction>(){
+			@Override
+			public Integer run(Tuple2<Integer, Integer> key, Transaction val) {
+				return  val.getBlock(getDBSet()).getHeight(getDBSet());
+			}
+		});
+		
+		
+		
 		
 		this.recipientKey = database.createTreeSet("recipient_txs")
 				.comparator(Fun.COMPARATOR)
@@ -216,6 +234,28 @@ public class TransactionFinalMap extends DBMap<Tuple2<Integer, Integer>, Transac
 		}
 		return txs;
 	}
+	
+	public List<Transaction> getTransactionsByBlock(Integer block)
+	{
+		return getTransactionsByBlock(block, 0);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Transaction> getTransactionsByBlock(Integer block, int limit)
+	{
+		Iterable keys = Fun.filter(this.block_Key, block);
+		Iterator iter = keys.iterator();
+		List<Transaction> txs = new ArrayList<>();
+		int counter=0;
+		while ( iter.hasNext() && (limit ==0 || counter<limit) )
+		{
+			txs.add(this.map.get(iter.next()));
+			counter++;
+		}
+		return txs;
+	}
+	
+	
 	
 	public List<Transaction> getTransactionsBySender(String address)
 	{
