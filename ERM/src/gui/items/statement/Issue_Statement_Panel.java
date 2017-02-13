@@ -89,6 +89,9 @@ public class Issue_Statement_Panel extends JPanel
 	private JComboBox<NoteCls> cbxFavorites;
 	private JTextArea txtRecDetails;
 	private JLabel messageLabel;
+	String file_hashes;
+	String file_extension;
+	byte[] file_content_zip;
 	
 	public Issue_Statement_Panel(NoteCls note, Account account)
 	{
@@ -649,10 +652,10 @@ public class Issue_Statement_Panel extends JPanel
 							}
 
 							/// HASHING
-							String file_hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
+							 file_hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
 							// extention
 							// если в имени файла есть точка и она не является первым символом в названии файла
-							String file_extension;
+							
 							if(file_name.lastIndexOf(".") != -1 && file_name.lastIndexOf(".") != 0)
 							// то вырезаем все знаки после последней точки в названии файла, то есть ХХХХХ.txt -> txt
 							file_extension = file_name.substring(file_name.lastIndexOf(".")+1);
@@ -660,7 +663,7 @@ public class Issue_Statement_Panel extends JPanel
 							else file_extension = "";
 							// ZIP
 							 Compressor_ZIP zip = new Compressor_ZIP();
-							byte[] file_content_zip = zip.compress(fileInArray);	
+							file_content_zip = zip.compress(fileInArray);	
 							
 							fileInArray=fileInArray;
 							
