@@ -84,11 +84,13 @@ public class Mail_Send_Panel extends JPanel
 	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
+	public JTextField txt_Title;
+	int y;
 	
 	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
 		
-		
+		y=0;
 		this.setName(Lang.getInstance().translate("Send Mail"));
 		if (asset == null)
 		{
@@ -110,7 +112,7 @@ public class Mail_Send_Panel extends JPanel
 		favoritesGBC.weightx = 1.0;
 		favoritesGBC.gridwidth = 5;
 		favoritesGBC.gridx = 0;	
-		favoritesGBC.gridy = 0;	
+		favoritesGBC.gridy = y;	
 		
 		txtRecDetails = new JTextField();
 		
@@ -120,18 +122,7 @@ public class Mail_Send_Panel extends JPanel
 		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		
-		
-		//LABEL RECEIVER
-				GridBagConstraints labelDetailsGBC = new GridBagConstraints();
-				labelDetailsGBC.gridy = 3;
-				labelDetailsGBC.insets = new Insets(5,10,5,5);
-				labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
-				labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
-				labelDetailsGBC.weightx = 0;	
-				labelDetailsGBC.gridx = 0;
-		      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
-		      	this.add(recDetailsLabel, labelDetailsGBC);
-		        
+	
 		
 		
 		
@@ -144,7 +135,7 @@ public class Mail_Send_Panel extends JPanel
 		labelFromGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
-		labelFromGBC.gridy = 1;
+		labelFromGBC.gridy = ++y;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
@@ -157,7 +148,7 @@ public class Mail_Send_Panel extends JPanel
 		cbxFromGBC.anchor = GridBagConstraints.NORTHWEST;
 		cbxFromGBC.weightx = 0.1;	
 		cbxFromGBC.gridx = 1;
-		cbxFromGBC.gridy = 1;
+		cbxFromGBC.gridy = y;
 		
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
@@ -183,7 +174,7 @@ public class Mail_Send_Panel extends JPanel
 		
 		//LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
-		labelToGBC.gridy = 2;
+		labelToGBC.gridy = ++y;
 		labelToGBC.insets = new Insets(5,10,5,10);
 		labelToGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
@@ -200,7 +191,7 @@ public class Mail_Send_Panel extends JPanel
 		txtToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtToGBC.weightx = 0.1;	
 		txtToGBC.gridx = 1;
-		txtToGBC.gridy = 2;
+		txtToGBC.gridy = y;
 
 		
 		
@@ -253,7 +244,19 @@ public class Mail_Send_Panel extends JPanel
 			}
         });
 		        
-      	
+      //LABEL RECEIVER
+		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
+		labelDetailsGBC.gridy = ++y;
+		labelDetailsGBC.insets = new Insets(5,10,5,5);
+		labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelDetailsGBC.weightx = 0;	
+		labelDetailsGBC.gridx = 0;
+      	JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
+      	this.add(recDetailsLabel, labelDetailsGBC);
+        
+	
+	
 		
       	//RECEIVER DETAILS 
 		GridBagConstraints txtReceiverGBC = new GridBagConstraints();
@@ -263,32 +266,60 @@ public class Mail_Send_Panel extends JPanel
 		txtReceiverGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtReceiverGBC.weightx = 0;	
 		txtReceiverGBC.gridx = 1;
-      	txtReceiverGBC.gridy = 3;
+      	txtReceiverGBC.gridy = y;
 
       	
       	txtRecDetails.setEditable(false);
       	this.add(txtRecDetails, txtReceiverGBC);
       	
-      	//LABEL MESSAGE
+   	 //LABEL TITLE
       	GridBagConstraints labelMessageGBC = new GridBagConstraints();
+      	labelMessageGBC.insets = new Insets(5,5,5,5);
+      	labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+      	labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+      	labelMessageGBC.weightx = 0;	
+      	labelMessageGBC.gridx = 0;
+      	labelMessageGBC.gridy = ++y;
+      	
+      	JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
+      	this.add(title_Label, labelMessageGBC);
+      	
+		//TXT TITLE
+		GridBagConstraints txtMessageGBC = new GridBagConstraints();
+		txtMessageGBC.gridwidth = 4;
+		txtMessageGBC.insets = new Insets(5, 5, 5, 0);
+		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+		txtMessageGBC.weightx = 0;	
+		txtMessageGBC.gridx = 1;
+        txtMessageGBC.gridy = y;
+        
+        txt_Title = new JTextField();
+       
+      	this.add(txt_Title, txtMessageGBC);
+		
+      	
+      	
+      	//LABEL MESSAGE
+ //     	GridBagConstraints labelMessageGBC = new GridBagConstraints();
       	labelMessageGBC.insets = new Insets(5,10,5,5);
       	labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
       	labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
       	labelMessageGBC.weightx = 0;	
       	labelMessageGBC.gridx = 0;
-      	labelMessageGBC.gridy = 4;
+      	labelMessageGBC.gridy = ++y;
       	
       	messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
       	
 		//TXT MESSAGE
-		GridBagConstraints txtMessageGBC = new GridBagConstraints();
+	//	GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
 		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
 		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
 		txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtMessageGBC.weightx = 0;	
 		txtMessageGBC.gridx = 1;
-        txtMessageGBC.gridy = 4;
+        txtMessageGBC.gridy = y;
         
         this.txtMessage = new JTextArea();
         this.txtMessage.setRows(4);
@@ -305,7 +336,7 @@ public class Mail_Send_Panel extends JPanel
       	
 		//LABEL ISTEXT
 		GridBagConstraints labelIsTextGBC = new GridBagConstraints();
-		labelIsTextGBC.gridy = 5;
+		labelIsTextGBC.gridy = ++y;
 		labelIsTextGBC.insets = new Insets(5,5,5,5);
 		labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
@@ -323,7 +354,7 @@ public class Mail_Send_Panel extends JPanel
 		isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		isChkTextGBC.weightx = 0;	
 		isChkTextGBC.gridx = 1;
-		isChkTextGBC.gridy = 5;
+		isChkTextGBC.gridy = y;
         
 		isText = new JCheckBox();
         isText.setSelected(true);
@@ -337,7 +368,7 @@ public class Mail_Send_Panel extends JPanel
 		labelEncGBC.weightx = 0;	
 		labelEncGBC.gridx = 4;
 		labelEncGBC.gridx = 2;
-		labelEncGBC.gridy = 5;
+		labelEncGBC.gridy = y;
 		
 		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
 		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -350,7 +381,7 @@ public class Mail_Send_Panel extends JPanel
 		ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		ChkEncGBC.weightx = 0;	
 		ChkEncGBC.gridx = 3;
-		ChkEncGBC.gridy = 5;
+		ChkEncGBC.gridy = y;
 		
 		encrypted = new JCheckBox();
 		encrypted.setSelected(true);
@@ -363,7 +394,7 @@ public class Mail_Send_Panel extends JPanel
 		amountlabelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		amountlabelGBC.weightx = 0;	
 		amountlabelGBC.gridx = 0;
-		amountlabelGBC.gridy = 6;
+		amountlabelGBC.gridy = ++y;
 		
 		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -376,35 +407,18 @@ public class Mail_Send_Panel extends JPanel
 		txtAmountGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtAmountGBC.weightx = 0;	
 		txtAmountGBC.gridx = 1;
-		txtAmountGBC.gridy = 6;
+		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
 		txtAmount.setPreferredSize(new Dimension(130,22));
 //		this.add(txtAmount, txtAmountGBC);
 		
-        //BUTTON SEND
-        GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,25,5,5);
-		buttonGBC.fill = GridBagConstraints.BOTH;  
-		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx =2;
-		buttonGBC.gridy = 11;
-        
-		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
-    	sendButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onSendClick();
-		    }
-		});	
-		this.add(sendButton, buttonGBC);
+     
 		
     	//LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();
 		feelabelGBC.anchor = GridBagConstraints.EAST;
-		feelabelGBC.gridy = 6;
+		feelabelGBC.gridy = y;
 		feelabelGBC.insets = new Insets(5,5,5,5);
 		feelabelGBC.fill = GridBagConstraints.BOTH;
 		feelabelGBC.weightx = 0;	
@@ -420,7 +434,7 @@ public class Mail_Send_Panel extends JPanel
 		feetxtGBC.insets = new Insets(5, 5, 5, 5);
 		feetxtGBC.anchor = GridBagConstraints.NORTH;
 		feetxtGBC.gridx = 3;	
-		feetxtGBC.gridy = 6;
+		feetxtGBC.gridy = y;
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
@@ -434,9 +448,28 @@ public class Mail_Send_Panel extends JPanel
 		decryptAllGBC.anchor = GridBagConstraints.NORTHWEST;
 		decryptAllGBC.gridwidth = 1;
 		decryptAllGBC.gridx = 3;
-		decryptAllGBC.gridy = 11;
+		decryptAllGBC.gridy = ++y;
 		JButton decryptButton = new JButton(Lang.getInstance().translate("Decrypt All"));
-    //	this.add(decryptButton, decryptAllGBC);
+		 //	this.add(decryptButton, decryptAllGBC);
+		
+		   //BUTTON SEND
+        GridBagConstraints buttonGBC = new GridBagConstraints();
+		buttonGBC.insets = new Insets(5,25,5,5);
+		buttonGBC.fill = GridBagConstraints.BOTH;  
+		buttonGBC.anchor = GridBagConstraints.PAGE_START;
+		buttonGBC.gridx =2;
+		buttonGBC.gridy = y;
+        
+		sendButton = new JButton(Lang.getInstance().translate("Send"));
+        sendButton.setPreferredSize(new Dimension(80, 25));
+    	sendButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onSendClick();
+		    }
+		});	
+		this.add(sendButton, buttonGBC);
 		
 		//MESSAGES HISTORY TABLE
 
@@ -459,7 +492,7 @@ public class Mail_Send_Panel extends JPanel
 		messagesGBC.gridx = 0;
 		
         //ADD BOTTOM SO IT PUSHES TO TOP
-		messagesGBC.gridy = 13;
+		messagesGBC.gridy = ++y;
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
