@@ -89,7 +89,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 	public JLabel recDetailsLabel;
 	int y;
 
-	private JTextField txt_Title;
+	public JTextField txt_Title;
 	
 	public Class_Account_Transaction_Panel()
 	{
