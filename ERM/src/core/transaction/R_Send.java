@@ -45,6 +45,8 @@ public class R_Send extends TransactionAmount {
 
 
 		this.head = head;
+		if (head == null)
+			this.head = "";
 		
 		if (data == null || data.length == 0) {
 			// set version byte
@@ -326,8 +328,9 @@ public class R_Send extends TransactionAmount {
 	public int getDataLength(boolean asPack) {
 		
 		int dataLen = super.getDataLength(asPack) + 1 + head.getBytes(StandardCharsets.UTF_8).length;
+		
 		if (this.typeBytes[3] >= 0)
-			return dataLen+ BASE_LENGTH + this.data.length;
+			return dataLen + BASE_LENGTH + this.data.length;
 		else 
 			return dataLen;
 	}
