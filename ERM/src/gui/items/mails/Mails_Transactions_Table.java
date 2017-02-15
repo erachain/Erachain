@@ -861,8 +861,8 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 			}
 			
 			String decrMessage = this.getDecrMessage(); 
-			decrMessage = decrMessage.replace( "<" , "&lt;" );
-			decrMessage = decrMessage.replace( ">" , "&gt;" );
+		//	decrMessage = decrMessage.replace( "<" , "&lt;" );
+		//	decrMessage = decrMessage.replace( ">" , "&gt;" );
 			decrMessage = decrMessage.replace( "\n" , "<br>" );
 			
 			String amountStr = "";

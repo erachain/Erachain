@@ -17,8 +17,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -30,6 +36,7 @@ import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -46,6 +53,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import gui.items.notes.ComboBoxModelItemsNotes;
+import gui.library.My_JFileChooser;
+import utils.Compressor_ZIP;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -54,6 +63,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
@@ -74,10 +84,14 @@ public class Issue_Statement_Panel extends JPanel
 	private JCheckBox encrypted;
 	private JButton sendButton;
 	private JButton packButton;
+	private JButton file_Button;
 	private AccountsComboBoxModel accountsModel;
 	private JComboBox<NoteCls> cbxFavorites;
 	private JTextArea txtRecDetails;
 	private JLabel messageLabel;
+	String file_hashes;
+	String file_extension;
+	byte[] file_content_zip;
 	
 	public Issue_Statement_Panel(NoteCls note, Account account)
 	{
@@ -232,7 +246,27 @@ public class Issue_Statement_Panel extends JPanel
 		isText = new JCheckBox();
         isText.setSelected(true);
         this.add(isText, isChkTextGBC);
+        
+        
+        //BUTTON PACK
+        GridBagConstraints buttonPBC = new GridBagConstraints();
+        buttonPBC.insets = new Insets(15,5,5,5);
+        buttonPBC.fill = GridBagConstraints.HORIZONTAL;  
+        buttonPBC.anchor = GridBagConstraints.NORTHEAST;
+        buttonPBC.gridx = 2;
+        buttonPBC.gridy = gridy;
 
+		file_Button = new JButton(Lang.getInstance().translate("Insert File"));
+		file_Button.setPreferredSize(new Dimension(160, 25));
+		file_Button.setSize(new Dimension(160, 25));
+        this.add(file_Button, buttonPBC);
+        file_Button.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        Include_File();
+		    }
+		});	
         //LABEL ENCRYPTED
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
 		labelEncGBC.insets = new Insets(5,5,5,5);
@@ -337,7 +371,7 @@ public class Issue_Statement_Panel extends JPanel
 		this.add(sendButton, buttonGBC);
 
         //BUTTON PACK
-        GridBagConstraints buttonPBC = new GridBagConstraints();
+   //     GridBagConstraints buttonPBC = new GridBagConstraints();
         buttonPBC.insets = new Insets(15,5,5,5);
         buttonPBC.fill = GridBagConstraints.HORIZONTAL;  
         buttonPBC.anchor = GridBagConstraints.NORTHEAST;
@@ -563,5 +597,77 @@ public class Issue_Statement_Panel extends JPanel
 			//description = description.replace(matcher.group(), getImgHtml(url));
 		}
 	}
+	
+// вставить файл	
+	private void  Include_File(){
+	
+		// TODO Auto-generated method stub
+				// открыть диалог для файла
+				//JFileChooser chooser = new JFileChooser();
+				// руссификация диалога выбора файла
+				//new All_Options().setUpdateUI(chooser);
+				My_JFileChooser chooser = new My_JFileChooser();
+				chooser.setDialogTitle(Lang.getInstance().translate("Select File"));
+				
+				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				chooser.setMultiSelectionEnabled(true);
+				int returnVal = chooser.showOpenDialog(getParent());
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+// make HASHES from files
+					File[] patchs = chooser.getSelectedFiles();
+						for (File patch : patchs) {
+							String file_name = patch.getPath();
+							File file = new File(patch.getPath());
 
+							// преобразуем в байты
+							long file_len = file.length();
+							if (file_len > Integer.MAX_VALUE) {
+								JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("length very long") + " - " + file_name, Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							byte[] fileInArray = new byte[(int) file.length()];
+							FileInputStream f = null;
+							try {
+								f = new FileInputStream(patch.getPath());
+							} catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("error streaming") + " - " + file_name , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							try {
+								f.read(fileInArray);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("error reading") + " - " + file_name  , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							try {
+								f.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								return;
+							}
+
+							/// HASHING
+							 file_hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
+							// extention
+							// если в имени файла есть точка и она не является первым символом в названии файла
+							
+							if(file_name.lastIndexOf(".") != -1 && file_name.lastIndexOf(".") != 0)
+							// то вырезаем все знаки после последней точки в названии файла, то есть ХХХХХ.txt -> txt
+							file_extension = file_name.substring(file_name.lastIndexOf(".")+1);
+							// в противном случае возвращаем заглушку, то есть расширение не найдено
+							else file_extension = "";
+							// ZIP
+							 Compressor_ZIP zip = new Compressor_ZIP();
+							file_content_zip = zip.compress(fileInArray);	
+							
+							fileInArray=fileInArray;
+							
+						}
+					}
+				}
 }

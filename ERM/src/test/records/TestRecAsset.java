@@ -537,7 +537,7 @@ public class TestRecAsset {
 		
 		//CREATE ASSET TRANSFER
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
 		
@@ -546,11 +546,11 @@ public class TestRecAsset {
 		
 		//INVALID SIGNATURE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), 
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp+1, maker.getLastReference(db), messageTransaction.getSignature());
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
@@ -579,7 +579,7 @@ public class TestRecAsset {
 		//timestamp += 100;
 		//CREATE VALID ASSET TRANSFER
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -592,7 +592,7 @@ public class TestRecAsset {
 		//CREATE VALID ASSET TRANSFER
 		//maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -600,7 +600,7 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
 		messageTransaction = new R_Send(maker, FEE_POWER, new Account("test"), key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 	
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -608,7 +608,7 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -616,7 +616,7 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -624,7 +624,7 @@ public class TestRecAsset {
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -632,7 +632,7 @@ public class TestRecAsset {
 
 		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, -123L);
 						
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -652,7 +652,7 @@ public class TestRecAsset {
 		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key_1,
 				amo,
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(db, releaserReference));	
 		messageTransaction.process(db, gb, false);
@@ -664,7 +664,7 @@ public class TestRecAsset {
 		
 		messageTransaction = new R_Send(maker_1, FEE_POWER, recipient, key_1,
 				amo,
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker_1.getLastReference(db));
 		assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(db, releaserReference));	
 						
@@ -685,7 +685,7 @@ public class TestRecAsset {
 					
 		//CREATE VALID ASSET TRANSFER
 		R_Send r_Send = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		r_Send.sign(maker, false);
 
@@ -766,7 +766,7 @@ public class TestRecAsset {
 		//CREATE ASSET TRANSFER
 		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
 		messageTransaction.process(db, gb, false);
@@ -799,7 +799,7 @@ public class TestRecAsset {
 		long key = 2l;
 		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
 		messageTransaction.process(db, gb, false);
@@ -843,7 +843,7 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -851,7 +851,7 @@ public class TestRecAsset {
 
 		//CREATE VALID ASSET TRANSFER
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -862,7 +862,7 @@ public class TestRecAsset {
 		
 		//NOW IT WILL BE vaLID
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -873,7 +873,7 @@ public class TestRecAsset {
 		//CREATE VALID ASSET TRANSFER
 		//maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 
 		//CHECK IF ASSET TRANSFER IS VALID
@@ -881,7 +881,7 @@ public class TestRecAsset {
 				
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -891,7 +891,7 @@ public class TestRecAsset {
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		rsend = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -899,7 +899,7 @@ public class TestRecAsset {
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		rsend = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -907,7 +907,7 @@ public class TestRecAsset {
 
 		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, -123L);
 						
 		//CHECK IF ASSET TRANSFER IS INVALID
@@ -927,7 +927,7 @@ public class TestRecAsset {
 		//CREATE INVALID ASSET TRANSFER WRONG REFERENCE
 		rsend = new R_Send(maker, FEE_POWER, recipient, key_1,
 				amo,
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		assertEquals(Transaction.VALIDATE_OK, rsend.isValid(db, releaserReference));	
 		rsend.process(db, gb, false);
@@ -939,7 +939,7 @@ public class TestRecAsset {
 		
 		rsend = new R_Send(maker_1, FEE_POWER, recipient, key_1,
 				amo,
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker_1.getLastReference(db));
 		assertEquals(Transaction.NO_BALANCE, rsend.isValid(db, releaserReference));	
 						
@@ -973,12 +973,12 @@ public class TestRecAsset {
 		
 		//CREATE ASSET TRANSFER
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		assertEquals(rsend.isValid(db, releaserReference), Transaction.NO_BALANCE);
 
 		rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(25).setScale(8),
-				"wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp++, maker.getLastReference(db));
 		assertEquals(rsend.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 

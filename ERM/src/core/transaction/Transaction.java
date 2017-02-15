@@ -121,6 +121,7 @@ public abstract class Transaction {
 	public static final int INVALID_DATA = 89;
 	public static final int INVALID_PARAMS_LENGTH = 90;
 	public static final int INVALID_URL_LENGTH = 91;
+	public static final int INVALID_HEAD_LENGTH = 92;
 
 	// ITEMS
 	public static final int INVALID_ITEM_VALUE = 100;

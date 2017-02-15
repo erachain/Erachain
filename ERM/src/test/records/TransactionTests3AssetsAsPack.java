@@ -743,7 +743,7 @@ public class TransactionTests3AssetsAsPack {
 				recipient, 
 				key, 
 				BigDecimal.valueOf(10).setScale(8), 
-				data,
+				"headdd", data,
 				new byte[] { 1 },
 				new byte[] { 0 },
 				maker.getLastReference()

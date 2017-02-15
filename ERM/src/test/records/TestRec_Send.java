@@ -58,6 +58,7 @@ public class TestRec_Send {
 	Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");		
 	BigDecimal amount = BigDecimal.valueOf(10).setScale(8); 
 
+	String head = "headdd";
 	byte[] data = "test123!".getBytes();
 	byte[] isText = new byte[] { 1 };
 	byte[] encrypted = new byte[] { 0 };
@@ -92,7 +93,7 @@ public class TestRec_Send {
 				recipient, 
 				ERM_KEY, 
 				amount,
-				data,
+				head, data,
 				isText,
 				encrypted,
 				timestamp, maker.getLastReference(db)
@@ -137,7 +138,7 @@ public class TestRec_Send {
 				recipient, 
 				ERM_KEY, 
 				null,
-				data,
+				head, data,
 				isText,
 				encrypted,
 				timestamp, maker.getLastReference(db)
@@ -183,7 +184,7 @@ public class TestRec_Send {
 				recipient, 
 				ERM_KEY, 
 				amount,
-				null,
+				"", null,
 				null,
 				null,
 				timestamp, maker.getLastReference(db)
@@ -227,7 +228,7 @@ public class TestRec_Send {
 				recipient, 
 				ERM_KEY, 
 				null,
-				null,
+				null, null,
 				null,
 				null,
 				timestamp, maker.getLastReference(db)
@@ -272,7 +273,7 @@ public class TestRec_Send {
 				recipient, 
 				-ERM_KEY, 
 				amount,
-				data,
+				head, data,
 				isText,
 				encrypted,
 				++timestamp, maker.getLastReference(db)

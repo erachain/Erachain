@@ -666,7 +666,7 @@ public class GeneratorTests {
 				
 			//CREATE VALID PAYMENT
 			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001).setScale(8),
-					 new byte[3000], new byte[]{1}, new byte[]{0},
+					 "sss", new byte[3000], new byte[]{1}, new byte[]{0},
 					 timestamp++, generator.getLastReference(snapshot));
 			payment.sign(generator, false);
 			assertEquals(payment.isValid(snapshot, null), Transaction.VALIDATE_OK);

@@ -87,11 +87,14 @@ public class Class_Account_Transaction_Panel extends JPanel
 	public JTextArea jTextArea_Title;
 	public JLabel toLabel;
 	public JLabel recDetailsLabel;
+	int y;
+
+	public JTextField txt_Title;
 	
 	public Class_Account_Transaction_Panel()
 	{
 		
-		
+		y =0;
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
@@ -107,7 +110,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 		iconlabelGBC.weightx = 1;	
 		iconlabelGBC.weighty = 0.1;
 		iconlabelGBC.gridx = 0;
-		iconlabelGBC.gridy = 0;
+		iconlabelGBC.gridy = y;
 		iconlabelGBC.gridwidth = 1;
 		
 		icon = new JLabel();
@@ -125,7 +128,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 				titlelabelGBC.weightx = 0;	
 				titlelabelGBC.weighty = 0.1;
 				titlelabelGBC.gridx = 1;
-				titlelabelGBC.gridy = 0;
+				titlelabelGBC.gridy = y;
 				titlelabelGBC.gridwidth = 4;
 				
 
@@ -158,7 +161,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		favoritesGBC.weightx = 1;
 		favoritesGBC.gridwidth = 5;
 		favoritesGBC.gridx = 0;	
-		favoritesGBC.gridy = 1;	
+		favoritesGBC.gridy = ++y;	
 		
 		cbxFavorites = new JComboBox();
 		this.add(cbxFavorites, favoritesGBC);
@@ -173,7 +176,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		labelFromGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelFromGBC.weightx = 0;	
 		labelFromGBC.gridx = 0;
-		labelFromGBC.gridy = 2;
+		labelFromGBC.gridy = ++y;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
 		this.add(fromLabel, labelFromGBC);
 		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
@@ -186,7 +189,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		cbxFromGBC.anchor = GridBagConstraints.NORTHWEST;
 		cbxFromGBC.weightx = 0;	
 		cbxFromGBC.gridx = 1;
-		cbxFromGBC.gridy = 2;
+		cbxFromGBC.gridy = y;
 		
 		this.cbxFrom = new JComboBox();
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
@@ -199,7 +202,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		
 		//LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
-		labelToGBC.gridy = 3;
+		labelToGBC.gridy = ++y;
 		labelToGBC.insets = new Insets(5,5,5,5);
 		labelToGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelToGBC.anchor = GridBagConstraints.NORTHWEST;
@@ -216,7 +219,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		txtToGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtToGBC.weightx = 0;	
 		txtToGBC.gridx = 1;
-		txtToGBC.gridy = 3;
+		txtToGBC.gridy = y;
 
 		txtTo = new JTextField();
 		this.add(txtTo, txtToGBC);
@@ -225,7 +228,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
       	
 		//LABEL RECEIVER
 		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
-		labelDetailsGBC.gridy = 4;
+		labelDetailsGBC.gridy = ++y;
 		labelDetailsGBC.insets = new Insets(5,5,5,5);
 		labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelDetailsGBC.anchor = GridBagConstraints.NORTHWEST;
@@ -242,24 +245,26 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		txtReceiverGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtReceiverGBC.weightx = 0;	
 		txtReceiverGBC.gridx = 1;
-      	txtReceiverGBC.gridy = 4;
+      	txtReceiverGBC.gridy = y;
 
       	txtRecDetails = new JTextField();
       	txtRecDetails.setEditable(false);
       	this.add(txtRecDetails, txtReceiverGBC);
       	
-      	//LABEL MESSAGE
+      	
+      //LABEL TITLE
       	GridBagConstraints labelMessageGBC = new GridBagConstraints();
       	labelMessageGBC.insets = new Insets(5,5,5,5);
       	labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
       	labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
       	labelMessageGBC.weightx = 0;	
       	labelMessageGBC.gridx = 0;
-      	labelMessageGBC.gridy = 5;
+      	labelMessageGBC.gridy = ++y;
       	
-      	messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+      	JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
+      	this.add(title_Label, labelMessageGBC);
       	
-		//TXT MESSAGE
+		//TXT TITLE
 		GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
 		txtMessageGBC.insets = new Insets(5, 5, 5, 0);
@@ -267,7 +272,40 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtMessageGBC.weightx = 0;	
 		txtMessageGBC.gridx = 1;
-        txtMessageGBC.gridy = 5;
+        txtMessageGBC.gridy = y;
+        
+        txt_Title = new JTextField();
+        
+      	this.add(txt_Title, txtMessageGBC);
+      	
+      	
+      	
+      	
+      	
+      	
+      	
+      	
+      	
+      	//LABEL MESSAGE
+   //   	GridBagConstraints labelMessageGBC = new GridBagConstraints();
+      	labelMessageGBC.insets = new Insets(5,5,5,5);
+      	labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+      	labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+      	labelMessageGBC.weightx = 0;	
+      	labelMessageGBC.gridx = 0;
+      	labelMessageGBC.gridy = ++y;
+      	
+      	messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+      	
+		//TXT MESSAGE
+	//	GridBagConstraints txtMessageGBC = new GridBagConstraints();
+		txtMessageGBC.gridwidth = 4;
+		txtMessageGBC.insets = new Insets(5, 5, 5, 0);
+		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+		txtMessageGBC.weightx = 0;	
+		txtMessageGBC.gridx = 1;
+        txtMessageGBC.gridy = y;
         
         this.txtMessage = new JTextArea();
         this.txtMessage.setRows(4);
@@ -284,7 +322,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
       	
 		//LABEL ISTEXT
 		GridBagConstraints labelIsTextGBC = new GridBagConstraints();
-		labelIsTextGBC.gridy = 6;
+		labelIsTextGBC.gridy = ++y;
 		labelIsTextGBC.insets = new Insets(5,5,5,5);
 		labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelIsTextGBC.anchor = GridBagConstraints.NORTHWEST;
@@ -302,7 +340,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		isChkTextGBC.anchor = GridBagConstraints.NORTHWEST;
 		isChkTextGBC.weightx = 0;	
 		isChkTextGBC.gridx = 1;
-		isChkTextGBC.gridy = 6;
+		isChkTextGBC.gridy = y;
         
 		isText = new JCheckBox();
         isText.setSelected(true);
@@ -316,7 +354,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		labelEncGBC.weightx = 0;	
 		labelEncGBC.gridx = 4;
 		labelEncGBC.gridx = 2;
-		labelEncGBC.gridy = 6;
+		labelEncGBC.gridy = y;
 		
 		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
 		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -329,7 +367,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		ChkEncGBC.anchor = GridBagConstraints.NORTHWEST;
 		ChkEncGBC.weightx = 0;	
 		ChkEncGBC.gridx = 3;
-		ChkEncGBC.gridy = 6;
+		ChkEncGBC.gridy = y;
 		
 		encrypted = new JCheckBox();
 		encrypted.setSelected(true);
@@ -342,7 +380,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		amountlabelGBC.anchor = GridBagConstraints.NORTHWEST;
 		amountlabelGBC.weightx = 0;	
 		amountlabelGBC.gridx = 0;
-		amountlabelGBC.gridy = 7;
+		amountlabelGBC.gridy = ++y;
 		
 		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -355,29 +393,18 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		txtAmountGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtAmountGBC.weightx = 0;	
 		txtAmountGBC.gridx = 1;
-		txtAmountGBC.gridy = 7;
+		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
 		txtAmount.setPreferredSize(new Dimension(130,22));
 		this.add(txtAmount, txtAmountGBC);
 		
-        //BUTTON SEND
-        GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,5,5,5);
-		buttonGBC.fill = GridBagConstraints.BOTH;  
-		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx = 0;
-		buttonGBC.gridy = 12;
-        
-		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
-    	
-		this.add(sendButton, buttonGBC);
+      
 		
     	//LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();
 		feelabelGBC.anchor = GridBagConstraints.EAST;
-		feelabelGBC.gridy = 7;
+		feelabelGBC.gridy = y;
 		feelabelGBC.insets = new Insets(5,5,5,5);
 		feelabelGBC.fill = GridBagConstraints.BOTH;
 		feelabelGBC.weightx = 0;	
@@ -393,14 +420,25 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		feetxtGBC.insets = new Insets(5, 5, 5, 5);
 		feetxtGBC.anchor = GridBagConstraints.NORTH;
 		feetxtGBC.gridx = 3;	
-		feetxtGBC.gridy = 7;
+		feetxtGBC.gridy = y;
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
-		
+		  //BUTTON SEND
+        GridBagConstraints buttonGBC = new GridBagConstraints();
+		buttonGBC.insets = new Insets(5,5,5,5);
+		buttonGBC.fill = GridBagConstraints.BOTH;  
+		buttonGBC.anchor = GridBagConstraints.PAGE_START;
+		buttonGBC.gridx = 0;
+		buttonGBC.gridy = ++y;
+        
+		sendButton = new JButton(Lang.getInstance().translate("Send"));
+        sendButton.setPreferredSize(new Dimension(80, 25));
+    	
+		this.add(sendButton, buttonGBC);
 
 
         //CONTEXT MENU

@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.ws.rs.HEAD;
 
 import org.apache.commons.io.FileUtils;
 import org.mapdb.Fun.Tuple2;
@@ -2287,23 +2288,23 @@ public class Controller extends Observable {
 			int feePow, Account recipient, long key, BigDecimal amount) {
 		synchronized (this.transactionCreator) {
 			return this.r_Send(sender, feePow, recipient,
-					key, amount, null, null, null);
+					key, amount, "", null, null, null);
 		}
 	}
 	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
 			int feePow, Account recipient, long key,BigDecimal amount,
-			byte[] isText, byte[] message, byte[] encryptMessage) {
+			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_Send(sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
+					key, amount, feePow, head, message, isText, encryptMessage);
 		}
 	}
 	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount sender,
 			int feePow, Account recipient, long key,BigDecimal amount,
-			byte[] isText, byte[] message, byte[] encryptMessage) {
+			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.r_Send(version, sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
+					key, amount, feePow, head, message, isText, encryptMessage);
 		}
 	}
 

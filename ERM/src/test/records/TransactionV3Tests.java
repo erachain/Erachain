@@ -84,7 +84,7 @@ public class TransactionV3Tests {
 				recipient, 
 				ERM_KEY, 
 				amount,
-				data,
+				"headdd", data,
 				isText,
 				encrypted,
 				timestamp, maker.getLastReference(db)
