@@ -451,7 +451,7 @@ public class Synchronizer
 			lastBlockSignatureCommon = headers.remove(0);
 		}
 
-		if (headers.isEmpty()) {
+		if (false && headers.isEmpty()) {
 			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
 			
 			peer.ban(0 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);

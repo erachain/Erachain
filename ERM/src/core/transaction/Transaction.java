@@ -67,6 +67,8 @@ public abstract class Transaction {
 	public static final int ACCOUNT_NOT_PERSONALIZED = 21;
 	public static final int ACCOUNT_ALREADY_PERSONALIZED = 23;
 	public static final int TRANSACTION_DOES_NOT_EXIST = 24;
+	public static final int CREATOR_NOT_PERSONALIZED = 25;
+	public static final int RECEIVER_NOT_PERSONALIZED = 26;
 
 	// ASSETS
 	public static final int INVALID_QUANTITY = 30;
@@ -874,7 +876,7 @@ public abstract class Transaction {
 					return VALIDATE_OK;
 				}
 			}
-			return ACCOUNT_NOT_PERSONALIZED;
+			return CREATOR_NOT_PERSONALIZED;
 		}
 
 		return VALIDATE_OK;
