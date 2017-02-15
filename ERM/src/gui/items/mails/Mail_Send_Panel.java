@@ -322,7 +322,7 @@ public class Mail_Send_Panel extends JPanel
         txtMessageGBC.gridy = y;
         
         this.txtMessage = new JTextArea();
-        this.txtMessage.setRows(4);
+        this.txtMessage.setRows(12);
         this.txtMessage.setColumns(25);
 
         this.txtMessage.setBorder(this.txtTo.getBorder());
@@ -366,7 +366,6 @@ public class Mail_Send_Panel extends JPanel
 		labelEncGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelEncGBC.weightx = 0;	
-		labelEncGBC.gridx = 4;
 		labelEncGBC.gridx = 2;
 		labelEncGBC.gridy = y;
 		

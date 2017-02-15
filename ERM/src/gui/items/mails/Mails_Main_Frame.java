@@ -23,6 +23,8 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	Incoming_Mails_Panel incoming_Mails_Panel;
 	Outcoming_Mails_Panel sent_Mails_Panel;
 	Mail_Send_Panel send_panel;
+	private Incoming_Mails_SplitPanel incoming_Mails_Panel1;
+	private Outcoming_Mails_SplitPanel outcoming_mails_Panel1;
 	
 	public Mails_Main_Frame(){
 		
@@ -48,7 +50,16 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		send_panel = new Mail_Send_Panel(null,null,null,null);
 	
 		this.jTabbedPane.add(send_panel);	
+		
+		
+		
+		// Incoming mails split panel
+				incoming_Mails_Panel1 = new Incoming_Mails_SplitPanel();
+				this.jTabbedPane.add(incoming_Mails_Panel1);
 	
+		// Outcoming mails split panel
+				outcoming_mails_Panel1 = new Outcoming_Mails_SplitPanel();
+				this.jTabbedPane.add(outcoming_mails_Panel1);
 	
 	this.pack();
 	//	this.setSize(800,600);
