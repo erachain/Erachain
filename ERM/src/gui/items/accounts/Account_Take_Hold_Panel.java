@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -332,20 +333,21 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
 		}
-		String title = this.txt_Title.getText();
-		String head;
-		if (title == null) head = "";
-		if (title.length()>255){
+		String head = this.txt_Title.getText();
+		if (head == null)
+			head = "";
+		if (head.getBytes(StandardCharsets.UTF_8).length>256){
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 255", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			return;
 			
 		}
+		
 
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
 				key, BigDecimal.ZERO.subtract(amount).setScale(8),
-				, head, messageBytes, isTextByte, encrypted);
+				head, messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 		
 		//CHECK VALIDATE MESSAGE
