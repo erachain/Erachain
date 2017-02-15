@@ -318,12 +318,22 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 				messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
 			}
 		}
+		
+		String title = this.txt_Title.getText();
+		String head;
+		if (title == null) head = "";
+		if (title.length()>255){
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 255", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			return;
+			
+		}
 
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().
 				r_Send((byte)1, Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
 				-key, amount,
-				messageBytes, isTextByte, encrypted);
+				head, messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 		
 		//CHECK VALIDATE MESSAGE
