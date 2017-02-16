@@ -68,7 +68,7 @@ public class Mail_Send_Dialog extends JDialog{
 		
 		 setMinimumSize(new java.awt.Dimension(650, 23));
 		setModal(true);
-        setPreferredSize(new java.awt.Dimension(650,401));
+        setPreferredSize(new java.awt.Dimension(650,600));
 	    
         
         
@@ -77,7 +77,7 @@ public class Mail_Send_Dialog extends JDialog{
 	    
 		//PACK
         this.pack();
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLocationRelativeTo(null);
 		
   //      this.setResizable(true);

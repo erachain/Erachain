@@ -40,7 +40,8 @@ import javax.swing.DefaultRowSorter;
 	import javax.swing.table.TableRowSorter;
 
 	import controller.Controller;
-	import core.item.assets.AssetCls;
+import core.account.Account;
+import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.transaction.R_Send;
 import gui.MainFrame;
@@ -152,7 +153,28 @@ import utils.TableMenuPopupUtil;
 			
 			menu.add(copyRecipient);
 			
-	
+			JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("To answer"));
+	  		Send_Mail_item_Menu.addActionListener(new ActionListener()
+	  		{
+	  			public void actionPerformed(ActionEvent e) 
+	  			{
+	  				
+	  				int row = inciming_Mail_Table.getSelectedRow();
+	  				row = inciming_Mail_Table.convertRowIndexToModel(row);
+	  				Account account = incoming_Mails_Model.getTransaction(row).getCreator();
+	  				
+	  				new Mail_Send_Dialog(null,null,account,null);
+	  				
+	  				
+	  			
+	  				
+	  			}
+	  		});
+	  		menu.add(Send_Mail_item_Menu);
+			
+			
+			
+			
 			TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 			
 			
