@@ -31,6 +31,7 @@ import database.DBSet;
 public class Synchronizer
 {
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
+	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)146, (byte)168, (byte)226};
 	
 	private boolean run = true;
 	
@@ -235,12 +236,16 @@ public class Synchronizer
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 				
 		// FIND HEADERS for common CHAIN
+		if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
+			LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
+					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());			
+		}
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
 			//String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
 			//peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
 			//throw new Exception(mess);
-			return;
+			//return;
 		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
