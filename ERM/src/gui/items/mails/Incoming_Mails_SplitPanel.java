@@ -1,12 +1,5 @@
 	package gui.items.mails;
 
-	import java.awt.Color;
-	import java.awt.Component;
-	import java.awt.Cursor;
-	import java.awt.Dimension;
-	import java.awt.GridLayout;
-	import java.awt.Point;
-	import java.awt.Rectangle;
 	import java.awt.event.ActionEvent;
 	import java.awt.event.ActionListener;
 	import java.awt.event.FocusEvent;
@@ -20,8 +13,10 @@
 	import java.awt.image.ColorModel;
 	import javax.swing.Timer;
 	import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
-	import javax.swing.DefaultRowSorter;
+import javax.swing.DefaultRowSorter;
 	import javax.swing.JButton;
 	import javax.swing.JDialog;
 	import javax.swing.JFrame;
@@ -61,6 +56,7 @@ import gui.models.Renderer_Boolean;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
 	import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 
 	public class Incoming_Mails_SplitPanel extends Split_Panel{
@@ -115,6 +111,64 @@ import gui.models.Renderer_Boolean;
 			confirmedColumn.setMinWidth(50);
 			confirmedColumn.setMaxWidth(50);
 			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
+	*/		
+
+			//MENU
+			JPopupMenu menu = new JPopupMenu();	
+
+		
+			
+			
+			JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Address"));
+			copySender.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+								        
+					int row = inciming_Mail_Table.getSelectedRow();
+					row = inciming_Mail_Table.convertRowIndexToModel(row);
+					
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					StringSelection value = new StringSelection(((R_Send)incoming_Mails_Model.getTransaction(row)).getCreator().getAddress());
+				    clipboard.setContents(value, null);
+				}
+			});
+			menu.add(copySender);
+					
+			JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Address"));
+			copyRecipient.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+								       
+			        int row = inciming_Mail_Table.getSelectedRow();
+					row = inciming_Mail_Table.convertRowIndexToModel(row);
+					
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					StringSelection value = new StringSelection(((R_Send)incoming_Mails_Model.getTransaction(row)).getRecipient().getAddress());
+				    clipboard.setContents(value, null);
+				}
+			});
+			
+			menu.add(copyRecipient);
+			
+	
+			TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+			
+			
+		/*	
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 			//CHECKBOX FOR FAVORITE

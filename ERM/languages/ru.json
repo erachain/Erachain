@@ -139,6 +139,7 @@
 	"Connection successfull : ":"Удачное подключение : ",
 	"Console":"Консоль",
 	"Content":"Содержание",
+	"Copy":"Копировать",
 	"Copy Address":"Копировать адрес",
 	"Copy All Messages":"Копировать все сообщения",
 	"Copy Amount":"Копировать Сумму",
@@ -161,7 +162,7 @@
 	"Create Status":"Создать Статус",
 	"Create Wallet":"Создать Кошелек",
 	"Create":"Создать",
-	
+	"Cut":"Вырезать",
 	"Creation date:":"Дата создания:",
 	"Creator:":"Создатель:",
 	"Creator":"Создатель",

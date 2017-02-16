@@ -36,7 +36,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		
 		
 		
-			
+	/*		
 		//this.jToolBar.setFloatable(true);
 		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Mails"));
 	// MY Accounts
@@ -46,6 +46,16 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	// Search Accounts
 		sent_Mails_Panel = new Outcoming_Mails_Panel();
 		this.jTabbedPane.add(sent_Mails_Panel);
+	*/
+		// Incoming mails split panel
+		incoming_Mails_Panel1 = new Incoming_Mails_SplitPanel();
+		this.jTabbedPane.add(incoming_Mails_Panel1);
+
+// Outcoming mails split panel
+		outcoming_mails_Panel1 = new Outcoming_Mails_SplitPanel();
+		this.jTabbedPane.add(outcoming_mails_Panel1);
+		
+		
 		
 		send_panel = new Mail_Send_Panel(null,null,null,null);
 	
@@ -53,13 +63,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		
 		
 		
-		// Incoming mails split panel
-				incoming_Mails_Panel1 = new Incoming_Mails_SplitPanel();
-				this.jTabbedPane.add(incoming_Mails_Panel1);
-	
-		// Outcoming mails split panel
-				outcoming_mails_Panel1 = new Outcoming_Mails_SplitPanel();
-				this.jTabbedPane.add(outcoming_mails_Panel1);
+		
 	
 	this.pack();
 	//	this.setSize(800,600);
