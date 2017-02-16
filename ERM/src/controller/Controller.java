@@ -259,6 +259,11 @@ public class Controller extends Observable {
 			return null;
 		}
 	}
+	public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
+		if(peerHWeight==null && peerHWeight.containsKey(peer)){
+			peerHWeight.put(peer, hWeight);
+		}
+	}
 	
 	public Map<Peer, Pair<String, Long>> getPeersVersions() {
 		return peersVersions;

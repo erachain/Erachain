@@ -258,9 +258,11 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
-			if (false && signatures.b.size() == 0) {
+			if (signatures.b.size() == 0) {
 				// TODO it is because incorrect calculate WIN_TARGET value
-				dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+				//dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+				Tuple2<Integer, Long> myHW = Controller.getInstance().getMyHWeight(false);
+				Controller.getInstance().setWeightOfPeer(peer, myHW);
 			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
