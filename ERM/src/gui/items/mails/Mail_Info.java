@@ -21,6 +21,7 @@ import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import utils.Converter;
 import utils.DateTimeFormat;
+import utils.MenuPopupUtil;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -80,7 +81,8 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 4);
         add(jLabel_Block, gridBagConstraints);
         
-       
+        jTextField_Block.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextField_Block);
         jTextField_Block.setText(trans.viewHeightSeq(DBSet.getInstance()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -88,6 +90,7 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
         add(jTextField_Block, gridBagConstraints);
+       
 
         jLabel_Data.setText(Lang.getInstance().translate("Date")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -95,6 +98,8 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 10, 0, 4);
         add(jLabel_Data, gridBagConstraints);
 
+        jTextField_Data.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextField_Data);
         jTextField_Data.setText(DateTimeFormat.timestamptoString(trans.getTimestamp(), "dd-mm-yyyy", "0"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -111,6 +116,7 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Sender, gridBagConstraints);
 
+        jTextField_Sender.setEditable(false);
         jTextField_Sender.setText(trans.getCreator().getPersonAsString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -130,7 +136,7 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Reciever, gridBagConstraints);
 
-
+        jTextField_Reciever.setEditable(false);
         jTextField_Reciever.setText(trans.getRecipient().getPersonAsString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -150,6 +156,8 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Title, gridBagConstraints);
 
+        jTextField_Title.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextField_Title);
         jTextField_Title.setText(trans.getHead());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -173,6 +181,9 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Message, gridBagConstraints);
 
+       
+        jTextArea_Messge.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextArea_Messge);
         jTextArea_Messge.setColumns(20);
         jTextArea_Messge.setRows(5);
         jTextArea_Messge.setLineWrap(true);
