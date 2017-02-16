@@ -97,9 +97,11 @@ import gui.models.Renderer_Boolean;
 			
 			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
+			columnModel.getColumn(1).setMaxWidth((100));
 			
 			//Custom renderer for the String column;
-			inciming_Mail_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+			inciming_Mail_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+			inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
 		//	inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Left(inciming_Mail_Table.getFontMetrics(inciming_Mail_Table.getFont()),incoming_Mails_Model.get_Column_AutoHeight())); // set renderer
 					
 					
@@ -175,10 +177,10 @@ import gui.models.Renderer_Boolean;
 				R_Send mail = null;
 				if (inciming_Mail_Table.getSelectedRow() >= 0 )mail = (R_Send)incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
 				//info1.show_001(person);
-				
+				Mail_Info info_panel = new Mail_Info(mail);
 			
-		//		jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-				jScrollPane_jPanel_RightPanel.add(new JLabel(mail.viewCreator())); 
+				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				
 			}
 			
 		}

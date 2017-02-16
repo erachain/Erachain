@@ -47,7 +47,8 @@
 	import controller.Controller;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
-	import gui.MainFrame;
+import core.transaction.R_Send;
+import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
@@ -95,9 +96,10 @@ import gui.models.Renderer_Boolean;
 			
 			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
-			
+			columnModel.getColumn(1).setMaxWidth((100));
 			//Custom renderer for the String column;
-			inciming_Mail_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+			inciming_Mail_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
+			inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
 		//	inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Left(inciming_Mail_Table.getFontMetrics(inciming_Mail_Table.getFont()),incoming_Mails_Model.get_Column_AutoHeight())); // set renderer
 					
 					
@@ -169,17 +171,13 @@ import gui.models.Renderer_Boolean;
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				
-				PersonCls person = null;
-	//			if (inciming_Mail_Table.getSelectedRow() >= 0 )person = incoming_Mails_Model.getItem(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
+				R_Send mail = null;
+				if (inciming_Mail_Table.getSelectedRow() >= 0 )mail = (R_Send)incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
 				//info1.show_001(person);
+				Mail_Info info_panel = new Mail_Info(mail);
+			
+				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				
-				// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-				//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
-				////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-				
-			//	Person_Info_002 info_panel = new Person_Info_002(person, false);
-		//		info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-		//		jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 			}
 			
 		}

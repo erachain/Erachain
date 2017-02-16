@@ -11,23 +11,24 @@ import controller.Controller;
 import core.account.Account;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import database.DBSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
 public class TableModelMails extends AbstractTableModel implements Observer {
-	public static final int COLUMN_HEIGH = 0;
+	public static final int COLUMN_CONFIRMATION = 0;
 	public static final int COLUMN_DATA = 1;
-	public static final int COLUMN_SENDER = 2;
-	public static final int COLUMN_RECIEVER = 3;
-	public static final int COLUMN_HEAD = 4;
-	public static final int COLUMN_CONFIRM = 5;
+	public static final int COLUMN_SENDER = 3;
+	public static final int COLUMN_RECIEVER = 4;
+	public static final int COLUMN_HEAD = 2;
+//	public static final int COLUMN_CONFIRM = 5;
 
 	private ArrayList<R_Send> transactions;
 
 	private String[] columnNames = Lang.getInstance()
-			.translate(new String[] { "Block", "Date", "Sender", "Reciever", "Title", "Confirm" });
+			.translate(new String[] { "Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
 	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false };
 	boolean incoming;
 
@@ -84,17 +85,18 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		R_Send tran = this.transactions.get(row);
 
 		switch (column) {
-		case COLUMN_HEIGH:
+		case COLUMN_CONFIRMATION:
 
-			return tran.getBlockHeight(DBSet.getInstance());
+			return tran.getConfirmations(DBSet.getInstance());
 
 		case COLUMN_DATA:
+			
 
-			return tran.getData();
+			return DateTimeFormat.timestamptoString(tran.getTimestamp(), "dd-mm-yyyy", "0");
 
-		case COLUMN_CONFIRM:
+	//	case COLUMN_CONFIRM:
 
-			return tran.isConfirmed(DBSet.getInstance());
+	//		return tran.isConfirmed(DBSet.getInstance());
 
 		case COLUMN_SENDER:
 
@@ -156,11 +158,13 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		for (Transaction messagetx : all_transactions) {
 			boolean is = false;
+			if (this.transactions.size() != 0){
 			for (R_Send message1 : this.transactions) {
 				if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
 					is = true;
 					break;
 				}
+			}
 			}
 			if (!is) {
 
