@@ -263,6 +263,8 @@ public class Synchronizer
 				//dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
 				Tuple2<Integer, Long> myHW = Controller.getInstance().getMyHWeight(false);
 				Controller.getInstance().setWeightOfPeer(peer, myHW);
+				LOGGER.info("  set new Weight " + myHW + " for PEER " + peer.getAddress().getHostAddress());
+				return;
 			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
