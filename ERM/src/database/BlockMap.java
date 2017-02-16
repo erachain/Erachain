@@ -33,6 +33,9 @@ public class BlockMap extends DBMap<byte[], Block>
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
+	private Var<Long> licenceKeyVar;
+	private Long licenceKey;
+	
 	private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
 		
@@ -54,6 +57,10 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BLOCK_TYPE);
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BLOCK_TYPE);
 		
+		// LICENCE SIGNED
+		this.licenceKeyVar = database.getAtomicVar("licenceKey");
+		this.licenceKey = this.licenceKeyVar.get();
+
 		//LAST BLOCK
 		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
@@ -140,7 +147,23 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		return this.observableData;
 	}
+
+	private void setLicenceKey(Long key) 
+	{
+		
+		this.licenceKey = key;
+		if(this.licenceKeyVar != null)
+		{
+			this.licenceKeyVar.set(this.licenceKey);
+		}
+
+	}
 	
+	public Long getLicenceKey()
+	{
+		return this.licenceKey;
+	}
+
 	private void setLastBlockSignature(byte[] signature) 
 	{
 		

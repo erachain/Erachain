@@ -237,9 +237,10 @@ public class Synchronizer
 		// FIND HEADERS for common CHAIN
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
-			String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
-			peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
-			throw new Exception(mess);
+			//String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
+			//peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+			//throw new Exception(mess);
+			return;
 		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
