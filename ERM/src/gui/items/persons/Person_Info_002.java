@@ -52,7 +52,7 @@ import utils.TableMenuPopupUtil;
 
 /**
  *
- * @author Саша
+ * @author РЎР°С€Р°
  */
 public class Person_Info_002 extends javax.swing.JPanel {
 
@@ -68,6 +68,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private JPanel jPanel_Tab_Accounts;
 	private JTable jTable_Tab_Accounts;
 	private JLabel jLabel_Tab_Accounts;
+	private PublicKeyAccount publisher;
 	
     public Person_Info_002(PersonCls person, boolean full) {
     	
@@ -195,8 +196,8 @@ public class Person_Info_002 extends javax.swing.JPanel {
         timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String dataStr = timeFormat.format(ddd);
         
-    	Locale local = new Locale("ru","RU"); // формат даты
-    	DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // для формата даты
+    	Locale local = new Locale("ru","RU"); // С„РѕСЂРјР°С‚ РґР°С‚С‹
+    	DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // РґР»СЏ С„РѕСЂРјР°С‚Р° РґР°С‚С‹
     	String dataStrLoc = df.format(ddd).toString();
     	String dataStrLoc1 = df.format(new Date(person.getBirthday())).toString();
     	*/
@@ -249,7 +250,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         PublicKeyAccount owner = null;
         byte[] recordReference = person.getReference();
         Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
-        PublicKeyAccount creator = issue_record.getCreator();
+        publisher = issue_record.getCreator();
         if (person instanceof PersonHuman) {
         	human = (PersonHuman) person;
         	if (human.isMustBeSigned()) {
@@ -277,7 +278,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(creator.toString());
+        jTextField_Creator.setText(publisher.toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -290,7 +291,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
                 
         
         if (human.isMustBeSigned() && owner != null
-        		&& !owner.equals(creator)) {
+        		&& !owner.equals(publisher)) {
         
 	        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -339,7 +340,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         			Lang.getInstance().translate("Wrong signaryte for data owner"));
 	        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
-        
+        MenuPopupUtil.installContextMenu(jTextField_Owner_Sign);
         
         JPopupMenu creator_Meny = new JPopupMenu();
         JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
@@ -350,7 +351,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
   				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-  				StringSelection value = new StringSelection(person.getOwner().getAddress().toString());
+  				StringSelection value = new StringSelection(publisher.getAddress().toString());
   			    clipboard.setContents(value, null);
   			}
   		});
@@ -363,7 +364,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			{
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
   				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
-  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(publisher.getAddress());
   				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
   				StringSelection value = new StringSelection(public_Account.getBase58());
   				 clipboard.setContents(value, null);
@@ -378,7 +379,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(publisher.getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -389,15 +390,69 @@ public class Person_Info_002 extends javax.swing.JPanel {
    			public void actionPerformed(ActionEvent e) 
    			{
    			
-   				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+   				new Mail_Send_Dialog(null, null, new Account(publisher.getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);
    		
-   	 jTextField_Creator.add(creator_Meny);
+   //	 jTextField_Creator.add(creator_Meny);
    	 jTextField_Creator.setComponentPopupMenu(creator_Meny);
   		 
-        
+   	 JPopupMenu owner_Meny = new JPopupMenu();
+     JMenuItem copy_Owner_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+     copy_Owner_Address1.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				
+				      				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(person.getOwner().getAddress());
+			    clipboard.setContents(value, null);
+			}
+		});
+     owner_Meny.add(copy_Owner_Address1);
+		 
+		JMenuItem copy_Owner_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copy_Owner_PublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
+				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
+				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+				StringSelection value = new StringSelection(public_Account.getBase58());
+				 clipboard.setContents(value, null);
+			}
+		});
+		owner_Meny.add(copy_Owner_PublicKey);
+		 
+		 
+
+		JMenuItem send_Coins_Owner = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+		send_Coins_Owner.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+			}
+		});
+		owner_Meny.add(send_Coins_Owner);
+
+		JMenuItem send_Mail_Owner = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+		send_Mail_Owner.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+			
+				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+			}
+		});
+		owner_Meny.add(send_Mail_Owner);
+		
+//	 jTextField_Creator.add(creator_Meny);
+		jTextField_Owner.setComponentPopupMenu(owner_Meny);    
         
 
         jLabel1.setText(Lang.getInstance().translate("Deathday")+":");
