@@ -64,99 +64,17 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	
 	
 	public Statements_Vouch_Table_Model(Transaction transaction){
-	//	transactions = new ArrayList<Transaction>();
-		
-		//transaction = transaction;
 		blockNo = transaction.getBlockHeight(DBSet.getInstance());
 		recNo = transaction.getSeqNo(DBSet.getInstance());
-
-		//Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(),));
-
-		
-	
-		
-	//	for (Account account : Controller.getInstance().getAccounts()) {
-	//		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-	//	}
-		
-	//	Pair<Block, List<Transaction>> result = Controller.getInstance().scanTransactions(null, 0, 0, 0, 0, null);
-			
-	
-	
-//	GenesisBlock block = new GenesisBlock();
-			
-		//FOR ALL TRANSACTIONS IN BLOCK
-//	List<Transaction> transactions = block.getTransactions();
-	
-	//BlockChain blockChain = new BlockChain(null);
-	//Block lastBlock = blockChain.getLastBlock();
-	
-	
-	//blockChain.getBlock(0)
-	
-	//	private DBSet dbSet;
-		
-			
-			//CREATE GENESIS BLOCK
-		//	genesisBlock = new GenesisBlock();
-		//	genesisTimestamp = genesisBlock.getTimestamp(null);
-		transactions = new ArrayList<Transaction>();
+//		transactions = new ArrayList<Transaction>();
+		transactions = read_Sign_Accoutns();
 		Controller.getInstance().addObserver(this);	
-		transactions = read_Sign_Accoutns();	
-/*		// база данных	
-				DBSet dbSet = DBSet.getInstance();
-		// читаем все блоки
-			SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
-		// проходим по блокам
-			for(Pair<byte[], Block> list: lists)
-			{
-				
-		// читаем транзакции из блока
-				db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-		// проходим по транзакциям
-				for (Transaction transaction:db_transactions){
-		// если ноте то пишем в transactions			
-				 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	transactions.add(transaction);	
-				
-				}
-			}
-*/				
-		
-	//	this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
-	
-	//
-		
-		
-		
-	//	List<Pair<Account, Block>> blocks = Controller.getInstance().getLastBlocks();
-	//	JSONArray array = new JSONArray();
-	/*	
-		for(Pair<Account, Block> block: blocks)
-		{
-			array.add(block.getB());
-			List<Transaction> transactions = block.getTransactions()
-		}
-		
-	
-		
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
-			{
-				transactions.add(transaction);
-			}
-		}
-		
-		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(null, Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-		}
-		
-		
-	*/		
+
 	
 	
 	}
 	
-	// set class
+	
 	
 	
 
@@ -189,20 +107,10 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	@Override
 	public int getRowCount() {
 		// TODO Auto-generated method stub
+		if (transactions ==null) return 0;
 		return transactions.size();
 	}
 	
-	public String get_Account (){
-	
-		
-		
-		
-		
-		return null;
-		
-		
-		
-	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
@@ -291,7 +199,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			//	this.statusesMap .registerObserver();
 				//this.imprints.sort(PollMap.NAME_INDEX);
-				transactions = read_Sign_Accoutns();
+			//	transactions = read_Sign_Accoutns();
 			}
 			
 			this.fireTableDataChanged();
@@ -309,7 +217,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			transactions = read_Sign_Accoutns();
+		//	transactions = read_Sign_Accoutns();
 			this.fireTableDataChanged();
 		}	
 	}	
@@ -325,7 +233,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		TransactionFinalMap table = DBSet.getInstance().getTransactionFinalMap();
 		
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
-
+		
+		if (signs == null) return null;
 		for(Tuple2<Integer, Integer> seq: signs.b)
 		{
 			 tran.add(table.getTransaction(seq.a, seq.b));

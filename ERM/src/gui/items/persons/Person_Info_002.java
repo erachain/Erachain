@@ -11,12 +11,14 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -40,14 +42,18 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.SortableList;
+import database.VouchRecordMap;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
+import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
+import utils.Pair;
 import utils.TableMenuPopupUtil;
 
 /**
@@ -69,9 +75,12 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private JTable jTable_Tab_Accounts;
 	private JLabel jLabel_Tab_Accounts;
 	private PublicKeyAccount publisher;
+	private JPanel jPanel_Tab_Vouch;
+	private JScrollPane jScrollPane_Tab_Vouches;
+	private PersonCls person;
 	
     public Person_Info_002(PersonCls person, boolean full) {
-    	
+    	this.person = person;
         initComponents(person, full);
     }
 
@@ -660,12 +669,37 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
         jTabbedPane1.addTab( Lang.getInstance().translate("Accounts"), jPanel_Tab_Accounts);
         
+    //    a  = new Transaction();
+   //      Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(Tran);
         
         
         
+        Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(issue_record);
+        JTable jTable_Vouches = new JTable(model);
         
+      
+        jPanel_Tab_Vouch = new javax.swing.JPanel();
+        jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
+     
+        jPanel_Tab_Vouch.setLayout(new java.awt.GridBagLayout());
         
+
         
+        jScrollPane_Tab_Vouches.setViewportView(jTable_Vouches);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Vouch.add(jScrollPane_Tab_Vouches, gridBagConstraints);
+
+       
+
+        jTabbedPane1.addTab(Lang.getInstance().translate("Vouch"), jPanel_Tab_Vouch);
         
         
 
