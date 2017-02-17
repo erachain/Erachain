@@ -145,17 +145,21 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-				all_transactions.add(transaction);
-			}
-		}
+		
 
 		for (Account account : Controller.getInstance().getAccounts()) {
 			all_transactions.addAll(DBSet.getInstance().getTransactionFinalMap()
 					.getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
 		}
 
+		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+				all_transactions.add(transaction);
+			}
+		}
+		
+		
+		
 		for (Transaction messagetx : all_transactions) {
 			boolean is = false;
 			if (this.transactions.size() != 0){
