@@ -104,7 +104,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		
 		//LABEL Height + Seq
 		labelGBC.gridy = componentLevel;
-		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Height / Seq.") + ":");
+		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Block") +"-" + Lang.getInstance().translate("Transaction")+":");
 		this.add(heSeqLabel, labelGBC);
 				
 		//Height + Seq
@@ -192,7 +192,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		//LABEL FEE POWER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
-		JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Size & Fee") + ":");
+		JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Size")+" & "+ Lang.getInstance().translate("Fee") + ":");
 		this.add(feePowLabel, labelGBC);
 						
 		//FEE POWER

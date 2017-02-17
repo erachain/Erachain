@@ -1,11 +1,14 @@
 package gui.transaction;
 
+import java.awt.datatransfer.StringSelection;
 import java.util.Date;
 
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import controller.Controller;
+import core.account.PublicKeyAccount;
 import core.item.persons.PersonCls;
 import core.transaction.IssuePersonRecord;
 import lang.Lang;
@@ -64,10 +67,39 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 				
 		//GENDER
 		++detailGBC.gridy;
-		JTextField gender = new JTextField(person.getGender());
+		String txt = "";
+		if(person.getGender() == 0) txt = Lang.getInstance().translate("Male");
+		if(person.getGender() == 1) txt = Lang.getInstance().translate("Female");
+		JTextField gender = new JTextField(txt);
+		
 		gender.setEditable(false);
 		this.add(gender, detailGBC);	
 
+		//LABEL owner
+		++labelGBC.gridy;
+		JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Owner") + ":");
+				this.add(ownerLabel, labelGBC);
+						
+		//owner
+		++detailGBC.gridy;
+		JTextField owner = new JTextField(person.getOwner().getAddress());
+		owner.setEditable(false);
+		this.add(owner, detailGBC);		
+		
+		//LABEL owner Public key
+		++labelGBC.gridy;
+		JLabel owner_Public_keyLabel = new JLabel(Lang.getInstance().translate("Public Key") + ":");
+		this.add(owner_Public_keyLabel, labelGBC);
+								
+		//owner public key
+		++detailGBC.gridy;
+		byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
+		PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+		//	StringSelection value = new StringSelection(public_Account.getBase58());
+		JTextField owner_Public_Key = new JTextField(public_Account.getBase58());
+		owner_Public_Key.setEditable(false);
+		this.add(owner_Public_Key, detailGBC);		
+		
         //PACK
 	//	this.pack();
     //    this.setResizable(false);

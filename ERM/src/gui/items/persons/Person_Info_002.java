@@ -755,7 +755,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
   		
   		
   		
-  		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+  		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
   		Send_Coins_item_Menu.addActionListener(new ActionListener()
   		{
   			public void actionPerformed(ActionEvent e) 
