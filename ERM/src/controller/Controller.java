@@ -995,22 +995,34 @@ public class Controller extends Observable {
 				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
 				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
+				
 				Block lastBlock = this.blockChain.getLastBlock(dbSet);
 				if (newBlock.getReference().equals(lastBlock.getReference())) {
-					LOGGER.debug("  !! it is concurent !!");
+					// NEW winBlock CONCURENT for LAST BLOCK found!!
+					LOGGER.debug("  ** it is concurent for LAST BLOCK ???");
 					if (newBlock.calcWinValue(dbSet) > lastBlock.calcWinValue(dbSet)) {
-						LOGGER.debug("   ++ concurent OK ++");
+						LOGGER.debug("   ++ concurent is OK ++");
 						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-						if (isNewWinBlockValid == 0 || isNewWinBlockValid == 4) {
+						if (isNewWinBlockValid == 0
+								|| isNewWinBlockValid == 4) {
+							// STOP FORGING
+							ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
+							this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
+							// ORPHAN
 							lastBlock.orphan(dbSet);
+							this.blockChain.clearWaitWinBuffer();
+							// set NEW win Block
 							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
+							
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
 							this.network.broadcast(message, excludes);
-							return;
+							// FORGING RESTORE
+							this.blockGenerator.setForgingStatus(tempStatus);
 						}
 						
 					}
+					return;
 				}
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
