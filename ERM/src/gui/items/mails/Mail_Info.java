@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -188,6 +190,8 @@ public class Mail_Info extends javax.swing.JPanel {
 
        
         jTextArea_Messge.setEditable(false);
+		jTextArea_Messge.setContentType("text/html");
+
        
   //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
    //     jTextArea_Messge.setColumns(20);
@@ -324,7 +328,8 @@ public class Mail_Info extends javax.swing.JPanel {
 		}
 		
 		try {
-			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
+			jTextArea_Messge.setText(Processor.process(
+					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8")));
 			jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 			encrypted =!encrypted;
 		
@@ -351,18 +356,20 @@ public class Mail_Info extends javax.swing.JPanel {
 		{	
 			
 			
-				jTextArea_Messge.setContentType("text/html");
+				//jTextArea_Messge.setContentType("text/html");
 				imgLock = "<img src='file:images/messages/locked.png'>";
-				return "<html>"+imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>"; 
+				//return "<html>"+imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>";
+				return imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>";
 		}
 		
 		
 		
 		if ( trans.isText() ) {
-			jTextArea_Messge.setContentType("text");
-			return new String(trans.getData(), Charset.forName("UTF-8"));
+			//jTextArea_Messge.setContentType("text");
+			//jTextArea_Messge.setContentType("text/html");
+			return Processor.process(new String(trans.getData(), Charset.forName("UTF-8")));
 		}
-		jTextArea_Messge.setContentType("text/html");
+		//jTextArea_Messge.setContentType("text/html");
 		return Converter.toHex(trans.getData());
 		
 		
