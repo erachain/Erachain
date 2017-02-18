@@ -11,6 +11,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ColorModel;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.DateFormat;
@@ -31,6 +32,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -676,7 +678,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
         
         Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(issue_record);
         JTable jTable_Vouches = new JTable(model);
+         TableColumnModel column_mod = jTable_Vouches.getColumnModel();
+        TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+        col_data.setMinWidth(50);
+        col_data.setMaxWidth(200);
+        col_data.setPreferredWidth(120);//.setWidth(30);
         
+        jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()),model.get_Column_AutoHeight())); // set renderer
       
         jPanel_Tab_Vouch = new javax.swing.JPanel();
         jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
@@ -699,7 +707,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
        
 
-        jTabbedPane1.addTab(Lang.getInstance().translate("Vouch"), jPanel_Tab_Vouch);
+        jTabbedPane1.addTab(Lang.getInstance().translate("Certified"), jPanel_Tab_Vouch);
         
         
 

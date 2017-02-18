@@ -5,6 +5,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import core.account.Account;
 import core.block.GenesisBlock;
@@ -14,6 +16,8 @@ import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.BalancesTableModel;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 /*
@@ -253,6 +257,13 @@ this.setVisible(false);
         
         Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(transaction);
         JTable jTable_Vouches = new JTable(model);
+        TableColumnModel column_mod = jTable_Vouches.getColumnModel();
+        TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+        col_data.setMinWidth(50);
+        col_data.setMaxWidth(200);
+        col_data.setPreferredWidth(120);//.setWidth(30);
+        
+        jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()),model.get_Column_AutoHeight())); // set renderer
         
       
         JPanel jPanel_Tab_Vouch = new javax.swing.JPanel();
@@ -276,7 +287,7 @@ this.setVisible(false);
 
        
 
-        jTabbedPane1.addTab(Lang.getInstance().translate("Vouch"), jPanel_Tab_Vouch);
+        jTabbedPane1.addTab(Lang.getInstance().translate("Certified"), jPanel_Tab_Vouch);
         
         JPanel jPanel_Tab_Holders = new javax.swing.JPanel();
         JScrollPane jScrollPane_Tab_Holders = new javax.swing.JScrollPane();
@@ -286,6 +297,12 @@ this.setVisible(false);
 
         BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
   		JTable  jTable1 = new JTable(balancesTableModel);
+  		
+         
+  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+  		
+  		
+  		
         
         jScrollPane_Tab_Holders.setViewportView(jTable1);
 
