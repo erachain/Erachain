@@ -30,7 +30,9 @@ import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
+import database.DBMap;
 import database.DBSet;
+import database.SortableList;
 import database.TransactionFinalMap;
 import lang.Lang;
 import utils.ObserverMessage;
@@ -66,9 +68,9 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public Statements_Vouch_Table_Model(Transaction transaction){
 		blockNo = transaction.getBlockHeight(DBSet.getInstance());
 		recNo = transaction.getSeqNo(DBSet.getInstance());
-//		transactions = new ArrayList<Transaction>();
-		transactions = read_Sign_Accoutns();
-		Controller.getInstance().addObserver(this);	
+		transactions = new ArrayList<Transaction>();
+	//	transactions = read_Sign_Accoutns();
+		DBSet.getInstance().getVouchRecordMap().addObserver(this);	
 
 	
 	
@@ -192,14 +194,11 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 //		System.out.println( message.getType());
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.ADD_STATEMENT_TYPE)
+		if(message.getType() == ObserverMessage.LIST_VOUCH_TYPE)
 		{
-			if(this.transactions == null)
+			if(this.transactions.size() == 0)
 			{
-			//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			//	this.statusesMap .registerObserver();
-				//this.imprints.sort(PollMap.NAME_INDEX);
-			//	transactions = read_Sign_Accoutns();
+			transactions = read_Sign_Accoutns();
 			}
 			
 			this.fireTableDataChanged();
@@ -207,17 +206,16 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		
 		
 		//CHECK IF LIST UPDATED
-		if( //message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
-			//	||
-				message.getType() == ObserverMessage.ADD_BLOCK_TYPE 
-		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE
+		if( 	message.getType() == ObserverMessage.ADD_VOUCH_TYPE 
+				|| message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		//		|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 				
 				)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-		//	transactions = read_Sign_Accoutns();
+		//	transactions.clear();
+			transactions = read_Sign_Accoutns();
 			this.fireTableDataChanged();
 		}	
 	}	
