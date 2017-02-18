@@ -52,6 +52,7 @@ import org.mapdb.Fun.Tuple3;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
 import database.DBSet;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
@@ -66,6 +67,7 @@ import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemPersonsTableModel;
+import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 
@@ -168,7 +170,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	//	Search_run_menu.setBackground(new Color(0,204,102,255));
 	//	Dimension dim = new Dimension(180,70);
     //	Search_run_menu.setSize(dim);
-    	Search_run_menu.setPreferredSize(new Dimension(180,120));
+    	Search_run_menu.setPreferredSize(new Dimension(220,120));
     	Search_run_menu.setVisible(false);
     	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
    // 	aaa.jButton1.setBorderPainted(false);
@@ -186,7 +188,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	}});
     	   	
     	
-    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Confirm"));
+    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Attest Public Key"));
     	Search_run_menu.jButton2.setContentAreaFilled(false);
     	Search_run_menu.jButton2.setOpaque(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
@@ -198,7 +200,29 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     		@SuppressWarnings("unused")
 			PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
     		}});
+    	
+    	javax.swing.JButton jButton_Vouh = new javax.swing.JButton();
  
+    	jButton_Vouh.setText(Lang.getInstance().translate("Confirm"));
+    	jButton_Vouh.setContentAreaFilled(false);
+    	jButton_Vouh.setOpaque(false);
+    	Search_run_menu.getContentPane().add(jButton_Vouh);
+    	jButton_Vouh.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+   
+  
+    		
+			PersonCls per = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+			byte[] ref = per.getReference();
+			Transaction transaction = Transaction.findByDBRef(DBSet.getInstance(), ref);
+			int blockNo = transaction.getBlockHeight(DBSet.getInstance());
+			int recNo = transaction.getSeqNo(DBSet.getInstance());
+    		new VouchRecordDialog(blockNo, recNo);	
+  		
+  		}});
+    	
+    	
     	Search_run_menu.jButton3.setContentAreaFilled(false);
   //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
     	Search_run_menu.jButton3.setOpaque(false);

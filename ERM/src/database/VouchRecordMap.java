@@ -21,6 +21,8 @@ import org.mapdb.DBMaker;
 //import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import utils.ObserverMessage;
+
 //import database.serializer.TransactionSerializer;
 
 // vouched record (BlockNo, RecNo) -> ERM balabce + List of vouchers records
@@ -32,9 +34,9 @@ public class VouchRecordMap extends DBMap<Tuple2<Integer, Integer>, Tuple2<BigDe
 	{
 		super(databaseSet, database);
 		
-		/*this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);*/
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
 	}
 
 	public VouchRecordMap(VouchRecordMap parent) 
