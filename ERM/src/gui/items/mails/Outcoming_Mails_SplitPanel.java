@@ -90,6 +90,7 @@ import utils.TableMenuPopupUtil;
 			//TABLE
 			incoming_Mails_Model = new TableModelMails(false);
 			inciming_Mail_Table = new JTable(incoming_Mails_Model);
+			inciming_Mail_Table.setAutoCreateRowSorter(true);
 			
 			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));

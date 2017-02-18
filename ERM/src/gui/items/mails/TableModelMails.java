@@ -1,7 +1,9 @@
 package gui.items.mails;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -92,7 +94,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		case COLUMN_DATA:
 			
 
-			return DateTimeFormat.timestamptoString(tran.getTimestamp(), "dd-mm-yyyy", "0");
+			return new Date(tran.getTimestamp()).toString();//DateTimeFormat.timestamptoString(tran.getTimestamp(), "dd-mm-yyyy", "0");
 
 	//	case COLUMN_CONFIRM:
 
@@ -160,6 +162,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		
 		
 		
+		
 		for (Transaction messagetx : all_transactions) {
 			boolean is = false;
 			if (this.transactions.size() != 0){
@@ -175,8 +178,6 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 				if (messagetx.getAssetKey() == 0) {
 					for (Account account1 : Controller.getInstance().getAccounts()) {
 						R_Send a = (R_Send) messagetx;
-						String aa = a.getRecipient().getAddress();
-						String aaa = account1.getAddress();
 						if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
 							this.transactions.add(a);
 						}
@@ -189,6 +190,18 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 				}
 			}
 		}
+		
+		
+		this.transactions.sort(new Comparator<Transaction>(){
+
+			
+			
+			public int compare(Transaction o1, Transaction o2) {
+				// TODO Auto-generated method stub
+				
+				return  (int) (o2.getTimestamp()- o1.getTimestamp());
+			}});
+		
 
 	}
 }

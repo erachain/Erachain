@@ -30,6 +30,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 		
 	
 		this.setTitle(Lang.getInstance().translate("Mails"));
+		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Mails"));
 		this.jButton2_jToolBar.setVisible(false);
 		this.jButton3_jToolBar.setVisible(false);
 		this.jButton1_jToolBar.setVisible(false);
