@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -36,6 +37,7 @@ import database.SortableList;
 import database.TransactionFinalMap;
 import lang.Lang;
 import utils.ObserverMessage;
+import utils.Pair;
 
 public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
 
@@ -62,10 +64,15 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	//private Transaction transaction;
 	private int blockNo;
 	private int recNo;
+
+	TransactionFinalMap table;
+
+	private ObserverMessage message;
 	
 	
 	
 	public Statements_Vouch_Table_Model(Transaction transaction){
+		table = DBSet.getInstance().getTransactionFinalMap();
 		blockNo = transaction.getBlockHeight(DBSet.getInstance());
 		recNo = transaction.getSeqNo(DBSet.getInstance());
 		transactions = new ArrayList<Transaction>();
@@ -110,7 +117,11 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public int getRowCount() {
 		// TODO Auto-generated method stub
 		if (transactions ==null) return 0;
-		return transactions.size();
+		int c =0;
+		for (Transaction a:this.transactions){
+		if(a != null)++c;
+		}
+		return c; //transactions.size();
 	}
 	
 
@@ -178,19 +189,19 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
+		//try
+		//{
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
+		//}
+	//	catch(Exception e)
+	//	{
 			//GUI ERROR
-		}
+	//	}
 	}
 	
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
-		ObserverMessage message = (ObserverMessage) arg;
+		message = (ObserverMessage) arg;
 //		System.out.println( message.getType());
 		
 		//CHECK IF NEW LIST
@@ -199,15 +210,16 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			if(this.transactions.size() == 0)
 			{
 			transactions = read_Sign_Accoutns();
+			this.fireTableDataChanged();
 			}
 			
-			this.fireTableDataChanged();
+			
 		}
 		
 		
 		//CHECK IF LIST UPDATED
 		if( 	message.getType() == ObserverMessage.ADD_VOUCH_TYPE 
-				|| message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
+		//		|| message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		//		|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 				
@@ -215,7 +227,22 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 		//	transactions.clear();
-			transactions = read_Sign_Accoutns();
+			@SuppressWarnings("unchecked")
+			Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a = (Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message.getValue();
+			if (a.a.a == blockNo && a.a.b == recNo){
+				List<Tuple2<Integer, Integer>> ff = a.b.b;
+				
+				for (Tuple2<Integer, Integer> ll:ff){
+				Integer bl = ll.a;
+				Integer seg = ll.b;
+				
+				Transaction kk = table.getTransaction(bl, seg);
+				if (!this.transactions.contains(kk))	 this.transactions.add(kk);
+				}
+			
+			}
+			
+		//	transactions = read_Sign_Accoutns();
 			this.fireTableDataChanged();
 		}	
 	}	
@@ -228,17 +255,41 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		//tran = new ArrayList<Transaction>();
 		// база данных	
 		//DBSet dbSet = DBSet.getInstance();
-		TransactionFinalMap table = DBSet.getInstance().getTransactionFinalMap();
-		
+	
+		/*
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
+		
 		
 		if (signs == null) return null;
 		for(Tuple2<Integer, Integer> seq: signs.b)
 		{
-			 tran.add(table.getTransaction(seq.a, seq.b));
+			
+			Transaction kk = table.getTransaction(seq.a, seq.b);
+			if (!tran.contains(kk))	 tran.add(kk);
 		}
-		return tran;
-	
+		*/
+		
+      @SuppressWarnings("unchecked")
+	SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> rec = (SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message.getValue();
+		
+		Iterator<Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>> ss = rec.iterator();
+		while(ss.hasNext()){
+		Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a = (Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) ss.next();
+		// block
+		if (a.getA().a == blockNo && a.getA().b == recNo){
+			List<Tuple2<Integer, Integer>> ff = a.getB().b;
+			
+			for (Tuple2<Integer, Integer> ll:ff){
+			Integer bl = ll.a;
+			Integer seg = ll.b;
+			
+			Transaction kk = table.getTransaction(bl, seg);
+			if (!tran.contains(kk))	 tran.add(kk);
+			}
+		}
+		
 	}	
+		return tran;
+	}
 
 }
