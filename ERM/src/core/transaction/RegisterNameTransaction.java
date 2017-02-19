@@ -16,6 +16,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -192,7 +193,7 @@ public class RegisterNameTransaction extends Transaction
 		
 		//CHECK VALUE LENGTH
 		int valueLength = this.name.getValue().getBytes(StandardCharsets.UTF_8).length;
-		if(valueLength > 4000 || valueLength < 1)
+		if(valueLength > BlockChain.MAX_REC_DATA_BYTES || valueLength < 1)
 		{
 			return INVALID_VALUE_LENGTH;
 		}

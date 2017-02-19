@@ -18,6 +18,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -161,7 +162,7 @@ public class CreatePollTransaction extends Transaction
 		data = Bytes.concat(data, this.creator.getPublicKey());
 		
 		//WRITE POLL
-		data = Bytes.concat(data , this.poll.toBytes());
+		data = Bytes.concat(data, this.poll.toBytes());
 		
 		//WRITE FEE POWER
 		byte[] feePowBytes = new byte[1];
@@ -218,7 +219,7 @@ public class CreatePollTransaction extends Transaction
 		
 		//CHECK POLL DESCRIPTION LENGTH
 		int descriptionLength = this.poll.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000 || descriptionLength < 1)
+		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES || descriptionLength < 1)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}

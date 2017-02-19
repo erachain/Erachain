@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import database.DBSet;
@@ -169,7 +170,7 @@ public class Poll
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 				
-		if(descriptionLength < 1 || descriptionLength > 4000)
+		if(descriptionLength < 1 || descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid description length");
 		}

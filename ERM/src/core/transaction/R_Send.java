@@ -85,7 +85,7 @@ public class R_Send extends TransactionAmount {
 	////////////////////////// SHOR -text DATA
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
-		typeBytes[3] = (byte)(typeBytes[3] & (byte)128);
+		typeBytes[3] = (byte)(typeBytes[3] & (byte)-128);
 	}
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, timestamp, reference);

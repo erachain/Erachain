@@ -452,7 +452,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+")</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		

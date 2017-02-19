@@ -54,6 +54,7 @@ import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
@@ -509,7 +510,7 @@ public class Account_Send_Panel extends JPanel
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+")</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		
@@ -728,9 +729,9 @@ public class Account_Send_Panel extends JPanel
 		
 		if(messageBytes != null)
 		{
-			if ( messageBytes.length > 4000 )
+			if ( messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= 4000", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
 				this.sendButton.setEnabled(true);

@@ -640,7 +640,7 @@ public class R_SetStatusToItem extends Transaction {
 
 		if (this.description != null ) {
 			//CHECK DATA SIZE
-			if(description.length > 4000)
+			if(description.length > BlockChain.MAX_REC_DATA_BYTES)
 			{
 				return INVALID_DATA_LENGTH;
 			}

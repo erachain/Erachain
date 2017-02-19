@@ -185,7 +185,7 @@ public class UpdateNameFrame extends JFrame
 		labelGBC.gridy = 6;
 		//labelGBC.gridwidth = ;
 		labelGBC.gridx = 1;
-		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/4000"));
+		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/MAX"));
 		this.add(countLabel, labelGBC);
 		
 		//TABLE GBC
