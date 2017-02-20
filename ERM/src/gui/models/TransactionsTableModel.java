@@ -89,6 +89,22 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		
 	}
 	
+	public void view_Transactioms_From_Adress(String str){
+		
+		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
+		 this.fireTableDataChanged();	
+		
+		
+	}
+	
+	public void view_Clear(){
+		transactions.clear();
+		 this.fireTableDataChanged();	
+		
+		
+		
+	}
+	
 	
 	public Transaction getTransaction(int row)
 	{
