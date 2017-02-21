@@ -46,6 +46,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
 import database.VouchRecordMap;
+import gui.Block_View_Panel;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.items.statement.Statements_Vouch_Table_Model;
@@ -127,7 +128,18 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jTextField_Owner_Sign = new javax.swing.JTextField();
         
 
-        
+
+        human = null;
+        PublicKeyAccount owner = null;
+        byte[] recordReference = person.getReference();
+        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+        publisher = issue_record.getCreator();
+        if (person instanceof PersonHuman) {
+        	human = (PersonHuman) person;
+        	if (human.isMustBeSigned()) {
+        		owner = person.getOwner();
+        	}
+        }
         
         SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
         
@@ -144,15 +156,15 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        add(jLabel_Title, gridBagConstraints);
+        
         
         if (person == null){
+        	add(jLabel_Title, gridBagConstraints);
         	jLabel_Title.setText(Lang.getInstance().translate("Person not found"));
         	return;
         	
         }
-        
-        jLabel_Title.setText(Lang.getInstance().translate(""));
+        add(new Block_View_Panel( issue_record.getBlockHeight(DBSet.getInstance()),issue_record.getSeqNo(DBSet.getInstance())), gridBagConstraints);
         
         
         
@@ -257,17 +269,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
                 
         jScrollPane1.setViewportView(jTextArea_Description);
 
-        human = null;
-        PublicKeyAccount owner = null;
-        byte[] recordReference = person.getReference();
-        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
-        publisher = issue_record.getCreator();
-        if (person instanceof PersonHuman) {
-        	human = (PersonHuman) person;
-        	if (human.isMustBeSigned()) {
-        		owner = person.getOwner();
-        	}
-        }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

@@ -203,7 +203,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	
     	javax.swing.JButton jButton_Vouh = new javax.swing.JButton();
  
-    	jButton_Vouh.setText(Lang.getInstance().translate("Confirm"));
+    	jButton_Vouh.setText(Lang.getInstance().translate("Vouch"));
     	jButton_Vouh.setContentAreaFilled(false);
     	jButton_Vouh.setOpaque(false);
     	Search_run_menu.getContentPane().add(jButton_Vouh);
