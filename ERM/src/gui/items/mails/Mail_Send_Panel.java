@@ -641,30 +641,16 @@ public class Mail_Send_Panel extends JPanel
 		//READ RECIPIENT
 		String recipientAddress = txtTo.getText();
 		
-		Account recipient;
 		
 		//ORDINARY RECIPIENT
-		if(Crypto.getInstance().isValidAddress(recipientAddress))
-		{
-			recipient = new Account(recipientAddress);
-		}
-		else
-		{
-			//IS IS NAME of RECIPIENT - resolve ADDRESS
-			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-			
-			if(result.getB() == NameResult.OK)
-			{
-				recipient = result.getA();
-			}
-			else		
-			{
-				JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage() , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				return;
-			}
+		Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
+		Account recipient = accountRes.a;
+		if (recipient == null)	{
+			JOptionPane.showMessageDialog(null, accountRes.b , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+	
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;
 		}
 		
 		int parsing = 0;
