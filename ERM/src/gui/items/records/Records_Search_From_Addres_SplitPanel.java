@@ -47,6 +47,7 @@ import javax.swing.JMenuItem;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
@@ -104,12 +105,14 @@ import lang.Lang;
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-						if(searchTextField_SearchToolBar_LeftPanel.getText().length()<34 || searchTextField_SearchToolBar_LeftPanel.getText().length()>35) {
+						
+						Tuple2<Account, String> accountRes = Account.tryMakeAccount(searchTextField_SearchToolBar_LeftPanel.getText());
+						Account recipient = accountRes.a;
+						if (recipient == null)	{
 							transactionsTableModel.view_Clear();
 							return;
 						}
-						transactionsTableModel.view_Transactioms_From_Adress( searchTextField_SearchToolBar_LeftPanel.getText());
+						transactionsTableModel.view_Transactioms_From_Adress( recipient.getAddress() );
 					
 					}
 		    		

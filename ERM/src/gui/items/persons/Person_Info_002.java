@@ -431,11 +431,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			public void actionPerformed(ActionEvent e) 
 			{
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
-				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+				PublicKeyAccount public_Account = person.getOwner();
 				StringSelection value = new StringSelection(public_Account.getBase58());
-				 clipboard.setContents(value, null);
+				clipboard.setContents(value, null);
 			}
 		});
 		owner_Meny.add(copy_Owner_PublicKey);
