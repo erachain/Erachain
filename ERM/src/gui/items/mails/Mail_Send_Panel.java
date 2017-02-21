@@ -45,6 +45,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.mapdb.Fun.Tuple2;
+
 //import settings.Settings;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -565,24 +567,13 @@ public class Mail_Send_Panel extends JPanel
 		}
 		
 		Account account = null;
+		Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(toValue))
-		{
-			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-					
-			if(nameToAdress.getB() == NameResult.OK)
-			{
-				account = nameToAdress.getA();
-				txtRecDetails.setText(account.toString(asset.getKey()));
-			}
-			else
-			{
-				txtRecDetails.setText(nameToAdress.getB().getShortStatusMessage());
-			}
-		} else
-		{
-			account = new Account(toValue);
+		if(accountRes.a == null) {
+			txtRecDetails.setText(accountRes.b);
+		} else {
+			account = accountRes.a;
 			
 			txtRecDetails.setText(account.toString(asset.getKey()));
 			
