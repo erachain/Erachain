@@ -134,7 +134,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	{
 		
 		//INSERT INTO DATABASE
-		this.item.insertToMap(db);
+		this.item.insertToMap(db, 0l);
 
 	}
 

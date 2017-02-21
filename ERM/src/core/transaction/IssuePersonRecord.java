@@ -67,8 +67,13 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	}
 
 	//GETTERS/SETTERS
-	
 	//public String getName() { return "Issue Person"; }
+	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
+
 	
 	@Override
 	public boolean hasPublicText() {

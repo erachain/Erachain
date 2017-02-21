@@ -71,6 +71,10 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Union"; }
 	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 1000l;
+	}
 
 	//PARSE CONVERT
 	

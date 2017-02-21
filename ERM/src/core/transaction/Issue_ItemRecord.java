@@ -83,6 +83,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		if (this.item.getReference() == null) this.item.setReference(this.signature);
 	}
 
+	protected abstract long getStartKey();
 	//PARSE CONVERT
 	
 	
@@ -189,7 +190,7 @@ public abstract class Issue_ItemRecord extends Transaction
 			this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
-		this.item.insertToMap(db);
+		this.item.insertToMap(db, this.getStartKey());
 				
 	}
 

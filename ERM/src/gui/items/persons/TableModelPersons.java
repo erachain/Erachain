@@ -30,9 +30,8 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	public TableModelPersons()
 	{
 		Controller.getInstance().addObserver(this);
-	PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
-	String sss = ss.getName();
-	
+		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
+		//String sss = ss!=null?ss.getName():"--";	
 	}
 	
 //	@Override
