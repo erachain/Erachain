@@ -53,7 +53,7 @@ public class IssueNotePanel extends JPanel
 
 	public IssueNotePanel()
 	{
-//		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Note"));
+//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Note"));
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

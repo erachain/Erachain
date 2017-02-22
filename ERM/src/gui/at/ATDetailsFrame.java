@@ -30,7 +30,7 @@ public class ATDetailsFrame extends JFrame {
 
 	public ATDetailsFrame(AT at)
 	{	
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("AT Details"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("AT Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

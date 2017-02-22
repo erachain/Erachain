@@ -19,7 +19,7 @@ public class ImprintFrame extends JFrame
 	
 	public ImprintFrame(ImprintCls imprint)
 	{
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.imprint = imprint;
 		

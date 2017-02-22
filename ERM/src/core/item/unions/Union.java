@@ -9,6 +9,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
@@ -90,7 +91,7 @@ public class Union extends UnionCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 1 || descriptionLength > 4000)
+		if(descriptionLength < 1 || descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid description length");
 		}

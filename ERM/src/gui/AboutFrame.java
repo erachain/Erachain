@@ -30,7 +30,7 @@ public class AboutFrame extends JFrame{
 	public AboutFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.world")+ " - " + Lang.getInstance().translate("Debug"));
+		super(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("Debug"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

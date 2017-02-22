@@ -47,7 +47,7 @@ public class ConfirmSeedFrame extends JFrame {
 			.getLogger(ConfirmSeedFrame.class);
 	public ConfirmSeedFrame(CreateWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("ARONICLE.world") + " - "+ Lang.getInstance().translate("Create Wallet"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - "+ Lang.getInstance().translate("Create Wallet"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

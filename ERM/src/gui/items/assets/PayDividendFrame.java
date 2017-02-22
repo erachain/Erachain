@@ -43,7 +43,7 @@ public class PayDividendFrame extends JFrame
 
 	public PayDividendFrame(AssetCls asset)
 	{
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Pay Dividend"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Pay Dividend"));
 		
 		this.asset = asset;
 		

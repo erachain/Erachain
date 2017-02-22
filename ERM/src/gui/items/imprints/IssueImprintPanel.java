@@ -59,8 +59,8 @@ public class IssueImprintPanel extends JPanel
 
 	public IssueImprintPanel()
 	{
-	//	super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
-//		this.setTitle(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
+	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Imprint"));
+//		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Imprint"));
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

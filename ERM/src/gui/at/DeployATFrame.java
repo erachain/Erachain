@@ -71,7 +71,7 @@ public class DeployATFrame extends JFrame {
 
 	public DeployATFrame()
 	{
-		super(Lang.getInstance().translate("ARONICLE.world")+" - "+Lang.getInstance().translate("Deploy AT Program"));
+		super(Lang.getInstance().translate("ARONICLE.com")+" - "+Lang.getInstance().translate("Deploy AT Program"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

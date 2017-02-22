@@ -484,7 +484,8 @@ public class BlockChain
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)
 			// FOR not repeated WINS - not need check BASE_TARGET
-			base = BlockChain.BASE_TARGET>>1;
+			/////base = BlockChain.BASE_TARGET>>1;
+			base = BlockChain.BASE_TARGET; // ONLY UP
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
 		else

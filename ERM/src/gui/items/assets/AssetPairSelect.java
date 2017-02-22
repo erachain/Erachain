@@ -66,7 +66,7 @@ public class AssetPairSelect extends JFrame{
 
 	public AssetPairSelect(long key, String action, String account) {
 		
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

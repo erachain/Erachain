@@ -1,7 +1,10 @@
 package core.block;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 // import org.apache.log4j.Logger;
 
@@ -13,6 +16,8 @@ import java.util.List;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -543,11 +548,20 @@ public class GenesisBlock extends Block{
 	{
 		switch(key)
 		{
-		case (int)NoteCls.LICENCE_KEY:
+		case (int)NoteCls.LICENSE_KEY:
 			String license = "";
 			try {
-				FileInputStream fis = new FileInputStream("Aronicle License ERM4.txt");
-				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+				//FileInputStream fis = new FileInputStream("Aronicle License ERM4.txt");
+				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+				//Reader in = new BufferedReader(isr);
+				File file = new File("Aronicle License ERM4.txt");
+				//READ SETTINS JSON FILE
+				List<String> lines = Files.readLines(file, Charsets.UTF_8);
+				
+				for(String line : lines){			
+					license += line + "\n";
+				}
+				//file.close();
 			} catch ( Exception e ) {
 				return null;
 			}

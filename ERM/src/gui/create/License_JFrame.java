@@ -67,7 +67,7 @@ public class License_JFrame extends JFrame {
 				@Override
 				public void itemStateChanged(ItemEvent arg0) {
 					// TODO Auto-generated method stub
-					jButton1.setEnabled(!jButton1.isEnabled());
+					jButton1.setEnabled(!jButton1.isEnabled());					
 				}
 	        });
 	        
@@ -141,7 +141,7 @@ public class License_JFrame extends JFrame {
 	        
 	        
 	        //ItemCls.NOTE_TYPE
-	        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+	        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
 
 	        // jTextArea1.setColumns(20);
 	        jTextArea1.setLineWrap(true);

@@ -51,7 +51,7 @@ public class SettingLangFrame extends JDialog {
 	public SettingLangFrame()
 	{
 		super();
-		this.setTitle("ARONICLE.world" + " - " + "Language select");
+		this.setTitle("ARONICLE.com" + " - " + "Language select");
 		this.setModal(true);
 
 		//ICON

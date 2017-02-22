@@ -100,7 +100,16 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			}
 		}
 		
+		
 		PersonCls person = (PersonCls) this.getItem();
+		
+		// FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
+		int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
+		if(descriptionLength > 8000)
+		{
+			return INVALID_DESCRIPTION_LENGTH;
+		}
+
 		// birthLatitude -90..90; birthLongitude -180..180
 		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
 		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;

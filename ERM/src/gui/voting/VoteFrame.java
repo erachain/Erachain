@@ -56,7 +56,7 @@ public class VoteFrame extends JFrame
 	
 	public VoteFrame(Poll poll, int option, AssetCls asset)
 	{
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Vote"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Vote"));
 		
 		this.poll = poll;
 		

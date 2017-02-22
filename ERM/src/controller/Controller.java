@@ -109,6 +109,8 @@ public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
+	// IF new abilities is made - new license insert in CHAIN and set this KEY
+	public static final long LICENSE_KEY = 2l;
 	public static final String APP_NAME = "ERM4";
 	private static final String version = "3.01.01";
 	private static final String buildTime = "2017-02-06 09:33:33 UTC";
@@ -1531,7 +1533,12 @@ public class Controller extends Observable {
 
 	public boolean createWallet(byte[] seed, String password, int amount) {
 		// IF NEW WALLET CREADED
-		return this.wallet.create(seed, password, amount, false);
+		if(this.wallet.create(seed, password, amount, false)) {
+			this.setWalletLicense(LICENSE_KEY);
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public boolean recoverWallet(byte[] seed, String password, int amount) {
@@ -1545,6 +1552,14 @@ public class Controller extends Observable {
 		}
 		else
 			return false;
+	}
+
+	public long getWalletLicense() {
+		return this.wallet.getLicenseKey(); 
+	}
+
+	public void setWalletLicense(long key) {
+		this.wallet.setLicenseKey(key); 
 	}
 
 	public List<Account> getAccounts() {

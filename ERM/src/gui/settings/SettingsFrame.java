@@ -43,7 +43,7 @@ public class SettingsFrame extends JFrame{
 	{
 		
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Settings"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Settings"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

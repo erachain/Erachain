@@ -486,6 +486,9 @@ public class Wallet extends Observable implements Observer
 	    //ADD VERSION
 	    this.database.setVersion(1);
 	    
+	    //SET LICENSE KEY
+	    this.setLicenseKey(Controller.LICENSE_KEY);
+
 	    //ADD SEED
 	    this.secureDatabase.setSeed(seed);
 	    
@@ -2045,5 +2048,15 @@ public class Wallet extends Observable implements Observer
 	public byte[] getLastBlockSignature()
 	{
 		return this.database.getLastBlockSignature();
+	}
+	
+	public long getLicenseKey()
+	{
+		return this.database.getAccountMap().getLicenseKey();
+	}
+
+	public void setLicenseKey(long key)
+	{
+		this.database.getAccountMap().setLicenseKey(key);
 	}
 }

@@ -41,7 +41,7 @@ public class CancelSellNameFrame extends JFrame
 	
 	public CancelSellNameFrame(NameSale nameSale)
 	{
-		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
