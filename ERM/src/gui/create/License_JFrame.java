@@ -18,6 +18,7 @@ import javax.swing.event.ChangeListener;
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
 import database.DBSet;
 import lang.Lang;
@@ -138,14 +139,15 @@ public class License_JFrame extends JFrame {
 	            }
 	        });
 	        
-	      
-	       StatusCls status = (StatusCls)DBSet.getInstance().getItemStatusMap().get((long)1);
+	        
+	        //ItemCls.NOTE_TYPE
+	        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
 
-	    //    jTextArea1.setColumns(20);
+	        // jTextArea1.setColumns(20);
 	        jTextArea1.setLineWrap(true);
 	        jTextArea1.setEditable(false);
 	        jTextArea1.setRows(5);
-	        jTextArea1.setText(status.getDescription());
+	        jTextArea1.setText(note.getDescription());
 	        jScrollPane1.setViewportView(jTextArea1);
 	        
 	        

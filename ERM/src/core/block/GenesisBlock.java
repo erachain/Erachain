@@ -14,6 +14,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.BlockChain;
@@ -539,6 +540,11 @@ public class GenesisBlock extends Block{
 	{
 		switch(key)
 		{
+		case (int)NoteCls.LICENCE_KEY:
+			return new Note(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
+					+ " \"" + Controller.APP_NAME + "\"", icon, image,
+					""
+					);
 		case (int)NoteCls.MARRIAGE_KEY:
 			return new Note(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
 		case (int)NoteCls.UNMARRIAGE_KEY:
