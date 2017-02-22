@@ -1,5 +1,8 @@
 package core.block;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
 // import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
@@ -541,9 +544,17 @@ public class GenesisBlock extends Block{
 		switch(key)
 		{
 		case (int)NoteCls.LICENCE_KEY:
+			String license = "";
+			try {
+				FileInputStream fis = new FileInputStream("Aronicle License ERM4.txt");
+				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			} catch ( Exception e ) {
+				return null;
+			}
+		
 			return new Note(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
 					+ " \"" + Controller.APP_NAME + "\"", icon, image,
-					""
+					license
 					);
 		case (int)NoteCls.MARRIAGE_KEY:
 			return new Note(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
