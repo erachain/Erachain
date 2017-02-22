@@ -77,7 +77,7 @@ public class UpdateNameFrame extends JFrame
 
 	public UpdateNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Update Name"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Update Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

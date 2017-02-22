@@ -41,7 +41,7 @@ public class MultiPaymentFrame extends JFrame
 	@SuppressWarnings("unchecked")
 	public MultiPaymentFrame(AssetCls asset, List<Payment> payments)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Pay Dividend"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Pay Dividend"));
 		
 		this.asset = asset;
 		this.payments = payments;

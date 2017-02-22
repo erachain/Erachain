@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
+import core.item.assets.AssetCls;
 import settings.Settings;
 import utils.StrJSonFine;
 
@@ -22,11 +23,14 @@ public class ApiClient {
 	
 	public static final String APICALLKEY = "apicallkey";
 	public static final int SELF_CALL = 10;
+	
 
 	private static List<String> allowedcalls = new CopyOnWriteArrayList<>();
+	private static final String ERM_ABBREV = AssetCls.ERM_ABBREV;
 	
 	
 	private static final Logger LOGGER = Logger.getLogger(ApiClient.class);
+
 	
 	
 	String[] [] helpStrings =
@@ -348,12 +352,12 @@ public class ApiClient {
 			},
 			{
 				"POST payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
-				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 			{
 				"POST namepayment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipientName>\"}", 
-				"Send a new neme-payment using the given data. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
+				"Send a new neme-payment using the given data. If \"asset\" is omitted, 2 is provided (default commission asset).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked. 701 - The name is not registered. 702 -  Names for sale. 703 = Name with trailing or leading spaces."
 			},
 			{

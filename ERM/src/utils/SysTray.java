@@ -73,10 +73,10 @@ public class SysTray implements Observer{
 				LOGGER.info("SystemTray is not supported");
 			} else {
 				
-				//String toolTipText = "DATACHAINS.world "	+ Controller.getInstance().getVersion();
+				//String toolTipText = "ARONICLE.world "	+ Controller.getInstance().getVersion();
 				createPopupMenu = createPopupMenu();
 				TrayIcon icon = new TrayIcon(createImage(
-						"images/icons/icon32.png", "tray icon"), "DATACHAINS.world "
+						"images/icons/icon32.png", "tray icon"), "ARONICLE.world "
 						+ Controller.getInstance().getVersion(),
 						createPopupMenu);
 				
@@ -127,7 +127,7 @@ public class SysTray implements Observer{
 		PopupMenu menu = new PopupMenu();
 		
 		
-		MenuItem decentralizedWeb = new MenuItem("DATACHAINS.world Web/Social Network");
+		MenuItem decentralizedWeb = new MenuItem("ARONICLE.world Web/Social Network");
 		decentralizedWeb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -328,7 +328,7 @@ public class SysTray implements Observer{
 		int currentHeight;
 		String networkStatus = "";
 		String syncProcent = "";
-		String toolTipText = "DATACHAINS.world " + Controller.getInstance().getVersion() + "\n";
+		String toolTipText = "ARONICLE.world " + Controller.getInstance().getVersion() + "\n";
 		
 		
 		if(Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {

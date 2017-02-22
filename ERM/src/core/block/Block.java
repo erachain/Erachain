@@ -812,7 +812,7 @@ public class Block {
 
 	}
 
-	private static long getWinValueHeight2(int heightThis, int heightStart, int generatingBalance)
+	private static long calcLenFoWinValue2(int heightThis, int heightStart, int generatingBalance)
 	{
 		int len = heightThis - heightStart;
 		if (len < 1)
@@ -821,19 +821,34 @@ public class Block {
 		if (generatingBalance == 0) {
 			return 1;
 		}
-		int times = BlockChain.GENESIS_ERA_TOTAL / (generatingBalance );
 		
-		if (times < 100) {
-			if (len > times * 7)
-				return times * 7;
-		} else if (times < 1000) {
-			if (len > times * 5)
-				return times * 5;
-		} else {			
-			if (len > times * 3) {
-				return times * 3;			
-			}
-		}
+		int maxLen = (BlockChain.GENESIS_ERA_TOTAL<<1) / BlockChain.MIN_GENERATING_BALANCE;
+		int pickBal = BlockChain.GENESIS_ERA_TOTAL / generatingBalance;
+		int pickMin = BlockChain.MIN_GENERATING_BALANCE<<1;
+		
+		if (generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
+			return 1;
+		else if (generatingBalance < pickMin)
+			; // not change
+		else if (generatingBalance < pickMin<<3) // 8
+			maxLen >>=1;
+		else if (generatingBalance < pickMin<<6) // 64
+			maxLen >>=2;
+		else if (generatingBalance < pickMin<<9) // 512
+			maxLen >>=3;
+		else if (generatingBalance < pickMin<<12) // 4k
+			maxLen >>=4;
+		else if (generatingBalance < pickMin<<15) // 32k
+			maxLen >>=5;
+		else if (generatingBalance < pickMin<<18) // 256k
+			maxLen >>=6;
+		else if (generatingBalance < pickMin<<21) // 2M
+			maxLen >>=7;
+		else			
+			maxLen >>=8;
+		
+		if (len > maxLen)
+			return maxLen;
 		
 		return len;
 	}
@@ -848,7 +863,7 @@ public class Block {
 		if (previousForgingHeight == -1)
 			return 0l;
 		
-		long winValueHeight2 = getWinValueHeight2(height, previousForgingHeight, generatingBalance);
+		long winValueHeight2 = calcLenFoWinValue2(height, previousForgingHeight, generatingBalance);
 
 		long win_value = generatingBalance * winValueHeight2;
 

@@ -53,12 +53,12 @@ public class ExchangeFrame extends JFrame
 
 	public ExchangeFrame(AssetCls have, AssetCls want, String action, String account) 
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Check Exchange"));
 		
 		this.have = have;
 		this.want = want;
 		
-	//	this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
+	//	this.setTitle(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -37,7 +37,7 @@ public class BlockChain
 	public static final int REPEAT_WIN = 6; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
-	public static final int GENESIS_ERA_TOTAL = 9999999;
+	public static final int GENESIS_ERA_TOTAL = 10000000;
 	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
 	public static final int MAJOR_ERM_BALANCE = 33000;
 	public static final int MINOR_ERM_BALANCE = 1000;

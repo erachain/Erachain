@@ -106,6 +106,8 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
+
+	public static final String APP_NAME = "ERM4";
 	private static final String version = "3.01.01";
 	private static final String buildTime = "2017-02-06 09:33:33 UTC";
 	private long buildTimestamp;

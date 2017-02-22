@@ -58,8 +58,8 @@ public class IssueImprintDialog extends JDialog
 
 	public IssueImprintDialog()
 	{
-	//	super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
-		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
+	//	super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
+		this.setTitle(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Imprint"));
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

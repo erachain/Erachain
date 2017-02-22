@@ -67,7 +67,7 @@ public class IssueUnionPanel extends JPanel
 
 	public IssueUnionPanel()
 	{
-//		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Union"));
+//		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Union"));
 		
 		String colorText ="ff0000"; // цвет текста в форме
 		

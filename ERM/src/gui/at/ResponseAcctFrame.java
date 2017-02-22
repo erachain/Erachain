@@ -66,7 +66,7 @@ public class ResponseAcctFrame extends JFrame {
 
 	public ResponseAcctFrame()
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Response ACCT"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Response ACCT"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -141,7 +141,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 1;
 		labelGBC.gridx = 2;
-		JLabel coreLabel = new JLabel(Lang.getInstance().translate("DATACHAINS.world for"));
+		JLabel coreLabel = new JLabel(Lang.getInstance().translate("ARONICLE.world for"));
 		this.add(coreLabel, labelGBC);
 
 		//TXT AMOUNT

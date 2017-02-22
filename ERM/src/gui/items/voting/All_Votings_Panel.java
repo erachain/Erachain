@@ -48,7 +48,7 @@ public class All_Votings_Panel extends JPanel{
 	public All_Votings_Panel() 
 	{
 		//CREATE FRAME
-	//	super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("All Polls"));
+	//	super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("All Polls"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

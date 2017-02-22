@@ -20,16 +20,16 @@ public abstract class AssetCls extends ItemCls {
 	// CORE KEY
 	public static final long ERM_KEY = 1l;
 	public static final String ERM_ABBREV = "ERA"; // ERM (main rights units)
-	public static final String ERM_NAME = "Era";
+	public static final String ERM_NAME = "ERA";
 	public static final String ERM_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
 			+ ERM_NAME + "(" + ERM_ABBREV + "). "
-			+ "Именно единицы Эранны позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
+			+ "Именно единицы Эра позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
 			+ ". "
-			+ ("Более чем %MIN% ЭРН, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
+			+ ("Более чем %MIN% ЭРА, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
 				.replace("%MIN%", "" + BlockChain.MIN_GENERATING_BALANCE)
 				.replace("%MINOR%", "" + BlockChain.MINOR_ERM_BALANCE))
 			+ ". "
-			+ "Число единиц %GENERAL% Эранны дает права создавать новые статусы и другие сущности в среде"
+			+ "Число единиц %GENERAL% ЭРА дает права создавать новые статусы и другие сущности в среде"
 			.replace("%GENERAL%", "" + BlockChain.GENERAL_ERM_BALANCE)
 			+ "."
 			;
@@ -37,7 +37,7 @@ public abstract class AssetCls extends ItemCls {
 	// FEE KEY
 	public static final long FEE_KEY = 2l;
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
-	public static final String FEE_NAME = "Compu";
+	public static final String FEE_NAME = "COMPU";
 	public static final String FEE_DESCR = "Основная учётная единица среды, используемая для оплаты комиссий за внесение записей в среду - \"рабочая\", \"оплатная\"" + ": "
 			+ FEE_NAME + "(" + FEE_ABBREV + "). ";
 			

@@ -44,7 +44,7 @@ public class IssueStatusPanel extends JPanel
 	//@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssueStatusPanel()
 	{
-//		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Status"));
+//		this.setTitle(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Status"));
 		
 		String colorText ="ff0000"; // цвет текста в форме
 		

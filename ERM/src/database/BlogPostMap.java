@@ -14,7 +14,7 @@ public class BlogPostMap extends DBMap<String, List<byte[]>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public final static String MAINBLOG = "DATACHAINS.world";
+	public final static String MAINBLOG = "ARONICLE.world";
 
 	public BlogPostMap(DBSet databaseSet, DB database) {
 		super(databaseSet, database);

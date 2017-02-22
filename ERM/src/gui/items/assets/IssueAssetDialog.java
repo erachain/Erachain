@@ -54,8 +54,8 @@ public class IssueAssetDialog extends JDialog //JFrame
 
 	public IssueAssetDialog()
 	{
-	//	super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Asset"));
-		this.setTitle(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Asset"));
+	//	super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Asset"));
+		this.setTitle(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Asset"));
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setModal(true);

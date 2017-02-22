@@ -16,6 +16,7 @@ import org.apache.log4j.PropertyConfigurator;
 import api.ApiClient;
 import controller.Controller;
 import core.BlockChain;
+import core.item.assets.AssetCls;
 import settings.Settings;
 import utils.SysTray;
 

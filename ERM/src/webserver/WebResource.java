@@ -932,7 +932,7 @@ public class WebResource {
 					Controller.getInstance().getForgingStatus().getName());
 			pebbleHelper.getContextMap().put(
 					"version",
-					"DATACHAINS.world " + Controller.getInstance().getVersion());
+					"ARONICLE.world " + Controller.getInstance().getVersion());
 			
 			int status = Controller.getInstance().getStatus();
 			String statustext = "";
@@ -1045,7 +1045,7 @@ public class WebResource {
 		}
 	}
 
-	String[] imgsArray = { "DATACHAINS.world.png", "logo_header.png", "DATACHAINS.world-user.png",
+	String[] imgsArray = { "ARONICLE.world.png", "logo_header.png", "ARONICLE.world-user.png",
 			"logo_bottom.png", "banner_01.png", "loading.gif",
 			"00_generating.png", "01_genesis.jpg", "02_payment_in.png",
 			"02_payment_out.png", "03_name_registration.png",

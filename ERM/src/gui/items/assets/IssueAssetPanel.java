@@ -58,7 +58,7 @@ public class IssueAssetPanel extends JPanel
 
 	public IssueAssetPanel()
 	{
-//		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Asset"));
+//		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Issue Asset"));
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

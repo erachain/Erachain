@@ -39,7 +39,7 @@ public class CancelOrderFrame extends JFrame
 	
 	public CancelOrderFrame(Order order)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Cancel Order"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Cancel Order"));
 		
 		this.order = order;
 		

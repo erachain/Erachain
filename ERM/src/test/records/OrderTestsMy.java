@@ -177,7 +177,7 @@ public class OrderTestsMy
 		//CHECK IF ORDER CREATION INVALID
 		assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(db, releaserReference));
 		
-    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "DATACHAINS.world", icon, image, "This is the simulated ERM asset.", false, 100000L, (byte)0, false);
+    	assetA = new AssetVenture(new GenesisBlock().getCreator(), "ARONICLE.world", icon, image, "This is the simulated ERM asset.", false, 100000L, (byte)0, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte)0, System.currentTimeMillis(), accountA.getLastReference(db));
 		issueAssetTransaction.process(db, null, false);
     	keyA = assetA.getKey(db);

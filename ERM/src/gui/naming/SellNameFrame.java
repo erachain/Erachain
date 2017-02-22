@@ -45,7 +45,7 @@ public class SellNameFrame extends JFrame
 	
 	public SellNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Sell Name"));
+		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Sell Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

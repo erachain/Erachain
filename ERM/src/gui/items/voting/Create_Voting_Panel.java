@@ -52,7 +52,7 @@ public class Create_Voting_Panel extends JPanel
 
 	public Create_Voting_Panel()
 	{
-//		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Create Poll"));
+//		super(Lang.getInstance().translate("ARONICLE.world") + " - " + Lang.getInstance().translate("Create Poll"));
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
