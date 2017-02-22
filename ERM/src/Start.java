@@ -91,9 +91,9 @@ public class Start {
 				}
 				
 				LOGGER.info(Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
-						.replace("%app%", Lang.getInstance().translate("ERMbase"))
-						.replace("%version%", Controller.getInstance().getVersion())
-						.replace("%builddate%", Controller.getInstance().getBuildDateString())
+						.replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME))
+						.replace("%version%", Controller.getVersion())
+						.replace("%builddate%", Controller.getBuildDateString())
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC

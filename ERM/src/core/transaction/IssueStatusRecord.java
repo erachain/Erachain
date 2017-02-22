@@ -32,8 +32,8 @@ public class IssueStatusRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Issue Status";
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
+	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(BlockChain.MAJOR_ERM_BALANCE).setScale(8);
+	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(BlockChain.GENERAL_ERM_BALANCE).setScale(8);
 
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) 
 	{

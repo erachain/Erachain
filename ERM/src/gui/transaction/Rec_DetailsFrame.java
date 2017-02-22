@@ -48,7 +48,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 	
 	public Rec_DetailsFrame(final Transaction record)
 	{
-//		super(Lang.getInstance().translate("ERMbase") + " - " + Lang.getInstance().translate(record.viewTypeName()));
+//		super(Lang.getInstance().translate(controller.Controller.APP_NAME) + " - " + Lang.getInstance().translate(record.viewTypeName()));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

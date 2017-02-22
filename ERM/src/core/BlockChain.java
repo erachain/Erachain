@@ -25,16 +25,16 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	
-	public static final int TESTNET_PORT = 9035;
-	public static final int MAINNET_PORT = 9036;
-	public static final int DEFAULT_WEB_PORT = 9037;
-	public static final int DEFAULT_RPC_PORT = 9038;
+	public static final int TESTNET_PORT = 9045;
+	public static final int MAINNET_PORT = 9046;
+	public static final int DEFAULT_WEB_PORT = 9047;
+	public static final int DEFAULT_RPC_PORT = 9048;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 6; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = 50; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -49,7 +49,7 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
-	public static final int GENESIS_WIN_VALUE = 1000;
+	public static final int GENESIS_WIN_VALUE = BASE_TARGET;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
@@ -77,14 +77,14 @@ public class BlockChain
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 	public static final int FEE_FOR_ANONIMOUSE = 33;
 
-	// issue PORSON
-	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
+	// issue PERSON
+	//public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
 	// SERTIFY
 	// need RIGHTS for non PERSON account
-	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
+	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(MAJOR_ERM_BALANCE).setScale(8);
 	// need RIGHTS for PERSON account
-	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
+	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
 	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
 
@@ -92,7 +92,6 @@ public class BlockChain
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
 
-	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
 	//private int target = 0;

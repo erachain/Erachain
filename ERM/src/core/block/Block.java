@@ -870,7 +870,7 @@ public class Block {
 		
 		if (height <4)
 			win_value >>= 3;
-		else if (true || height < BlockChain.TARGET_COUNT>>1)
+		else if (height < BlockChain.TARGET_COUNT>>1)
 			win_value = (win_value >>3) - (win_value >>5);
 		else if (height < BlockChain.TARGET_COUNT)
 			win_value >>= 4;

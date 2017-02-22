@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -110,7 +112,7 @@ public class Controller extends Observable {
 	public static final String APP_NAME = "ERM4";
 	private static final String version = "3.01.01";
 	private static final String buildTime = "2017-02-06 09:33:33 UTC";
-	private long buildTimestamp;
+	private static long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
 	// for reset DB if DB PROTOCOL is CHANGED
@@ -173,31 +175,41 @@ public class Controller extends Observable {
 		return Settings.getInstance().isTestnet();
 	}
 	
-	public String getBuildDateTimeString(){
-		return DateTimeFormat.timestamptoString(this.getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
+	public static String getBuildDateTimeString(){
+		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
 	}
 	
-	public String getBuildDateString(){
-		return DateTimeFormat.timestamptoString(this.getBuildTimestamp(), "yyyy-MM-dd", "UTC");
+	public static String getBuildDateString(){
+		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd", "UTC");
 	}
 	
-	public long getBuildTimestamp() {
-	    if(this.buildTimestamp == 0) {
+	public static long getBuildTimestamp() {
+	    if(buildTimestamp == 0) {
 		    Date date = new Date();
-		    URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
-		    if (resource != null) {
-		        if (true || !resource.getProtocol().equals("file")) {
-		        	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-		        	try {
-						date = (Date)formatter.parse(this.buildTime);
-					} catch (ParseException e) {
-						LOGGER.error(e.getMessage(),e);
-					}
-		        }
+		    ////URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
+		    URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
+		    if (resource != null && resource.getProtocol().equals("file")) {
+	        	try {
+		        	File f = new File(Controller.APP_NAME + ".jar");
+		            Path p = f.toPath();
+		            		            
+		            BasicFileAttributes attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+		            buildTimestamp = attr.creationTime().toMillis();
+		            return buildTimestamp;
+		            
+	        	} catch (Exception e) {
+					LOGGER.error(e.getMessage(), e);
+	        	}
 		    }
-		    this.buildTimestamp = date.getTime();
+	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+	    	try {
+				date = (Date)formatter.parse(buildTime);
+			    buildTimestamp = date.getTime();
+			} catch (ParseException e) {
+				LOGGER.error(e.getMessage(),e);
+			}
 	    }
-	    return this.buildTimestamp;
+	    return buildTimestamp;
 	}
 	
 	public byte[] getMessageMagic() {

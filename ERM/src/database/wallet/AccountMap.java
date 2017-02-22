@@ -12,6 +12,7 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+import org.mapdb.Atomic.Var;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -32,6 +33,9 @@ public class AccountMap extends Observable {
 	private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
 	private Set<byte[]> publickKeys;
 	
+	private Var<Long> licenceKeyVar;
+	private Long licenceKey;
+	
 	//private List<Account> accounts;
 	//private List<PublicKeyAccount> publickKeys;
 	
@@ -46,6 +50,10 @@ public class AccountMap extends Observable {
 	    		.makeOrGet();
 
 		this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
+
+		// LICENCE SIGNED
+		this.licenceKeyVar = database.getAtomicVar("licenceKey");
+		this.licenceKey = this.licenceKeyVar.get();
 
 	}
 	
@@ -69,6 +77,20 @@ public class AccountMap extends Observable {
 		}
 	}
 	*/
+
+	private void setLicenceKey(Long key) 
+	{
+		
+		this.licenceKey = key;
+		this.licenceKeyVar.set(this.licenceKey);
+
+	}
+	
+	public Long getLicenceKey()
+	{
+		return this.licenceKey;
+	}
+
 
 	public List<Account> getAccounts()
 	{
