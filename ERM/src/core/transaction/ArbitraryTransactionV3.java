@@ -10,6 +10,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -231,7 +232,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		}
 
 		// CHECK DATA SIZE
-		if (data.length > 4000 || data.length < 1) {
+		if (data.length > BlockChain.MAX_REC_DATA_BYTES || data.length < 1) {
 			return INVALID_DATA_LENGTH;
 		}
 

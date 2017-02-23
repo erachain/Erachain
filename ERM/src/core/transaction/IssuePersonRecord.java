@@ -67,9 +67,15 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	}
 
 	//GETTERS/SETTERS
-	
 	//public String getName() { return "Issue Person"; }
 	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
+
+	
+	/*
 	@Override
 	public boolean hasPublicText() {
 		for ( String admin: BlockChain.GENESIS_ADMINS) {
@@ -79,23 +85,46 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		}
 		return true;
 	}
+	*/
 
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) 
 	{
-						
+
+		boolean creator_admin = false;
 		int res = super.isValid(db, releaserReference);
-		if (res != Transaction.VALIDATE_OK) {
-			if (res != Transaction.NOT_ENOUGH_FEE) {
-				return res;
-			} else {
-				// IF balance of FEE < 0 - ERROR 
-				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
-					return Transaction.NOT_ENOUGH_FEE;
+		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
+			long count = db.getItemPersonMap().getSize();
+			if (count < 20) {
+				// FIRST Persons only by ME
+				// FIRST Persons only by ADMINS
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						creator_admin = true;
+						break;
+					}
+				}
 			}
+			if (!creator_admin)
+				return res;
+		} else if (res == Transaction.NOT_ENOUGH_FEE) {
+			// IF balance of FEE < 0 - ERROR 
+			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
+				return res;
+		} else {
+			return res;
 		}
 		
+		
 		PersonCls person = (PersonCls) this.getItem();
+		
+		// FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
+		int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
+		if(descriptionLength > 8000)
+		{
+			return INVALID_DESCRIPTION_LENGTH;
+		}
+
 		// birthLatitude -90..90; birthLongitude -180..180
 		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
 		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
@@ -122,27 +151,6 @@ public class IssuePersonRecord extends Issue_ItemRecord
 					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
 				}
 			}
-		}
-
-		long count = db.getItemPersonMap().getSize();
-		if (count < 20) {
-			// FIRST Persons only by ME
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
-				}
-			}
-		}
-
-		// CHECH MAKER IS PERSON?
-		if (!this.creator.isPerson(db)) {
-				// OR RIGHTS_KEY ENOUGHT
-			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-						.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE) < 0)
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		} else {
-			
 		}
 		
 		return VALIDATE_OK;

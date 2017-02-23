@@ -269,8 +269,14 @@ public class OnDealClick
 		case Transaction.ITEM_DOES_NOT_EXIST:
 			mess = "Item does not exist";
 			break;
-		case Transaction.ACCOUNT_NOT_PERSONALIZED:
-			mess = "This Account is not personalized";
+		case Transaction.OWNER_NOT_PERSONALIZED:
+			mess = "Ownre Account is not personalized";
+			break;
+		case Transaction.CREATOR_NOT_PERSONALIZED:
+			mess = "Creator Account is not personalized";
+			break;
+		case Transaction.RECEIVER_NOT_PERSONALIZED:
+			mess = "Receiver Account is not personalized";
 			break;
 		case Transaction.ITEM_DUPLICATE_KEY:
 			mess = "Duplicate key";

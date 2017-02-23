@@ -392,11 +392,17 @@ public abstract class ItemCls {
 		return itemJSON;
 	}
 
-	public void insertToMap(DBSet db)
+	//
+	public void insertToMap(DBSet db, long startKey)
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.add(this);
+		long key = dbMap.getSize();
+		if (key < startKey) {
+			// IF this not GENESIS issue - start from 1000
+			dbMap.setSize(startKey);
+		}
+		key = dbMap.add(this);
 		
 		//SET ORPHAN DATA
 		this.getDBIssueMap(db).set(this.reference, key);

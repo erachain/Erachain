@@ -45,6 +45,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.mapdb.Fun.Tuple2;
+
 //import settings.Settings;
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -53,6 +55,7 @@ import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
@@ -322,7 +325,7 @@ public class Mail_Send_Panel extends JPanel
         txtMessageGBC.gridy = y;
         
         this.txtMessage = new JTextArea();
-        this.txtMessage.setRows(4);
+        this.txtMessage.setRows(12);
         this.txtMessage.setColumns(25);
 
         this.txtMessage.setBorder(this.txtTo.getBorder());
@@ -366,7 +369,6 @@ public class Mail_Send_Panel extends JPanel
 		labelEncGBC.fill = GridBagConstraints.HORIZONTAL;   
 		labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		labelEncGBC.weightx = 0;	
-		labelEncGBC.gridx = 4;
 		labelEncGBC.gridx = 2;
 		labelEncGBC.gridy = y;
 		
@@ -518,7 +520,7 @@ public class Mail_Send_Panel extends JPanel
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+")</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		
@@ -565,24 +567,13 @@ public class Mail_Send_Panel extends JPanel
 		}
 		
 		Account account = null;
+		Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(toValue))
-		{
-			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-					
-			if(nameToAdress.getB() == NameResult.OK)
-			{
-				account = nameToAdress.getA();
-				txtRecDetails.setText(account.toString(asset.getKey()));
-			}
-			else
-			{
-				txtRecDetails.setText(nameToAdress.getB().getShortStatusMessage());
-			}
-		} else
-		{
-			account = new Account(toValue);
+		if(accountRes.a == null) {
+			txtRecDetails.setText(accountRes.b);
+		} else {
+			account = accountRes.a;
 			
 			txtRecDetails.setText(account.toString(asset.getKey()));
 			
@@ -650,30 +641,16 @@ public class Mail_Send_Panel extends JPanel
 		//READ RECIPIENT
 		String recipientAddress = txtTo.getText();
 		
-		Account recipient;
 		
 		//ORDINARY RECIPIENT
-		if(Crypto.getInstance().isValidAddress(recipientAddress))
-		{
-			recipient = new Account(recipientAddress);
-		}
-		else
-		{
-			//IS IS NAME of RECIPIENT - resolve ADDRESS
-			Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
-			
-			if(result.getB() == NameResult.OK)
-			{
-				recipient = result.getA();
-			}
-			else		
-			{
-				JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage() , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		
-				//ENABLE
-				this.sendButton.setEnabled(true);
-				return;
-			}
+		Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
+		Account recipient = accountRes.a;
+		if (recipient == null)	{
+			JOptionPane.showMessageDialog(null, accountRes.b , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+	
+			//ENABLE
+			this.sendButton.setEnabled(true);
+			return;
 		}
 		
 		int parsing = 0;
@@ -767,9 +744,9 @@ public class Mail_Send_Panel extends JPanel
 		
 		if(messageBytes != null)
 		{
-			if ( messageBytes.length > 4000 )
+			if ( messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= 4000", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
 				this.sendButton.setEnabled(true);

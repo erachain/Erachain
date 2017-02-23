@@ -9,6 +9,7 @@ import java.util.Arrays;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
@@ -107,7 +108,7 @@ public class Imprint extends ImprintCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength > 4000)
+		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid description length");
 		}

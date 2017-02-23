@@ -42,7 +42,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	private Var<Boolean> processingVar;
 	private Boolean processing;
 	
-	private List<Block> lastBlocksForTarget;
+	//private List<Block> lastBlocksForTarget;
 
 	private BTreeMap<Tuple2<String, String>, byte[]> generatorMap;
 	
@@ -53,7 +53,7 @@ public class BlockMap extends DBMap<byte[], Block>
 		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BLOCK_TYPE);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BLOCK_TYPE);
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BLOCK_TYPE);
-		
+
 		//LAST BLOCK
 		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
@@ -140,7 +140,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		return this.observableData;
 	}
-	
+
 	private void setLastBlockSignature(byte[] signature) 
 	{
 		

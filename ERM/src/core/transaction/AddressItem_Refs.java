@@ -125,7 +125,7 @@ public abstract class AddressItem_Refs extends Transaction
 		
 		//CHECK DESCRIPTION LENGTH
 		int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000 || descriptionLength < 0)
+		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}
@@ -146,7 +146,7 @@ public abstract class AddressItem_Refs extends Transaction
 		if (this.item.getReference() == null) this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
-		this.item.insertToMap(db);
+		this.item.insertToMap(db, 1000l);
 
 	}
 

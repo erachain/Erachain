@@ -37,7 +37,7 @@ public class MyOrdersFrame extends JFrame{
 
 	public MyOrdersFrame() {
 		
-		super(Lang.getInstance().translate("DATACHAINS.world")+ " - " + Lang.getInstance().translate("My Orders"));
+		super(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("My Orders"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -1,5 +1,11 @@
 package core.block;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 // import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
@@ -10,10 +16,13 @@ import java.util.List;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.BlockChain;
@@ -216,45 +225,45 @@ public class GenesisBlock extends Block{
 
 			////////// ACTIVISTS
 			List<List<Object>> genesisActivists = Arrays.asList(
-					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "1231.5270936"), //
-					Arrays.asList("76Um7KRBKDjoLWbLDWMdbtmBJkxjW9GNpZ", "1231.5270936"),
-					Arrays.asList("76u1ywTpSTdZvpq9bNk5GdnwTxD5uNo6dF", "1231.5270936"),
-					Arrays.asList("7KcBS1bmK1NiYwJD1mgwhz1ZFWESviQthG", "1231.5270936"),
-					Arrays.asList("78Eo2dL898wzqXBn6zbGanEnwXtdDF2BWV", "1231.5270936"),
-					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "1231.5270936"),
-					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "1231.5270936"),
-					Arrays.asList("7D7S5veDCiAwvBCkoK4G2YqdXC4dZ3SH1Q", "1231.5270936"),
-					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "129310.344828"),
-					Arrays.asList("7FPm2tet9HTVmBMe5xvRzp4sWoS6d8PgWZ", "1231.5270936"),
-					Arrays.asList("78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg", "1231.5270936"),
-					Arrays.asList("79gQ4iB4Cs8EkhrUanEiDQtKArt6k6NAdu", "1231.5270936"),
-					Arrays.asList("7Kh5KvHCuWAq8XHioKyUBZxRmbwCJZV5b2", "123152.70936"),
-					Arrays.asList("74Rcp979npxf6Q5zV6ZnpEnsxrsCHdXeNU", "1231.5270936"),
-					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "2463.05418719"),
-					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "1231.5270936"), //
-					Arrays.asList("7K4XaDVf98J1fKDdCS8oYofYgFgoezFEAA", "1231.5270936"),
-					Arrays.asList("7Cy2J5ST6ukHSJVWtQd7eH4wbhbSBbMbZD", "1231.5270936"),
-					Arrays.asList("7DRH1MjEo3GgtySGsXjzfdqeQYagutXqeP", "1231.5270936"),
-					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "2463.05418719"),
-					Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1231.5270936"),
-					Arrays.asList("7MPmVWSobucE6TdJvnEeohFAZnCej7fr2F", "1231.5270936"),
-					Arrays.asList("75qZ6ncf5T4Gkz1vrwkqjCPJ1A5gr2Cyah", "1231.5270936"),
-					Arrays.asList("7JNUfHeuCRLApKX9MievkAoGdFgVfBf7DE", "1231.5270936"),
-					Arrays.asList("7Fgkw8cuPiTc4LVRvkYBuXEEfGYxrg6XiX", "1231.5270936"),
-					Arrays.asList("75rVEuvpzhLJznkXZaYyxJq8L9pVCeqFbk", "1231.5270936"),
-					Arrays.asList("7J3M8xwJeG5gyBC5kLPb5c2kVHoTsMT5MK", "1231.5270936"),
-					Arrays.asList("75rEoNUknMU3qYGjS3wriY53n1aRUznFus", "1231.5270936"),
-					Arrays.asList("73dXJb1orwqk1ADW364KEAzPVQNGa1vX9S", "61576.3546798"),
-					Arrays.asList("7CPGk25mTFGhANaBCiV4LqrowcUfrfLcRe", "1231.5270936"),
-					Arrays.asList("78KCkgNeSvxwtnVJTyzLFGGzmP8SUUuN1J", "1231.5270936"),
-					Arrays.asList("7AJNCwQvbEbGn7Mt3mzPHbK1Zxvy9t6xtA", "1231.5270936"),
-					Arrays.asList("77GYw61CPhDhdHsHg8oYCaKhenq2izAps8", "1231.5270936"),
-					Arrays.asList("7NeUmKbZadHLwS9FfLdhFL4ymVYSieF9Uc", "1231.5270936"),
-					Arrays.asList("73yfeCDiSciBF1vc3PG8uyJMty4jRDxxL9", "1231.5270936"),
-					Arrays.asList("7AXey16ivPRCQoFWzkMU4Q7V8FZugqjYUX", "18472.9064039"),
-					Arrays.asList("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7", "3694.58128079"),
-					Arrays.asList("7HWxbcgVRxzdxDiVj9oc5ZG39a93imLUWz", "1231.5270936"),
-					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", "1231.5270936")
+					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "1000.0"), //
+					Arrays.asList("76Um7KRBKDjoLWbLDWMdbtmBJkxjW9GNpZ", "1000.0"),
+					Arrays.asList("76u1ywTpSTdZvpq9bNk5GdnwTxD5uNo6dF", "1000.0"),
+					Arrays.asList("7KcBS1bmK1NiYwJD1mgwhz1ZFWESviQthG", "1000.0"),
+					Arrays.asList("78Eo2dL898wzqXBn6zbGanEnwXtdDF2BWV", "1000.0"),
+					Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "1000.0"),
+					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "1000.0"),
+					Arrays.asList("7D7S5veDCiAwvBCkoK4G2YqdXC4dZ3SH1Q", "1000.0"),
+					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "10000.0"),
+					Arrays.asList("7FPm2tet9HTVmBMe5xvRzp4sWoS6d8PgWZ", "1000.0"),
+					Arrays.asList("78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg", "1000.0"),
+					Arrays.asList("79gQ4iB4Cs8EkhrUanEiDQtKArt6k6NAdu", "1000.0"),
+					Arrays.asList("7Kh5KvHCuWAq8XHioKyUBZxRmbwCJZV5b2", "1000.0"),
+					Arrays.asList("74Rcp979npxf6Q5zV6ZnpEnsxrsCHdXeNU", "1000.0"),
+					Arrays.asList("78HfjphyuwWkLw7jMymcTM3UsRdXCE5auq", "1000.0"),
+					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "1000.0"), //
+					Arrays.asList("7K4XaDVf98J1fKDdCS8oYofYgFgoezFEAA", "1000.0"),
+					Arrays.asList("7Cy2J5ST6ukHSJVWtQd7eH4wbhbSBbMbZD", "1000.0"),
+					Arrays.asList("7DRH1MjEo3GgtySGsXjzfdqeQYagutXqeP", "1000.0"),
+					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "2000.0"),
+					Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1000.0"),
+					Arrays.asList("7MPmVWSobucE6TdJvnEeohFAZnCej7fr2F", "1000.0"),
+					Arrays.asList("75qZ6ncf5T4Gkz1vrwkqjCPJ1A5gr2Cyah", "1000.0"),
+					Arrays.asList("7JNUfHeuCRLApKX9MievkAoGdFgVfBf7DE", "1000.0"),
+					Arrays.asList("7Fgkw8cuPiTc4LVRvkYBuXEEfGYxrg6XiX", "1000.0"),
+					Arrays.asList("75rVEuvpzhLJznkXZaYyxJq8L9pVCeqFbk", "1000.0"),
+					Arrays.asList("7J3M8xwJeG5gyBC5kLPb5c2kVHoTsMT5MK", "1000.0"),
+					Arrays.asList("75rEoNUknMU3qYGjS3wriY53n1aRUznFus", "1000.0"),
+					Arrays.asList("73dXJb1orwqk1ADW364KEAzPVQNGa1vX9S", "10000.0"),
+					Arrays.asList("7CPGk25mTFGhANaBCiV4LqrowcUfrfLcRe", "1000.0"),
+					Arrays.asList("78KCkgNeSvxwtnVJTyzLFGGzmP8SUUuN1J", "1000.0"),
+					Arrays.asList("7AJNCwQvbEbGn7Mt3mzPHbK1Zxvy9t6xtA", "1000.0"),
+					Arrays.asList("77GYw61CPhDhdHsHg8oYCaKhenq2izAps8", "1000.0"),
+					Arrays.asList("7NeUmKbZadHLwS9FfLdhFL4ymVYSieF9Uc", "1000.0"),
+					Arrays.asList("73yfeCDiSciBF1vc3PG8uyJMty4jRDxxL9", "1000.0"),
+					Arrays.asList("7AXey16ivPRCQoFWzkMU4Q7V8FZugqjYUX", "10000.0"),
+					Arrays.asList("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7", "3000.0"),
+					Arrays.asList("7HWxbcgVRxzdxDiVj9oc5ZG39a93imLUWz", "1000.0"),
+					Arrays.asList("79qUjyTW4VoSgMKpF2dLW9eCwGVTSSnP2H", "1000.0")
 					);
 
 			// GENESIS FORGERS
@@ -490,7 +499,7 @@ public class GenesisBlock extends Block{
 		//asset1 = makeAsset(AssetCls.FEE_KEY);
 		//transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = 1; i <= AssetCls.REAL_KEY + 4; i++) 
+		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) 
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
@@ -517,20 +526,28 @@ public class GenesisBlock extends Block{
 			return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 1:
 			return new AssetVenture(
-					new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
-					"A", icon, image, "ARONICLE.COM shares", false, 0l, (byte)8, true);
+					CREATOR,
+					"РА", icon, image, "Единица Ра",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 2:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroCredits", icon, image, "RuNeuro users can distribute 100 NeuroCredits (NCR) monthly to rate each other's proposals and opinions in messaging apps.\n NeuroCredits are ensured by every member's 100 billion neurons. The members’ neuroactivity is considered to be the greatest value, therefore it is knit to NCR.", false, 0l, (byte)8, true);
+					"RUNEURO", icon, image, "RuNeuro",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 3:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroCurrency", icon, image, "User earns NeuroCurrency (NCU) by providing proposals and receiving evaluations from other users. NCU is calculated by platform system algorithms summarizing NCR collected from the other users in accordance with their NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 0l, (byte)8, true);
+					"ERG", icon, image, "1 миллион ЕРГ. Основная учётная единица, мера полезного ЭНЕРГОПОТОКА (пользы для ноосферы) управления данной средой - ЭРГ (ERG). Для обеспчения жизни на земле постоянно требуется поток энергии. Из общего потока энергии полезный поток всегда меньше полного. Отношение полезного энергопотока к полному энергопотоку = КПД Системы.",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 4:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroPower", icon, image, " NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 9999999999l, (byte)8, true);
+					"LERG", icon, image, "1 миллион потраченных ЕРГ - ПЭРГ (Lost ERG)",
+					false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 5:
+			return new AssetVenture(
+					new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
+					"A", icon, image, "ARONICLE.COM shares", false, 0l, (byte)8, true);
 		}
 		return null;
 	}
@@ -539,6 +556,28 @@ public class GenesisBlock extends Block{
 	{
 		switch(key)
 		{
+		case (int)NoteCls.LICENSE_KEY:
+			String license = "";
+			try {
+				//FileInputStream fis = new FileInputStream("Aronicle License ERM4.txt");
+				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+				//Reader in = new BufferedReader(isr);
+				File file = new File("Aronicle License ERM4.txt");
+				//READ SETTINS JSON FILE
+				List<String> lines = Files.readLines(file, Charsets.UTF_8);
+				
+				for(String line : lines){			
+					license += line + "\n";
+				}
+				//file.close();
+			} catch ( Exception e ) {
+				return null;
+			}
+		
+			return new Note(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
+					+ " \"" + Controller.APP_NAME + "\"", icon, image,
+					license
+					);
 		case (int)NoteCls.MARRIAGE_KEY:
 			return new Note(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
 		case (int)NoteCls.UNMARRIAGE_KEY:

@@ -66,7 +66,7 @@ public class IssueUnionDialog extends JDialog //JFrame
 
 	public IssueUnionDialog()
 	{
-//		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Union"));
+//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Union"));
 		
 		String colorText ="ff0000"; // цвет текста в форме
 		

@@ -20,6 +20,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
@@ -421,7 +422,7 @@ public class IssueStatementRecord extends Transaction {
 	public int isValid(DBSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
-		if(data.length > 4000 || data.length < 1)
+		if(data.length > BlockChain.MAX_REC_DATA_BYTES || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}

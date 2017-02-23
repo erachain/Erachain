@@ -32,8 +32,6 @@ public class IssueStatusRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Issue Status";
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
 
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) 
 	{
@@ -67,6 +65,10 @@ public class IssueStatusRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Status"; }
 	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
 
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) {	
@@ -75,28 +77,9 @@ public class IssueStatusRecord extends Issue_ItemRecord
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+		if ( balERM.compareTo(BlockChain.MAJOR_ERM_BALANCE_BD)<0 )
 		{
 			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		long count = db.getItemPersonMap().getSize();
-		if (count < 10) {
-			// FIRST Persons only by ME
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
-				}
-			}
-		}
-
-		if ( !this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-			{
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-			}
 		}
 
 		return Transaction.VALIDATE_OK;

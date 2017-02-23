@@ -247,12 +247,6 @@ public class R_Vouch extends Transaction {
 		Transaction tx = db.getTransactionFinalMap().getTransaction(height, seq);
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
-		
-		
-		if (!this.creator.isPerson(db))
-			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db).compareTo(BigDecimal.TEN) <= 0)
-				return Transaction.NOT_ENOUGH_RIGHTS;
-
 
 		return Transaction.VALIDATE_OK;
 		

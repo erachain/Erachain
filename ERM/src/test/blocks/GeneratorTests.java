@@ -762,5 +762,33 @@ public class GeneratorTests {
 
 	}
 	
+	@Test
+	public void winValuesOnRun()
+	{
 
+		int target = 100000;
+		int generatingBalance = target;
+		int previousForgingHeight = 0;
+		long winned_value = 0l;
+		int base = 0;
+		int targetedWinValue = 0;
+		for (int height=2; height < 1000; height++) {
+			
+			if (height < BlockChain.REPEAT_WIN)
+				previousForgingHeight = 1;
+			else if (height < BlockChain.BASE_TARGET)
+				previousForgingHeight = BlockChain.REPEAT_WIN + height>>1;
+			else if (height < BlockChain.BASE_TARGET << 3)
+				previousForgingHeight = BlockChain.REPEAT_WIN + (BlockChain.BASE_TARGET>>1) + (height>>2);
+			
+			previousForgingHeight = height;
+			winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
+			base = BlockChain.getMinTarget(height);
+			targetedWinValue = Block.calcWinValueTargeted2(winned_value, target);
+			
+			assertEquals(true, targetedWinValue > 0);
+
+			
+		}
+	}
 }

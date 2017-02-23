@@ -10,6 +10,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -134,7 +135,7 @@ public class PersonHuman extends PersonCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 0 || descriptionLength > 4000)
+		if(descriptionLength < 0 || descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid description length");
 		}

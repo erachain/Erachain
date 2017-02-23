@@ -19,7 +19,7 @@ public class NoteFrame extends JFrame
 	
 	public NoteFrame(NoteCls note)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.note = note;
 		

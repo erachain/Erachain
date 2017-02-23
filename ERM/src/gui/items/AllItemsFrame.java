@@ -41,7 +41,7 @@ public class AllItemsFrame extends JFrame{
 
 	public AllItemsFrame(String title) {
 		
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate(title));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate(title));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

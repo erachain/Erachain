@@ -10,6 +10,7 @@ import utils.NumberAsString;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
@@ -94,7 +95,7 @@ public class Name {
 		int valueLength = Ints.fromByteArray(valueLengthBytes);
 		position += VALUE_SIZE_LENGTH;
 		
-		if(valueLength < 1 || valueLength > 4000)
+		if(valueLength < 1 || valueLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid value length");
 		}

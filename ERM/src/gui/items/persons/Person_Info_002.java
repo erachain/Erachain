@@ -11,12 +11,15 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ColorModel;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -29,6 +32,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -40,19 +44,24 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.SortableList;
+import database.VouchRecordMap;
+import gui.Block_View_Panel;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
+import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
+import utils.Pair;
 import utils.TableMenuPopupUtil;
 
 /**
  *
- * @author Саша
+ * @author РЎР°С€Р°
  */
 public class Person_Info_002 extends javax.swing.JPanel {
 
@@ -68,9 +77,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private JPanel jPanel_Tab_Accounts;
 	private JTable jTable_Tab_Accounts;
 	private JLabel jLabel_Tab_Accounts;
+	private PublicKeyAccount publisher;
+	private JPanel jPanel_Tab_Vouch;
+	private JScrollPane jScrollPane_Tab_Vouches;
+	private PersonCls person;
 	
     public Person_Info_002(PersonCls person, boolean full) {
-    	
+    	this.person = person;
         initComponents(person, full);
     }
 
@@ -115,7 +128,18 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jTextField_Owner_Sign = new javax.swing.JTextField();
         
 
-        
+
+        human = null;
+        PublicKeyAccount owner = null;
+        byte[] recordReference = person.getReference();
+        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+        publisher = issue_record.getCreator();
+        if (person instanceof PersonHuman) {
+        	human = (PersonHuman) person;
+        	if (human.isMustBeSigned()) {
+        		owner = person.getOwner();
+        	}
+        }
         
         SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
         
@@ -132,15 +156,15 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        add(jLabel_Title, gridBagConstraints);
+        
         
         if (person == null){
+        	add(jLabel_Title, gridBagConstraints);
         	jLabel_Title.setText(Lang.getInstance().translate("Person not found"));
         	return;
         	
         }
-        
-        jLabel_Title.setText(Lang.getInstance().translate(""));
+        add(new Block_View_Panel( issue_record.getBlockHeight(DBSet.getInstance()),issue_record.getSeqNo(DBSet.getInstance())), gridBagConstraints);
         
         
         
@@ -195,8 +219,8 @@ public class Person_Info_002 extends javax.swing.JPanel {
         timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String dataStr = timeFormat.format(ddd);
         
-    	Locale local = new Locale("ru","RU"); // формат даты
-    	DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // для формата даты
+    	Locale local = new Locale("ru","RU"); // С„РѕСЂРјР°С‚ РґР°С‚С‹
+    	DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // РґР»СЏ С„РѕСЂРјР°С‚Р° РґР°С‚С‹
     	String dataStrLoc = df.format(ddd).toString();
     	String dataStrLoc1 = df.format(new Date(person.getBirthday())).toString();
     	*/
@@ -245,17 +269,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
                 
         jScrollPane1.setViewportView(jTextArea_Description);
 
-        human = null;
-        PublicKeyAccount owner = null;
-        byte[] recordReference = person.getReference();
-        Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
-        PublicKeyAccount creator = issue_record.getCreator();
-        if (person instanceof PersonHuman) {
-        	human = (PersonHuman) person;
-        	if (human.isMustBeSigned()) {
-        		owner = person.getOwner();
-        	}
-        }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -277,7 +290,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         jPanel3.add(jLabel_Creator, gridBagConstraints);
 
         jTextField_Creator.setEditable(false);
-        jTextField_Creator.setText(creator.toString());
+        jTextField_Creator.setText(publisher.toString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -290,7 +303,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
                 
         
         if (human.isMustBeSigned() && owner != null
-        		&& !owner.equals(creator)) {
+        		&& !owner.equals(publisher)) {
         
 	        jLabel_Owner.setText(Lang.getInstance().translate("Owner")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -339,7 +352,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         			Lang.getInstance().translate("Wrong signaryte for data owner"));
 	        jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
-        
+        MenuPopupUtil.installContextMenu(jTextField_Owner_Sign);
         
         JPopupMenu creator_Meny = new JPopupMenu();
         JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
@@ -350,7 +363,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
   				
   				      				
   				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-  				StringSelection value = new StringSelection(person.getOwner().getAddress().toString());
+  				StringSelection value = new StringSelection(publisher.getAddress().toString());
   			    clipboard.setContents(value, null);
   			}
   		});
@@ -363,7 +376,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			{
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
   				//StringSelection value = new StringSelection(person.getCreator().getAddress().toString());
-  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
+  				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(publisher.getAddress());
   				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
   				StringSelection value = new StringSelection(public_Account.getBase58());
   				 clipboard.setContents(value, null);
@@ -378,7 +391,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
    		{
    			public void actionPerformed(ActionEvent e) 
    			{
-   				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+   				new Account_Send_Dialog(null, null, new Account(publisher.getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Coins_Crator);
@@ -389,15 +402,67 @@ public class Person_Info_002 extends javax.swing.JPanel {
    			public void actionPerformed(ActionEvent e) 
    			{
    			
-   				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+   				new Mail_Send_Dialog(null, null, new Account(publisher.getAddress().toString()),null);
    			}
    		});
    		creator_Meny.add(Send_Mail_Creator);
    		
-   	 jTextField_Creator.add(creator_Meny);
+   //	 jTextField_Creator.add(creator_Meny);
    	 jTextField_Creator.setComponentPopupMenu(creator_Meny);
   		 
-        
+   	 JPopupMenu owner_Meny = new JPopupMenu();
+     JMenuItem copy_Owner_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+     copy_Owner_Address1.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				
+				      				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(person.getOwner().getAddress());
+			    clipboard.setContents(value, null);
+			}
+		});
+     owner_Meny.add(copy_Owner_Address1);
+		 
+		JMenuItem copy_Owner_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+		copy_Owner_PublicKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				PublicKeyAccount public_Account = person.getOwner();
+				StringSelection value = new StringSelection(public_Account.getBase58());
+				clipboard.setContents(value, null);
+			}
+		});
+		owner_Meny.add(copy_Owner_PublicKey);
+		 
+		 
+
+		JMenuItem send_Coins_Owner = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+		send_Coins_Owner.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+			}
+		});
+		owner_Meny.add(send_Coins_Owner);
+
+		JMenuItem send_Mail_Owner = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+		send_Mail_Owner.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+			
+				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()),null);
+			}
+		});
+		owner_Meny.add(send_Mail_Owner);
+		
+//	 jTextField_Creator.add(creator_Meny);
+		jTextField_Owner.setComponentPopupMenu(owner_Meny);    
         
 
         jLabel1.setText(Lang.getInstance().translate("Deathday")+":");
@@ -605,12 +670,43 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
         jTabbedPane1.addTab( Lang.getInstance().translate("Accounts"), jPanel_Tab_Accounts);
         
+    //    a  = new Transaction();
+   //      Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(Tran);
         
         
         
+        Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(issue_record);
+        JTable jTable_Vouches = new JTable(model);
+         TableColumnModel column_mod = jTable_Vouches.getColumnModel();
+        TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+        col_data.setMinWidth(50);
+        col_data.setMaxWidth(200);
+        col_data.setPreferredWidth(120);//.setWidth(30);
         
+        jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()),model.get_Column_AutoHeight())); // set renderer
+      
+        jPanel_Tab_Vouch = new javax.swing.JPanel();
+        jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
+     
+        jPanel_Tab_Vouch.setLayout(new java.awt.GridBagLayout());
         
+
         
+        jScrollPane_Tab_Vouches.setViewportView(jTable_Vouches);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Vouch.add(jScrollPane_Tab_Vouches, gridBagConstraints);
+
+       
+
+        jTabbedPane1.addTab(Lang.getInstance().translate("Certified"), jPanel_Tab_Vouch);
         
         
 
@@ -700,7 +796,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
   		
   		
   		
-  		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+  		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
   		Send_Coins_item_Menu.addActionListener(new ActionListener()
   		{
   			public void actionPerformed(ActionEvent e) 

@@ -71,7 +71,7 @@ public class RegisterNameFrame extends JFrame
 	
 	public RegisterNameFrame()
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Register Name"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Register Name"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -214,7 +214,7 @@ public class RegisterNameFrame extends JFrame
 		labelGBC.fill = GridBagConstraints.BOTH;   
 		labelGBC.anchor = GridBagConstraints.CENTER;
 		
-		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/4000"));
+		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/MAX"));
 		this.add(countLabel, labelGBC);
 		
 		
@@ -555,7 +555,7 @@ public class RegisterNameFrame extends JFrame
 				
 			case Transaction.INVALID_VALUE_LENGTH:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Value must be between 1 and 4000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Value must be between 1 and MAX characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.NAME_ALREADY_REGISTRED:

@@ -2,8 +2,11 @@ package gui.items.assets;
 
 import javax.swing.AbstractButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import core.account.Account;
 import core.block.GenesisBlock;
@@ -11,7 +14,10 @@ import core.item.assets.AssetCls;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.BalancesTableModel;
+import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import lang.Lang;
 
 /*
@@ -31,7 +37,14 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
      * Creates new form НовыйJPanel1
      * @param asset 
      */
+	 Transaction transaction;
+	
     public AssetDetailsPanel001(AssetCls asset) {
+    	
+    	 byte[] recordReference = asset.getReference();
+         transaction = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+    	
+    	
         initComponents(asset);
     }
 
@@ -223,41 +236,92 @@ this.setVisible(false);
         jScrollPane1.setViewportView(jPanel2);
         
         
-        
-		jLabel7.setText(Lang.getInstance().translate("Holders"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        jPanel2.add(jLabel7, gridBagConstraints);
-
-        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
-  		final JTable  jTable1 = new JTable(balancesTableModel);
-    
-  
-	
-    //    jTable1.setAlignmentX(0.0F);
-     //   jTable1.setAlignmentY(0.0F);
-    //    jTable1.setPreferredSize(new java.awt.Dimension(0, 0));
-    //    jTable1.setRequestFocusEnabled(false);
-        
-  		gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 11;
         gridBagConstraints.gridheight = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel2.add(jScrollPane3, gridBagConstraints);
-  		
-        jScrollPane3.setPreferredSize(new java.awt.Dimension(0, 0));
-		jScrollPane3.setViewportView(jTable1);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
+       // add(jScrollPane2, gridBagConstraints);
+  
         
+        
+        
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        
+        jPanel2.add(jTabbedPane1, gridBagConstraints);
+        
+        Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(transaction);
+        JTable jTable_Vouches = new JTable(model);
+        TableColumnModel column_mod = jTable_Vouches.getColumnModel();
+        TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+        col_data.setMinWidth(50);
+        col_data.setMaxWidth(200);
+        col_data.setPreferredWidth(120);//.setWidth(30);
+        
+        jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()),model.get_Column_AutoHeight())); // set renderer
+        
+      
+        JPanel jPanel_Tab_Vouch = new javax.swing.JPanel();
+        JScrollPane jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
+     
+        jPanel_Tab_Vouch.setLayout(new java.awt.GridBagLayout());
         
 
+        
+        jScrollPane_Tab_Vouches.setViewportView(jTable_Vouches);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Vouch.add(jScrollPane_Tab_Vouches, gridBagConstraints);
+
+       
+
+        jTabbedPane1.addTab(Lang.getInstance().translate("Certified"), jPanel_Tab_Vouch);
+        
+        JPanel jPanel_Tab_Holders = new javax.swing.JPanel();
+        JScrollPane jScrollPane_Tab_Holders = new javax.swing.JScrollPane();
+     
+        jPanel_Tab_Holders.setLayout(new java.awt.GridBagLayout());
+        
+
+        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+  		JTable  jTable1 = new JTable(balancesTableModel);
+  		
+         
+  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+  		
+  		
+  		
+        
+        jScrollPane_Tab_Holders.setViewportView(jTable1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel_Tab_Holders.add(jScrollPane_Tab_Holders, gridBagConstraints);
+
+       
+
+        jTabbedPane1.addTab(Lang.getInstance().translate("Holders"), jPanel_Tab_Holders);
+        
+        
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = 5;
         gridBagConstraints.gridheight = 4;

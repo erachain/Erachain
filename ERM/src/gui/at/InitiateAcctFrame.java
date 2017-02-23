@@ -73,7 +73,7 @@ public class InitiateAcctFrame extends JFrame {
 
 	public InitiateAcctFrame()
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Initiate ACCT"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Initiate ACCT"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -148,7 +148,7 @@ public class InitiateAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 1;
 		labelGBC.gridx = 2;
-		JLabel coreLabel = new JLabel(Lang.getInstance().translate("DATACHAINS.world for"));
+		JLabel coreLabel = new JLabel(Lang.getInstance().translate("ARONICLE.com for"));
 		this.add(coreLabel, labelGBC);
 		
 		//TXT AMOUNT
@@ -523,7 +523,7 @@ public class InitiateAcctFrame extends JFrame {
 			byte[] creationBytes = null;
 			creationBytes = creation.array();
 			
-			String name = "DATACHAINS.worldBURST @ " + quantity.divide(burstQuantity, 2, RoundingMode.HALF_UP);
+			String name = "ARONICLE.comBURST @ " + quantity.divide(burstQuantity, 2, RoundingMode.HALF_UP);
 			String desc = Lang.getInstance().translate("Initiators BURST address: ") + this.txtBurstAddress.getText();
 			String type = "acct";
 			String tags = "acct,atomic cross chain tx,initiate,initiator";

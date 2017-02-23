@@ -77,7 +77,7 @@ public class UpdateNameFrame extends JFrame
 
 	public UpdateNameFrame(Name name)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Update Name"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Update Name"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -185,7 +185,7 @@ public class UpdateNameFrame extends JFrame
 		labelGBC.gridy = 6;
 		//labelGBC.gridwidth = ;
 		labelGBC.gridx = 1;
-		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/4000"));
+		countLabel = new JLabel(Lang.getInstance().translate("Character count: 0/MAX"));
 		this.add(countLabel, labelGBC);
 		
 		//TABLE GBC

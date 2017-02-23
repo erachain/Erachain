@@ -76,10 +76,10 @@ private JFrame parent;
 	{
 		
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ERM4" +  " v." + Controller.getVersion()));
+		super(controller.Controller.APP_NAME +  " v." + Controller.getVersion());
 		this.setVisible(false);
 		if(Settings.getInstance().isTestnet()) {
-			setTitle(Lang.getInstance().translate("ERM4 TestNet ")
+			setTitle(controller.Controller.APP_NAME + " TestNet "
 					 +  "v." + Controller.getVersion()
 					 + " TS:" + Settings.getInstance().getGenesisStamp());
 		}

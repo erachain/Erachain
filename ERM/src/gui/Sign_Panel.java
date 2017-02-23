@@ -49,6 +49,7 @@ import utils.MenuPopupUtil;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.item.ItemCls;
@@ -358,7 +359,7 @@ public class Sign_Panel extends JPanel
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/4000)</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+"/MAX)</html>");
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 	}
@@ -429,9 +430,9 @@ public class Sign_Panel extends JPanel
 					return null;
 				}
 			}
-			if ( messageBytes.length < 10 || messageBytes.length > 4000 )
+			if ( messageBytes.length < 10 || messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded! 10...4000"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded! 10...MAX"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 								
 				return null;
 			}

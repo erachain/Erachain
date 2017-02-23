@@ -48,7 +48,7 @@ public class RecoverWalletFrame extends JFrame
 			.getLogger(RecoverWalletFrame.class);
 	public RecoverWalletFrame(NoWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Recover Wallet"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Recover Wallet"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

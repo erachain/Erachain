@@ -64,9 +64,11 @@ public abstract class Transaction {
 	public static final int NO_HOLD_BALANCE = 18;
 	
 	public static final int NOT_ENOUGH_RIGHTS = 20;
-	public static final int ACCOUNT_NOT_PERSONALIZED = 21;
+	public static final int OWNER_NOT_PERSONALIZED = 21;
 	public static final int ACCOUNT_ALREADY_PERSONALIZED = 23;
 	public static final int TRANSACTION_DOES_NOT_EXIST = 24;
+	public static final int CREATOR_NOT_PERSONALIZED = 25;
+	public static final int RECEIVER_NOT_PERSONALIZED = 26;
 
 	// ASSETS
 	public static final int INVALID_QUANTITY = 30;
@@ -861,20 +863,23 @@ public abstract class Transaction {
 		{
 			return INVALID_ADDRESS;
 		}
-		
+				
+		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+			if (BlockChain.DEVELOP_USE) {	
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						return VALIDATE_OK;
+					}
+				}
+			}
+			return CREATOR_NOT_PERSONALIZED;
+		}
+
+		// CHECK EE AFTER isPERSON ! because in ignored in IssuePerson
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
 		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
-		}
-		
-		if (this.hasPublicText() && !this.creator.isPerson(db)) {
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
-				}
-			}
-			return ACCOUNT_NOT_PERSONALIZED;
 		}
 
 		return VALIDATE_OK;

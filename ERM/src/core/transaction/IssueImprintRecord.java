@@ -71,6 +71,11 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Imprint"; }
 	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
+
 	public boolean hasPublicText() {
 		return false;
 	}

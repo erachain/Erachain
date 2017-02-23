@@ -19,7 +19,7 @@ public class NameExchangeFrame extends JFrame{
 	public NameExchangeFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Name Exchange"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Name Exchange"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

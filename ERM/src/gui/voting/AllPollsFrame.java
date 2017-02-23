@@ -46,7 +46,7 @@ public class AllPollsFrame extends JFrame{
 	public AllPollsFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("All Polls"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("All Polls"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

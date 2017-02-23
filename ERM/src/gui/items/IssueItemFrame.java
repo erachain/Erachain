@@ -53,7 +53,7 @@ public class IssueItemFrame extends JFrame
 
 	public IssueItemFrame()
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Item"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Item"));
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -309,9 +309,14 @@ public class IssueItemFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 				
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
+			case Transaction.CREATOR_NOT_PERSONALIZED:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Creator account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;	
+
+			case Transaction.RECEIVER_NOT_PERSONALIZED:
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Receiver account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 
 			default:

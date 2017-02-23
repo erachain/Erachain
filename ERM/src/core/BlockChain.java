@@ -24,20 +24,21 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
+	public static final boolean DEVELOP_USE = false;
 	
-	public static final int TESTNET_PORT = 9035;
-	public static final int MAINNET_PORT = 9036;
-	public static final int DEFAULT_WEB_PORT = 9037;
-	public static final int DEFAULT_RPC_PORT = 9038;
+	public static final int TESTNET_PORT = 9045;
+	public static final int MAINNET_PORT = 9046;
+	public static final int DEFAULT_WEB_PORT = 9047;
+	public static final int DEFAULT_RPC_PORT = 9048;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 6; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = 40; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
-	public static final int GENESIS_ERA_TOTAL = 9999999;
+	public static final int GENESIS_ERA_TOTAL = 10000000;
 	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
 	public static final int MAJOR_ERM_BALANCE = 33000;
 	public static final int MINOR_ERM_BALANCE = 1000;
@@ -47,8 +48,9 @@ public class BlockChain
 	public static final int GENERATING_MIN_BLOCK_TIME = 288; // 300 PER DAY
 	public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-	public static final int MAX_BLOCK_BYTES = 4 * 1048576;
-	public static final int GENESIS_WIN_VALUE = 1000;
+	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
+	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
+	public static final int GENESIS_WIN_VALUE = 22000;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
@@ -59,7 +61,8 @@ public class BlockChain
 
 	//TESTNET 
 												//   1486444444444l
-	public static final long DEFAULT_MAINNET_STAMP = 1486641444444l;
+												//	 1487844444444
+	public static final long DEFAULT_MAINNET_STAMP = 1487844793333l;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -76,14 +79,14 @@ public class BlockChain
 	public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
 	public static final int FEE_FOR_ANONIMOUSE = 33;
 
-	// issue PORSON
-	public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
+	// issue PERSON
+	//public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
 	// SERTIFY
 	// need RIGHTS for non PERSON account
-	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(1000000).setScale(8);
+	public static final BigDecimal MAJOR_ERM_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERM_BALANCE).setScale(8);
 	// need RIGHTS for PERSON account
-	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
+	public static final BigDecimal MINOR_ERM_BALANCE_BD = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
 	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
 
@@ -91,7 +94,6 @@ public class BlockChain
 	private GenesisBlock genesisBlock;
 	private long genesisTimestamp;
 
-	
 	private Block waitWinBuffer;
 	private int checkPoint = 1;
 	//private int target = 0;
@@ -480,15 +482,19 @@ public class BlockChain
 
 	// GET MIN TARGET
 	// TODO GENESIS_CHAIN
+	// SEE core.block.Block.calcWinValue(DBSet, Account, int, int)
 	public static int getMinTarget(int height) {
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)
 			// FOR not repeated WINS - not need check BASE_TARGET
-			base = BlockChain.BASE_TARGET>>1;
+			/////base = BlockChain.BASE_TARGET>>1;
+			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
-		else
+		else if ( height < BlockChain.TARGET_COUNT <<5)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
 
 		return base;
 

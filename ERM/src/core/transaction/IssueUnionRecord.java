@@ -33,12 +33,6 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	private static final byte TYPE_ID = (byte)ISSUE_UNION_TRANSACTION;
 	private static final String NAME_ID = "Issue Union";
 	
-	// need RIGHTS for PERSON account
-	public static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(100).setScale(8);
-	// need RIGHTS for non PERSON account
-	public static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(10000).setScale(8);
-
-	
 	public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, union, feePow, timestamp, reference);		
@@ -71,6 +65,25 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Union"; }
 	
+	// NOT GENESIS ISSUE STRT FRON NUM
+	protected long getStartKey() {
+		return 1000l;
+	}
+
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) {	
+
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		if ( balERM.compareTo(BlockChain.MAJOR_ERM_BALANCE_BD)<0 )
+		{
+			return Transaction.NOT_ENOUGH_RIGHTS;
+		}
+
+		return Transaction.VALIDATE_OK;
+	}
 
 	//PARSE CONVERT
 	
@@ -134,30 +147,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 			return new IssueUnionRecord(typeBytes, creator, union, signatureBytes);
 		}
 	}	
-	
-	//VALIDATE
-	public int isValid(DBSet db, Long releaserReference) {
 		
-		int result = super.isValid(db, releaserReference);
-		if (result != Transaction.VALIDATE_OK) return result; 
-
-
-		
-		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-				return Transaction.NOT_ENOUGH_RIGHTS;
-
-		} else {
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
-		}
-		
-		return Transaction.VALIDATE_OK;
-	}
-
-	
 	//PROCESS/ORPHAN
 
 	/*

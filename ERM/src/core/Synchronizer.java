@@ -31,6 +31,7 @@ import database.DBSet;
 public class Synchronizer
 {
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
+	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)146, (byte)168, (byte)226};
 	
 	private boolean run = true;
 	
@@ -235,11 +236,16 @@ public class Synchronizer
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 				
 		// FIND HEADERS for common CHAIN
+		if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
+			LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
+					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());			
+		}
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
-			String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
-			peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
-			throw new Exception(mess);
+			//String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
+			//peer.ban(2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
+			//throw new Exception(mess);
+			//return;
 		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
@@ -252,9 +258,13 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
-			if (false && signatures.b.size() == 0) {
+			if (signatures.b.size() == 0) {
 				// TODO it is because incorrect calculate WIN_TARGET value
-				dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+				//dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+				Tuple2<Integer, Long> myHW = Controller.getInstance().getMyHWeight(false);
+				Controller.getInstance().setWeightOfPeer(peer, myHW);
+				LOGGER.info("  set new Weight " + myHW + " for PEER " + peer.getAddress().getHostAddress());
+				return;
 			}
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
@@ -451,7 +461,7 @@ public class Synchronizer
 			lastBlockSignatureCommon = headers.remove(0);
 		}
 
-		if (headers.isEmpty()) {
+		if (false && headers.isEmpty()) {
 			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
 			
 			peer.ban(0 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);

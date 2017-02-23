@@ -21,7 +21,7 @@ public class NameDetailsFrame extends JFrame
 {
 	public NameDetailsFrame(Name name)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Name Details"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Name Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -168,7 +168,7 @@ public class BlockGenerator extends Thread implements Observer
 		}
 	}
 	
-	private void setForgingStatus(ForgingStatus status)
+	public void setForgingStatus(ForgingStatus status)
 	{
 		if(forgingStatus != status)
 		{
@@ -396,7 +396,7 @@ public class BlockGenerator extends Thread implements Observer
 					}
 				}
 				
-				if(acc_winner == null)
+				if(acc_winner == null || forgingStatus != ForgingStatus.FORGING)
 					continue;
 					
 				// sleep by (TARGET / WIN_VALUE)

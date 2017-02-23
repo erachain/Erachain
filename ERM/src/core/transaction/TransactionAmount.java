@@ -362,7 +362,7 @@ public abstract class TransactionAmount extends Transaction {
 
 			// IF send from PERSON to ANONIMOUSE
 			if (isPerson && !this.recipient.isPerson(db)) {
-				return ACCOUNT_NOT_PERSONALIZED;
+				return RECEIVER_NOT_PERSONALIZED;
 			}
 
 		} else {
@@ -377,7 +377,7 @@ public abstract class TransactionAmount extends Transaction {
 		
 		// PUBLICK TEXT only from PERSONS
 		if (this.hasPublicText() && !isPerson) {
-			return ACCOUNT_NOT_PERSONALIZED;
+			return CREATOR_NOT_PERSONALIZED;
 		}
 		
 		return VALIDATE_OK;

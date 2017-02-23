@@ -20,16 +20,16 @@ public abstract class AssetCls extends ItemCls {
 	// CORE KEY
 	public static final long ERM_KEY = 1l;
 	public static final String ERM_ABBREV = "ERA"; // ERM (main rights units)
-	public static final String ERM_NAME = "Era";
+	public static final String ERM_NAME = "ERA";
 	public static final String ERM_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
 			+ ERM_NAME + "(" + ERM_ABBREV + "). "
-			+ "Именно единицы Эранны позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
+			+ "Именно единицы Эра позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
 			+ ". "
-			+ ("Более чем %MIN% ЭРН, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
+			+ ("Более чем %MIN% ЭРА, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
 				.replace("%MIN%", "" + BlockChain.MIN_GENERATING_BALANCE)
 				.replace("%MINOR%", "" + BlockChain.MINOR_ERM_BALANCE))
 			+ ". "
-			+ "Число единиц %GENERAL% Эранны дает права создавать новые статусы и другие сущности в среде"
+			+ "Число единиц %GENERAL% ЭРА дает права создавать новые статусы и другие сущности в среде"
 			.replace("%GENERAL%", "" + BlockChain.GENERAL_ERM_BALANCE)
 			+ "."
 			;
@@ -37,22 +37,22 @@ public abstract class AssetCls extends ItemCls {
 	// FEE KEY
 	public static final long FEE_KEY = 2l;
 	public static final String FEE_ABBREV = "CMP"; // COMPU (compute units)
-	public static final String FEE_NAME = "Compu";
+	public static final String FEE_NAME = "COMPU";
 	public static final String FEE_DESCR = "Основная учётная единица среды, используемая для оплаты комиссий за внесение записей в среду - \"рабочая\", \"оплатная\"" + ": "
 			+ FEE_NAME + "(" + FEE_ABBREV + "). ";
 			
 	// TRUST KEY
 	public static final long TRUST_KEY = 3l;
-	public static final String TRUST_ABBREV = "HNR"; // COMPU (compute units)
-	public static final String TRUST_NAME = "Honor";
+	public static final String TRUST_ABBREV = "АЗЫ"; // COMPU (compute units)
+	public static final String TRUST_NAME = "АЗЫ";
 	public static final String TRUST_DESCR = "Честь, доблесть и доверие" + ": "
 			+ TRUST_NAME + "(" + TRUST_ABBREV + "). ";
 
 	// REAL KEY
 	public static final long REAL_KEY = 4l;
-	public static final String REAL_ABBREV = "AVL"; // COMPU (compute units)
-	public static final String REAL_NAME = "Avail";
-	public static final String REAL_DESCR = "Труд, заслуги и польза" + ": "
+	public static final String REAL_ABBREV = "ВЕД"; // COMPU (compute units)
+	public static final String REAL_NAME = "ВЕДЫ";
+	public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
 		+ REAL_NAME + "(" + REAL_ABBREV + "). ";
 
 	/*

@@ -47,9 +47,7 @@ public class R_SetStatusToItem extends Transaction {
 	private static final int VALUE_LENGTH = 8; // one year + 256 days max
 	private static final int REF_LENGTH = 8;
 	private static final int ITEM_TYPE_LENGTH = 1;
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
 	// need RIGHTS for non PERSON account
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
 	protected Long key; // STATUS KEY
 	protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
@@ -640,7 +638,7 @@ public class R_SetStatusToItem extends Transaction {
 
 		if (this.description != null ) {
 			//CHECK DATA SIZE
-			if(description.length > 4000)
+			if(description.length > BlockChain.MAX_REC_DATA_BYTES)
 			{
 				return INVALID_DATA_LENGTH;
 			}
@@ -672,7 +670,8 @@ public class R_SetStatusToItem extends Transaction {
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 		
-		if (this.key < 10) {
+		
+		if (BlockChain.DEVELOP_USE) {
 			for ( String admin: BlockChain.GENESIS_ADMINS) {
 				if (this.creator.equals(admin)) {
 					return VALIDATE_OK;
@@ -680,15 +679,8 @@ public class R_SetStatusToItem extends Transaction {
 			}
 		} else {
 			BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 ) {
-				if ( this.creator.isPerson(db) )
-				{
-					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-						return Transaction.NOT_ENOUGH_RIGHTS;
-				} else {
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
-				}
-			}
+			if ( balERM.compareTo(BlockChain.MINOR_ERM_BALANCE_BD)<0 )
+				return Transaction.NOT_ENOUGH_RIGHTS;
 		}
 		
 		return Transaction.VALIDATE_OK;

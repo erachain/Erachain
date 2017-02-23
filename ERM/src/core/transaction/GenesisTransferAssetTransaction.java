@@ -266,9 +266,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
-			// SKIP Genesis Block
-			//this.recipient.setLastForgingData(db, 2);
-			this.recipient.setForgingData(db, 2);
+			//// SKIP Genesis Block
+			this.recipient.setForgingData(db, 1);
 		}
 
 		if (key < 0) {

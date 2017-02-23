@@ -190,8 +190,9 @@ public class R_SertifyPubKeys extends Transaction {
 		return typeBytes[2];
 	}
 	
+	// IT is only PERSONALITY record
 	public boolean hasPublicText() {
-		return false;
+		return true;
 	}
 
 			
@@ -440,10 +441,24 @@ public class R_SertifyPubKeys extends Transaction {
 	//
 	public int isValid(DBSet db, Long releaserReference) {
 		
+		boolean creator_admin = false;
+		
 		int result = super.isValid(db, releaserReference);
-		if (result != Transaction.VALIDATE_OK) return result; 
-
-		//int transactionIndex = block.getTransactionIndex(signature);
+		if ( result == Transaction.CREATOR_NOT_PERSONALIZED) {
+			long personsCount = db.getItemPersonMap().getSize();
+			if (personsCount < 20) {
+				// FIRST Persons only by ME
+				// FIRST Persons only by ADMINS
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						creator_admin = true;
+						break;
+					}
+				}
+			}
+			if (!creator_admin)
+				return result;
+		}
 
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
@@ -463,27 +478,8 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE)<0 )
-			if ( this.creator.isPerson(db) )
-			{
-				if ( balERM.compareTo(BlockChain.PSERT_MIN_ERM_BALANCE)<0 )
-					return Transaction.NOT_ENOUGH_RIGHTS;
-			} else {
-				if (this.key < 20) {
-					// FIRST Persons only by ADMINS
-					boolean notAdmin = true;
-					for ( String admin: BlockChain.GENESIS_ADMINS) {
-						if (this.creator.equals(admin)) {
-							notAdmin = false;
-							break;
-						}
-					}
-					if (notAdmin) {
-						return Transaction.ACCOUNT_NOT_PERSONALIZED;
-					}
-				}
-
-			}
+		if ( balERM.compareTo(BlockChain.MINOR_ERM_BALANCE_BD)<0 )
+			return Transaction.NOT_ENOUGH_RIGHTS;
 		
 		return Transaction.VALIDATE_OK;
 	}

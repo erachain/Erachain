@@ -1,4 +1,6 @@
 import gui.Gui;
+import gui.create.License_JFrame;
+
 // 30/03
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import org.apache.log4j.PropertyConfigurator;
 import api.ApiClient;
 import controller.Controller;
 import core.BlockChain;
+import core.item.assets.AssetCls;
 import settings.Settings;
 import utils.SysTray;
 
@@ -90,9 +93,9 @@ public class Start {
 				}
 				
 				LOGGER.info(Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
-						.replace("%app%", Lang.getInstance().translate("ERMbase"))
-						.replace("%version%", Controller.getInstance().getVersion())
-						.replace("%builddate%", Controller.getInstance().getBuildDateString())
+						.replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME))
+						.replace("%version%", Controller.getVersion())
+						.replace("%builddate%", Controller.getBuildDateString())
 						);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
@@ -100,12 +103,17 @@ public class Start {
 				
 				try
 				{
-						Thread.sleep(1000);
+						Thread.sleep(100);
 
 						//START GUI
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
+							if (BlockChain.DEVELOP_USE || Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
+								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
+								new License_JFrame(null);
+								Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
+							}
 						}
 				} catch(Exception e1) {
 					LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);

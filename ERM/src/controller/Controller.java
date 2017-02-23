@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -106,9 +108,13 @@ import webserver.WebService;
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
+
+	// IF new abilities is made - new license insert in CHAIN and set this KEY
+	public static final long LICENSE_KEY = 2l;
+	public static final String APP_NAME = "ERM4";
 	private static final String version = "3.01.01";
 	private static final String buildTime = "2017-02-06 09:33:33 UTC";
-	private long buildTimestamp;
+	private static long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
 	// for reset DB if DB PROTOCOL is CHANGED
@@ -171,31 +177,41 @@ public class Controller extends Observable {
 		return Settings.getInstance().isTestnet();
 	}
 	
-	public String getBuildDateTimeString(){
-		return DateTimeFormat.timestamptoString(this.getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
+	public static String getBuildDateTimeString(){
+		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
 	}
 	
-	public String getBuildDateString(){
-		return DateTimeFormat.timestamptoString(this.getBuildTimestamp(), "yyyy-MM-dd", "UTC");
+	public static String getBuildDateString(){
+		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd", "UTC");
 	}
 	
-	public long getBuildTimestamp() {
-	    if(this.buildTimestamp == 0) {
+	public static long getBuildTimestamp() {
+	    if(buildTimestamp == 0) {
 		    Date date = new Date();
-		    URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
-		    if (resource != null) {
-		        if (true || !resource.getProtocol().equals("file")) {
-		        	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-		        	try {
-						date = (Date)formatter.parse(this.buildTime);
-					} catch (ParseException e) {
-						LOGGER.error(e.getMessage(),e);
-					}
-		        }
+		    ////URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
+		    URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
+		    if (resource != null && resource.getProtocol().equals("file")) {
+	        	try {
+		        	File f = new File(Controller.APP_NAME + ".jar");
+		            Path p = f.toPath();
+		            		            
+		            BasicFileAttributes attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+		            buildTimestamp = attr.creationTime().toMillis();
+		            return buildTimestamp;
+		            
+	        	} catch (Exception e) {
+					LOGGER.error(e.getMessage(), e);
+	        	}
 		    }
-		    this.buildTimestamp = date.getTime();
+	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+	    	try {
+				date = (Date)formatter.parse(buildTime);
+			    buildTimestamp = date.getTime();
+			} catch (ParseException e) {
+				LOGGER.error(e.getMessage(),e);
+			}
 	    }
-	    return this.buildTimestamp;
+	    return buildTimestamp;
 	}
 	
 	public byte[] getMessageMagic() {
@@ -257,6 +273,11 @@ public class Controller extends Observable {
 		else
 		{
 			return null;
+		}
+	}
+	public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
+		if(peerHWeight!=null){
+			peerHWeight.put(peer, hWeight);
 		}
 	}
 	
@@ -990,22 +1011,34 @@ public class Controller extends Observable {
 				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
 				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
 
+				
 				Block lastBlock = this.blockChain.getLastBlock(dbSet);
 				if (newBlock.getReference().equals(lastBlock.getReference())) {
-					LOGGER.debug("  !! it is concurent !!");
+					// NEW winBlock CONCURENT for LAST BLOCK found!!
+					LOGGER.debug("  ** it is concurent for LAST BLOCK ???");
 					if (newBlock.calcWinValue(dbSet) > lastBlock.calcWinValue(dbSet)) {
-						LOGGER.debug("   ++ concurent OK ++");
+						LOGGER.debug("   ++ concurent is OK ++");
 						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-						if (isNewWinBlockValid == 0 || isNewWinBlockValid == 4) {
+						if (isNewWinBlockValid == 0
+								|| isNewWinBlockValid == 4) {
+							// STOP FORGING
+							ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
+							this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
+							// ORPHAN
 							lastBlock.orphan(dbSet);
+							this.blockChain.clearWaitWinBuffer();
+							// set NEW win Block
 							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
+							
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
 							this.network.broadcast(message, excludes);
-							return;
+							// FORGING RESTORE
+							this.blockGenerator.setForgingStatus(tempStatus);
 						}
 						
 					}
+					return;
 				}
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
@@ -1500,7 +1533,12 @@ public class Controller extends Observable {
 
 	public boolean createWallet(byte[] seed, String password, int amount) {
 		// IF NEW WALLET CREADED
-		return this.wallet.create(seed, password, amount, false);
+		if(this.wallet.create(seed, password, amount, false)) {
+			this.setWalletLicense(LICENSE_KEY);
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public boolean recoverWallet(byte[] seed, String password, int amount) {
@@ -1514,6 +1552,14 @@ public class Controller extends Observable {
 		}
 		else
 			return false;
+	}
+
+	public long getWalletLicense() {
+		return this.wallet.getLicenseKey(); 
+	}
+
+	public void setWalletLicense(long key) {
+		this.wallet.setLicenseKey(key); 
 	}
 
 	public List<Account> getAccounts() {

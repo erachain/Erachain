@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple2;
 import controller.Controller;
 import core.item.persons.PersonCls;
 import utils.ObserverMessage;
+import database.DBSet;
 import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -29,6 +30,8 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	public TableModelPersons()
 	{
 		Controller.getInstance().addObserver(this);
+		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
+		//String sss = ss!=null?ss.getName():"--";	
 	}
 	
 //	@Override
@@ -151,7 +154,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
-			this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
+	//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 			this.fireTableDataChanged();
 		}
 	}

@@ -19,6 +19,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -118,7 +119,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		
 		//CHECK DESCRIPTION LENGTH
 		int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000)
+		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}
@@ -133,7 +134,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	{
 		
 		//INSERT INTO DATABASE
-		this.item.insertToMap(db);
+		this.item.insertToMap(db, 0l);
 
 	}
 

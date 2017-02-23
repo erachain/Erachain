@@ -19,6 +19,7 @@ import org.mapdb.Fun.Tuple4;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -83,6 +84,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		if (this.item.getReference() == null) this.item.setReference(this.signature);
 	}
 
+	protected abstract long getStartKey();
 	//PARSE CONVERT
 	
 	
@@ -128,18 +130,16 @@ public abstract class Issue_ItemRecord extends Transaction
 	{
 		
 		//CHECK NAME LENGTH
-		int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 12)
+		String name = this.item.getName();
+		if(name.length() < 12)
 		{
-			boolean founded = false;
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					founded = true;
-					break;
-				}
-			}
-			if (!founded)
-				return INVALID_NAME_LENGTH;
+			// TEST OMLY CHARS
+			return INVALID_NAME_LENGTH;
+		}
+		if(name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH)
+		{
+			// TEST ALL BYTES for database FIELD
+			return INVALID_NAME_LENGTH;
 		}
 
 		//CHECK ICON LENGTH
@@ -158,19 +158,9 @@ public abstract class Issue_ItemRecord extends Transaction
 
 		//CHECK DESCRIPTION LENGTH
 		int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 4000)
+		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
-		}
-				
-		long count = this.item.getDBMap(db).getSize();
-		if (count < 10) {
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return Transaction.VALIDATE_OK;
-				}
-			}
 		}
 
 		return super.isValid(db, releaserReference);
@@ -189,7 +179,7 @@ public abstract class Issue_ItemRecord extends Transaction
 			this.item.setReference(this.signature);
 		
 		//INSERT INTO DATABASE
-		this.item.insertToMap(db);
+		this.item.insertToMap(db, this.getStartKey());
 				
 	}
 

@@ -215,7 +215,7 @@ public class TestRecPerson {
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
 
 	}
 
@@ -409,7 +409,7 @@ public class TestRecPerson {
 		R_SertifyPubKeys personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastReference(db));
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));	
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));	
 
 		//CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
 		personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
@@ -427,10 +427,10 @@ public class TestRecPerson {
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
 		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
 	    sertifiedPublicKeys011.add( new PublicKeyAccount(new byte[60]));

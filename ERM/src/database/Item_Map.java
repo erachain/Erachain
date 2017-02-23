@@ -52,6 +52,16 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	{	
 		return this.key;
 	}
+	
+	public void setSize(long size)
+	{	
+		//INCREMENT ATOMIC KEY IF EXISTS
+		if(this.atomicKey != null)
+		{
+			this.atomicKey.set(size);
+		}
+		this.key = size;
+	}
 
 	protected void createIndexes(DB database){}
 
@@ -103,7 +113,18 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 			this.atomicKey.decrementAndGet();
 		}
 		
-		//DECREMENT KEY
-		 this.key = key - 1;
+		// delete empty KEYS (run to GENESIS inserted keys)
+		do {
+			//DECREMENT ATOMIC KEY IF EXISTS
+			if(this.atomicKey != null)
+			{
+				this.atomicKey.decrementAndGet();
+			}
+			
+			//DECREMENT KEY
+			this.key = key - 1;
+		 
+		} while ( !super.map.containsKey(key)  || key == 0l );
+		 
 	}
 }

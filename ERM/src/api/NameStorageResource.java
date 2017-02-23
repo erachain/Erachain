@@ -46,6 +46,10 @@ public class NameStorageResource {
 	public static final String ASSET_JSON_KEY = "asset";
 	public static final String AMOUNT_JSON_KEY = "amount";
 	public static final String PAYMENTS_JSON_KEY = "payments";
+
+	private static final String ERM_ABBREV = AssetCls.ERM_ABBREV;
+	private static final String FEE_ABBREV = AssetCls.FEE_ABBREV;
+
 	@Context
 	HttpServletRequest request;
 
@@ -478,7 +482,7 @@ public class NameStorageResource {
 		}
 		String basicInfo = "WARNING : This call contains multipayments:\n";
 		for (Payment payment : resultPayments) {
-			basicInfo +=  "Recipient " + payment.getRecipient().getAddress() + " Amount: " + payment.getAmount().toPlainString() + " AssetID " + payment.getAsset() + (payment.getAsset() == 0L ? "(ERM)\n" : "\n");
+			basicInfo +=  "Recipient " + payment.getRecipient().getAddress() + " Amount: " + payment.getAmount().toPlainString() + " AssetID " + payment.getAsset() + (payment.getAsset() == 2L ? ("(" + FEE_ABBREV + ")\n") : "\n");
 		}
 		basicInfo +="\n";
 		return basicInfo;

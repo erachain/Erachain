@@ -45,7 +45,7 @@ public class BuyNameFrame extends JFrame
 	
 	public BuyNameFrame(NameSale nameSale)
 	{
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Buy Name"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Buy Name"));
 		
 		this.nameSale = nameSale;
 		

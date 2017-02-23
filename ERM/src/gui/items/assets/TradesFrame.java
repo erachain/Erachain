@@ -25,7 +25,7 @@ public class TradesFrame extends JFrame{
 
 	public TradesFrame(Order order) {
 		
-		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Trades"));
+		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

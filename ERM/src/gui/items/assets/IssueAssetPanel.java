@@ -58,7 +58,7 @@ public class IssueAssetPanel extends JPanel
 
 	public IssueAssetPanel()
 	{
-//		super(Lang.getInstance().translate("DATACHAINS.world") + " - " + Lang.getInstance().translate("Issue Asset"));
+//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Asset"));
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -550,7 +550,7 @@ public class IssueAssetPanel extends JPanel
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 				
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
+			case Transaction.CREATOR_NOT_PERSONALIZED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
