@@ -84,17 +84,6 @@ public class IssueStatusRecord extends Issue_ItemRecord
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		}
 
-		long count = db.getItemPersonMap().getSize();
-		if (count < 10) {
-			// FIRST Persons only by ME
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
-				}
-			}
-		}
-
 		if ( !this.creator.isPerson(db) )
 		{
 			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )

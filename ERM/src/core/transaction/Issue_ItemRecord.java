@@ -19,6 +19,7 @@ import org.mapdb.Fun.Tuple4;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -133,10 +134,12 @@ public abstract class Issue_ItemRecord extends Transaction
 		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 12)
 		{
 			boolean founded = false;
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					founded = true;
-					break;
+			if (BlockChain.DEVELOP_USE) {
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						founded = true;
+						break;
+					}
 				}
 			}
 			if (!founded)
@@ -162,16 +165,6 @@ public abstract class Issue_ItemRecord extends Transaction
 		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			return INVALID_DESCRIPTION_LENGTH;
-		}
-				
-		long count = this.item.getDBMap(db).getSize();
-		if (count < 10) {
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return Transaction.VALIDATE_OK;
-				}
-			}
 		}
 
 		return super.isValid(db, releaserReference);

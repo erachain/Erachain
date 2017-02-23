@@ -871,9 +871,11 @@ public abstract class Transaction {
 		}
 		
 		if (this.hasPublicText() && !this.creator.isPerson(db)) {
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
+			if (BlockChain.DEVELOP_USE) {	
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						return VALIDATE_OK;
+					}
 				}
 			}
 			return CREATOR_NOT_PERSONALIZED;

@@ -75,6 +75,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	}
 
 	
+	/*
 	@Override
 	public boolean hasPublicText() {
 		for ( String admin: BlockChain.GENESIS_ADMINS) {
@@ -84,6 +85,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		}
 		return true;
 	}
+	*/
 
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) 
@@ -91,7 +93,8 @@ public class IssuePersonRecord extends Issue_ItemRecord
 						
 		int res = super.isValid(db, releaserReference);
 		if (res != Transaction.VALIDATE_OK) {
-			if (res != Transaction.NOT_ENOUGH_FEE) {
+			if (res != Transaction.NOT_ENOUGH_FEE && res
+					!= Transaction.ACCOUNT_NOT_PERSONALIZED) {
 				return res;
 			} else {
 				// IF balance of FEE < 0 - ERROR 

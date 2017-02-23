@@ -672,7 +672,8 @@ public class R_SetStatusToItem extends Transaction {
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 		
-		if (this.key < 10) {
+		
+		if (BlockChain.DEVELOP_USE) {
 			for ( String admin: BlockChain.GENESIS_ADMINS) {
 				if (this.creator.equals(admin)) {
 					return VALIDATE_OK;

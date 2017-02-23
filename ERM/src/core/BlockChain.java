@@ -24,6 +24,7 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
+	public static final boolean DEVELOP_USE = false;
 	
 	public static final int TESTNET_PORT = 9045;
 	public static final int MAINNET_PORT = 9046;
@@ -49,7 +50,7 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
-	public static final int GENESIS_WIN_VALUE = BASE_TARGET;
+	public static final int GENESIS_WIN_VALUE = 66000;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
