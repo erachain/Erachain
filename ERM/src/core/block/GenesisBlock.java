@@ -499,7 +499,7 @@ public class GenesisBlock extends Block{
 		//asset1 = makeAsset(AssetCls.FEE_KEY);
 		//transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = 1; i <= AssetCls.REAL_KEY + 4; i++) 
+		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) 
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// NOTES
@@ -526,20 +526,28 @@ public class GenesisBlock extends Block{
 			return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 1:
 			return new AssetVenture(
-					new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
-					"A", icon, image, "ARONICLE.COM shares", false, 0l, (byte)8, true);
+					CREATOR,
+					"РА", icon, image, "Единица Ра",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 2:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroCredits", icon, image, "RuNeuro users can distribute 100 NeuroCredits (NCR) monthly to rate each other's proposals and opinions in messaging apps.\n NeuroCredits are ensured by every member's 100 billion neurons. The members’ neuroactivity is considered to be the greatest value, therefore it is knit to NCR.", false, 0l, (byte)8, true);
+					"RUNEURO", icon, image, "RuNeuro",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 3:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroCurrency", icon, image, "User earns NeuroCurrency (NCU) by providing proposals and receiving evaluations from other users. NCU is calculated by platform system algorithms summarizing NCR collected from the other users in accordance with their NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 0l, (byte)8, true);
+					"ERG", icon, image, "1 миллион ЕРГ. Основная учётная единица, мера полезного ЭНЕРГОПОТОКА (пользы для ноосферы) управления данной средой - ЭРГ (ERG). Для обеспчения жизни на земле постоянно требуется поток энергии. Из общего потока энергии полезный поток всегда меньше полного. Отношение полезного энергопотока к полному энергопотоку = КПД Системы.",
+					false, 0l, (byte)8, true);
 		case (int)AssetCls.REAL_KEY + 4:
 			return new AssetVenture(
 					CREATOR,
-					"NeuroPower", icon, image, " NeuroPower (NPW) and in compliance with overall amount of distributed NCR.", false, 9999999999l, (byte)8, true);
+					"LERG", icon, image, "1 миллион потраченных ЕРГ - ПЭРГ (Lost ERG)",
+					false, 0l, (byte)8, true);
+		case (int)AssetCls.REAL_KEY + 5:
+			return new AssetVenture(
+					new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
+					"A", icon, image, "ARONICLE.COM shares", false, 0l, (byte)8, true);
 		}
 		return null;
 	}

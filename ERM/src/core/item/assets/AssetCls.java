@@ -43,16 +43,16 @@ public abstract class AssetCls extends ItemCls {
 			
 	// TRUST KEY
 	public static final long TRUST_KEY = 3l;
-	public static final String TRUST_ABBREV = "HNR"; // COMPU (compute units)
-	public static final String TRUST_NAME = "Honor";
+	public static final String TRUST_ABBREV = "АЗЫ"; // COMPU (compute units)
+	public static final String TRUST_NAME = "АЗЫ";
 	public static final String TRUST_DESCR = "Честь, доблесть и доверие" + ": "
 			+ TRUST_NAME + "(" + TRUST_ABBREV + "). ";
 
 	// REAL KEY
 	public static final long REAL_KEY = 4l;
-	public static final String REAL_ABBREV = "AVL"; // COMPU (compute units)
-	public static final String REAL_NAME = "Avail";
-	public static final String REAL_DESCR = "Труд, заслуги и польза" + ": "
+	public static final String REAL_ABBREV = "ВЕД"; // COMPU (compute units)
+	public static final String REAL_NAME = "ВЕДЫ";
+	public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
 		+ REAL_NAME + "(" + REAL_ABBREV + "). ";
 
 	/*
