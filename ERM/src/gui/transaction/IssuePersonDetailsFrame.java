@@ -93,10 +93,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 								
 		//owner public key
 		++detailGBC.gridy;
-		byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(person.getOwner().getAddress());
-		PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-		//	StringSelection value = new StringSelection(public_Account.getBase58());
-		JTextField owner_Public_Key = new JTextField(public_Account.getBase58());
+		JTextField owner_Public_Key = new JTextField(person.getOwner().getBase58());
 		owner_Public_Key.setEditable(false);
 		this.add(owner_Public_Key, detailGBC);		
 		

@@ -50,7 +50,7 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
-	public static final int GENESIS_WIN_VALUE = 66000;
+	public static final int GENESIS_WIN_VALUE = 22000;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
@@ -61,7 +61,7 @@ public class BlockChain
 
 	//TESTNET 
 												//   1486444444444l
-	public static final long DEFAULT_MAINNET_STAMP = 1487823869444l;
+	public static final long DEFAULT_MAINNET_STAMP = 1487842514444l;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -481,16 +481,19 @@ public class BlockChain
 
 	// GET MIN TARGET
 	// TODO GENESIS_CHAIN
+	// SEE core.block.Block.calcWinValue(DBSet, Account, int, int)
 	public static int getMinTarget(int height) {
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)
 			// FOR not repeated WINS - not need check BASE_TARGET
 			/////base = BlockChain.BASE_TARGET>>1;
-			base = BlockChain.BASE_TARGET; // ONLY UP
+			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
-		else
+		else if ( height < BlockChain.TARGET_COUNT <<5)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
 
 		return base;
 

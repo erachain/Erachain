@@ -748,7 +748,11 @@ public class Account {
 		}
 		
 		// TEST STRONG of win Value
-		long winned_value = Block.calcWinValue(dbSet, this, height, generatingBalance);
+		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dbSet, this, height);
+		if (previousForgingHeight == -1)
+			return 0l;
+
+		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
 
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 

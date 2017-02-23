@@ -202,6 +202,7 @@ public class Block {
 		if (previousForgingHeight == -1)
 			return 0;
 				
+		previousForgingHeight++;
 		if (previousForgingHeight < height) {
 			
 			// for recipient
@@ -855,33 +856,25 @@ public class Block {
 
 	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
 	// because: creator.getLastForgingData(dbSet);
-	public static long calcWinValue(DBSet dbSet, Account account, int height, int generatingBalance)
+	// see core.BlockChain.getMinTarget(int)
+	public static long calcWinValue(int previousForgingHeight, int height, int generatingBalance)
 	{
-		//int height = this.getParentHeight(dbSet) + 1;
-
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, account, height);
-		if (previousForgingHeight == -1)
-			return 0l;
 		
-		long winValueHeight2 = calcLenFoWinValue2(height, previousForgingHeight, generatingBalance);
-
-		long win_value = generatingBalance * winValueHeight2;
+		long win_value = (long)generatingBalance * (height - previousForgingHeight);
 
 		
-		if (height <4)
-			win_value >>= 3;
-		else if (height < BlockChain.TARGET_COUNT>>1)
-			win_value = (win_value >>3) - (win_value >>5);
-		else if (height < BlockChain.TARGET_COUNT)
+		if (height < BlockChain.REPEAT_WIN)
 			win_value >>= 4;
-		else if (height < BlockChain.TARGET_COUNT<<1)
+		else if (height < BlockChain.TARGET_COUNT)
 			win_value = (win_value >>4) - (win_value >>6);
-		else if (height < BlockChain.TARGET_COUNT<<1)
-			win_value >>= 5;
 		else if (height < BlockChain.TARGET_COUNT<<2)
+			win_value >>= 5;
+		else if (height < BlockChain.TARGET_COUNT<<6)
 			win_value = (win_value >>5) - (win_value >>7);
-		else
+		else if (height < BlockChain.TARGET_COUNT<<10)
 			win_value >>= 6;
+		else
+			win_value = (win_value >>7) - (win_value >>9);
 		
 		return win_value;
 
@@ -891,7 +884,7 @@ public class Block {
 	{
 		if (this.version == 0) {
 			// GENESIS
-			return BlockChain.BASE_TARGET;
+			return BlockChain.GENESIS_WIN_VALUE;
 		}
 
 		int height = this.getHeightByParent(dbSet);
@@ -905,7 +898,10 @@ public class Block {
 			this.setCalcGeneratingBalance(dbSet);
 		}
 		
-		return calcWinValue(dbSet, this.creator, height, this.generatingBalance);
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, this.creator, height);
+		if (previousForgingHeight == -1)
+			return 0l;
+		return calcWinValue(previousForgingHeight, height, this.generatingBalance);
 	}
 
 

@@ -42,7 +42,7 @@ public class BlockMap extends DBMap<byte[], Block>
 	private Var<Boolean> processingVar;
 	private Boolean processing;
 	
-	private List<Block> lastBlocksForTarget;
+	//private List<Block> lastBlocksForTarget;
 
 	private BTreeMap<Tuple2<String, String>, byte[]> generatorMap;
 	
