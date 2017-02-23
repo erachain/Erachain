@@ -190,8 +190,9 @@ public class R_SertifyPubKeys extends Transaction {
 		return typeBytes[2];
 	}
 	
+	// IT is only PERSONALITY record
 	public boolean hasPublicText() {
-		return false;
+		return true;
 	}
 
 			
@@ -441,10 +442,11 @@ public class R_SertifyPubKeys extends Transaction {
 	public int isValid(DBSet db, Long releaserReference) {
 		
 		boolean creator_admin = false;
+		
 		int result = super.isValid(db, releaserReference);
 		if ( result == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long count = db.getItemPersonMap().getSize();
-			if (count < 20) {
+			long personsCount = db.getItemPersonMap().getSize();
+			if (personsCount < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS
 				for ( String admin: BlockChain.GENESIS_ADMINS) {
@@ -457,8 +459,6 @@ public class R_SertifyPubKeys extends Transaction {
 			if (!creator_admin)
 				return result;
 		}
-
-		//int transactionIndex = block.getTransactionIndex(signature);
 
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
