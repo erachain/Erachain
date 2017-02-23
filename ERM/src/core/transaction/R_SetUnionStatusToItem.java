@@ -23,6 +23,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -41,9 +42,6 @@ public class R_SetUnionStatusToItem extends Transaction {
 	private static final byte TYPE_ID = (byte)Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
 	private static final String NAME_ID = "Set Union Status to Unit";
 	private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(1000).setScale(8);
-	// need RIGHTS for non PERSON account
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(100000).setScale(8);
 
 	protected Long key; // UNION KEY
 	protected Long statusKey; // STATUS KEY
@@ -309,14 +307,8 @@ public class R_SetUnionStatusToItem extends Transaction {
 		}
 		
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-			if ( this.creator.isPerson(db) )
-			{
-				if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
-					return Transaction.NOT_ENOUGH_RIGHTS;
-			} else {
-				return Transaction.CREATOR_NOT_PERSONALIZED;
-			}
+		if ( balERM.compareTo(BlockChain.MINOR_ERM_BALANCE_BD)<0 )
+			return Transaction.NOT_ENOUGH_RIGHTS;
 		
 		return Transaction.VALIDATE_OK;
 	}

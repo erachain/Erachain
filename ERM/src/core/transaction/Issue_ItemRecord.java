@@ -133,17 +133,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
 		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 12)
 		{
-			boolean founded = false;
-			if (BlockChain.DEVELOP_USE) {
-				for ( String admin: BlockChain.GENESIS_ADMINS) {
-					if (this.creator.equals(admin)) {
-						founded = true;
-						break;
-					}
-				}
-			}
-			if (!founded)
-				return INVALID_NAME_LENGTH;
+			return INVALID_NAME_LENGTH;
 		}
 
 		//CHECK ICON LENGTH

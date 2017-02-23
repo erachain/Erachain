@@ -18,6 +18,7 @@ import ntp.NTP;
 
 import org.junit.Test;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -116,7 +117,7 @@ public class TestRecUnion {
 		//genesis_certify.process(db, false);
 		
 		certifier.setLastReference(gb.getTimestamp(db), db);
-		certifier.changeBalance(db, false, ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE);
+		certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERM_BALANCE_BD);
 		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		union = new Union(certifier, "РСФСР", timestamp - 1234567,
@@ -190,11 +191,11 @@ public class TestRecUnion {
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK IF ISSUE UNION IS VALID
-		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.MIN_ERM_BALANCE);
+		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERM_BALANCE_BD);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK 
-		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE);
+		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERM_BALANCE_BD);
 		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
 
 	}
@@ -321,7 +322,7 @@ public class TestRecUnion {
 		LOGGER.info("union KEY: " + union.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BlockChain.MAJOR_ERM_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
 		assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS DB AS CONFIRMED:  key > -1
@@ -339,7 +340,7 @@ public class TestRecUnion {
 		issueUnionTransaction.orphan(db, false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(IssueUnionRecord.GENERAL_ERM_BALANCE, certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BlockChain.MAJOR_ERM_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
 		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS ISSUER

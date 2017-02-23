@@ -2,6 +2,7 @@ package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -67,6 +68,21 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	// NOT GENESIS ISSUE STRT FRON NUM
 	protected long getStartKey() {
 		return 1000l;
+	}
+
+	//@Override
+	public int isValid(DBSet db, Long releaserReference) {	
+
+		int result = super.isValid(db, releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result; 
+		
+		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		if ( balERM.compareTo(BlockChain.MAJOR_ERM_BALANCE_BD)<0 )
+		{
+			return Transaction.NOT_ENOUGH_RIGHTS;
+		}
+
+		return Transaction.VALIDATE_OK;
 	}
 
 	//PARSE CONVERT

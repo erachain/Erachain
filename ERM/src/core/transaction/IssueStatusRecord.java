@@ -32,8 +32,6 @@ public class IssueStatusRecord extends Issue_ItemRecord
 {
 	private static final byte TYPE_ID = (byte)ISSUE_STATUS_TRANSACTION;
 	private static final String NAME_ID = "Issue Status";
-	private static final BigDecimal MIN_ERM_BALANCE = BigDecimal.valueOf(BlockChain.MAJOR_ERM_BALANCE).setScale(8);
-	private static final BigDecimal GENERAL_ERM_BALANCE = BigDecimal.valueOf(BlockChain.GENERAL_ERM_BALANCE).setScale(8);
 
 	public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference) 
 	{
@@ -79,17 +77,9 @@ public class IssueStatusRecord extends Issue_ItemRecord
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
+		if ( balERM.compareTo(BlockChain.MAJOR_ERM_BALANCE_BD)<0 )
 		{
 			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-
-		if ( !this.creator.isPerson(db) )
-		{
-			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
-			{
-				return Transaction.CREATOR_NOT_PERSONALIZED;
-			}
 		}
 
 		return Transaction.VALIDATE_OK;

@@ -83,9 +83,9 @@ public class BlockChain
 
 	// SERTIFY
 	// need RIGHTS for non PERSON account
-	public static final BigDecimal PSERT_GENERAL_ERM_BALANCE = BigDecimal.valueOf(MAJOR_ERM_BALANCE).setScale(8);
+	public static final BigDecimal MAJOR_ERM_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERM_BALANCE).setScale(8);
 	// need RIGHTS for PERSON account
-	public static final BigDecimal PSERT_MIN_ERM_BALANCE = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
+	public static final BigDecimal MINOR_ERM_BALANCE_BD = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
 	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
 
