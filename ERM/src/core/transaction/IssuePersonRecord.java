@@ -152,16 +152,6 @@ public class IssuePersonRecord extends Issue_ItemRecord
 				}
 			}
 		}
-
-		// CHECH MAKER IS PERSON?
-		if (!this.creator.isPerson(db)) {
-				// OR RIGHTS_KEY ENOUGHT
-			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
-						.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE) < 0)
-				return Transaction.CREATOR_NOT_PERSONALIZED;
-		} else {
-			
-		}
 		
 		return VALIDATE_OK;
 	

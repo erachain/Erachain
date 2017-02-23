@@ -863,13 +863,7 @@ public abstract class Transaction {
 		{
 			return INVALID_ADDRESS;
 		}
-		
-		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
-		{
-			return NOT_ENOUGH_FEE;
-		}
-		
+				
 		if (this.hasPublicText() && !this.creator.isPerson(db)) {
 			if (BlockChain.DEVELOP_USE) {	
 				for ( String admin: BlockChain.GENESIS_ADMINS) {
@@ -879,6 +873,13 @@ public abstract class Transaction {
 				}
 			}
 			return CREATOR_NOT_PERSONALIZED;
+		}
+
+		// CHECK EE AFTER isPERSON ! because in ignored in IssuePerson
+		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
+		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+		{
+			return NOT_ENOUGH_FEE;
 		}
 
 		return VALIDATE_OK;
