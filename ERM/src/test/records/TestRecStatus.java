@@ -180,7 +180,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
 		
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
 		
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(db, gb, false);

@@ -64,7 +64,7 @@ public abstract class Transaction {
 	public static final int NO_HOLD_BALANCE = 18;
 	
 	public static final int NOT_ENOUGH_RIGHTS = 20;
-	public static final int ACCOUNT_NOT_PERSONALIZED = 21;
+	public static final int OWNER_NOT_PERSONALIZED = 21;
 	public static final int ACCOUNT_ALREADY_PERSONALIZED = 23;
 	public static final int TRANSACTION_DOES_NOT_EXIST = 24;
 	public static final int CREATOR_NOT_PERSONALIZED = 25;

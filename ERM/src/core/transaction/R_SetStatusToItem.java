@@ -687,7 +687,7 @@ public class R_SetStatusToItem extends Transaction {
 					if ( balERM.compareTo(MIN_ERM_BALANCE)<0 )
 						return Transaction.NOT_ENOUGH_RIGHTS;
 				} else {
-					return Transaction.ACCOUNT_NOT_PERSONALIZED;
+					return Transaction.CREATOR_NOT_PERSONALIZED;
 				}
 			}
 		}

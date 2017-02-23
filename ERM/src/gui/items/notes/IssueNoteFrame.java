@@ -292,7 +292,7 @@ public class IssueNoteFrame extends JFrame
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 								
-			case Transaction.ACCOUNT_NOT_PERSONALIZED:
+			case Transaction.CREATOR_NOT_PERSONALIZED:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	

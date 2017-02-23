@@ -187,11 +187,11 @@ public class TestRecUnion {
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(db, releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK IF ISSUE UNION IS VALID
 		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.MIN_ERM_BALANCE);
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK 
 		userAccount1.changeBalance(db, false, ERM_KEY, IssueUnionRecord.GENERAL_ERM_BALANCE);

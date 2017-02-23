@@ -90,17 +90,29 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) 
 	{
-						
+
+		boolean creator_admin = false;
 		int res = super.isValid(db, releaserReference);
-		if (res != Transaction.VALIDATE_OK) {
-			if (res != Transaction.NOT_ENOUGH_FEE && res
-					!= Transaction.ACCOUNT_NOT_PERSONALIZED) {
-				return res;
-			} else {
-				// IF balance of FEE < 0 - ERROR 
-				if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
-					return Transaction.NOT_ENOUGH_FEE;
+		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
+			long count = db.getItemPersonMap().getSize();
+			if (count < 20) {
+				// FIRST Persons only by ME
+				// FIRST Persons only by ADMINS
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						creator_admin = true;
+						break;
+					}
+				}
 			}
+			if (!creator_admin)
+				return res;
+		} else if (res == Transaction.NOT_ENOUGH_FEE) {
+			// IF balance of FEE < 0 - ERROR 
+			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
+				return res;
+		} else {
+			return res;
 		}
 		
 		
@@ -141,23 +153,12 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			}
 		}
 
-		long count = db.getItemPersonMap().getSize();
-		if (count < 20) {
-			// FIRST Persons only by ME
-			// FIRST Persons only by ADMINS
-			for ( String admin: BlockChain.GENESIS_ADMINS) {
-				if (this.creator.equals(admin)) {
-					return VALIDATE_OK;
-				}
-			}
-		}
-
 		// CHECH MAKER IS PERSON?
 		if (!this.creator.isPerson(db)) {
 				// OR RIGHTS_KEY ENOUGHT
 			if (this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)
 						.compareTo(BlockChain.PSERT_GENERAL_ERM_BALANCE) < 0)
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				return Transaction.CREATOR_NOT_PERSONALIZED;
 		} else {
 			
 		}

@@ -88,7 +88,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 		{
 			if ( balERM.compareTo(GENERAL_ERM_BALANCE)<0 )
 			{
-				return Transaction.ACCOUNT_NOT_PERSONALIZED;
+				return Transaction.CREATOR_NOT_PERSONALIZED;
 			}
 		}
 

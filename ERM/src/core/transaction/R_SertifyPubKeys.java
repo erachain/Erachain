@@ -479,7 +479,7 @@ public class R_SertifyPubKeys extends Transaction {
 						}
 					}
 					if (notAdmin) {
-						return Transaction.ACCOUNT_NOT_PERSONALIZED;
+						return Transaction.CREATOR_NOT_PERSONALIZED;
 					}
 				}
 

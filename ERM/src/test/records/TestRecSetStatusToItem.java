@@ -216,7 +216,7 @@ public class TestRecSetStatusToItem {
 		
 		init();				
 		
-		assertEquals(Transaction.ACCOUNT_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(db, releaserReference));
 		assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(),	0);
 
 		Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);

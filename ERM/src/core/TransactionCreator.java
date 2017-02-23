@@ -354,7 +354,7 @@ public class TransactionCreator
 			// for COPY -
 			int valid = issuePersonRecord.isValid(DBSet.getInstance(), lastReference);
 			if (valid == Transaction.NOT_ENOUGH_FEE
-					|| valid == Transaction.ACCOUNT_NOT_PERSONALIZED) {
+					|| valid == Transaction.CREATOR_NOT_PERSONALIZED) {
 				valid = Transaction.VALIDATE_OK;
 			}
 			return new Pair<Transaction, Integer>(issuePersonRecord, valid);
