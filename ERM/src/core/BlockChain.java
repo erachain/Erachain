@@ -27,15 +27,15 @@ public class BlockChain
 	public static final boolean DEVELOP_USE = true;
 	
 	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
-	public static final int MAINNET_PORT = DEVELOP_USE?9066:9036;
-	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9037;
-	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9038;
+	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;
+	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9047;
+	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9048;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = DEVELOP_USE?7:40; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -45,7 +45,7 @@ public class BlockChain
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 288; // 300 PER DAY
+	public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE?120:288; // 300 PER DAY
 	public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
