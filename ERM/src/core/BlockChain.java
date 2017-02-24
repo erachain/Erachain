@@ -24,18 +24,18 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = false;
+	public static final boolean DEVELOP_USE = true;
 	
-	public static final int TESTNET_PORT = 9045;
-	public static final int MAINNET_PORT = 9046;
-	public static final int DEFAULT_WEB_PORT = 9047;
-	public static final int DEFAULT_RPC_PORT = 9048;
+	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
+	public static final int MAINNET_PORT = DEVELOP_USE?9066:9036;
+	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9037;
+	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9038;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 40; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = DEVELOP_USE?7:40; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -50,7 +50,7 @@ public class BlockChain
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
-	public static final int GENESIS_WIN_VALUE = 22000;
+	public static final int GENESIS_WIN_VALUE = DEVELOP_USE?3000:22000;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
