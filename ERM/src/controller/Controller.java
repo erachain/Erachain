@@ -200,7 +200,7 @@ public class Controller extends Observable {
 		            return buildTimestamp;
 		            
 	        	} catch (Exception e) {
-					LOGGER.error(e.getMessage(), e);
+					//LOGGER.error(e.getMessage(), e);
 	        	}
 		    }
 	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -793,9 +793,14 @@ public class Controller extends Observable {
 
 		// SEND VERSION MESSAGE
 		peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
-			Controller.getInstance().getVersion(),
-			this.getBuildTimestamp() ));
+			Controller.getVersion(),
+			getBuildTimestamp() ));
 		
+		// GET GENESIS BLOCK - TEST WRONG CHAIN
+		byte[]  genesisBlockSign = Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
+		// SEND GENESIS BLOCK MESSAGE
+		peer.sendMessage(MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign));
+
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
 		// SEND HEIGTH MESSAGE
@@ -983,8 +988,7 @@ public class Controller extends Observable {
 						.getBlock(dbSet, getBlockMessage.getSignature());
 
 				// CREATE RESPONSE WITH SAME ID
-				response = MessageFactory.getInstance().createBlockMessage(
-						newBlock);
+				response = MessageFactory.getInstance().createBlockMessage(newBlock);
 				response.setId(message.getId());
 
 				// SEND RESPONSE BACK WITH SAME ID
@@ -1074,15 +1078,26 @@ public class Controller extends Observable {
 				break;
 
 			case Message.BLOCK_TYPE:
-				
 
-				// ALL IINCOMED BLOCKS ignored now!!!
-				if (true || this.status != STATUS_OK
+				/* send GENESIS block for test NODE
+				 * 				
+				*/
+
+				BlockMessage blockMessage = (BlockMessage) message;
+				int newBlockHeight = blockMessage.getHeight();
+				if (newBlockHeight < 1) {
+					// BLOCK NOT FOUND!!!
+					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
+					banPeerOnError(message.getSender(), mess);
+					return;
+				}
+
+				////// ALL IINCOMED BLOCKS ignored now!!!
+				if (this.status != STATUS_OK
 						|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
 
-				BlockMessage blockMessage = (BlockMessage) message;
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();

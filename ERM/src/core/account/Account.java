@@ -743,13 +743,16 @@ public class Account {
 			return 0l;
 		
 		// test repeated win account
-		if (!Controller.getInstance().isTestNet() && Block.isSoRapidly(height, this, lastBlocksForTarget)) {
-			return 0l;
+		if (!Controller.getInstance().isTestNet()) {
+			int repeated = Block.isSoRapidly(height, this, lastBlocksForTarget);
+			if (repeated > 0) {
+				return -repeated;
+			}
 		}
 		
 		// TEST STRONG of win Value
 		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dbSet, this, height);
-		if (previousForgingHeight == -1)
+		if (previousForgingHeight < 1)
 			return 0l;
 
 		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
@@ -757,7 +760,7 @@ public class Account {
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 
 		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
-			return 0l;
+			return -targetedWinValue;
 		}
 
 		return winned_value;
