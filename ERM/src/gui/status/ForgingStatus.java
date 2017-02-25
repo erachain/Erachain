@@ -66,7 +66,8 @@ public class ForgingStatus extends JLabel implements Observer {
 	            		winBalance = win_value;
 	            		winAccount = account;
 	            	}
-		        }
+		        }  
+	            ///
 	            
 		        String timeForge = "";
 		        if(winAccount != null)
