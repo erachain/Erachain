@@ -640,6 +640,9 @@ public abstract class Transaction {
 		{
 			// soft or hard confirmations
 			key = db.getTransactionFinalMapSigns().get(dbRef);
+			if (key == null) {
+				return db.getTransactionMap().get(dbRef);
+			}
 		} else {
 			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
 			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
