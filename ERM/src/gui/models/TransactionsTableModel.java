@@ -88,6 +88,24 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		 this.fireTableDataChanged();
 		
 	}
+
+	public void Find_Transactions_from_Address(String address){
+	String sender;
+	String recipient;
+	int minHeight;
+	int maxHeight;
+	int type;
+	int service;
+	boolean desc;
+	int offset;
+	int limit;
+	transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+	 this.fireTableDataChanged();
+	
+	}
+	
+	
+	
 	
 	public void view_Transactioms_From_Adress(String str){
 		

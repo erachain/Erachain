@@ -65,7 +65,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 ////////////////////////////////////////////////////////////////////////
 		// search from adress
 		
-		Records_Search_From_Addres_SplitPanel search_from_adress = new Records_Search_From_Addres_SplitPanel();
+//		Records_Search_From_Addres_SplitPanel search_from_adress = new Records_Search_From_Addres_SplitPanel();
 	
 		
 ///////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 		
 		this.jTabbedPane.add(search_Records_SplitPanel);
 		
-		this.jTabbedPane.add(search_from_adress);
+//		this.jTabbedPane.add(search_from_adress);
 		
 		this.jTabbedPane.add(unConfirmed_Records_SplitPanel);
 		

@@ -73,12 +73,14 @@ import gui.models.WalletItemAssetsTableModel;
 import gui.records.VouchRecordDialog;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 
 	public class Records_Search_SplitPanel extends Split_Panel{
 	
 		TransactionsTableModel transactionsTableModel;
 		JScrollPane jScrollPane4;
+		private JTextField sender_address;
 
 		    public Records_Search_SplitPanel() {
 		   
@@ -88,6 +90,36 @@ import lang.Lang;
 		    	this.setName(Lang.getInstance().translate("Search Records"));
 		    	
 		    	this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert Height Block")+":");
+		    	this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert Address")+":"));
+		    	sender_address = new JTextField();
+		    	sender_address.setToolTipText("");
+		    	sender_address.setAlignmentX(1.0F);
+		    	sender_address.setMinimumSize(new java.awt.Dimension(200, 20));
+		    	sender_address.setName(""); // NOI18N
+		    	sender_address.setPreferredSize(new java.awt.Dimension(200, 20));
+		       	
+		    	MenuPopupUtil.installContextMenu(sender_address);
+		    	
+		    	this.toolBar_LeftPanel.add(sender_address);
+		    	sender_address.addActionListener(new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						searchTextField_SearchToolBar_LeftPanel.setText("");
+						transactionsTableModel.Find_Transactions_from_Address(sender_address.getText());	
+						
+					}
+		    		
+		    		
+		    		
+		    		
+		    		
+		    	});
+		    	
+		    	
+		    	
+		    	
 		    	
 		    	this.button1_ToolBar_LeftPanel.setVisible(false);
 		    	this.button2_ToolBar_LeftPanel.setVisible(false);
@@ -100,12 +132,14 @@ import lang.Lang;
 		   // 	Records_Table_Model records_Model = new Records_Table_Model();
 		   // 	this.jTable_jScrollPanel_LeftPanel = new JTable(records_Model);
 		    	
+		    	MenuPopupUtil.installContextMenu(this.searchTextField_SearchToolBar_LeftPanel);
 		    	this.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener(){
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						// TODO Auto-generated method stub
-						transactionsTableModel.Set_Block_Namber( searchTextField_SearchToolBar_LeftPanel.getText());
+						sender_address.setText("");
+						transactionsTableModel.Set_Block_Namber(searchTextField_SearchToolBar_LeftPanel.getText());
 					
 					}
 		    		
