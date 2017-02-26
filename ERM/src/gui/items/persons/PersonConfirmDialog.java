@@ -1,6 +1,8 @@
 package gui.items.persons;
 
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -49,7 +51,13 @@ public class PersonConfirmDialog extends JDialog  {
 
 	public PersonConfirmDialog( PersonCls person) {
 		super();
-	
+		//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
 		
 		
 		initComponents(person);

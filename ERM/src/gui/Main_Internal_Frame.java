@@ -5,6 +5,10 @@
  */
 package gui;
 
+import java.awt.Toolkit;
+
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author Саша
@@ -15,6 +19,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
      * Creates new form MainInternalFpame
      */
     public Main_Internal_Frame() {
+    	this.setFrameIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png")));
         initComponents();
     }
 

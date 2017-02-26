@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,6 +30,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+
 import javax.swing.JScrollPane;
 
 import gui.Send_Panel;
@@ -49,7 +53,13 @@ public class Account_Lend_Dialog extends JDialog{
 
 	public Account_Lend_Dialog (AssetCls asset, Account account)
 	{
-	
+		//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
 		Account_Lend_Panel panel = new Account_Lend_Panel(asset, account);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         

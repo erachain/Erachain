@@ -1,6 +1,8 @@
 package gui.records;
 
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,6 +46,13 @@ public class VouchRecordDialog extends JDialog  {
 
 	public VouchRecordDialog(Integer block_No, Integer rec_No) {
 		super();
+		//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
 		
 		initComponents();
 		if (block_No != null && rec_No != null )	{

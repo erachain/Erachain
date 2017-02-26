@@ -1,9 +1,13 @@
 package gui.items.persons;
 
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -87,7 +91,13 @@ public class PersonSetStatusDialog extends JDialog {
 
 	public PersonSetStatusDialog( PersonCls person) {
 		super();
-	
+		//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initComponents();
 		this.setTitle(Lang.getInstance().translate("Set Status"));

@@ -49,6 +49,7 @@ public class Send_Frame extends JInternalFrame{
 	public Send_Frame (AssetCls asset, Account account)
 	{
 	
+		this.setFrameIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png")));
 		Send_Panel panel = new Send_Panel(asset, account);
         getContentPane().add(panel, BorderLayout.CENTER);
 	         

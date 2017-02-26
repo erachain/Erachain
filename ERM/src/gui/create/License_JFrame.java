@@ -1,5 +1,7 @@
 package gui.create;
 
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -10,7 +12,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -29,6 +34,13 @@ public class License_JFrame extends JFrame {
 
 	    public License_JFrame(NoWalletFrame parent) {
 	    	this.parent = parent;
+	    	//ICON
+			List<Image> icons = new ArrayList<Image>();
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+			this.setIconImages(icons);
 	        initComponents();
 	    }
 
