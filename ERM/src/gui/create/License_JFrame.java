@@ -192,7 +192,7 @@ public class License_JFrame extends JDialog {
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 	        gridBagConstraints.weightx = 0.2;
 	        gridBagConstraints.weighty = 0.2;
-	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
 	        getContentPane().add(jScrollPane1, gridBagConstraints);
 
 	        jLabel1.setText(Lang.getInstance().translate("Read carefully")+"!");
