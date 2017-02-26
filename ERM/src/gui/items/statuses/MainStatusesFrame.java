@@ -432,7 +432,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		
 
 		Search_run_menu = new RunMenu();
-		Dimension dim = new Dimension(180,50);
+		Dimension dim = new Dimension(180,75);
     	Search_run_menu.setSize(dim);
     	Search_run_menu.setPreferredSize(dim);
     	Search_run_menu.setVisible(false);

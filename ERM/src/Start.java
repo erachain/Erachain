@@ -111,8 +111,8 @@ public class Start {
 							SysTray.getInstance().createTrayIcon();
 							if (BlockChain.DEVELOP_USE || Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
-								new License_JFrame(null);
-								Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
+							new License_JFrame(null);
+							Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
 							}
 						}
 				} catch(Exception e1) {

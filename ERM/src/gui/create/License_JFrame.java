@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -28,7 +29,7 @@ import core.item.statuses.StatusCls;
 import database.DBSet;
 import lang.Lang;
 
-public class License_JFrame extends JFrame {
+public class License_JFrame extends JDialog {
 
 	NoWalletFrame parent;
 
@@ -41,6 +42,7 @@ public class License_JFrame extends JFrame {
 			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 			this.setIconImages(icons);
+			this.setModal(true);
 	        initComponents();
 	    }
 
@@ -61,7 +63,7 @@ public class License_JFrame extends JFrame {
 	        jTextArea1 = new javax.swing.JTextArea();
 	        jLabel1 = new javax.swing.JLabel();
 
-	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+	  //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 	        setTitle(Lang.getInstance().translate("License"));
 	        setMinimumSize(new java.awt.Dimension(600, 550));
 	        getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -162,7 +164,7 @@ public class License_JFrame extends JFrame {
 	        jTextArea1.setText(note.getDescription());
 	        jScrollPane1.setViewportView(jTextArea1);
 	        
-	        
+	 /*       
 	        this.jTextArea1.addMouseListener(new MouseAdapter() {
 	            @Override
 	            public void mouseClicked(MouseEvent e) {
@@ -180,7 +182,7 @@ public class License_JFrame extends JFrame {
 			    }
 			});
 	        
-	        
+	   */     
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
