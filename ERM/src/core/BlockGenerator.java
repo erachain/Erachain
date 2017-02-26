@@ -262,7 +262,7 @@ public class BlockGenerator extends Thread implements Observer
 						try 
 						{
 							// IF quickRun ++ SLEEP
-							Thread.sleep(quickRun?13000:wait_rand);
+							Thread.sleep(quickRun?(BlockChain.DEVELOP_USE?3000:13000):wait_rand);
 						} 
 						catch (InterruptedException e) 
 						{
@@ -411,7 +411,7 @@ public class BlockGenerator extends Thread implements Observer
 				}
 				
 				if (quickRun) {
-					wait_new_good_block = 10000 + wait_new_good_block>>2;
+					wait_new_good_block = BlockChain.DEVELOP_USE?5000:10000 + wait_new_good_block>>2;
 				}
 
 				LOGGER.info("for height and target: " + height + " : " + target
