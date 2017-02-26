@@ -189,20 +189,31 @@ public class Controller extends Observable {
 	    if(buildTimestamp == 0) {
 		    Date date = new Date();
 		    ////URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
-		    URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
-		    if (resource != null && resource.getProtocol().equals("file")) {
-	        	try {
-		        	File f = new File(Controller.APP_NAME + ".jar");
-		            Path p = f.toPath();
-		            		            
-		            BasicFileAttributes attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-		            buildTimestamp = attr.creationTime().toMillis();
-		            return buildTimestamp;
-		            
-	        	} catch (Exception e) {
-					//LOGGER.error(e.getMessage(), e);
-	        	}
-		    }
+		    //URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
+		    //if (resource != null && resource.getProtocol().equals("file")) {
+        	File f = null;
+            Path p = null;
+            BasicFileAttributes attr = null;
+        	try {
+	        	f = new File(Controller.APP_NAME + ".jar");
+	            p = f.toPath();
+	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+        	} catch (Exception e) {
+				//LOGGER.error(e.getMessage(), e);
+        	}
+        	try {
+	        	f = new File(Controller.APP_NAME + ".exe");
+	            p = f.toPath();
+	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+        	} catch (Exception e) {
+				//LOGGER.error(e.getMessage(), e);
+        	}
+
+        	if (p != null) {
+	            buildTimestamp = attr.creationTime().toMillis();
+	            return buildTimestamp;
+        	}
+	            
 	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 	    	try {
 				date = (Date)formatter.parse(buildTime);
