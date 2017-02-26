@@ -195,16 +195,12 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		// TODO Auto-generated method stub
 		try
 		{
-			if(this.transactions == null || this.transactions.size() -1 < row)
+			if(this.transactions == null || this.transactions.size() < 0
+					|| this.transactions.size() -1 < row)
 			{
 				return null;
 			}
 			
-			//Transaction transaction = (R_SignNote)this.transactions.get(row);
-			
-			
-			if (this.transactions == null || this.transactions.size() == 0)
-				return null;
 			
 			Transaction trans = this.transactions.get(row);
 			if (trans == null)
@@ -212,6 +208,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			R_SignNote record = (R_SignNote)trans;
 			
+			PublicKeyAccount creator;
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
@@ -227,9 +224,13 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 			case COLUMN_NOTE:
 				
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+				ItemCls item = ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				return item==null?null:item.toString();
 				
 			case COLUMN_BODY:				
+				
+				if (record.getData() == null)
+					return null;
 				
 				return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
 				
@@ -244,8 +245,9 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			case COLUMN_CREATOR:
 				
+				creator = record.getCreator();
 				
-				return record.getCreator().getPersonAsString();
+				return creator==null?null:creator.getPersonAsString();
 			}
 			
 			return null;
