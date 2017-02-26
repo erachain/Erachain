@@ -2,12 +2,15 @@ package gui;
 
 // 16/03
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -40,7 +43,23 @@ public class Gui extends JFrame{
 	private Gui() throws Exception
 	{
 		//USE SYSTEM STYLE
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		   //     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				
+
+				Toolkit.getDefaultToolkit().setDynamicLayout(true);
+				System.setProperty("sun.awt.noerasebackground", "true");
+				JFrame.setDefaultLookAndFeelDecorated(true);
+				JDialog.setDefaultLookAndFeelDecorated(true);
+
+				try {
+				    UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
+				    SwingUtilities.updateComponentTreeUI(this);
+				} catch(Exception ex) {
+				    ex.printStackTrace();
+				}
+				
+        
+        
         UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
         UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
