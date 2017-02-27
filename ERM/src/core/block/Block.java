@@ -865,6 +865,8 @@ public class Block {
 		
 		if (height < BlockChain.REPEAT_WIN)
 			win_value >>= 4;
+		else if (BlockChain.DEVELOP_USE)
+			win_value >>= 4;
 		else if (height < BlockChain.TARGET_COUNT)
 			win_value = (win_value >>4) - (win_value >>6);
 		else if (height < BlockChain.TARGET_COUNT<<2)

@@ -230,7 +230,7 @@ public abstract class PersonCls extends ItemCls {
 	public String toString(DBSet db)
 	{
 		long key = this.getKey(db);
-		return (key<0?"?":key) + "." + this.typeBytes[0] + " " + this.name + " "
+		return (key<0?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " " + this.name + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
@@ -238,7 +238,7 @@ public abstract class PersonCls extends ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		return (key<0?"?":key) + "." + this.typeBytes[0] + " "
+		return (key<0?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " "
 				+ this.name.substring(0, Math.min(this.name.length(), 20)) + " "
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}

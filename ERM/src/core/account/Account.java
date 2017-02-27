@@ -597,8 +597,8 @@ public class Account {
 			String addressStr = this.getAddress().substring(1, 6);
 			if (personRes.a == -2) personStr = "[-]" + personStr;
 			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
-			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			//else if (personRes.a == 1) personStr = "[+]" + personStr;
 			return addressStr + ": " + personStr;
 		}
 	}
