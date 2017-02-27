@@ -207,7 +207,7 @@ public class Controller extends Observable {
             	}
         	}
 
-        	if (p != null) {
+        	if (attr != null) {
 	            buildTimestamp = attr.creationTime().toMillis();
 	            return buildTimestamp;
         	}
