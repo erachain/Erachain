@@ -198,15 +198,13 @@ public class Controller extends Observable {
 	        	f = new File(Controller.APP_NAME + ".jar");
 	            p = f.toPath();
 	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-        	} catch (Exception e) {
-				//LOGGER.error(e.getMessage(), e);
-        	}
-        	try {
-	        	f = new File(Controller.APP_NAME + ".exe");
-	            p = f.toPath();
-	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-        	} catch (Exception e) {
-				//LOGGER.error(e.getMessage(), e);
+        	} catch (Exception e1) {
+            	try {
+    	        	f = new File(Controller.APP_NAME + ".exe");
+    	            p = f.toPath();
+    	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+            	} catch (Exception e2) {
+            	}
         	}
 
         	if (p != null) {

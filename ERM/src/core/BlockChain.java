@@ -490,7 +490,7 @@ public class BlockChain
 			/////base = BlockChain.BASE_TARGET>>1;
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
-			base = BlockChain.BASE_TARGET <<1;
+			base = BlockChain.BASE_TARGET >>1;
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
 		else if ( height < BlockChain.TARGET_COUNT <<5)
