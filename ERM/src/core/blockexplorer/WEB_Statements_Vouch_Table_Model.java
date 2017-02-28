@@ -1,4 +1,4 @@
-package gui.items.statement;
+package core.blockexplorer;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -39,7 +39,7 @@ import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
+public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -49,14 +49,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public static final int COLUMN_TIMESTAMP = 0;
 	// public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
-	// public static final int COLUMN_BODY = 2;
-	// public static final int COLUMN_AMOUNT = 2;
+	 public static final int COLUMN_CREATOR_ADDRESS = 2;
+	public static final int COLUMN_TRANSACTION = 3;
 	// public static final int COLUMN_FEE = 3;
 	List<Transaction> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator" });// ,
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Address_Creator" , "Transaction"});// ,
 																											// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
 	// private Map<byte[], BlockingQueue<Block>> blocks;
@@ -70,7 +70,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 	private String sss;
 
-	public Statements_Vouch_Table_Model(Transaction transaction) {
+	public WEB_Statements_Vouch_Table_Model(Transaction transaction) {
 		table = DBSet.getInstance().getTransactionFinalMap();
 		blockNo = transaction.getBlockHeight(DBSet.getInstance());
 		recNo = transaction.getSeqNo(DBSet.getInstance());
@@ -86,6 +86,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		return o == null ? null : o.getClass();
 	}
 
+	
 	// читаем колонки которые изменяем высоту
 	public Boolean[] get_Column_AutoHeight() {
 
@@ -142,33 +143,18 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 													// transaction.getTimestamp()
 													// / 1000;
 
-			/*
-			 * case COLUMN_TYPE:
-			 * 
-			 * //return Lang.transactionTypes[transaction.getType()]; return
-			 * Lang.getInstance().translate(transaction.viewTypeName());
-			 */
-
-			// case COLUMN_BODY:
-
-			// i = (R_Vouch)transaction;
-
-			// return new String( i.getData(), Charset.forName("UTF-8") )
-			// ;//transaction.viewReference();//.viewProperies();
-
-			// case COLUMN_AMOUNT:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
-
-			// case COLUMN_FEE:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getFee());
-
+			case COLUMN_CREATOR_ADDRESS:
+				
+				
+				return transaction.getCreator().getAddress().toString();
 			case COLUMN_CREATOR:
 
-				return (transaction.getCreator().toString());
+				return transaction.getCreator().getPerson().b;
+				
+			case COLUMN_TRANSACTION:
+				
+				return transaction;
+			
 			}
 
 			return null;
