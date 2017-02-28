@@ -878,7 +878,7 @@ public abstract class Transaction {
 			return CREATOR_NOT_PERSONALIZED;
 		}
 
-		// CHECK EE AFTER isPERSON ! because in ignored in IssuePerson
+		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
 		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 		{
