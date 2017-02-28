@@ -24,14 +24,13 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import gui.AccountsFrame;
 import gui.Send_Frame;
 import gui.create.License_JFrame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
 import gui.items.accounts.Account_Repay_Debt_Dialog;
 import gui.items.accounts.Account_Take_Hold_Dialog;
-import gui.items.assets.IssueAssetDialog;
+import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.imprints.MainImprintsFrame;
 import gui.items.persons.MainPersonsFrame;
@@ -294,7 +293,8 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
+				selectOrAdd( new Main_Accounts_Frame(), MainFrame.desktopPane.getAllFrames());
+        		//selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames());
         	}
         });
         accountsMenu.add(accountsMenuList);

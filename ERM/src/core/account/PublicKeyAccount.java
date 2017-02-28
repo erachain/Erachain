@@ -5,6 +5,7 @@ import java.util.TreeSet;
 import org.mapdb.Fun.Tuple3;
 
 import api.ApiErrorFactory;
+import core.crypto.Base32;
 import core.crypto.Base58;
 
 //import java.math.BigDecimal;
@@ -62,17 +63,30 @@ public class PublicKeyAccount extends Account {
 			return false;
 		return true;
 	}
+	
 	public static boolean isValidPublicKey(String publicKey)
 	{
 		
 		byte[] pk = null;
-		try {
-			pk = Base58.decode(publicKey);
-		} catch(Exception e) {
-			return false;
+		if (publicKey.startsWith("+")) {
+			// BASE.32 from  BANK
+			publicKey = publicKey.substring(1);
+			try {
+				pk = Base32.decode(publicKey);
+			} catch(Exception e) {
+				return false;
+			}
+			return isValidPublicKey(pk);
+		} else {
+			try {
+				pk = Base58.decode(publicKey);
+			} catch(Exception e) {
+				return false;
+			}
+			return isValidPublicKey(pk);
 		}
-		return isValidPublicKey(pk);
 	}
+	
 	public boolean isValid()
 	{
 		return isValidPublicKey(this.publicKey);

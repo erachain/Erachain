@@ -45,7 +45,7 @@ import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import core.account.Account;
 import core.account.PublicKeyAccount;
-import core.crypto.Base34;
+import core.crypto.Base32;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
@@ -352,7 +352,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		menu.add(copyPublicKey);
 		
-		JMenuItem copyBankKey = new JMenuItem(Lang.getInstance().translate("Copy Bank Key"));
+		JMenuItem copyBankKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key for BANK"));
 		copyBankKey.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -360,7 +360,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 				int row = table.getSelectedRow();
 				row = table.convertRowIndexToModel(row);
 				
-				 String bankKeyAccount = Base34.encode(tableModel.getPublicKeyAccount(row).getPublicKey());
+				 String bankKeyAccount = "+" + Base32.encode(tableModel.getPublicKeyAccount(row).getPublicKey());
 				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
 				//		account.getAddress());
 				

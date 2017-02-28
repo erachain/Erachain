@@ -114,6 +114,12 @@ public class Base58 {
         //
         if (string.length() == 0)
             return null;
+
+		if (string.startsWith("+")) {
+			// BASE.32 from  BANK
+			return Base32.decode(string.substring(1));
+		}
+
         //
         // Convert the input string to a byte sequence
         //

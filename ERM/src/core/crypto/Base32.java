@@ -22,9 +22,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Provides Base-34 encoding and decoding
+ * Provides Base-32 encoding and decoding
  */
-public class Base34 {
+public class Base32 {
 
     /** Alphabet used for encoding and decoding */
 	// not use O & I
@@ -43,7 +43,7 @@ public class Base34 {
     }
 
     /**
-     * Encodes a byte array as a Base34 string
+     * Encodes a byte array as a Base32 string
      *
      * @param       bytes           Array to be encoded
      * @return                      Encoded string
@@ -70,10 +70,10 @@ public class Base34 {
         // Encode the input starting with the first non-zero byte
         //
         int offset = zeroCount;
-        byte[] encoded = new byte[input.length*2];
+        byte[] encoded = new byte[input.length<<2];
         int encodedOffset = encoded.length;
         while (offset < input.length) {
-            byte mod = divMod34(input, offset);
+            byte mod = divMod32(input, offset);
             if (input[offset] == 0)
                 offset++;
             encoded[--encodedOffset] = (byte)ALPHABET[mod];
@@ -102,11 +102,11 @@ public class Base34 {
     }
 
     /**
-     * Decodes a Base34 string
+     * Decodes a Base32 string
      *
      * @param       string                  Encoded string
      * @return                              Decoded bytes
-     * @throws      NumberFormatException  Invalid Base-34 encoded string
+     * @throws      NumberFormatException  Invalid Base-32 encoded string
      */
     public static byte[] decode(String string) {
         //
@@ -136,7 +136,7 @@ public class Base34 {
         while (zeroCount < input.length && input[zeroCount] == 0)
             zeroCount++;
         //
-        // Convert from Base34 encoding starting with the first non-zero character
+        // Convert from Base32 encoding starting with the first non-zero character
         //
         byte[] decoded = new byte[input.length];
         int decodedOffset = decoded.length;
@@ -161,10 +161,10 @@ public class Base34 {
     }
 
     /**
-     * Decode a Base34-encoded checksummed string and verify the checksum.  The
+     * Decode a Base32-encoded checksummed string and verify the checksum.  The
      * checksum will then be removed from the decoded value.
      *
-     * @param       string                  Base-34 encoded checksummed string
+     * @param       string                  Base-32 encoded checksummed string
      * @return                              Decoded value
      * @throws      NumberFormatException  The string is not valid or the checksum is incorrect
      */
@@ -190,20 +190,20 @@ public class Base34 {
     }
 
     /**
-     * Divide the current number by 34 and return the remainder.  The input array
+     * Divide the current number by 32 and return the remainder.  The input array
      * is updated for the next round.
      *
      * @param       number          Number array
      * @param       offset          Offset within the array
      * @return                      The remainder
      */
-    private static byte divMod34(byte[] number, int offset) {
+    private static byte divMod32(byte[] number, int offset) {
         int remainder = 0;
         for (int i=offset; i<number.length; i++) {
             int digit = (int)number[i]&0xff;
             int temp = remainder*256 + digit;
-            number[i] = (byte)(temp/34);
-            remainder = temp%34;
+            number[i] = (byte)(temp/32);
+            remainder = temp%32;
         }
         return (byte)remainder;
     }
@@ -220,7 +220,7 @@ public class Base34 {
         int remainder = 0;
         for (int i=offset; i<number.length; i++) {
             int digit = (int)number[i]&0xff;
-            int temp = remainder*34 + digit;
+            int temp = remainder*32 + digit;
             number[i] = (byte)(temp/256);
             remainder = temp%256;
         }
