@@ -110,6 +110,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		   //     jTextArea_Messge.setLineWrap(true);
 		        jTextArea_Messge.setText((r_Send.isText() ) ? new String(r_Send.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
 		        
+		        MenuPopupUtil.installContextMenu(jTextArea_Messge);
 		        //jTextArea_Messge.setText();
 		        jScrollPane1.setViewportView(jTextArea_Messge);
 

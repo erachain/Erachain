@@ -192,7 +192,7 @@ public class Mail_Info extends javax.swing.JPanel {
         jTextArea_Messge.setEditable(false);
 		jTextArea_Messge.setContentType("text/html");
 
-       
+		MenuPopupUtil.installContextMenu(jTextArea_Messge);
   //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
    //     jTextArea_Messge.setColumns(20);
    //     jTextArea_Messge.setRows(5);
