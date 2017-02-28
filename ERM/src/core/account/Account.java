@@ -93,7 +93,10 @@ public class Account {
 		}
 		catch(Exception e)
 		{
-			
+			if (PublicKeyAccount.isValidPublicKey(address)) {
+				// MAY BE IT BASE.32 +
+				return new Tuple2<Account, String>(new PublicKeyAccount(address), null);
+			}
 		}
 
 		if (isBase58) {
