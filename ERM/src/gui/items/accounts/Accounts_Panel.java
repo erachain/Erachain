@@ -45,6 +45,7 @@ import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.crypto.Base34;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
@@ -350,6 +351,27 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			}
 		});
 		menu.add(copyPublicKey);
+		
+		JMenuItem copyBankKey = new JMenuItem(Lang.getInstance().translate("Copy Bank Key"));
+		copyBankKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				 String bankKeyAccount = Base34.encode(tableModel.getPublicKeyAccount(row).getPublicKey());
+				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
+				//		account.getAddress());
+				
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				StringSelection value = new StringSelection(bankKeyAccount);
+			    clipboard.setContents(value, null);
+			}
+		});
+		menu.add(copyBankKey);
+		
+		
 
 		////////////////////
 		TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
