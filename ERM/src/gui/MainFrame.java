@@ -504,12 +504,12 @@ private JFrame parent;
         
         
         //GENERAL TABPANE
-        GeneralTabPane generalTabPane = new GeneralTabPane();
+        //GeneralTabPane generalTabPane = new GeneralTabPane();
         
         //
         JInternalFrame frame1 = new JInternalFrame();
         
-        frame1.add(generalTabPane);
+        //frame1.add(generalTabPane);
         frame1.setVisible(true);
         frame1.setBorder(new EmptyBorder(10, 10, 10, 10));
         frame1.setSize(500, 500);

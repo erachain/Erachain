@@ -110,7 +110,7 @@ public class Controller extends Observable {
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
-	public static final long LICENSE_KEY = 2l;
+	public static final long LICENSE_KEY = 1l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
 	private static final String version = "3.01.02";
 	private static final String buildTime = "2017-02-28 09:33:33 UTC";
@@ -1088,10 +1088,7 @@ public class Controller extends Observable {
 
 			case Message.BLOCK_TYPE:
 
-				/* send GENESIS block for test NODE
-				 * 				
-				*/
-
+				// send GENESIS block for test NODE
 				BlockMessage blockMessage = (BlockMessage) message;
 				int newBlockHeight = blockMessage.getHeight();
 				if (newBlockHeight < 1) {
@@ -1642,7 +1639,8 @@ public class Controller extends Observable {
 	}
 
 	public void addWalletListener(Observer o) {
-		this.wallet.addObserver(o);
+		if (this.wallet != null )
+			this.wallet.addObserver(o);
 	}
 
 	public String importAccountSeed(byte[] accountSeed) {

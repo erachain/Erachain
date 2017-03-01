@@ -226,7 +226,7 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-                new License_JFrame(null) ;
+                new License_JFrame() ;
         	}
         });
         fileMenu.add(licisceItem);
