@@ -502,30 +502,6 @@ private JFrame parent;
         // РґРѕР±Р°РІР»СЏРµРј РµРіРѕ РІ С†РµРЅС‚СЂ РѕРєРЅР°
         add(desktopPane);
         
-        
-        //GENERAL TABPANE
-        //GeneralTabPane generalTabPane = new GeneralTabPane();
-        
-        //
-        JInternalFrame frame1 = new JInternalFrame();
-        
-        //frame1.add(generalTabPane);
-        frame1.setVisible(true);
-        frame1.setBorder(new EmptyBorder(10, 10, 10, 10));
-        frame1.setSize(500, 500);
-        frame1.setLocation(500, 80);
-             
-        
-        frame1.setVisible(true);
-        frame1.setMaximizable(true);
-        frame1.setTitle(Lang.getInstance().translate("Old Panels"));
-        //frame1.setClosable(true);
-        frame1.setResizable(true);
-        
-        
-        //ADD GENERAL TABPANE TO FRAME
-  //      desktopPane.add(frame1);
-        
         // WALLET STATS
         this.add(new StatusPanel(), BorderLayout.SOUTH);
         
