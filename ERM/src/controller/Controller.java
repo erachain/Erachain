@@ -523,9 +523,7 @@ public class Controller extends Observable {
 	*/
 	
 	public void replaseFavoriteItems(int type) {
-		if(this.wallet != null) {
-			this.wallet.replaseFavoriteItems(type);
-		}
+		this.wallet.replaseFavoriteItems(type);
 	}
 	
 	public void reCreateDB() throws IOException, Exception {
@@ -1639,8 +1637,7 @@ public class Controller extends Observable {
 	}
 
 	public void addWalletListener(Observer o) {
-		if (this.wallet != null )
-			this.wallet.addObserver(o);
+		this.wallet.addObserver(o);
 	}
 
 	public String importAccountSeed(byte[] accountSeed) {
