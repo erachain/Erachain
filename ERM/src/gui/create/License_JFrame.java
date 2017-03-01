@@ -36,25 +36,21 @@ public class License_JFrame extends JDialog {
 	boolean goCreateWallet;
 
     public License_JFrame(boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
-    	super();
+    //	super();
     	this.needAccept = needAccept;
     	this.parent = parent;
     	this.goCreateWallet = goCreateWallet;
+    	initComponents();
     }
     public License_JFrame(boolean needAccept) {
-    	super();
+    	//super();
     	this.needAccept = needAccept;
+    	initComponents();
     }
     	
     public License_JFrame() {
     	//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		this.setModal(true);
+		
         initComponents();
     }
 
@@ -66,6 +62,15 @@ public class License_JFrame extends JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
+    	
+    	List<Image> icons = new ArrayList<Image>();
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+		this.setIconImages(icons);
+		this.setModal(true);
+    	
         java.awt.GridBagConstraints gridBagConstraints;
 
         jCheckBox1 = new javax.swing.JCheckBox();
