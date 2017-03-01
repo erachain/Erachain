@@ -110,7 +110,7 @@ public class Start {
 						{					
 							SysTray.getInstance().createTrayIcon();
 							
-							if (true || Controller.getInstance().doesWalletExists() &&
+							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
 							new License_JFrame(true);
