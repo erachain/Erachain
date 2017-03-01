@@ -36,6 +36,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	public WalletBlocksTableModel()
 	{
 		Controller.getInstance().addWalletListener(this);
+		blocks.registerObserver();
 	}
 	
 	@Override

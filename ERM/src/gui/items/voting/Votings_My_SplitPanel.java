@@ -139,7 +139,7 @@ import lang.Lang;
 			
 			my_Voting_table.addMouseListener(new My_Mouse());
 			my_run_menu  = new RunMenu();
-			Dimension dim1 = new Dimension(180,25);
+			Dimension dim1 = new Dimension(180,50);
 			my_run_menu.setSize(dim1);
 			my_run_menu.setPreferredSize(dim1);
 			my_run_menu.setVisible(false);

@@ -208,6 +208,11 @@ function asyncAjax (url, type){
 					document.getElementById('main').innerHTML = statements(data);
 				}
 				
+				if(type == 'statement')
+				{
+					document.getElementById('main').innerHTML = statement(data);
+				}
+				
 				
 				if(type == 'topRichest')
 				{
@@ -3515,7 +3520,7 @@ function start() {
 	
 
 	
-	var title = 'ERM BlockExplorer';
+	var title = 'Aronicle BlockExplorer';
 	
 	
 	
@@ -3844,6 +3849,14 @@ function start() {
 		document.title = title ;
 		return;
 	}	
+	
+	if(params.hasOwnProperty('statement'))
+	{
+		asyncAjax('blockexplorer.json?statement=' + params['statement']+'&Seg_No=' + params['Seg_No']+'&lang='+params['lang'], 'statement');
+		document.title = title ;
+		return;
+	}
+	
 	asyncAjax('blockexplorer.json?blocks'+'&lang='+params['lang'], 'blocks');
 	
 	document.title = title;

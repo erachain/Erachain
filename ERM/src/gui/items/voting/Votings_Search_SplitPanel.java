@@ -191,7 +191,7 @@ import lang.Lang;
 		//	Search_run_menu.setBackground(new Color(0,204,102,255));
 		//	Dimension dim = new Dimension(180,70);
 	    //	Search_run_menu.setSize(dim);
-	    	Search_run_menu.setPreferredSize(new Dimension(180,70));
+	    	Search_run_menu.setPreferredSize(new Dimension(180,95));
 	    	Search_run_menu.setVisible(false);
 	    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
 	   // 	aaa.jButton1.setBorderPainted(false);

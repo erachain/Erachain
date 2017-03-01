@@ -14,6 +14,7 @@ import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
+import core.account.Account;
 import core.block.Block;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
@@ -88,6 +89,31 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		 this.fireTableDataChanged();
 		
 	}
+
+	public void Find_Transactions_from_Address(String address){
+		String sender;
+		String recipient;
+		int minHeight;
+		int maxHeight;
+		int type;
+		int service;
+		boolean desc;
+		int offset;
+		int limit;
+		
+		Tuple2<Account, String> accountResult = Account.tryMakeAccount(address);
+		Account account = accountResult.a;
+		if (account != null) {
+			transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+			this.fireTableDataChanged();
+		} else {
+			;
+		}
+	
+	}
+	
+	
+	
 	
 	public void view_Transactioms_From_Adress(String str){
 		

@@ -1,4 +1,4 @@
-package gui.items.statement;
+package core.blockexplorer;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -29,10 +29,12 @@ import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.SortableList;
 import lang.Lang;
 import utils.ObserverMessage;
+import utils.Pair;
 
-public class Statements_Table_Model_My extends AbstractTableModel implements Observer {
+public class WEB_Statements_Table_Model_Search extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -52,12 +54,12 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 //	private SortableList<byte[], Transaction> transactions;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
+	private String[] columnNames =new String[]{"Timestamp", "Creator", "Template", "Statement"};//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
 //	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	
-	public Statements_Table_Model_My(){
+	public WEB_Statements_Table_Model_Search(){
 	//	transactions = new ArrayList<Transaction>();
 		
 	
@@ -156,7 +158,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		public Class<? extends Object> getColumnClass(int c) {     // set column type
 			Object o = getValueAt(0, c);
 			return o==null?null:o.getClass();
-		}
+			   }
 	
 		// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){
@@ -181,7 +183,12 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	@Override
 	public String getColumnName(int index) 
 	{
-		return this.columnNames[index];
+		return Lang.getInstance().translate(columnNames[index]);
+	}
+	
+	public String getColumnNameNO_Translate(int index) 
+	{
+		return columnNames[index];
 	}
 
 	@Override
@@ -189,26 +196,39 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		// TODO Auto-generated method stub
 		return transactions.size();
 	}
+	
+	
+	public String get_person_key(int row){
+		String str ="";
+		R_SignNote record = (R_SignNote)this.transactions.get(row);
+		PublicKeyAccount creator = record.getCreator();
+		if (creator.isPerson(DBSet.getInstance())){
+		return creator.getPerson(DBSet.getInstance()).b.getKey()+"";
+		
+		
+		}
+		
+		
+		
+		return "";
+	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
 		try
 		{
-			if(this.transactions == null || this.transactions.size() < 0
-					|| this.transactions.size() -1 < row)
+			if(this.transactions == null || this.transactions.size() -1 < row)
 			{
 				return null;
 			}
 			
+			//Transaction transaction = (R_SignNote)this.transactions.get(row);
 			
-			Transaction trans = this.transactions.get(row);
-			if (trans == null)
-				return null;
 			
-			R_SignNote record = (R_SignNote)trans;
 			
-			PublicKeyAccount creator;
+			R_SignNote record = (R_SignNote)this.transactions.get(row);
+			
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
@@ -224,15 +244,13 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 			case COLUMN_NOTE:
 				
-				ItemCls item = ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
-				return item==null?null:item.toString();
+				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
 				
 			case COLUMN_BODY:				
 				
-				if (record.getData() == null)
-					return null;
-				
-				return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
+				 String str = new String( record.getData() , Charset.forName("UTF-8") );
+				if (str.length()>50) return str.substring(0,50)+"...";
+				return str ;//transaction.viewReference();//.viewProperies();
 				
 				
 	//		case COLUMN_AMOUNT:
@@ -245,12 +263,15 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			case COLUMN_CREATOR:
 				
-				creator = record.getCreator();
 				
-				return creator==null?null:creator.getPersonAsString();
+				return record.getCreator().getPersonAsString();
 			}
 			
 			return null;
+			
+					
+			
+			
 			
 		} catch (Exception e) {
 	//		LOGGER.error(e.getMessage(),e);
@@ -314,21 +335,26 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
 		tran = new ArrayList<Transaction>();
-		transactions.clear();
 		// база данных	
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
-			{
-				transactions.add(transaction);
-			}
+		DBSet dbSet = DBSet.getInstance();
+// читаем все блоки
+	SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+// проходим по блокам
+	for(Pair<byte[], Block> list: lists)
+	{
+		
+// читаем транзакции из блока
+		db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
+// проходим по транзакциям
+		for (Transaction transaction:db_transactions){
+// если ноте то пишем в transactions			
+		 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	tran.add(transaction);	
+		
+		
 		}
 		
-		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-		}
-		
-		
-	return transactions;
+	}
+	return tran;
 	
 	}
 	

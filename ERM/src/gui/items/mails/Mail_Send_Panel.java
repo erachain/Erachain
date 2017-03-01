@@ -290,7 +290,7 @@ public class Mail_Send_Panel extends JPanel
 		//TXT TITLE
 		GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
-		txtMessageGBC.insets = new Insets(5, 5, 5, 0);
+		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
 		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
 		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtMessageGBC.weightx = 0;	
@@ -318,21 +318,24 @@ public class Mail_Send_Panel extends JPanel
 	//	GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
 		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
-		txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+		//txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+		txtMessageGBC.fill = java.awt.GridBagConstraints.BOTH;
 		txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
 		txtMessageGBC.weightx = 0;	
 		txtMessageGBC.gridx = 1;
         txtMessageGBC.gridy = y;
+        txtMessageGBC.weighty = 0.2;
         
         this.txtMessage = new JTextArea();
-        this.txtMessage.setRows(12);
+        this.txtMessage.setRows(4);
         this.txtMessage.setColumns(25);
+   //     this.txtMessage.setMinimumSize(new Dimension(200,150));
 
         this.txtMessage.setBorder(this.txtTo.getBorder());
 
       	JScrollPane messageScroll = new JScrollPane(this.txtMessage);
-      	messageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-      	messageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+      	//messageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+      	//messageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(messageScroll, txtMessageGBC);
       	
       	this.add(messageLabel, labelMessageGBC);

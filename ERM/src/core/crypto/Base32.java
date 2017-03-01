@@ -22,13 +22,13 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Provides Base-58 encoding and decoding
+ * Provides Base-32 encoding and decoding
  */
-public class Base58 {
+public class Base32 {
 
     /** Alphabet used for encoding and decoding */
-	
-	private static final String ALPHABET_STR = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	// not use O & I
+	private static final String ALPHABET_STR = "123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 			
     private static final char[] ALPHABET =
     		ALPHABET_STR.toCharArray();
@@ -43,7 +43,7 @@ public class Base58 {
     }
 
     /**
-     * Encodes a byte array as a Base58 string
+     * Encodes a byte array as a Base32 string
      *
      * @param       bytes           Array to be encoded
      * @return                      Encoded string
@@ -70,10 +70,10 @@ public class Base58 {
         // Encode the input starting with the first non-zero byte
         //
         int offset = zeroCount;
-        byte[] encoded = new byte[input.length*2];
+        byte[] encoded = new byte[input.length<<2];
         int encodedOffset = encoded.length;
         while (offset < input.length) {
-            byte mod = divMod58(input, offset);
+            byte mod = divMod32(input, offset);
             if (input[offset] == 0)
                 offset++;
             encoded[--encodedOffset] = (byte)ALPHABET[mod];
@@ -102,11 +102,11 @@ public class Base58 {
     }
 
     /**
-     * Decodes a Base58 string
+     * Decodes a Base32 string
      *
      * @param       string                  Encoded string
      * @return                              Decoded bytes
-     * @throws      NumberFormatException  Invalid Base-58 encoded string
+     * @throws      NumberFormatException  Invalid Base-32 encoded string
      */
     public static byte[] decode(String string) {
         //
@@ -114,12 +114,6 @@ public class Base58 {
         //
         if (string.length() == 0)
             return null;
-
-		if (string.startsWith("+")) {
-			// BASE.32 from  BANK
-			return Base32.decode(string.substring(1));
-		}
-
         //
         // Convert the input string to a byte sequence
         //
@@ -142,7 +136,7 @@ public class Base58 {
         while (zeroCount < input.length && input[zeroCount] == 0)
             zeroCount++;
         //
-        // Convert from Base58 encoding starting with the first non-zero character
+        // Convert from Base32 encoding starting with the first non-zero character
         //
         byte[] decoded = new byte[input.length];
         int decodedOffset = decoded.length;
@@ -167,10 +161,10 @@ public class Base58 {
     }
 
     /**
-     * Decode a Base58-encoded checksummed string and verify the checksum.  The
+     * Decode a Base32-encoded checksummed string and verify the checksum.  The
      * checksum will then be removed from the decoded value.
      *
-     * @param       string                  Base-58 encoded checksummed string
+     * @param       string                  Base-32 encoded checksummed string
      * @return                              Decoded value
      * @throws      NumberFormatException  The string is not valid or the checksum is incorrect
      */
@@ -196,20 +190,20 @@ public class Base58 {
     }
 
     /**
-     * Divide the current number by 58 and return the remainder.  The input array
+     * Divide the current number by 32 and return the remainder.  The input array
      * is updated for the next round.
      *
      * @param       number          Number array
      * @param       offset          Offset within the array
      * @return                      The remainder
      */
-    private static byte divMod58(byte[] number, int offset) {
+    private static byte divMod32(byte[] number, int offset) {
         int remainder = 0;
         for (int i=offset; i<number.length; i++) {
             int digit = (int)number[i]&0xff;
             int temp = remainder*256 + digit;
-            number[i] = (byte)(temp/58);
-            remainder = temp%58;
+            number[i] = (byte)(temp/32);
+            remainder = temp%32;
         }
         return (byte)remainder;
     }
@@ -226,7 +220,7 @@ public class Base58 {
         int remainder = 0;
         for (int i=offset; i<number.length; i++) {
             int digit = (int)number[i]&0xff;
-            int temp = remainder*58 + digit;
+            int temp = remainder*32 + digit;
             number[i] = (byte)(temp/256);
             remainder = temp%256;
         }

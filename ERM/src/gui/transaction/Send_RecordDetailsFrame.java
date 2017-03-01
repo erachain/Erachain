@@ -21,7 +21,9 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -41,6 +43,10 @@ import core.transaction.R_Send;
 public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 {
 	private JTextField messageText;
+
+	private JScrollPane jScrollPane1;
+
+	private JTextPane jTextArea_Messge;
 	
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	
@@ -66,6 +72,22 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			++detailGBC.gridy;
 			this.add(new JLabel(personStr), detailGBC);
 		}
+		
+		if(r_Send.getHead() != null){
+			//LABEL MESSAGE
+			++labelGBC.gridy;
+			JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
+			this.add(title_Label, labelGBC);
+			
+			// ISTEXT
+			++detailGBC.gridy;
+			detailGBC.gridwidth = 2;
+			JTextField head_Text = new JTextField( r_Send.getHead());
+			head_Text.setEditable(false);
+			MenuPopupUtil.installContextMenu(head_Text);
+			this.add(head_Text, detailGBC);		
+		}
+		
 
 		if (r_Send.getData() != null) {
 			//LABEL MESSAGE
@@ -73,14 +95,54 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
 			this.add(serviceLabel, labelGBC);
 			
+			jScrollPane1 = new javax.swing.JScrollPane();
+	        //jTextArea_Messge = new javax.swing.JTextArea();
+	        jTextArea_Messge = new javax.swing.JTextPane();
+			
+			
+			  jTextArea_Messge.setEditable(false);
+				jTextArea_Messge.setContentType("text/html");
+
+		       
+		  //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
+		   //     jTextArea_Messge.setColumns(20);
+		   //     jTextArea_Messge.setRows(5);
+		   //     jTextArea_Messge.setLineWrap(true);
+		        jTextArea_Messge.setText((r_Send.isText() ) ? new String(r_Send.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
+		        
+		        MenuPopupUtil.installContextMenu(jTextArea_Messge);
+		        //jTextArea_Messge.setText();
+		        jScrollPane1.setViewportView(jTextArea_Messge);
+
+		        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+		        gridBagConstraints.gridx = 1;
+		        gridBagConstraints.gridy =detailGBC.gridy+1;
+		        gridBagConstraints.gridwidth = 3;
+		        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		        gridBagConstraints.weightx = 0.1;
+		        gridBagConstraints.weighty = 0.6;
+		        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
+		        add(jScrollPane1, gridBagConstraints);
+
+			
+			
+			
+			
+			
+			
 			// ISTEXT
 			++detailGBC.gridy;
 			detailGBC.gridwidth = 2;
 			messageText = new JTextField( ( r_Send.isText() ) ? new String(r_Send.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
 			messageText.setEditable(false);
 			MenuPopupUtil.installContextMenu(messageText);
-			this.add(messageText, detailGBC);			
+//			this.add(messageText, detailGBC);			
 			detailGBC.gridwidth = 3;
+			
+			
+			
+			
 			
 			//ENCRYPTED CHECKBOX
 			
@@ -88,8 +150,8 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			GridBagConstraints chcGBC = new GridBagConstraints();
 			chcGBC.fill = GridBagConstraints.HORIZONTAL;  
 			chcGBC.anchor = GridBagConstraints.NORTHWEST;
-			chcGBC.gridy = labelGBC.gridy;
-			chcGBC.gridx = 3;
+			chcGBC.gridy = ++labelGBC.gridy;
+			chcGBC.gridx = 2;
 			chcGBC.gridwidth = 1;
 	        final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
 	        
@@ -141,7 +203,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        		}
 		        		
 		        		try {
-		        			messageText.setText(new String(AEScrypto.dataDecrypt(r_Send.getData(), privateKey, publicKey), "UTF-8"));
+		        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_Send.getData(), privateKey, publicKey), "UTF-8"));
 						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
 							LOGGER.error(e1.getMessage(),e1);
 						}
@@ -149,7 +211,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	        		else
 	        		{
 	        			try {
-	        				messageText.setText(new String(r_Send.getData(), "UTF-8"));
+	        				jTextArea_Messge.setText(new String(r_Send.getData(), "UTF-8"));
 						} catch (UnsupportedEncodingException e1) {
 							LOGGER.error(e1.getMessage(),e1);
 						}

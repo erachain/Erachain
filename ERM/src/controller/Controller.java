@@ -111,9 +111,9 @@ public class Controller extends Observable {
 
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 2l;
-	public static final String APP_NAME = "ERM4";
-	private static final String version = "3.01.01";
-	private static final String buildTime = "2017-02-06 09:33:33 UTC";
+	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
+	private static final String version = "3.01.02";
+	private static final String buildTime = "2017-02-28 09:33:33 UTC";
 	private static long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
@@ -189,20 +189,29 @@ public class Controller extends Observable {
 	    if(buildTimestamp == 0) {
 		    Date date = new Date();
 		    ////URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
-		    URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
-		    if (resource != null && resource.getProtocol().equals("file")) {
-	        	try {
-		        	File f = new File(Controller.APP_NAME + ".jar");
-		            Path p = f.toPath();
-		            		            
-		            BasicFileAttributes attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-		            buildTimestamp = attr.creationTime().toMillis();
-		            return buildTimestamp;
-		            
-	        	} catch (Exception e) {
-					LOGGER.error(e.getMessage(), e);
-	        	}
-		    }
+		    //URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
+		    //if (resource != null && resource.getProtocol().equals("file")) {
+        	File f = null;
+            Path p = null;
+            BasicFileAttributes attr = null;
+        	try {
+	        	f = new File(Controller.APP_NAME + ".jar");
+	            p = f.toPath();
+	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+        	} catch (Exception e1) {
+            	try {
+    	        	f = new File(Controller.APP_NAME + ".exe");
+    	            p = f.toPath();
+    	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
+            	} catch (Exception e2) {
+            	}
+        	}
+
+        	if (attr != null) {
+	            buildTimestamp = attr.creationTime().toMillis();
+	            return buildTimestamp;
+        	}
+	            
 	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 	    	try {
 				date = (Date)formatter.parse(buildTime);
@@ -793,9 +802,14 @@ public class Controller extends Observable {
 
 		// SEND VERSION MESSAGE
 		peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
-			Controller.getInstance().getVersion(),
-			this.getBuildTimestamp() ));
+			Controller.getVersion(),
+			getBuildTimestamp() ));
 		
+		// GET GENESIS BLOCK - TEST WRONG CHAIN
+		byte[]  genesisBlockSign = Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
+		// SEND GENESIS BLOCK MESSAGE
+		peer.sendMessage(MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign));
+
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
 		// SEND HEIGTH MESSAGE
@@ -983,8 +997,7 @@ public class Controller extends Observable {
 						.getBlock(dbSet, getBlockMessage.getSignature());
 
 				// CREATE RESPONSE WITH SAME ID
-				response = MessageFactory.getInstance().createBlockMessage(
-						newBlock);
+				response = MessageFactory.getInstance().createBlockMessage(newBlock);
 				response.setId(message.getId());
 
 				// SEND RESPONSE BACK WITH SAME ID
@@ -1074,15 +1087,26 @@ public class Controller extends Observable {
 				break;
 
 			case Message.BLOCK_TYPE:
-				
 
-				// ALL IINCOMED BLOCKS ignored now!!!
-				if (true || this.status != STATUS_OK
+				/* send GENESIS block for test NODE
+				 * 				
+				*/
+
+				BlockMessage blockMessage = (BlockMessage) message;
+				int newBlockHeight = blockMessage.getHeight();
+				if (newBlockHeight < 1) {
+					// BLOCK NOT FOUND!!!
+					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
+					banPeerOnError(message.getSender(), mess);
+					return;
+				}
+
+				////// ALL IINCOMED BLOCKS ignored now!!!
+				if (this.status != STATUS_OK
 						|| this.isProcessingWalletSynchronize()) {
 					break;
 				}
 
-				BlockMessage blockMessage = (BlockMessage) message;
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockMessage.getBlock();

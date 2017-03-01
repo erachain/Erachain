@@ -865,6 +865,8 @@ public class Block {
 		
 		if (height < BlockChain.REPEAT_WIN)
 			win_value >>= 4;
+		else if (BlockChain.DEVELOP_USE)
+			win_value >>= 4;
 		else if (height < BlockChain.TARGET_COUNT)
 			win_value = (win_value >>4) - (win_value >>6);
 		else if (height < BlockChain.TARGET_COUNT<<2)
@@ -984,32 +986,32 @@ public class Block {
 		*/
 	}
 
-	public static boolean isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
+	public static int isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
 		
 		int repeat_win = 0;
 		if (height < BlockChain.REPEAT_WIN<<1) {
 			repeat_win = BlockChain.REPEAT_WIN;
 		} else {
-			return false;
+			return 0;
 		}
 		
 		// NEED CHECK ONLY ON START
 		// test repeated win account
 		if (lastBlocksForTarget == null || lastBlocksForTarget.isEmpty()) {
-			return false;
+			return 0;
 		}
 		// NEED CHECK ONLY ON START
 		int i = 0;
 		for (Block testBlock: lastBlocksForTarget) {
 			i++;
 			if (testBlock.getCreator().equals(accountCreator)) {
-				return true;
+				return i;
 			} else if ( i > repeat_win) {
-				return false;
+				return 0;
 			}
 		}
 	
-	return false;
+	return 0;
 
 	}
 	public boolean isValid(DBSet db)
@@ -1063,7 +1065,7 @@ public class Block {
 		}
 		
 		// STOP IF SO RAPIDLY			
-		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db))) {
+		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db)) > 0) {
 			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}

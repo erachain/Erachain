@@ -640,6 +640,9 @@ public abstract class Transaction {
 		{
 			// soft or hard confirmations
 			key = db.getTransactionFinalMapSigns().get(dbRef);
+			if (key == null) {
+				return db.getTransactionMap().get(dbRef);
+			}
 		} else {
 			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
 			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 4, 8));
@@ -875,7 +878,7 @@ public abstract class Transaction {
 			return CREATOR_NOT_PERSONALIZED;
 		}
 
-		// CHECK EE AFTER isPERSON ! because in ignored in IssuePerson
+		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
 		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
 		{

@@ -93,7 +93,10 @@ public class Account {
 		}
 		catch(Exception e)
 		{
-			
+			if (PublicKeyAccount.isValidPublicKey(address)) {
+				// MAY BE IT BASE.32 +
+				return new Tuple2<Account, String>(new PublicKeyAccount(address), null);
+			}
 		}
 
 		if (isBase58) {
@@ -597,8 +600,8 @@ public class Account {
 			String addressStr = this.getAddress().substring(1, 6);
 			if (personRes.a == -2) personStr = "[-]" + personStr;
 			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
-			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
+			//else if (personRes.a == 1) personStr = "[+]" + personStr;
 			return addressStr + ": " + personStr;
 		}
 	}
@@ -743,13 +746,16 @@ public class Account {
 			return 0l;
 		
 		// test repeated win account
-		if (!Controller.getInstance().isTestNet() && Block.isSoRapidly(height, this, lastBlocksForTarget)) {
-			return 0l;
+		if (!Controller.getInstance().isTestNet()) {
+			int repeated = Block.isSoRapidly(height, this, lastBlocksForTarget);
+			if (repeated > 0) {
+				return -repeated;
+			}
 		}
 		
 		// TEST STRONG of win Value
 		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dbSet, this, height);
-		if (previousForgingHeight == -1)
+		if (previousForgingHeight < 1)
 			return 0l;
 
 		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
@@ -757,7 +763,7 @@ public class Account {
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target); 
 		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
-			return 0l;
+			return -targetedWinValue;
 		}
 
 		return winned_value;

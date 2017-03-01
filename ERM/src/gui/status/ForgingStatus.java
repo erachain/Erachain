@@ -62,11 +62,12 @@ public class ForgingStatus extends JLabel implements Observer {
 	            for(Account account: Controller.getInstance().getAccounts())
 		        {
 	            	long win_value = account.calcWinValue(dbSet, bchain, lastBlocksForTarget, newHeight, target);
-	            	if (win_value > winBalance) {
+	            	if (win_value > Math.abs(winBalance)) {
 	            		winBalance = win_value;
 	            		winAccount = account;
 	            	}
-		        }
+		        }  
+	            ///
 	            
 		        String timeForge = "";
 		        if(winAccount != null)

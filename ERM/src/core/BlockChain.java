@@ -24,18 +24,18 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = false;
+	public static final boolean DEVELOP_USE = true;
 	
-	public static final int TESTNET_PORT = 9045;
-	public static final int MAINNET_PORT = 9046;
-	public static final int DEFAULT_WEB_PORT = 9047;
-	public static final int DEFAULT_RPC_PORT = 9048;
+	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
+	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;
+	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9047;
+	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9048;
 
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
-	public static final int REPEAT_WIN = 40; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -45,12 +45,12 @@ public class BlockChain
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
-	public static final int GENERATING_MIN_BLOCK_TIME = 288; // 300 PER DAY
+	public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE?120:288; // 300 PER DAY
 	public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
-	public static final int GENESIS_WIN_VALUE = 22000;
+	public static final int GENESIS_WIN_VALUE = DEVELOP_USE?3000:22000;
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
@@ -62,7 +62,7 @@ public class BlockChain
 	//TESTNET 
 												//   1486444444444l
 												//	 1487844444444
-	public static final long DEFAULT_MAINNET_STAMP = 1487844793333l;
+	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1488126173111l:1487844793333l;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -489,6 +489,8 @@ public class BlockChain
 			// FOR not repeated WINS - not need check BASE_TARGET
 			/////base = BlockChain.BASE_TARGET>>1;
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
+		else if (DEVELOP_USE)
+			base = BlockChain.BASE_TARGET >>1;
 		else if ( height < BlockChain.TARGET_COUNT)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
 		else if ( height < BlockChain.TARGET_COUNT <<5)

@@ -35,10 +35,18 @@ public class BlockMessage extends Message{
 	
 	public static BlockMessage parse(byte[] data) throws Exception
 	{
+
+		// TEST DATA LEN
+		if (data.length == 0) {
+			BlockMessage message = new BlockMessage(null);
+			message.height = -1;
+			return message;
+		}
+
 		//PARSE HEIGHT
 		byte[] heightBytes =  Arrays.copyOfRange(data, 0, HEIGHT_LENGTH);
 		int height = Ints.fromByteArray(heightBytes);
-		
+				
 		//PARSE BLOCK
 		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
 		//block.getGeneratingBalance(dbSet);
