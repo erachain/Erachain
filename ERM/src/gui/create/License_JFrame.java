@@ -117,9 +117,12 @@ public class License_JFrame extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub			
 				setVisible(false);
+				Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
+
 				if (parent != null)
 					parent.goAfterLicence(goCreateWallet);
 			}
+			
         });
 
         jButton2.setText(Lang.getInstance().translate(parent==null?"Not Accept":"Back"));
