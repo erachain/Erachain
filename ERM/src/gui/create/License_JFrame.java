@@ -36,21 +36,18 @@ public class License_JFrame extends JDialog {
 	boolean goCreateWallet;
 
     public License_JFrame(boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
-    //	super();
     	this.needAccept = needAccept;
     	this.parent = parent;
     	this.goCreateWallet = goCreateWallet;
     	initComponents();
     }
     public License_JFrame(boolean needAccept) {
-    	//super();
     	this.needAccept = needAccept;
     	initComponents();
     }
     	
     public License_JFrame() {
-    	//ICON
-		
+    	//ICON		
         initComponents();
     }
 
@@ -122,7 +119,6 @@ public class License_JFrame extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub			
 				setVisible(false);
-				Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
 
 				if (parent != null)
 					parent.goAfterLicence(goCreateWallet);

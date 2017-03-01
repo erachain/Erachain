@@ -114,6 +114,7 @@ public class Start {
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
 							new License_JFrame(true);
+							Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
 							}
 						}
 				} catch(Exception e1) {
