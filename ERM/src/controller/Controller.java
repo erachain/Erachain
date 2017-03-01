@@ -1037,7 +1037,10 @@ public class Controller extends Observable {
 							this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
 							// ORPHAN
 							lastBlock.orphan(dbSet);
+							//broadcastHWeight(null);
+
 							this.blockChain.clearWaitWinBuffer();
+
 							// set NEW win Block
 							this.blockChain.setWaitWinBuffer(dbSet, newBlock);
 							
@@ -1423,7 +1426,7 @@ public class Controller extends Observable {
 				if (peerHW != null) {
 					peer = peerHW.c;
 					if (peer != null) {
-						LOGGER.info("Controller.update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+						LOGGER.info("update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
 								+ " WH: " + getHWeightOfPeer(peer));
 
 						// SYNCHRONIZE FROM PEER
@@ -1447,12 +1450,16 @@ public class Controller extends Observable {
 				|| peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
-		} else if (!this.isUpToDate()) {
-			// UPDATE STATUS
-			this.status = STATUS_SYNCHRONIZING;
+		//} else if (!this.isUpToDate()) {
+			//////this.s/tatus = STATUS_SYNCHRONIZING;
+			// UPDATE RENEW
+		///	update();
 		} else {
 			this.status = STATUS_OK;
 		}
+		
+		// send to ALL my HW
+		broadcastHWeight(null);
 
 		// NOTIFY
 		this.setChanged();
@@ -1959,7 +1966,7 @@ public class Controller extends Observable {
 	}
 	*/
 
-	// FLUSH BLOCK from win Buffer - ti MAP and NERWORK
+	// FLUSH BLOCK from win Buffer - to MAP and NERWORK
 	public boolean flushNewBlockGenerated() {
 
 		Block newBlock = this.blockChain.popWaitWinBuffer();
@@ -1985,6 +1992,9 @@ public class Controller extends Observable {
 					+ newBlock.toString(this.dbSet));
 
 			///LOGGER.info("and broadcast it");
+			
+			// broadcast my HW
+			broadcastHWeight(null);
 			
 		}
 		

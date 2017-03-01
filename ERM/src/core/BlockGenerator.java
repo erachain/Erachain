@@ -275,7 +275,6 @@ public class BlockGenerator extends Thread implements Observer
 						if(!ctrl.isUpToDate())
 							continue;
 
-						ctrl.broadcastHWeight(null);
 					}
 
 					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
