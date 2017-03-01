@@ -39,6 +39,7 @@ import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
@@ -3331,7 +3332,7 @@ if ( asset_1 == null) {
 	
 	public Map jsonQueryStatements (int start){
 		Map output=new LinkedHashMap();
-		Statements_Table_Model_Search model_Statements =  new Statements_Table_Model_Search();
+		WEB_Statements_Table_Model_Search model_Statements =  new WEB_Statements_Table_Model_Search();
 		int rowCount = start+20;
 		int column_Count = model_Statements.getColumnCount();
 		
@@ -3345,18 +3346,21 @@ if ( asset_1 == null) {
 		rowCount = model_Statements.getRowCount();
 		for (int row = 0; row< rowCount; row++ ){
 			Map out_statement=new LinkedHashMap();
+			Transaction statement = model_Statements.get_Statement(row);
+			out_statement.put("Block", statement.getBlockHeight(DBSet.getInstance()));
+			out_statement.put("Seg_No", statement.getSeqNo(DBSet.getInstance()));
+			out_statement.put("person_key", model_Statements.get_person_key(row));
 			
 			for (int column=0; column < column_Count; column++ ){
 				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), model_Statements.getValueAt(row, column).toString());
-				Transaction statement = model_Statements.get_Statement(row);
-				out_statement.put("Block", statement.getBlockHeight(DBSet.getInstance()));
-				out_statement.put("Seg_No", statement.getSeqNo(DBSet.getInstance()));
+				
 			}
 			out_Statements.put(row, out_statement);			
 		}
 //		output.put("rowCount", rowCount);
 //		output.put("start", start);
 		output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
+		output.put("Label_block",  Lang.getInstance().translate_from_langObj("Block",langObj));
 		output.put("Statements", out_Statements);
 		return output;
 	}
@@ -3383,11 +3387,12 @@ if ( asset_1 == null) {
 				output.put("block",block);
 				output.put("Seg_No",seg_No);
 				output.put("statement",  new String( trans.getData(), Charset.forName("UTF-8") ));
-				output.put("creator", statement.getOwner().getPersonAsString());
+				output.put("creator", trans.getCreator().getPersonAsString());
 				
-				if (statement.getOwner().getPerson() != null){
-					output.put("creator_key", statement.getOwner().getPerson().b.getKey());
-					output.put("creator_name", statement.getOwner().getPerson().b.getName());
+				
+				if (trans.getCreator().getPerson() !=null){
+					output.put("creator_key", trans.getCreator().getPerson().b.getKey());
+					output.put("creator_name", trans.getCreator().getPerson().b.getName());
 				}else{
 					output.put("creator_key", "");
 					output.put("creator_name", "");
