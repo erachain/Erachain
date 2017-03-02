@@ -42,11 +42,25 @@ public class VouchRecordDialog extends JDialog  {
 	private static final long serialVersionUID = 2717571093561259483L;
 	
 	private static Transaction record;
+	Account account;
 	
 
+	public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
+		super();
+		vouch(block_No, rec_No, account);
+	
+	}
 	public VouchRecordDialog(Integer block_No, Integer rec_No) {
 		super();
+		vouch( block_No, rec_No, null);
+		
+		
+	}
+	
+	private void vouch(Integer block_No, Integer rec_No, Account account){
 		//ICON
+			
+		this.account = account;
 				List<Image> icons = new ArrayList<Image>();
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
@@ -279,6 +293,7 @@ public class VouchRecordDialog extends JDialog  {
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
 	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
 	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
+	        if (account != null) jComboBox_YourAddress.setSelectedItem(account);
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 0;

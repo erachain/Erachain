@@ -187,7 +187,7 @@ import utils.TableMenuPopupUtil;
 	  				Transaction trans = incoming_Mails_Model.getTransaction(row);
 	  				int blockNo = trans.getBlockHeight(DBSet.getInstance());
 	  				int recNo = trans.getSeqNo(DBSet.getInstance());
-	  	    		new VouchRecordDialog(blockNo, recNo);	
+	  	    		new VouchRecordDialog(blockNo, recNo,((R_Send) trans).getRecipient());	
 	  				
 	  				
 	  				
