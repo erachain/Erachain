@@ -22,6 +22,7 @@ import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import database.DBSet;
 import gui.PasswordPane;
+import gui.library.Voush_Library_Panel;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import utils.Converter;
@@ -250,10 +251,35 @@ public class Mail_Info extends javax.swing.JPanel {
         
         
         
+        
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
+       // add(jScrollPane2, gridBagConstraints);
+        
+        
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        jTabbedPane1.add(new Voush_Library_Panel(trans));
+        add(jTabbedPane1, gridBagConstraints);
+        
+        
+        
+        
+        
+        
+        
+        
         jLabel1.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 0.2;
         add(jLabel1, gridBagConstraints);
