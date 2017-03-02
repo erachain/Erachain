@@ -203,10 +203,11 @@ public class Mail_Info extends javax.swing.JPanel {
         //jTextArea_Messge.setText();
         jScrollPane1.setViewportView(jTextArea_Messge);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+    
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight=4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -220,7 +221,7 @@ public class Mail_Info extends javax.swing.JPanel {
         jButton1.setText(Lang.getInstance().translate("Decrypt"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 9);
         if (trans.isEncrypted()) add(jButton1, gridBagConstraints);
@@ -253,14 +254,14 @@ public class Mail_Info extends javax.swing.JPanel {
         
         
         
-        gridBagConstraints = new java.awt.GridBagConstraints();
+
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.weighty = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
        // add(jScrollPane2, gridBagConstraints);
         
@@ -275,14 +276,7 @@ public class Mail_Info extends javax.swing.JPanel {
         
         
         
-        
-        jLabel1.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 0.2;
-        add(jLabel1, gridBagConstraints);
+     
 
     }// </editor-fold>                        
 
