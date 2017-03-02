@@ -939,6 +939,13 @@ public class Controller extends Observable {
 
 				HWeightMessage hWeightMessage = (HWeightMessage) message;
 
+				// TEST TIMESTAMP of PEER
+				Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
+				if ( this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME > NTP.getTime()) {
+					// IT PEER from FUTURE
+					this.banPeerOnError(hWeightMessage.getSender(),"peer from FUTURE");
+					return;
+				}
 				// ADD TO LIST
 				synchronized (this.peerHWeight) {
 					this.peerHWeight.put(hWeightMessage.getSender(),
@@ -1024,14 +1031,15 @@ public class Controller extends Observable {
 
 				
 				Block lastBlock = this.blockChain.getLastBlock(dbSet);
-				if (newBlock.getReference().equals(lastBlock.getReference())) {
+				byte[] lastBlockReference = lastBlock.getReference();
+				
+				if (newBlock.getReference().equals(lastBlockReference)) {
 					// NEW winBlock CONCURENT for LAST BLOCK found!!
 					LOGGER.debug("  ** it is concurent for LAST BLOCK ???");
 					if (newBlock.calcWinValue(dbSet) > lastBlock.calcWinValue(dbSet)) {
 						LOGGER.debug("   ++ concurent is OK ++");
 						int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
-						if (isNewWinBlockValid == 0
-								|| isNewWinBlockValid == 4) {
+						if (isNewWinBlockValid == 4) {
 							// STOP FORGING
 							ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
 							this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
@@ -1054,6 +1062,7 @@ public class Controller extends Observable {
 					}
 					return;
 				}
+				
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dbSet, newBlock);
 				
 				// CHECK IF VALID
@@ -1071,14 +1080,21 @@ public class Controller extends Observable {
 						this.network.broadcast(message, excludes);
 						return;
 					}
-				} else {
-					if (isNewWinBlockValid == 4) {
-						// update peers WH
-						Peer peer = blockWinMessage.getSender();
-						int peerHeight = blockWinMessage.getHeight();
-						updatePeerHeight(peer, peerHeight);
-						return;
+				} else if (isNewWinBlockValid == 5) {
+					// STOP FORGING
+					LOGGER.debug("   ++ block to FUTURE ++");
+					ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
+					this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
+					if (this.flushNewBlockGenerated()) {				
+						this.blockChain.setWaitWinBuffer(dbSet, newBlock);					
+						List<Peer> excludes = new ArrayList<Peer>();
+						excludes.add(message.getSender());
+						this.network.broadcast(message, excludes);
 					}
+					// FORGING RESTORE
+					this.blockGenerator.setForgingStatus(tempStatus);
+					return;
+				} else {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
 							+ " for Height: " + this.getMyHeight()
 							+ ", code: " + isNewWinBlockValid

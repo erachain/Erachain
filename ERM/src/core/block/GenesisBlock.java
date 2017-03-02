@@ -646,6 +646,11 @@ public class GenesisBlock extends Block{
 	{
 		return this.genesisTimestamp;
 	}
+
+	public long getGenesisBlockTimestamp()
+	{
+		return this.genesisTimestamp;
+	}
 	
 	public String getTestNetInfo() 
 	{

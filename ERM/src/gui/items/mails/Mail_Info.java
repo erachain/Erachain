@@ -72,7 +72,6 @@ public class Mail_Info extends javax.swing.JPanel {
         jTextField_Sender = new javax.swing.JTextField();
         jLabel_Message = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        //jTextArea_Messge = new javax.swing.JTextArea();
         jTextArea_Messge = new javax.swing.JTextPane();
         jLabel_Reciever = new javax.swing.JLabel();
         jTextField_Reciever = new javax.swing.JTextField();
