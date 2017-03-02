@@ -50,6 +50,8 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 	{
 //		super(Lang.getInstance().translate(controller.Controller.APP_NAME) + " - " + Lang.getInstance().translate(record.viewTypeName()));
 		
+		DBSet db = DBSet.getInstance();
+
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -104,14 +106,16 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		
 		//LABEL Height + Seq
 		labelGBC.gridy = componentLevel;
-		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Block") +"-" + Lang.getInstance().translate("Transaction")+":");
+		JLabel heSeqLabel = new JLabel(Lang.getInstance().translate("Short Info") + ":");
 		this.add(heSeqLabel, labelGBC);
 				
 		//Height + Seq
-		DBSet db = DBSet.getInstance();
-
 		detailGBC.gridy = componentLevel++;
-		JTextField heSeq = new JTextField(record.viewHeightSeq(db));
+		JTextField heSeq = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
+				+ " [" + record.viewHeightSeq(db) + " " + record.getReference() + "] "
+				+ String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
+				+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+				+ ">>" + record.getConfirmations(db));
 		heSeq.setEditable(false);
 		MenuPopupUtil.installContextMenu(heSeq);
 		this.add(heSeq, detailGBC);
@@ -123,11 +127,13 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 				
 		//SIGNATURE
 		detailGBC.gridy = componentLevel;
+		//JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
 		JTextField signature = new JTextField(Base58.encode(record.getSignature()));
 		signature.setEditable(false);
 		MenuPopupUtil.installContextMenu(signature);
 		this.add(signature, detailGBC);
-		
+
+		/*
 		//LABEL REFERENCE
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
@@ -153,6 +159,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		timestamp.setEditable(false);
 		MenuPopupUtil.installContextMenu(timestamp);
 		this.add(timestamp, detailGBC);
+		*/
 		
 		//LABEL CREATOR
 		componentLevel ++;
@@ -189,6 +196,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		MenuPopupUtil.installContextMenu(creator_Pub_key);
 		this.add(creator_Pub_key, detailGBC);
 		
+		/*
 		//LABEL FEE POWER
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
@@ -198,12 +206,13 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		//FEE POWER
 		detailGBC.gridy = componentLevel;
 		JTextField feePow = new JTextField(
-				String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow()) + ": "
-				+ record.getFee().toPlainString() + " " + core.item.assets.AssetCls.FEE_ABBREV);
+				String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
+				+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+				+ ">>" + record.getConfirmations(db));
 		feePow.setEditable(false);
 		MenuPopupUtil.installContextMenu(feePow);
 		this.add(feePow, detailGBC);	
-												
+						
 		//LABEL CONFIRMATIONS
 		componentLevel ++;
 		labelGBC.gridy = componentLevel;
@@ -212,8 +221,9 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 								
 		//CONFIRMATIONS
 		detailGBC.gridy = componentLevel;
-		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(DBSet.getInstance())));
-		this.add(confirmations, detailGBC);	
+		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(db)));
+		this.add(confirmations, detailGBC);
+		*/	
 		  
 	}
 }
