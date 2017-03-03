@@ -1,6 +1,7 @@
 package gui.voting;
 
 import gui.PasswordPane;
+import gui.library.MTable;
 import gui.models.AccountsComboBoxModel;
 import gui.models.CreateOptionsTableModel;
 import lang.Lang;
@@ -143,7 +144,7 @@ public class CreatePollFrame extends JFrame
       	//TABLE OPTIONS
       	txtGBC.gridy = 3;
       	this.optionsTableModel = new CreateOptionsTableModel(new Object[] { Lang.getInstance().translate("Name") }, 0);
-      	final JTable table = new JTable(optionsTableModel);
+      	final JTable table = new MTable(optionsTableModel);
       	
       	this.add(new JScrollPane(table), txtGBC);
       	

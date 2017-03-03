@@ -58,6 +58,7 @@ import database.DBSet;
 import database.SortableList;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -95,7 +96,7 @@ public class My_Balance_Tab extends Split_Panel {
 	//TABLE
 		
 		  BalancesModel = new Balance_from_Adress_TableModel();
-	final JTable table = new JTable(BalancesModel);
+	final MTable table = new MTable(BalancesModel);
 	
 	
 	

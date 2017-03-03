@@ -53,7 +53,8 @@
 	import gui.Split_Panel;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
-	import gui.models.Renderer_Boolean;
+import gui.library.MTable;
+import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
@@ -66,7 +67,7 @@
 
 		
 		private WalletItemPersonsTableModel my_PersonsModel;
-		private JTable my_Person_table;
+		private MTable my_Person_table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
 	// для прозрачности
@@ -90,7 +91,7 @@
 			
 			//TABLE
 			my_PersonsModel = new WalletItemPersonsTableModel();
-			my_Person_table = new JTable(my_PersonsModel);
+			my_Person_table = new MTable(my_PersonsModel);
 			
 			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));

@@ -62,9 +62,9 @@ public class Gui extends JFrame{
 				}
 				
         
-		/*		
 				
-				int size_font = 18;
+				
+				int size_font = 24;
 			      Font font = new Font("Courier", Font.PLAIN, size_font);
 			      UIManager.put("Button.font", font);
 			      UIManager.put("Table.font", font);
@@ -88,9 +88,9 @@ public class Gui extends JFrame{
 			      UIManager.put("Table.height", size_font*5);
 			      
 			      
-			      UIManager.put("Label.foreground", Color.GREEN);
+		//	      UIManager.put("Label.foreground", Color.GREEN);
 			      
-        */
+        
         UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
         UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));

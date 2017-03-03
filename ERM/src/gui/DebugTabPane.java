@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
+import gui.library.MTable;
 import gui.models.BlocksTableModel;
 import gui.models.Debug_Transactions_Table_Model;
 import gui.models.PeersTableModel;
@@ -47,11 +48,11 @@ public class DebugTabPane extends JTabbedPane{
         }
         
         this.peersTableModel = new PeersTableModel();
-		this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new JTable(this.peersTableModel)));
+		this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new MTable(this.peersTableModel)));
         
 		//TRANSACTIONS TABLE MODEL
 		this.transactionsTableModel = new Debug_Transactions_Table_Model();
-		this.transactionsTable = new JTable(this.transactionsTableModel);
+		this.transactionsTable = new MTable(this.transactionsTableModel);
 		
 		//TRANSACTIONS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
@@ -84,7 +85,7 @@ public class DebugTabPane extends JTabbedPane{
 	           
 		//BLOCKS TABLE MODEL
 		this.blocksTableModel = new BlocksTableModel(false);
-		JTable blocksTable = new JTable(this.blocksTableModel);
+		JTable blocksTable = new MTable(this.blocksTableModel);
 		
 		//BLOCKS SORTER
 		indexes = new TreeMap<Integer, Integer>();

@@ -37,7 +37,7 @@ public class Accounts_Library_Panel extends JPanel {
 		this.setName(Lang.getInstance().translate("Accounts"));
 		
 		PersonAccountsModel person_Accounts_Model = new PersonAccountsModel(person.getKey());
-		jTable_Accounts = new JTable(person_Accounts_Model);
+		jTable_Accounts = new MTable(person_Accounts_Model);
 
 		jTable_Accounts.setDefaultRenderer(String.class,
 				new Renderer_Left(jTable_Accounts.getFontMetrics(jTable_Accounts.getFont()),

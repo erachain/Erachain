@@ -26,7 +26,7 @@ public class Voush_Library_Panel extends JPanel {
 
 		this.setName(Lang.getInstance().translate("Certified"));
 		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
-		JTable jTable_Vouches = new JTable(model);
+		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
 		TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
 		col_data.setMinWidth(50);

@@ -24,6 +24,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
+import gui.library.MTable;
 import gui.models.KnownPeersTableModel;
 import lang.Lang;
 import utils.IPAddressFormatValidator;
@@ -50,7 +51,7 @@ public class SettingsKnownPeersPanel extends JPanel
         
 		this.knownPeersTableModel = new KnownPeersTableModel();
 		
-		knownPeersTable = new JTable(knownPeersTableModel);
+		knownPeersTable = new MTable(knownPeersTableModel);
 
         GridBagConstraints gbc_knownPeersTable = new GridBagConstraints();
         gbc_knownPeersTable.fill = GridBagConstraints.BOTH;

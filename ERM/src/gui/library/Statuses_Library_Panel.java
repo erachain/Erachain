@@ -32,7 +32,7 @@ public Statuses_Library_Panel(PersonCls person){
 
 
 	   PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
-       jTable_Statuses = new JTable(statusModel);
+       jTable_Statuses = new MTable(statusModel);
        
        jTable_Statuses.setDefaultRenderer(String.class, new Renderer_Left(jTable_Statuses.getFontMetrics(jTable_Statuses.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
        //CHECKBOX FOR FAVORITE

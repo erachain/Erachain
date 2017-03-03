@@ -52,6 +52,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import gui.MainFrame;
 import gui.Table_Formats;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -121,7 +122,7 @@ public class AssetPairSelect extends JFrame{
 		
 		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
 				
-		final JTable assetsPairTable = new JTable(assetPairSelectTableModel);
+		final MTable assetsPairTable = new MTable(assetPairSelectTableModel);
 		
 		sorter = new TableRowSorter(assetPairSelectTableModel);
 		assetsPairTable.setRowSorter(sorter);	

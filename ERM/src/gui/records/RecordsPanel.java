@@ -4,6 +4,7 @@ import gui.CoreRowSorter;
 import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.assets.AssetDetailsPanel001;
+import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -50,7 +51,7 @@ public class RecordsPanel extends  JPanel // JPanel
 {
 
 	private WalletTransactionsTableModel transactionsModel;
-	private JTable transactionsTable;
+	private MTable transactionsTable;
 
 	public RecordsPanel()
 	{
@@ -81,7 +82,7 @@ public class RecordsPanel extends  JPanel // JPanel
 				
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
-		this.transactionsTable = new JTable(this.transactionsModel);
+		this.transactionsTable = new MTable(this.transactionsModel);
 		
 		//TRANSACTIONS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

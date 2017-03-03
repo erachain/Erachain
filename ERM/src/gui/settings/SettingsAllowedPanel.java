@@ -26,6 +26,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import gui.library.MTable;
 import gui.models.AllowedTableModel;
 import lang.Lang;
 import settings.Settings;
@@ -62,7 +63,7 @@ public class SettingsAllowedPanel extends JPanel
         this.webAllowedTableModel = new AllowedTableModel(Settings.getInstance().getWebAllowed());
         
 
-        webAllowedTable = new JTable(webAllowedTableModel);
+        webAllowedTable = new MTable(webAllowedTableModel);
         
         webAllowedTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -144,7 +145,7 @@ public class SettingsAllowedPanel extends JPanel
 		
         this.rpcAllowedTableModel = new AllowedTableModel(Settings.getInstance().getRpcAllowed());
 
-        rpcAllowedTable = new JTable(rpcAllowedTableModel);
+        rpcAllowedTable = new MTable(rpcAllowedTableModel);
         
         rpcAllowedTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {

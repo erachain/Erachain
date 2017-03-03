@@ -63,6 +63,7 @@ import gui.MainFrame;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.records.Records_My_SplitPanel.search_listener;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.library.MTable;
 import gui.models.BlocksTableModel;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
@@ -152,7 +153,7 @@ import utils.MenuPopupUtil;
 		    	
 		    	//TRANSACTIONS TABLE MODEL
 				this.transactionsTableModel = new TransactionsTableModel();
-				this.jTable_jScrollPanel_LeftPanel = new JTable(this.transactionsTableModel);
+				this.jTable_jScrollPanel_LeftPanel = new MTable(this.transactionsTableModel);
 				
 				this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 				

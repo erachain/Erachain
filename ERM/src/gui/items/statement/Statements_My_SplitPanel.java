@@ -56,6 +56,7 @@ import gui.MainFrame;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.persons.Person_info_panel_001;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
@@ -140,7 +141,7 @@ import gui.models.Renderer_Boolean;
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/		// SET VIDEO			
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = new JTable(my_Statements_Model); //my_Statements_table;
+			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionBackground(new Color(209, 232, 255, 255));
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);

@@ -62,6 +62,7 @@ import gui.items.accounts.Account_Send_Dialog;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
 import gui.items.mails.Mail_Send_Dialog;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -76,7 +77,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	private static final long serialVersionUID = 2717571093561259483L;
 
 	private TableModelPersons search_Table_Model;
-	private JTable search_Table;
+	private MTable search_Table;
 	private RowSorter<TableModelPersons> search_Sorter;
 	private RunMenu Search_run_menu;
 // для прозрачности
@@ -100,7 +101,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 		
 //CREATE TABLE
 		search_Table_Model = new TableModelPersons();
-		search_Table = new JTable(this.search_Table_Model);
+		search_Table = new MTable(this.search_Table_Model);
 		TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
 	

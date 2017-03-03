@@ -53,6 +53,7 @@ import gui.MainFrame;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.persons.TableModelPersons;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
@@ -68,7 +69,7 @@ import utils.TableMenuPopupUtil;
 
 		
 		private TableModelMails incoming_Mails_Model;
-		private JTable inciming_Mail_Table;
+		private MTable inciming_Mail_Table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
 	// для прозрачности
@@ -92,7 +93,7 @@ import utils.TableMenuPopupUtil;
 			
 			//TABLE
 			incoming_Mails_Model = new TableModelMails(true);
-			inciming_Mail_Table = new JTable(incoming_Mails_Model);
+			inciming_Mail_Table = new MTable(incoming_Mails_Model);
 			inciming_Mail_Table.setAutoCreateRowSorter(true);
 			
 			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model

@@ -2,7 +2,7 @@ package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.items.persons.Person_info_panel_001;
-
+import gui.library.MTable;
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -103,7 +103,7 @@ public class Credits_Panel extends JPanel // implements ItemListener
 		// start data in model
 		tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
 		// table = Gui.createSortableTable(tableModel, 0);
-		 table = new JTable(tableModel);
+		 table = new MTable(tableModel);
 			
 	//	TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
 	//	sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());

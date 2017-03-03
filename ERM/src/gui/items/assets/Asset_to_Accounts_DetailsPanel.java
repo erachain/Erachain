@@ -9,6 +9,7 @@ import javax.swing.JTable;
 
 import core.account.Account;
 import core.item.assets.AssetCls;
+import gui.library.MTable;
 import gui.models.AccountsTableModel;
 import gui.models.Accounts_Of_Deals_TableModel;
 import gui.models.BalancesTableModel;
@@ -219,7 +220,7 @@ this.setVisible(false);
       //  Balances_To_Account_TableModel balancesTableModel = new Balances_To_Account_TableModel(asset.getKey());
         Accounts_Of_Deals_TableModel balancesTableModel = new Accounts_Of_Deals_TableModel(0);
         balancesTableModel.setAsset(asset);
-  		final JTable  jTable1 = new JTable(balancesTableModel);
+  		final MTable  jTable1 = new MTable(balancesTableModel);
     
   	//Custom renderer for the String column;
   		jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer

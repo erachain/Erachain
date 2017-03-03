@@ -35,6 +35,7 @@ import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
@@ -49,7 +50,7 @@ public class My_Notes_Tab extends Split_Panel {
 	WalletItemAssetsTableModel assetsModel;
 	private static final long serialVersionUID = 1L;
 	RowSorter<WalletItemAssetsTableModel> sorter;
-	final JTable table;
+	final MTable table;
 
 	public My_Notes_Tab()
 	{
@@ -65,7 +66,7 @@ public class My_Notes_Tab extends Split_Panel {
 		
 	//TABLE
 	 assetsModel = new WalletItemAssetsTableModel();
-	table = new JTable(assetsModel);
+	table = new MTable(assetsModel);
 	//assetsModel.getAsset(row)
 	//POLLS SORTER
 	 sorter =   new TableRowSorter<WalletItemAssetsTableModel>(assetsModel);

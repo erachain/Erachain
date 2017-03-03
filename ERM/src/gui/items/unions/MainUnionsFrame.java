@@ -28,6 +28,7 @@ import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
 import gui.items.statuses.IssueStatusPanel;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -75,7 +76,7 @@ public MainUnionsFrame (){
 			
 //CREATE TABLE
 		this.tableModelUnions = new TableModelUnions();
-		final JTable unionsTable = new JTable(this.tableModelUnions);
+		final MTable unionsTable = new MTable(this.tableModelUnions);
 		TableColumnModel columnModel = unionsTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
 //Custom renderer for the String column;
@@ -189,7 +190,7 @@ public MainUnionsFrame (){
 	my_Union_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
 //TABLE
 	final WalletItemUnionsTableModel unionsModel = new WalletItemUnionsTableModel();
-	final JTable tableUnion = new JTable(unionsModel);
+	final MTable tableUnion = new MTable(unionsModel);
 	columnModel = tableUnion.getColumnModel(); // read column model
 	columnModel.getColumn(0).setMaxWidth((100));
 //Custom renderer for the String column;
