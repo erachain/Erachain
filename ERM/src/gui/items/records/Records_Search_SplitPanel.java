@@ -64,6 +64,7 @@ import gui.MainFrame;
 import gui.items.records.Records_My_SplitPanel.search_listener;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.library.MTable;
+import gui.library.Voush_Library_Panel;
 import gui.models.BlocksTableModel;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
@@ -274,14 +275,6 @@ import utils.MenuPopupUtil;
 											  	    
 											        
 											       
-											  	    	Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(voting);
-											  	        JTable jTable_Sign = new JTable (table_sing_model);
-											  	        
-											  	      jTable_Sign.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-											  	    jTable_Sign.setDefaultRenderer(String.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
-											  	  jTable_Sign.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
-															
-											  
 											  	  
 											  	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
 											        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -294,10 +287,7 @@ import utils.MenuPopupUtil;
 											        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
 											  	  
 											  	  
-											  	  
-											
-												jScrollPane4.setViewportView(jTable_Sign);
-													
+											  											
 													
 												        gridBagConstraints = new java.awt.GridBagConstraints();
 												        gridBagConstraints.gridx = 0;
@@ -306,7 +296,7 @@ import utils.MenuPopupUtil;
 												        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 												        gridBagConstraints.weightx = 1.0;
 												        gridBagConstraints.weighty = 1.0;
-												        panel. add( jScrollPane4, gridBagConstraints);
+												        panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
 													
 											        }
 												     

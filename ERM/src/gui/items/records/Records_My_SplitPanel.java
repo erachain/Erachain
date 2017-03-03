@@ -61,6 +61,7 @@ import gui.MainFrame;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.library.MTable;
+import gui.library.Voush_Library_Panel;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
@@ -342,39 +343,29 @@ import lang.Lang;
 										  	    
 										        
 										       
-										  	    	Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(voting);
-										  	        MTable jTable_Sign = new MTable (table_sing_model);
-										  	        
-										  	      jTable_Sign.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-										  	    jTable_Sign.setDefaultRenderer(String.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
-										  	  jTable_Sign.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer
-														
-										  
-										  	  
-										  	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
-										        gridBagConstraints = new java.awt.GridBagConstraints();
-										        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-										        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-										        gridBagConstraints.weightx = 0.1;
-										        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
-										        gridBagConstraints.gridx = 0;
-										        gridBagConstraints.gridy = 1;
-										        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
-										  	  
-										  	  
-										  	  
-											jScrollPane4.setViewportView(jTable_Sign);
-												
-												
+										  	    	
+										        	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
 											        gridBagConstraints = new java.awt.GridBagConstraints();
-											        gridBagConstraints.gridx = 0;
-											        gridBagConstraints.gridy = 2;
-											        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+											        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 											        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-											        gridBagConstraints.weightx = 1.0;
-											        gridBagConstraints.weighty = 1.0;
-											        panel. add( jScrollPane4, gridBagConstraints);
-												
+											        gridBagConstraints.weightx = 0.1;
+											        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
+											        gridBagConstraints.gridx = 0;
+											        gridBagConstraints.gridy = 1;
+											        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
+											  	  
+											  	  
+											  											
+													
+												        gridBagConstraints = new java.awt.GridBagConstraints();
+												        gridBagConstraints.gridx = 0;
+												        gridBagConstraints.gridy = 2;
+												        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+												        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+												        gridBagConstraints.weightx = 1.0;
+												        gridBagConstraints.weighty = 1.0;
+												        panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
+										     
 										        }
 											     
 											        
