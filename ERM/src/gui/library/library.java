@@ -50,38 +50,16 @@ public class library {
 	
 	}
 	
-	public static void Set_Font(){
-				
-		int size_font =new Integer(Settings.getInstance().get_Font());
-	      Font font = new Font("Courier", Font.PLAIN, size_font);
-	      UIManager.put("Button.font", font);
-	      UIManager.put("Table.font", font);
-	      UIManager.put("Label.font", font);
-	      UIManager.put("ComboBox.font", font);
-	      UIManager.put("TextField.font", font);
-	      UIManager.put("TableHeader.font", font);
-	      UIManager.put("TabbedPane.font", font);
-	      UIManager.put("RadioButton.font", font);
-	      UIManager.put("ComboBox.font", font);
-	      UIManager.put("CheckBox.font", font);
-	 
-	      UIManager.put("Menu.font", font);
-	      UIManager.put("MenuItem.font", font);
-	      UIManager.put("Frame.titleFont", font);
-	      UIManager.put("InternalFrame.font",font);
-	         
-	      UIManager.put( "TextPane.font", font ); 
-	   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
-	      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
-	      UIManager.put("Table.height", size_font*5);
-	      UIManager.put("TextArea.font", font);
-	     	
-		
-		
-	}
 
-	public static void Set_Font(String text) {
-		int size_font =new Integer(text);
+	public static void Set_GUI_Font(String text) {
+		
+		int size_font;
+		if ( text == ""){
+			size_font =new Integer(Settings.getInstance().get_Font());
+		}
+		else{
+		size_font =new Integer(text);
+		}
 	      Font font = new Font("Courier", Font.PLAIN, size_font);
 	      UIManager.put("Button.font", font);
 	      UIManager.put("Table.font", font);

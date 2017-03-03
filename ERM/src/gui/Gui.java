@@ -63,8 +63,8 @@ public class Gui extends JFrame{
 				}
 				
         
-				
-				gui.library.library.Set_Font();
+// set GUI font 				
+				gui.library.library.Set_GUI_Font("");
 				
 			/*	
 				int size_font = 24;

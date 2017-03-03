@@ -170,7 +170,7 @@ public class SettingsFrame extends JFrame{
 	//	{
 		if (settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString() != "") {
 			settingsJSONbuf.put("font_size", settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
-			gui.library.library.Set_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+			gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
 		}
 	
 
