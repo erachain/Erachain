@@ -55,6 +55,8 @@ import gui.items.statement.MainStatementsFrame;
 import gui.items.statuses.MainStatusesFrame;
 import gui.items.unions.MainUnionsFrame;
 import gui.items.voting.MainVotingsFrame;
+import gui.library.Menu_Popup_Deals_button;
+import gui.library.Menu_Popup_File_button;
 import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
@@ -105,7 +107,11 @@ private JFrame parent;
 			//	tb1.add(new JButton(new ImageIcon("Add24.gif"))); tb1.add(new JButton(new ImageIcon("AlignTop24.gif")));
 
 			//	tb1.add(new JButton(new ImageIcon("About24.gif")));
-				
+	
+			
+			Toolbar_Main.add(new Menu_Popup_File_button());
+			Toolbar_Main.add(new Menu_Popup_Deals_button());
+			
 		JButton button1_MainToolBar = new JButton();
 		button1_MainToolBar.setText(Lang.getInstance().translate("Accounts"));
 			//     button1_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -115,7 +121,7 @@ private JFrame parent;
 		button1_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 			//	gui.Menu.selectOrAdd( new AccountsFrame(parent), MainFrame.desktopPane.getAllFrames()); // old panel
-				gui.Menu.selectOrAdd( new Main_Accounts_Frame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new Main_Accounts_Frame(), MainFrame.desktopPane.getAllFrames());
 		    }
 		});
 		Toolbar_Main.add(button1_MainToolBar);
@@ -131,7 +137,7 @@ private JFrame parent;
 		button2_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
        	button2_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
        		public void actionPerformed(java.awt.event.ActionEvent evt) {
-       			gui.Menu.selectOrAdd( new MainPersonsFrame(), MainFrame.desktopPane.getAllFrames());
+       			gui.library.library.selectOrAdd( new MainPersonsFrame(), MainFrame.desktopPane.getAllFrames());
        		}
        	});
        	Toolbar_Main.add(button2_MainToolBar);
@@ -146,7 +152,7 @@ private JFrame parent;
 		button_Mails_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button_Mails_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new Mails_Main_Frame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new Mails_Main_Frame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button_Mails_MainToolBar);
@@ -162,7 +168,7 @@ private JFrame parent;
 		button11_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button11_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new Main_Hash_Document_Frame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new Main_Hash_Document_Frame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button11_MainToolBar);
@@ -178,7 +184,7 @@ private JFrame parent;
        	button_Statements_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
        	button_Statements_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
        		public void actionPerformed(java.awt.event.ActionEvent evt) {
-       			gui.Menu.selectOrAdd( new MainStatementsFrame(), MainFrame.desktopPane.getAllFrames());
+       			gui.library.library.selectOrAdd( new MainStatementsFrame(), MainFrame.desktopPane.getAllFrames());
        		}
        	});
        	
@@ -205,7 +211,7 @@ private JFrame parent;
 		button3_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button3_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainAssetsFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainAssetsFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button3_MainToolBar);	
@@ -218,7 +224,7 @@ private JFrame parent;
 		button4_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button4_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainImprintsFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainImprintsFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button4_MainToolBar);
@@ -231,7 +237,7 @@ private JFrame parent;
 		button5_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button5_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainUnionsFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainUnionsFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button5_MainToolBar);
@@ -245,7 +251,7 @@ private JFrame parent;
 		button41_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button41_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainNotesFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainNotesFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button41_MainToolBar);
@@ -262,7 +268,7 @@ private JFrame parent;
 		button6_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button6_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainStatusesFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button6_MainToolBar);
@@ -289,7 +295,7 @@ private JFrame parent;
 		button9_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button9_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new MainVotingsFrame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new MainVotingsFrame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button9_MainToolBar);
@@ -310,7 +316,7 @@ private JFrame parent;
 		button10_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button10_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new Records_Main_Frame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new Records_Main_Frame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button10_MainToolBar);
@@ -326,7 +332,7 @@ private JFrame parent;
 		button8_MainToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);		       
 		button8_MainToolBar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				gui.Menu.selectOrAdd( new Other_Internal_Frame(), MainFrame.desktopPane.getAllFrames());
+				gui.library.library.selectOrAdd( new Other_Internal_Frame(), MainFrame.desktopPane.getAllFrames());
 			}
 		});
 		Toolbar_Main.add(button8_MainToolBar);
@@ -343,10 +349,10 @@ private JFrame parent;
 		
 
 		//MENU
-        Menu menu = new Menu(this);
+     //   Menu menu = new Menu(this);
 
         //ADD MENU TO FRAME
-        this.setJMenuBar(menu);
+     //   this.setJMenuBar(menu);
         
      
         // 
@@ -470,7 +476,7 @@ private JFrame parent;
 								object  = (JInternalFrame) Class.forName(str).newInstance();
 								object.setLocation(Integer.valueOf( userObject.get("location_X").toString()), Integer.valueOf(userObject.get("location_Y").toString()));
 								object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
-								gui.Menu.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
+								gui.library.library.selectOrAdd( object, MainFrame.desktopPane.getAllFrames());
 							} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();

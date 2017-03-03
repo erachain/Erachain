@@ -8,6 +8,8 @@ import javax.swing.JTable;
 
 import org.mapdb.Fun.Tuple2;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.item.notes.Note;
@@ -60,7 +62,8 @@ public class Statement_Info extends javax.swing.JPanel {
         jScrollPane4.setViewportView(jTable_Sign);
         statement = (R_SignNote)transaction;
         NoteCls note = (NoteCls)ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
-        jTextArea_Body.setText(note.getName() + "\n\n" + note.getDescription() + "\n\n" + new String( statement.getData(), Charset.forName("UTF-8") ));
+        jTextArea_Body.setContentType("text/html");
+        jTextArea_Body.setText(note.getName() + "\n\n" + note.getDescription() + "\n\n" + Processor.process(new String( statement.getData(), Charset.forName("UTF-8")) ));
         
         jSplitPane1.setDividerLocation(350);//.setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
        
@@ -80,7 +83,7 @@ public class Statement_Info extends javax.swing.JPanel {
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea_Body = new javax.swing.JTextArea();
+        jTextArea_Body = new javax.swing.JTextPane();
         jPanel2 = new javax.swing.JPanel();
         jLabelTitlt_Table_Sign = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -103,9 +106,10 @@ public class Statement_Info extends javax.swing.JPanel {
        
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jTextArea_Body.setColumns(20);
-        jTextArea_Body.setRows(5);
-        jScrollPane3.setViewportView(jTextArea_Body);
+   //     jTextArea_Body.setColumns(20);
+    //    jTextArea_Body.setRows(5);
+   //     jScrollPane3.setViewportView(jTextArea_Body);
+        jScrollPane3.getViewport().add(jTextArea_Body);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -161,6 +165,6 @@ public class Statement_Info extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jTable_Sign;
-    private javax.swing.JTextArea jTextArea_Body;
+    private javax.swing.JTextPane jTextArea_Body;
     // End of variables declaration                   
 }

@@ -2,12 +2,15 @@ package gui;
 
 // 16/03
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
@@ -59,7 +62,35 @@ public class Gui extends JFrame{
 				}
 				
         
-        
+		/*		
+				
+				int size_font = 18;
+			      Font font = new Font("Courier", Font.PLAIN, size_font);
+			      UIManager.put("Button.font", font);
+			      UIManager.put("Table.font", font);
+			      UIManager.put("Label.font", font);
+			      UIManager.put("ComboBox.font", font);
+			      UIManager.put("TextField.font", font);
+			      UIManager.put("TableHeader.font", font);
+			      UIManager.put("TabbedPane.font", font);
+			      UIManager.put("RadioButton.font", font);
+			      UIManager.put("ComboBox.font", font);
+			      UIManager.put("CheckBox.font", font);
+			 
+			      UIManager.put("Menu.font", font);
+			      UIManager.put("MenuItem.font", font);
+			      UIManager.put("Frame.titleFont", font);
+			      UIManager.put("InternalFrame.font",font);
+			         
+			      UIManager.put( "TextPane.font", font ); 
+			   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
+			      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
+			      UIManager.put("Table.height", size_font*5);
+			      
+			      
+			      UIManager.put("Label.foreground", Color.GREEN);
+			      
+        */
         UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
         UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));

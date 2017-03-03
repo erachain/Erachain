@@ -24,7 +24,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import controller.Controller;
-import gui.Menu;
+import gui.library.Menu_Popup_File_button;
 import gui.naming.SellNameFrame;
 import lang.Lang;
 import lang.LangFile;
@@ -362,8 +362,8 @@ public class SettingsFrame extends JFrame{
 		{
 			Controller.getInstance().webServiceRestart();
 			
-			Menu.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
-			Menu.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Popup_File_button.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Popup_File_button.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
 		}
 		Lang.getInstance().loadLang();
 		
