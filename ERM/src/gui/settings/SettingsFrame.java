@@ -163,6 +163,20 @@ public class SettingsFrame extends JFrame{
 		boolean limitConnections = false;
 		boolean changeLang = false;
 		
+		
+		
+		// font
+	//	if(Settings.getInstance().getMinConnections() != MinConnections)
+	//	{
+		if (settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_size", settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+			gui.library.library.Set_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+		}
+	
+
+				
+		
+		
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled() != settingsTabPane.settingsBasicPanel.chckbxKeyCaching.isSelected())
 		{
 			settingsJSONbuf.put("generatorkeycaching", settingsTabPane.settingsBasicPanel.chckbxKeyCaching.isSelected());
@@ -340,6 +354,8 @@ public class SettingsFrame extends JFrame{
 			settingsJSONbuf.put("rpcallowed",settingsTabPane.settingsAllowedPanel.rpcAllowedTableModel.getPeers());
 		}
 		
+		
+		
 		try {
 			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);			
 		} catch (IOException e) {
@@ -366,6 +382,8 @@ public class SettingsFrame extends JFrame{
 			Menu_Popup_File_button.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
 		}
 		Lang.getInstance().loadLang();
+		
+		
 		
 		if(changeDataDir || changeWallet)
 		{

@@ -64,6 +64,8 @@ public class Gui extends JFrame{
 				
         
 				
+				gui.library.library.Set_Font();
+				
 			/*	
 				int size_font = 24;
 			      Font font = new Font("Courier", Font.PLAIN, size_font);
@@ -96,7 +98,7 @@ public class Gui extends JFrame{
         UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
         UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
-        UIManager.put("TextArea.font", UIManager.get("TextField.font"));
+   //     UIManager.put("TextArea.font", UIManager.get("TextField.font"));
 
         
         if(Settings.getInstance().Dump().containsKey("lang"))
