@@ -21,6 +21,7 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import gui.create.NoWalletFrame;
 import gui.create.SettingLangFrame;
+import gui.library.MTable;
 import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
@@ -62,8 +63,8 @@ public class Gui extends JFrame{
 				}
 				
         
-			/*	
 				
+			/*	
 				int size_font = 24;
 			      Font font = new Font("Courier", Font.PLAIN, size_font);
 			      UIManager.put("Button.font", font);
@@ -86,8 +87,8 @@ public class Gui extends JFrame{
 			   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
 			      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
 			      UIManager.put("Table.height", size_font*5);
-			      
 			*/      
+			     
 		//	      UIManager.put("Label.foreground", Color.GREEN);
 			      
         
@@ -162,10 +163,10 @@ public class Gui extends JFrame{
 		System.exit(0);
 	}
 	
-	public static <T extends TableModel> JTable createSortableTable(T tableModel, int defaultSort)
+	public static <T extends TableModel> MTable createSortableTable(T tableModel, int defaultSort)
 	{
 		//CREATE TABLE
-		JTable table = new JTable(tableModel);
+		MTable table = new MTable(tableModel);
 		
 		//CREATE SORTER
 		TableRowSorter<T> rowSorter = new TableRowSorter<T>(tableModel);
@@ -182,10 +183,10 @@ public class Gui extends JFrame{
 		return table;
 	}
 
-	public static <T extends TableModel> JTable createSortableTable(T tableModel, int defaultSort, RowFilter<T, Object> rowFilter)
+	public static <T extends TableModel> MTable createSortableTable(T tableModel, int defaultSort, RowFilter<T, Object> rowFilter)
 	{
 		//CREATE TABLE
-		JTable table = new JTable(tableModel);
+		MTable table = new MTable(tableModel);
 		
 		//CREATE SORTER
 		TableRowSorter<T> rowSorter = new TableRowSorter<T>(tableModel);

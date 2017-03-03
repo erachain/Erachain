@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import org.mapdb.Fun.Tuple2;
@@ -13,6 +13,7 @@ import org.mapdb.Fun.Tuple2;
 import database.wallet.BlockMap;
 import gui.CoreRowSorter;
 import gui.MainFrame;
+import gui.library.MTable;
 import gui.models.BlocksTableModel;
 import gui.models.PeersTableModel;
 import gui.models.Renderer_Left;
@@ -46,8 +47,8 @@ public class other_Panel extends javax.swing.JPanel {
     public other_Panel() {
     // peers table	
     	 this.peersTableModel = new PeersTableModel();
-         this.jTable_Peers = new JTable(this.peersTableModel);
-         this.jTable_Peers.setAutoCreateRowSorter(true);
+         this.jTable_Peers = new MTable(this.peersTableModel);
+         this.jTable_Peers.setAutoCreateRowSorter(true);	
          this.jTable_Peers.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
     //     Renderer_Left ren = new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
          this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
@@ -60,7 +61,7 @@ public class other_Panel extends javax.swing.JPanel {
          
     // all block table
          this.All_Blocks_TableModel = new BlocksTableModel(true);
-		this.jTable_All_Block = new JTable(this.All_Blocks_TableModel);
+		this.jTable_All_Block = new MTable(this.All_Blocks_TableModel);
 		 this.jTable_All_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
          this.jTable_All_Block.setDefaultRenderer(String.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
          this.jTable_All_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
@@ -76,7 +77,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		
 		//TRANSACTIONS
 		this.blocksModel = new WalletBlocksTableModel();
-		this.jTable_My_Block = new JTable(blocksModel);
+		this.jTable_My_Block = new MTable(blocksModel);
 				
 		//TRANSACTIONS SORTER
 		indexes = new TreeMap<Integer, Integer>();
@@ -119,13 +120,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         this.jSplitPane3.setDividerLocation((int)((size.getHeight()-100)*.4));
         this.jSplitPane5.setDividerLocation((int)((size.getWidth()-100)*.5));
        
-//		this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new JTable(this.peersTableModel)));	
-//ADD BLOCK TABLE
-	//	this.jScrollPane_Peers_Table.add(this.peersTable);
-	//	this.jScrollPane_Peers_Table.setViewportView(this.peersTable);
-	//	split_Peers.setRowHeightFormat(true);	
-        
-        
+
         
     }
  /**
@@ -160,7 +155,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         jLabel_Transaction_Title = new javax.swing.JLabel();
     //    jSplitPane6 = new javax.swing.JSplitPane();
         jScrollPane_Transaction_Table = new javax.swing.JScrollPane();
-        jTable_My_Records = new javax.swing.JTable();
+        jTable_My_Records = new MTable(new DefaultTableModel());
         jScrollPane_Transaction_Info = new javax.swing.JScrollPane();
 
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
@@ -345,10 +340,10 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
     private javax.swing.JSplitPane jSplitPane4;
     private javax.swing.JSplitPane jSplitPane5;
 //    private javax.swing.JSplitPane jSplitPane6;
-    private javax.swing.JTable jTable_All_Block;
-    private javax.swing.JTable jTable_My_Block;
-    private javax.swing.JTable jTable_My_Records;
-    private javax.swing.JTable jTable_Peers;         
+    private MTable jTable_All_Block;
+    private MTable jTable_My_Block;
+    private MTable jTable_My_Records;
+    private MTable jTable_Peers;         
 
 
 

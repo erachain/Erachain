@@ -60,6 +60,7 @@ import gui.MainFrame;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
@@ -342,7 +343,7 @@ import lang.Lang;
 										        
 										       
 										  	    	Statements_Vouch_Table_Model table_sing_model = new Statements_Vouch_Table_Model(voting);
-										  	        JTable jTable_Sign = new JTable (table_sing_model);
+										  	        MTable jTable_Sign = new MTable (table_sing_model);
 										  	        
 										  	      jTable_Sign.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
 										  	    jTable_Sign.setDefaultRenderer(String.class, new Renderer_Left(jTable_Sign.getFontMetrics(jTable_Sign.getFont()),table_sing_model.get_Column_AutoHeight())); // set renderer

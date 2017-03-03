@@ -7,21 +7,19 @@ import javax.swing.table.TableModel;
 
 public class MTable extends JTable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public MTable(TableModel model) {
 		super();
+	// set model
 		setModel(model);
-		// set auto row Heighy
-		set_Row_Height();
-	}
-
-	public void set_Row_Height() {
-		FontMetrics fontMetrics = getFontMetrics(getFont());
-		double textHeight = fontMetrics.getHeight();
-		for (int ii = 0; ii < getRowCount(); ii++) {
-			
-			setRowHeight(ii, (int) (textHeight));
-		}
-
+	// height row in table	
+		setRowHeight( (int) (getFontMetrics(getFont()).getHeight()));
+	// set renders
+	
 	}
 
 }
