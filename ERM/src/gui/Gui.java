@@ -64,7 +64,7 @@ public class Gui extends JFrame{
 				
         
 				
-				
+			/*	
 				int size_font = 24;
 			      Font font = new Font("Courier", Font.PLAIN, size_font);
 			      UIManager.put("Button.font", font);
@@ -87,7 +87,7 @@ public class Gui extends JFrame{
 			   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
 			      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
 			      UIManager.put("Table.height", size_font*5);
-			      
+			*/      
 			     
 		//	      UIManager.put("Label.foreground", Color.GREEN);
 			      
