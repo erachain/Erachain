@@ -57,6 +57,7 @@ public class SettingsBasicPanel extends JPanel
 	public JComboBox<LangFile> cbxListOfAvailableLangs;
 	public JButton btnLoadNewLang;
 	public JComboBox<String> size_Font;
+	public JComboBox<String> font_Name;
 	
 	public SettingsBasicPanel()
 	{
@@ -527,7 +528,7 @@ public class SettingsBasicPanel extends JPanel
       	
       	
       	
-      	 JLabel lbl_Font = new JLabel(Lang.getInstance().translate("Font Size")+":");
+      	 JLabel lbl_Font = new JLabel(Lang.getInstance().translate("Font")+":");
          GridBagConstraints gbc_lblFont = new GridBagConstraints();
          gbc_lblFont.anchor = GridBagConstraints.WEST;
          gbc_lblFont.insets = new Insets(0, 0, 5, 5);
@@ -535,20 +536,34 @@ public class SettingsBasicPanel extends JPanel
          gbc_lblFont.gridy = 16;
          add(lbl_Font, gbc_lblFont);
          
-        
-         
-         size_Font = new javax.swing.JComboBox<String>();
+//name font set
+         font_Name = new javax.swing.JComboBox<String>();
 
-         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "11", "14", "18", "24" }));
+         font_Name.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Arial", "Courier", "Tahoma", "Times New Roman"}));
+         
          
         
-        size_Font.setSelectedItem(Settings.getInstance().get_Font());
+         
+        
+         font_Name.setSelectedItem(Settings.getInstance().get_Font_Name());
          gbc_cbxListOfAvailableLangs.gridwidth = 2;
          gbc_cbxListOfAvailableLangs.insets = new Insets(0, 0, 5, 5);
          gbc_cbxListOfAvailableLangs.fill = GridBagConstraints.HORIZONTAL;
          gbc_cbxListOfAvailableLangs.gridx = 2;
          gbc_cbxListOfAvailableLangs.gridy = 16;
+         add(font_Name, gbc_cbxListOfAvailableLangs);
+ // size font set        
+         size_Font = new javax.swing.JComboBox<String>();
+
+         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "11", "14", "18", "24" }));
+         size_Font.setSelectedItem(Settings.getInstance().get_Font());  
+         gbc_cbxListOfAvailableLangs.gridwidth = 1;
+         gbc_cbxListOfAvailableLangs.insets = new Insets(0, 0, 5, 5);
+         gbc_cbxListOfAvailableLangs.fill = GridBagConstraints.HORIZONTAL;
+         gbc_cbxListOfAvailableLangs.gridx = 4;
+         gbc_cbxListOfAvailableLangs.gridy = 16;
          add(size_Font, gbc_cbxListOfAvailableLangs);
+         
          
         JButton btn_Set_Font = new JButton(Lang.getInstance().translate("Download"));
  		GridBagConstraints gbtn_Set_Font = new GridBagConstraints();

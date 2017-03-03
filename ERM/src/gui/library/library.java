@@ -52,15 +52,21 @@ public class library {
 	
 
 	public static void Set_GUI_Font(String text) {
-		
+		String name_font = "Courier";
 		int size_font;
 		if ( text == ""){
 			size_font =new Integer(Settings.getInstance().get_Font());
+			name_font = Settings.getInstance().get_Font_Name();
+		
 		}
 		else{
 		size_font =new Integer(text);
 		}
-	      Font font = new Font("Courier", Font.PLAIN, size_font);
+		
+		
+		
+		
+	      Font font = new Font(name_font, Font.TRUETYPE_FONT, size_font);
 	      UIManager.put("Button.font", font);
 	      UIManager.put("Table.font", font);
 	      UIManager.put("Label.font", font);

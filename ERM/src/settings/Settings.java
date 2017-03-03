@@ -47,6 +47,7 @@ public class Settings {
 	private static final int DEFAULT_PING_INTERVAL = 60000;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
+	private static final String DEFAULT_FONT_NAME = "Arial";
 	//private static final String[] DEFAULT_PEERS = { };
 	
 	// BLOCK
@@ -852,5 +853,20 @@ public class Settings {
 		
 		
 	}
+	
+	public String get_Font_Name(){
+		if(this.settingsJSON.containsKey("font_name"))
+		{
+			return ((String) this.settingsJSON.get("font_name").toString());
+		}
+		
+		return DEFAULT_FONT_NAME;
+		
+		
+		
+		
+		
+	}
+	
 	
 }

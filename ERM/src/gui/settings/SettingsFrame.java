@@ -170,10 +170,15 @@ public class SettingsFrame extends JFrame{
 	//	{
 		if (settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString() != "") {
 			settingsJSONbuf.put("font_size", settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
-			gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
 		}
 	
-
+		if (settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_name", settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+		}
+	
+		
 				
 		
 		
