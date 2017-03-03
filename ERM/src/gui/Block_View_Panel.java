@@ -1,7 +1,11 @@
 package gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JPanel;
 
+import gui.records.VouchRecordDialog;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
@@ -9,7 +13,14 @@ public class Block_View_Panel extends JPanel {
 	  /**
      * Creates new form Block_View_Panel
      */
+	
+	int block;
+	int trans;
+	
+	
     public Block_View_Panel(int block, int trans) {
+    	this.trans = trans;
+    	this.block = block;
         initComponents( block, trans);
     }
 
@@ -40,7 +51,7 @@ public class Block_View_Panel extends JPanel {
         add(jLabel_Block, gridBagConstraints);
 
         jTextField_Block.setEditable(false);
-        jTextField_Block.setText("" +block);
+        jTextField_Block.setText("" +block +"-"+ trans);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -53,7 +64,7 @@ public class Block_View_Panel extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 10, 8, 0);
-        add(jLabel_Trans, gridBagConstraints);
+/*        add(jLabel_Trans, gridBagConstraints);
 
         jTextField_Trans.setEditable(false);
         jTextField_Trans.setText(trans+"");
@@ -64,12 +75,28 @@ public class Block_View_Panel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 3, 8, 0);
         add(jTextField_Trans, gridBagConstraints);
         MenuPopupUtil.installContextMenu(jTextField_Trans);
-
+*/
         jButtonVouch.setText(Lang.getInstance().translate("Vouch"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(8, 16, 8, 8);
+ //       gridBagConstraints = new java.awt.GridBagConstraints();
+  //      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+  //      gridBagConstraints.insets = new java.awt.Insets(8, 16, 8, 8);
         add(jButtonVouch, gridBagConstraints);
+        
+        jButtonVouch.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				new  VouchRecordDialog(block, trans);	
+			}
+        	
+        	
+        	
+        });
+        
+        
+        
+        
     }// </editor-fold>                        
 
 
