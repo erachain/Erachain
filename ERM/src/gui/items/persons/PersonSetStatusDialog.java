@@ -36,6 +36,7 @@ import gui.models.AccountsComboBoxModel;
 import gui.records.Record_Info;
 import gui.records.VouchRecordDialog;
 import gui.items.statuses.ComboBoxModelItemsStatuses;
+import gui.library.MButton;
 import gui.transaction.OnDealClick;
 import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
@@ -83,6 +84,7 @@ public class PersonSetStatusDialog extends JDialog {
     private javax.swing.JScrollPane jLabel_PersonInfo;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea_Description;
+    private PersonCls person;
   
 	
 	
@@ -99,6 +101,7 @@ public class PersonSetStatusDialog extends JDialog {
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 				this.setIconImages(icons);
+				this.person = person;
 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initComponents();
 		this.setTitle(Lang.getInstance().translate("Set Status"));
@@ -118,47 +121,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jLabel_Title.setText(Lang.getInstance().translate("Information about the person")+":");
 		    jLabel__Description.setText(Lang.getInstance().translate("Description")+":");;
 		    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power")+ " (0..6):");
-		    jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));    
-		    jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	dispose();	
-	            }
-	        });
-		
-		    jButton_SetStatus.setText(Lang.getInstance().translate("Set Status"));
-		    jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	
-	            	
-	            	Date date;
-					String str_jFormattedTextField_fromDate;
-					try {
-						date = jFormattedTextField_fromDate.getCalendar().getTime();
-						str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-					}
-			     	catch(Exception e2){
-			     		str_jFormattedTextField_fromDate = null;
-			     		
-			     	}
-								     			
-					String str_jFormattedTextField_toDate;
-			     	try{
-	     				 date = jFormattedTextField_toDate.getCalendar().getTime();
-			     		 str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
-			     				
-			     	}
-			     	catch(Exception e3){
-			     		str_jFormattedTextField_toDate = null;
-			     		
-			     	}   			
-
-			     	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
-	            			(StatusCls)jComboBox_Status.getSelectedItem(),
-	            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
-	            	
-	            }
-	        });
-		
+		    
+		   
 		
 		    jComboBox_Status.setModel(new ComboBoxModelItemsStatuses());
 		    jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
@@ -397,8 +361,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         jTextArea_Description = new javax.swing.JTextArea();
         jLabel_Fee = new javax.swing.JLabel();
         jFeeTxt = new javax.swing.JTextField();
-        jButton_Cansel = new javax.swing.JButton();
-        jButton_SetStatus = new javax.swing.JButton();
+        
+      
         jLabel_Title = new javax.swing.JLabel();
         jLabel__Description = new javax.swing.JLabel();
         jLabel_PersonInfo = new javax.swing.JScrollPane();
@@ -603,7 +567,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel_Fee.setText("jLabel11");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 24;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         getContentPane().add(jLabel_Fee, gridBagConstraints);
@@ -612,35 +576,79 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         jFeeTxt.setMinimumSize(new java.awt.Dimension(80, 20));
         jFeeTxt.setName(""); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 10;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 24;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 17);
+        
+        gridBagConstraints.insets = new java.awt.Insets(20, 0, 20, 17);
         getContentPane().add(jFeeTxt, gridBagConstraints);
 
-        jButton_Cansel.setText("jButton1");
-        jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_CanselActionPerformed(evt);
-            }
-        });
+        jButton_Cansel= new MButton(Lang.getInstance().translate("Cancel"),2);     
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 28;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 23, 0);
         getContentPane().add(jButton_Cansel, gridBagConstraints);
+       
+	    jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	dispose();	
+            }
+        });
+	
 
-        jButton_SetStatus.setText("jButton2");
+	    jButton_SetStatus = new MButton(Lang.getInstance().translate("Set Status"),2);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 28;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.ipadx = 1;
+       // gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
+       // gridBagConstraints.weightx = 0.1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 23, 16);
         getContentPane().add(jButton_SetStatus, gridBagConstraints);
+        
+        
+	    jButton_SetStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	
+            	
+            	Date date;
+				String str_jFormattedTextField_fromDate;
+				try {
+					date = jFormattedTextField_fromDate.getCalendar().getTime();
+					str_jFormattedTextField_fromDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+				}
+		     	catch(Exception e2){
+		     		str_jFormattedTextField_fromDate = null;
+		     		
+		     	}
+							     			
+				String str_jFormattedTextField_toDate;
+		     	try{
+     				 date = jFormattedTextField_toDate.getCalendar().getTime();
+		     		 str_jFormattedTextField_toDate = (date.getYear()+1900)+"-"+(date.getMonth()+1)+"-"+(date.getDate());
+		     				
+		     	}
+		     	catch(Exception e3){
+		     		str_jFormattedTextField_toDate = null;
+		     		
+		     	}   			
+
+		     	onGoClick(person, jButton_SetStatus, (Account)jComboBox_YourAddress.getSelectedItem(),
+            			(StatusCls)jComboBox_Status.getSelectedItem(),
+            			str_jFormattedTextField_fromDate, str_jFormattedTextField_toDate, jFeeTxt);
+            	
+            }
+        });
+	
+        
+        
+        
 
         jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_Title.setText("jLabel12");
@@ -701,8 +709,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	  
 
 	    // Variables declaration - do not modify                     
-	    private javax.swing.JButton jButton_Cansel;
-	    private javax.swing.JButton jButton_SetStatus;
+	    private MButton jButton_Cansel;
+	    private MButton jButton_SetStatus;
 	    private JComboBox<StatusCls> jComboBox_Status;
 	    private JComboBox<Account> jComboBox_YourAddress;
 	    private javax.swing.JTextField jPar1Txt;

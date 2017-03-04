@@ -9,6 +9,11 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -197,7 +202,20 @@ public class Mail_Info extends javax.swing.JPanel {
    //     jTextArea_Messge.setColumns(20);
    //     jTextArea_Messge.setRows(5);
    //     jTextArea_Messge.setLineWrap(true);
-        jTextArea_Messge.setText(descript_Mesage());
+       jTextArea_Messge.setText(descript_Mesage());
+        
+    /* 
+        StyledDocument doc = (StyledDocument) jTextArea_Messge.getDocument();
+        // Create a style object and then set the style attributes
+        Style style = doc.addStyle("StyleName", null);
+        StyleConstants.setFontSize(style, UIManager.getFont("TextField.font").getSize());
+        try {
+			doc.insertString(doc.getLength(), descript_Mesage(), style);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+     */   
         
         //jTextArea_Messge.setText();
         jScrollPane1.setViewportView(jTextArea_Messge);

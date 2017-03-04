@@ -29,6 +29,7 @@ import core.crypto.Base58;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.library.MButton;
 //import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
@@ -197,8 +198,8 @@ public class VouchRecordDialog extends JDialog  {
 
 	        jLabel_Fee = new javax.swing.JLabel();
 	        jFormattedTextField_Fee = new javax.swing.JTextField();
-	        jButton_Cansel = new javax.swing.JButton();
-	        jButton_Confirm = new javax.swing.JButton();
+	   //     jButton_Cansel = new javax.swing.JButton();
+	  //      jButton_Confirm = new javax.swing.JButton();
 	        jLabel_Fee_Check = new javax.swing.JLabel();
 	        jLabel_Title = new javax.swing.JLabel();
 	        jLabel_Name_Records= new javax.swing.JLabel();
@@ -328,10 +329,10 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.weightx = 0.1;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
 	        getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
 
-	        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
+	        jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"),2);
 	        jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	dispose();	
@@ -345,7 +346,7 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
 	        getContentPane().add(jButton_Cansel, gridBagConstraints);
 
-	        jButton_Confirm.setText(Lang.getInstance().translate("Confirm"));
+	        jButton_Confirm = new MButton(Lang.getInstance().translate("Confirm"),2);
 	        jButton_Confirm.setToolTipText("");
 	        jButton_Confirm.addActionListener(new ActionListener()
 			{
@@ -405,8 +406,8 @@ public class VouchRecordDialog extends JDialog  {
 	  
 
 	    // Variables declaration - do not modify                     
-	    private javax.swing.JButton jButton_Cansel;
-	    private javax.swing.JButton jButton_Confirm;
+	    private MButton jButton_Cansel;
+	    private MButton jButton_Confirm;
 	    private JComboBox<Account> jComboBox_YourAddress;
 	    private javax.swing.JLabel jLabel_Fee;
 	    private javax.swing.JTextField jFormattedTextField_Fee;
