@@ -5,12 +5,17 @@ package gui.items.persons;
  * and open the template in the editor.
  */
 
+import java.awt.Color;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -530,6 +535,10 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 			jLabel2.setIcon(new ImageIcon(Im));
 		}
+		
+		jLabel2.addMouseListener(new Image_mouse_Clikl());
+
+			
 
 		// jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new
 		// java.awt.Color(0, 0, 0)));
@@ -596,4 +605,48 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private javax.swing.JTextField jTextField_Owner_Sign;
 
 	// End of variables declaration
+	class  Image_mouse_Clikl extends MouseAdapter {
+		@Override
+		public void mousePressed(MouseEvent e) {
+	//		Point p = e.getPoint();
+	//		int row = search_Table.rowAtPoint(p);
+			if(e.getClickCount() == 2)
+			{
+	//			row = personsTable.convertRowIndexToModel(row);
+	//			PersonCls person = tableModelPersons.getPerson(row);
+	//			new PersonFrame(person);
+				
+			}
+		
+		//	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+				if( e.getButton() == MouseEvent.BUTTON1)
+			{
+				
+		/*		
+				row = search_Table.convertRowIndexToModel(row);
+				PersonCls person = search_Table_Model.getPerson(row);	
+//выводим меню всплывающее
+				if(Controller.getInstance().isItemFavorite(person))
+				{
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
+				}
+				else
+				{
+					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
+				}
+	//			alpha = 255;
+				alpha_int = 5;
+				Search_run_menu.setBackground(new Color(1,204,102,255));		
+			    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+			    Search_run_menu.repaint();
+		        Search_run_menu.setVisible(true);		
+	    
+		    */
+		
+			}
+			
+		}
+		}
+	
+	
 }
