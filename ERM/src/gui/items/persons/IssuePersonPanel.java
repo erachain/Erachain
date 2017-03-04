@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
 
@@ -157,7 +158,9 @@ public class IssuePersonPanel extends JPanel
        	this.txtFeePow.setText("0");
  // issue buton
        	this.issueButton.setText(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(120, 30));
+       	int wti = (int) (getFontMetrics( UIManager.getFont("Button.font")).stringWidth(Lang.getInstance().translate("Issue")+"ww"));	
+    	int ht = (int) (getFontMetrics( UIManager.getFont("Button.font")).getFont().getSize()) *2;
+        this.issueButton.setPreferredSize(new Dimension(wti, ht));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -167,7 +170,9 @@ public class IssuePersonPanel extends JPanel
 		});
         
        	this.copyButton.setText(Lang.getInstance().translate("Copy"));
-        this.copyButton.setPreferredSize(new Dimension(120, 30));
+       	int wt = (int) (getFontMetrics( UIManager.getFont("Button.font")).stringWidth(Lang.getInstance().translate("Copy")+"ww"));	
+  
+        this.copyButton.setPreferredSize(new Dimension(wt, ht));
         this.copyButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

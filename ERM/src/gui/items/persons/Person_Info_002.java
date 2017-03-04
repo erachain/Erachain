@@ -520,12 +520,13 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		int x = image.getIconWidth();
 		int y = image.getIconHeight();
 
-		double k = ((double) x / (double) 150);
+		int x1 = 250;
+		double k = ((double) x / (double) x1);
 		y = (int) ((double) y / k);
-		x = 150;
+		
 
 		if (y != 0) {
-			Image Im = image.getImage().getScaledInstance(x, y, 1);
+			Image Im = image.getImage().getScaledInstance(x1, y, 1);
 
 			jLabel2.setIcon(new ImageIcon(Im));
 		}

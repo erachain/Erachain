@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -234,9 +236,12 @@ private void init(){
      gridBagConstraints.weightx = 0.05;
      jPanel1.add(iconLabel, gridBagConstraints);
  	 
+     int wt = (int) (getFontMetrics( UIManager.getFont("Button.font")).stringWidth(Lang.getInstance().translate("Paste") +"ww"));	
+     	int ht = (int) (getFontMetrics( UIManager.getFont("Button.font")).getFont().getSize()) *2;
      
 	 pasteButton = new JButton();
-     pasteButton.setText(Lang.getInstance().translate("Paste") +"...");
+     pasteButton.setText(Lang.getInstance().translate("Paste") );
+     pasteButton.setPreferredSize(new Dimension(wt,ht));
      pasteButton.addActionListener(new ActionListener(){
 
  		@Override
@@ -302,10 +307,12 @@ private void init(){
      add(pasteButton, gridBagConstraints1);
 	
  
- 
+     int wti = (int) (getFontMetrics( UIManager.getFont("Button.font")).stringWidth(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") +"ww"));	
+ //	int ht = (int) (getFontMetrics( UIManager.getFont("Button.font")).getFont().getSize()) *2;
     
      trans_Button = new JButton();
-     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
+     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") );
+     trans_Button.setPreferredSize(new Dimension(wti,ht));
      trans_Button.addActionListener(new ActionListener(){
 
 		@Override
