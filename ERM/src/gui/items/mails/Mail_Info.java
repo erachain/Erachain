@@ -27,6 +27,7 @@ import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import database.DBSet;
 import gui.PasswordPane;
+import gui.library.M_Accoutn_Text_Field;
 import gui.library.Voush_Library_Panel;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
@@ -74,12 +75,12 @@ public class Mail_Info extends javax.swing.JPanel {
         jLabel_Data = new javax.swing.JLabel();
         jTextField_Data = new javax.swing.JTextField();
         jLabel_Sender = new javax.swing.JLabel();
-        jTextField_Sender = new javax.swing.JTextField();
+    //    jTextField_Sender = new javax.swing.JTextField();
         jLabel_Message = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea_Messge = new javax.swing.JTextPane();
         jLabel_Reciever = new javax.swing.JLabel();
-        jTextField_Reciever = new javax.swing.JTextField();
+    //    jTextField_Reciever = new javax.swing.JTextField();
         jLabel_Title = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -128,8 +129,9 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Sender, gridBagConstraints);
 
+        jTextField_Sender = new M_Accoutn_Text_Field(trans.getCreator());
         jTextField_Sender.setEditable(false);
-        jTextField_Sender.setText(trans.getCreator().getPersonAsString());
+  //      jTextField_Sender.setText(trans.getCreator().getPersonAsString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -148,8 +150,9 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Reciever, gridBagConstraints);
 
+        jTextField_Reciever = new M_Accoutn_Text_Field(trans.getRecipient());
         jTextField_Reciever.setEditable(false);
-        jTextField_Reciever.setText(trans.getRecipient().getPersonAsString());
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -314,8 +317,8 @@ public class Mail_Info extends javax.swing.JPanel {
    
     private javax.swing.JTextField jTextField_Block;
     private javax.swing.JTextField jTextField_Data;
-    private javax.swing.JTextField jTextField_Reciever;
-    private javax.swing.JTextField jTextField_Sender;
+    private M_Accoutn_Text_Field jTextField_Reciever;
+    private M_Accoutn_Text_Field jTextField_Sender;
     private javax.swing.JTextField jTextField_Title;
     // End of variables declaration 
     

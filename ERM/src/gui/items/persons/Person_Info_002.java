@@ -37,6 +37,7 @@ import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.Accounts_Library_Panel;
 import gui.library.MButton;
+import gui.library.M_Accoutn_Text_Field;
 import gui.library.Statuses_Library_Panel;
 import gui.library.Voush_Library_Panel;
 import lang.Lang;
@@ -83,7 +84,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		jScrollPane1 = new javax.swing.JScrollPane();
 		jTextArea_Description = new javax.swing.JTextArea();
 		jLabel_Creator = new javax.swing.JLabel();
-		jTextField_Creator = new javax.swing.JTextField();
+//		jTextField_Creator = new javax.swing.JTextField();
 		jLabel1 = new javax.swing.JLabel();
 		jTextField1 = new javax.swing.JTextField();
 		jPanel_Image = new javax.swing.JPanel();
@@ -96,7 +97,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		new javax.swing.JTable();
 		jLabel_Owner = new javax.swing.JLabel();
 		new javax.swing.JLabel();
-		jTextField_Owner = new javax.swing.JTextField();
+	//	jTextField_Owner = new javax.swing.JTextField();
 		new javax.swing.JTextField();
 		jLabel_Owner_Sign = new javax.swing.JLabel();
 		jTextField_Owner_Sign = new javax.swing.JTextField();
@@ -393,8 +394,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 		jPanel3.add(jLabel_Creator, gridBagConstraints);
 
+		jTextField_Creator = new M_Accoutn_Text_Field(publisher);
 		jTextField_Creator.setEditable(false);
-		jTextField_Creator.setText(publisher.toString());
+	//	jTextField_Creator.setText(publisher.toString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 11;
@@ -404,11 +406,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.2;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 		jPanel3.add(jTextField_Creator, gridBagConstraints);
-		jTextField_Creator.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jTextField_NameActionPerformed(evt);
-			}
-		});
+		
 
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
@@ -420,6 +418,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 			jPanel3.add(jLabel_Owner, gridBagConstraints);
 
+			jTextField_Owner = new M_Accoutn_Text_Field(owner);
 			jTextField_Owner.setEditable(false);
 
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -431,14 +430,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			gridBagConstraints.weightx = 0.2;
 			gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
-			jTextField_Owner.setText(owner.toString());
-			jPanel3.add(jTextField_Owner, gridBagConstraints);
-			jTextField_Owner.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent evt) {
-					jTextField_NameActionPerformed(evt);
-				}
-			});
-
+			
 			jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -462,110 +454,11 @@ public class Person_Info_002 extends javax.swing.JPanel {
 					: Lang.getInstance().translate("Wrong signaryte for data owner"));
 		//	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
 		}
-		MenuPopupUtil.installContextMenu(jTextField_Owner_Sign);
+	
 
-		JPopupMenu creator_Meny = new JPopupMenu();
-		JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
-		copy_Creator_Address1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(publisher.getAddress().toString());
-				clipboard.setContents(value, null);
-			}
-		});
-		creator_Meny.add(copy_Creator_Address1);
-
-		JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
-		copyPublicKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(publisher.getAddress());
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-				StringSelection value = new StringSelection(public_Account.getBase58());
-				clipboard.setContents(value, null);
-			}
-		});
-		creator_Meny.add(copyPublicKey);
-
-		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
-		Send_Coins_Crator.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new Account_Send_Dialog(null, null, new Account(publisher.getAddress().toString()), null);
-			}
-		});
-		creator_Meny.add(Send_Coins_Crator);
-
-		JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
-		Send_Mail_Creator.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				new Mail_Send_Dialog(null, null, new Account(publisher.getAddress().toString()), null);
-			}
-		});
-		creator_Meny.add(Send_Mail_Creator);
 
 		// jTextField_Creator.add(creator_Meny);
-		jTextField_Creator.setComponentPopupMenu(creator_Meny);
-
-		JPopupMenu owner_Meny = new JPopupMenu();
-		JMenuItem copy_Owner_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
-		copy_Owner_Address1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(person.getOwner().getAddress());
-				clipboard.setContents(value, null);
-			}
-		});
-		owner_Meny.add(copy_Owner_Address1);
-
-		JMenuItem copy_Owner_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
-		copy_Owner_PublicKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				PublicKeyAccount public_Account = person.getOwner();
-				StringSelection value = new StringSelection(public_Account.getBase58());
-				clipboard.setContents(value, null);
-			}
-		});
-		owner_Meny.add(copy_Owner_PublicKey);
-
-		JMenuItem copy_Owner_Sign = new JMenuItem(Lang.getInstance().translate("Copy Owner Sign"));
-		copy_Owner_Sign.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				PublicKeyAccount public_Account = person.getOwner();
-				StringSelection value = new StringSelection(human.isSignatureValid() ? Base58.encode(human.getOwnerSignature())
-						: Lang.getInstance().translate("Wrong signaryte for data owner"));
-				clipboard.setContents(value, null);
-			}
-		});
-		owner_Meny.add(copy_Owner_Sign);
-
-		
-		
-		JMenuItem send_Coins_Owner = new JMenuItem(Lang.getInstance().translate("Send Coins"));
-		send_Coins_Owner.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new Account_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()), null);
-			}
-		});
-		owner_Meny.add(send_Coins_Owner);
-
-		JMenuItem send_Mail_Owner = new JMenuItem(Lang.getInstance().translate("Send Mail"));
-		send_Mail_Owner.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				new Mail_Send_Dialog(null, null, new Account(person.getOwner().getAddress().toString()), null);
-			}
-		});
-		owner_Meny.add(send_Mail_Owner);
-
-		// jTextField_Creator.add(creator_Meny);
-		jTextField_Owner.setComponentPopupMenu(owner_Meny);
+	//	jTextField_Owner.setComponentPopupMenu(owner_Meny);
 
 		jLabel1.setText(Lang.getInstance().translate("Deathday") + ":");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -682,12 +575,12 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private javax.swing.JScrollPane jScrollPane1;
 	private javax.swing.JTextArea jTextArea_Description;
 	private javax.swing.JTextField jTextField1;
-	private javax.swing.JTextField jTextField_Creator;
+	private M_Accoutn_Text_Field jTextField_Creator;
 	private javax.swing.JTextField jTextField_Date_Born;
 	private javax.swing.JTextField jTextField_Gender;
 	private javax.swing.JTextField jTextField_Name;
 	private javax.swing.JLabel jLabel_Owner;
-	private javax.swing.JTextField jTextField_Owner;
+	private M_Accoutn_Text_Field jTextField_Owner;
 	private javax.swing.JLabel jLabel_Owner_Sign;
 	private javax.swing.JTextField jTextField_Owner_Sign;
 
