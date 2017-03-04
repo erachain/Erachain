@@ -36,6 +36,7 @@ import gui.Block_View_Panel;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.Accounts_Library_Panel;
+import gui.library.MButton;
 import gui.library.Statuses_Library_Panel;
 import gui.library.Voush_Library_Panel;
 import lang.Lang;
@@ -155,17 +156,93 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	        jPanel1.add(jTextField1N, gridBagConstraints);
 
 		
+	        JLabel lbl_Block = new JLabel(Lang.getInstance().translate("Block") + ":");
+	        
+			gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridy = 0;
+	      //  gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+	     //   gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
+	        
+	        
+	        jPanel1.add(lbl_Block, gridBagConstraints);    
+	        
+	        
+	    
+		JTextField txt_Block = new JTextField(issue_record.getBlockHeight(DBSet.getInstance())+"-"+issue_record.getSeqNo(DBSet.getInstance()));
 		
+		txt_Block.setEditable(false);
 		gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 3, 8);
-        jPanel1.add(new Block_View_Panel(issue_record.getBlockHeight(DBSet.getInstance()),
-				issue_record.getSeqNo(DBSet.getInstance())), gridBagConstraints);
-		
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
+        
+        jPanel1.add(txt_Block, gridBagConstraints);
+        MenuPopupUtil.installContextMenu(txt_Block);
+        txt_Block.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jTextField_NameActionPerformed(evt);
+			}
+		});
+        
+        MButton btn_Block = new MButton(Lang.getInstance().translate("Deals") ,2.0);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
+        
+       if (person.isConfirmed()) jPanel1.add(btn_Block, gridBagConstraints);
+        
+        btn_Block.addMouseListener(new MouseListener(){
+
+			
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				Person_Work_Dialog pWD = new Person_Work_Dialog(person);
+				
+				pWD. setLocation(arg0.getXOnScreen()-pWD.getWidth(), arg0.getYOnScreen());
+				pWD.setVisible(true);
+				
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+        
+        
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -311,7 +388,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		jLabel_Creator.setText(Lang.getInstance().translate("Publisher") + ":");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 8;
+		gridBagConstraints.gridy = 10;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 		gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 		jPanel3.add(jLabel_Creator, gridBagConstraints);
@@ -320,20 +397,25 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		jTextField_Creator.setText(publisher.toString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 9;
+		gridBagConstraints.gridy = 11;
 		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 		gridBagConstraints.weightx = 0.2;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 		jPanel3.add(jTextField_Creator, gridBagConstraints);
+		jTextField_Creator.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jTextField_NameActionPerformed(evt);
+			}
+		});
 
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
 			jLabel_Owner.setText(Lang.getInstance().translate("Owner") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 10;
+			gridBagConstraints.gridy = 8;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 			gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 			jPanel3.add(jLabel_Owner, gridBagConstraints);
@@ -342,7 +424,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 11;
+			gridBagConstraints.gridy = 9;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -351,6 +433,11 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 			jTextField_Owner.setText(owner.toString());
 			jPanel3.add(jTextField_Owner, gridBagConstraints);
+			jTextField_Owner.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					jTextField_NameActionPerformed(evt);
+				}
+			});
 
 			jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();

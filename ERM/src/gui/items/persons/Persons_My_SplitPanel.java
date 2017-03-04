@@ -69,7 +69,7 @@ import gui.models.Renderer_Boolean;
 		private WalletItemPersonsTableModel my_PersonsModel;
 		private MTable my_Person_table;
 		private TableRowSorter my_Sorter;
-		private RunMenu my_run_menu;
+		
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
@@ -134,18 +134,8 @@ import gui.models.Renderer_Boolean;
 			// EVENTS on CURSOR
 			my_Person_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			
-			my_Person_table.addMouseListener(new My_Mouse());
-			my_run_menu  = new RunMenu();
-			my_run_menu.setUndecorated(true);
-			//Dimension dim1 = new Dimension(180,((int)(getFontMetrics(getFont()).getHeight()+10)*2));
-			//my_run_menu.setSize(dim1);
-		//	my_run_menu.setPreferredSize(dim1);
-			my_run_menu.setVisible(false);
-			my_run_menu.jButton1.setFocusPainted(true);
-			my_run_menu.jButton1.setFocusCycleRoot(true);
-			my_run_menu.jButton1.addActionListener(new My_run_menu_Button1_Action());
-			my_run_menu.pack();
-			my_run_menu.addWindowFocusListener(new My_run_Menu_Focus_Listener());
+	
+		
 
 			 Dimension size = MainFrame.desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
@@ -184,69 +174,10 @@ import gui.models.Renderer_Boolean;
 		
 	
 	
-	// listener search_tab run menu focus
-		class My_run_Menu_Focus_Listener implements WindowFocusListener{
-			@Override
-			public void windowGainedFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void windowLostFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				my_run_menu.setVisible(false);
-			}
-		};
+	
 
-		class My_run_menu_Button1_Action implements ActionListener{
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				favorite_my(my_Person_table);
-				int row = my_Person_table.getSelectedRow();
-				row = my_Person_table.convertRowIndexToModel(row);
-				PersonCls person = my_PersonsModel.getItem(row);
-				if(Controller.getInstance().isItemFavorite(person))
-				{
-					my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
-				}
-				else
-				{
-					my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
-				}
-			
-			
-			}
-		
-		};
+	
 
-		class My_Mouse extends MouseAdapter {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Point p = e.getPoint();
-				int row = my_Person_table.rowAtPoint(p);
-				row = my_Person_table.convertRowIndexToModel(row);
-				PersonCls person = my_PersonsModel.getItem(row);
-				if(e.getClickCount() == 2)
-				{
-					
-				}
-			
-				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-				{
-					if(Controller.getInstance().isItemFavorite(person))
-					{
-						my_run_menu.jButton1.setText(Lang.getInstance().translate("Remove Favorite"));
-					}
-					else
-					{
-						my_run_menu.jButton1.setText(Lang.getInstance().translate("Add Favorite"));
-					}
-					my_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-					my_run_menu.setVisible(true);	
-				}
-			}
-		}
 
 		class My_Tab_Listener implements ListSelectionListener {
 			
