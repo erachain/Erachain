@@ -883,6 +883,10 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         add( txtBirthday, gridBagConstraints);
+        
+        txtBirthday.setFont(UIManager.getFont("TextField.font"));
+       
+        
 
   //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
   //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
@@ -900,6 +904,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         add(txtDeathday, gridBagConstraints);
+        txtDeathday.setFont(UIManager.getFont("TextField.font"));
     }// </editor-fold>                        
 
 }

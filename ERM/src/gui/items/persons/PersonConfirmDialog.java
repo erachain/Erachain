@@ -77,7 +77,7 @@ public class PersonConfirmDialog extends JDialog  {
 	//	this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		//	MainFrame mainFram = new MainFrame();
 	
-		setSize(400,300);
+	//	setSize(400,300);
 	//	setModal(true);
         //setLocationRelativeTo(apers);
         //setModalityType(ModalityType.TOOLKIT_MODAL);
@@ -499,9 +499,9 @@ public class PersonConfirmDialog extends JDialog  {
 	        jLabel_Address2_Check = new javax.swing.JLabel();
 	        jLabel_Address3_Check = new javax.swing.JLabel();
 	        jLabel_addDays = new javax.swing.JLabel();
-	        jTextField_addDays = new javax.swing.JFormattedTextField();
+	        jTextField_addDays = new javax.swing.JTextField();
 	        jLabel_Fee = new javax.swing.JLabel();
-	        jFormattedTextField_Fee = new javax.swing.JFormattedTextField();
+	        jFormattedTextField_Fee = new javax.swing.JTextField();
 	        jButton_Cansel = new javax.swing.JButton();
 	        jButton_Confirm = new javax.swing.JButton();
 	        jLabel_addDays_Check = new javax.swing.JLabel();
@@ -509,9 +509,9 @@ public class PersonConfirmDialog extends JDialog  {
 	        jLabel_Title = new javax.swing.JLabel();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	        setMinimumSize(new java.awt.Dimension(800, 600));
+	      //  setMinimumSize(new java.awt.Dimension(800, 600));
 	        setModal(true);
-	        setPreferredSize(new java.awt.Dimension(800, 600));
+	     //   setPreferredSize(new java.awt.Dimension(800, 600));
 	        addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
 	            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
 	                formAncestorMoved(evt);
@@ -554,8 +554,8 @@ public class PersonConfirmDialog extends JDialog  {
 	        getContentPane().add(jLabel_YourAddress, gridBagConstraints);
 
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
-	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
-	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
+	        //jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
+	      //  jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 0;
@@ -574,9 +574,9 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_Address1, gridBagConstraints);
 
-	        jTextField_Address1.setMinimumSize(new java.awt.Dimension(300, 20));
+	  //      jTextField_Address1.setMinimumSize(new java.awt.Dimension(300, 20));
 	        jTextField_Address1.setName(""); // NOI18N
-	        jTextField_Address1.setPreferredSize(new java.awt.Dimension(300, 20));
+	   //     jTextField_Address1.setPreferredSize(new java.awt.Dimension(300, 20));
 	      //  jTextField_Address1.setRequestFocusEnabled(false);
 	        jTextField_Address1.getDocument().addDocumentListener(new DocumentListener() {
 	            
@@ -693,6 +693,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 14;
+	       
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_addDays, gridBagConstraints);
@@ -704,11 +705,11 @@ public class PersonConfirmDialog extends JDialog  {
 	            ex.printStackTrace();
 	        }
 	        */
-	        jTextField_addDays.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	    //    jTextField_addDays.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jTextField_addDays.setToolTipText("");
-	        jTextField_addDays.setMinimumSize(new java.awt.Dimension(100, 20));
+	  //      jTextField_addDays.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jTextField_addDays.setText("0"); // NOI18N
-	        jTextField_addDays.setPreferredSize(new java.awt.Dimension(100, 20));
+	  //      jTextField_addDays.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jTextField_addDays.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_ToDoActionPerformed(evt);
@@ -717,6 +718,8 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jTextField_addDays, gridBagConstraints);
 
@@ -728,11 +731,11 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_Fee, gridBagConstraints);
 
-	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
+	   //    jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
 	        jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
+	  //      jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_Fee.setText("0");
-	        jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
+	  //      jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_Fee.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_FeeActionPerformed(evt);
@@ -741,8 +744,11 @@ public class PersonConfirmDialog extends JDialog  {
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 16;
+	       
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 	        getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
 
 	        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
@@ -850,7 +856,7 @@ public class PersonConfirmDialog extends JDialog  {
 	    private javax.swing.JButton jButton_Cansel;
 	    private javax.swing.JButton jButton_Confirm;
 	    private JComboBox<Account> jComboBox_YourAddress;
-	    private javax.swing.JFormattedTextField jFormattedTextField_Fee;
+	    private javax.swing.JTextField jFormattedTextField_Fee;
 	    private javax.swing.JTextField jTextField_addDays;
 	    private javax.swing.JLabel jLabel_Address1;
 	    private javax.swing.JLabel jLabel_Address2;

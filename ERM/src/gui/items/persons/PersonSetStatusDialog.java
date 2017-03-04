@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -183,9 +184,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(650, 23));
+ //       setMinimumSize(new java.awt.Dimension(650, 23));
         setModal(true);
-        setPreferredSize(new java.awt.Dimension(800, 650));
+  //      setPreferredSize(new java.awt.Dimension(800, 650));
 	    
         
         
@@ -456,6 +457,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
  //       jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField_fromDate.setName(""); // NOI18N
+        jFormattedTextField_fromDate.setFont(UIManager.getFont("TextField.font"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -466,6 +468,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().add(jFormattedTextField_fromDate, gridBagConstraints);
 
         jLabel_Data_To.setText("jLabel5");
+        jLabel_Data_To.setFont(UIManager.getFont("TextField.font"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 8;
@@ -482,6 +485,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
   //              jFormattedTextField_toDateActionPerformed(evt);
   //          }
   //      });
+        jFormattedTextField_toDate.setFont(UIManager.getFont("TextField.font"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 8;
