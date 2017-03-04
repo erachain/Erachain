@@ -20,7 +20,7 @@ public class Statuses_Library_Panel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-private JTable jTable_Statuses;
+private MTable jTable_Statuses;
 private JScrollPane jScrollPane_Tab_Status;
 private GridBagConstraints gridBagConstraints;
 
@@ -41,7 +41,16 @@ public Statuses_Library_Panel(PersonCls person){
        		to_Date_Column1.setMinWidth(80);
        		to_Date_Column1.setMaxWidth(200);
        		to_Date_Column1.setPreferredWidth(120);//.setWidth(30);
-       
+      
+       		TableColumn Date_Column = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_MAKE_DATA);	
+       		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+       		int rr = (int) (getFontMetrics(getFont()).stringWidth("22-22-2222"));	
+       		Date_Column.setMinWidth(rr+1);
+       		Date_Column.setMaxWidth(rr+20);
+       		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
+      
+       		
+       		
     
        jScrollPane_Tab_Status = new javax.swing.JScrollPane();
       

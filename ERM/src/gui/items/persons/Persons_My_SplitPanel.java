@@ -136,9 +136,10 @@ import gui.models.Renderer_Boolean;
 			
 			my_Person_table.addMouseListener(new My_Mouse());
 			my_run_menu  = new RunMenu();
-			Dimension dim1 = new Dimension(180,50);
-			my_run_menu.setSize(dim1);
-			my_run_menu.setPreferredSize(dim1);
+			my_run_menu.setUndecorated(true);
+			//Dimension dim1 = new Dimension(180,((int)(getFontMetrics(getFont()).getHeight()+10)*2));
+			//my_run_menu.setSize(dim1);
+		//	my_run_menu.setPreferredSize(dim1);
 			my_run_menu.setVisible(false);
 			my_run_menu.jButton1.setFocusPainted(true);
 			my_run_menu.jButton1.setFocusCycleRoot(true);

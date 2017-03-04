@@ -158,8 +158,11 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			block = value.b.d;
 			recNo = value.b.e;
 			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
-			return record==null?null:record.viewTimestamp();
-		
+			if (record==null) return null;
+			
+			 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
+				return  dateFormat.format( new Date(record.getTimestamp()));
+				
 		case COLUMN_STATUS_NAME:
 			
 			return statusesMap.get(value.a).toString(dbSet, value.b.c);

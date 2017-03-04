@@ -145,8 +145,8 @@ public class MainPersonsFrame extends Main_Internal_Frame{
 	    this.setVisible(true);
 	    Dimension size = MainFrame.desktopPane.getSize();
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-	    search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-	 	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	    search_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/3));
+	 	my_Person_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/3));
 	}
 
 // set favorine My

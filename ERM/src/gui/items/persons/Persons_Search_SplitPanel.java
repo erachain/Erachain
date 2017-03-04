@@ -18,6 +18,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.image.ColorModel;
+import java.util.Date;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -107,15 +108,18 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	
 //Custom renderer for the String column;
 		search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		search_Table.setDefaultRenderer(Date.class, new Renderer_Right()); // set renderer
 		search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()),search_Table_Model.get_Column_AutoHeight())); // set renderer
 	
 //CHECKBOX FOR FAVORITE
-		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
-		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
-		favoriteColumn.setMinWidth(50);
-		favoriteColumn.setMaxWidth(50);
-		favoriteColumn.setPreferredWidth(50);
-//Sorter
+		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(search_Table_Model.COLUMN_BORN);	
+//		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
+	//	 int ss = search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN).length();
+		int rr = (int) (getFontMetrics(getFont()).stringWidth(search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN)));
+		favoriteColumn.setMinWidth(rr+1);
+		favoriteColumn.setMaxWidth(rr+20);
+		favoriteColumn.setPreferredWidth(rr+5);
+		//Sorter
 		 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
 		search_Table.setRowSorter(search_Sorter);	
 	
@@ -171,14 +175,14 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	//	Search_run_menu.setBackground(new Color(0,204,102,255));
 	//	Dimension dim = new Dimension(180,70);
     //	Search_run_menu.setSize(dim);
-    	Search_run_menu.setPreferredSize(new Dimension(220,145));
+    //	Search_run_menu.setPreferredSize(new Dimension(250,((int)(getFontMetrics(getFont()).getHeight()+10)*7)));
     	Search_run_menu.setVisible(false);
     	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
    // 	aaa.jButton1.setBorderPainted(false);
   //  	Search_run_menu.jButton1.setFocusPainted(true);
  //  	Search_run_menu.jButton1.setFocusCycleRoot(true);
-	Search_run_menu.jButton1.setContentAreaFilled(false);
-	Search_run_menu.jButton1.setOpaque(false);
+//	Search_run_menu.jButton1.setContentAreaFilled(false);
+//	Search_run_menu.jButton1.setOpaque(false);
 //		Search_run_menu.jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
     	Search_run_menu.jButton1.addActionListener(new ActionListener(){
   		@Override
@@ -190,8 +194,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	   	
     	
     	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Attest Public Key"));
-    	Search_run_menu.jButton2.setContentAreaFilled(false);
-    	Search_run_menu.jButton2.setOpaque(false);
+  //  	Search_run_menu.jButton2.setContentAreaFilled(false);
+  //  	Search_run_menu.jButton2.setOpaque(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
     	Search_run_menu.jButton2.addActionListener(new ActionListener(){
   		@Override
@@ -205,8 +209,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	javax.swing.JButton jButton_Vouh = new javax.swing.JButton();
  
     	jButton_Vouh.setText(Lang.getInstance().translate("Vouch"));
-    	jButton_Vouh.setContentAreaFilled(false);
-    	jButton_Vouh.setOpaque(false);
+    //	jButton_Vouh.setContentAreaFilled(false);
+   // 	jButton_Vouh.setOpaque(false);
     	Search_run_menu.getContentPane().add(jButton_Vouh);
     	jButton_Vouh.addActionListener(new ActionListener(){
   		@Override
@@ -224,9 +228,9 @@ public class Persons_Search_SplitPanel extends Split_Panel{
   		}});
     	
     	
-    	Search_run_menu.jButton3.setContentAreaFilled(false);
+  //  	Search_run_menu.jButton3.setContentAreaFilled(false);
   //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    	Search_run_menu.jButton3.setOpaque(false);
+   // 	Search_run_menu.jButton3.setOpaque(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
     	Search_run_menu.jButton3.addActionListener(new  ActionListener(){
 // вычисляем устанавливаем\ сбрасываем флажек выбранные
@@ -253,8 +257,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	
 
     	Search_run_menu.jButton6.setText(Lang.getInstance().translate("Send Coins"));
-    	Search_run_menu.jButton6.setContentAreaFilled(false);
-    	Search_run_menu.jButton6.setOpaque(false);
+    //	Search_run_menu.jButton6.setContentAreaFilled(false);
+    //	Search_run_menu.jButton6.setOpaque(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton6);
     	Search_run_menu.jButton6.addActionListener(new ActionListener(){
   		@Override
@@ -276,8 +280,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	
     	
       	Search_run_menu.jButton5.setText(Lang.getInstance().translate("Send Mail"));
-    	Search_run_menu.jButton5.setContentAreaFilled(false);
-    	Search_run_menu.jButton5.setOpaque(false);
+   // 	Search_run_menu.jButton5.setContentAreaFilled(false);
+   // 	Search_run_menu.jButton5.setOpaque(false);
     	Search_run_menu.getContentPane().add(Search_run_menu.jButton5);
     	Search_run_menu.jButton5.addActionListener(new ActionListener(){
   		@Override
