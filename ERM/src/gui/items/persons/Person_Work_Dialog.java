@@ -81,7 +81,7 @@ public class Person_Work_Dialog extends JDialog {
         
       		*/
       	   
-      	  jButton1 = new MButton(Lang.getInstance().translate("Set Status"),3);
+      	  jButton1 = new MButton(Lang.getInstance().translate("Set Status to Person"), 3);
       	   // 	aaa.jButton1.setBorderPainted(false);
       	  //  	Search_run_menu.jButton1.setFocusPainted(true);
       	 //  	Search_run_menu.jButton1.setFocusCycleRoot(true);
@@ -97,7 +97,7 @@ public class Person_Work_Dialog extends JDialog {
       				PersonSetStatusDialog fm = new PersonSetStatusDialog( person);	
       	    	}});
       	    	   	
-      	    	jButton2= new MButton(Lang.getInstance().translate("Attest Public Key"),3);
+      	    	jButton2= new MButton(Lang.getInstance().translate("Attest Public Key or Person"), 3);
       	  //  	jButton2.setText(Lang.getInstance().translate("Attest Public Key"));
       	  //  	Search_run_menu.jButton2.setContentAreaFilled(false);
       	  //  	Search_run_menu.jButton2.setOpaque(false);
@@ -113,7 +113,7 @@ public class Person_Work_Dialog extends JDialog {
       	    	
       	    	javax.swing.JButton jButton_Vouh = new javax.swing.JButton();
       	 
-      	    	jButton3 = new MButton(Lang.getInstance().translate("Vouch"),3);
+      	    	jButton3 = new MButton(Lang.getInstance().translate("Vouch the Person Info"), 3);
       	    //	jButton_Vouh.setContentAreaFilled(false);
       	   // 	jButton_Vouh.setOpaque(false);
       	    	getContentPane().add(jButton3);
@@ -134,7 +134,7 @@ public class Person_Work_Dialog extends JDialog {
       	    	
       		
 
-      	    	jButton4 =new MButton(Lang.getInstance().translate("Send Coins"),3);
+      	    	jButton4 =new MButton(Lang.getInstance().translate("Send Coins to Person"), 3);
       	    //	Search_run_menu.jButton6.setContentAreaFilled(false);
       	    //	Search_run_menu.jButton6.setOpaque(false);
       	    	getContentPane().add(jButton4);
@@ -155,7 +155,7 @@ public class Person_Work_Dialog extends JDialog {
       	    		}});
       	    	
       	    	
-      	      	jButton5 = new MButton(Lang.getInstance().translate("Send Mail"),3);
+      	      	jButton5 = new MButton(Lang.getInstance().translate("Send Mail to Person"), 3);
       	   // 	Search_run_menu.jButton5.setContentAreaFilled(false);
       	   // 	Search_run_menu.jButton5.setOpaque(false);
       	    	getContentPane().add(jButton5);

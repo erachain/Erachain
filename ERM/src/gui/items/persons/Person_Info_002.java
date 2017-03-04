@@ -190,7 +190,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			}
 		});
         
-        MButton btn_Block = new MButton(Lang.getInstance().translate("Deals") ,2.0);
+        MButton btn_Block = new MButton(Lang.getInstance().translate("Deals"), 2.0);
 		gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
