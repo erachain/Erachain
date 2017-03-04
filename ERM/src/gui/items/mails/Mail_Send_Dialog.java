@@ -66,9 +66,9 @@ public class Mail_Send_Dialog extends JDialog{
 		//CLOSE
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 		
-		 setMinimumSize(new java.awt.Dimension(650, 23));
+	//	 setMinimumSize(new java.awt.Dimension(650, 23));
 		setModal(true);
-        setPreferredSize(new java.awt.Dimension(650,600));
+   //     setPreferredSize(new java.awt.Dimension(650,600));
 	    
         
         
