@@ -97,7 +97,7 @@ public class Person_Work_Dialog extends JDialog {
       				PersonSetStatusDialog fm = new PersonSetStatusDialog( person);	
       	    	}});
       	    	   	
-      	    	jButton2= new MButton(Lang.getInstance().translate("Attest Public Key or Person"), 3);
+      	    	jButton2= new MButton(Lang.getInstance().translate("Attest Public Key for Person"), 3);
       	  //  	jButton2.setText(Lang.getInstance().translate("Attest Public Key"));
       	  //  	Search_run_menu.jButton2.setContentAreaFilled(false);
       	  //  	Search_run_menu.jButton2.setOpaque(false);
