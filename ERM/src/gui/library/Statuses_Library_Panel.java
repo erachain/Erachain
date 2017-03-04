@@ -1,10 +1,12 @@
 package gui.library;
 
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 
 import core.item.persons.PersonCls;
@@ -44,9 +46,9 @@ public Statuses_Library_Panel(PersonCls person){
       
        		TableColumn Date_Column = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_MAKE_DATA);	
        		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
-       		int rr = (int) (getFontMetrics(getFont()).stringWidth("22-22-2222"));	
+       		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
        		Date_Column.setMinWidth(rr+1);
-       		Date_Column.setMaxWidth(rr+20);
+       		Date_Column.setMaxWidth(rr*10);
        		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
       
        		

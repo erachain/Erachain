@@ -5,11 +5,13 @@ import java.awt.GridBagConstraints;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import core.transaction.Transaction;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import lang.Lang;
 
@@ -36,6 +38,13 @@ public class Voush_Library_Panel extends JPanel {
 		jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(
 				jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()), model.get_Column_AutoHeight())); // set renderer
 
+		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_TIMESTAMP);	
+   		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+   		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
+   		Date_Column.setMinWidth(rr+1);
+   		Date_Column.setMaxWidth(rr*10);
+   		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
+		
 		// jPanel_Tab_Vouch = new javax.swing.JPanel();
 		jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
 

@@ -23,6 +23,8 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import javax.swing.Timer;
+import javax.swing.UIManager;
+
 import java.awt.*;
 
 import javax.swing.DefaultRowSorter;
@@ -115,9 +117,9 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(search_Table_Model.COLUMN_BORN);	
 //		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
 	//	 int ss = search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN).length();
-		int rr = (int) (getFontMetrics(getFont()).stringWidth(search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN)));
+		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth(search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN)));	
 		favoriteColumn.setMinWidth(rr+1);
-		favoriteColumn.setMaxWidth(rr+20);
+		favoriteColumn.setMaxWidth(rr*10);
 		favoriteColumn.setPreferredWidth(rr+5);
 		//Sorter
 		 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);

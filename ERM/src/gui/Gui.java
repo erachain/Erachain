@@ -48,12 +48,16 @@ public class Gui extends JFrame{
 	{
 		//USE SYSTEM STYLE
 		   //     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				
+	
+		
+	
+		
 
 				Toolkit.getDefaultToolkit().setDynamicLayout(true);
 				System.setProperty("sun.awt.noerasebackground", "true");
 				JFrame.setDefaultLookAndFeelDecorated(true);
 				JDialog.setDefaultLookAndFeelDecorated(true);
+				
 
 				try {
 				    UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
@@ -63,6 +67,7 @@ public class Gui extends JFrame{
 				}
 				
         
+//				gui.library.library.setupSubstance();
 // set GUI font 				
 				gui.library.library.Set_GUI_Font("");
 				

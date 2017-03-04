@@ -3,9 +3,20 @@ package gui.library;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.beans.PropertyVetoException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+
+import org.jvnet.substance.SubstanceLookAndFeel;
+
+import org.jvnet.substance.api.skin.*;
+import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 
 import gui.MainFrame;
 import settings.Settings;
@@ -82,7 +93,8 @@ public class library {
 	      UIManager.put("MenuItem.font", font);
 	      UIManager.put("Frame.titleFont", font);
 	      UIManager.put("InternalFrame.font",font);
-	         
+	      UIManager.put( "InternalFrame.titleFont",font);
+	     
 	      UIManager.put( "TextPane.font", font ); 
 	   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
 	      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
@@ -91,5 +103,33 @@ public class library {
 	     	
 		
 	}
+	
+	 public static void setupSubstance() {
+	        try {
+	            final String fileName = System.getProperty("user.home") + System.getProperty("file.separator") + "insubstantial.txt";
+	            final Properties properties = new Properties();
+	           LookAndFeel laf = new SubstanceGeminiLookAndFeel();
+	            UIManager.setLookAndFeel(laf);
+	            UIManager.put(SubstanceGeminiLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
+	            JFrame.setDefaultLookAndFeelDecorated(true);
+	            JDialog.setDefaultLookAndFeelDecorated(true);
+	            Runtime.getRuntime().addShutdownHook(new Thread() {
+	                @Override public void run() {
+	                    try {
+	                        String skinClassName = SubstanceLookAndFeel.getCurrentSkin().getClass().getCanonicalName();
+	                        properties.setProperty("skinClassName", skinClassName);
+	                        properties.store(new FileOutputStream(fileName), fileName);
+	                    } catch (Throwable t) {
+	                        t.printStackTrace();
+	                    }
+	                }
+	            });
+	            properties.load(new FileInputStream(fileName));
+	            String skinClassName = properties.getProperty("skinClassName");
+	            ((SubstanceLookAndFeel) laf).setSkin(skinClassName);
+	        } catch (Throwable t) {
+	            t.printStackTrace();
+	        }
+	    }
 
 }

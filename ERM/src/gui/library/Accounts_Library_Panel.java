@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
@@ -45,9 +46,11 @@ public class Accounts_Library_Panel extends JPanel {
 																			// renderer
 		
 		TableColumn to_Date_Column = jTable_Accounts.getColumnModel().getColumn(PersonAccountsModel.COLUMN_TO_DATE);
-		to_Date_Column.setMinWidth(50);
-		to_Date_Column.setMaxWidth(200);
-		to_Date_Column.setPreferredWidth(80);// .setWidth(30);
+		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
+		to_Date_Column.setMinWidth(rr+1);
+		to_Date_Column.setMaxWidth(rr*10);
+		to_Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
+		
 		
 		jScrollPane_Tab_Accounts = new JScrollPane();
 		jScrollPane_Tab_Accounts.setViewportView(jTable_Accounts);

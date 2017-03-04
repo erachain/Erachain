@@ -161,7 +161,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			if (record==null) return null;
 			
 			 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
-				return  dateFormat.format( new Date(record.getTimestamp()));
+				return  dateFormat.format(new Date(record.getTimestamp())).toString();
 				
 		case COLUMN_STATUS_NAME:
 			
