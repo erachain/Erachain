@@ -3,6 +3,7 @@ package gui.transaction;
 import gui.PasswordPane;
 import lang.Lang;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -20,11 +21,16 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+
+import com.github.rjeschke.txtmark.Processor;
 
 import utils.Converter;
 import utils.DateTimeFormat;
@@ -39,7 +45,7 @@ import core.transaction.R_SignNote;
 @SuppressWarnings("serial")
 public class RecStatementDetailsFrame extends Rec_DetailsFrame
 {
-	private JTextField messageText;
+	private JTextPane messageText;
 	
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	
@@ -67,10 +73,35 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 			// ISTEXT
 			++detailGBC.gridy;
 			detailGBC.gridwidth = 2;
-			messageText = new JTextField( ( r_Statement.isText() ) ? new String(r_Statement.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Statement.getData()));
+			messageText = new JTextPane();
+			messageText.setContentType("text/html");
+			String ss = (( r_Statement.isText() ) ? Processor.process(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
 			messageText.setEditable(false);
+			//messageText.setSize(200, 300);
+			//messageText.setPreferredSize(new Dimension(800,200));
 			MenuPopupUtil.installContextMenu(messageText);
-			this.add(messageText, detailGBC);			
+	
+			
+			ss = "<div  style='word-wrap: break-word;'>" +ss;
+			
+			messageText.setText(ss);
+			
+			JScrollPane scrol = new JScrollPane();
+			
+			
+		//	scrol.setPreferredSize(new Dimension(800,300));
+			int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth(this.signature.getText()));	
+			
+			scrol.setPreferredSize(new Dimension(rr,300));
+			scrol.setViewportView(messageText);
+			detailGBC.fill = GridBagConstraints.NONE;
+			
+			
+			
+			
+			this.add(scrol, detailGBC);
+	
+			
 			detailGBC.gridwidth = 3;
 			
 			//ENCRYPTED CHECKBOX
@@ -79,8 +110,8 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 			GridBagConstraints chcGBC = new GridBagConstraints();
 			chcGBC.fill = GridBagConstraints.HORIZONTAL;  
 			chcGBC.anchor = GridBagConstraints.NORTHWEST;
-			chcGBC.gridy = labelGBC.gridy;
-			chcGBC.gridx = 3;
+			chcGBC.gridy = ++labelGBC.gridy;
+			chcGBC.gridx = 2;
 			chcGBC.gridwidth = 1;
 	        final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
 	        
@@ -140,8 +171,8 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 		}
 		        				           
         //PACK
-	//	this.pack();
-    //    this.setResizable(false);
+		
+	    //    this.setResizable(false);
     //    this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}

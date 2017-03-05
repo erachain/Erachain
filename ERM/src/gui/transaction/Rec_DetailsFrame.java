@@ -45,6 +45,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 
 	public GridBagConstraints labelGBC = new GridBagConstraints();
 	public GridBagConstraints detailGBC = new GridBagConstraints();
+	public JTextField signature;
 	
 	public Rec_DetailsFrame(final Transaction record)
 	{
@@ -128,7 +129,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		//SIGNATURE
 		detailGBC.gridy = componentLevel;
 		//JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
-		JTextField signature = new JTextField(Base58.encode(record.getSignature()));
+		signature = new JTextField(Base58.encode(record.getSignature()));
 		signature.setEditable(false);
 		MenuPopupUtil.installContextMenu(signature);
 		this.add(signature, detailGBC);
