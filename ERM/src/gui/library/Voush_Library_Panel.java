@@ -134,7 +134,7 @@ public class Voush_Library_Panel extends JPanel {
 		
 		
 		
-		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
+		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Coins to Creator"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -148,7 +148,7 @@ public class Voush_Library_Panel extends JPanel {
 		});
 		menu.add(Send_Coins_item_Menu);
 
-		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail Creator"));
 		Send_Mail_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
