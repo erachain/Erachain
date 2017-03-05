@@ -91,6 +91,50 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	public int isValid(DBSet db, Long releaserReference) 
 	{
 
+		PersonCls person = (PersonCls) this.getItem();
+		
+		// FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
+		int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
+		if(descriptionLength > 8000)
+		{
+			return INVALID_DESCRIPTION_LENGTH;
+		}
+
+		// birthLatitude -90..90; birthLongitude -180..180
+		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
+		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
+		if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) return Transaction.ITEM_PERSON_RACE_ERROR;
+		if (person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
+		if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
+		if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
+		if (person.getHairСolor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
+		//int ii = Math.abs(person.getHeight());
+		//if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		if (person.getHeight() < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		
+		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
+				|| person.getImage().length > MAX_IMAGE_LENGTH) {
+			int height = this.getBlockHeightByParent(db);
+			if (height != 2998) {
+				// early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
+				return Transaction.INVALID_IMAGE_LENGTH;				
+			}
+		}
+
+		if (person instanceof PersonHuman) {
+			PersonHuman human = (PersonHuman) person;
+			if (human.isMustBeSigned()
+				&& !Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
+				// OWNER of personal INFO not is CREATOR
+				if (human.getOwnerSignature() == null) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
+				}
+				if (!human.isSignatureValid()) {
+					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
+				}
+			}
+		}
+
 		boolean creator_admin = false;
 		int res = super.isValid(db, releaserReference);
 		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
@@ -115,43 +159,6 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			return res;
 		}
 		
-		PersonCls person = (PersonCls) this.getItem();
-		
-		// FOR PERSONS need LIMIT DESCRIPTION because it may be make with 0 COMPU balance
-		int descriptionLength = person.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > 8000)
-		{
-			return INVALID_DESCRIPTION_LENGTH;
-		}
-
-		// birthLatitude -90..90; birthLongitude -180..180
-		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
-		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
-		if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) return Transaction.ITEM_PERSON_RACE_ERROR;
-		if (person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
-		if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
-		if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-		if (person.getHairСolor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
-		//int ii = Math.abs(person.getHeight());
-		//if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-		if (person.getHeight() < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-		
-		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
-				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
-
-		if (person instanceof PersonHuman) {
-			PersonHuman human = (PersonHuman) person;
-			if (human.isMustBeSigned()
-				&& !Arrays.equals(person.getOwner().getPublicKey(), this.creator.getPublicKey())) {
-				// OWNER of personal INFO not is CREATOR
-				if (human.getOwnerSignature() == null) {
-					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
-				}
-				if (!human.isSignatureValid()) {
-					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
-				}
-			}
-		}
 		
 		return VALIDATE_OK;
 	

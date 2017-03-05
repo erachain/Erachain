@@ -546,7 +546,11 @@ public abstract class Transaction {
 	{
 		return BigDecimal.valueOf(fee, 8);		
 	}
-	
+
+	public void setBlock(Block block) {
+		this.block = block;
+	}
+
 	public Block getBlock(DBSet db) {
 		
 		if (block != null)
@@ -592,7 +596,7 @@ public abstract class Transaction {
 		if (block != null)
 			return block.getHeightByParent(db);
 		
-		return -1;
+		return getBlockHeight(db);
 	}
 
 	public int getSeqNo(DBSet db)

@@ -519,13 +519,14 @@ public class Synchronizer
 		}
 		
 		//CHECK BLOCK SIGNATURE
-		if(block == null || !block.isSignatureValid())
+		if(!block.isSignatureValid())
 		{
 			String mess = "*** Invalid block --signature";
 			peer.ban(600, mess);
 			throw new Exception(mess);
 		}
 		
+		block.makeTransactionsHash();
 		//ADD TO LIST
 		return block;
 	}
