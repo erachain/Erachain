@@ -868,7 +868,7 @@ public class BlockExplorer
 
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
-			assetJSON.put("description", asset.getDescription());
+			assetJSON.put("description", Processor.process(asset.getDescription()));
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
@@ -988,7 +988,7 @@ if ( asset_1 == null) {
 
 		pollJSON.put("creator", poll.getCreator().getAddress());
 		pollJSON.put("name", poll.getName());
-		pollJSON.put("description", poll.getDescription());
+		pollJSON.put("description", Processor.process(poll.getDescription()));
 		pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
 		
@@ -1241,7 +1241,7 @@ if ( asset_1 == null) {
 
 		assetJSON.put("key", asset.getKey());
 		assetJSON.put("name", asset.getName());
-		assetJSON.put("description", asset.getDescription());
+		assetJSON.put("description", Processor.process(asset.getDescription()));
 		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
 		assetJSON.put("isDivisible", asset.isDivisible());
@@ -1305,7 +1305,7 @@ if ( asset_1 == null) {
 			pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
 			pairJSON.put("asset", pair.getKey());
 			pairJSON.put("assetName", assetWant.getName());
-			pairJSON.put("description", assetWant.getDescription());
+			pairJSON.put("description", Processor.process(assetWant.getDescription()));
 			pairsJSON.put(pair.getKey(), pairJSON);
 		}
 
@@ -1627,7 +1627,7 @@ if ( asset_1 == null) {
 		
 		output.put("name", person.getName());
 		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
-		output.put("description", person.getDescription());
+		output.put("description", Processor.process(person.getDescription()));
 		
 		String gender = Lang.getInstance().translate_from_langObj("Man",langObj);
 		if (person.getGender() != 0) gender = Lang.getInstance().translate_from_langObj("Woman",langObj);
@@ -3384,7 +3384,6 @@ if ( asset_1 == null) {
 				output.put("Label_block", Lang.getInstance().translate_from_langObj("Block",langObj));
 				output.put("Label_seg_No", Lang.getInstance().translate_from_langObj("Seg_no",langObj));
 				output.put("Label_No",  Lang.getInstance().translate_from_langObj("No.",langObj));
-				
 			
 				output.put("block",block);
 				output.put("Seg_No",seg_No);
@@ -3405,7 +3404,7 @@ if ( asset_1 == null) {
 				
 			//	output.put("name", person.getName());
 				output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-			//	output.put("description", person.getDescription());
+			//	output.put("description", Processor.process(person.getDescription()));
 				
 		
 				
