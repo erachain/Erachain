@@ -148,7 +148,7 @@ public class Voush_Library_Panel extends JPanel {
 		});
 		menu.add(Send_Coins_item_Menu);
 
-		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail Creator"));
+		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Creator"));
 		Send_Mail_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
