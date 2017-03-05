@@ -10,6 +10,7 @@ import javax.swing.JTable;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import gui.library.MTable;
+import gui.library.M_Accoutn_Text_Field;
 import gui.models.AccountsTableModel;
 import gui.models.Accounts_Of_Deals_TableModel;
 import gui.models.BalancesTableModel;
@@ -62,7 +63,7 @@ public class Asset_to_Accounts_DetailsPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+     //   jTextField3 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -157,15 +158,18 @@ this.setVisible(false);
         jPanel2.add(jLabel4, gridBagConstraints);
 
         Account creator = asset.getOwner();
-        jTextField3.setText(creator.getPersonAsString());
-        jTextField3.setEditable(false);
+        
+        jTextField_Creator = new M_Accoutn_Text_Field(creator);
+        
+   
+        jTextField_Creator.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
-        jPanel2.add(jTextField3, gridBagConstraints);
+        jPanel2.add(jTextField_Creator, gridBagConstraints);
 
         jLabel5.setText(Lang.getInstance().translate("Quantity") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -286,7 +290,7 @@ this.setVisible(false);
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private M_Accoutn_Text_Field jTextField_Creator;
     private javax.swing.JTextField jTextField4;
     // End of variables declaration                   
 }

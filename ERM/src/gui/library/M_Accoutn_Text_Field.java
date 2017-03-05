@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.GenesisBlock;
 import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
@@ -28,11 +29,11 @@ this.account = account;
 if(account.isPerson(DBSet.getInstance())){
 	this.setText( account.viewPerson());
 }
+else if (GenesisBlock.CREATOR.equals(account)) this.setText("GENESIS");
 else
 {
 	this.setText(account.getAddress());
 }
-
 
 
 

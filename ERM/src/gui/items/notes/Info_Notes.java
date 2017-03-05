@@ -2,6 +2,12 @@ package gui.items.notes;
 
 import core.block.GenesisBlock;
 import core.item.notes.NoteCls;
+import core.transaction.Transaction;
+import database.DBSet;
+import gui.library.Accounts_Library_Panel;
+import gui.library.M_Accoutn_Text_Field;
+import gui.library.Statuses_Library_Panel;
+import gui.library.Voush_Library_Panel;
 import lang.Lang;
 
 public class Info_Notes extends javax.swing.JPanel {
@@ -10,10 +16,12 @@ public class Info_Notes extends javax.swing.JPanel {
      * Creates new form Info_Notes
      * @param note 
      */
+	NoteCls note;
+	
     public Info_Notes(NoteCls note) {
+    	this.note = note;
         initComponents();
-        String addr = note.getOwner().getAddress();
-        jTextField_Account_Creator.setText(GenesisBlock.CREATOR.equals(addr)?"GENESIS":addr);
+        
         jTextField_Title.setText(note.getName());
         jTextArea_Content.setText(note.getDescription());
     
@@ -26,7 +34,7 @@ public class Info_Notes extends javax.swing.JPanel {
 
         jLabel4 = new javax.swing.JLabel();
         jLabel_Account_Creator = new javax.swing.JLabel();
-        jTextField_Account_Creator = new javax.swing.JTextField();
+   //     jTextField_Account_Creator = new javax.swing.JTextField();
         jLabel_Title = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
         jLabel_Content = new javax.swing.JLabel();
@@ -53,6 +61,11 @@ public class Info_Notes extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(9, 8, 0, 0);
         add(jLabel_Account_Creator, gridBagConstraints);
+        
+        
+        
+     
+        jTextField_Account_Creator = new M_Accoutn_Text_Field(note.getOwner());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -107,69 +120,38 @@ public class Info_Notes extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jScrollPane1, gridBagConstraints);
 
-        jTable_Statuses.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable_Statuses);
+        
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 9, 0);
-        add(jScrollPane2, gridBagConstraints);
+        
 
-        jTable_Signatures.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(jTable_Signatures);
+    	javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.16;
-        gridBagConstraints.weighty = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 9, 10);
-        add(jScrollPane3, gridBagConstraints);
+		add(jTabbedPane1, gridBagConstraints);
 
-        jLabel_Statuses.setText(Lang.getInstance().translate("Statuses"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 0);
-        add(jLabel_Statuses, gridBagConstraints);
+		// statuses panel
+		
 
-        jLabel_Signatures.setText(Lang.getInstance().translate("Signatures"));
-        jLabel_Signatures.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(11, 0, 0, 0);
-        add(jLabel_Signatures, gridBagConstraints);
+//		jTabbedPane1.add(new Statuses_Library_Panel(note..getOwner()));
+
+		
+
+		// vouch panel
+		Transaction trans = Transaction.findByDBRef(DBSet.getInstance(), note.getReference());
+		jTabbedPane1.add(new Voush_Library_Panel(trans));
+
+       
+       
+
+     
     }// </editor-fold> 
 
     // Variables declaration - do not modify                     
@@ -185,7 +167,7 @@ public class Info_Notes extends javax.swing.JPanel {
     private javax.swing.JTable jTable_Signatures;
     private javax.swing.JTable jTable_Statuses;
     private javax.swing.JTextArea jTextArea_Content;
-    private javax.swing.JTextField jTextField_Account_Creator;
+    private M_Accoutn_Text_Field jTextField_Account_Creator;
     private javax.swing.JTextField jTextField_Title;
     // End of variables declaration                   
 }

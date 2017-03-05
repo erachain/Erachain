@@ -16,6 +16,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.library.MTable;
+import gui.library.M_Accoutn_Text_Field;
 import gui.library.Voush_Library_Panel;
 import gui.models.BalancesTableModel;
 import gui.models.Renderer_Left;
@@ -71,7 +72,7 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+  //      jTextField3 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -188,6 +189,7 @@ this.setVisible(false);
         jPanel2.add(jLabel4, gridBagConstraints);
 
         Account owner = asset.getOwner();
+        jTextField3 = new M_Accoutn_Text_Field(owner);
         jTextField3.setText(GenesisBlock.CREATOR.equals(owner)?"GENESIS":owner.getPersonAsString());
 
         jTextField3.setEditable(false);
@@ -327,7 +329,7 @@ this.setVisible(false);
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private M_Accoutn_Text_Field jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JLabel jLabel_Block;
     private javax.swing.JTextField jTextField_Block;
