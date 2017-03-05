@@ -111,10 +111,9 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			// IF balance of FEE < 0 - ERROR 
 			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
 				return res;
-		} else {
+		} else if (res != Transaction.VALIDATE_OK) {
 			return res;
 		}
-		
 		
 		PersonCls person = (PersonCls) this.getItem();
 		
@@ -128,13 +127,14 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		// birthLatitude -90..90; birthLongitude -180..180
 		if (person.getBirthLatitude() > 90 || person.getBirthLatitude() < -90) return Transaction.ITEM_PERSON_LATITUDE_ERROR;
 		if (person.getBirthLongitude() > 180 || person.getBirthLongitude() < -180) return Transaction.ITEM_PERSON_LONGITUDE_ERROR;
-		if (person.getRace().length() > 125) return Transaction.ITEM_PERSON_RACE_ERROR;
+		if (person.getRace().getBytes(StandardCharsets.UTF_8).length > 255) return Transaction.ITEM_PERSON_RACE_ERROR;
 		if (person.getGender() > 10) return Transaction.ITEM_PERSON_GENDER_ERROR;
-		if (person.getSkinColor().length() >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
-		if (person.getEyeColor().length() >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-		if (person.getHairСolor().length() >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
+		if (person.getSkinColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
+		if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
+		if (person.getHairСolor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
 		//int ii = Math.abs(person.getHeight());
-		if (Math.abs(person.getHeight()) < 0) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		//if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		if (person.getHeight() < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
 		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
 				|| person.getImage().length > MAX_IMAGE_LENGTH) return Transaction.INVALID_IMAGE_LENGTH;
