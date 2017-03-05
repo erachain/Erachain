@@ -13,10 +13,11 @@ import javax.swing.JInternalFrame;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
+/*
 import org.jvnet.substance.SubstanceLookAndFeel;
-
 import org.jvnet.substance.api.skin.*;
 import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
+*/
 
 import gui.MainFrame;
 import settings.Settings;
@@ -103,7 +104,8 @@ public class library {
 	     	
 		
 	}
-	
+
+	/*
 	 public static void setupSubstance() {
 	        try {
 	            final String fileName = System.getProperty("user.home") + System.getProperty("file.separator") + "insubstantial.txt";
@@ -131,5 +133,6 @@ public class library {
 	            t.printStackTrace();
 	        }
 	    }
+	    */
 
 }

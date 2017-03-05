@@ -35,6 +35,8 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple6;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
@@ -3386,7 +3388,7 @@ if ( asset_1 == null) {
 			
 				output.put("block",block);
 				output.put("Seg_No",seg_No);
-				output.put("statement",  new String( trans.getData(), Charset.forName("UTF-8") ));
+				output.put("statement", Processor.process(new String( trans.getData(), Charset.forName("UTF-8") )));
 				output.put("creator", trans.getCreator().getPersonAsString());
 				
 				
