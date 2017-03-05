@@ -25,6 +25,7 @@ import gui.items.mails.Mail_Send_Dialog;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
+import gui.models.Renderer_Right;
 import lang.Lang;
 import utils.TableMenuPopupUtil;
 
@@ -48,6 +49,7 @@ public class Voush_Library_Panel extends JPanel {
 		col_data.setMaxWidth(200);
 		col_data.setPreferredWidth(120);// .setWidth(30);
 
+		jTable_Vouches.setDefaultRenderer(Account.class, new Renderer_Right());
 		jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(
 		jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()), model.get_Column_AutoHeight())); // set renderer
 
