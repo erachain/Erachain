@@ -46,10 +46,4 @@ function statements(data){
 	
 	return output;
 
-
-
 }
-
-
-
-
