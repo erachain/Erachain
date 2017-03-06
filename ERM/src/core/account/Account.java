@@ -528,7 +528,21 @@ public class Account {
 	}
 	
 	//TOSTRING
-	
+	public String personChar(Tuple2<Integer, PersonCls> personRes)
+	{
+		if (personRes == null) return "";
+		
+		PersonCls person = personRes.b;
+		if (person.getDeathday() > person.getBirthday())
+			return "="; //"☗";
+		
+		int key = personRes.a;
+		if (key == -1) return "-"; //"☺";
+		else if (key == 1) return "+"; //"♥"; //"☺"; //"☑"; 9829
+		else return "";
+		
+	}
+
 	@Override
 	public String toString()
 	{
@@ -540,17 +554,13 @@ public class Account {
 			addressStr = this.getAddress();
 		}
 		else {
-			personStr = personRes.b.getShort();
+			personStr = personChar(personRes) + personRes.b.getShort();
 			addressStr = this.getAddress().substring(0, 8);
-			if (personRes.a == -2) personStr = "[-]" + personStr;
-			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			else if (personRes.a == 0) personStr = "[++]" + personStr;
-			else if (personRes.a == 1) personStr = "[+]" + personStr;
 		}
 		return " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 				+ " " + addressStr + " " + personStr;
 	}
-	
+		
 	public String toString(long key)
 	{
 		Tuple2<Integer, PersonCls> personRes = this.getPerson();
@@ -561,12 +571,8 @@ public class Account {
 			addressStr = this.getAddress();
 		}
 		else {
-			personStr = personRes.b.getShort();
+			personStr = personChar(personRes) + personRes.b.getShort();
 			addressStr = this.getAddress().substring(0, 8);
-			if (personRes.a == -2) personStr = "[-]" + personStr;
-			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			else if (personRes.a == 0) personStr = "[++]" + personStr;
-			else if (personRes.a == 1) personStr = "[+]" + personStr;
 		}
 		return NumberAsString.getInstance().numberAsString(this.getBalanceUSE(key))
 				+ " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
@@ -579,11 +585,7 @@ public class Account {
 		if (personRes == null) {
 			return "";
 		} else {
-			String personStr = personRes.b.toString();
-			if (personRes.a == -2) personStr = "[-]" + personStr;
-			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			//else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
-			else if (personRes.a == 1) personStr = "[+]" + personStr;
+			String personStr = personChar(personRes) + personRes.b.toString();
 			return personStr;
 		}
 		
@@ -596,12 +598,8 @@ public class Account {
 			return this.getAddress();
 		}
 		else {
-			String personStr = personRes.b.getShort();
+			String personStr = personChar(personRes) + personRes.b.getShort();
 			String addressStr = this.getAddress().substring(1, 6);
-			if (personRes.a == -2) personStr = "[-]" + personStr;
-			else if (personRes.a == -1) personStr = "[?]" + personStr;
-			else if (personRes.a == 0) personStr = "[+]" + personStr; // default is permanent ACTIVE
-			//else if (personRes.a == 1) personStr = "[+]" + personStr;
 			return addressStr + ": " + personStr;
 		}
 	}
