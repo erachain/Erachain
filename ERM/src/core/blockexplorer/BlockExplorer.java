@@ -3412,12 +3412,12 @@ if ( asset_1 == null) {
 		
 		WEB_Statements_Vouch_Table_Model table_sing_model = new WEB_Statements_Vouch_Table_Model(trans);
 		int rowCount = table_sing_model.getRowCount();
-		Map vouchJSON=new LinkedHashMap();		
 	
 		if (rowCount >0) {
 			for (int i = 0; i<rowCount; i++) {
 				
 				Transaction vouch_Tr = (Transaction)  table_sing_model.getValueAt(i, 3);
+				Map vouchJSON=new LinkedHashMap();
 				vouchJSON.put("date", vouch_Tr.viewTimestamp());
 				vouchJSON.put("block", "" + vouch_Tr.getBlockHeight(DBSet.getInstance()));
 				vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo(DBSet.getInstance()));			
