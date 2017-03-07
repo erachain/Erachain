@@ -305,16 +305,13 @@ public class PersonConfirmDialog extends JDialog  {
 
 	  //      jTextField_Address1.setMinimumSize(new java.awt.Dimension(300, 20));
 	        jTextField_Address1.setName(""); // NOI18N
-	        if (publicKey!=null) {
-	        	jTextField_Address1.setText(publicKey.getBase58());
-				refreshReceiverDetails(jTextField_Address1, jLabel_Adress1_Check);
-	        }
 	   //     jTextField_Address1.setPreferredSize(new java.awt.Dimension(300, 20));
 	      //  jTextField_Address1.setRequestFocusEnabled(false);
 	        jTextField_Address1.getDocument().addDocumentListener(new DocumentListener() {
 	            
 				@Override
 				public void changedUpdate(DocumentEvent arg0) {
+					refreshReceiverDetails(jTextField_Address1, jLabel_Adress1_Check);
 				}
 				@Override
 				public void insertUpdate(DocumentEvent arg0) {
@@ -328,6 +325,9 @@ public class PersonConfirmDialog extends JDialog  {
 	        
 	        if (publicKey==null) {
 	        	jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
+	        } else {
+	        	jTextField_Address1.setText(publicKey.getBase58());
+				refreshReceiverDetails(jTextField_Address1, jLabel_Adress1_Check);
 	        }
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
@@ -357,6 +357,7 @@ public class PersonConfirmDialog extends JDialog  {
 	            
 				@Override
 				public void changedUpdate(DocumentEvent arg0) {
+					refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
 				}
 				@Override
 				public void insertUpdate(DocumentEvent arg0) {
@@ -395,6 +396,7 @@ public class PersonConfirmDialog extends JDialog  {
 	            
 				@Override
 				public void changedUpdate(DocumentEvent arg0) {
+					refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
 				}
 				@Override
 				public void insertUpdate(DocumentEvent arg0) {
