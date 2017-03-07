@@ -13,8 +13,11 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import de.muntjak.tinylookandfeel.Theme;
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -83,14 +86,18 @@ public class library {
 				JFrame.setDefaultLookAndFeelDecorated(true);
 				JDialog.setDefaultLookAndFeelDecorated(true);
 				
-/*
+
 				try {
 				    UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
-				    SwingUtilities.updateComponentTreeUI(this);
+			//	    SwingUtilities.updateComponentTreeUI();
 				} catch(Exception ex) {
 				    ex.printStackTrace();
 				}
-				*/
+		
+				
+				
+				
+				/*		
 				try {
 					UIManager.setLookAndFeel ( MLookAndFeel.class.getCanonicalName () );
 				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -99,7 +106,7 @@ public class library {
 					e.printStackTrace();
 				}
 				
-		
+		*/
 		
 		
 		
@@ -141,6 +148,9 @@ public class library {
 	      UIManager.put("Table.height", size_font*5);
 	      UIManager.put("TextArea.font", font);
 	      
+	      UIManager.put("InternalFrame.paletteTitleFont", font);
+	      UIManager.put("InternalFrame.normalTitleFont", font);
+	      
 	      
 	        UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
 	        UIManager.put("Button.focus", new Color(0, 0, 0, 0));
@@ -148,7 +158,13 @@ public class library {
 	        UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
 	   //     UIManager.put("TextArea.font", UIManager.get("TextField.font"));
 
+	       
+	        int scrolH = (int)(size_font*1.2);
+	        if (scrolH < 17) scrolH=17;
+	        Theme.scrollSize.setValue(scrolH);
 	     	
+	        Theme.internalPaletteTitleFont.setFont(font);
+	        Theme.toolTipFont.setFont(font);
 		
 	}
 
