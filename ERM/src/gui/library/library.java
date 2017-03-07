@@ -1,7 +1,9 @@
 package gui.library;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.beans.PropertyVetoException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -63,9 +66,43 @@ public class library {
 	}
 	
 
-	public static void Set_GUI_Font(String text) {
+	public static void Set_GUI_Look_And_Feel(String text) {
 		String name_font = "Courier";
 		int size_font;
+		
+		
+		//USE SYSTEM STYLE
+		   //     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	
+		
+	
+		
+
+				Toolkit.getDefaultToolkit().setDynamicLayout(true);
+				System.setProperty("sun.awt.noerasebackground", "true");
+				JFrame.setDefaultLookAndFeelDecorated(true);
+				JDialog.setDefaultLookAndFeelDecorated(true);
+				
+/*
+				try {
+				    UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
+				    SwingUtilities.updateComponentTreeUI(this);
+				} catch(Exception ex) {
+				    ex.printStackTrace();
+				}
+				*/
+				try {
+					UIManager.setLookAndFeel ( MLookAndFeel.class.getCanonicalName () );
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+						| UnsupportedLookAndFeelException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+		
+		
+		
+		
 		if ( text == ""){
 			size_font =new Integer(Settings.getInstance().get_Font());
 			name_font = Settings.getInstance().get_Font_Name();
@@ -103,6 +140,14 @@ public class library {
 	      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
 	      UIManager.put("Table.height", size_font*5);
 	      UIManager.put("TextArea.font", font);
+	      
+	      
+	        UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
+	        UIManager.put("Button.focus", new Color(0, 0, 0, 0));
+	        UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
+	        UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
+	   //     UIManager.put("TextArea.font", UIManager.get("TextField.font"));
+
 	     	
 		
 	}
