@@ -238,7 +238,7 @@ public class Synchronizer
 		// FIND HEADERS for common CHAIN
 		if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
 			LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
-					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());			
+					+ peer.getAddress().getHostAddress() + ", ping: " + peer.getPing());			
 		}
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
@@ -519,13 +519,14 @@ public class Synchronizer
 		}
 		
 		//CHECK BLOCK SIGNATURE
-		if(block == null || !block.isSignatureValid())
+		if(!block.isSignatureValid())
 		{
 			String mess = "*** Invalid block --signature";
 			peer.ban(600, mess);
 			throw new Exception(mess);
 		}
 		
+		block.makeTransactionsHash();
 		//ADD TO LIST
 		return block;
 	}

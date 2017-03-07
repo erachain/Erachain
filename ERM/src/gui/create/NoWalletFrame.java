@@ -148,23 +148,29 @@ public class NoWalletFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
-	
+
+	public void goAfterLicence(boolean createWallet)
+	{
+		if (createWallet)
+			new CreateWalletFrame(this);
+		else
+			new RecoverWalletFrame(this);
+	}
+
 	public void onNextClick()
 	{
 		if(createButton.isSelected())
 		{
 			//OPEN CREATE WALLET FRAME
 			this.setVisible(false);
-			new License_JFrame(this);
-			
+			new License_JFrame(true, this, true);			
 		}
 		
 		if(recoverButton.isSelected())
 		{
 			//OPEN RECOVER WALLET FRAME
 			this.setVisible(false);
-			
-			new RecoverWalletFrame(this);
+			new License_JFrame(true, this, false);	
 		}
 	}
 	

@@ -43,18 +43,10 @@ import core.transaction.Transaction;
 @SuppressWarnings("serial")
 public class IssueAssetDialog extends JDialog //JFrame
 {
-	private JComboBox<Account> cbxFrom;
-	private JTextField txtScale;
-	private JTextField txtFeePow;
-	private JTextField txtName;
-	private JTextArea txtareaDescription;
-	private JTextField txtQuantity;
-	private JCheckBox chkDivisible;
-	private JButton issueButton;
+	
 
 	public IssueAssetDialog()
 	{
-	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Asset"));
 		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Asset"));
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

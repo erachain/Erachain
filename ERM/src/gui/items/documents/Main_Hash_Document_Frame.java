@@ -64,7 +64,7 @@ public Main_Hash_Document_Frame(){
 	
 	
 	this.pack();
-	this.setSize(800,600);	
+//	this.setSize(800,600);	
 	this.setMaximizable(true);	
 	this.setClosable(true);
 	this.setResizable(true);

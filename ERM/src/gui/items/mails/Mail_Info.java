@@ -9,6 +9,11 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -22,6 +27,9 @@ import core.crypto.AEScrypto;
 import core.transaction.R_Send;
 import database.DBSet;
 import gui.PasswordPane;
+import gui.library.MTextPane;
+import gui.library.M_Accoutn_Text_Field;
+import gui.library.Voush_Library_Panel;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import utils.Converter;
@@ -68,13 +76,12 @@ public class Mail_Info extends javax.swing.JPanel {
         jLabel_Data = new javax.swing.JLabel();
         jTextField_Data = new javax.swing.JTextField();
         jLabel_Sender = new javax.swing.JLabel();
-        jTextField_Sender = new javax.swing.JTextField();
+    //    jTextField_Sender = new javax.swing.JTextField();
         jLabel_Message = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        //jTextArea_Messge = new javax.swing.JTextArea();
-        jTextArea_Messge = new javax.swing.JTextPane();
+        jTextArea_Messge = new MTextPane();
         jLabel_Reciever = new javax.swing.JLabel();
-        jTextField_Reciever = new javax.swing.JTextField();
+    //    jTextField_Reciever = new javax.swing.JTextField();
         jLabel_Title = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -123,8 +130,9 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Sender, gridBagConstraints);
 
+        jTextField_Sender = new M_Accoutn_Text_Field(trans.getCreator());
         jTextField_Sender.setEditable(false);
-        jTextField_Sender.setText(trans.getCreator().getPersonAsString());
+  //      jTextField_Sender.setText(trans.getCreator().getPersonAsString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -143,8 +151,9 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 4);
         add(jLabel_Reciever, gridBagConstraints);
 
+        jTextField_Reciever = new M_Accoutn_Text_Field(trans.getRecipient());
         jTextField_Reciever.setEditable(false);
-        jTextField_Reciever.setText(trans.getRecipient().getPersonAsString());
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -189,29 +198,43 @@ public class Mail_Info extends javax.swing.JPanel {
         add(jLabel_Message, gridBagConstraints);
 
        
-        jTextArea_Messge.setEditable(false);
-		jTextArea_Messge.setContentType("text/html");
+     //   jTextArea_Messge.setEditable(false);
+	//	jTextArea_Messge.setContentType("text/html");
 
-		MenuPopupUtil.installContextMenu(jTextArea_Messge);
+	//	MenuPopupUtil.installContextMenu(jTextArea_Messge);
   //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
    //     jTextArea_Messge.setColumns(20);
    //     jTextArea_Messge.setRows(5);
    //     jTextArea_Messge.setLineWrap(true);
-        jTextArea_Messge.setText(descript_Mesage());
+       jTextArea_Messge.set_text(descript_Mesage());
+        
+    /* 
+        StyledDocument doc = (StyledDocument) jTextArea_Messge.getDocument();
+        // Create a style object and then set the style attributes
+        Style style = doc.addStyle("StyleName", null);
+        StyleConstants.setFontSize(style, UIManager.getFont("TextField.font").getSize());
+        try {
+			doc.insertString(doc.getLength(), descript_Mesage(), style);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+     */   
         
         //jTextArea_Messge.setText();
-        jScrollPane1.setViewportView(jTextArea_Messge);
+    //    jScrollPane1.setViewportView(jTextArea_Messge);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+    
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight=4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.6;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
-        add(jScrollPane1, gridBagConstraints);
+        add(jTextArea_Messge, gridBagConstraints);
 
         
         
@@ -219,7 +242,7 @@ public class Mail_Info extends javax.swing.JPanel {
         jButton1.setText(Lang.getInstance().translate("Decrypt"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 9);
         if (trans.isEncrypted()) add(jButton1, gridBagConstraints);
@@ -250,13 +273,31 @@ public class Mail_Info extends javax.swing.JPanel {
         
         
         
-        jLabel1.setToolTipText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        
+        
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.2;
-        add(jLabel1, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
+       // add(jScrollPane2, gridBagConstraints);
+        
+        
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        jTabbedPane1.add(new Voush_Library_Panel(trans));
+        add(jTabbedPane1, gridBagConstraints);
+        
+        
+        
+        
+        
+        
+        
+     
 
     }// </editor-fold>                        
 
@@ -272,13 +313,13 @@ public class Mail_Info extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JScrollPane jScrollPane1;
 //    private javax.swing.JTextArea jTextArea_Messge;
-    private javax.swing.JTextPane jTextArea_Messge;
+    private MTextPane jTextArea_Messge;
     
    
     private javax.swing.JTextField jTextField_Block;
     private javax.swing.JTextField jTextField_Data;
-    private javax.swing.JTextField jTextField_Reciever;
-    private javax.swing.JTextField jTextField_Sender;
+    private M_Accoutn_Text_Field jTextField_Reciever;
+    private M_Accoutn_Text_Field jTextField_Sender;
     private javax.swing.JTextField jTextField_Title;
     // End of variables declaration 
     
@@ -328,8 +369,8 @@ public class Mail_Info extends javax.swing.JPanel {
 		}
 		
 		try {
-			jTextArea_Messge.setText(Processor.process(
-					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8")));
+			jTextArea_Messge.set_text(
+					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
 			jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 			encrypted =!encrypted;
 		
@@ -342,7 +383,7 @@ public class Mail_Info extends javax.swing.JPanel {
 	{
 		//jTextArea_Messge.setText(new String(trans.getData(), "UTF-8"));
 		
-		jTextArea_Messge.setText(descript_Mesage());
+		jTextArea_Messge.set_text(descript_Mesage());
 		jButton1.setText(Lang.getInstance().translate("Decrypt"));
 		encrypted =!encrypted;
 	}

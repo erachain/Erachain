@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -32,6 +34,7 @@ import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import gui.library.MButton;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import utils.Pair;
@@ -52,13 +55,13 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	
 	
 	
-	protected javax.swing.JButton trans_Button;
+	protected MButton trans_Button;
     protected javax.swing.JLabel label_Sign;
     protected javax.swing.JLabel label_public_key;
     protected javax.swing.JLabel label_info;
     protected javax.swing.JLabel iconLabel;
     protected javax.swing.JPanel jPanel_Paste;
-    protected javax.swing.JButton pasteButton;
+    protected MButton pasteButton;
     
     
     
@@ -234,9 +237,9 @@ private void init(){
      gridBagConstraints.weightx = 0.05;
      jPanel1.add(iconLabel, gridBagConstraints);
  	 
+    
      
-	 pasteButton = new JButton();
-     pasteButton.setText(Lang.getInstance().translate("Paste") +"...");
+	 pasteButton = new MButton(Lang.getInstance().translate("Paste"),2);
      pasteButton.addActionListener(new ActionListener(){
 
  		@Override
@@ -302,10 +305,9 @@ private void init(){
      add(pasteButton, gridBagConstraints1);
 	
  
- 
+  
+     trans_Button = new MButton(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue"), 2);
     
-     trans_Button = new JButton();
-     trans_Button.setText(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue") + "...");
      trans_Button.addActionListener(new ActionListener(){
 
 		@Override

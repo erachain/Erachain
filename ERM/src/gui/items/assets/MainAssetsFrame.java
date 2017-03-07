@@ -89,7 +89,7 @@ public MainAssetsFrame(){
 					if (my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
 						WalletItemAssetsTableModel tableModelAssets = (WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
 						Object asset = tableModelAssets.getAsset(my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-						info.show_Asset_001((AssetCls) asset);
+						//info.show_Asset_001((AssetCls) asset);
 						info2=new AssetDetailsPanel001((AssetCls) asset);
 						my_Assets_SplitPanel.jSplitPanel.setDividerLocation(my_Assets_SplitPanel.jSplitPanel.getDividerLocation());	
 						my_Assets_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);

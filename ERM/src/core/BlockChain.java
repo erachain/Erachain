@@ -308,8 +308,27 @@ public class BlockChain
 		}
 
 		byte[] lastSignature = dbSet.getBlockMap().getLastBlockSignature();
-		if(!Arrays.equals(lastSignature, block.getReference())) {
+		byte[] newBlockReference = block.getReference();
+		if(!Arrays.equals(lastSignature, newBlockReference)) {
 			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");
+			//Block lastBlock = dbSet.getBlockMap().get(lastSignature);
+			//if(!Arrays.equals(lastBlock.getReference(), block.getReference())) {
+				// SAME
+			//}
+			Block winBlock = this.getWaitWinBuffer();
+			if (winBlock == null)
+				return 10;
+			
+			if (Arrays.equals(winBlock.getSignature(), newBlockReference)) {
+				// this new block for my winBlock + 1 Height
+				if (winBlock.getTimestamp(dbSet) - 100*GENERATING_MIN_BLOCK_TIME > NTP.getTime()) {
+					// BLOCK from FUTURE
+					return 9;
+				} else {
+					// LETS FLUSH winBlock and set newBlock as waitWIN
+					return 5;
+				}
+			}
 			return 4;
 		}
 		

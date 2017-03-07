@@ -19,6 +19,7 @@ import javax.swing.table.TableColumn;
 import core.item.imprints.ImprintCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -42,7 +43,7 @@ public My_Imprints_Tab(){
 	
 //TABLE
 	final WalletItemImprintsTableModel imprintsModel = new WalletItemImprintsTableModel();
-	final JTable tableImprints = new JTable(imprintsModel);
+	final MTable tableImprints = new MTable(imprintsModel);
 //POLLS SORTER
 	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 	CoreRowSorter sorter = new CoreRowSorter(imprintsModel, indexes);

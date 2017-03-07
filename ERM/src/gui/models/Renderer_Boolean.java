@@ -29,7 +29,7 @@ import javax.swing.border.LineBorder;
               setMargin(new Insets(0, 0, 0, 0));
               setHorizontalAlignment(JLabel.CENTER);
               setBorder(null);
-
+              setSize(40, 50);
               setBorderPaintedFlat(true);
           }
 

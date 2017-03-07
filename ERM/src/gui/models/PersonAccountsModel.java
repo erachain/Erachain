@@ -51,6 +51,30 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 	}
 
+	public String get_No_Trancaction(int row){
+		
+		
+		//Map.Entry<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> entry  =  records.entrySet();
+				String addrses_key_value = "-";
+				int i = 0;
+				for (String addrses_key: addresses.keySet()) {
+					if (i == row)
+					{
+						addrses_key_value = addrses_key;
+						break;
+					}
+					i++;
+				}
+		
+		Stack<Tuple3<Integer, Integer, Integer>> entry = addresses.get(addrses_key_value);
+		if (entry == null || entry.isEmpty() ) return "-";
+		
+		Tuple3<Integer, Integer, Integer> value = entry.peek();
+		//int height = value.b;
+		//int seq = value.c;
+		return value.b +"-"+  value.c;
+		
+	}
 	
 	//@Override
 	//public SortableList<Tuple2<String, String>, ImprintCls> getSortableList() {

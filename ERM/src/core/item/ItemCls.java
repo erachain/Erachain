@@ -347,7 +347,7 @@ public abstract class ItemCls {
 	{
 		long key = this.getKey(db);
 		String creator = this.owner.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.owner.getPersonAsString_01(true);
-		return (key<0?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 300))
+		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30))
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String getShort()

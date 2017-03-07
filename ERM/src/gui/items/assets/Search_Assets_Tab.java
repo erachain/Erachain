@@ -54,6 +54,7 @@ import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
 import gui.items.unions.TableModelUnions;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -63,7 +64,7 @@ import lang.Lang;
 
 public class Search_Assets_Tab extends Split_Panel {
 	private TableModelItemAssets tableModelItemAssets;
-	final JTable assetsTable;
+	final MTable assetsTable;
 	
 	
 	public Search_Assets_Tab(){
@@ -80,7 +81,7 @@ public class Search_Assets_Tab extends Split_Panel {
 
 	//CREATE TABLE
 	tableModelItemAssets = new TableModelItemAssets();
-	 assetsTable = new JTable(tableModelItemAssets);
+	 assetsTable = new MTable(tableModelItemAssets);
 	
 	//CHECKBOX FOR DIVISIBLE
 //	TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);

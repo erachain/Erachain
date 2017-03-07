@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gui.CoreRowSorter;
+import gui.library.MTable;
 import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
 
@@ -93,7 +94,7 @@ public class AllAssetsFrame extends JFrame{
 		
 		//CREATE TABLE
 		this.tableModelItemAssets = new TableModelItemAssets();
-		final JTable assetsTable = new JTable(this.tableModelItemAssets);
+		final MTable assetsTable = new MTable(this.tableModelItemAssets);
 		
 		//CHECKBOX FOR MOVABLE
 		TableColumn movableColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_MOVABLE);

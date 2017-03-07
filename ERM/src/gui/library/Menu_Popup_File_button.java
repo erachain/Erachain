@@ -1,0 +1,291 @@
+package gui.library;
+
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import controller.Controller;
+import gui.AboutFrame;
+import gui.ClosingDialog;
+import gui.DebugFrame;
+import gui.PasswordPane;
+import gui.create.License_JFrame;
+import gui.settings.SettingsFrame;
+import lang.Lang;
+import settings.Settings;
+import utils.URLViewer;
+
+public class Menu_Popup_File_button extends JButton{
+
+	
+	
+		private static final long serialVersionUID = 5237335232850181080L;
+		public static JMenuItem webServerItem;
+		public static JMenuItem blockExplorerItem;
+		public static JMenuItem lockItem;
+		private ImageIcon lockedIcon;
+		private ImageIcon unlockedIcon;
+		private Menu_Popup_File_button this_component;
+		final JPopupMenu fileMenu ;
+		
+
+	
+		public Menu_Popup_File_button()
+		{
+		
+			
+			super();
+			
+		this_component = this;
+		this.setText(Lang.getInstance().translate("File"));
+			//     button1_MainToolBar.setActionCommand("button1_Main_Panel");
+		this.setFocusable(false);
+		this.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+		
+			
+			
+				fileMenu = new JPopupMenu("popup menu");
+				
+		
+				this.addActionListener(new ActionListener() {
+		 
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						
+						
+						if(Controller.getInstance().isWalletUnlocked()) {
+		        			lockItem.setText(Lang.getInstance().translate("Lock Wallet"));
+		        			lockItem.setIcon(lockedIcon);
+		        		} else {
+		        			lockItem.setText(Lang.getInstance().translate("Unlock Wallet"));
+		        			lockItem.setIcon(unlockedIcon);
+		        		}
+						Dimension d = fileMenu.getPreferredSize();
+						d.width = Math.max(d.width, 300);
+						fileMenu.setPreferredSize(d);
+						fileMenu.show(this_component, 0, this_component.getHeight());
+					}
+				});
+			
+				this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+				
+				 //LOAD IMAGES
+			
+					BufferedImage lockedImage;
+					try {
+						lockedImage = ImageIO.read(new File("images/wallet/locked.png"));
+					
+					this.lockedIcon = new ImageIcon(lockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
+			
+					BufferedImage unlockedImage = ImageIO.read(new File("images/wallet/unlocked.png"));
+					this.unlockedIcon = new ImageIcon(unlockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
+					} catch (IOException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+					
+				
+		        lockItem = new JMenuItem("lock");
+		        lockItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Lock/Unlock Wallet"));
+		        lockItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
+		        
+		        lockItem.addActionListener(new ActionListener()
+		        {
+		        	
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+						PasswordPane.switchLockDialog();
+		        	}
+		        });
+		        fileMenu.add(lockItem);
+		        
+		        //SEPARATOR
+		        fileMenu.addSeparator();
+		        
+		        //CONSOLE
+		        JMenuItem consoleItem = new JMenuItem(Lang.getInstance().translate("Debug"));
+		        consoleItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Debug information"));
+		        consoleItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.ALT_MASK));
+		        consoleItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		                new DebugFrame();
+		        	}
+		        });
+		        fileMenu.add(consoleItem);
+		        
+		        //SETTINGS
+		        JMenuItem settingsItem = new JMenuItem(Lang.getInstance().translate("Settings"));
+		        settingsItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Settings of program"));
+		        settingsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+		        settingsItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		                new SettingsFrame();
+		        	}
+		        });
+		        fileMenu.add(settingsItem);        
+
+		        //WEB SERVER
+		        webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));
+		        webServerItem.getAccessibleContext().setAccessibleDescription("http://127.0.0.1:"+Settings.getInstance().getWebPort());
+		        webServerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.ALT_MASK));
+		        webServerItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		        		
+		        			try {
+								URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort()));
+							} catch (MalformedURLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						
+		        	}
+		        });
+		        fileMenu.add(webServerItem);   
+		        
+		        webServerItem.setVisible(Settings.getInstance().isWebEnabled());
+		        
+		        //WEB SERVER
+		        blockExplorerItem = new JMenuItem(Lang.getInstance().translate("Built-in BlockExplorer"));
+		        blockExplorerItem.getAccessibleContext().setAccessibleDescription("http://127.0.0.1:"+Settings.getInstance().getWebPort()+"/index/blockexplorer.html");
+		        blockExplorerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
+		        blockExplorerItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		        		
+		        			try {
+								URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort()+"/index/blockexplorer.html"));
+							} catch (MalformedURLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						
+		        	}
+		        });
+		        fileMenu.add(blockExplorerItem);   
+		        
+		        blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
+		        
+		        //ABOUT
+		        JMenuItem aboutItem = new JMenuItem(Lang.getInstance().translate("About"));
+		        aboutItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+		        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+		        aboutItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		                new AboutFrame();
+		        	}
+		        });
+		        fileMenu.add(aboutItem);
+		        
+		        //ABOUT
+		        JMenuItem licisceItem = new JMenuItem(Lang.getInstance().translate("License"));
+		    //    licisceItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Information about the application"));
+		    //    licisceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
+		        licisceItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		                new License_JFrame() ;
+		        	}
+		        });
+		        fileMenu.add(licisceItem);
+		        
+		        
+		        
+		        //SEPARATOR
+		        fileMenu.addSeparator();
+		        
+		        //QUIT
+		        JMenuItem quitItem = new JMenuItem(Lang.getInstance().translate("Quit"));
+		        quitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
+		        quitItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Quit the application"));
+		        quitItem.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
+		        		new ClosingDialog();
+		        	}
+		        });
+		       
+		        fileMenu.add(quitItem);
+		/*        
+		        fileMenu.addMenuListener(new MenuListener()
+		        {
+					@Override
+					public void menuSelected(MenuEvent arg0) {
+		        		if(Controller.getInstance().isWalletUnlocked()) {
+		        			lockItem.setText(Lang.getInstance().translate("Lock Wallet"));
+		        			lockItem.setIcon(lockedIcon);
+		        		} else {
+		        			lockItem.setText(Lang.getInstance().translate("Unlock Wallet"));
+		        			lockItem.setIcon(unlockedIcon);
+		        		}
+					}
+
+					@Override
+					public void menuCanceled(MenuEvent e) {
+						
+					}
+
+					@Override
+					public void menuDeselected(MenuEvent e) {
+						
+					}
+		        });
+		        	*/
+		        
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		}	
+			
+		
+		
+		
+		
+		
+			
+		}
+
+	
+	
+	
+

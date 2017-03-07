@@ -29,6 +29,7 @@ import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.items.persons.Person_info_panel_001;
 import gui.items.unions.TableModelUnions;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -51,7 +52,7 @@ public Search_Imprints_Tab(){
 	
 //CREATE TABLE
 	this.tableModelImprints = new TableModelImprints();
-	final JTable imprintsTable = new JTable(this.tableModelImprints);
+	final MTable imprintsTable = new MTable(this.tableModelImprints);
 
 //Custom renderer for the String column;
 	imprintsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer

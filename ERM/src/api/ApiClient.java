@@ -241,6 +241,11 @@ public class ApiClient {
 				"Errors: 301 - Block does not exist."
 			},
 			{
+				"GET blocks/fromheight/<height>", 
+				"Returns the block from given height.",
+				"Errors: 301 - Block does not exist."
+			},			
+			{
 				"GET addresses", 
 				"Returns an array of all the addresses in your wallet.",
 				"Errors: 201 - Wallet does not exist."

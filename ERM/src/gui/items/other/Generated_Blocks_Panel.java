@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import database.wallet.BlockMap;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.library.MTable;
 import gui.models.TableModelCls;
 import gui.models.WalletBlocksTableModel;
 import gui.models.WalletTransactionsTableModel;
@@ -17,7 +18,7 @@ import lang.Lang;
 public class Generated_Blocks_Panel extends Split_Panel {
 
 	private WalletTransactionsTableModel transactionsModel;
-	private JTable transactionsTable;
+	private MTable transactionsTable;
 	private static final long serialVersionUID = -4045744114543168423L;
 	WalletBlocksTableModel blocksModel;
 
@@ -40,7 +41,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
 		
 		//TRANSACTIONS
 		blocksModel = new WalletBlocksTableModel();
-		jTable_jScrollPanel_LeftPanel = new JTable(blocksModel);
+		jTable_jScrollPanel_LeftPanel = new MTable(blocksModel);
 				
 		//TRANSACTIONS SORTER
 		indexes = new TreeMap<Integer, Integer>();

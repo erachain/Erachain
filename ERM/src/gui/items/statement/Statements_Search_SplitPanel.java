@@ -61,6 +61,7 @@ import gui.items.persons.PersonConfirmDialog;
 import gui.items.persons.PersonSetStatusDialog;
 import gui.items.persons.Person_info_panel_001;
 import gui.items.persons.TableModelPersons;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
@@ -68,6 +69,7 @@ import gui.models.Renderer_Boolean;
 	import gui.models.WalletItemPersonsTableModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 
 	public class Statements_Search_SplitPanel extends Split_Panel{
@@ -75,9 +77,9 @@ import lang.Lang;
 		private static final long serialVersionUID = 2717571093561259483L;
 
 		private Statements_Table_Model_Search search_Table_Model;
-		private JTable search_Table;
+		private MTable search_Table;
 		private RowSorter<TableModelPersons> search_Sorter;
-		private RunMenu Search_run_menu;
+	
 // для прозрачности
 	     int alpha =255;
 	     int alpha_int;
@@ -99,7 +101,7 @@ import lang.Lang;
 			
 	//CREATE TABLE
 			search_Table_Model = new Statements_Table_Model_Search();
-			search_Table = new JTable(this.search_Table_Model);
+			search_Table = new MTable(this.search_Table_Model);
 			TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 	//		columnModel.getColumn(0).setMaxWidth((100));
 		
@@ -132,119 +134,49 @@ import lang.Lang;
 	// Event LISTENER		
 			jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 		
-			search_Table.addMouseListener( new search_Mouse());
+		
 				
 			
-			Timer timer = new Timer( 200, new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					
-					
-					
-					if (alpha <50) {
-						
-						Search_run_menu.setVisible(false);
-						alpha = 50;
-					}
-			//	Search_run_menu.setBackground(new Color(0,204,102,alpha));	
-			//		Search_run_menu.jButton1.setForeground(new Color(0,0,0,alpha));
-			//		Search_run_menu.jButton2.setForeground(new Color(0,0,0,alpha));
-			//		Search_run_menu.jButton3.setForeground(new Color(0,0,0,alpha));
-			//		Search_run_menu.jButton1.setBackground( new Color(212,208,200,alpha));
-					alpha = alpha - alpha_int;
-					
-					
-					
-					
-				}
-				
-			});
-				   
-
-		//		timer.start();
+		
 			
-			
-			
+			JPopupMenu menu =new JPopupMenu();
 				 
-
-			Search_run_menu  = new RunMenu();
 			
-			Search_run_menu.setUndecorated(true);
-		//	Search_run_menu.setBackground(new Color(0,204,102,255));
-		//	Dimension dim = new Dimension(180,70);
-	    //	Search_run_menu.setSize(dim);
-	    	Search_run_menu.setPreferredSize(new Dimension(180,71));
-	    	Search_run_menu.setVisible(false);
-	    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
-	   // 	aaa.jButton1.setBorderPainted(false);
-	  //  	Search_run_menu.jButton1.setFocusPainted(true);
-	 //  	Search_run_menu.jButton1.setFocusCycleRoot(true);
-		Search_run_menu.jButton1.setContentAreaFilled(false);
-		Search_run_menu.jButton1.setOpaque(false);
-//		Search_run_menu.jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-	    	Search_run_menu.jButton1.addActionListener(new ActionListener(){
+			JMenuItem set_Status_Item= new JMenuItem(Lang.getInstance().translate("Set Status"));
+    	    
+			set_Status_Item.addActionListener(new ActionListener(){
 	  		@Override
 	    	public void actionPerformed(ActionEvent e) {
-	   
-	 // 		  	@SuppressWarnings("unused")
-	//			PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));	
-	    	}});
-	    	   	
+		//	  	@SuppressWarnings("unused")
+						//	PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));	
+				    	
+	  			
+	  			
+	  		}});
+	    //	menu.add(set_Status_Item);
 	    	
-	    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Sign"));
-	    	Search_run_menu.jButton2.setContentAreaFilled(false);
-	    	Search_run_menu.jButton2.setOpaque(false);
-	    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
-	    	Search_run_menu.jButton2.addActionListener(new ActionListener(){
+			
+	    	JMenuItem vouch_Item= new JMenuItem(Lang.getInstance().translate("Vouch"));
+    	    
+	    	vouch_Item.addActionListener(new ActionListener(){
 	  		@Override
 	    	public void actionPerformed(ActionEvent e) {
-	   
+	  			
 	  			Transaction statement = null;
 				if (search_Table.getSelectedRow() >= 0 ) statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
 				VouchRecordDialog vouch_panel = new VouchRecordDialog(statement.getBlockHeight(DBSet.getInstance()),statement.getSeqNo(DBSet.getInstance()));
-			//	info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-			//	jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				
 	  			
-	  			
-	    //		@SuppressWarnings("unused")
-		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-	    		}});
-	 /*
-	    	Search_run_menu.jButton3.setContentAreaFilled(false);
-	  //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-	    	Search_run_menu.jButton3.setOpaque(false);
-	    	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
-	    	Search_run_menu.jButton3.addActionListener(new  ActionListener(){
-	// вычисляем устанавливаем\ сбрасываем флажек выбранные
-				@Override
-				public void actionPerformed(ActionEvent e) {
-				
-					
-					favorite_all(search_Table);
-					alpha = 200;
-					int row = search_Table.getSelectedRow();
-					row = search_Table.convertRowIndexToModel(row);
-					PersonCls person = search_Table_Model.getPerson(row);	
-					if(Controller.getInstance().isItemFavorite(person))
-					{
-						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
-					}
-					else
-					{
-						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
-					}
-				
-				
-				}
+	  		}});
+	    	menu.add(vouch_Item);
 	    	
-	    	});
-	   */
-	    	Search_run_menu.pack();
-	    
-	    	Search_run_menu.addWindowFocusListener( new run_Menu_Search_Focus_Listener());
-	 
-		 
+			
+	    	TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
+			
+			
+			
+			
+		
 			
 	
 		   
@@ -321,69 +253,10 @@ import lang.Lang;
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				}
 			}
-	// mouse listener		
-		class  search_Mouse extends MouseAdapter {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Point p = e.getPoint();
-				int row = search_Table.rowAtPoint(p);
-				if(e.getClickCount() == 2)
-				{
-		//			row = personsTable.convertRowIndexToModel(row);
-		//			PersonCls person = tableModelPersons.getPerson(row);
-		//			new PersonFrame(person);
-					
-				}
-			
-			//	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-					if( e.getButton() == MouseEvent.BUTTON1)
-				{
-					
-					
-					row = search_Table.convertRowIndexToModel(row);
-			/*		PersonCls person = search_Table_Model.getPerson(row);	
-	//выводим меню всплывающее
-					if(Controller.getInstance().isItemFavorite(person))
-					{
-						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
-					}
-					else
-					{
-						Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
-					}
-		//			alpha = 255;
-			*/ 		alpha_int = 5;
-					Search_run_menu.setBackground(new Color(1,204,102,255));		
-				    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-				    Search_run_menu.repaint();
-			        Search_run_menu.setVisible(true);		
-		   
-			    
-			
-				}
-			}
-			}
-	
 
-	
 
 		
-		
-		class run_Menu_Search_Focus_Listener implements WindowFocusListener{
-			@Override
-			public void windowGainedFocus(WindowEvent arg0) {
-				alpha = 255;
-			}
-			@Override
-			public void windowLostFocus(WindowEvent arg0) {
-				Search_run_menu.setVisible(false);
-			}
-		};
-		
-		
-//		@Override
-//		 public void setRowHeightFormat(boolean format){
-//		}
+	
 	}
 
 

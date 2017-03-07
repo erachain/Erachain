@@ -34,6 +34,7 @@ import core.voting.Poll;
 import database.PollMap;
 import gui.CoreRowSorter;
 import gui.items.ComboBoxModelItemsAll;
+import gui.library.MTable;
 import gui.models.PollsTableModel;
 import lang.Lang;
 
@@ -115,7 +116,7 @@ public class AllPollsFrame extends JFrame{
 
 		//CREATE TABLE
 		this.pollsTableModel = new PollsTableModel();
-		final JTable pollsTable = new JTable(this.pollsTableModel);
+		final JTable pollsTable = new MTable(this.pollsTableModel);
 				
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

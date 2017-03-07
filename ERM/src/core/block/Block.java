@@ -359,6 +359,7 @@ public class Block {
 					//PARSE TRANSACTION
 					byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
 					Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
+					transaction.setBlock(this);
 
 					//ADD TO TRANSACTIONS
 					this.transactions.add(transaction);
@@ -449,9 +450,11 @@ public class Block {
 
 	public Transaction getTransaction(int index)
 	{
-		if (index < this.transactions.size())
+
+		if (index < this.transactionCount)
 			return getTransactions().get(index);
-		else return null;
+		else
+			return null;
 	}
 	
 	public byte[] getBlockATs()
@@ -502,7 +505,7 @@ public class Block {
 	}
 	public void makeTransactionsHash() 
 	{
-		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), this.transactions, this.atBytes);
+		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), this.getTransactions(), this.atBytes);
 	}
 
 	//PARSE/CONVERT
@@ -1086,6 +1089,8 @@ public class Block {
 		}
 
 		//CHECK TRANSACTIONS
+		this.getTransactions(); // load from RAW transactions
+		
 		if (this.transactions == null || this.transactions.size() == 0) {
 			// empty transactions
 		} else {
@@ -1096,7 +1101,7 @@ public class Block {
 			// because time filter used by parent block timestamp on core.BlockGenerator.run()
 			long timestampBeg = this.getParent(fork).getTimestamp(fork);
 
-			for(Transaction transaction: this.getTransactions())
+			for(Transaction transaction: this.transactions)
 			{
 				//CHECK IF NOT GENESISTRANSACTION
 				if(transaction.getCreator() == null)

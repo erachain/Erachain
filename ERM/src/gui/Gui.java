@@ -1,23 +1,16 @@
 package gui;
 
-// 16/03
-import java.awt.Color;
-import java.awt.Toolkit;
+
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
-
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JTable;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
 import controller.Controller;
 import gui.create.NoWalletFrame;
 import gui.create.SettingLangFrame;
+import gui.library.MTable;
 import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
@@ -42,30 +35,11 @@ public class Gui extends JFrame{
 	
 	private Gui() throws Exception
 	{
-		//USE SYSTEM STYLE
-		   //     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				
-
-				Toolkit.getDefaultToolkit().setDynamicLayout(true);
-				System.setProperty("sun.awt.noerasebackground", "true");
-				JFrame.setDefaultLookAndFeelDecorated(true);
-				JDialog.setDefaultLookAndFeelDecorated(true);
-
-				try {
-				    UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
-				    SwingUtilities.updateComponentTreeUI(this);
-				} catch(Exception ex) {
-				    ex.printStackTrace();
-				}
-				
+		
         
-        
-        UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
-        UIManager.put("Button.focus", new Color(0, 0, 0, 0));
-        UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
-        UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
-        UIManager.put("TextArea.font", UIManager.get("TextField.font"));
-
+		gui.library.library.Set_GUI_Look_And_Feel("");
+			
+    
         
         if(Settings.getInstance().Dump().containsKey("lang"))
         {
@@ -87,9 +61,7 @@ public class Gui extends JFrame{
         {
         	//OPEN WALLET CREATION SCREEN
         	new NoWalletFrame(this);
-        }
-
-        if (Settings.getInstance().isGuiEnabled())
+        } else if (Settings.getInstance().isGuiEnabled())
     	{
     		mainframe =	new MainFrame();
     		mainframe.setVisible(true);
@@ -133,10 +105,10 @@ public class Gui extends JFrame{
 		System.exit(0);
 	}
 	
-	public static <T extends TableModel> JTable createSortableTable(T tableModel, int defaultSort)
+	public static <T extends TableModel> MTable createSortableTable(T tableModel, int defaultSort)
 	{
 		//CREATE TABLE
-		JTable table = new JTable(tableModel);
+		MTable table = new MTable(tableModel);
 		
 		//CREATE SORTER
 		TableRowSorter<T> rowSorter = new TableRowSorter<T>(tableModel);
@@ -153,10 +125,10 @@ public class Gui extends JFrame{
 		return table;
 	}
 
-	public static <T extends TableModel> JTable createSortableTable(T tableModel, int defaultSort, RowFilter<T, Object> rowFilter)
+	public static <T extends TableModel> MTable createSortableTable(T tableModel, int defaultSort, RowFilter<T, Object> rowFilter)
 	{
 		//CREATE TABLE
-		JTable table = new JTable(tableModel);
+		MTable table = new MTable(tableModel);
 		
 		//CREATE SORTER
 		TableRowSorter<T> rowSorter = new TableRowSorter<T>(tableModel);

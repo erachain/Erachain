@@ -55,6 +55,7 @@ import gui.Table_Formats;
 import gui.items.persons.Person_info_panel_001;
 
 import gui.items.unions.TableModelUnions;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -63,7 +64,7 @@ import lang.Lang;
 
 public class Search_Notes_Tab extends Split_Panel {
 	private TableModelNotes tableModelNotes;
-	final JTable notesTable;
+	final MTable notesTable;
 	
 	
 	public Search_Notes_Tab(){
@@ -80,7 +81,7 @@ public class Search_Notes_Tab extends Split_Panel {
 
 	//CREATE TABLE
 	tableModelNotes = new TableModelNotes();
-	 notesTable = new JTable(tableModelNotes);
+	 notesTable = new MTable(tableModelNotes);
 	
 	
 		

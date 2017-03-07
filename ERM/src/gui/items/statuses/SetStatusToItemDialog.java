@@ -35,7 +35,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initComponents(status);
 		this.setTitle(Lang.getInstance().translate("Set Status"));
 		this.setResizable(true);
-	    setPreferredSize(new Dimension(400, 600));
+	//    setPreferredSize(new Dimension(400, 600));
 		//PACK
 		this.pack();
         this.setResizable(false);
@@ -155,9 +155,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        jComboBox_Status = new javax.swing.JComboBox<>();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	        setMinimumSize(new java.awt.Dimension(650, 23));
+	     //   setMinimumSize(new java.awt.Dimension(650, 23));
 	        setModal(true);
-	        setPreferredSize(new java.awt.Dimension(700, 600));
+	  //      setPreferredSize(new java.awt.Dimension(700, 600));
 	        addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
 	            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
 	                formAncestorMoved(evt);
@@ -196,8 +196,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        		gridBagConstraints);
 
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
-	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
-	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
+	   //     jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
+	   //     jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 0;
@@ -232,9 +232,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        }
 	        jFormattedTextField_fromDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_fromDate.setToolTipText("0000-00-00 - set to MIN");
-	        jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(100, 20));
+	     //   jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_fromDate.setText("0000-00-00"); // NOI18N
-	        jFormattedTextField_fromDate.setPreferredSize(new java.awt.Dimension(100, 20));
+	     //   jFormattedTextField_fromDate.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_fromDate.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_fromDateActionPerformed(evt);
@@ -263,9 +263,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        }
 	        jFormattedTextField_toDate.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFormattedTextField_toDate.setToolTipText("0000-00-00 - set to MAX");
-	        jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(100, 20));
+	   //     jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_toDate.setText("0000-00-00"); // NOI18N
-	        jFormattedTextField_toDate.setPreferredSize(new java.awt.Dimension(100, 20));
+	   //     jFormattedTextField_toDate.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_toDateActionPerformed(evt);
@@ -289,8 +289,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        //jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####,###.00"))));
 	        jFeeTxt.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jFeeTxt.setText("0");
-	        jFeeTxt.setMinimumSize(new java.awt.Dimension(100, 20));
-	        jFeeTxt.setPreferredSize(new java.awt.Dimension(100, 20));
+	    //    jFeeTxt.setMinimumSize(new java.awt.Dimension(100, 20));
+	   //     jFeeTxt.setPreferredSize(new java.awt.Dimension(100, 20));
 	        jFeeTxt.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jFormattedTextField_FeeActionPerformed(evt);
@@ -299,6 +299,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 7;
 	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.weightx = 0.1;
+	        
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
 	        getContentPane().add(jFeeTxt, gridBagConstraints);
@@ -343,8 +346,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 	        //jComboBox_Status.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 	        jComboBox_Status =new JComboBox<StatusCls>(new ComboBoxModelItemsStatuses());
-	        jComboBox_Status.setMinimumSize(new java.awt.Dimension(400, 22));
-	        jComboBox_Status.setPreferredSize(new java.awt.Dimension(400, 22));
+	   //     jComboBox_Status.setMinimumSize(new java.awt.Dimension(400, 22));
+	   //     jComboBox_Status.setPreferredSize(new java.awt.Dimension(400, 22));
 	        jComboBox_Status.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                jComboBox_StatusActionPerformed(evt);

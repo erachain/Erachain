@@ -4,6 +4,7 @@ import gui.AccountRenderer;
 import gui.PasswordPane;
 import gui.items.accounts.Accounts_ComboBox_Model;
 import gui.items.assets.AssetsComboBoxModel;
+import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
@@ -82,7 +83,7 @@ public class Mail_Send_Panel extends JPanel
 	public JTextArea txtMessage;
 	private JCheckBox encrypted;
 	private JCheckBox isText;
-	private JButton sendButton;
+	private MButton sendButton;
 	private AccountsComboBoxModel accountsModel;
 	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
@@ -465,8 +466,8 @@ public class Mail_Send_Panel extends JPanel
 		buttonGBC.gridx =2;
 		buttonGBC.gridy = y;
         
-		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
+		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
+  //      sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

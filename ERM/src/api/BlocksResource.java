@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import utils.APIUtils;
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.BlockGenerator;
 import core.account.Account;
 import core.block.Block;
@@ -23,6 +24,7 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
+import database.BlockMap;
 import database.DBSet;
 
 @Path("blocks")
@@ -226,6 +228,38 @@ public class BlocksResource
 	public static String getHeight() 
 	{
 		return String.valueOf(Controller.getInstance().getMyHeight());
+	}
+
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("/fromheight/{height}")
+	public static String getFromHeight(@PathParam("height") int height) 
+	{
+		DBSet db = DBSet.getInstance();
+		
+		byte[] signature = db.getBlockHeightsMap().get((long)(height - 1));
+		if(signature == null)
+		{
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+		
+		List<byte[]> headers = Controller.getInstance().getNextHeaders(signature);
+		
+		//CHECK IF BLOCK EXISTS
+		if(headers == null)
+		{
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+		
+		
+		JSONArray array = new JSONArray();
+		
+		BlockMap dbMap = db.getBlockMap();
+		for ( byte[] header: headers) {
+			array.add(dbMap.get(header).toJson());
+		}
+		
+		return array.toJSONString();
 	}
 	
 	@GET

@@ -33,6 +33,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
@@ -62,7 +63,7 @@ public class My_Order_Tab extends Split_Panel {
 		
 	//TABLE
 		ordersModel = new WalletOrdersTableModel();
-	final JTable table = new JTable(ordersModel);
+	final MTable table = new MTable(ordersModel);
 	
 	
 	

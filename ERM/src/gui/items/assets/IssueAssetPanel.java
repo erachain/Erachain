@@ -1,6 +1,7 @@
 package gui.items.assets;
 
 import gui.PasswordPane;
+import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
@@ -54,7 +55,7 @@ public class IssueAssetPanel extends JPanel
 	private JCheckBox chkMovable;
 	private JTextField txtQuantity;
 	private JCheckBox chkDivisible;
-	private JButton issueButton;
+	private MButton issueButton;
 
 	public IssueAssetPanel()
 	{
@@ -385,8 +386,8 @@ public class IssueAssetPanel extends JPanel
 		           
         //BUTTON Register
         
-        this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
+        this.issueButton = new MButton(Lang.getInstance().translate("Issue"),2);
+    //    this.issueButton.setPreferredSize(new Dimension(100, 25));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

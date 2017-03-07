@@ -1,6 +1,7 @@
 package gui.items.persons;
 
 import gui.PasswordPane;
+import gui.library.MButton;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
@@ -37,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
 
@@ -76,8 +78,8 @@ public class IssuePersonPanel extends JPanel
 	protected JTextField txtEyeColor;
 	protected JTextField txtHairСolor;
 	protected JTextField txtHeight;
-    protected javax.swing.JButton copyButton;
-    protected javax.swing.JButton issueButton;
+    protected MButton copyButton;
+    protected MButton issueButton;
     protected javax.swing.JLabel jLabel_Fee;
     protected javax.swing.JLabel jLabel9;
     protected javax.swing.JLabel jLabel_Account;
@@ -156,25 +158,7 @@ public class IssuePersonPanel extends JPanel
        	this.txtHeight.setText("170");
        	this.txtFeePow.setText("0");
  // issue buton
-       	this.issueButton.setText(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(120, 30));
-        this.issueButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick(true);
-		    }
-		});
-        
-       	this.copyButton.setText(Lang.getInstance().translate("Copy"));
-        this.copyButton.setPreferredSize(new Dimension(120, 30));
-        this.copyButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick(false);
-		    }
-		});
+       
 
 // add icin
         iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
@@ -526,10 +510,33 @@ public class IssuePersonPanel extends JPanel
         cbxFrom = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        issueButton = new javax.swing.JButton();
-        copyButton = new javax.swing.JButton();
+        issueButton = new MButton(Lang.getInstance().translate("Issue"),2);
+        copyButton = new MButton(Lang.getInstance().translate("Copy"),2);
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
+        
+        
+        
+    	
+        this.issueButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick(true);
+		    }
+		});
+        
+       	
+        this.copyButton.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        onIssueClick(false);
+		    }
+		});
+        
+        
+        
         
         // SET ONE TIME ZONE for Birthday 
 		TimeZone tz  = TimeZone.getDefault();
@@ -815,9 +822,9 @@ public class IssuePersonPanel extends JPanel
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        copyButton.setText("jButton2");
+        
         jPanel2.add(copyButton, new java.awt.GridBagConstraints());
-        issueButton.setText("jButton1");
+       
         jPanel2.add(issueButton, new java.awt.GridBagConstraints());
 
 
@@ -876,6 +883,10 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         add( txtBirthday, gridBagConstraints);
+        
+        txtBirthday.setFont(UIManager.getFont("TextField.font"));
+       
+        
 
   //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
   //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
@@ -893,6 +904,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         add(txtDeathday, gridBagConstraints);
+        txtDeathday.setFont(UIManager.getFont("TextField.font"));
     }// </editor-fold>                        
 
 }

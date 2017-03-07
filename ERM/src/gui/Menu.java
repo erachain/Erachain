@@ -56,7 +56,7 @@ public class Menu extends JMenuBar
 	private ImageIcon lockedIcon;
 	private ImageIcon unlockedIcon;
 
-	private static final Logger LOGGER = Logger.getLogger(Menu.class);
+//	private static final Logger LOGGER = Logger.getLogger(Menu.class);
 
 	public Menu(JFrame parent)
 	{
@@ -69,8 +69,8 @@ public class Menu extends JMenuBar
         fileMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("File menu"));
         this.add(fileMenu);
         
-        JMenu accountsMenu = new JMenu(Lang.getInstance().translate("Accounts"));
-        accountsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts menu"));
+      //  JMenu accountsMenu = new JMenu(Lang.getInstance().translate("Accounts"));
+      //  accountsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts menu"));
         /*
         accountsMenu.addActionListener(new ActionListener()
         {
@@ -80,12 +80,12 @@ public class Menu extends JMenuBar
         	}
         });
         */
-        this.add(accountsMenu);
+    //    this.add(accountsMenu);
       
         JMenu dealsMenu = new JMenu(Lang.getInstance().translate("Deals"));
         dealsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Deals menu"));
         this.add(dealsMenu);
-
+/*
         JMenu personsMenu = new JMenu(Lang.getInstance().translate("Persons"));
         personsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Persons menu"));
         this.add(personsMenu);
@@ -110,7 +110,7 @@ public class Menu extends JMenuBar
         recordsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Records menu"));
         this.add(recordsMenu);
 
-
+*/
         //LOCK
 
         //LOAD IMAGES
@@ -121,7 +121,7 @@ public class Menu extends JMenuBar
 			BufferedImage unlockedImage = ImageIO.read(new File("images/wallet/unlocked.png"));
 			this.unlockedIcon = new ImageIcon(unlockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
 		} catch (IOException e2) {
-			LOGGER.error(e2.getMessage(),e2);
+		//	LOGGER.error(e2.getMessage(),e2);
 		}
 		
         lockItem = new JMenuItem("lock");
@@ -178,7 +178,7 @@ public class Menu extends JMenuBar
         		try {
         			URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort()));
 				} catch (MalformedURLException e1) {
-					LOGGER.error(e1.getMessage(),e1);
+	//				LOGGER.error(e1.getMessage(),e1);
 				}
         	}
         });
@@ -197,7 +197,7 @@ public class Menu extends JMenuBar
         		try {
         			URLViewer.openWebpage(new URL("http://127.0.0.1:"+Settings.getInstance().getWebPort()+"/index/blockexplorer.html"));
 				} catch (MalformedURLException e1) {
-					LOGGER.error(e1.getMessage(),e1);
+		//			LOGGER.error(e1.getMessage(),e1);
 				}
         	}
         });
@@ -226,7 +226,7 @@ public class Menu extends JMenuBar
         {
         	public void actionPerformed(ActionEvent e)
         	{
-                new License_JFrame(null) ;
+                new License_JFrame() ;
         	}
         });
         fileMenu.add(licisceItem);
@@ -285,7 +285,7 @@ public class Menu extends JMenuBar
         helpMenu.add(aboutItem);  */ 
        
         // work menu
-        
+ /*       
         // Accounts menu
         JMenuItem accountsMenuList = new JMenuItem(Lang.getInstance().translate("List"));
         accountsMenuList.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Accounts List"));
@@ -298,11 +298,11 @@ public class Menu extends JMenuBar
         	}
         });
         accountsMenu.add(accountsMenuList);
-
+*/
         ///// PERSONS
-        JMenuItem allPersonsMenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
-        allPersonsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
-   //     searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+   //     JMenuItem allPersonsMenu = new JMenuItem(Lang.getInstance().translate("All Persons"));
+    //    allPersonsMenu.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("All Persons"));
+  /*      searchPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
         allPersonsMenu.addActionListener(new ActionListener()
         {
         	public void actionPerformed(ActionEvent e)
@@ -328,7 +328,7 @@ public class Menu extends JMenuBar
         		
         	}
         });
-
+*/
  //       personsMenu.addSeparator();  
  //       personsMenu.add(ripPersonMenu);  
 
@@ -430,7 +430,7 @@ public class Menu extends JMenuBar
         
                  
                    
-        
+     /*   
         
         JMenuItem dealsMenuSignNote = new JMenuItem(Lang.getInstance().translate("Statement"));
         dealsMenuSignNote.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Statement record"));
@@ -575,7 +575,7 @@ public class Menu extends JMenuBar
         });
         assetsMenu.add(allAssetsMenu);
         
-        /*
+        
         assetsMenu.addSeparator();
 
         // issue asset menu

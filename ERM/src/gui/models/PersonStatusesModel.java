@@ -39,11 +39,10 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public  class PersonStatusesModel extends  AbstractTableModel implements Observer
 {
-	public static final int COLUMN_MAKE_DATA = 0;
-	public static final int COLUMN_STATUS_NAME = 1;
-	public static final int COLUMN_PERIOD = 2;
-	public static final int COLUMN_MAKER = 3;
-	public static final int COLUMN_RECORD_NO = 4;
+	
+	public static final int COLUMN_STATUS_NAME = 0;
+	public static final int COLUMN_PERIOD = 1;
+	public static final int COLUMN_MAKER = 2;
 	
 	TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
 	List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
@@ -52,7 +51,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 
 	private DBSet dbSet = DBSet.getInstance();
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Maked", "Status","Period","Creator", "RecNo"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","Period","Creator"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
 	String to_date_str;
@@ -75,6 +74,25 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		return statuses;
 	}
 	
+public String get_No_Trancaction(int row){
+		
+	Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+ return 	value.b.d +"-"+ value.b.e;
+	
+
+		
+	}
+
+public Account get_Creator_Account(int row){
+	
+	Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+	
+	int block = value.b.d;
+	int recNo = value.b.e;
+	Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+	return (Account)record.getCreator();
+	
+}
 
 
 // set class
@@ -153,13 +171,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		 switch(column)
 		{
 
-		case COLUMN_MAKE_DATA:
-			
-			block = value.b.d;
-			recNo = value.b.e;
-			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
-			return record==null?null:record.viewTimestamp();
-		
+						
 		case COLUMN_STATUS_NAME:
 			
 			return statusesMap.get(value.a).toString(dbSet, value.b.c);
@@ -190,11 +202,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
 			return record==null?"":((Account)record.getCreator()).getPersonAsString();
 
-		case COLUMN_RECORD_NO:
-
-			block = value.b.d;
-			recNo = value.b.e;
-			return block>0? block+"-"+recNo:"???";
+		
 
 		}
 		

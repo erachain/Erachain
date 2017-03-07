@@ -24,7 +24,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import controller.Controller;
-import gui.Menu;
+import gui.library.Menu_Popup_File_button;
 import gui.naming.SellNameFrame;
 import lang.Lang;
 import lang.LangFile;
@@ -162,6 +162,25 @@ public class SettingsFrame extends JFrame{
 		boolean changeDataDir = false;
 		boolean limitConnections = false;
 		boolean changeLang = false;
+		
+		
+		
+		// font
+	//	if(Settings.getInstance().getMinConnections() != MinConnections)
+	//	{
+		if (settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_size", settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+		}
+	
+		if (settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_name", settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+		}
+	
+		
+				
+		
 		
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled() != settingsTabPane.settingsBasicPanel.chckbxKeyCaching.isSelected())
 		{
@@ -340,6 +359,8 @@ public class SettingsFrame extends JFrame{
 			settingsJSONbuf.put("rpcallowed",settingsTabPane.settingsAllowedPanel.rpcAllowedTableModel.getPeers());
 		}
 		
+		
+		
 		try {
 			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);			
 		} catch (IOException e) {
@@ -362,10 +383,12 @@ public class SettingsFrame extends JFrame{
 		{
 			Controller.getInstance().webServiceRestart();
 			
-			Menu.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
-			Menu.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Popup_File_button.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Popup_File_button.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
 		}
 		Lang.getInstance().loadLang();
+		
+		
 		
 		if(changeDataDir || changeWallet)
 		{

@@ -1,5 +1,8 @@
 package gui.items.persons;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -18,13 +21,14 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
-	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_FAVORITE = 3;
+	public static final int COLUMN_BORN = 2;
+	public static final int COLUMN_ADDRESS = 3;
+	public static final int COLUMN_FAVORITE = 4;
 
 //	private SortableList<Long, PersonCls> persons;
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday"});//, "Publisher", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
 	public TableModelPersons()
@@ -113,6 +117,12 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		case COLUMN_FAVORITE:
 			
 			return person.isFavorite();
+		
+		case COLUMN_BORN:
+			
+		//	DateFormat f = new DateFormat("DD-MM-YYYY");
+			 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
+			return  dateFormat.format( new Date(person.getBirthday()));
 
 		}
 		

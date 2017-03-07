@@ -1,12 +1,5 @@
 package gui.items.persons;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -18,11 +11,16 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.image.ColorModel;
+import java.util.Date;
 import java.util.Stack;
 import java.util.TreeMap;
 
 import javax.swing.Timer;
+import javax.swing.UIManager;
+
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
@@ -62,6 +60,8 @@ import gui.items.accounts.Account_Send_Dialog;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;
 import gui.items.mails.Mail_Send_Dialog;
+import gui.library.MButton;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -69,6 +69,7 @@ import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemPersonsTableModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 
 public class Persons_Search_SplitPanel extends Split_Panel{
@@ -76,9 +77,9 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	private static final long serialVersionUID = 2717571093561259483L;
 
 	private TableModelPersons search_Table_Model;
-	private JTable search_Table;
+	private MTable search_Table;
 	private RowSorter<TableModelPersons> search_Sorter;
-	private RunMenu Search_run_menu;
+	
 // для прозрачности
      int alpha =255;
      int alpha_int;
@@ -100,21 +101,24 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 		
 //CREATE TABLE
 		search_Table_Model = new TableModelPersons();
-		search_Table = new JTable(this.search_Table_Model);
+		search_Table = new MTable(this.search_Table_Model);
 		TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
 	
 //Custom renderer for the String column;
 		search_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+		search_Table.setDefaultRenderer(Date.class, new Renderer_Right()); // set renderer
 		search_Table.setDefaultRenderer(String.class, new Renderer_Left(search_Table.getFontMetrics(search_Table.getFont()),search_Table_Model.get_Column_AutoHeight())); // set renderer
 	
 //CHECKBOX FOR FAVORITE
-		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(TableModelPersons.COLUMN_FAVORITE);	
-		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
-		favoriteColumn.setMinWidth(50);
-		favoriteColumn.setMaxWidth(50);
-		favoriteColumn.setPreferredWidth(50);
-//Sorter
+		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(search_Table_Model.COLUMN_BORN);	
+//		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
+	//	 int ss = search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN).length();
+		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth(search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN)));	
+		favoriteColumn.setMinWidth(rr+1);
+		favoriteColumn.setMaxWidth(rr*10);
+		favoriteColumn.setPreferredWidth(rr+5);
+		//Sorter
 		 search_Sorter = new TableRowSorter<TableModelPersons>(this.search_Table_Model);
 		search_Table.setRowSorter(search_Sorter);	
 	
@@ -128,190 +132,82 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 // Event LISTENER		
 		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 	
-		search_Table.addMouseListener( new search_Mouse());
-			
 		
-		Timer timer = new Timer( 200, new ActionListener(){
+		JPopupMenu menu = new JPopupMenu();
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				
-				
-				if (alpha <50) {
-					
-					Search_run_menu.setVisible(false);
-					alpha = 50;
-				}
-		//	Search_run_menu.setBackground(new Color(0,204,102,alpha));	
-		//		Search_run_menu.jButton1.setForeground(new Color(0,0,0,alpha));
-		//		Search_run_menu.jButton2.setForeground(new Color(0,0,0,alpha));
-		//		Search_run_menu.jButton3.setForeground(new Color(0,0,0,alpha));
-		//		Search_run_menu.jButton1.setBackground( new Color(212,208,200,alpha));
-				alpha = alpha - alpha_int;
-				
-				
-				
-				
-			}
-			
-		});
-			   
+	
+    	    	
+    	    	JMenuItem vsend_Coins_Item= new JMenuItem(Lang.getInstance().translate("Send"));
+    	    
+    	    	vsend_Coins_Item.addActionListener(new ActionListener(){
+    	  		@Override
+    	    	public void actionPerformed(ActionEvent e) {
+    	  			
+    				
+    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+    	    		
+    				PersonCls person = search_Table_Model.getPerson(row);
+    	  			
+    	  			
+    	  			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    				if (addresses.isEmpty()) {
+    					
+    				} else {
+    					Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+    				}
+    	  			
+    	  
+    	    //		@SuppressWarnings("unused")
+    		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
+    	    		}});
+    	    	menu.add(vsend_Coins_Item);
+    	    	
+    	   
+    	      	JMenuItem send_Mail_Item= new JMenuItem(Lang.getInstance().translate("Send Mail"));
+    	  
+    	      	send_Mail_Item.addActionListener(new ActionListener(){
+    	  		@Override
+    	    	public void actionPerformed(ActionEvent e) {
+    	   
 
-			timer.start();
-		
-		
-		
-			 
-
-		Search_run_menu  = new RunMenu();
-		
-		Search_run_menu.setUndecorated(true);
-	//	Search_run_menu.setBackground(new Color(0,204,102,255));
-	//	Dimension dim = new Dimension(180,70);
-    //	Search_run_menu.setSize(dim);
-    	Search_run_menu.setPreferredSize(new Dimension(220,145));
-    	Search_run_menu.setVisible(false);
-    	Search_run_menu.jButton1.setText(Lang.getInstance().translate("Set Status"));
-   // 	aaa.jButton1.setBorderPainted(false);
-  //  	Search_run_menu.jButton1.setFocusPainted(true);
- //  	Search_run_menu.jButton1.setFocusCycleRoot(true);
-	Search_run_menu.jButton1.setContentAreaFilled(false);
-	Search_run_menu.jButton1.setOpaque(false);
-//		Search_run_menu.jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    	Search_run_menu.jButton1.addActionListener(new ActionListener(){
-  		@Override
-    	public void actionPerformed(ActionEvent e) {
-   
-  		  	@SuppressWarnings("unused")
-			PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));	
-    	}});
-    	   	
-    	
-    	Search_run_menu.jButton2.setText(Lang.getInstance().translate("Attest Public Key"));
-    	Search_run_menu.jButton2.setContentAreaFilled(false);
-    	Search_run_menu.jButton2.setOpaque(false);
-    	Search_run_menu.getContentPane().add(Search_run_menu.jButton2);
-    	Search_run_menu.jButton2.addActionListener(new ActionListener(){
-  		@Override
-    	public void actionPerformed(ActionEvent e) {
-   
-  
-    		@SuppressWarnings("unused")
-			PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-    		}});
-    	
-    	javax.swing.JButton jButton_Vouh = new javax.swing.JButton();
- 
-    	jButton_Vouh.setText(Lang.getInstance().translate("Vouch"));
-    	jButton_Vouh.setContentAreaFilled(false);
-    	jButton_Vouh.setOpaque(false);
-    	Search_run_menu.getContentPane().add(jButton_Vouh);
-    	jButton_Vouh.addActionListener(new ActionListener(){
-  		@Override
-    	public void actionPerformed(ActionEvent e) {
-   
-  
+    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+    	    		
+    				PersonCls person = search_Table_Model.getPerson(row);
+    	  			
+    	  		
+    				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+    				if (addresses.isEmpty()) {
+    					
+    				} else {
+    					Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+    				}
+    	  			
+    	  			
+    	  			
+    	  			
+    	  			
+    	    //		@SuppressWarnings("unused")
+    		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
+    	    		}});
+    	    	
+    	    	menu.add(send_Mail_Item);
+    	    	
     		
-			PersonCls per = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
-			byte[] ref = per.getReference();
-			Transaction transaction = Transaction.findByDBRef(DBSet.getInstance(), ref);
-			int blockNo = transaction.getBlockHeight(DBSet.getInstance());
-			int recNo = transaction.getSeqNo(DBSet.getInstance());
-    		new VouchRecordDialog(blockNo, recNo);	
-  		
-  		}});
-    	
-    	
-    	Search_run_menu.jButton3.setContentAreaFilled(false);
-  //  	Search_run_menu.jButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    	Search_run_menu.jButton3.setOpaque(false);
-    	Search_run_menu.getContentPane().add(Search_run_menu.jButton3);
-    	Search_run_menu.jButton3.addActionListener(new  ActionListener(){
-// вычисляем устанавливаем\ сбрасываем флажек выбранные
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				favorite_all(search_Table);
-				alpha = 200;
-				int row = search_Table.getSelectedRow();
-				row = search_Table.convertRowIndexToModel(row);
-				PersonCls person = search_Table_Model.getPerson(row);	
-				if(Controller.getInstance().isItemFavorite(person))
-				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
-				}
-				else
-				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
-				}
-			
-			
-			}
-    	
-    	});
-    	
-
-    	Search_run_menu.jButton6.setText(Lang.getInstance().translate("Send Coins"));
-    	Search_run_menu.jButton6.setContentAreaFilled(false);
-    	Search_run_menu.jButton6.setOpaque(false);
-    	Search_run_menu.getContentPane().add(Search_run_menu.jButton6);
-    	Search_run_menu.jButton6.addActionListener(new ActionListener(){
-  		@Override
-    	public void actionPerformed(ActionEvent e) {
-  			int row = search_Table.getSelectedRow();
-			row = search_Table.convertRowIndexToModel(row);
-			PersonCls person = search_Table_Model.getPerson(row);	
-			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-			if (addresses.isEmpty()) {
-				
-			} else {
-				Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
-			}
-  			
-  
-    //		@SuppressWarnings("unused")
-	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-    		}});
-    	
-    	
-      	Search_run_menu.jButton5.setText(Lang.getInstance().translate("Send Mail"));
-    	Search_run_menu.jButton5.setContentAreaFilled(false);
-    	Search_run_menu.jButton5.setOpaque(false);
-    	Search_run_menu.getContentPane().add(Search_run_menu.jButton5);
-    	Search_run_menu.jButton5.addActionListener(new ActionListener(){
-  		@Override
-    	public void actionPerformed(ActionEvent e) {
-   
-  
-  			int row = search_Table.getSelectedRow();
-			row = search_Table.convertRowIndexToModel(row);
-			PersonCls person = search_Table_Model.getPerson(row);	
-			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-			if (addresses.isEmpty()) {
-				
-			} else {
-				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
-			}
-  			
-  			
-  			
-  			
-  			
-    //		@SuppressWarnings("unused")
-	//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-    		}});
-    	
-    	
-    	
-    	
-    	
-    	
-   
-    	Search_run_menu.pack();
-    
-    	Search_run_menu.addWindowFocusListener( new run_Menu_Search_Focus_Listener());
- 
-	 
+    		
+    		
+    		
+    		
+    	    	TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
+    		
+    		
+    		
+    		
+    		
+    		
+    		
+    		
 		
 
 	   
@@ -383,69 +279,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 				if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
 				if (person != null) {
 					//Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
-					Person_Info_002 info_panel = new Person_Info_002(person, false);
+					Person_Info_002 info_panel = new Person_Info_002(person, true);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				}
 			}
 		}
-// mouse listener		
-	class  search_Mouse extends MouseAdapter {
-		@Override
-		public void mousePressed(MouseEvent e) {
-			Point p = e.getPoint();
-			int row = search_Table.rowAtPoint(p);
-			if(e.getClickCount() == 2)
-			{
-	//			row = personsTable.convertRowIndexToModel(row);
-	//			PersonCls person = tableModelPersons.getPerson(row);
-	//			new PersonFrame(person);
-				
-			}
-		
-		//	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-				if( e.getButton() == MouseEvent.BUTTON1)
-			{
-				
-				
-				row = search_Table.convertRowIndexToModel(row);
-				PersonCls person = search_Table_Model.getPerson(row);	
-//выводим меню всплывающее
-				if(Controller.getInstance().isItemFavorite(person))
-				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Remove Favorite"));
-				}
-				else
-				{
-					Search_run_menu.jButton3.setText(Lang.getInstance().translate("Add Favorite"));
-				}
-	//			alpha = 255;
-				alpha_int = 5;
-				Search_run_menu.setBackground(new Color(1,204,102,255));		
-			    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-			    Search_run_menu.repaint();
-		        Search_run_menu.setVisible(true);		
-	    
-		    
-		
-			}
-		}
-		}
 
-
-
-
-	
-	
-	class run_Menu_Search_Focus_Listener implements WindowFocusListener{
-		@Override
-		public void windowGainedFocus(WindowEvent arg0) {
-			alpha = 255;
-		}
-		@Override
-		public void windowLostFocus(WindowEvent arg0) {
-			Search_run_menu.setVisible(false);
-		}
-	};
 
 }

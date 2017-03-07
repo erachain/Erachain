@@ -29,6 +29,7 @@ import core.crypto.Base58;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.library.MButton;
 //import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
@@ -42,11 +43,25 @@ public class VouchRecordDialog extends JDialog  {
 	private static final long serialVersionUID = 2717571093561259483L;
 	
 	private static Transaction record;
+	Account account;
 	
 
+	public VouchRecordDialog(Integer block_No, Integer rec_No, Account account) {
+		super();
+		vouch(block_No, rec_No, account);
+	
+	}
 	public VouchRecordDialog(Integer block_No, Integer rec_No) {
 		super();
+		vouch( block_No, rec_No, null);
+		
+		
+	}
+	
+	private void vouch(Integer block_No, Integer rec_No, Account account){
 		//ICON
+			
+		this.account = account;
 				List<Image> icons = new ArrayList<Image>();
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
@@ -62,12 +77,12 @@ public class VouchRecordDialog extends JDialog  {
 			
 			
 		}
-		setSize(400,300);
+	//	setSize(400,300);
 			this.setTitle(Lang.getInstance().translate("Vouch Record"));
 			this.setResizable(true);
 			this.setModal(true);
 
-	    setPreferredSize(new Dimension(500, 600));
+	//    setPreferredSize(new Dimension(500, 600));
 		//PACK
 		this.pack();
         this.setResizable(false);
@@ -182,17 +197,17 @@ public class VouchRecordDialog extends JDialog  {
 	        jTextField_recordID = new javax.swing.JTextField();
 
 	        jLabel_Fee = new javax.swing.JLabel();
-	        jFormattedTextField_Fee = new javax.swing.JFormattedTextField();
-	        jButton_Cansel = new javax.swing.JButton();
-	        jButton_Confirm = new javax.swing.JButton();
+	        jFormattedTextField_Fee = new javax.swing.JTextField();
+	   //     jButton_Cansel = new javax.swing.JButton();
+	  //      jButton_Confirm = new javax.swing.JButton();
 	        jLabel_Fee_Check = new javax.swing.JLabel();
 	        jLabel_Title = new javax.swing.JLabel();
 	        jLabel_Name_Records= new javax.swing.JLabel();
 
 	        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	        setMinimumSize(new java.awt.Dimension(650, 23));
+	    //    setMinimumSize(new java.awt.Dimension(650, 23));
 	        setModal(true);
-	        setPreferredSize(new java.awt.Dimension(700, 600));
+	    //    setPreferredSize(new java.awt.Dimension(700, 600));
 	        addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
 	            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
 	                //formAncestorMoved(evt);
@@ -220,11 +235,11 @@ public class VouchRecordDialog extends JDialog  {
 	            ex.printStackTrace();
 	        }
 	        */
-	        jTextField_recordID.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	      //  jTextField_recordID.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 	        jTextField_recordID.setToolTipText("BlockNo-recNo or signature");
-	        jTextField_recordID.setMinimumSize(new java.awt.Dimension(300, 20));
+	     //   jTextField_recordID.setMinimumSize(new java.awt.Dimension(300, 20));
 	        jTextField_recordID.setText(""); // NOI18N
-	        jTextField_recordID.setPreferredSize(new java.awt.Dimension(300, 20));
+	    //    jTextField_recordID.setPreferredSize(new java.awt.Dimension(300, 20));
 	        jTextField_recordID.getDocument().addDocumentListener(new DocumentListener() {
 	            
 				@Override
@@ -243,6 +258,8 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 14;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.weightx =0.1;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        getContentPane().add(jTextField_recordID, gridBagConstraints);
 		    
@@ -277,8 +294,9 @@ public class VouchRecordDialog extends JDialog  {
 
 	        //AccountsComboBoxModel
 	        jComboBox_YourAddress =new JComboBox<Account>(new AccountsComboBoxModel());
-	        jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
-	        jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
+	     //   jComboBox_YourAddress.setMinimumSize(new java.awt.Dimension(500, 22));
+	    //    jComboBox_YourAddress.setPreferredSize(new java.awt.Dimension(500, 22));
+	        if (account != null) jComboBox_YourAddress.setSelectedItem(account);
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 0;
@@ -299,20 +317,22 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
 	        getContentPane().add(jLabel_Fee, gridBagConstraints);
 
-	        jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
-	        jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-	        jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
+	      //  jFormattedTextField_Fee.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
+	     //   jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+	    //    jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100, 20));
 	        jFormattedTextField_Fee.setText("0");
-	        jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
+	    //    jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100, 20));
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 17;
+	        gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.weightx = 0.1;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 48, 0);
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
 	        getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
 
-	        jButton_Cansel.setText(Lang.getInstance().translate("Cancel"));
+	        jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"),2);
 	        jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	dispose();	
@@ -326,7 +346,7 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
 	        getContentPane().add(jButton_Cansel, gridBagConstraints);
 
-	        jButton_Confirm.setText(Lang.getInstance().translate("Confirm"));
+	        jButton_Confirm = new MButton(Lang.getInstance().translate("Confirm"),2);
 	        jButton_Confirm.setToolTipText("");
 	        jButton_Confirm.addActionListener(new ActionListener()
 			{
@@ -386,11 +406,11 @@ public class VouchRecordDialog extends JDialog  {
 	  
 
 	    // Variables declaration - do not modify                     
-	    private javax.swing.JButton jButton_Cansel;
-	    private javax.swing.JButton jButton_Confirm;
+	    private MButton jButton_Cansel;
+	    private MButton jButton_Confirm;
 	    private JComboBox<Account> jComboBox_YourAddress;
 	    private javax.swing.JLabel jLabel_Fee;
-	    private javax.swing.JFormattedTextField jFormattedTextField_Fee;
+	    private javax.swing.JTextField jFormattedTextField_Fee;
 	    private javax.swing.JLabel jLabel_Fee_Check;
 	    private javax.swing.JScrollPane jLabel_RecordInfo;
 	    //private javax.swing.JLabel jLabel_RecordInfo;

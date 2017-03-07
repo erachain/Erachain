@@ -1,12 +1,17 @@
 package gui.items.assets;
 
+import java.awt.Dimension;
+
 import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import com.github.rjeschke.txtmark.Processor;
 
 import core.account.Account;
 import core.block.GenesisBlock;
@@ -15,6 +20,10 @@ import core.transaction.Issue_ItemRecord;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.library.MTable;
+import gui.library.MTextPane;
+import gui.library.M_Accoutn_Text_Field;
+import gui.library.Voush_Library_Panel;
 import gui.models.BalancesTableModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -67,9 +76,9 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
         jTextField2 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+ //       jTextArea1 = new javax.swing.JTextPane();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+  //      jTextField3 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -162,11 +171,10 @@ this.setVisible(false);
         jPanel2.add(jLabel3, gridBagConstraints);
 
        // jTextArea1.setColumns(20);
-        jTextArea1.setText(asset.getDescription());
-        jTextArea1.setRows(4);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setEditable(false);
-        jScrollPane2.setViewportView(jTextArea1);
+        jTextArea1 = new MTextPane(asset.getDescription());
+        
+       
+        jTextArea1.setPreferredSize(new Dimension(600,300));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -175,7 +183,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.15;
-        jPanel2.add(jScrollPane2, gridBagConstraints);
+        jPanel2.add(jTextArea1, gridBagConstraints);
 
         jLabel4.setText(Lang.getInstance().translate("Owner") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -186,6 +194,7 @@ this.setVisible(false);
         jPanel2.add(jLabel4, gridBagConstraints);
 
         Account owner = asset.getOwner();
+        jTextField3 = new M_Accoutn_Text_Field(owner);
         jTextField3.setText(GenesisBlock.CREATOR.equals(owner)?"GENESIS":owner.getPersonAsString());
 
         jTextField3.setEditable(false);
@@ -233,7 +242,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         jPanel2.add(jCheckBox1, gridBagConstraints);
 
-        jScrollPane1.setViewportView(jPanel2);
+     //  jScrollPane1.setViewportView(jPanel2);
         
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -254,40 +263,9 @@ this.setVisible(false);
         javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
         
         jPanel2.add(jTabbedPane1, gridBagConstraints);
-        
-        Statements_Vouch_Table_Model model = new  Statements_Vouch_Table_Model(transaction);
-        JTable jTable_Vouches = new JTable(model);
-        TableColumnModel column_mod = jTable_Vouches.getColumnModel();
-        TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
-        col_data.setMinWidth(50);
-        col_data.setMaxWidth(200);
-        col_data.setPreferredWidth(120);//.setWidth(30);
-        
-        jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()),model.get_Column_AutoHeight())); // set renderer
-        
       
-        JPanel jPanel_Tab_Vouch = new javax.swing.JPanel();
-        JScrollPane jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
-     
-        jPanel_Tab_Vouch.setLayout(new java.awt.GridBagLayout());
-        
-
-        
-        jScrollPane_Tab_Vouches.setViewportView(jTable_Vouches);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        jPanel_Tab_Vouch.add(jScrollPane_Tab_Vouches, gridBagConstraints);
-
-       
-
-        jTabbedPane1.addTab(Lang.getInstance().translate("Certified"), jPanel_Tab_Vouch);
+     // vouches
+        jTabbedPane1.add(new Voush_Library_Panel(transaction));
         
         JPanel jPanel_Tab_Holders = new javax.swing.JPanel();
         JScrollPane jScrollPane_Tab_Holders = new javax.swing.JScrollPane();
@@ -296,7 +274,7 @@ this.setVisible(false);
         
 
         BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
-  		JTable  jTable1 = new JTable(balancesTableModel);
+  		MTable  jTable1 = new MTable(balancesTableModel);
   		
          
   		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
@@ -329,7 +307,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jScrollPane1, gridBagConstraints);
+        jPanel1.add(jPanel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -353,10 +331,10 @@ this.setVisible(false);
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
+    private MTextPane jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private M_Accoutn_Text_Field jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JLabel jLabel_Block;
     private javax.swing.JTextField jTextField_Block;

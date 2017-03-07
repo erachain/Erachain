@@ -37,6 +37,7 @@ import core.voting.Poll;
 import database.PollMap;
 import gui.CoreRowSorter;
 import gui.items.ComboBoxModelItemsAll;
+import gui.library.MTable;
 import gui.models.PollsTableModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -48,7 +49,7 @@ public class All_Records_Panel extends JPanel{
 
 //	public PollsTableModel records_model;
 	public JComboBox<ItemCls> cbxAssets;
-	public JTable records_Table;
+	public MTable records_Table;
 	public  WalletTransactionsTableModel records_model;
 	
 	public All_Records_Panel() 
@@ -123,7 +124,7 @@ public class All_Records_Panel extends JPanel{
 
 		//CREATE TABLE
 		this.records_model = new WalletTransactionsTableModel();
-		records_Table = new JTable(this.records_model);
+		records_Table = new MTable(this.records_model);
 				
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

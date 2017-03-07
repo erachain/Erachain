@@ -47,6 +47,7 @@ import gui.PasswordPane;
 import gui.Split_Panel;
 import gui.items.imprints.Issue_Hash_Imprint;
 import gui.items.imprints.Table_Model_Issue_Hashes;
+import gui.library.MTable;
 import gui.library.My_JFileChooser;
 import gui.models.Renderer_Hashes;
 import lang.Lang;
@@ -54,7 +55,7 @@ import utils.Pair;
 
 public class Write_Documents_Hashes_Panel extends Split_Panel {
 	public Table_Model_Issue_Hashes table_Model;
-	public JTable Table_Hash;
+	public MTable Table_Hash;
 	private JButton jButton3_jToolBar_RightPanel;
 	Issue_Hash_Imprint issue_Hash_Imprint;
 
@@ -122,12 +123,9 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 
 		jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
 
-		jButton1_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
-		jButton2_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
-		jButton3_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
-
+		
 		table_Model = new Table_Model_Issue_Hashes(0);
-		Table_Hash = new JTable(table_Model);
+		Table_Hash = new MTable(table_Model);
 		Table_Hash.setDefaultRenderer(String.class, new Renderer_Hashes());
 		this.jScrollPane_jPanel_RightPanel.setViewportView(Table_Hash);
 

@@ -44,6 +44,8 @@ import core.account.Account;
 import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.transaction.R_Send;
+import core.transaction.Transaction;
+import database.DBSet;
 import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
@@ -51,12 +53,14 @@ import gui.MainFrame;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.persons.TableModelPersons;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
-	import lang.Lang;
+import gui.records.VouchRecordDialog;
+import lang.Lang;
 import utils.TableMenuPopupUtil;
 
 
@@ -65,7 +69,7 @@ import utils.TableMenuPopupUtil;
 
 		
 		private TableModelMails incoming_Mails_Model;
-		private JTable inciming_Mail_Table;
+		private MTable inciming_Mail_Table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
 	// для прозрачности
@@ -89,7 +93,7 @@ import utils.TableMenuPopupUtil;
 			
 			//TABLE
 			incoming_Mails_Model = new TableModelMails(true);
-			inciming_Mail_Table = new JTable(incoming_Mails_Model);
+			inciming_Mail_Table = new MTable(incoming_Mails_Model);
 			inciming_Mail_Table.setAutoCreateRowSorter(true);
 			
 			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
@@ -173,7 +177,30 @@ import utils.TableMenuPopupUtil;
 	  		});
 	  		menu.add(Send_Mail_item_Menu);
 			
+	  		JMenuItem vouch_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+	  		vouch_Mail_item_Menu.addActionListener(new ActionListener()
+	  		{
+	  			public void actionPerformed(ActionEvent e) 
+	  			{
+	  				
+	  				int row = inciming_Mail_Table.getSelectedRow();
+	  				row = inciming_Mail_Table.convertRowIndexToModel(row);
+	  				Transaction trans = incoming_Mails_Model.getTransaction(row);
+	  				int blockNo = trans.getBlockHeight(DBSet.getInstance());
+	  				int recNo = trans.getSeqNo(DBSet.getInstance());
+	  	    		new VouchRecordDialog(blockNo, recNo,((R_Send) trans).getRecipient());	
+	  				
+	  				
+	  				
+	  			
+	  				
+	  			}
+	  		});
+	  		menu.add(vouch_Mail_item_Menu);
 			
+	  		
+	  		
+	  		
 			
 			
 			TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON

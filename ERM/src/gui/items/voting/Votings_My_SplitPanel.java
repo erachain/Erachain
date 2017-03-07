@@ -55,7 +55,8 @@ import gui.MainFrame;
 	import gui.Split_Panel;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
-	import gui.models.Renderer_Boolean;
+import gui.library.MTable;
+import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
@@ -70,7 +71,7 @@ import lang.Lang;
 
 		
 		private WalletPollsTableModel my_Voting_Model;
-		private JTable my_Voting_table;
+		private MTable my_Voting_table;
 		private TableRowSorter my_Sorter;
 		private RunMenu my_run_menu;
 	// для прозрачности
@@ -94,7 +95,7 @@ import lang.Lang;
 			
 			//TABLE
 			my_Voting_Model = new WalletPollsTableModel();
-			my_Voting_table = new JTable(my_Voting_Model);
+			my_Voting_table = new MTable(my_Voting_Model);
 			
 			TableColumnModel columnModel = my_Voting_table.getColumnModel(); // read column model
 		//	columnModel.getColumn(0).setMaxWidth((100));

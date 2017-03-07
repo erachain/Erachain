@@ -3,6 +3,7 @@ package gui.items.accounts;
 import gui.items.assets.AssetsComboBoxModel;
 import gui.items.persons.Person_info_panel_001;
 import gui.items.persons.TableModelPersons;
+import gui.library.MTable;
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -60,7 +61,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 
 	public JComboBox<AssetCls> cbxFavorites;
 	public AccountsTableModel tableModel;
-	JTable table;
+	MTable table;
 
 	@SuppressWarnings("unchecked")
 	public Accounts_Panel()

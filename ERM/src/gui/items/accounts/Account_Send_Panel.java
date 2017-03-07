@@ -3,6 +3,7 @@ package gui.items.accounts;
 import gui.AccountRenderer;
 import gui.PasswordPane;
 import gui.items.assets.AssetsComboBoxModel;
+import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
@@ -81,7 +82,7 @@ public class Account_Send_Panel extends JPanel
 	protected JTextArea txtMessage;
 	protected JCheckBox encrypted;
 	protected JCheckBox isText;
-	protected JButton sendButton;
+	protected MButton sendButton;
 	protected AccountsComboBoxModel accountsModel;
 	protected JComboBox<AssetCls> cbxFavorites;
 	protected JTextField txtRecDetails;
@@ -398,7 +399,7 @@ public class Account_Send_Panel extends JPanel
 		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
-		txtAmount.setPreferredSize(new Dimension(130,22));
+//		txtAmount.setPreferredSize(new Dimension(130,22));
 		this.add(txtAmount, txtAmountGBC);
 		
        
@@ -426,7 +427,7 @@ public class Account_Send_Panel extends JPanel
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
-		txtFeePow.setPreferredSize(new Dimension(130,22));
+		//txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
@@ -437,7 +438,7 @@ public class Account_Send_Panel extends JPanel
 		decryptAllGBC.gridwidth = 1;
 		decryptAllGBC.gridx = 3;
 		decryptAllGBC.gridy = ++y;
-		JButton decryptButton = new JButton(Lang.getInstance().translate("Decrypt All"));
+		MButton decryptButton = new MButton(Lang.getInstance().translate("Decrypt All"),2);
     	this.add(decryptButton, decryptAllGBC);
 		
 		
@@ -446,11 +447,11 @@ public class Account_Send_Panel extends JPanel
 		buttonGBC.insets = new Insets(5,5,5,5);
 		buttonGBC.fill = GridBagConstraints.BOTH;  
 		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx = 0;
+		buttonGBC.gridx = 1;
 		buttonGBC.gridy = y;
         
-		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
+		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
+     //   sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

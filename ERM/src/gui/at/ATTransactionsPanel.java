@@ -1,6 +1,7 @@
 package gui.at;
 
 import gui.CoreRowSorter;
+import gui.library.MTable;
 import gui.models.ATTxsTableModel;
 import lang.Lang;
 
@@ -41,7 +42,8 @@ public class ATTransactionsPanel extends JPanel
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		this.atTxsTableModel = new ATTxsTableModel();
-		final JTable atsTable = new JTable(this.atTxsTableModel);
+		final JTable atsTable = new MTable(this.atTxsTableModel);
+		
 			
 		//ASSETS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

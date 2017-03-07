@@ -19,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 
+import gui.library.MTable;
 import lang.Lang;
 
 /**
@@ -50,31 +51,7 @@ public class Split_Panel extends javax.swing.JPanel {
         
       
     }
-    public void setRowHeightFormat(boolean format){
-    	// изменение высоты строки при изменении ширины
-    	if (!format) return;
-	    for (int i = 0; i < jTable_jScrollPanel_LeftPanel .getColumnCount(); i++) { 
-	   jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(i).addPropertyChangeListener(new PropertyChangeListener(){
-
-		@Override
-		public void propertyChange(PropertyChangeEvent arg0) {
-	//		if (arg0.getPropertyName() == "width") 		new Table_Formats().Table_Row_Auto_Height(jTable_jScrollPanel_LeftPanel); //Table_Render("333" + arg0.getSource().toString(), pair_Panel.jTable_jScrollPanel_LeftPanel);
-		
-	//	arg0.getSource().
-		//System.out.println();
-	//	setPreferredSize(getMaximumSize());
-		
-		}
-		   
-	   });
-	    }
-    	
-    	
-    	
-    	
-    }
-
-
+  
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -94,7 +71,7 @@ public class Split_Panel extends javax.swing.JPanel {
         searthLabel_SearchToolBar_LeftPanel = new javax.swing.JLabel();
         searchTextField_SearchToolBar_LeftPanel = new javax.swing.JTextField();
         jScrollPanel_LeftPanel = new javax.swing.JScrollPane();
-        jTable_jScrollPanel_LeftPanel = new javax.swing.JTable();
+        
         rightPanel1 = new javax.swing.JPanel();
         jToolBar_RightPanel = new javax.swing.JToolBar();
         jButton1_jToolBar_RightPanel = new javax.swing.JButton();
@@ -180,18 +157,18 @@ public class Split_Panel extends javax.swing.JPanel {
 
         jScrollPanel_LeftPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTable_jScrollPanel_LeftPanel.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-  //      jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+        jTable_jScrollPanel_LeftPanel = new MTable(new javax.swing.table.DefaultTableModel(
+                new Object [][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null}
+                },
+                new String [] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
+            ));
+          //      jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -337,7 +314,7 @@ public class Split_Panel extends javax.swing.JPanel {
     public javax.swing.JScrollPane jScrollPane_jPanel_RightPanel;
     public javax.swing.JScrollPane jScrollPanel_LeftPanel;
     public javax.swing.JSplitPane jSplitPanel;
-    public javax.swing.JTable jTable_jScrollPanel_LeftPanel;
+    public MTable jTable_jScrollPanel_LeftPanel;
     public javax.swing.JToolBar jToolBar_RightPanel;
     public javax.swing.JPanel leftPanel;
     public javax.swing.JPanel rightPanel1;

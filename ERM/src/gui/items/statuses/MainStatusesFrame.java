@@ -47,6 +47,7 @@ import gui.items.assets.TableModelItemAssets;
 import gui.items.persons.MainPersonsFrame;
 import gui.items.persons.PersonConfirmDialog;
 import gui.items.persons.PersonSetStatusDialog;
+import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
@@ -56,7 +57,7 @@ import lang.Lang;
 public class MainStatusesFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 1L;
 	private TableModelItemStatuses tableModelItemStatuses;
-	final JTable statusesTable ;
+	final MTable statusesTable ;
 	
 	RunMenu Search_run_menu;
 
@@ -112,7 +113,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		
 		//CREATE TABLE
 		this.tableModelItemStatuses = new TableModelItemStatuses();
-		statusesTable = new JTable(this.tableModelItemStatuses);
+		statusesTable = new MTable(this.tableModelItemStatuses);
 		TableColumnModel columnModel = statusesTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
 		//Custom renderer for the String column;
@@ -533,7 +534,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	
 	//TABLE
 			final WalletItemStatusesTableModel statusesModel = new WalletItemStatusesTableModel();
-			final JTable table = new JTable(statusesModel);
+			final MTable table = new MTable(statusesModel);
 			
 			columnModel = table.getColumnModel(); // read column model
 				columnModel.getColumn(0).setMaxWidth((100));
