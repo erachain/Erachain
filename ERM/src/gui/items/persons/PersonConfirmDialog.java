@@ -52,56 +52,22 @@ public class PersonConfirmDialog extends JDialog  {
 
 	public PersonConfirmDialog( PersonCls person) {
 		super();
+
 		//ICON
-				List<Image> icons = new ArrayList<Image>();
-				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-				this.setIconImages(icons);
+		List<Image> icons = new ArrayList<Image>();
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+		this.setIconImages(icons);
 		
 		
 		initComponents(person);
-		
-/*
-		final JTextField pubKey1Txt = new JTextField();
-		final JTextField pubKey2Txt = new JTextField();
-		final JTextField pubKey3Txt = new JTextField();
-		final JLabel pubKey1Details = new JLabel();
-		final JLabel pubKey2Details = new JLabel();
-		final JLabel pubKey3Details = new JLabel();
-
-		final JTextField toDate = new JTextField("0");
-		final JTextField feePow = new JTextField("0");
-	*/	
-		
-	//	this.setBorder(new EmptyBorder(10, 10, 10, 10));
-		//	MainFrame mainFram = new MainFrame();
-	
-	//	setSize(400,300);
-	//	setModal(true);
-        //setLocationRelativeTo(apers);
-        //setModalityType(ModalityType.TOOLKIT_MODAL);
-        //setDefaultCloseOperation(HIDE_ON_CLOSE);    	
-		
-	//		this.setMaximizable(true);
-			this.setTitle(Lang.getInstance().translate("Person confirm"));
-		//	this.setClosable(true);
-			this.setResizable(true);
-			this.setModal(true);
-	//		this.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);//.TOOLKIT_MODAL);//.APPLICATION_MODAL);
-	//		this.setModalExclusionType (Dialog.ModalExclusionType.NO_EXCLUDE);
-		
-		//	 setLocationRelativeTo(owner);
-	//	        setModalityType(ModalityType.TOOLKIT_MODAL);
-	//	        setDefaultCloseOperation(HIDE_ON_CLOSE);     
-		
+				
+		this.setTitle(Lang.getInstance().translate("Person confirm"));
+		this.setResizable(true);
+		this.setModal(true);
 			
-		//	this.setLocation(50, 20);
-		//	this.setIconImages(icons);
-			
-		//CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
  /*   
 		//LAYOUT

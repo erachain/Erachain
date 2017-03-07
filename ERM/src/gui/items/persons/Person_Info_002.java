@@ -200,51 +200,46 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
         
-       if (person.isConfirmed()) jPanel1.add(btn_Block, gridBagConstraints);
+        if (person.isConfirmed()) {
+        	jPanel1.add(btn_Block, gridBagConstraints);
+        	btn_Block.addMouseListener(new MouseListener(){
+	
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					Person_Work_Dialog pWD = new Person_Work_Dialog(person);
+					
+					pWD.setLocation(arg0.getXOnScreen()-pWD.getWidth(), arg0.getYOnScreen());
+					pWD.setVisible(true);
+				}
+	
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+	
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+	
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+	
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+	        	
+	        });
+       }
         
-        btn_Block.addMouseListener(new MouseListener(){
-
-			
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				Person_Work_Dialog pWD = new Person_Work_Dialog(person);
-				
-				pWD. setLocation(arg0.getXOnScreen()-pWD.getWidth(), arg0.getYOnScreen());
-				pWD.setVisible(true);
-				
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-        	
-        });
-        
-        
-		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -289,64 +284,6 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
 		jPanel3.add(jLabel_Description, gridBagConstraints);
 
-		jLabel_Date_Born.setText(Lang.getInstance().translate("Birthday") + ":");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-	//	jPanel3.add(jLabel_Date_Born, gridBagConstraints);
-
-		//////////////////////////////
-		/*
-		 * Date ddd = new Date(person.getBirthday()); DateFormat timeFormat =
-		 * new SimpleDateFormat("YYYY.MM.DD");
-		 * timeFormat.setTimeZone(TimeZone.getTimeZone("UTC")); String dataStr =
-		 * timeFormat.format(ddd);
-		 * 
-		 * Locale local = new Locale("ru","RU"); // С„РѕСЂРјР°С‚ РґР°С‚С‹
-		 * DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT,
-		 * local); // РґР»СЏ С„РѕСЂРјР°С‚Р° РґР°С‚С‹ String dataStrLoc =
-		 * df.format(ddd).toString(); String dataStrLoc1 = df.format(new
-		 * Date(person.getBirthday())).toString();
-		 */
-
-		jTextField_Date_Born.setEditable(false);
-		jTextField_Date_Born.setText(new Date(person.getBirthday()) + "");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.weightx = 0.1;
-	//	jPanel3.add(jTextField_Date_Born, gridBagConstraints);
-
-		/// TimeZone.setDefault(tz);
-		////////////////////////
-
-		jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 6;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-	//	jPanel3.add(jLabel_Gender, gridBagConstraints);
-
-		jTextField_Gender.setEditable(false);
-		if (person.getGender() == 0)
-			jTextField_Gender.setText(Lang.getInstance().translate("Male"));
-		if (person.getGender() == 1)
-			jTextField_Gender.setText(Lang.getInstance().translate("Female"));
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 7;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.weightx = 0.1;
-	//	jPanel3.add(jTextField_Gender, gridBagConstraints);
-
-		// jTextArea_Description.setColumns(20);
 		jTextArea_Description.setRows(5);
 
 		MenuPopupUtil.installContextMenu(jTextArea_Description);
@@ -386,44 +323,32 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		gridBagConstraints.weighty = 0.6;
 		jPanel3.add(jScrollPane1, gridBagConstraints);
 
-		jLabel_Creator.setText(Lang.getInstance().translate("Publisher") + ":");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 10;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-		gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
-		jPanel3.add(jLabel_Creator, gridBagConstraints);
-
-		jTextField_Creator = new M_Accoutn_Text_Field(publisher);
-		jTextField_Creator.setEditable(false);
-	//	jTextField_Creator.setText(publisher.toString());
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 11;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-		gridBagConstraints.weightx = 0.2;
-		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-		jPanel3.add(jTextField_Creator, gridBagConstraints);
-		
-
+		int gridy = 8;
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
 			jLabel_Owner.setText(Lang.getInstance().translate("Owner") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 8;
+			gridBagConstraints.gridy = gridy++;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 			gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 			jPanel3.add(jLabel_Owner, gridBagConstraints);
 
 			jTextField_Owner = new M_Accoutn_Text_Field(owner);
 			jTextField_Owner.setEditable(false);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = gridy++;
+			gridBagConstraints.gridwidth = 3;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+			gridBagConstraints.weightx = 0.2;
+			gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+			jPanel3.add(jTextField_Owner, gridBagConstraints);
 
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 9;
+			gridBagConstraints.gridy = gridy++;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -434,7 +359,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			jLabel_Owner_Sign.setText(Lang.getInstance().translate("Owner Sign") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 12;
+			gridBagConstraints.gridy = gridy++;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 			gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
 		//	jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
@@ -443,7 +368,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 13;
+			gridBagConstraints.gridy = gridy++;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -455,25 +380,27 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		//	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
 		}
 	
-
-
-		// jTextField_Creator.add(creator_Meny);
-	//	jTextField_Owner.setComponentPopupMenu(owner_Meny);
-
-		jLabel1.setText(Lang.getInstance().translate("Deathday") + ":");
+		jLabel_Creator.setText(Lang.getInstance().translate("Publisher") + ":");
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 2);
-	//	jPanel3.add(jLabel1, gridBagConstraints);
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = gridy++;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+		gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
+		jPanel3.add(jLabel_Creator, gridBagConstraints);
 
-		
+		jTextField_Creator = new M_Accoutn_Text_Field(publisher);
+		jTextField_Creator.setEditable(false);
+	//	jTextField_Creator.setText(publisher.toString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = gridy;
+		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 0.1;
-	//	jPanel3.add(jTextField1, gridBagConstraints);
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+		gridBagConstraints.weightx = 0.2;
+		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+		jPanel3.add(jTextField_Creator, gridBagConstraints);
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
