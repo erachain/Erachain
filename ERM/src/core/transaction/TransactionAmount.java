@@ -435,8 +435,13 @@ public abstract class TransactionAmount extends Transaction {
 
 			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
-			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
+			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
+			int blockHeight;
+			if (block == null) {
+				blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 1;
+			} else {
+				blockHeight = block.getHeightByParent(db);
+			}
 			//this.recipient.setLastForgingData(db, blockHeight);
 			this.recipient.setForgingData(db, blockHeight);
 		}
