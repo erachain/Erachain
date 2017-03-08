@@ -110,14 +110,14 @@ public class PersonConfirmDialog extends JDialog  {
 			long current_time = NTP.getTime();
 			
 			// TEST TIME and EXPIRE TIME
-			int daysLeft = (int)((addressDuration.b - current_time) / (long)86400000);	
+			int daysLeft = addressDuration.b - (int)(current_time / (long)86400000);	
 			if (daysLeft < 0 ) personDetails = Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
 			else personDetails = Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
 
 			personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive");
 			
 		}
-		pubKeyDetails.setText("<html>" + personDetails  + account.toString(Transaction.FEE_KEY) +  "</html>");
+		pubKeyDetails.setText("<html>" + personDetails  + "<br>" +  account.toString(Transaction.FEE_KEY) +  "</html>");
 		
 	}
 
