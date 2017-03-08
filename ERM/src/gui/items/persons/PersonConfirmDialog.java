@@ -103,9 +103,9 @@ public class PersonConfirmDialog extends JDialog  {
 		String personDetails;
 		Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DBSet.getInstance());
 		
-		if (addressDuration == null) personDetails = Lang.getInstance().translate("Not personalized yet");
-		else
-		{
+		if (addressDuration == null) {
+			personDetails = Lang.getInstance().translate("Not personalized yet");
+		} else {
 			// TEST TIME and EXPIRE TIME
 			long current_time = NTP.getTime();
 			
@@ -116,9 +116,8 @@ public class PersonConfirmDialog extends JDialog  {
 
 			personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive");
 			
-			pubKeyDetails.setText("<html>" + personDetails  + account.toString(Transaction.FEE_KEY) +  "</html>");
-			
 		}
+		pubKeyDetails.setText("<html>" + personDetails  + account.toString(Transaction.FEE_KEY) +  "</html>");
 		
 	}
 
@@ -327,7 +326,7 @@ public class PersonConfirmDialog extends JDialog  {
 	        	jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
 	        } else {
 	        	jTextField_Address1.setText(publicKey.getBase58());
-				refreshReceiverDetails(jTextField_Address1, jLabel_Adress1_Check);
+				//refreshReceiverDetails(jTextField_Address1, jLabel_Adress1_Check);
 	        }
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
