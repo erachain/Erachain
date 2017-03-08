@@ -101,6 +101,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			}
 
 			Block block = data.getB();
+			if (block == null)
+				return null;
 			
 			switch(column)
 			{
@@ -132,7 +134,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
+			LOGGER.error(e.getMessage() +  " row:" + row, e);
 		}
 		
 		return null;
