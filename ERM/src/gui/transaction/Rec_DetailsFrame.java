@@ -121,18 +121,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		MenuPopupUtil.installContextMenu(heSeq);
 		this.add(heSeq, detailGBC);
 
-		//LABEL SIGNATURE
-		labelGBC.gridy = componentLevel;
-		JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
-		this.add(signatureLabel, labelGBC);
-				
-		//SIGNATURE
-		detailGBC.gridy = componentLevel;
-		//JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
-		signature = new JTextField(Base58.encode(record.getSignature()));
-		signature.setEditable(false);
-		MenuPopupUtil.installContextMenu(signature);
-		this.add(signature, detailGBC);
+		
 
 		/*
 		//LABEL REFERENCE
@@ -196,6 +185,22 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		creator_Pub_key.setEditable(false);
 		MenuPopupUtil.installContextMenu(creator_Pub_key);
 		this.add(creator_Pub_key, detailGBC);
+		
+		componentLevel++;
+		//LABEL SIGNATURE
+				labelGBC.gridy = componentLevel;
+				JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
+				this.add(signatureLabel, labelGBC);
+						
+				//SIGNATURE
+				detailGBC.gridy = componentLevel;
+				//JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
+				signature = new JTextField(Base58.encode(record.getSignature()));
+				signature.setEditable(false);
+				MenuPopupUtil.installContextMenu(signature);
+				this.add(signature, detailGBC);
+		
+		
 		
 		/*
 		//LABEL FEE POWER
