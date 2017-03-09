@@ -47,7 +47,8 @@ public class License_JFrame extends JDialog {
     }
     	
     public License_JFrame() {
-    	//ICON		
+    	//ICON	
+    	needAccept = false;
         initComponents();
     }
 
@@ -79,7 +80,7 @@ public class License_JFrame extends JDialog {
 
   //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle(Lang.getInstance().translate("License"));
-        setMinimumSize(new java.awt.Dimension(600, 550));
+        setMinimumSize(new java.awt.Dimension(800, 550));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jCheckBox1.setText(Lang.getInstance().translate("I accept"));
@@ -153,6 +154,28 @@ public class License_JFrame extends JDialog {
         });
         
        
+      jTextArea1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            	if (!needAccept)
+            	
+            	setVisible(false);
+                dispose();
+            }
+        });
+        
+      jTextArea1.addKeyListener(new KeyAdapter() {
+		    public void keyPressed(KeyEvent e) {
+		    	if (!needAccept)
+            	
+		    	setVisible(false);
+                dispose();
+		    }
+		});
+        
+        
+        
+        
         
       //CLOSE NICELY
         this.addWindowListener(new WindowAdapter()
@@ -225,7 +248,7 @@ public class License_JFrame extends JDialog {
 
         
    //     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        if(!needAccept)
+  //      if(!needAccept)
         	this.setUndecorated(true);
         
         pack();
