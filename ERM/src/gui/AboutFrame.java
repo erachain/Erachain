@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -23,15 +24,15 @@ import controller.Controller;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class AboutFrame extends JFrame{
+public class AboutFrame extends JDialog{
 
 	private AboutPanel aboutPanel;
 	
 	public AboutFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("Debug"));
-		
+		setTitle(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("Debug"));
+		setModal(true);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
