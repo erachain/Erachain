@@ -12,3 +12,4 @@ settings.json
 gui_settings.json
 *.jar
 *.zip
+*.theme
