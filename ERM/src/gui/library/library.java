@@ -33,6 +33,7 @@ import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 */
 
 import gui.MainFrame;
+import lang.Lang;
 import settings.Settings;
 
 public class library {
@@ -249,7 +250,13 @@ public class library {
 		 UIManager.put("TitledBorder.font",font);
 				 UIManager.put("Panel.font",font);
 		 
-	      
+	     
+// text to button optionPane				 
+		UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
+		UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));	
+		UIManager.put("OptionPane.cancelButtonText", Lang.getInstance().translate("Cancel"));
+		UIManager.put("OptionPane.okButtonText", Lang.getInstance().translate("Yes"));
+		
 	      
 		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
 		 
@@ -289,7 +296,7 @@ public class library {
 		       
 		    	
 		    	String key = keys.nextElement().toString();
-		    	if (key.contains("Radio")){
+		    	if (key.contains("OptionPane")){
 		        Object value = UIManager.get(key);
 		        ss.add(new Tuple2<String, Object>(key,value));
 		//        if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);

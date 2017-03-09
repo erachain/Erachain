@@ -490,8 +490,7 @@ public class IssueAssetPanel extends JPanel
 			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
 			    text += "&nbsp;&nbsp; <b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.viewFee()+"</b><br>";
 			    
-			    UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
-			    UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));
+			  
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			
