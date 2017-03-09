@@ -13,6 +13,7 @@ public class SettingsTabPane extends JTabbedPane{
 	public SettingsKnownPeersPanel settingsKnownPeersPanel;
 	public SettingsBasicPanel settingsBasicPanel;
 	public SettingsAllowedPanel settingsAllowedPanel;
+	public UI_Setting_Panel uI_Settings_Panel;
 	
 	public SettingsTabPane()
 	{
@@ -31,6 +32,11 @@ public class SettingsTabPane extends JTabbedPane{
         settingsAllowedPanel = new SettingsAllowedPanel();
         JScrollPane scrollPane3 = new JScrollPane(settingsAllowedPanel);
         this.addTab(Lang.getInstance().translate("Access permission"), scrollPane3);
+        
+        uI_Settings_Panel = new UI_Setting_Panel();
+        JScrollPane scrollPane4 = new JScrollPane(uI_Settings_Panel);
+        this.addTab(Lang.getInstance().translate("UI Settings"), scrollPane4);
+        
 
 	}
 	public void close() 

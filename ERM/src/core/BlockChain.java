@@ -141,6 +141,9 @@ public class BlockChain
 	public GenesisBlock getGenesisBlock() {
 		return this.genesisBlock;
 	}
+	public long getGenesisTimestamp() {
+		return this.genesisTimestamp;
+	}
 	public long getTimestamp(int height) {
 		return this.genesisTimestamp + (long)height * (long)Block.GENERATING_MIN_BLOCK_TIME;
 	}
@@ -472,7 +475,7 @@ public class BlockChain
 			return block.calcWinValue(dbSet);
 		}		
 
-		int height = block.getParentHeight(dbSet);
+		int height = block.getHeightByParent(dbSet);
 		min_value = min_value<<1;
 
 		parent = block.getParent(dbSet);

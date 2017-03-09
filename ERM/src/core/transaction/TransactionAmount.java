@@ -435,9 +435,13 @@ public abstract class TransactionAmount extends Transaction {
 
 			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
-			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK 
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
-			//this.recipient.setLastForgingData(db, blockHeight);
+			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
+			int blockHeight;
+			if (block == null) {
+				blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 1;
+			} else {
+				blockHeight = block.getHeightByParent(db);
+			}
 			this.recipient.setForgingData(db, blockHeight);
 		}
 	}
@@ -482,7 +486,12 @@ public abstract class TransactionAmount extends Transaction {
 	
 		if (absKey == Transaction.RIGHTS_KEY) {			
 			// Parent BLOCK is still in MAP!
-			int blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
+			int blockHeight;
+			if (block == null) {
+				blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
+			} else {
+				blockHeight = block.getHeightByParent(db);
+			}
 			int lastForgingHeight = this.recipient.getLastForgingData(db);
 			if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
 				int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);

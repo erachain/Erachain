@@ -11,14 +11,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -31,6 +34,7 @@ import lang.LangFile;
 import network.Network;
 import settings.Settings;
 import utils.SaveStrToFile;
+import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JFrame{
@@ -105,7 +109,7 @@ public class SettingsFrame extends JFrame{
 				}
 			}
 		});	  
-        btnNewButton.setPreferredSize(new Dimension(100, 25));
+ //       btnNewButton.setPreferredSize(new Dimension(100, 25));
 
         this.add(btnNewButton, gbc_btnNewButton);
         
@@ -130,7 +134,7 @@ public class SettingsFrame extends JFrame{
 			}
 		});
         
-        btnCancel.setPreferredSize(new Dimension(100, 25));
+    //    btnCancel.setPreferredSize(new Dimension(100, 25));
 
         this.add(btnCancel, gbc_btnCancel);
     	
@@ -155,7 +159,7 @@ public class SettingsFrame extends JFrame{
 	}	
 	
 	@SuppressWarnings("unchecked")
-	public boolean saveSettings()
+	public boolean saveSettings() 
 	{
 		boolean changeKeyCaching = false;
 		boolean changeWallet = false;
@@ -165,21 +169,68 @@ public class SettingsFrame extends JFrame{
 		
 		
 		
+		
+		
+		
+		
+			
+		
+		
+		
+		
+		
+		
 		// font
 	//	if(Settings.getInstance().getMinConnections() != MinConnections)
 	//	{
-		if (settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString() != "") {
-			settingsJSONbuf.put("font_size", settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
+		if (settingsTabPane.uI_Settings_Panel.size_Font.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_size", settingsTabPane.uI_Settings_Panel.size_Font.getSelectedItem().toString());
 	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.size_Font.getSelectedItem().toString());
 		}
 	
-		if (settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString() != "") {
-			settingsJSONbuf.put("font_name", settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
+		if (settingsTabPane.uI_Settings_Panel.font_Name.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("font_name", settingsTabPane.uI_Settings_Panel.font_Name.getSelectedItem().toString());
 	//		gui.library.library.Set_GUI_Font(settingsTabPane.settingsBasicPanel.font_Name.getSelectedItem().toString());
 		}
 	
+		// themes
 		
+		if(settingsTabPane.uI_Settings_Panel.other_Themes.isSelected())
+		{
+			settingsJSONbuf.put("LookAndFell", "Other");
 				
+		if (settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString() != "") {
+			settingsJSONbuf.put("theme", settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString());
+		String path = Settings.getInstance().getUserPath();
+		 File source = new File( path +"themes/" +settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString(), "Default.theme");
+	     File dest = new File(path  +  "Default.theme");
+	 //   C:/Users/РЎР°С€Р°/git/ARONICLE/ERM
+	    String a = dest.getAbsolutePath();
+		
+	     try {
+			FileUtils.copyFile(source, dest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		}
+		
+		}
+		
+		
+		if(settingsTabPane.uI_Settings_Panel.system_Theme.isSelected())
+		{
+			settingsJSONbuf.put("LookAndFell", "System");
+		}
+		
+		if(settingsTabPane.uI_Settings_Panel.metal_Theme.isSelected())
+		{
+			settingsJSONbuf.put("LookAndFell", "Metal");
+		}
+		
+		
 		
 		
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled() != settingsTabPane.settingsBasicPanel.chckbxKeyCaching.isSelected())
@@ -188,19 +239,19 @@ public class SettingsFrame extends JFrame{
 			changeKeyCaching = true;
 		}
 		
-		if(Settings.getInstance().isSoundNewTransactionEnabled() != settingsTabPane.settingsBasicPanel.chckbxSoundNewTransaction.isSelected())
+		if(Settings.getInstance().isSoundNewTransactionEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected())
 		{
-			settingsJSONbuf.put("soundnewtransaction", settingsTabPane.settingsBasicPanel.chckbxSoundNewTransaction.isSelected());
+			settingsJSONbuf.put("soundnewtransaction", settingsTabPane.uI_Settings_Panel.chckbxSoundNewTransaction.isSelected());
 		}
 		
-		if(Settings.getInstance().isSoundReceiveMessageEnabled() != settingsTabPane.settingsBasicPanel.chckbxSoundReceiveMessage.isSelected())
+		if(Settings.getInstance().isSoundReceiveMessageEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundReceiveMessage.isSelected())
 		{
-			settingsJSONbuf.put("soundreceivemessage", settingsTabPane.settingsBasicPanel.chckbxSoundReceiveMessage.isSelected());
+			settingsJSONbuf.put("soundreceivemessage", settingsTabPane.uI_Settings_Panel.chckbxSoundReceiveMessage.isSelected());
 		}
 
-		if(Settings.getInstance().isSoundReceivePaymentEnabled() != settingsTabPane.settingsBasicPanel.chckbxSoundReceivePayment.isSelected())
+		if(Settings.getInstance().isSoundReceivePaymentEnabled() != settingsTabPane.uI_Settings_Panel.chckbxSoundReceivePayment.isSelected())
 		{
-			settingsJSONbuf.put("soundreceivepayment", settingsTabPane.settingsBasicPanel.chckbxSoundReceivePayment.isSelected());
+			settingsJSONbuf.put("soundreceivepayment", settingsTabPane.uI_Settings_Panel.chckbxSoundReceivePayment.isSelected());
 		}
 
 		if(Settings.getInstance().isGuiEnabled() != settingsTabPane.settingsBasicPanel.chckbxGuiEnabled.isSelected())
@@ -293,9 +344,9 @@ public class SettingsFrame extends JFrame{
 		}
 		
 		if(!Settings.getInstance().getLang().equals(
-				((LangFile)settingsTabPane.settingsBasicPanel.cbxListOfAvailableLangs.getSelectedItem()).getFileName()))
+				((LangFile)settingsTabPane.uI_Settings_Panel.jComboBox_Lang.getSelectedItem()).getFileName()))
 		{
-			settingsJSONbuf.put("lang", ((LangFile)settingsTabPane.settingsBasicPanel.cbxListOfAvailableLangs.getSelectedItem()).getFileName());
+			settingsJSONbuf.put("lang", ((LangFile)settingsTabPane.uI_Settings_Panel.jComboBox_Lang.getSelectedItem()).getFileName());
 			changeLang = true;
 		}
 		
@@ -421,4 +472,6 @@ public class SettingsFrame extends JFrame{
 	
 		return true;
 	}
+
+	
 }

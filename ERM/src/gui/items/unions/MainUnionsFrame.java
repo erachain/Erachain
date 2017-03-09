@@ -48,7 +48,7 @@ public MainUnionsFrame (){
 // buttun1
 		 this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Union"));
 // status panel
-		 this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Unions"));
+		 //this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Unions"));
 		 
 		 this.jButton1_jToolBar.addActionListener(new ActionListener()
 			{

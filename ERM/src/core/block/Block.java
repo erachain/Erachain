@@ -72,7 +72,8 @@ public class Block {
 
 	protected int version;
 	protected byte[] reference;
-	int height_process;
+	int heightBlock;
+	Block parentBlock;
 	//protected long timestamp;
 	protected int generatingBalance; // only for DB MAP
 	protected PublicKeyAccount creator;
@@ -133,8 +134,10 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 		
-		int height = db.getBlockSignsMap().get(this.signature).a;
-		return height;
+		if (heightBlock < 1)
+			heightBlock = db.getBlockSignsMap().get(this.signature).a;
+
+		return heightBlock;
 
 	}
 	
@@ -149,31 +152,40 @@ public class Block {
 	}
 	*/
 
-	// TODO - on orphan = -1 for parent on resolve new chain
-	public int getParentHeight(DBSet db)
+	public Block getParent(DBSet db)
 	{
+		if (parentBlock == null) {
+			this.parentBlock = db.getBlockMap().get(this.reference);
+		}
+		return parentBlock;
+	}
 
-		if (this instanceof GenesisBlock
-				|| Arrays.equals(this.signature,
-						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
-			return 0;
-		
-		int height = db.getBlockSignsMap().get(this.reference).a;
-		return height;
-
+	public Block getChild(DBSet db)
+	{
+		return db.getChildMap().get(this);
 	}
 
 	public int getHeightByParent(DBSet db)
 	{
 		
-		int height = getParentHeight(db) + 1;
+		if (this instanceof GenesisBlock
+				|| Arrays.equals(this.signature,
+						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
+			return 1;
+
+		Block parent = this.getParent(db);
+		if (parent == null)
+			return -1;
+
+		int height = parent.getHeight(db) + 1;
 		return height;
 
 	}
 
 	public long getTimestamp(DBSet db)
 	{
-		int height = this.getParentHeight(db) + 1;
+
+		int height = getHeightByParent(db);
 		
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 
@@ -460,16 +472,6 @@ public class Block {
 	public byte[] getBlockATs()
 	{
 		return this.atBytes;
-	}
-
-	public Block getParent(DBSet db)
-	{
-		return db.getBlockMap().get(this.reference);
-	}
-
-	public Block getChild(DBSet db)
-	{
-		return db.getChildMap().get(this);
 	}
 
 	/*
@@ -1236,7 +1238,7 @@ public class Block {
 		//ADD TO DB
 		dbSet.getBlockMap().set(this);
 		
-		this.height_process = dbSet.getBlockSignsMap().getHeight(this.signature);
+		this.heightBlock = dbSet.getBlockSignsMap().getHeight(this.signature);
 
 		/*
 		if (!dbSet.isFork()) {
@@ -1249,7 +1251,7 @@ public class Block {
 
 		BlockChain blockChain = Controller.getInstance().getBlockChain();
 		if (blockChain != null) {
-			Controller.getInstance().getBlockChain().setCheckPoint(this.height_process - BlockChain.MAX_ORPHAN);
+			Controller.getInstance().getBlockChain().setCheckPoint(this.heightBlock - BlockChain.MAX_ORPHAN);
 		}
 
 		//PROCESS TRANSACTIONS
@@ -1263,15 +1265,15 @@ public class Block {
 
 		for(Transaction transaction: blockTransactions)
 		{
-			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height_process, seq);
+			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(heightBlock, seq);
 			dbSet.getTransactionFinalMap().set( key, transaction);
 			dbSet.getTransactionFinalMapSigns().set( transaction.getSignature(), key);
 			seq++;
 		}
 
-		if(height_process % BlockChain.MAX_ORPHAN == 0) 
+		if(heightBlock % BlockChain.MAX_ORPHAN == 0) 
 		{
-			Controller.getInstance().blockchainSyncStatusUpdate(height_process);
+			Controller.getInstance().blockchainSyncStatusUpdate(heightBlock);
 		}
 		
 	}
@@ -1357,8 +1359,6 @@ public class Block {
 		}
 		*/
 
-		
-
 		for(Transaction transaction: this.getTransactions())
 		{
 			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
@@ -1370,7 +1370,8 @@ public class Block {
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
 			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
 		}
-		this.height_process = -1;
+		this.heightBlock = -1;
+		this.parentBlock = null;
 
 	}
 

@@ -50,6 +50,7 @@ public class ForgingStatus extends JLabel implements Observer {
 			public void mouseEntered(MouseEvent mEvt) {
 				
 				long winBalance = 0;
+				long winBalance2 = 0;
 				Account winAccount = null;
 				BlockChain bchain = Controller.getInstance().getBlockChain();
 				List<Block> lastBlocksForTarget = bchain.getLastBlocksForTarget(DBSet.getInstance());
@@ -62,9 +63,10 @@ public class ForgingStatus extends JLabel implements Observer {
 	            for(Account account: Controller.getInstance().getAccounts())
 		        {
 	            	long win_value = account.calcWinValue(dbSet, bchain, lastBlocksForTarget, newHeight, target);
-	            	if (win_value > Math.abs(winBalance)) {
-	            		winBalance = win_value;
+	            	if (Math.abs(win_value) > winBalance) {
+	            		winBalance = Math.abs(win_value);
 	            		winAccount = account;
+	            		winBalance2 = win_value;
 	            	}
 		        }  
 	            ///
@@ -73,7 +75,9 @@ public class ForgingStatus extends JLabel implements Observer {
 		        if(winAccount != null)
 		        {
 		        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
-		        	timeForge = (BlockChain.BASE_TARGET * winBalance / target) + " " + winAccount.getAddress();
+		        	timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
+		        	timeForge = winBalance2>0?timeForge:("("+timeForge+")");
+		        	timeForge = timeForge + " " + winAccount.getAddress();
 		        	timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
 		        }
 		        else

@@ -39,7 +39,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         jButton3_jToolBar = new javax.swing.JButton();
         jTabbedPane = new javax.swing.JTabbedPane();
         status_jPanel = new javax.swing.JPanel();
-        jLabel_status_jPanel = new javax.swing.JLabel();
+        //jLabel_status_jPanel = new javax.swing.JLabel();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0};
@@ -90,8 +90,9 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         status_jPanel.setMinimumSize(new java.awt.Dimension(100, 22));
         status_jPanel.setPreferredSize(new java.awt.Dimension(495, 22));
 
-        jLabel_status_jPanel.setText("jLabel1");
+        //jLabel_status_jPanel.setText("jLabel1");
 
+        /*
         javax.swing.GroupLayout status_jPanelLayout = new javax.swing.GroupLayout(status_jPanel);
         status_jPanel.setLayout(status_jPanelLayout);
         status_jPanelLayout.setHorizontalGroup(
@@ -102,6 +103,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
             status_jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel_status_jPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
         );
+        */
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -120,7 +122,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
     public javax.swing.JButton jButton1_jToolBar;
     public javax.swing.JButton jButton2_jToolBar;
     public javax.swing.JButton jButton3_jToolBar;
-    public javax.swing.JLabel jLabel_status_jPanel;
+    //public javax.swing.JLabel jLabel_status_jPanel;
     public javax.swing.JTabbedPane jTabbedPane;
     public javax.swing.JToolBar jToolBar;
     public javax.swing.JPanel status_jPanel;

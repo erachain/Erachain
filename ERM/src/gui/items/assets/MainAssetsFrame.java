@@ -52,7 +52,6 @@ public MainAssetsFrame(){
 // buttun1
 	this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Assets"));
 // status panel
-	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Assets"));
 	this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

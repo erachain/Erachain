@@ -47,7 +47,7 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
 		
 		
 		//this.jToolBar.setFloatable(true);
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Accounts"));
+		//this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Accounts"));
 	// MY Accounts
 		my_Accounts_SplitPanel = new My_Accounts_SplitPanel();
 		this.jTabbedPane.add(my_Accounts_SplitPanel);
