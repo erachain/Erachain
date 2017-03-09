@@ -872,6 +872,18 @@ public class Settings {
 		
 		return DEFAULT_THEME;
 	}
+	
+	public String get_LookAndFell(){
+		
+		if(this.settingsJSON.containsKey("LookAndFell"))
+		{
+			return ((String) this.settingsJSON.get("LookAndFell").toString());
+		}
+		
+		return DEFAULT_THEME;
+		
+		
+	}
 		
 		
 	

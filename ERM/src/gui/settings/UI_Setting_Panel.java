@@ -114,6 +114,10 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 8, 10);
         add(other_Themes, gridBagConstraints);
         
+        
+        if(Settings.getInstance().get_LookAndFell().equals("Other")) other_Themes.setSelected(true);
+        
+        
         other_Themes.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
@@ -140,7 +144,12 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
 			}
 		});
             
-        
+        if(Settings.getInstance().get_LookAndFell().equals("System")) {
+        	
+        	
+         	jComboBox_Thems.setEnabled(false);
+        	system_Theme.setSelected(true);
+        }
         
         
        
@@ -160,7 +169,12 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
 			}
 		});
             
-		
+        if(Settings.getInstance().get_LookAndFell().equals("Metal")) {
+        	
+        	
+        	jComboBox_Thems.setEnabled(false);
+        	metal_Theme.setSelected(true);
+        }
 		
 		
 		

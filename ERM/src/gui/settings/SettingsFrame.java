@@ -197,10 +197,10 @@ public class SettingsFrame extends JFrame{
 		
 		if(settingsTabPane.uI_Settings_Panel.other_Themes.isSelected())
 		{
-			settingsJSONbuf.put("theme", "Other");
+			settingsJSONbuf.put("LookAndFell", "Other");
 				
 		if (settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString() != "") {
-			//settingsJSONbuf.put("theme", settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString());
+			settingsJSONbuf.put("theme", settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString());
 		String path = Settings.getInstance().getUserPath();
 		 File source = new File( path +"themes/" +settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString(), "Default.theme");
 	     File dest = new File(path  +  "Default.theme");
@@ -222,12 +222,12 @@ public class SettingsFrame extends JFrame{
 		
 		if(settingsTabPane.uI_Settings_Panel.system_Theme.isSelected())
 		{
-			settingsJSONbuf.put("theme", "System");
+			settingsJSONbuf.put("LookAndFell", "System");
 		}
 		
 		if(settingsTabPane.uI_Settings_Panel.metal_Theme.isSelected())
 		{
-			settingsJSONbuf.put("theme", "Metal");
+			settingsJSONbuf.put("LookAndFell", "Metal");
 		}
 		
 		

@@ -79,7 +79,7 @@ public class library {
 		
 		
 		// theme
-		String name_Theme = Settings.getInstance().get_Theme();
+		String name_Theme = Settings.getInstance().get_LookAndFell();
 		
 		if (name_Theme.equals("System")){
 			
