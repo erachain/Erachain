@@ -94,13 +94,6 @@ public class RecordsPanel extends  JPanel // JPanel
 		transactionsTable.setRowSorter(sorter);
 		
 		//Custom renderer for the String column;
-		//RenderingHints.
-		this.transactionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left(this.transactionsTable.getFontMetrics(this.transactionsTable.getFont()),transactionsModel.get_Column_AutoHeight())); // set renderer
-		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-		
 		this.transactionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 		TableColumn column_Size = this.transactionsTable.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_SIZE);

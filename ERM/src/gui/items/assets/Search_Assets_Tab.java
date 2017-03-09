@@ -96,10 +96,6 @@ public class Search_Assets_Tab extends Split_Panel {
 //	CoreRowSorter sorter = new CoreRowSorter(tableModelItemAssets, indexes);
 //	assetsTable.setRowSorter(sorter);
 	
-	//Custom renderer for the String column;
-	assetsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	assetsTable.setDefaultRenderer(String.class, new Renderer_Left(assetsTable.getFontMetrics(assetsTable.getFont()),tableModelItemAssets.get_Column_AutoHeight())); // set renderer
-	assetsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 		// column #1
 		TableColumn column1 = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column1.setMinWidth(50);

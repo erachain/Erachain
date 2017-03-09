@@ -100,9 +100,6 @@ import lang.Lang;
 			TableColumnModel columnModel = my_Voting_table.getColumnModel(); // read column model
 		//	columnModel.getColumn(0).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			my_Voting_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		//	my_Voting_table.setDefaultRenderer(String.class, new Renderer_Left(my_Voting_table.getFontMetrics(my_Voting_table.getFont()),my_Voting_Model.get_Column_AutoHeight())); // set renderer
 					
 					
 			my_Sorter = new TableRowSorter(my_Voting_Model);
@@ -113,7 +110,7 @@ import lang.Lang;
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = my_Voting_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			confirmedColumn.setCellRenderer(new Renderer_Boolean());
+			
 			confirmedColumn.setMinWidth(50);
 			confirmedColumn.setMaxWidth(50);
 			confirmedColumn.setPreferredWidth(50);//.setWidth(30);

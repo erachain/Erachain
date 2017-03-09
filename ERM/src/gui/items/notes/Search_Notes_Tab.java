@@ -98,12 +98,7 @@ public class Search_Notes_Tab extends Split_Panel {
 //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 //	CoreRowSorter sorter = new CoreRowSorter(tableModelItemAssets, indexes);
 //	assetsTable.setRowSorter(sorter);
-	
-	//Custom renderer for the String column;
-	notesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	notesTable.setDefaultRenderer(String.class, new Renderer_Left(notesTable.getFontMetrics(notesTable.getFont()),tableModelNotes.get_Column_AutoHeight())); // set renderer
-	notesTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-	// column #1
+		// column #1
 		TableColumn column1 = notesTable.getColumnModel().getColumn(tableModelNotes.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column1.setMinWidth(50);
 		column1.setMaxWidth(100);

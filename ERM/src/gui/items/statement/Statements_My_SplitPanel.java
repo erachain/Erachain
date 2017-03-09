@@ -101,7 +101,6 @@ import gui.models.Renderer_Boolean;
 		//	my_Statements_table = new JTable(my_Statements_Model);// new Statements_Table_Model();
 	    	
 		//	my_Statements_table.setTableHeader(null);
-		//	my_Statements_table.setSelectionBackground(new Color(209, 232, 255, 255));
 		//	my_Statements_table.setEditingColumn(0);
 		//	my_Statements_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
@@ -143,16 +142,12 @@ import gui.models.Renderer_Boolean;
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
 			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
-			this.jTable_jScrollPanel_LeftPanel.setSelectionBackground(new Color(209, 232, 255, 255));
+	
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
 	//		this.setRowHeightFormat(false);
-			
-			//Custom renderer for the String column;
-			this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_jScrollPanel_LeftPanel.getFontMetrics(this.jTable_jScrollPanel_LeftPanel.getFont()),my_Statements_Model.get_Column_AutoHeight())); // set renderer
 			
 			
 			 

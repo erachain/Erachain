@@ -409,7 +409,6 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
         jTable1.setModel(statusModel);
         
-        jTable1.setDefaultRenderer(String.class, new Renderer_Left(jTable1.getFontMetrics(jTable1.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
         //CHECKBOX FOR FAVORITE
         		TableColumn to_Date_Column1 = jTable1.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
@@ -454,8 +453,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         jTable2.setModel(personModel);
         
-        jTable2.setDefaultRenderer(String.class, new Renderer_Left(jTable2.getFontMetrics(jTable2.getFont()),personModel.get_Column_AutoHeight())); // set renderer
-      //CHECKBOX FOR FAVORITE
+     //CHECKBOX FOR FAVORITE
       		TableColumn to_Date_Column = jTable2.getColumnModel().getColumn( PersonAccountsModel.COLUMN_TO_DATE);	
       		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
       		to_Date_Column.setMinWidth(50);

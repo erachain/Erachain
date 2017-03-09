@@ -49,9 +49,6 @@ public class Voush_Library_Panel extends JPanel {
 		col_data.setMaxWidth(200);
 		col_data.setPreferredWidth(120);// .setWidth(30);
 
-		jTable_Vouches.setDefaultRenderer(Account.class, new Renderer_Right());
-		jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(
-		jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()), model.get_Column_AutoHeight())); // set renderer
 
 		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_TIMESTAMP);	
    		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));

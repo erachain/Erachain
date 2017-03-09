@@ -96,9 +96,6 @@ import gui.models.Renderer_Boolean;
 			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			my_Person_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()),my_PersonsModel.get_Column_AutoHeight())); // set renderer
 					
 					
 			my_Sorter = new TableRowSorter(my_PersonsModel);
@@ -109,7 +106,7 @@ import gui.models.Renderer_Boolean;
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			confirmedColumn.setCellRenderer(new Renderer_Boolean());
+			
 			confirmedColumn.setMinWidth(50);
 			confirmedColumn.setMaxWidth(50);
 			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
@@ -118,7 +115,7 @@ import gui.models.Renderer_Boolean;
 			//CHECKBOX FOR FAVORITE
 			TableColumn favoriteColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
 			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			favoriteColumn.setCellRenderer(new Renderer_Boolean());
+			
 			favoriteColumn.setMinWidth(50);
 			favoriteColumn.setMaxWidth(50);
 			favoriteColumn.setPreferredWidth(50);//.setWidth(30);

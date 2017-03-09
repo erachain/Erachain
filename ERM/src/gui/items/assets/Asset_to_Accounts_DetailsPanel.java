@@ -231,12 +231,7 @@ this.setVisible(false);
         balancesTableModel.setAsset(asset);
   		final MTable  jTable1 = new MTable(balancesTableModel);
     
-  	//Custom renderer for the String column;
-  		jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-  		
+  	
   		
   
 	

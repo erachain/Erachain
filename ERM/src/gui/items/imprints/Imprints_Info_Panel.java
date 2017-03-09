@@ -5,6 +5,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import core.item.imprints.ImprintCls;
+import gui.library.MTable;
 import gui.models.BalancesTableModel;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
@@ -51,7 +52,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         owner_jTextField = new javax.swing.JTextField();
         holders_jLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        holders_jTable1 = new javax.swing.JTable();
+       
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 7, 0};
@@ -154,10 +155,8 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
                 
       //BALANCES
         BalancesTableModel table_model = new BalancesTableModel(imprint.getKey());
-        holders_jTable1.setModel(table_model);
-        holders_jTable1.setDefaultRenderer(String.class, new Renderer_Left(holders_jTable1.getFontMetrics(holders_jTable1.getFont()),table_model.get_Column_AutoHeight())); // set renderer
-        holders_jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-        //CHECKBOX FOR FAVORITE
+        holders_jTable1 = new MTable(table_model);
+             //CHECKBOX FOR FAVORITE
         		TableColumn to_Date_Column1 = holders_jTable1.getColumnModel().getColumn( BalancesTableModel.COLUMN_BALANCE);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
         		to_Date_Column1.setMinWidth(80);
@@ -190,7 +189,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
     private javax.swing.JLabel description_jLabel;
     private javax.swing.JTextArea description_jTextArea;
     private javax.swing.JLabel holders_jLabel;
-    private javax.swing.JTable holders_jTable1;
+    private MTable holders_jTable1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel key_jLabel;

@@ -12,23 +12,37 @@ import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import settings.Settings;
+import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
+import database.DBSet;
+import database.PeerMap.PeerInfo;
 import lang.Lang;
 import network.Peer;
 
 @SuppressWarnings("serial")
 public class KnownPeersTableModel extends AbstractTableModel implements Observer{
 
+//	private static final int COLUMN_ADDRESS = 0;
+//	public static final int COLUMN_CONNECTED = 1;
 	private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_CONNECTED = 1;
+	private static final int COLUMN_HEIGHT = 1;
+	private static final int COLUMN_PINGMC = 2;
+	private static final int COLUMN_REILABLE = 3;
+	private static final int COLUMN_INITIATOR = 4;
+	private static final int COLUMN_FINDING_AGO = 5;
+	private static final int COLUMN_ONLINE_TIME = 6;
+	private static final int COLUMN_VERSION = 7;
 	
 	private List<Peer> peers;
 	private ArrayList<Boolean> peersStatus = new ArrayList<Boolean>();
 	
-	private String[] columnNames = {"IP", Lang.getInstance().translate("Connected now")};
+//	private String[] columnNames = {"IP", Lang.getInstance().translate("Connected now")};
+//	String[] columnNames = new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"};
+	 String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
 	
 	static Logger LOGGER = Logger.getLogger(KnownPeersTableModel.class.getName());
 
@@ -110,7 +124,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 	@Override
 	public Object getValueAt(int row, int column)
 	{
-		if(peers == null)
+	/*	if(peers == null)
 		{
 			return null;
 		}
@@ -133,6 +147,73 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 		}
 		
 		return null;
+		*/
+		
+		if(peers == null || this.peers.size() -1 < row )
+		{
+			return null;
+		}
+		
+		Peer peer = peers.get(row);
+		
+		if(peer == null || DBSet.getInstance().isStoped())
+			return null;
+			
+		PeerInfo peerInfo = DBSet.getInstance().getPeerMap().getInfo(peer.getAddress());
+		if (peerInfo == null)
+			return null;
+		
+		switch(column)
+		{
+			case COLUMN_ADDRESS:
+				return peer.getAddress().getHostAddress();
+
+			case COLUMN_HEIGHT:
+				if(!peer.isUsed()) {
+					int banMinutes = DBSet.getInstance().getPeerMap().getBanMinutes(peer);
+					if (banMinutes > 0) {
+						return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+					} else {
+						return Lang.getInstance().translate("Broken");
+					}
+				}
+				Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
+				if(res == null) {
+					return Lang.getInstance().translate("Waiting...");
+				} else {
+					return res;
+				}
+			
+			case COLUMN_PINGMC:
+				if(!peer.isUsed()) {
+					return Lang.getInstance().translate("Broken");
+				} else if(peer.getPing() > 1000000) {
+					return Lang.getInstance().translate("Waiting...");
+				} else {
+					return peer.getPing();
+				}
+			
+			case COLUMN_REILABLE:
+				return peerInfo.getWhitePingCouner();
+			
+			case COLUMN_INITIATOR:
+				if(peer.isWhite()) {
+					return Lang.getInstance().translate("You");
+				} else {
+					return Lang.getInstance().translate("Remote");
+				}
+			
+			case COLUMN_FINDING_AGO:
+				return DateTimeFormat.timeAgo(peerInfo.getFindingTime());
+				
+			case COLUMN_ONLINE_TIME:
+				return DateTimeFormat.timeAgo(peer.getConnectionTime());
+
+			case COLUMN_VERSION:
+				return Controller.getInstance().getVersionOfPeer(peer).getA();
+		}
+		return null;
+		
 	}
 
 

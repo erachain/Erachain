@@ -40,10 +40,7 @@ public class Accounts_Library_Panel extends JPanel {
 		PersonAccountsModel person_Accounts_Model = new PersonAccountsModel(person.getKey());
 		jTable_Accounts = new MTable(person_Accounts_Model);
 
-		jTable_Accounts.setDefaultRenderer(String.class,
-				new Renderer_Left(jTable_Accounts.getFontMetrics(jTable_Accounts.getFont()),
-						person_Accounts_Model.get_Column_AutoHeight())); // set
-																			// renderer
+		
 		
 		TableColumn to_Date_Column = jTable_Accounts.getColumnModel().getColumn(PersonAccountsModel.COLUMN_TO_DATE);
 		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	

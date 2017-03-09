@@ -49,10 +49,7 @@ public class other_Panel extends javax.swing.JPanel {
     	 this.peersTableModel = new PeersTableModel();
          this.jTable_Peers = new MTable(this.peersTableModel);
          this.jTable_Peers.setAutoCreateRowSorter(true);	
-         this.jTable_Peers.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-    //     Renderer_Left ren = new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_Peers.setDefaultRenderer(String.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_Peers.setDefaultRenderer(Tuple2.class, new Renderer_Left(this.jTable_Peers.getFontMetrics(this.jTable_Peers.getFont()),peersTableModel.get_Column_AutoHeight())); // set renderer
+  
          this.jTable_Peers.setEnabled(false);
          
          
@@ -62,11 +59,7 @@ public class other_Panel extends javax.swing.JPanel {
     // all block table
          this.All_Blocks_TableModel = new BlocksTableModel(true);
 		this.jTable_All_Block = new MTable(this.All_Blocks_TableModel);
-		 this.jTable_All_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-         this.jTable_All_Block.setDefaultRenderer(String.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_All_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left(  this.jTable_All_Block.getFontMetrics(  this.jTable_All_Block.getFont()),All_Blocks_TableModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_All_Block.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-         this.jTable_All_Block.setEnabled(false);
+		   this.jTable_All_Block.setEnabled(false);
 		
 		
 		
@@ -89,11 +82,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(WalletBlocksTableModel.COLUMN_FEE, BlockMap.FEE_INDEX);
 		sorter = new CoreRowSorter(blocksModel, indexes);
 		jTable_My_Block.setRowSorter(sorter);
-		 this.jTable_My_Block.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		 this.jTable_My_Block.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-         this.jTable_My_Block.setDefaultRenderer(String.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()),blocksModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_My_Block.setDefaultRenderer(Tuple2.class, new Renderer_Left( this.jTable_My_Block.getFontMetrics( this.jTable_My_Block.getFont()),blocksModel.get_Column_AutoHeight())); // set renderer
-         this.jTable_My_Block.setEnabled(false);
+		   this.jTable_My_Block.setEnabled(false);
 		
 		
 	//	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);

@@ -126,7 +126,6 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 		
 		table_Model = new Table_Model_Issue_Hashes(0);
 		Table_Hash = new MTable(table_Model);
-		Table_Hash.setDefaultRenderer(String.class, new Renderer_Hashes());
 		this.jScrollPane_jPanel_RightPanel.setViewportView(Table_Hash);
 
 	}

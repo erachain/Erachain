@@ -329,7 +329,6 @@ public class Sign_Panel extends JPanel
     	table = new Send_TableModel();
     	
     	table.setTableHeader(null);
-    	table.setSelectionBackground(new Color(209, 232, 255, 255));
     	table.setEditingColumn(0);
     	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	JScrollPane scrollPane = new JScrollPane(table);

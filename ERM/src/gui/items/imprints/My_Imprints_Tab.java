@@ -50,7 +50,7 @@ public My_Imprints_Tab(){
 	tableImprints.setRowSorter(sorter);
 //CHECKBOX FOR CONFIRMED
 	TableColumn confirmedColumn = tableImprints.getColumnModel().getColumn(WalletItemImprintsTableModel.COLUMN_CONFIRMED);
-	confirmedColumn.setCellRenderer(new Renderer_Boolean()); 
+	
 	confirmedColumn.setMinWidth(50);
 	confirmedColumn.setMaxWidth(100);
 	confirmedColumn.setPreferredWidth(50);//.setWidth(30);
@@ -59,9 +59,6 @@ public My_Imprints_Tab(){
 	column1.setMinWidth(1);
 	column1.setMaxWidth(1000);
 	column1.setPreferredWidth(50);
-//Custom renderer for the String column;
-	tableImprints.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	tableImprints.setDefaultRenderer(String.class, new Renderer_Left(tableImprints.getFontMetrics(tableImprints.getFont()),imprintsModel.get_Column_AutoHeight())); // set renderer
 // set show			
 	jTable_jScrollPanel_LeftPanel.setModel(imprintsModel);
 	jTable_jScrollPanel_LeftPanel = tableImprints;

@@ -178,9 +178,6 @@ import utils.MenuPopupUtil;
 				
 				this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
 				
-				this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Object.class, new Renderer_Right()); // set renderer
-				//this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-				
 				
 				
 				

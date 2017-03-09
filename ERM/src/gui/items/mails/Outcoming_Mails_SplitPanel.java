@@ -97,11 +97,7 @@ import utils.TableMenuPopupUtil;
 			columnModel.getColumn(0).setMaxWidth((100));
 			columnModel.getColumn(1).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			inciming_Mail_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-			inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-		//	inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Left(inciming_Mail_Table.getFontMetrics(inciming_Mail_Table.getFont()),incoming_Mails_Model.get_Column_AutoHeight())); // set renderer
-					
+				
 					
 		//	my_Sorter = new TableRowSorter(incoming_Mails_Model);
 		//	inciming_Mail_Table.setRowSorter(my_Sorter);

@@ -64,7 +64,7 @@ public class SettingsKnownPeersPanel extends JPanel
         
         //CHECKBOX FOR CONNECTED
         TableColumn confirmedColumn = knownPeersTable.getColumnModel().getColumn(1);
-        confirmedColumn.setCellRenderer(knownPeersTable.getDefaultRenderer(Boolean.class));
+   //     confirmedColumn.setCellRenderer(knownPeersTable.getDefaultRenderer(Boolean.class));
         
         JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
         GridBagConstraints gbc_lblAddNewAddress = new GridBagConstraints();

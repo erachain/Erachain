@@ -277,7 +277,7 @@ this.setVisible(false);
   		MTable  jTable1 = new MTable(balancesTableModel);
   		
          
-  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
+  	
   		
   		
   		

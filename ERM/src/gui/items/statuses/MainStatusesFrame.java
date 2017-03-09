@@ -116,10 +116,6 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		statusesTable = new MTable(this.tableModelItemStatuses);
 		TableColumnModel columnModel = statusesTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
-		//Custom renderer for the String column;
-		statusesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		statusesTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-		statusesTable.setDefaultRenderer(String.class, new Renderer_Left(statusesTable.getFontMetrics(statusesTable.getFont()),tableModelItemStatuses.get_Column_AutoHeight())); // set renderer
 		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = statusesTable.getColumnModel().getColumn(TableModelItemStatuses.COLUMN_FAVORITE);
 			
@@ -539,11 +535,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			columnModel = table.getColumnModel(); // read column model
 				columnModel.getColumn(0).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()),statusesModel.get_Column_AutoHeight())); // set renderer
-			table.setDefaultRenderer(Boolean.class, new Renderer_Boolean());
-			
+				
 			TableRowSorter sorter1 = new TableRowSorter(statusesModel);
 			table.setRowSorter(sorter1);
 			table.getRowSorter();
@@ -567,7 +559,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			//CHECKBOX FOR FAVORITE
 			favoriteColumn = table.getColumnModel().getColumn(WalletItemStatusesTableModel.COLUMN_FAVORITE);
 			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			favoriteColumn.setCellRenderer(new Renderer_Boolean()); //statusesTable.getDefaultRenderer(Boolean.class));
+			
 			favoriteColumn.setMinWidth(50);
 			favoriteColumn.setMaxWidth(90);
 			favoriteColumn.setPreferredWidth(90);//.setWidth(30);

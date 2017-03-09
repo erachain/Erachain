@@ -88,11 +88,7 @@ public class My_Assets_Tab extends Split_Panel {
 //	TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);
 //	favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 	
-	//Custom renderer for the String column;
-	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()),assetsModel.get_Column_AutoHeight())); // set renderer
-	table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-
+	
 // column #1
 	TableColumn column1 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
 	column1.setMinWidth(1);
