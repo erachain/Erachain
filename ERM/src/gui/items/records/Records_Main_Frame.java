@@ -48,7 +48,7 @@ public class Records_Main_Frame extends Main_Internal_Frame{
 		this.setTitle(Lang.getInstance().translate("Records"));
 		this.jToolBar.setVisible(false);
 	
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Records"));
+		//this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Records"));
 	
 		///////////////////////
 		// search pecords

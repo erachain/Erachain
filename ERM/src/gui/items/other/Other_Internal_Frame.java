@@ -60,11 +60,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
         jTabbedPane.setVisible(false);
         
         this.jToolBar.setVisible(false);
-		
-		//int yy = Integer.MAX_VALUE;
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
-				+ ", " + Lang.getInstance().translate("target") + ": " + Controller.getInstance().getBlockChain().getTarget(DBSet.getInstance()));
-		
+				
  // отключаем все что ниже  		
 		
 	/*	// My block

@@ -94,7 +94,7 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 		this.setTitle(Lang.getInstance().translate("Statements"));
 		this.jToolBar.setVisible(false);
 	
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Statements"));
+		//this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Statements"));
 		///////////////////////
 		// ALL StatementS
 		///////////////////////

@@ -23,7 +23,7 @@ public MainImprintsFrame(){
 // buttun1
 	this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Imprint"));
 // status panel
-	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with imprints"));
+//	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with imprints"));
 	this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

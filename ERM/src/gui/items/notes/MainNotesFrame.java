@@ -52,7 +52,7 @@ public MainNotesFrame(){
 
 
 // status panel
-	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Templates"));
+	//this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Templates"));
 	this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

@@ -71,7 +71,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 		this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Status"));
 		this.jButton1_jToolBar.setVisible(false);
 		// status panel
-		this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with statuses"));
+		//this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with statuses"));
 	 
 		this.jButton1_jToolBar.addActionListener(new ActionListener()
 		{

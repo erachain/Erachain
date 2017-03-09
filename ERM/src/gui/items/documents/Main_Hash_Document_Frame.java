@@ -25,7 +25,6 @@ public Main_Hash_Document_Frame(){
 // buttun1
 //	this.jButton1_jToolBar.setText(Lang.getInstance().translate("Issue Imprint"));
 // status panel
-	this.jLabel_status_jPanel.setText(Lang.getInstance().translate("Work with Documents"));
 	this.jToolBar.setVisible(false);
 	
 	Write_Documents_Hashes_Panel write_Documents_Hashes_Panel = new Write_Documents_Hashes_Panel();
