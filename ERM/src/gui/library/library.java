@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.swing.JDialog;
@@ -19,6 +20,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import org.mapdb.Fun.Tuple2;
 
 import de.muntjak.tinylookandfeel.Theme;
 import de.muntjak.tinylookandfeel.ThemeDescription;
@@ -76,6 +79,7 @@ public class library {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void Set_GUI_Look_And_Feel(String text) {
 		String name_font = "Courier";
 		int size_font;
@@ -183,9 +187,9 @@ public class library {
 	      UIManager.put("MenuItem.font", font);
 	      UIManager.put("Frame.titleFont", font);
 	      UIManager.put("InternalFrame.font",font);
-	      UIManager.put( "InternalFrame.titleFont",font);
+	      UIManager.put("InternalFrame.titleFont",font);
 	     
-	      UIManager.put( "TextPane.font", font ); 
+	      UIManager.put("TextPane.font", font ); 
 	   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
 	    //  UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
 	    //  UIManager.put("Table.height", size_font*5);
@@ -242,14 +246,16 @@ public class library {
 		 UIManager.put("ToolTip.font",font);
 		 UIManager.put("Tree.font",font);
 	      
+		 UIManager.put("TitledBorder.font",font);
+				 UIManager.put("Panel.font",font);
+		 
 	      
 	      
+		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
+		 
+		 ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String, Object>>();
 	      
-	      
-	      
-	      
-	      
-	      
+		  
 	      
 	      
 	      
@@ -264,7 +270,9 @@ public class library {
 	        int scrolH = (int)(size_font*1.2);
 	        if (scrolH < 17) scrolH=17;
 	        
-	        
+	        UIManager.put("InternalFrame.titlePaneHeight",scrolH);
+	        UIManager.put("InternalFrame.titleButtonHeight",scrolH);
+	        UIManager.put("InternalFrame.titleButtonWidth",scrolH);
 	     
 	        
 	        
@@ -273,6 +281,21 @@ public class library {
 	        Theme.internalPaletteTitleFont.setFont(font);
 	        Theme.toolTipFont.setFont(font);
 	 
+	        java.util.Enumeration keys = UIManager.getDefaults().keys();
+			 
+		    while(keys.hasMoreElements())
+		    {
+		       
+		    	
+		    	String key = keys.nextElement().toString();
+		    	if (key.contains("Title")){
+		        Object value = UIManager.get(key);
+		        ss.add(new Tuple2<String, Object>(key,value));
+		//        if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);
+		    	}
+		    }
+	      
+	    font = font;
 	       
 	        
 		

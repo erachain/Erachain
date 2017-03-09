@@ -76,7 +76,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 6);
         getContentPane().add(jToolBar, gridBagConstraints);
 
-        jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
+  //      jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
