@@ -34,12 +34,13 @@ public class DebugTabPane extends JTabbedPane{
 	private Debug_Transactions_Table_Model transactionsTableModel;
 	private BlocksTableModel blocksTableModel;
 	private LoggerTextArea loggerTextArea;
-	private JTable transactionsTable;
+	private MTable transactionsTable;
 	
 	
 	public DebugTabPane()
 	{
 		super();
+		
 		
 		//ADD TABS
         if(Settings.getInstance().isGuiConsoleEnabled())

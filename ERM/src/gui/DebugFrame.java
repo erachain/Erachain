@@ -7,19 +7,21 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class DebugFrame extends JFrame{
+public class DebugFrame extends JDialog{
 
 	private DebugTabPane debugTabPane;
 	
 	public DebugFrame() 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Debug"));
+		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Debug"));
+		setModal(true);
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -52,7 +54,7 @@ public class DebugFrame extends JFrame{
         //PACK
 		this.pack();
 		this.setSize(800, this.getHeight());
-		this.setResizable(true);
+		setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		
