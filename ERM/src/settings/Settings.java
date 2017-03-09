@@ -49,7 +49,7 @@ public class Settings {
 	private static final Integer DEFAULT_FONT_SIZE = 11;
 	private static final String DEFAULT_FONT_NAME = "Arial";
 	//private static final String[] DEFAULT_PEERS = { };
-	
+	public static final String DEFAULT_THEME="System";
 	// BLOCK
 	//public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
 
@@ -861,12 +861,20 @@ public class Settings {
 		}
 		
 		return DEFAULT_FONT_NAME;
-		
-		
-		
-		
-		
 	}
+		
+	public String get_Theme(){
+		
+		if(this.settingsJSON.containsKey("theme"))
+		{
+			return ((String) this.settingsJSON.get("theme").toString());
+		}
+		
+		return DEFAULT_THEME;
+	}
+		
+		
+	
 	
 	
 }
