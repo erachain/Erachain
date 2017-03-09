@@ -167,7 +167,7 @@ public class RecoverWalletFrame extends JFrame
 		        onConfirmClick();
 		    }
 		});	
-        confirmButton.setPreferredSize(new Dimension(110, 25));
+   //     confirmButton.setPreferredSize(new Dimension(110, 25));
     	this.add(confirmButton, buttonGBC);
     	
     	//BUTTON BACK
@@ -180,7 +180,7 @@ public class RecoverWalletFrame extends JFrame
 		        onBackClick();
 		    }
 		});
-        backButton.setPreferredSize(new Dimension(110, 25));
+   //     backButton.setPreferredSize(new Dimension(110, 25));
     	this.add(backButton, buttonGBC);
     	
     	//CLOSE NICELY
@@ -195,7 +195,7 @@ public class RecoverWalletFrame extends JFrame
         
       	//CALCULATE HEIGHT WIDTH
       	this.pack();
-      	this.setSize(500, this.getHeight());
+    //  	this.setSize(500, this.getHeight());
       	
       	this.setResizable(false);
 		this.setLocationRelativeTo(null);

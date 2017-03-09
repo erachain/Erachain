@@ -359,7 +359,7 @@ public class Send_Panel extends JPanel
 		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
-		txtAmount.setPreferredSize(new Dimension(130,22));
+	//	txtAmount.setPreferredSize(new Dimension(130,22));
 		this.add(txtAmount, txtAmountGBC);
 		
        
@@ -387,7 +387,7 @@ public class Send_Panel extends JPanel
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
-		txtFeePow.setPreferredSize(new Dimension(130,22));
+//		txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
@@ -411,7 +411,7 @@ public class Send_Panel extends JPanel
 		buttonGBC.gridy = y;
         
 		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
+   //     sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -447,7 +447,7 @@ public class Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+  //      add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()

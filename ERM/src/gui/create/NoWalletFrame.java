@@ -93,6 +93,7 @@ public class NoWalletFrame extends JFrame {
         
       	//ADD OPTIONS
       	this.createButton = new JRadioButton(Lang.getInstance().translate("Create a new wallet."));
+      	this.createButton.setSelected(true);
       	this.add(this.createButton, optionsGBC);
       		
       	optionsGBC.gridy = 3;
@@ -113,7 +114,7 @@ public class NoWalletFrame extends JFrame {
 		        onNextClick();
 		    }
 		});	
-        nextButton.setPreferredSize(new Dimension(80, 25));
+ //       nextButton.setPreferredSize(new Dimension(80, 25));
     	this.add(nextButton, buttonGBC);
     	
     	//BUTTON CANCEL
@@ -127,7 +128,7 @@ public class NoWalletFrame extends JFrame {
 		        onCancelClick();
 		    }
 		});
-        cancelButton.setPreferredSize(new Dimension(80, 25));
+ //       cancelButton.setPreferredSize(new Dimension(80, 25));
     	this.add(cancelButton, buttonGBC);
         
     	//CLOSE NICELY
@@ -142,7 +143,7 @@ public class NoWalletFrame extends JFrame {
     	
         //CALCULATE HEIGHT WIDTH
       	this.pack();
-      	this.setSize(500, this.getHeight());
+  //    	this.setSize(500, this.getHeight());
       	
       	this.setResizable(false);
 		this.setLocationRelativeTo(null);

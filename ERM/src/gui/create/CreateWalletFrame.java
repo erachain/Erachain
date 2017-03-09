@@ -141,7 +141,7 @@ public class CreateWalletFrame extends JFrame {
 		});	
         
         
-        nextButton.setPreferredSize(new Dimension(80, 25));
+   //     nextButton.setPreferredSize(new Dimension(80, 25));
     	this.add(nextButton, buttonGBC);
     	
     	//BUTTON BACK
@@ -154,7 +154,7 @@ public class CreateWalletFrame extends JFrame {
 		        onBackClick();
 		    }
 		});
-        backButton.setPreferredSize(new Dimension(80, 25));
+ //       backButton.setPreferredSize(new Dimension(80, 25));
     	this.add(backButton, buttonGBC);
     	
     	//CLOSE NICELY
@@ -169,7 +169,7 @@ public class CreateWalletFrame extends JFrame {
         
       	//CALCULATE HEIGHT WIDTH
       	this.pack();
-      	this.setSize(500, this.getHeight());
+  //    	this.setSize(500, this.getHeight());
       	
       	this.setResizable(false);
 		this.setLocationRelativeTo(null);

@@ -275,8 +275,9 @@ public class library {
 	        UIManager.put("InternalFrame.titleButtonWidth",scrolH);
 	     
 	        
-	        
+	        Theme.frameTitleFont.setFont(font);
 	        Theme.scrollSize.setValue(scrolH);
+	        
 	     	
 	        Theme.internalPaletteTitleFont.setFont(font);
 	        Theme.toolTipFont.setFont(font);
@@ -288,7 +289,7 @@ public class library {
 		       
 		    	
 		    	String key = keys.nextElement().toString();
-		    	if (key.contains("Title")){
+		    	if (key.contains("Radio")){
 		        Object value = UIManager.get(key);
 		        ss.add(new Tuple2<String, Object>(key,value));
 		//        if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);

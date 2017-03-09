@@ -152,28 +152,30 @@ public class License_JFrame extends JDialog {
 				}
 			}
         });
-        
+    /*    
        
       jTextArea1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	if (!needAccept)
+            	if (!needAccept){
             	
             	setVisible(false);
                 dispose();
+            	}
             }
         });
         
       jTextArea1.addKeyListener(new KeyAdapter() {
 		    public void keyPressed(KeyEvent e) {
-		    	if (!needAccept)
+		    	if (!needAccept){
             	
 		    	setVisible(false);
                 dispose();
+		    	}
 		    }
 		});
         
-        
+     */  
         
         
         
@@ -249,7 +251,8 @@ public class License_JFrame extends JDialog {
         
    //     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
   //      if(!needAccept)
-        	this.setUndecorated(true);
+    	this.setUndecorated(false);
+        if (needAccept)	this.setUndecorated(true);
         
         pack();
         this.setLocationRelativeTo(null);

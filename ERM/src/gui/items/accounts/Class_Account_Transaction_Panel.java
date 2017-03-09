@@ -96,8 +96,8 @@ public class Class_Account_Transaction_Panel extends JPanel
 		
 		y =0;
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+	//	gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
+		gridBagLayout.columnWeights = new double[]{0.0, 0.1, 0.1, 0.1, 0.1};
 		this.setLayout(gridBagLayout);
 		
 		//PADDING
@@ -108,7 +108,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 		iconlabelGBC.fill = GridBagConstraints.BOTH;//.HORIZONTAL;   
 		iconlabelGBC.anchor = GridBagConstraints.NORTHWEST;
 		iconlabelGBC.weightx = 1;	
-		iconlabelGBC.weighty = 0.1;
+	//	iconlabelGBC.weighty = 0.1;
 		iconlabelGBC.gridx = 0;
 		iconlabelGBC.gridy = y;
 		iconlabelGBC.gridwidth = 1;
@@ -126,7 +126,7 @@ public class Class_Account_Transaction_Panel extends JPanel
 				titlelabelGBC.fill = GridBagConstraints.BOTH;//.HORIZONTAL;   
 				titlelabelGBC.anchor = GridBagConstraints.NORTHWEST;
 				titlelabelGBC.weightx = 0;	
-				titlelabelGBC.weighty = 0.1;
+				titlelabelGBC.weighty = 0.3;
 				titlelabelGBC.gridx = 1;
 				titlelabelGBC.gridy = y;
 				titlelabelGBC.gridwidth = 4;
@@ -146,7 +146,7 @@ jTextArea_Title.setBackground(this.getBackground());
 jTextArea_Title.setFocusCycleRoot(true);
 				
 jTextArea_Title.setText(Lang.getInstance().translate("Title"));
-jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+//jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
 				
 				this.add(jTextArea_Title, titlelabelGBC);
@@ -396,14 +396,14 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
-		txtAmount.setPreferredSize(new Dimension(130,22));
+	//	txtAmount.setPreferredSize(new Dimension(130,22));
 		this.add(txtAmount, txtAmountGBC);
 		
       
 		
     	//LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();
-		feelabelGBC.anchor = GridBagConstraints.EAST;
+		feelabelGBC.anchor = GridBagConstraints.NORTHWEST;
 		feelabelGBC.gridy = y;
 		feelabelGBC.insets = new Insets(5,5,5,5);
 		feelabelGBC.fill = GridBagConstraints.BOTH;
@@ -424,7 +424,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
-		txtFeePow.setPreferredSize(new Dimension(130,22));
+	//	txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
 		  //BUTTON SEND
@@ -432,11 +432,11 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		buttonGBC.insets = new Insets(5,5,5,5);
 		buttonGBC.fill = GridBagConstraints.BOTH;  
 		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx = 0;
+		buttonGBC.gridx = 3;
 		buttonGBC.gridy = ++y;
         
 		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
+   //     sendButton.setPreferredSize(new Dimension(80, 25));
     	
 		this.add(sendButton, buttonGBC);
 
@@ -447,7 +447,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		MenuPopupUtil.installContextMenu(txtAmount);
 		MenuPopupUtil.installContextMenu(txtMessage);
 		MenuPopupUtil.installContextMenu(txtRecDetails);
-		
+/*		
 		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
@@ -456,7 +456,7 @@ jTextArea_Title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		
- 
+ */
         /*
         this.pack();
 		this.setLocationRelativeTo(null);
