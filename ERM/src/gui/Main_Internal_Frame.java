@@ -92,16 +92,18 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
 
         //jLabel_status_jPanel.setText("jLabel1");
 
+        /*
         javax.swing.GroupLayout status_jPanelLayout = new javax.swing.GroupLayout(status_jPanel);
         status_jPanel.setLayout(status_jPanelLayout);
         status_jPanelLayout.setHorizontalGroup(
             status_jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            //.addComponent(jLabel_status_jPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+            .addComponent(jLabel_status_jPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
         status_jPanelLayout.setVerticalGroup(
             status_jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            //.addComponent(jLabel_status_jPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+            .addComponent(jLabel_status_jPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
         );
+        */
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

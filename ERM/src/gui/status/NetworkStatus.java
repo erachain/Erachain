@@ -42,14 +42,15 @@ public class NetworkStatus extends JLabel implements Observer
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent mEvt) {
 				String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
-				+ ", " + Lang.getInstance().translate("target") + ": " + Controller.getInstance().getBlockChain().getTarget(DBSet.getInstance());
+				+ ", " + Lang.getInstance().translate("target")
+				+ ": " + Controller.getInstance().getBlockChain().getTarget(DBSet.getInstance()) + ", ";
 
 				if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-					mess += " " + Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a;
+					mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a;
 				} else if( Controller.getInstance().getWalletSyncHeight() > 0 ) {
-					mess += " " + Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight();
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight();
 				} else {
-					mess += " " + Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight().a;
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight().a;
 				}
 				setToolTipText(mess);
 		}});
