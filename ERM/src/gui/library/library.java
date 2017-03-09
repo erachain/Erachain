@@ -33,34 +33,38 @@ import gui.MainFrame;
 import settings.Settings;
 
 public class library {
-	
-	
-	// РїРѕРґРїСЂРѕРіСЂР°РјРјР° РІС‹РІРѕРґРёС‚ РІ РїР°РЅРµР»Рё РѕРєРЅРѕ РёР»Рё РїРµСЂРµРґР°РµС‚ С„РѕРєСѓСЃ РµСЃР»Рё РѕРєРЅРѕ СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ
+
+	// РїРѕРґРїСЂРѕРіСЂР°РјРјР° РІС‹РІРѕРґРёС‚ РІ РїР°РЅРµР»Рё РѕРєРЅРѕ РёР»Рё
+	// РїРµСЂРµРґР°РµС‚ С„РѕРєСѓСЃ РµСЃР»Рё РѕРєРЅРѕ СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ
 	// item РѕС‚РєСЂС‹РІР°РµРјРѕРµ РѕРєРЅРѕ
 	// РјР°СЃСЃРёРІ РІСЃРµС… РѕС‚РєСЂС‹С‚С‹С… РѕРєРѕРЅ РІ РїР°РЅРµР»Рё
-	public static void selectOrAdd(JInternalFrame item, JInternalFrame[] openedFrames ){
-		    		
-		//РїСЂРѕРІРµСЂРєР° РµСЃР»Рё СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ С‚Р°РєРѕРµ РѕРєРЅРѕ С‚Рѕ РїРµСЂРµРґР°РµРј С‚РѕР»СЊРєРѕ С„РѕРєСѓСЃ РЅР° РЅРµРіРѕ
+	public static void selectOrAdd(JInternalFrame item, JInternalFrame[] openedFrames) {
+
+		// РїСЂРѕРІРµСЂРєР° РµСЃР»Рё СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ С‚Р°РєРѕРµ РѕРєРЅРѕ
+		// С‚Рѕ РїРµСЂРµРґР°РµРј С‚РѕР»СЊРєРѕ С„РѕРєСѓСЃ РЅР° РЅРµРіРѕ
 		String itemName = item.getName();
-		if (itemName == null) itemName  = item.getClass().getName();
-		
-		int k= -1;
-		if (openedFrames != null) 
-		{
-			for (int i=0 ; i < openedFrames.length; i=i+1) {
+		if (itemName == null)
+			itemName = item.getClass().getName();
+
+		int k = -1;
+		if (openedFrames != null) {
+			for (int i = 0; i < openedFrames.length; i = i + 1) {
 				String name = openedFrames[i].getName();
-				if (name == null) name  = openedFrames[i].getClass().getName();
-				if (name == itemName){
-					k=i;
+				if (name == null)
+					name = openedFrames[i].getClass().getName();
+				if (name == itemName) {
+					k = i;
 				}
-			};
+			}
+			;
 		}
-			
-		if (k==-1){
+
+		if (k == -1) {
 			MainFrame.desktopPane.add(item);
 			try {
-				 item.setSelected(true);
-		        } catch (java.beans.PropertyVetoException e1) {}
+				item.setSelected(true);
+			} catch (java.beans.PropertyVetoException e1) {
+			}
 		} else {
 			try {
 				openedFrames[k].setSelected(true);
@@ -68,10 +72,9 @@ public class library {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}	
-	
+		}
+
 	}
-	
 
 	public static void Set_GUI_Look_And_Feel(String text) {
 		String name_font = "Courier";
@@ -184,12 +187,71 @@ public class library {
 	     
 	      UIManager.put( "TextPane.font", font ); 
 	   //   UIManager.put( "ScrollBar.minimumThumbSize", new Dimension(20,30) );
-	      UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
-	      UIManager.put("Table.height", size_font*5);
+	    //  UIManager.put("ScrollBar.minimumThumbSize", new Dimension(25,25));
+	    //  UIManager.put("Table.height", size_font*5);
 	      UIManager.put("TextArea.font", font);
 	      
 	      UIManager.put("InternalFrame.paletteTitleFont", font);
 	      UIManager.put("InternalFrame.normalTitleFont", font);
+	      
+	      UIManager.put("FileChooser.font",font);
+	      
+	      
+	     
+	  
+	      UIManager.put("CheckBoxMenuItem.acceleratorFont",font);
+	      UIManager.put("CheckBoxMenuItem.font",font);
+	      UIManager.put("ColorChooser.font",font);
+	  
+	      UIManager.put("EditorPane.font",font);
+	      UIManager.put("FormattedTextField.font",font);
+	      UIManager.put("IconButton.font",font);
+	      UIManager.put("InternalFrame.optionDialogTitleFont",font);
+	   UIManager.put("InternalFrame.paletteTitleFont",font);
+	   UIManager.put("InternalFrame.titleFont",font);
+	UIManager.put("Label.font",font);
+	 UIManager.put("List.font",font);
+			 UIManager.put("Menu.acceleratorFont",font);
+			 UIManager.put("Menu.font",font);
+			 UIManager.put("MenuBar.font",font);
+			 UIManager.put("MenuItem.acceleratorFont",font);
+			UIManager.put("MenuItem.font",font);
+			UIManager.put("OptionPane.buttonFont",font);
+			UIManager.put("OptionPane.font",font);
+			 UIManager.put("OptionPane.messageFont",font);
+			UIManager.put("Panel.font",font);
+			 UIManager.put("PasswordField.font",font);
+		UIManager.put("PopupMenu.font",font);
+		UIManager.put("ProgressBar.font",font);
+		UIManager.put("RadioButton.font",font);
+		UIManager.put("RadioButtonMenuItem.acceleratorFont",font);
+		 UIManager.put("RadioButtonMenuItem.font",font);
+		 UIManager.put("ScrollPane.fon",font);
+		UIManager.put("Slider.font",font);
+		UIManager.put("Spinner.font",font);
+		UIManager.put("TabbedPane.font",font);
+		UIManager.put("TabbedPane.smallFont",font);
+		 UIManager.put("Table.font",font);
+		 UIManager.put("TableHeader.font",font);
+		 UIManager.put("TextArea.font",font);
+		UIManager.put("TextField.font",font);
+		UIManager.put("TextPane.font",font);
+		 UIManager.put("TitledBorder.font",font);
+		 UIManager.put("ToggleButton.font",font);
+		UIManager.put("ToolBar.font",font);
+		 UIManager.put("ToolTip.font",font);
+		 UIManager.put("Tree.font",font);
+	      
+	      
+	      
+	      
+	      
+	      
+	      
+	      
+	      
+	      
+	      
 	      
 	      
 	 //       UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
@@ -217,33 +279,25 @@ public class library {
 	}
 
 	/*
-	 public static void setupSubstance() {
-	        try {
-	            final String fileName = System.getProperty("user.home") + System.getProperty("file.separator") + "insubstantial.txt";
-	            final Properties properties = new Properties();
-	           LookAndFeel laf = new SubstanceGeminiLookAndFeel();
-	            UIManager.setLookAndFeel(laf);
-	            UIManager.put(SubstanceGeminiLookAndFeel.SHOW_EXTRA_WIDGETS, Boolean.TRUE);
-	            JFrame.setDefaultLookAndFeelDecorated(true);
-	            JDialog.setDefaultLookAndFeelDecorated(true);
-	            Runtime.getRuntime().addShutdownHook(new Thread() {
-	                @Override public void run() {
-	                    try {
-	                        String skinClassName = SubstanceLookAndFeel.getCurrentSkin().getClass().getCanonicalName();
-	                        properties.setProperty("skinClassName", skinClassName);
-	                        properties.store(new FileOutputStream(fileName), fileName);
-	                    } catch (Throwable t) {
-	                        t.printStackTrace();
-	                    }
-	                }
-	            });
-	            properties.load(new FileInputStream(fileName));
-	            String skinClassName = properties.getProperty("skinClassName");
-	            ((SubstanceLookAndFeel) laf).setSkin(skinClassName);
-	        } catch (Throwable t) {
-	            t.printStackTrace();
-	        }
-	    }
-	    */
+	 * public static void setupSubstance() { try { final String fileName =
+	 * System.getProperty("user.home") + System.getProperty("file.separator") +
+	 * "insubstantial.txt"; final Properties properties = new Properties();
+	 * LookAndFeel laf = new SubstanceGeminiLookAndFeel();
+	 * UIManager.setLookAndFeel(laf);
+	 * UIManager.put(SubstanceGeminiLookAndFeel.SHOW_EXTRA_WIDGETS,
+	 * Boolean.TRUE); JFrame.setDefaultLookAndFeelDecorated(true);
+	 * JDialog.setDefaultLookAndFeelDecorated(true);
+	 * Runtime.getRuntime().addShutdownHook(new Thread() {
+	 * 
+	 * @Override public void run() { try { String skinClassName =
+	 * SubstanceLookAndFeel.getCurrentSkin().getClass().getCanonicalName();
+	 * properties.setProperty("skinClassName", skinClassName);
+	 * properties.store(new FileOutputStream(fileName), fileName); } catch
+	 * (Throwable t) { t.printStackTrace(); } } }); properties.load(new
+	 * FileInputStream(fileName)); String skinClassName =
+	 * properties.getProperty("skinClassName"); ((SubstanceLookAndFeel)
+	 * laf).setSkin(skinClassName); } catch (Throwable t) { t.printStackTrace();
+	 * } }
+	 */
 
 }
