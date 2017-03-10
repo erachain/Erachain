@@ -1,5 +1,6 @@
 package core.account;
 
+import java.util.Arrays;
 import java.util.TreeSet;
 
 import org.mapdb.Fun.Tuple3;
@@ -48,6 +49,21 @@ public class PublicKeyAccount extends Account {
 	public byte[] getPublicKey()
 	{
 		return publicKey;
+	}
+
+	//EQUALS
+	@Override
+	public boolean equals(Object b)
+	{
+		if (b instanceof PublicKeyAccount) {
+			return Arrays.equals(publicKey, ((PublicKeyAccount) b).getPublicKey());
+		} else if (b instanceof Account) {
+			return this.getAddress().equals(((Account) b).getAddress());
+		} else if (b instanceof String) {
+			return this.getAddress().equals((String) b);			
+		}
+		
+		return false;	
 	}
 
 	public String getBase58()

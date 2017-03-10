@@ -139,9 +139,6 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		detailGBC.gridy = componentLevel;
 		M_Accoutn_Text_Field creator = new M_Accoutn_Text_Field(record.getCreator());
 		
-		
-		
-		
 		creator.setEditable(false);
 		
 		this.add(creator, detailGBC);

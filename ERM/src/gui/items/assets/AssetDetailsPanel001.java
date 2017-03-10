@@ -14,6 +14,7 @@ import javax.swing.table.TableColumnModel;
 import com.github.rjeschke.txtmark.Processor;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
 import core.transaction.Issue_ItemRecord;
@@ -193,7 +194,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel2.add(jLabel4, gridBagConstraints);
 
-        Account owner = asset.getOwner();
+        PublicKeyAccount owner = asset.getOwner();
         jTextField3 = new M_Accoutn_Text_Field(owner);
         jTextField3.setText(GenesisBlock.CREATOR.equals(owner)?"GENESIS":owner.getPersonAsString());
 

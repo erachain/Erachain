@@ -21,6 +21,7 @@ import lang.Lang;
 
 public class M_Accoutn_Text_Field  extends JTextField{
 	public Account account;
+	public PublicKeyAccount publicKeyAccount;
 		
 	public M_Accoutn_Text_Field() {
 		super();
@@ -31,6 +32,11 @@ public class M_Accoutn_Text_Field  extends JTextField{
 		super();
 		this.account = account;
 		set_account(account);	
+	}
+
+	public M_Accoutn_Text_Field(PublicKeyAccount publicKeyAccount){
+		this((Account)publicKeyAccount);
+		this.publicKeyAccount = publicKeyAccount;
 	}
 	
 	public void set_account(Account account){
@@ -62,8 +68,13 @@ public class M_Accoutn_Text_Field  extends JTextField{
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				// StringSelection value = new
 				// StringSelection(person.getCreator().getAddress().toString());
-				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getAddress());
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+				PublicKeyAccount public_Account;
+				if (publicKeyAccount==null) {
+					byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getAddress());
+					public_Account = new PublicKeyAccount(publick_Key);
+				} else {
+					public_Account = publicKeyAccount;
+				}
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
 			}
