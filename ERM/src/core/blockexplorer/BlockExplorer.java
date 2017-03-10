@@ -1820,6 +1820,8 @@ if ( asset_1 == null) {
 			blockJSON.put("key", person.getKey());
 			blockJSON.put("name", person.getName());
 			blockJSON.put("creator",person.getOwner().getAddress());
+			String img = Base64.encodeBase64String(person.getImage());
+			blockJSON.put("img",img);
 			
 	
 		/*	
