@@ -52,7 +52,6 @@ import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
-import gui.items.persons.Person_info_panel_001;
 
 import gui.items.unions.TableModelUnions;
 import gui.library.MTable;

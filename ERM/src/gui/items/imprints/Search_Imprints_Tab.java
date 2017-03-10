@@ -27,7 +27,6 @@ import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.items.persons.Person_info_panel_001;
 import gui.items.unions.TableModelUnions;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;

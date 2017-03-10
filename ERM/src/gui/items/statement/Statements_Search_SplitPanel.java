@@ -59,7 +59,6 @@ import gui.MainFrame;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.persons.PersonConfirmDialog;
 import gui.items.persons.PersonSetStatusDialog;
-import gui.items.persons.Person_info_panel_001;
 import gui.items.persons.TableModelPersons;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;

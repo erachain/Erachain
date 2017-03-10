@@ -10,6 +10,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.util.TimeZone;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -263,11 +264,17 @@ private void init(){
  			txtName.setText(person.getName());
  			iconLabel.setIcon(new ImageIcon(person.getImage()));
 
+
+ 	        // SET ONE TIME ZONE for Birthday 
+ 			TimeZone tz  = TimeZone.getDefault();
+ 			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
  			txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			long dayTimestamp = person.getDeathday();
  			if ( dayTimestamp > person.getBirthday()) {
  				txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
  			}
+ 			TimeZone.setDefault(tz);
  
  			txtareaDescription.setText(person.getDescription()==null?"":person.getDescription());
 

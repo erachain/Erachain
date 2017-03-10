@@ -35,7 +35,7 @@ import database.HashesSignsMap;
 import database.SortableList;
 import gui.Split_Panel;
 import gui.items.imprints.TableModelImprints;
-import gui.items.persons.Person_info_panel_001;
+import gui.items.persons.Person_Info_002;
 import gui.library.My_JFileChooser;
 import lang.Lang;
 
@@ -58,19 +58,15 @@ public class Search_Document_Hash extends Split_Panel {
 				public void valueChanged(ListSelectionEvent arg0) {
 					// TODO Auto-generated method stub
 					
-					
-					
-					
 					PersonCls person = null;
-					if (Table_Hash.getSelectedRow() >= 0 ) person =  model_Hashs.getCreatorAdress(Table_Hash.convertRowIndexToModel(Table_Hash.getSelectedRow()));
-				//	if (person != null) {
-						
-						Person_info_panel_001 info_panel = new Person_info_panel_001(person , false);
-						info_panel.key_jLabel.setText(Lang.getInstance().translate("Information about the Signer"));
+					if (Table_Hash.getSelectedRow() >= 0 ) 
+						person =  model_Hashs.getCreatorAdress(Table_Hash.convertRowIndexToModel(Table_Hash.getSelectedRow()));
+					if (person != null) {
+						Person_Info_002 info_panel = new Person_Info_002(person, false);
+						//info_panel..key_jLabel.setText(Lang.getInstance().translate("Information about the Signer"));
 						info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 						jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-					
-				//	}
+					}
 				
 				}
 				

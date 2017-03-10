@@ -536,8 +536,6 @@ public class IssuePersonPanel extends JPanel
 		});
         
         
-        
-        
         // SET ONE TIME ZONE for Birthday 
 		TimeZone tz  = TimeZone.getDefault();
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

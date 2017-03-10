@@ -55,7 +55,6 @@ import gui.MainFrame;
 	import gui.Split_Panel;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
-import gui.items.persons.Person_info_panel_001;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;

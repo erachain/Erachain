@@ -1,7 +1,6 @@
 package gui.items.mails;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.Person_info_panel_001;
 
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Left;
