@@ -121,7 +121,8 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		
 		case COLUMN_I_OWNER:
 			
-			if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))	return true;
+			if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))
+				return true;
 			return false;
 		}
 		

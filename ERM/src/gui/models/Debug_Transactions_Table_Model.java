@@ -29,7 +29,6 @@
 		private SortableList<byte[], Transaction> transactions;
 		
 		private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
-	//	private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Asset Issue", "Asset Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction"});
 
 		public Debug_Transactions_Table_Model()
 		{

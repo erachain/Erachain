@@ -61,7 +61,7 @@ public class Account {
 	//private static final long ERM_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
-	public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
+	//public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
 
 
 	protected String address;
@@ -568,7 +568,7 @@ public class Account {
 		String addressStr;
 		if (personRes == null) {
 			personStr = "";
-			addressStr = this.getAddress();
+			addressStr = GenesisBlock.CREATOR.equals(this)?"GENESIS":this.getAddress();
 		}
 		else {
 			personStr = personChar(personRes) + personRes.b.getShort();
@@ -595,7 +595,7 @@ public class Account {
 	{
 		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		if (personRes == null) {
-			return this.getAddress();
+			return GenesisBlock.CREATOR.equals(this)?"GENESIS":this.getAddress();
 		}
 		else {
 			String personStr = personChar(personRes) + personRes.b.getShort();
@@ -625,8 +625,7 @@ public class Account {
 	@Override
 	public boolean equals(Object b)
 	{
-		if(b instanceof Account)
-		{
+		if(b instanceof Account) {
 			return this.getAddress().equals(((Account) b).getAddress());
 		} else if (b instanceof String) {
 			return this.getAddress().equals((String) b);			

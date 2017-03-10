@@ -18,6 +18,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -311,7 +312,7 @@ public abstract class ItemCls {
 	public String toString(DBSet db)
 	{		
 		long key = this.getKey(db);
-		String creator = this.owner.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.owner.getPersonAsString_01(false);
+		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
 		return (key==0?"?:":key
 				//+ "." + this.typeBytes[0]
 				+ " ") + this.getName()  
@@ -346,7 +347,7 @@ public abstract class ItemCls {
 	public String getShort(DBSet db)
 	{
 		long key = this.getKey(db);
-		String creator = this.owner.getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)? "GENESIS": this.owner.getPersonAsString_01(true);
+		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
 		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30))
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}

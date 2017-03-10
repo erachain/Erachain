@@ -12,6 +12,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import core.account.Account;
+import core.block.GenesisBlock;
 import core.item.statuses.StatusCls;
 import database.ItemStatusMap;
 import database.DBSet;
@@ -48,9 +49,7 @@ public class Status_Info extends MTextPane {
 		message += "<div>" + status.getDescription() + "</div>";
 		message += "<div>" + (status.isUnique()?"UNIQUE":"multi") + "</div>";
 
-		String creator = status.getOwner().getAddress().equals(Account.EMPTY_PUBLICK_ADDRESS)?
-				"GENESIS":
-					status.getOwner().getPersonAsString_01(false);
+		String creator = GenesisBlock.CREATOR.equals(status.getOwner())?"GENESIS":status.getOwner().getPersonAsString_01(false);
 
 		message += "<div> Creator: " + (creator.length()==0?status.getOwner().getAddress():creator) + "</div>";
 

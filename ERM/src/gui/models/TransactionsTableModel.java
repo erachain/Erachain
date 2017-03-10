@@ -40,7 +40,6 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	Integer block_No;
 	List<Transaction> transactions;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
-	//private String[] transactionTypes = Lang.getInstance().translate(new String[]{"", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Check Issue", "Check Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message Transaction","Accounting Transaction"});
 
 	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
 
