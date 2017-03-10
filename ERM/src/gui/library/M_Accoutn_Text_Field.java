@@ -66,6 +66,7 @@ public class M_Accoutn_Text_Field  extends JTextField{
 		JMenuItem copyPublicKey;
 		if (public_Account == null) {
 			copyPublicKey = new JMenuItem(Lang.getInstance().translate("Public Key not Found"));
+			copyPublicKey.setEnabled(false);
 		} else {
 			copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
 			copyPublicKey.addActionListener(new ActionListener() {
