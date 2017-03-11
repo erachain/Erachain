@@ -121,8 +121,9 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		case COLUMN_BORN:
 			
 		//	DateFormat f = new DateFormat("DD-MM-YYYY");
-			 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
-			return  dateFormat.format( new Date(person.getBirthday()));
+			//SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY");
+			//return  dateFormat.format( new Date(person.getBirthday()));
+			return person.getBirthdayStr();
 
 		}
 		

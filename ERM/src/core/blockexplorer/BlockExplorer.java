@@ -1743,10 +1743,8 @@ if ( asset_1 == null) {
 			my_Person_JSON.put("key", item.getKey());
 			my_Person_JSON.put("name",item.getName());
 			
-			
-			
-			
 			my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
+			///my_Person_JSON.put("date", utils.DateTimeFormat.timestamptoString(my_Issue_Person.getTimestamp()));
 			my_Persons_JSON.put(i, my_Person_JSON);
 			i++;
 		}

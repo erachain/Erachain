@@ -56,7 +56,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 				
 		//Birthday
 		++detailGBC.gridy;
-		JTextField birtday = new JTextField(new Date(person.getBirthday()).toString());
+		JTextField birtday = new JTextField(person.getBirthdayStr());
 		birtday.setEditable(false);
 		this.add(birtday, detailGBC);	
 		
