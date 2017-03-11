@@ -116,10 +116,10 @@ public abstract class PersonCls extends ItemCls {
 		return this.deathday;
 	}
 	public String getBirthdayStr() {
-		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat());
+		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
 	}
 	public String getDeathdayStr() {
-		return utils.DateTimeFormat.timestamptoString(this.deathday, Settings.getInstance().getBirthTimeFormat());
+		return utils.DateTimeFormat.timestamptoString(this.deathday, Settings.getInstance().getBirthTimeFormat(), "UTC");
 	}
 	
 	public byte getGender() {

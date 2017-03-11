@@ -56,8 +56,6 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	protected JTextField txtBirthdayTxt;
 	protected JTextField txtDeathdayTxt;
 	
-	
-	
 	protected MButton trans_Button;
     protected javax.swing.JLabel label_Sign;
     protected javax.swing.JLabel label_public_key;
@@ -80,7 +78,7 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		
 	}
 	
-	 public String getClipboardContents() {
+	public String getClipboardContents() {
 	    String result = "";
 	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 	    //odd: the Object param of getContents is not currently used
@@ -110,16 +108,10 @@ private void init(){
 	txtBirthdayTxt = new javax.swing.JTextField();
 	txtDeathdayTxt = new javax.swing.JTextField();
 	
-	
-	
-	
-	
 	iconLabel = new javax.swing.JLabel();
 	label_Sign= new javax.swing.JLabel();
 	label_public_key= new javax.swing.JLabel();
 	label_info= new javax.swing.JLabel();
-	
-	
 	
 	//txtBirthday = new javax.swing.JTextField();
 	//txtDeathday = new javax.swing.JTextField();
@@ -269,7 +261,7 @@ private void init(){
 
  	        // SET ONE TIME ZONE for Birthday 
  			TimeZone tz  = TimeZone.getDefault();
- 			TimeZone.setDefault(TimeZone.getTimeZone(Settings.getInstance().getTimeZone()));
+ 			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
  			///txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			txtBirthdayTxt.setText(person.getBirthdayStr());

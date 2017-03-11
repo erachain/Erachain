@@ -31,6 +31,7 @@ public class BlockChain
 	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9047;
 	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9048;
 
+	//public static final String TIME_ZONE = "GMT+3";
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;

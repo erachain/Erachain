@@ -43,10 +43,12 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
 
+import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 
 import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -142,10 +144,6 @@ public class IssuePersonPanel extends JPanel
 			
 		});
       	
-
-		
-        
-    	
     	String[] items = {
       			Lang.getInstance().translate("Male"),
       			Lang.getInstance().translate("Female"),
@@ -153,9 +151,12 @@ public class IssuePersonPanel extends JPanel
         	};	
        	txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(items));
        	
+        //Calendar can = txtBirthday.getJCalendar().getCalendar();
+        //can.set(1999, 11, 12, 13, 14);
+
        	txtRace.setText("");
-       	this.txtBirthLatitude.setText("45.123");
-       	this.txtBirthLongitude.setText("12.123");
+       	this.txtBirthLatitude.setText("0");
+       	this.txtBirthLongitude.setText("0");
        	this.txtHeight.setText("170");
        	this.txtFeePow.setText("0");
  // issue buton
@@ -178,14 +179,7 @@ public class IssuePersonPanel extends JPanel
 			}
         });
         
-        
-        
-        
         this.setVisible(true);
-        
-        
-    
-        
         
 	}
 	
@@ -280,15 +274,8 @@ public class IssuePersonPanel extends JPanel
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        
-	       
-	       
-	       
+	          
 	    }
-		
-	
-		
-		
 		
 	}
 
@@ -515,9 +502,6 @@ public class IssuePersonPanel extends JPanel
         copyButton = new MButton(Lang.getInstance().translate("Copy"),2);
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
-        
-        
-        
     	
         this.issueButton.addActionListener(new ActionListener()
 		{
@@ -536,12 +520,14 @@ public class IssuePersonPanel extends JPanel
 		    }
 		});
         
-        
         // SET ONE TIME ZONE for Birthday 
 		TimeZone tz  = TimeZone.getDefault();
-		TimeZone.setDefault(TimeZone.getTimeZone(Settings.getInstance().getTimeZone()));
-        txtBirthday =  new JDateChooser("yyyy-MM-dd","####-##-##", '_');
-        txtDeathday = new JDateChooser("yyyy-MM-dd","####-##-##", '_');
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        txtBirthday =  new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        Calendar ccc = Calendar.getInstance(tz);
+        ccc.set(1990, 10, 11, 12, 13, 01);
+        txtBirthday.setCalendar(ccc);
+        txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
 		TimeZone.setDefault(tz);
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -820,12 +806,10 @@ public class IssuePersonPanel extends JPanel
         add(jLabel9, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
-
         
         jPanel2.add(copyButton, new java.awt.GridBagConstraints());
        
         jPanel2.add(issueButton, new java.awt.GridBagConstraints());
-
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -881,11 +865,8 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add( txtBirthday, gridBagConstraints);
-        
+        add( txtBirthday, gridBagConstraints);        
         txtBirthday.setFont(UIManager.getFont("TextField.font"));
-       
-        
 
   //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
   //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
@@ -894,7 +875,7 @@ public class IssuePersonPanel extends JPanel
  //           }
  //       });
         
-        txtDeathday.setDateFormatString("yyyy-MM-dd");
+        ///txtDeathday.setDateFormatString("yyyy-MM-dd");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 6;
@@ -935,10 +916,6 @@ class FileFilterExt extends javax.swing.filechooser.FileFilter
 	public String getDescription() {
 		return description;
 	}
-	
-	
-	
-	
 	
 }
 

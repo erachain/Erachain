@@ -89,9 +89,9 @@ public class Settings {
 	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
 
 	//DATE FORMAT
-	private static final String DEFAULT_TIME_ZONE = "GMT+3";
-	private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
-	private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd hh:mm";
+	private static final String DEFAULT_TIME_ZONE = ""; //"GMT+3";
+	private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+	private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
 	
 	private static final boolean DEFAULT_NS_UPDATE = false;
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
