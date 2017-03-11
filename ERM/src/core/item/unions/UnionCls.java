@@ -58,7 +58,7 @@ public abstract class UnionCls extends ItemCls{
 		return this.birthday;
 	}
 	public String getBirthdayStr() {
-		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat());
+		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
 	}
 	public long getParent() {
 		return this.parent;
