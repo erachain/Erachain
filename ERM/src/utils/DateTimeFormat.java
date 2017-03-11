@@ -18,6 +18,12 @@ public class DateTimeFormat
 
 		return timestamptoString(timestamp, strTimeFormat, timeZone);
 	}
+	public static String timestamptoString(long timestamp, String strTimeFormat){
+
+		String timeZone = Settings.getInstance().getTimeZone(); 
+
+		return timestamptoString(timestamp, strTimeFormat, timeZone);
+	}
 	
 	public static String timestamptoString(long timestamp, String strTimeFormat, String timeZone){
 

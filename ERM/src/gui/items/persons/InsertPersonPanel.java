@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import com.toedter.calendar.JDateChooser;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -38,6 +39,7 @@ import core.transaction.TransactionFactory;
 import gui.library.MButton;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import settings.Settings;
 import utils.Pair;
 
 public class InsertPersonPanel extends IssuePersonPanel{
@@ -267,12 +269,14 @@ private void init(){
 
  	        // SET ONE TIME ZONE for Birthday 
  			TimeZone tz  = TimeZone.getDefault();
- 			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+ 			TimeZone.setDefault(TimeZone.getTimeZone(Settings.getInstance().getTimeZone()));
 
- 			txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
+ 			///txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
+ 			txtBirthdayTxt.setText(person.getBirthdayStr());
  			long dayTimestamp = person.getDeathday();
- 			if ( dayTimestamp > person.getBirthday()) {
- 				txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
+ 			if ( dayTimestamp/10 > person.getBirthday()/10) {
+ 				//txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
+ 				txtDeathdayTxt.setText(person.getDeathdayStr());
  			}
  			TimeZone.setDefault(tz);
  

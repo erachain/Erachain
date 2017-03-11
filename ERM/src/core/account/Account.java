@@ -533,7 +533,7 @@ public class Account {
 		if (personRes == null) return "";
 		
 		PersonCls person = personRes.b;
-		if (person.getDeathday() > person.getBirthday())
+		if (person.getDeathday()/10 > person.getBirthday()/10)
 			return "="; //"☗";
 		
 		int key = personRes.a;

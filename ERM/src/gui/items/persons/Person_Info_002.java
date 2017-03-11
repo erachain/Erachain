@@ -295,15 +295,20 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			descript =descript+Lang.getInstance().translate("Male");
 		if (person.getGender() == 1)
 			descript =descript+Lang.getInstance().translate("Female");
-		long ss = person.getDeathday();
-		long aa = person.getBirthday();
-		if (person.getDeathday()/10 != person.getBirthday()/10){
-			descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
-			
+		long bi = person.getDeathday();
+		long de = person.getBirthday();
+		String biStr = utils.DateTimeFormat.timestamptoString(bi, "yyyy-MM-dd hh:mm");
+		if (de/10 > bi/10){
+			//descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
+			descript =descript+"\n"+ biStr
+					+ " - "+ utils.DateTimeFormat.timestamptoString(de, "yyyy-MM-dd hh:mm");			
 			
 		}else{
 			
-			descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";	
+			//descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
+			descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":"
+					+ biStr;
+			
 			
 		}
 		

@@ -1626,7 +1626,8 @@ if ( asset_1 == null) {
 			
 		
 		output.put("name", person.getName());
-		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
+		////////output.put("birthday", df.format(new Date(person.getBirthday())).toString());
+		output.put("birthday", person.getBirthdayStr());
 		output.put("description", Processor.process(person.getDescription()));
 		
 		String gender = Lang.getInstance().translate_from_langObj("Man",langObj);

@@ -6,6 +6,7 @@ import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 import ntp.NTP;
+import settings.Settings;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -538,7 +539,7 @@ public class IssuePersonPanel extends JPanel
         
         // SET ONE TIME ZONE for Birthday 
 		TimeZone tz  = TimeZone.getDefault();
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		TimeZone.setDefault(TimeZone.getTimeZone(Settings.getInstance().getTimeZone()));
         txtBirthday =  new JDateChooser("yyyy-MM-dd","####-##-##", '_');
         txtDeathday = new JDateChooser("yyyy-MM-dd","####-##-##", '_');
 		TimeZone.setDefault(tz);
