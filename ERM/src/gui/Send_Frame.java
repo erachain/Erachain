@@ -56,7 +56,7 @@ public class Send_Frame extends JInternalFrame{
        //SHOW FRAME
         this.pack();
         this.setMaximizable(true);
-		this.setTitle(Lang.getInstance().translate("Send Message"));
+		this.setTitle(Lang.getInstance().translate("Send"));
 		this.setClosable(true);
 		this.setResizable(true);
 		//this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));

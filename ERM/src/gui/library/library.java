@@ -256,13 +256,14 @@ public class library {
 		UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));	
 		UIManager.put("OptionPane.cancelButtonText", Lang.getInstance().translate("Cancel"));
 		UIManager.put("OptionPane.okButtonText", Lang.getInstance().translate("Yes"));
+		UIManager.put("OptionPane.titleFont", font); 
 		
 	      
 		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
 		 
 		 ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String, Object>>();
 	      
-		  
+		
 	      
 	      
 	      
