@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
@@ -29,6 +30,7 @@ import lang.Lang;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -59,7 +61,7 @@ import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 
 @SuppressWarnings("serial")
-public class AssetPairSelect extends JFrame{
+public class AssetPairSelect extends JDialog{
 	
 	public AssetPairSelectTableModel assetPairSelectTableModel;
 	 AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
@@ -67,8 +69,8 @@ public class AssetPairSelect extends JFrame{
 
 	public AssetPairSelect(long key, String action, String account) {
 		
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
-		
+	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -79,7 +81,7 @@ public class AssetPairSelect extends JFrame{
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+		this.setModal(true);
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
@@ -190,7 +192,7 @@ public class AssetPairSelect extends JFrame{
 						new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
-						((JFrame) (pair_Panel.getTopLevelAncestor())).dispose();
+						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
 					}
 				}
 			}
