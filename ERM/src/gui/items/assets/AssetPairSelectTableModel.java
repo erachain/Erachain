@@ -95,6 +95,10 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		return o==null?null:o.getClass();
 	    }
 	
+	public AssetCls getAsset(int row){
+		
+		return (AssetCls) this.assets.get(row);
+	}
 	
 	@Override
 	public String getColumnName(int index) 

@@ -12,6 +12,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
@@ -43,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
@@ -120,9 +123,28 @@ public class AssetPairSelect extends JDialog{
 		tableGBC.gridy = 1;	
 		
 		
-		pair_Panel.button1_ToolBar_LeftPanel.setVisible(false);
-		pair_Panel.button2_ToolBar_LeftPanel.setVisible(false);
+		pair_Panel.button1_ToolBar_LeftPanel.setVisible(true);
+		pair_Panel.button1_ToolBar_LeftPanel.setEnabled(false);
+		pair_Panel.button1_ToolBar_LeftPanel.setFocusable(true);
+		pair_Panel.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Next"));
+		pair_Panel.button1_ToolBar_LeftPanel.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				selectAsset();
+				 
+			}
+				
+					
+		});
 		
+		
+		pair_Panel.button2_ToolBar_LeftPanel.setVisible(false);
+		pair_Panel.searth_My_JCheckBox_LeftPanel.setVisible(false);
+		pair_Panel.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+		pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
+		pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 		
 		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
 				
@@ -137,6 +159,25 @@ public class AssetPairSelect extends JDialog{
 	    pair_Panel.jTable_jScrollPanel_LeftPanel = assetsPairTable;
 		
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setIntercellSpacing(new java.awt.Dimension(2, 2));
+	    
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+			@SuppressWarnings({ "unused" })
+			@Override
+				public void valueChanged(ListSelectionEvent arg0) {
+					
+						if (pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+							AssetPairSelectTableModel tableModelAssets1 =  (AssetPairSelectTableModel) pair_Panel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+						Object asset = tableModelAssets1.getAsset(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+					
+						pair_Panel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+						pair_Panel.button1_ToolBar_LeftPanel.setEnabled(true);
+						 
+					}
+				}
+			});	
+	    
+	    
+	    
 
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	  //Custom renderer for the String column;
@@ -200,8 +241,10 @@ public class AssetPairSelect extends JDialog{
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
 						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
 					*/
-						pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
-						dispose();
+						
+						selectAsset();
+					//	pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
+						
 					}
 				}
 			}
@@ -248,15 +291,25 @@ public class AssetPairSelect extends JDialog{
 	    
 	    
 	    Dimension size = MainFrame.desktopPane.getSize();
-	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.width/2.5));
 	    this.add(pair_Panel, labelGBC);
 		//PACK
 		this.pack();
-		this.setSize(1000, this.getHeight());
+		this.setSize( size.width-(size.width/8), size.height-(size.width/8));
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
+private void selectAsset(){
+	if (pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+		AssetPairSelectTableModel tableModelAssets1 =  (AssetPairSelectTableModel) pair_Panel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+		pairAsset = tableModelAssets1.getAsset(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+		dispose();
+	}
+	
+	
+	
+}
 	
 
 }
