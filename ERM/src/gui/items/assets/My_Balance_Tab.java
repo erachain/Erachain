@@ -220,7 +220,8 @@ public class My_Balance_Tab extends Split_Panel {
 
 			AssetCls asset = BalancesModel.getAsset(row);
 			String account = BalancesModel.getAccount(row);
-			AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", account);
+			//AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", account);
+			new ExchangeFrame(asset,null, "To sell", account);
 			}
 			
 		}
@@ -234,7 +235,8 @@ public class My_Balance_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = BalancesModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "","");
+		//	new AssetPairSelect(asset.getKey(), "","");
+			new ExchangeFrame(asset,null, "", "");			
 		}
 	});
 	assetsMenu.add(excahge);
@@ -247,7 +249,8 @@ public class My_Balance_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = BalancesModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "Buy","");
+	//		new AssetPairSelect(asset.getKey(), "Buy","");
+			new ExchangeFrame(asset,null,  "Buy", "");	
 		}
 	});
 	

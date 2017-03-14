@@ -19,15 +19,21 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
@@ -44,75 +50,278 @@ public class ExchangeFrame extends JDialog
 	
 	private AssetCls have;
 	private AssetCls want;
+	pane_Tab tt;
 	
-	private SellOrdersTableModel sellOrdersTableModel;
-	private BuyOrdersTableModel buyOrdersTableModel;
-	private TradesTableModel tradesTableModel;
-	private OrderPanel sellOrderPanel;
 	public OrderPanel buyOrderPanel;
 	
-	private JPopupMenu sellOrdersMenu = new JPopupMenu();
-	private JPopupMenu buyOrdersMenu = new JPopupMenu();
-
-	private JTabbedPane jTabbedPane;
-
-	private JPanel jPanel_Trade;
-
-	private JPanel jPanel_History;
+	
 	String action;
 	String account;
 
+	private JLabel jLabel_Icon;
+
+	private JTextField jTextField_Asset_1;
+
+	private JButton jButton_Change_Asset_1;
+
+	private JTextField jTextField_Asset_2;
+
+	private JButton jButton_Change_Asset_2;
+
+	private JTabbedPane jSelectPane;
+
+	private JPanel jSelect_Trade;
+	 java.awt.GridBagConstraints gridBagConstraints;
+
+	private JScrollPane jScrollPane_jPanel_RightPanel;
+
 	public ExchangeFrame(AssetCls have, AssetCls want, String action, String account) 
 	{
-	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));
-		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));
+
 		this.account= account;
 		this.action = action;
 		this.have = have;
 		this.want = want;
-		this.setModal(true);
-		this.setAlwaysOnTop(true);
+		
+		if (this.want== null) {
+			
+			AssetPairSelect ss = new AssetPairSelect(have.getKey(),  action,  account);	
+		this.want = ss.pairAsset;
+		}
+		
 	//	this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
-		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		
-		//CLOSE
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		//LAYOUT
-		this.setLayout(new GridBagLayout());
 		initComponents();
-		
-		
-		
-		//PACK
-		this.pack();
-		this.setResizable(true);
-		if(action == "Buy" || action =="To sell") this.setSize(900,800);
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
 	}
 	
-	   private void initComponents() {
-	        java.awt.GridBagConstraints gridBagConstraints;
+	public ExchangeFrame(AssetCls have, String account) 
+	{
 
-	        jTabbedPane = new javax.swing.JTabbedPane();
+		this.account= account;
+		this.action = "";
+		this.have = have;
+		this.want = have;
+	
+		initComponents();
+		
+	}
+	
+	   @SuppressWarnings("static-access")
+	private void initComponents() {
+	       
+
+	        this.setModal(true);
+	//		this.setAlwaysOnTop(true); 
+	        
+	//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));
+				this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));      
+	        
+	      //ICON
+			List<Image> icons = new ArrayList<Image>();
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+	//		this.setFrameIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png")));
+			
+			//CLOSE
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+			//LAYOUT
+			this.setLayout(new GridBagLayout());
+			 //PADDING
+			
+			 getContentPane().setLayout(new java.awt.GridBagLayout());
+			((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
+	        
+			
+	       
+	      
+
+	// select panel  
+
+	      
+	        jSelect_Trade = new javax.swing.JPanel();
+	    
+	        jSelect_Trade.setLayout(new java.awt.GridBagLayout());
+	        
+	        
+	        jLabel_Icon = new javax.swing.JLabel();
+	        jTextField_Asset_1 = new javax.swing.JTextField();
+	        jButton_Change_Asset_1 = new javax.swing.JButton();
+	        jTextField_Asset_2 = new javax.swing.JTextField();
+	        jButton_Change_Asset_2 = new javax.swing.JButton();
+
+	        setLayout(new java.awt.GridBagLayout());
+
+	        jLabel_Icon.setText("");
+	        ImageIcon ic = new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/exchange.png"));
+	        
+	        jLabel_Icon.setIcon( new ImageIcon(ic.getImage().getScaledInstance(20, 20, 1)));
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 3;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 0);
+	        jSelect_Trade.add(jLabel_Icon, gridBagConstraints);
+
+	        jTextField_Asset_1.setText(have.getName());
+	        jTextField_Asset_1.setEditable(false);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 1;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.3;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+	        jSelect_Trade.add(jTextField_Asset_1, gridBagConstraints);
+
+	        jButton_Change_Asset_1.setText("jButton1");
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+	   //     jSelect_Trade.add(jButton_Change_Asset_1, gridBagConstraints);
+
+	        jTextField_Asset_2.setText(want.getName());
+	        jTextField_Asset_2.setEditable(false);
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 5;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.3;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+	        jSelect_Trade.add(jTextField_Asset_2, gridBagConstraints);
+
+	        jButton_Change_Asset_2.setText(Lang.getInstance().translate("Asset"));
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 6;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+	        jSelect_Trade.add(jButton_Change_Asset_2, gridBagConstraints);
+	        
+	        
+	        jButton_Change_Asset_2.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					AssetPairSelect ss = new AssetPairSelect(have.getKey(), "", "");
+					
+					want = ss.pairAsset;
+					jTextField_Asset_2.setText(want.getName());
+					jScrollPane_jPanel_RightPanel.setViewportView( new  pane_Tab(have, want, action, account));
+	//				remove(tt);
+	//				tt = new  pane_Tab(have, want, action, account);
+					
+	//				 getContentPane().add(tt, gridBagConstraints);
+				//	tt.repaint();
+				/*	set_view();
+					 gridBagConstraints = new java.awt.GridBagConstraints();
+				        gridBagConstraints.gridx = 0;
+				        gridBagConstraints.gridy = 1;
+				        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+				        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+				        gridBagConstraints.weightx = 0.2;
+				        gridBagConstraints.weighty = 0.2;
+				        getContentPane().add(jTabbedPane, gridBagConstraints);
+				 */       
+					
+				}
+	        	
+	        	
+	        });
+	       
+	        
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        getContentPane().add(jSelect_Trade, gridBagConstraints);
+	        
+	        
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 1;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.2;
+	        gridBagConstraints.weighty = 0.2;
+	        
+	        jScrollPane_jPanel_RightPanel = new javax.swing.JScrollPane();
+	 //       jScrollPane_jPanel_RightPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+	        
+	  //      jScrollPane_jPanel_RightPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	 //       jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
+	 //       jScrollPane_jPanel_RightPanel.setVerticalScrollBar(null);
+	        jScrollPane_jPanel_RightPanel.setViewportView( new  pane_Tab(have, want, action, account));
+	    //      tt = new  pane_Tab(have, want, action, account);
+	          getContentPane().add(jScrollPane_jPanel_RightPanel, gridBagConstraints);
+	          
+	           JPanel ee = new JPanel();
+	          
+	      //PACK
+			this.pack();
+			this.setResizable(true);
+	//		if(action == "Buy" || action =="To sell") this.setSize(900,800);
+			this.setLocationRelativeTo(null);
+			this.setVisible(true);
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	    }
+	
+}
+	   class pane_Tab extends JTabbedPane{
+		   
+		   private AssetCls have;
+			private AssetCls want;
+			
+			private SellOrdersTableModel sellOrdersTableModel;
+			private BuyOrdersTableModel buyOrdersTableModel;
+			private TradesTableModel tradesTableModel;
+			private OrderPanel sellOrderPanel;
+			public OrderPanel buyOrderPanel;
+			
+			private JPopupMenu sellOrdersMenu = new JPopupMenu();
+			private JPopupMenu buyOrdersMenu = new JPopupMenu();
+
+			private JPanel jPanel_Trade;
+
+			private JPanel jPanel_History;
+			String action;
+			String account;
+
+			public pane_Tab(AssetCls have2, AssetCls want2, String action2, String account2) {
+				// TODO Auto-generated constructor stub
+			
+			this.action = action2;
+			this.have = have2;
+			this.want = want2;
+			this.account = account2;
+			new javax.swing.JTabbedPane();
 	        jPanel_Trade = new javax.swing.JPanel();
 	        jPanel_History = new javax.swing.JPanel();
 
 	      //  setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-	        getContentPane().setLayout(new java.awt.GridBagLayout());
+	       
 
 	        jPanel_Trade.setLayout(new java.awt.GridBagLayout());
 	        
-	      //PADDING
-			((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
+	     
 			
 			//LABEL GBC
 			GridBagConstraints labelGBC = new GridBagConstraints();
@@ -368,7 +577,7 @@ public class ExchangeFrame extends JDialog
 	        
 	        
 	        
-	        jTabbedPane.addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
+	        addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
 
 	        jPanel_History.setLayout(new java.awt.GridBagLayout());
 	        
@@ -426,41 +635,16 @@ public class ExchangeFrame extends JDialog
 			////
 			jPanel_History.add(new JScrollPane(tradesTable), tableGBC);
 	        
+	                
 	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        jTabbedPane.addTab(Lang.getInstance().translate("Trade History"), jPanel_History);
-
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	        gridBagConstraints.ipadx = 95;
-	        gridBagConstraints.ipady = 95;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.weightx = 0.2;
-	        gridBagConstraints.weighty = 0.2;
-	        getContentPane().add(jTabbedPane, gridBagConstraints);
+	        addTab(Lang.getInstance().translate("Trade History"), jPanel_History);
 
 	        
-	    }
-	
-	
-	
-	
+		
+		
+		
+		
+	}
+			
 	
 }

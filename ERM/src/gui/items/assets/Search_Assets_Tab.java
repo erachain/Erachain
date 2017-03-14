@@ -192,7 +192,8 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "To sell",  "");
+		//	new AssetPairSelect(asset.getKey(), "To sell",  "");
+			new ExchangeFrame(asset,null,  "To sell", "");	
 		}
 	});
 	
@@ -301,7 +302,8 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "","");
+		//	new AssetPairSelect(asset.getKey(), "","");
+			new ExchangeFrame(asset,null,  "", "");	
 		}
 	});
 	 nameSalesMenu.add(excahge);
@@ -314,7 +316,8 @@ public class Search_Assets_Tab extends Split_Panel {
 			row = assetsTable.convertRowIndexToModel(row);
 
 			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "Buy","");
+		//	new AssetPairSelect(asset.getKey(), "Buy","");
+			new ExchangeFrame(asset,null, "Buy", "");	
 		}
 	});
 	
@@ -363,7 +366,8 @@ public class Search_Assets_Tab extends Split_Panel {
 			{
 				row = assetsTable.convertRowIndexToModel(row);
 				AssetCls asset = tableModelItemAssets.getAsset(row);
-				new AssetPairSelect(asset.getKey(), "","");
+			//	new AssetPairSelect(asset.getKey(), "","");
+				new ExchangeFrame(asset,null, "", "");
 		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)

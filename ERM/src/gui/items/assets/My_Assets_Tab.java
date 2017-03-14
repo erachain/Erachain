@@ -209,7 +209,8 @@ public class My_Assets_Tab extends Split_Panel {
 
 			AssetCls asset = assetsModel.getAsset(row);
 		//	String account = assetsModel..getAccount(row);
-			AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+		//	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+			new ExchangeFrame(asset,null, "To sell", "");
 			}
 			
 		}
@@ -223,7 +224,8 @@ public class My_Assets_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = assetsModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "","");
+		//	new AssetPairSelect(asset.getKey(), "","");
+			new ExchangeFrame(asset,null, "", "");
 		}
 	});
 	assetsMenu.add(excahge);
@@ -236,7 +238,8 @@ public class My_Assets_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = assetsModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "Buy","");
+		//	new AssetPairSelect(asset.getKey(), "Buy","");
+			new ExchangeFrame(asset,null,  "Buy", "");	
 		}
 	});
 	
@@ -363,7 +366,8 @@ public class My_Assets_Tab extends Split_Panel {
 			{
 				row = table.convertRowIndexToModel(row);
 				AssetCls asset = assetsModel.getAsset(row);
-				new AssetPairSelect(asset.getKey(), "","");
+	//			new AssetPairSelect(asset.getKey(), "","");
+				new ExchangeFrame(asset,null,  "", "");	
 		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)

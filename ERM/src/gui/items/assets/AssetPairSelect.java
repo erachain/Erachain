@@ -1,6 +1,7 @@
 package gui.items.assets;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -66,6 +67,7 @@ public class AssetPairSelect extends JDialog{
 	public AssetPairSelectTableModel assetPairSelectTableModel;
 	 AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
 	 RowSorter sorter;
+	 public AssetCls pairAsset;
 
 	public AssetPairSelect(long key, String action, String account) {
 		
@@ -182,6 +184,8 @@ public class AssetPairSelect extends JDialog{
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 	    
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+			
+
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					JTable target = (JTable)e.getSource();
@@ -189,10 +193,15 @@ public class AssetPairSelect extends JDialog{
 
 					if(row < assetPairSelectTableModel.assets.size())
 					{
-						new ExchangeFrame(
+						// Container ss = getParent();
+						//if (getParent().getClass().getName() == "11")
+					/*	new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
 						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
+					*/
+						pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
+						dispose();
 					}
 				}
 			}
