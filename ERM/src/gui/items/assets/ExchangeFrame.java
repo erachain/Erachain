@@ -83,11 +83,7 @@ public class ExchangeFrame extends JDialog
 		this.have = have;
 		this.want = want;
 		
-		if (this.want== null) {
-			
-			AssetPairSelect ss = new AssetPairSelect(have.getKey(),  action,  account);	
-		this.want = ss.pairAsset;
-		}
+		
 		
 	//	this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		initComponents();
@@ -108,7 +104,17 @@ public class ExchangeFrame extends JDialog
 	   @SuppressWarnings("static-access")
 	private void initComponents() {
 	       
-
+		   if (this.want== null) {
+				
+				AssetPairSelect ss = new AssetPairSelect(have.getKey(),  action,  account);	
+			this.want = ss.pairAsset;
+			
+			}
+		   if(this.want == null) {
+			   this.dispose();
+			   return;
+		   }
+		   
 	        this.setModal(true);
 	//		this.setAlwaysOnTop(true); 
 	        
@@ -210,24 +216,14 @@ public class ExchangeFrame extends JDialog
 					// TODO Auto-generated method stub
 					AssetPairSelect ss = new AssetPairSelect(have.getKey(), "", "");
 					
-					want = ss.pairAsset;
+					if(ss.pairAsset!= null)	
+					{
+						want = ss.pairAsset;
+					
 					jTextField_Asset_2.setText(want.getName());
 					jScrollPane_jPanel_RightPanel.setViewportView( new  pane_Tab(have, want, action, account));
-	//				remove(tt);
-	//				tt = new  pane_Tab(have, want, action, account);
-					
-	//				 getContentPane().add(tt, gridBagConstraints);
-				//	tt.repaint();
-				/*	set_view();
-					 gridBagConstraints = new java.awt.GridBagConstraints();
-				        gridBagConstraints.gridx = 0;
-				        gridBagConstraints.gridy = 1;
-				        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-				        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-				        gridBagConstraints.weightx = 0.2;
-				        gridBagConstraints.weighty = 0.2;
-				        getContentPane().add(jTabbedPane, gridBagConstraints);
-				 */       
+					}
+	
 					
 				}
 	        	
