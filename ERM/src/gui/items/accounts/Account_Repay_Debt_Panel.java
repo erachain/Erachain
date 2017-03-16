@@ -95,6 +95,7 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 		this.accountsModel = new AccountsComboBoxModel();
         this.cbxFrom.setModel(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
+		((AccountRenderer)cbxFrom.getRenderer()).setAsset(((AssetCls)cbxFavorites.getSelectedItem()).getKey());
 		if (account != null) cbxFrom.setSelectedItem(account);
 		
 		//ON FAVORITES CHANGE
