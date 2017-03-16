@@ -27,8 +27,8 @@ import database.DBSet;
 import network.Peer;
 
 // 
-// account.address Creditor + asset key + account.address Debtor -> sum
-public class Credit_AddressesMap extends DBMap<Tuple3<String, Long, String>, BigDecimal> 
+// account.address Creditor + asset key + account.address Debtor -> sum + Int Int (Block + seeqNo trunsaction
+public class Credit_AddressesMap extends DBMap<Tuple3<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -46,16 +46,16 @@ public class Credit_AddressesMap extends DBMap<Tuple3<String, Long, String>, Big
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) 
+	protected Map<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.getTreeMap("credit_debt");
 	}
 
 	@Override
-	protected Map<Tuple3<String, Long, String>, BigDecimal> getMemoryMap() 
+	protected Map<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> getMemoryMap() 
 	{
-		return new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
+		return new TreeMap<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>>();
 	}
 
 	@Override
