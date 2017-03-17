@@ -100,50 +100,27 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	        jTextArea_Messge = new javax.swing.JTextPane();
 			
 			
-			  jTextArea_Messge.setEditable(false);
-				jTextArea_Messge.setContentType("text/html");
+	        jTextArea_Messge.setEditable(false);
+			jTextArea_Messge.setContentType("text/html");
 
-		       
-		  //      MenuPopupUtil.installContextMenu(jTextArea_Messge);
-		   //     jTextArea_Messge.setColumns(20);
-		   //     jTextArea_Messge.setRows(5);
-		   //     jTextArea_Messge.setLineWrap(true);
-		        jTextArea_Messge.setText((r_Send.isText() ) ? new String(r_Send.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
+	        jTextArea_Messge.setText((r_Send.isText() ) ? new String(r_Send.getData(),
+	        		Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
 		        
-		        MenuPopupUtil.installContextMenu(jTextArea_Messge);
-		        //jTextArea_Messge.setText();
-		        jScrollPane1.setViewportView(jTextArea_Messge);
+	        MenuPopupUtil.installContextMenu(jTextArea_Messge);
+	        //jTextArea_Messge.setText();
+	        jScrollPane1.setViewportView(jTextArea_Messge);
 
-		        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-		        gridBagConstraints.gridx = 1;
-		        gridBagConstraints.gridy =detailGBC.gridy+1;
-		        gridBagConstraints.gridwidth = 3;
-		        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-		        gridBagConstraints.weightx = 0.1;
-		        gridBagConstraints.weighty = 0.6;
-		        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
-		        add(jScrollPane1, gridBagConstraints);
+	        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 1;
+	        gridBagConstraints.gridy =detailGBC.gridy+1;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+	        gridBagConstraints.weightx = 0.1;
+	        gridBagConstraints.weighty = 0.6;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
+	        add(jScrollPane1, gridBagConstraints);			
 
-			
-			
-			
-			
-			
-			
-			// ISTEXT
-			++detailGBC.gridy;
-			detailGBC.gridwidth = 2;
-			messageText = new JTextField( ( r_Send.isText() ) ? new String(r_Send.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
-			messageText.setEditable(false);
-			MenuPopupUtil.installContextMenu(messageText);
-//			this.add(messageText, detailGBC);			
-			detailGBC.gridwidth = 3;
-			
-			
-			
-			
-			
 			//ENCRYPTED CHECKBOX
 			
 			//ENCRYPTED
