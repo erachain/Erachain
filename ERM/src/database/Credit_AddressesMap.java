@@ -16,9 +16,9 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-//import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple3;
 
+import com.google.common.primitives.SignedBytes;
 import com.google.common.primitives.UnsignedBytes;
 
 import core.transaction.Transaction;
@@ -28,7 +28,7 @@ import network.Peer;
 
 // 
 // account.address Creditor + asset key + account.address Debtor -> sum + Int Int (Block + seeqNo trunsaction
-public class Credit_AddressesMap extends DBMap<Tuple3<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> 
+public class Credit_AddressesMap extends DBMap<Tuple3<String, Long, String>, BigDecimal> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -46,16 +46,22 @@ public class Credit_AddressesMap extends DBMap<Tuple3<byte[], Long, byte[]>, Tup
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> getMap(DB database) 
+	protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) 
 	{
 		//OPEN MAP
-		return database.getTreeMap("credit_debt");
+		return database.createTreeMap("credit_debt")
+    		.keySerializer(BTreeKeySerializer.TUPLE3)
+    		//.comparator(UnsignedBytes.lexicographicalComparator())
+			//.comparator(Fun.COMPARATOR)
+			//.comparator(Fun.COMPARABLE_ARRAY_COMPARATOR)
+            //.comparator(SignedBytes.lexicographicalComparator())
+			.makeOrGet();
 	}
 
 	@Override
-	protected Map<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>> getMemoryMap() 
+	protected Map<Tuple3<String, Long, String>, BigDecimal> getMemoryMap() 
 	{
-		return new TreeMap<byte[], Long, byte[]>, Tuple2<BigDecimal, Tuple2<Integer, Integer>>>();
+		return new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBMap;
@@ -40,9 +41,9 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
-	private AssetCls asset;
-	private Account account;
-	long asset_Key;
+	private long asset_Key = 1l;
+//	private AssetCls asset = core.block.GenesisBlock.makeAsset(asset_Key);
+	//private Account account;
 	List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred ;
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	private List<Tuple2<Tuple2<String, String>, Transaction>> transactions_Asset;
@@ -50,19 +51,13 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 	@SuppressWarnings("unchecked")
 	public CreditsTableModel()
 	{
-		 this.transactions_Asset = new ArrayList <Tuple2<Tuple2<String, String>, Transaction>>();
+		this.transactions_Asset = new ArrayList <Tuple2<Tuple2<String, String>, Transaction>>();
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-	
 		
-		
-		 cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
-		for (PublicKeyAccount account:this.publicKeyAccounts){
-			
-			asset_Key=1;	
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
-		 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
-			
-			
+		cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
+		for (PublicKeyAccount account:this.publicKeyAccounts){			
+			//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+			cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
 		}
 		
 		Controller.getInstance().addWalletListener(this);
@@ -101,23 +96,14 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 	}
 	
 	public void setAsset(AssetCls asset) 
-	{
-		
-		
-		
-		
+	{	
 		asset_Key = asset.getKey();
 		cred.clear();
-		for (PublicKeyAccount account:this.publicKeyAccounts){
-			
-			
+		for (PublicKeyAccount account:this.publicKeyAccounts){			
 			List<Transaction> trans = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
-			
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));
-			 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
-				
-				
-			}
+			//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+			cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
+		}
 /*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
 			long a = trans.getB().getAssetKey();
 			this.transactions_Asset.clear();
@@ -136,18 +122,10 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		long a = trans.getB().getAssetKey();
 		Tuple2<Tuple2<String, String>, Transaction> ss = null;
 			if (a == asset_Key ||  a == -asset_Key){
-				
-				ss = new Tuple2(trans.getA(), trans.getB());
-				
-				
+				ss = new Tuple2(trans.getA(), trans.getB());		
 				this.transactions_Asset.add(ss);		
-				
-				
 			}
-		
-			
 		}
-		
 		
 		this.fireTableDataChanged();
 	}
@@ -303,13 +281,9 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				cred.clear();
 				for (PublicKeyAccount account:this.publicKeyAccounts){
-					
-					
-					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(),asset_Key));
-					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));	
-						
-						
-					}
+					cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+					//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));	
+				}
 				
 				
 				this.fireTableDataChanged();
@@ -336,14 +310,7 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		
 		for(Account account: this.publicKeyAccounts)
 		{
-			if(this.asset == null)
-			{
-				totalBalance = totalBalance.add(account.getBalanceUSE(Transaction.FEE_KEY));
-			}
-			else
-			{
-				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DBSet.getInstance())));
-			}
+			totalBalance = totalBalance.add(account.getBalanceUSE(this.asset_Key));
 		}
 		
 		return totalBalance;
