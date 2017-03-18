@@ -478,7 +478,11 @@ public class R_SertifyPubKeys extends Transaction {
 		}
 
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(BlockChain.MINOR_ERM_BALANCE_BD)<0 )
+		if ( balERM.compareTo(
+						//BlockChain.MINOR_ERM_BALANCE_BD
+						BlockChain.MIN_GENERATING_BALANCE_BD
+					)<0
+				)
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		
 		return Transaction.VALIDATE_OK;

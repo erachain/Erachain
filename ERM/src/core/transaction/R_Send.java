@@ -39,7 +39,8 @@ public class R_Send extends TransactionAmount {
 	protected byte[] isText;
 	
 	protected static final int BASE_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
-
+	protected static final int MAX_DATA_VIEW = 20;
+	
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
 
@@ -120,6 +121,24 @@ public class R_Send extends TransactionAmount {
 	public byte[] getData()
 	{
 		return this.data;
+	}
+	public String viewData()
+	{
+		if (this.isText()) {
+			if (this.isEncrypted()) {
+				return "encrypted"; 				
+			} else {
+				if (this.data.length > MAX_DATA_VIEW<<5) {
+					return "{{" +  new String(Arrays.copyOfRange(data, 0, MAX_DATA_VIEW), Charset.forName("UTF-8")) + "...}}"; 
+				}
+					return new String(this.data, Charset.forName("UTF-8"));
+				}
+		} else {			
+			if (this.data.length > MAX_DATA_VIEW) {
+				return "{{" +  Base58.encode(Arrays.copyOfRange(data, 0, MAX_DATA_VIEW)) + "...}}"; 
+			}
+			return "{{" +  Base58.encode(data) + "}}"; 
+		}
 	}
 	
 	public byte[] getEncrypted()
