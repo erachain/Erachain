@@ -89,7 +89,10 @@ public class BlockChain
 	// need RIGHTS for PERSON account
 	public static final BigDecimal MINOR_ERM_BALANCE_BD = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
-	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
+	public static final int GIFTED_COMPU_AMOUNT = FEE_PER_BYTE<<8;
+	public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
+	public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = GIFTED_COMPU_AMOUNT<<3;
+	public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;
