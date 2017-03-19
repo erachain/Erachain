@@ -70,7 +70,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 //		return this.transactions;
 //	}
 	
-	public void Set_Block_Namber(String string){
+	public void setBlockNumber(String string){
 		
 		// byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get(Long.parseLong(string));
 		// Block block = DBSet.getInstance().getBlockMap().get(block_key);
@@ -79,13 +79,11 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		try {
 			block_No = Integer.parseInt(string);
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
 			return;
 		}
 		
 		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-		 this.fireTableDataChanged();
+		this.fireTableDataChanged();
 		
 	}
 

@@ -5,16 +5,14 @@ import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.primitives.Longs;
-
 import core.transaction.Transaction;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import database.SortableList;
 import database.TransactionMap;
-import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -43,7 +41,15 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 	
 	public Transaction getTransaction(int row)
 	{
-		return transactions.get(row).getB();
+		if (transactions == null
+				|| row >= transactions.size())
+			return null;
+		
+		Pair<byte[], Transaction> record = transactions.get(row);
+		if (record == null)
+			return null;
+		
+		return record.getB();
 	}
 	
 	@Override
@@ -74,13 +80,19 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 	{
 		try
 		{
-			if(this.transactions == null || this.transactions.size() -1 < row)
+			if(this.transactions == null || this.transactions.size() <= row)
 			{
 				return null;
 			}
 			
-			Transaction transaction = this.transactions.get(row).getB();
+			Pair<byte[], Transaction> record = this.transactions.get(row);
+			if (record == null)
+				return null;
 			
+			Transaction transaction = record.getB();
+			if (transaction == null)
+				return null;
+
 			switch(column)
 			{
 			case COLUMN_TIMESTAMP:
@@ -122,9 +134,9 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 	{
 		ObserverMessage message = (ObserverMessage) arg;
 		
-		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
 		{
+			//CHECK IF NEW LIST
 			if(this.transactions == null)
 			{
 				this.transactions = (SortableList<byte[], Transaction>) message.getValue();
@@ -134,14 +146,11 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 			
 			this.fireTableDataChanged();
 		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+		else if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
 		{
-			Transaction transaction = (Transaction)message.getValue();
-			byte[] key = Longs.toByteArray(transaction.getTimestamp());
-			utils.Pair<byte[], Transaction> pair = new utils.Pair<byte[], Transaction>(key, transaction);
-			this.transactions.add(pair);
+			//CHECK IF LIST UPDATED
+			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
+			this.transactions.add(value);
 			this.fireTableDataChanged();
 		}	
 	}

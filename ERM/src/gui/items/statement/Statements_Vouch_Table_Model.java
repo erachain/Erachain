@@ -124,7 +124,15 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	
 	public String get_No_Trancaction(int row){
 		
-		return this.transactions.get(row).viewHeightSeq(DBSet.getInstance());
+		if (this.transactions == null || this.transactions.size() <= row) {
+			return null;
+		}
+
+		Transaction transaction = this.transactions.get(row);
+		if (transaction == null)
+			return null;
+
+		return transaction.viewHeightSeq(DBSet.getInstance());
 		
 	}
 
@@ -132,11 +140,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
 		try {
-			if (this.transactions == null || this.transactions.size() - 1 < row) {
+			if (this.transactions == null || this.transactions.size() <= row) {
 				return null;
 			}
 
 			Transaction transaction = this.transactions.get(row);
+			if (transaction == null)
+				return null;
 
 			// R_Vouch i;
 			switch (column) {
@@ -207,12 +217,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				transactions = read_Sign_Accoutns();
 				this.fireTableDataChanged();
 			}
-		} else if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
+		} 
+		
+		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-
-		) {
+				) {
 			Transaction ss = (Transaction) message.getValue();
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;

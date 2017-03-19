@@ -175,6 +175,14 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 	public Transaction get_Statement(int row){
 		
+		if (this.transactions == null || this.transactions.size() <= row) {
+			return null;
+		}
+
+		Transaction transaction = this.transactions.get(row);
+		if (transaction == null)
+			return null;
+
 		return transactions.get(row);
 	}
 	
@@ -200,7 +208,6 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			{
 				return null;
 			}
-			
 			
 			Transaction trans = this.transactions.get(row);
 			if (trans == null)
@@ -309,7 +316,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	}	
 	
 	
-	private List<Transaction> read_Statement(){
+	private List<Transaction> read_Statement() {
 		List<Transaction> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
@@ -326,12 +333,9 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		for (Account account : Controller.getInstance().getAccounts()) {
 			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
 		}
-		
-		
-	return transactions;
+				
+		return transactions;
 	
 	}
-	
-	
 
 }

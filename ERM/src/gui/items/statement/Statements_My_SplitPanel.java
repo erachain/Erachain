@@ -96,7 +96,7 @@ import gui.models.Renderer_Boolean;
 			
 			
 			
-			 my_Statements_Model = new  Statements_Table_Model_My();
+			 my_Statements_Model = new Statements_Table_Model_My();
 		//	my_Statements_table = new JTable(my_Statements_Model);// new Statements_Table_Model();
 	    	
 		//	my_Statements_table.setTableHeader(null);
