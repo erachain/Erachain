@@ -35,6 +35,7 @@ import database.DBMap;
 import database.DBSet;
 import database.SortableList;
 import database.TransactionFinalMap;
+import database.TransactionMap;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -199,19 +200,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 	public synchronized void syncUpdate(Observable o, Object arg) {
 		message = (ObserverMessage) arg;
-		// System.out.println( message.getType());
 
-		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
+			// CHECK IF NEW LIST
 			if (this.transactions.size() == 0) {
 				transactions = read_Sign_Accoutns();
 				this.fireTableDataChanged();
 			}
-
-		}
-
-		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
+		} else if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
@@ -220,11 +216,15 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			Transaction ss = (Transaction) message.getValue();
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;
-				if (ss1.getVouchHeight() == blockNo && ss1.getSeqNo(DBSet.getInstance()) == recNo)
+				if (ss1.getVouchHeight() == blockNo
+						//&& ss1.getSeqNo(DBSet.getInstance()) == recNo
+						&& ss1.getVouchSeq() == recNo
+						)
 
 					if (!this.transactions.contains(ss)){
 						this.transactions.add(ss);
 						this.fireTableDataChanged();
+					} else {
 					}
 			}
 
