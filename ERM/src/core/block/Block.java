@@ -288,23 +288,22 @@ public class Block {
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
-		int inDay = BlockChain.BLOCKS_PER_DAY;
+		int inDay30 = BlockChain.BLOCKS_PER_DAY*30;
 
 		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
-		BigDecimal two = new BigDecimal(2);
 		int height = this.getHeightByParent(db);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 2 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 4 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 8 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 16 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 32 * inDay)
-			minFee = minFee.divide(two).setScale(8);
+		if (height < inDay30<<1)
+			;
+		else if (height < inDay30<<2)
+			minFee = minFee.divide(new BigDecimal(2)).setScale(8);
+		else if (height < inDay30<<3)
+			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
+		else if (height < inDay30<<4)
+			minFee = minFee.divide(new BigDecimal(8)).setScale(8);
+		else if (height < inDay30<<5)
+			minFee = minFee.divide(new BigDecimal(16)).setScale(8);
+		else
+			minFee = minFee.divide(new BigDecimal(64)).setScale(8);
 			
 		if ( fee.compareTo(minFee) < 0) 
 			fee = minFee;

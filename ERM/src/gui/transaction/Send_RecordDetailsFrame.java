@@ -35,6 +35,7 @@ import utils.MenuPopupUtil;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.transaction.R_Send;
@@ -89,7 +90,8 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		}
 		
 
-		if (r_Send.getData() != null) {
+		byte[] r_data = r_Send.getData();
+		if (r_data != null && r_data.length > 0) {
 			//LABEL MESSAGE
 			++labelGBC.gridy;
 			JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
@@ -103,8 +105,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	        jTextArea_Messge.setEditable(false);
 			jTextArea_Messge.setContentType("text/html");
 
-	        jTextArea_Messge.setText((r_Send.isText() ) ? new String(r_Send.getData(),
-	        		Charset.forName("UTF-8")) : Converter.toHex(r_Send.getData()));
+	        jTextArea_Messge.setText(r_Send.viewData());
 		        
 	        MenuPopupUtil.installContextMenu(jTextArea_Messge);
 	        //jTextArea_Messge.setText();
@@ -121,28 +122,27 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
 	        add(jScrollPane1, gridBagConstraints);			
 
-			//ENCRYPTED CHECKBOX
-			
-			//ENCRYPTED
-			GridBagConstraints chcGBC = new GridBagConstraints();
-			chcGBC.fill = GridBagConstraints.HORIZONTAL;  
-			chcGBC.anchor = GridBagConstraints.NORTHWEST;
-			chcGBC.gridy = ++labelGBC.gridy;
-			chcGBC.gridx = 2;
-			chcGBC.gridwidth = 1;
-	        final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
 	        
-	        encrypted.setSelected(r_Send.isEncrypted());
-	        encrypted.setEnabled(r_Send.isEncrypted());
-	        
-	        this.add(encrypted, chcGBC);
-	        
-	        encrypted.addActionListener(new ActionListener()
-	        {
-	        	public void actionPerformed(ActionEvent e)
-	        	{
-	        		if(!encrypted.isSelected())
-	        		{
+	        if (r_Send.isEncrypted()) {
+				//ENCRYPTED CHECKBOX
+				
+				//ENCRYPTED
+				GridBagConstraints chcGBC = new GridBagConstraints();
+				chcGBC.fill = GridBagConstraints.HORIZONTAL;  
+				chcGBC.anchor = GridBagConstraints.NORTHWEST;
+				chcGBC.gridy = ++labelGBC.gridy;
+				chcGBC.gridx = 2;
+				chcGBC.gridwidth = 1;
+		        final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+		        
+		        encrypted.setSelected(r_Send.isEncrypted());
+		        
+		        this.add(encrypted, chcGBC);
+		        
+		        encrypted.addActionListener(new ActionListener()
+		        {
+		        	public void actionPerformed(ActionEvent e)
+		        	{
 		        		if(!Controller.getInstance().isWalletUnlocked())
 		        		{
 		        			//ASK FOR PASSWORD
@@ -157,46 +157,39 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        				return;
 		        			}
 		        		}
-		
-		        		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());	
-		        		
-		        		byte[] privateKey = null; 
-		        		byte[] publicKey = null;
-		        		//IF SENDER ANOTHER
-		        		if(account == null)
+
+		        		// ICREATOR
+		        		PublicKeyAccount publicKeyAccount = r_Send.getCreator();
+	            		PrivateKeyAccount privateKeyAccount = Controller.getInstance().getPrivateKeyAccountByAddress(publicKeyAccount.getAddress());
+		        					        		
+		        		if(privateKeyAccount == null)
 		        		{
-		            		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
-		    				privateKey = accountRecipient.getPrivateKey();		
-		    				
-		    				publicKey = r_Send.getCreator().getPublicKey();    				
+			        		//IF SENDER ANOTHER
+		    				privateKeyAccount = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
 		        		}
-		        		//IF SENDER ME
-		        		else
-		        		{
-		            		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-		    				privateKey = accountRecipient.getPrivateKey();		
-		    				
-		    				publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());    				
+
+		        		if (privateKeyAccount != null) {
+			        		byte[] privateKey = privateKeyAccount.getPrivateKey(); 
+			        		byte[] publicKey = publicKeyAccount.getPublicKey();
+
+			        		try {
+			        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
+							} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+								LOGGER.error(e1.getMessage(), e1);
+							}
 		        		}
-		        		
-		        		try {
-		        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_Send.getData(), privateKey, publicKey), "UTF-8"));
-						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-							LOGGER.error(e1.getMessage(),e1);
-						}
-	        		}
 	        		else
 	        		{
 	        			try {
-	        				jTextArea_Messge.setText(new String(r_Send.getData(), "UTF-8"));
+	        				jTextArea_Messge.setText(new String(r_data, "UTF-8"));
 						} catch (UnsupportedEncodingException e1) {
 							LOGGER.error(e1.getMessage(),e1);
 						}
 	        		}
-	        		//encrypted.isSelected();
-	        		
-	        	}
-	        });
+		        		
+		        	}
+		        });
+	        }
 		}
         
 		if (r_Send.getAmount() != null) {
