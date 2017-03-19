@@ -311,6 +311,7 @@ public class Block {
 
 		return fee;
 	}
+	
 	public BigDecimal getTotalFee() {
 		return getTotalFee(DBSet.getInstance());
 	}
