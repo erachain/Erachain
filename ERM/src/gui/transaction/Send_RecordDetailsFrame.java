@@ -158,6 +158,8 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        			}
 		        		}
 
+	        			encrypted.setEnabled(false);
+
 		        		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());	
 		        		
 		        		byte[] privateKey = null; 
