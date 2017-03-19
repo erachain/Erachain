@@ -217,7 +217,6 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;
 				if (ss1.getVouchHeight() == blockNo
-						//&& ss1.getSeqNo(DBSet.getInstance()) == recNo
 						&& ss1.getVouchSeq() == recNo
 						)
 
