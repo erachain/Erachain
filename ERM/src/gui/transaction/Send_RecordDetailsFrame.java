@@ -158,28 +158,35 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        			}
 		        		}
 
-		        		// ICREATOR
-		        		PublicKeyAccount publicKeyAccount = r_Send.getCreator();
-	            		PrivateKeyAccount privateKeyAccount = Controller.getInstance().getPrivateKeyAccountByAddress(publicKeyAccount.getAddress());
-		        					        		
-		        		if(privateKeyAccount == null)
+		        		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());	
+		        		
+		        		byte[] privateKey = null; 
+		        		byte[] publicKey = null;
+		        		//IF SENDER ANOTHER
+		        		if(account == null)
 		        		{
-			        		//IF SENDER ANOTHER
-		    				privateKeyAccount = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
+		            		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
+		        			privateKey = accountRecipient.getPrivateKey();		
+		        			
+		        			publicKey = r_Send.getCreator().getPublicKey();    				
+		        		}
+		        		//IF SENDER ME
+		        		else
+		        		{
+		            		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+		        			privateKey = accountRecipient.getPrivateKey();		
+		        			
+		        			publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());    				
 		        		}
 
-		        		if (privateKeyAccount != null) {
-			        		byte[] privateKey = privateKeyAccount.getPrivateKey(); 
-			        		byte[] publicKey = publicKeyAccount.getPublicKey();
-
-			        		try {
-			        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
-							} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-								LOGGER.error(e1.getMessage(), e1);
-							}
-		        		} else {
+		        		try {
+			        		byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
+			        		String sss = new String(ddd, "UTF-8");
+		        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
+						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
 		        			jTextArea_Messge.setText("unknown password");
-		        		}		        		
+							LOGGER.error(e1.getMessage(), e1);
+						}
 		        	}
 		        });
 	        }
