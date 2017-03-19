@@ -177,16 +177,9 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 							} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
 								LOGGER.error(e1.getMessage(), e1);
 							}
-		        		}
-	        		else
-	        		{
-	        			try {
-	        				jTextArea_Messge.setText(new String(r_data, "UTF-8"));
-						} catch (UnsupportedEncodingException e1) {
-							LOGGER.error(e1.getMessage(),e1);
-						}
-	        		}
-		        		
+		        		} else {
+		        			jTextArea_Messge.setText("unknown password");
+		        		}		        		
 		        	}
 		        });
 	        }
