@@ -177,6 +177,9 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	
 	public Transaction get_Statement(int row){
 		
+		if (transactions == null || row <0 || transactions.size() <= row)
+			return null;
+		
 		return transactions.get(row);
 	}
 	

@@ -160,7 +160,6 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		
 		menu.add(vouch_Item);
 		
-		
 		TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
 	
 	}
