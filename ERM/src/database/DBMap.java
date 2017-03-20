@@ -132,7 +132,8 @@ public abstract class DBMap<T, U> extends Observable {
 	{
 		this.addUses();
 		
-		try
+		//try
+		if (true)
 		{
 			if(this.map.containsKey(key))
 			{
@@ -157,9 +158,10 @@ public abstract class DBMap<T, U> extends Observable {
 			this.outUses();
 			return u;
 		}
-		catch(Exception e)
+		//catch(Exception e)
+		else
 		{
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(), e);
 			
 			U u = this.getDefaultValue();
 			this.outUses();

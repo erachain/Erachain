@@ -115,12 +115,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// TODO Auto-generated method stub
 		if (transactions == null)
 			return 0;
-		int c = 0;
-		for (Transaction a : this.transactions) {
-			if (a != null)
-				++c;
-		}
-		return c; // transactions.size();
+		
+		return transactions.size();
 	}
 	
 	public String get_No_Trancaction(int row){
