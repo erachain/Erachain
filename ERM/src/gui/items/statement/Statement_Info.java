@@ -38,6 +38,9 @@ public class Statement_Info extends javax.swing.JPanel {
 	Transaction transaction;
 
 	public Statement_Info(Transaction transaction) {
+		if (transaction == null)
+			return;
+		
 		this.transaction = transaction;
 		initComponents();
 

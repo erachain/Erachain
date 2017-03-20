@@ -82,7 +82,7 @@ public class Voush_Library_Panel extends JPanel {
                                                                               //TableRowSorter автоматически добавит
                                                                              //SortOrder.ASCENDING
         //sorter.setSortKeys(keys);                                   //Добавляем ключи к сортировщику
-        sorter.toggleSortOrder(2);                                  //Сортируем первую колонку
+        sorter.toggleSortOrder(1);                                  //Сортируем первую колонку
         sorter.setSortsOnUpdates(true);                         //Указываем автоматически сортировать
                                                                             //при изменении модели данных
         jTable_Vouches.setRowSorter(sorter);   

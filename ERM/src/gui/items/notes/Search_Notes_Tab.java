@@ -427,8 +427,10 @@ if(note.getKey() >= NoteCls.INITIAL_FAVORITES)
 class search_listener implements ListSelectionListener  {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			NoteCls note = null;
-			if (notesTable.getSelectedRow() >= 0 ) note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
+			if (notesTable.getSelectedRow() < 0 )
+				return;
+
+			NoteCls note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
 			Info_Notes info_Note = new Info_Notes(note);
 			info_Note.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 			jScrollPane_jPanel_RightPanel.setViewportView(info_Note);
