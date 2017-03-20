@@ -52,12 +52,12 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public static final int COLUMN_CREATOR = 1;
 	// public static final int COLUMN_BODY = 2;
 	// public static final int COLUMN_AMOUNT = 2;
-	// public static final int COLUMN_FEE = 3;
+	 public static final int COLUMN_HEIGHT = 2;
 	List<Transaction> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator" });// ,
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });// ,
 																											// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
 	// private Map<byte[], BlockingQueue<Block>> blocks;
@@ -78,6 +78,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		transactions = new ArrayList<Transaction>();
 		// transactions = read_Sign_Accoutns();
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DBSet.getInstance().getTransactionMap().addObserver(this);
 		DBSet.getInstance().getVouchRecordMap().addObserver(this);
 
 	}
@@ -186,6 +187,10 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			case COLUMN_CREATOR:
 
 				return (transaction.getCreator());
+				
+			case COLUMN_HEIGHT:
+				
+				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
 			}
 
 			return null;
@@ -218,6 +223,35 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				this.fireTableDataChanged();
 			}
 		} 
+		
+		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		{
+			//CHECK IF NEW LIST
+			
+				SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
+				Iterator<Pair<byte[], Transaction>> s = ss.iterator();
+				int k = 0;
+				while (s.hasNext()){
+					Pair<byte[], Transaction> a = s.next();
+					Transaction t = a.getB();
+					if (t.getType()== Transaction.VOUCH_TRANSACTION ){
+						R_Vouch tt = (R_Vouch)t;
+						if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
+							if (!this.transactions.contains(tt)){
+								this.transactions.add(tt);
+								k++;
+							}
+						}
+					}
+					
+					
+				}
+				
+				
+			
+			
+			if (k > 0)this.fireTableDataChanged();
+		}
 		
 		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE

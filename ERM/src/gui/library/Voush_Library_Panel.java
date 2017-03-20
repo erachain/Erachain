@@ -6,15 +6,20 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.account.Account;
@@ -56,6 +61,31 @@ public class Voush_Library_Panel extends JPanel {
    		Date_Column.setMinWidth(rr+1);
    		Date_Column.setMaxWidth(rr*10);
    		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
+   		
+   		TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_HEIGHT);	
+   		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+   		rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("002222222222"));	
+   		height_Column.setMinWidth(rr+1);
+   		height_Column.setMaxWidth(rr*10);
+   		height_Column.setPreferredWidth(rr+5);//.setWidth(30);
+   		
+   		jTable_Vouches.setAutoCreateRowSorter(true);
+   		
+   		TableRowSorter sorter=new TableRowSorter(model); //Создаем сортировщик
+        //sorter.setSortable(0, true); //Указываем, что сортировать будем в первой колонке
+        //sorter.setSortable(1, true); // а в других нет
+        //sorter.setSortable(2, true);
+        //ArrayList<SortKey> keys=new ArrayList<SortKey>(); // создаем коллецию ключей сортировки
+        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //Записываем два ключа !!! (если задать
+        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //один раз, то сортировщик по-умолчанию
+                                                                              //DefaultRowSorter от которого происходит
+                                                                              //TableRowSorter автоматически добавит
+                                                                             //SortOrder.ASCENDING
+        //sorter.setSortKeys(keys);                                   //Добавляем ключи к сортировщику
+        sorter.toggleSortOrder(2);                                  //Сортируем первую колонку
+        sorter.setSortsOnUpdates(true);                         //Указываем автоматически сортировать
+                                                                            //при изменении модели данных
+        jTable_Vouches.setRowSorter(sorter);   
    		
 		
 		// jPanel_Tab_Vouch = new javax.swing.JPanel();
