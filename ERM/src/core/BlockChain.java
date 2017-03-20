@@ -55,6 +55,10 @@ public class BlockChain
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
+	public static final String[] WIPED_RECORDS = new String[]{
+			"2yTFTetbUrpZzTU3Y1kRSg3nfdetJDC2diwLJTGosnG7sScTkGaFudrTf6iyCkTfUDjP2rXP7pR1o5Y8M4DuwLe3",
+			};
+
 	// CHAIN
 	public static final int CONFIRMS_HARD = 3; // for reference by signature 
 	// MAX orphan CHAIN

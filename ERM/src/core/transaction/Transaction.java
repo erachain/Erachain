@@ -815,6 +815,15 @@ public abstract class Transaction {
 
 	public abstract int getDataLength(boolean asPack);
 
+	public boolean isWiped() {
+		for ( String wiped: BlockChain.WIPED_RECORDS) {
+			byte[] sign = Base58.decode(wiped);
+			if (Arrays.equals(this.signature, sign)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	//VALIDATE
 	
@@ -847,7 +856,6 @@ public abstract class Transaction {
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
 	
-
 	public int isValid(Long releaserReference)
 	{
 		return isValid(DBSet.getInstance(), releaserReference);
