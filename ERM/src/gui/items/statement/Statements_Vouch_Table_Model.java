@@ -218,7 +218,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
 			// CHECK IF NEW LIST
-			if (this.transactions.size() == 0) {
+			if (this.transactions == null || this.transactions.size() == 0) {
 				transactions = read_Sign_Accoutns();
 				this.fireTableDataChanged();
 			}
@@ -228,29 +228,26 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		{
 			//CHECK IF NEW LIST
 			
-				SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
-				Iterator<Pair<byte[], Transaction>> s = ss.iterator();
-				int k = 0;
-				while (s.hasNext()){
-					Pair<byte[], Transaction> a = s.next();
-					Transaction t = a.getB();
-					if (t.getType()== Transaction.VOUCH_TRANSACTION ){
-						R_Vouch tt = (R_Vouch)t;
-						if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
-							if (!this.transactions.contains(tt)){
-								this.transactions.add(tt);
-								k++;
-							}
+			SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
+			Iterator<Pair<byte[], Transaction>> s = ss.iterator();
+			
+			boolean fire = false;
+			while (s.hasNext()){
+				Pair<byte[], Transaction> a = s.next();
+				Transaction t = a.getB();
+				if (t.getType()== Transaction.VOUCH_TRANSACTION ){
+					R_Vouch tt = (R_Vouch)t;
+					if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
+						if (!this.transactions.contains(tt)){
+							this.transactions.add(tt);
+							fire = true;
 						}
 					}
-					
-					
 				}
-				
-				
+			}
 			
-			
-			if (k > 0)this.fireTableDataChanged();
+			if (fire)
+				this.fireTableDataChanged();
 		}
 		
 		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
@@ -261,23 +258,18 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			Transaction ss = (Transaction) message.getValue();
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;
-				if (ss1.getVouchHeight() == blockNo
-						&& ss1.getVouchSeq() == recNo
-						)
-
+				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
 					if (!this.transactions.contains(ss)){
 						this.transactions.add(ss);
 						this.fireTableDataChanged();
-					} else {
 					}
+				}
 			}
-
-			
 		}
 	}
 
 	private List<Transaction> read_Sign_Accoutns() {
-		List<Transaction> tran = new ArrayList<Transaction>();
+		List<Transaction> trans = new ArrayList<Transaction>();
 		// ArrayList<Transaction> db_transactions;
 		// db_transactions = new ArrayList<Transaction>();
 		// tran = new ArrayList<Transaction>();
@@ -314,13 +306,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 					Integer seg = ll.b;
 
 					Transaction kk = table.getTransaction(bl, seg);
-					if (!tran.contains(kk))
-						tran.add(kk);
+					if (!trans.contains(kk))
+						trans.add(kk);
 				}
 			}
 
 		}
-		return tran;
+		return trans;
 	}
 
 }
