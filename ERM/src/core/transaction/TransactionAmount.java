@@ -409,7 +409,7 @@ public abstract class TransactionAmount extends Transaction {
 			Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
 					this.creator.getAddress(), absKey,
 					this.recipient.getAddress()); 
-			BigDecimal creditAmount = db.getCredit_AddressesMap().add(creditKey, this.amount);
+			db.getCredit_AddressesMap().sub(creditKey, this.amount);
 		}
 		
 		if (!asPack) {
@@ -473,7 +473,7 @@ public abstract class TransactionAmount extends Transaction {
 			Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
 					this.creator.getAddress(), absKey,
 					this.recipient.getAddress()); 
-			BigDecimal creditAmount = db.getCredit_AddressesMap().sub(creditKey, this.amount);
+			db.getCredit_AddressesMap().add(creditKey, this.amount);
 		}
 
 		if (!asPack) {
