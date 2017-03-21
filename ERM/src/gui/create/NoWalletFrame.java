@@ -25,6 +25,8 @@ import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import core.item.notes.NoteCls;
+import database.DBSet;
 
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
@@ -160,18 +162,25 @@ public class NoWalletFrame extends JFrame {
 
 	public void onNextClick()
 	{
-		if(createButton.isSelected())
+        
+		NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+        if (note == null) {
+        	// USE default LICENSE
+	        note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+        }
+
+        if(createButton.isSelected())
 		{
 			//OPEN CREATE WALLET FRAME
 			this.setVisible(false);
-			new License_JFrame(true, this, true);			
+        	new License_JFrame(note, true, this, true);
 		}
 		
 		if(recoverButton.isSelected())
 		{
 			//OPEN RECOVER WALLET FRAME
 			this.setVisible(false);
-			new License_JFrame(true, this, false);	
+			new License_JFrame(note, true, this, false);	
 		}
 	}
 	

@@ -1573,10 +1573,11 @@ public class Controller extends Observable {
 		return wallet != null && this.wallet.isWalletDatabaseExisting();
 	}
 
-	public boolean createWallet(byte[] seed, String password, int amount) {
+	// use license KEY
+	public boolean createWallet(long licenseKey, byte[] seed, String password, int amount) {
 		// IF NEW WALLET CREADED
 		if(this.wallet.create(seed, password, amount, false)) {
-			this.setWalletLicense(LICENSE_KEY);
+			this.setWalletLicense(licenseKey);
 			return true;
 		}
 		else
@@ -1597,11 +1598,17 @@ public class Controller extends Observable {
 	}
 
 	public long getWalletLicense() {
-		return this.wallet.getLicenseKey(); 
+		if (this.doesWalletExists()) {
+			return this.wallet.getLicenseKey();
+		} else {
+			return 2l;
+		}
 	}
 
 	public void setWalletLicense(long key) {
-		this.wallet.setLicenseKey(key); 
+		if (this.doesWalletExists()) {
+			this.wallet.setLicenseKey(key);
+		}
 	}
 
 	public List<Account> getAccounts() {

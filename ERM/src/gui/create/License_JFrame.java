@@ -38,22 +38,31 @@ public class License_JFrame extends JDialog {
 	boolean needAccept;
 	NoWalletFrame parent;
 	boolean goCreateWallet;
+	NoteCls note;
 
 	static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
 
-    public License_JFrame(boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+    public License_JFrame(NoteCls note, boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+    	this.note = note;
     	this.needAccept = needAccept;
     	this.parent = parent;
     	this.goCreateWallet = goCreateWallet;
     	initComponents();
     }
-    public License_JFrame(boolean needAccept) {
+    public License_JFrame(NoteCls note, boolean needAccept) {
+    	this.note = note;
     	this.needAccept = needAccept;
     	initComponents();
     }
+
+    public License_JFrame(NoteCls note) {
+    	this.note = note;
+    	needAccept = false;
+        initComponents();
+    }
     	
     public License_JFrame() {
-    	//ICON	
+    	this.note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.getInstance().getWalletLicense());
     	needAccept = false;
         initComponents();
     }
@@ -200,17 +209,6 @@ public class License_JFrame extends JDialog {
             }
         });
         
-        
-        //ItemCls.NOTE_TYPE
-        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
-        if (note == null) {
-			LOGGER.error("LICENCE not found in NOTES");
-
-	    	Controller.getInstance().stopAll();
-	    	System.exit(0);
-        }
-
-
         // jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setEditable(false);
