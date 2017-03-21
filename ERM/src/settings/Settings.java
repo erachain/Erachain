@@ -61,7 +61,7 @@ public class Settings {
 	
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
-	public static final int DEFAULT_ACCOUNTS = 3;
+	public static final int DEFAULT_ACCOUNTS = 1;
 	
 	//WEB
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";

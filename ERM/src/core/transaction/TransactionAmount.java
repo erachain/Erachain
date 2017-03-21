@@ -269,6 +269,8 @@ public abstract class TransactionAmount extends Transaction {
 
 			//CHECK IF AMOUNT IS DIVISIBLE
 			int amount_sign = this.amount.signum();
+			boolean confiscate_credit = typeBytes[1] == 1;
+			
 			if (amount_sign != 0) {
 
 				if(!asset.isDivisible())
@@ -290,7 +292,6 @@ public abstract class TransactionAmount extends Transaction {
 					}					
 				}
 					
-				boolean confiscate_credit = typeBytes[1] == 1; 
 				if (actionType == 2 && confiscate_credit) {
 					// CONFISCATE CREDIT
 					Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
@@ -362,7 +363,7 @@ public abstract class TransactionAmount extends Transaction {
 			}
 
 			// IF send from PERSON to ANONIMOUSE
-			if (isPerson && !this.recipient.isPerson(db)) {
+			if (!confiscate_credit && isPerson && !this.recipient.isPerson(db)) {
 				return RECEIVER_NOT_PERSONALIZED;
 			}
 
