@@ -49,20 +49,20 @@ public class Voush_Library_Panel extends JPanel {
 		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
 		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
-		TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+		TableColumn col_data = column_mod.getColumn(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);
 		col_data.setMinWidth(50);
 		col_data.setMaxWidth(200);
 		col_data.setPreferredWidth(120);// .setWidth(30);
 
 
-		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_TIMESTAMP);	
+		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);	
    		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
    		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
    		Date_Column.setMinWidth(rr+1);
    		Date_Column.setMaxWidth(rr*10);
    		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
    		
-   		TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_HEIGHT);	
+   		TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn( Statements_Vouch_Table_Model.COLUMN_HEIGHT);	
    		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
    		rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("002222222222"));	
    		height_Column.setMinWidth(rr+1);
@@ -118,7 +118,8 @@ public class Voush_Library_Panel extends JPanel {
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection( ((Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR)).getAddress());
+				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
+				StringSelection value = new StringSelection(public_Account.getAddress());
 				clipboard.setContents(value, null);
 			}
 		});
@@ -133,9 +134,7 @@ public class Voush_Library_Panel extends JPanel {
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
-				byte[] publick_Key = Controller.getInstance()
-						.getPublicKeyByAddress(((Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR)).getAddress());
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
 			}

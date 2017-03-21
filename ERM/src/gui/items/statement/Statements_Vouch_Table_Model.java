@@ -119,7 +119,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		return transactions.size();
 	}
 	
-	public String get_No_Trancaction(int row){
+	public String get_No_Trancaction(int row) {
 		
 		if (this.transactions == null || this.transactions.size() <= row) {
 			return null;
@@ -130,6 +130,16 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			return null;
 
 		return transaction.viewHeightSeq(DBSet.getInstance());
+		
+	}
+
+	public Transaction getTrancaction(int row) {
+		
+		if (this.transactions == null || this.transactions.size() <= row) {
+			return null;
+		}
+
+		return this.transactions.get(row);
 		
 	}
 
