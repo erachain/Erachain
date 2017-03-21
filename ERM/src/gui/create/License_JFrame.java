@@ -57,7 +57,7 @@ public class License_JFrame extends JDialog {
 
     public License_JFrame(NoteCls note) {
     	this.note = note;
-    	needAccept = false;
+    	needAccept = true;
         initComponents();
     }
     	
