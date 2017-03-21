@@ -109,7 +109,8 @@ public class Start {
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
-							
+
+							//Controller.getInstance().setWalletLicense(0); // TEST
 							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу

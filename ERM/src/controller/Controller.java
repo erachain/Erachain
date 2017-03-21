@@ -110,15 +110,15 @@ public class Controller extends Observable {
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
-	public static final long LICENSE_KEY = 2l;
+	public static final long LICENSE_KEY = 1001l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
 	private static final String version = "3.02.01";
-	private static final String buildTime = "2017-03-10 19:33:33 UTC";
+	private static final String buildTime = "2017-03-21 19:33:33 UTC";
 	private static long buildTimestamp;
 	
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
 	// for reset DB if DB PROTOCOL is CHANGED
-	public static final String releaseVersion = "2.06.01";
+	public static final String releaseVersion = "3.02.01";
 
 //	TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
@@ -208,7 +208,7 @@ public class Controller extends Observable {
         	}
 
         	if (attr != null) {
-	            buildTimestamp = attr.creationTime().toMillis();
+	            buildTimestamp = attr.lastModifiedTime().toMillis();
 	            return buildTimestamp;
         	}
 	            

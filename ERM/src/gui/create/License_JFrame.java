@@ -21,7 +21,11 @@ import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
+import core.BlockChain;
+import core.block.GenesisBlock;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
@@ -34,6 +38,8 @@ public class License_JFrame extends JDialog {
 	boolean needAccept;
 	NoWalletFrame parent;
 	boolean goCreateWallet;
+
+	static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
 
     public License_JFrame(boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
     	this.needAccept = needAccept;
@@ -197,6 +203,13 @@ public class License_JFrame extends JDialog {
         
         //ItemCls.NOTE_TYPE
         NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+        if (note == null) {
+			LOGGER.error("LICENCE not found in NOTES");
+
+	    	Controller.getInstance().stopAll();
+	    	System.exit(0);
+        }
+
 
         // jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);

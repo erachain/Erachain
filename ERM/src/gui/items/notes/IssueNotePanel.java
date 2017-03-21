@@ -230,6 +230,11 @@ public class IssueNotePanel extends JPanel
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
+			
+			//ENABLE
+			this.jButton_Create.setEnabled(true);
+			return;
+
 		}
 						
 			//CREATE NOTE
@@ -378,7 +383,7 @@ public class IssueNotePanel extends JPanel
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
 	        add(jComboBox_Account_Creator, gridBagConstraints);
 
-	        jTextField_Fee.setToolTipText("");
+	        jTextField_Fee.setToolTipText("0");
 	        jTextField_Fee.setMaximumSize(new java.awt.Dimension(80, 20));
 	        jTextField_Fee.setMinimumSize(new java.awt.Dimension(80, 20));
 	        jTextField_Fee.setName(""); // NOI18N
