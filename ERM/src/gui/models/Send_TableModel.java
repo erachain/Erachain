@@ -406,6 +406,7 @@ public class Send_TableModel extends JTable implements Observer{
 	private void addMessage(int pos, R_Send transaction)
 	{
 		messageBufs.add(pos, new MessageBuf(
+				// TODO use viewData instead - use transaction instead buffer
 				transaction.getData(), 
 				transaction.isEncrypted(),
 				transaction.getCreator(), //.asPerson(),

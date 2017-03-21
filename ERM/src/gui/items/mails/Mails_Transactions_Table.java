@@ -484,6 +484,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 	private void addMessage(int pos, R_Send transaction, Account account, Boolean incoming)
 	{
 		messageBufs.add(pos, new MessageBuf(
+				// TODO use viewDATA - use TRNASACTION insteqd this buffer
 				transaction.getData(), 
 				transaction.isEncrypted(),
 				transaction.getCreator(), //.asPerson(),

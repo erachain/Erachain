@@ -184,10 +184,6 @@ public class Mail_Info extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jTextField_Title, gridBagConstraints);
-
-        
-        
-        
         
         jLabel_Message.setText(Lang.getInstance().translate("Message")+":");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -206,7 +202,8 @@ public class Mail_Info extends javax.swing.JPanel {
    //     jTextArea_Messge.setColumns(20);
    //     jTextArea_Messge.setRows(5);
    //     jTextArea_Messge.setLineWrap(true);
-       jTextArea_Messge.set_text(descript_Mesage());
+       //jTextArea_Messge.set_text(descript_Mesage());
+        jTextArea_Messge.set_text(trans.viewData());
         
     /* 
         StyledDocument doc = (StyledDocument) jTextArea_Messge.getDocument();
@@ -323,80 +320,79 @@ public class Mail_Info extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Title;
     // End of variables declaration 
     
-	void enscript(){	
-	
-//	jTextArea_Messge.setContentType("text/html");
-//	if (trans.isText())  jTextArea_Messge.setContentType("text");
-	if(!trans.isEncrypted()) return;
-	if(!encrypted)
-	{
+	void enscript() {
 		
+	//	jTextArea_Messge.setContentType("text/html");
+	//	if (trans.isText())  jTextArea_Messge.setContentType("text");
+		if(!trans.isEncrypted())
+			return;
 		
-		if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
-			if(!Controller.getInstance().unlockWallet(password))
+		if(!encrypted)
+		{	
+			if(!Controller.getInstance().isWalletUnlocked())
 			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				//ASK FOR PASSWORD
+				String password = PasswordPane.showUnlockWalletDialog(); 
+				if(!Controller.getInstance().unlockWallet(password))
+				{
+					//WRONG PASSWORD
+					JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+					
+					encrypted =!encrypted;
+					
+					return;
+				}
+			}
+	
+			Account account = Controller.getInstance().getAccountByAddress(trans.getCreator().getAddress());	
+			
+			byte[] privateKey = null; 
+			byte[] publicKey = null;
+			//IF SENDER ANOTHER
+			if(account == null)
+			{
+	    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(trans.getRecipient().getAddress());
+				privateKey = accountRecipient.getPrivateKey();		
 				
+				publicKey = trans.getCreator().getPublicKey();    				
+			}
+			//IF SENDER ME
+			else
+			{
+	    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+				privateKey = accountRecipient.getPrivateKey();		
+				
+				publicKey = Controller.getInstance().getPublicKeyByAddress(trans.getRecipient().getAddress());    				
+			}
+			
+			try {
+				jTextArea_Messge.set_text(
+						new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
+				jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 				encrypted =!encrypted;
-				
-				return;
+			
+			
+			} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+				LOGGER.error(e1.getMessage(),e1);
 			}
 		}
-
-		Account account = Controller.getInstance().getAccountByAddress(trans.getCreator().getAddress());	
-		
-		byte[] privateKey = null; 
-		byte[] publicKey = null;
-		//IF SENDER ANOTHER
-		if(account == null)
-		{
-    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(trans.getRecipient().getAddress());
-			privateKey = accountRecipient.getPrivateKey();		
-			
-			publicKey = trans.getCreator().getPublicKey();    				
-		}
-		//IF SENDER ME
 		else
 		{
-    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-			privateKey = accountRecipient.getPrivateKey();		
-			
-			publicKey = Controller.getInstance().getPublicKeyByAddress(trans.getRecipient().getAddress());    				
-		}
-		
-		try {
-			jTextArea_Messge.set_text(
-					new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
-			jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
+			jTextArea_Messge.set_text(trans.viewData());
+			jButton1.setText(Lang.getInstance().translate("Decrypt"));
 			encrypted =!encrypted;
-		
-		
-		} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-			LOGGER.error(e1.getMessage(),e1);
 		}
-	}
-	else
-	{
-		//jTextArea_Messge.setText(new String(trans.getData(), "UTF-8"));
+		//encrypted.isSelected();
 		
-		jTextArea_Messge.set_text(descript_Mesage());
-		jButton1.setText(Lang.getInstance().translate("Decrypt"));
-		encrypted =!encrypted;
 	}
-	//encrypted.isSelected();
-	
-}
-	String descript_Mesage(){
+
+	/*
+	private String descript_Mesage() {
 		String imgLock = "";
-		
+
+		byte[] data = 
 		if(this.encrypted)
 		{	
-			
-			
 				//jTextArea_Messge.setContentType("text/html");
 				imgLock = "<img src='file:images/messages/locked.png'>";
 				//return "<html>"+imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>";
@@ -411,9 +407,8 @@ public class Mail_Info extends javax.swing.JPanel {
 			return Processor.process(new String(trans.getData(), Charset.forName("UTF-8")));
 		}
 		//jTextArea_Messge.setContentType("text/html");
-		return Converter.toHex(trans.getData());
 		
-		
+		return Converter.toHex(trans.viewData());		
 	}
-    
+    */
 }
