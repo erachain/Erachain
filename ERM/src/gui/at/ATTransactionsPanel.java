@@ -63,6 +63,9 @@ public class ATTransactionsPanel extends JPanel
 			public void actionPerformed(ActionEvent e) 
 			{
 				int row = atsTable.getSelectedRow();
+		        if (row < 0)
+		        	return;
+		        
 				row = atsTable.convertRowIndexToModel(row);
 
 				Account account = new Account(atTxsTableModel.getSender(row));
