@@ -183,7 +183,8 @@ import gui.models.Renderer_Boolean;
 			public void valueChanged(ListSelectionEvent arg0) {
 				
 				PersonCls person = null;
-				if (my_Person_table.getSelectedRow() >= 0 )person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
+				if (my_Person_table.getSelectedRow() >= 0 )
+					person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
 				//info1.show_001(person);
 				
 				// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());

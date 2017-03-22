@@ -82,8 +82,8 @@ public class Voush_Library_Panel extends JPanel {
                                                                               //TableRowSorter автоматически добавит
                                                                              //SortOrder.ASCENDING
         //sorter.setSortKeys(keys);                                   //Добавляем ключи к сортировщику
-   		if (model.getRowCount() > 0 && sorter.isSortable(1)) {
-   	        sorter.toggleSortOrder(1);                                  //Сортируем первую колонку
+   		if (model.getRowCount() > 0 && sorter.isSortable(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP)) {
+   	        sorter.toggleSortOrder(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP); //Сортируем первую колонку
    		}
         sorter.setSortsOnUpdates(true);                         //Указываем автоматически сортировать
                                                                             //при изменении модели данных
