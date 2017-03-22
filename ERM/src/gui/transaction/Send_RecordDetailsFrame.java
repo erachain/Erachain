@@ -122,6 +122,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
 	        add(jScrollPane1, gridBagConstraints);			
 
+	        labelGBC.gridy = labelGBC.gridy+4;
 	        
 	        if (r_Send.isEncrypted()) {
 				//ENCRYPTED CHECKBOX
@@ -203,7 +204,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			this.add(amountLabel, labelGBC);
 					
 			//AMOUNT
-			++detailGBC.gridy;
+			detailGBC.gridy = labelGBC.gridy;
 			detailGBC.gridwidth = 2;
 			JTextField amount = new JTextField(r_Send.getAmount().toPlainString());
 			amount.setEditable(false);
