@@ -2052,6 +2052,10 @@ public class Wallet extends Observable implements Observer
 	
 	public long getLicenseKey()
 	{
+		if (this.database == null) {
+			return 2l;
+		}
+		
 		return this.database.getAccountMap().getLicenseKey();
 	}
 
