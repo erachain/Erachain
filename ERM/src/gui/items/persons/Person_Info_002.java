@@ -329,7 +329,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		int gridy = 8;
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
-			jLabel_Owner.setText(Lang.getInstance().translate("Owner") + ":");
+			jLabel_Owner.setText(Lang.getInstance().translate("Creator of data") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy++;
