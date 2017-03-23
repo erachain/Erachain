@@ -366,8 +366,9 @@ public class Mail_Info extends javax.swing.JPanel {
 			}
 			
 			try {
-				jTextArea_Messge.set_text(
+				String str = (
 						new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
+				 jTextArea_Messge.set_text("{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
 				jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 				encrypted =!encrypted;
 			

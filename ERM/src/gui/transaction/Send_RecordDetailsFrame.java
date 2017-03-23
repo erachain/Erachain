@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JCheckBox;
@@ -185,7 +186,8 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        		try {
 			        		byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
 			        		String sss = new String(ddd, "UTF-8");
-		        			jTextArea_Messge.setText(new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
+		        			 String str = (new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
+		        			 jTextArea_Messge.setText("{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
 						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
 		        			jTextArea_Messge.setText("unknown password");
 							LOGGER.error(e1.getMessage(), e1);

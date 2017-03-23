@@ -39,7 +39,7 @@ public class R_Send extends TransactionAmount {
 	protected byte[] isText;
 	
 	protected static final int BASE_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
-	protected static final int MAX_DATA_VIEW = 64;
+	public static final int MAX_DATA_VIEW = 64;
 	
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);

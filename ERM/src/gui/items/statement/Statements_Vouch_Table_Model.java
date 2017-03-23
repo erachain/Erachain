@@ -230,6 +230,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			}
 		} 
 		
+		if (message.getType() == ObserverMessage.ADD_VOUCH_TYPE) {
+			// CHECK IF NEW LIST
+		
+				transactions = read_Sign_Accoutns();
+				this.fireTableDataChanged();
+			
+		} 
+		
 		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
 		{
 			//CHECK IF NEW LIST
