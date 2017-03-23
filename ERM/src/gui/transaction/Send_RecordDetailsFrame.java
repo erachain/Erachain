@@ -1,8 +1,10 @@
 package gui.transaction;
 // 30/03
 import gui.PasswordPane;
+import gui.library.MTextPane;
 import lang.Lang;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -48,7 +50,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 
 	private JScrollPane jScrollPane1;
 
-	private JTextPane jTextArea_Messge;
+	private MTextPane jTextArea_Messge;
 	
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	
@@ -100,16 +102,20 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			
 			jScrollPane1 = new javax.swing.JScrollPane();
 	        //jTextArea_Messge = new javax.swing.JTextArea();
-	        jTextArea_Messge = new javax.swing.JTextPane();
+	        jTextArea_Messge = new MTextPane();
 			
-			
-	        jTextArea_Messge.setEditable(false);
-			jTextArea_Messge.setContentType("text/html");
+	        
+	        jTextArea_Messge.text_pane.setEditable(false);
+			jTextArea_Messge.text_pane.setContentType("text/html");
 
-	        jTextArea_Messge.setText(r_Send.viewData());
+	        jTextArea_Messge.set_text(r_Send.viewData());
 		        
-	        MenuPopupUtil.installContextMenu(jTextArea_Messge);
+	        MenuPopupUtil.installContextMenu(jTextArea_Messge.text_pane);
 	        //jTextArea_Messge.setText();
+	        
+	        jTextArea_Messge.setPreferredSize(new Dimension(300,200));
+	     //   jScrollPane1.setMaximumSize(new Dimension(600,800));
+	        
 	        jScrollPane1.setViewportView(jTextArea_Messge);
 
 	        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -187,9 +193,9 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 			        		byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
 			        		String sss = new String(ddd, "UTF-8");
 		        			 String str = (new String(AEScrypto.dataDecrypt(r_data, privateKey, publicKey), "UTF-8"));
-		        			 jTextArea_Messge.setText("{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
+		        			 jTextArea_Messge.set_text(str); //"{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
 						} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-		        			jTextArea_Messge.setText("unknown password");
+		        			jTextArea_Messge.set_text("unknown password");
 							LOGGER.error(e1.getMessage(), e1);
 						}
 		        	}

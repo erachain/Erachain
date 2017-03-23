@@ -130,7 +130,7 @@ public class R_Send extends TransactionAmount {
 				return "encrypted"; 				
 			} else {
 				if (this.data.length > MAX_DATA_VIEW<<4) {
-					return "{{" +  new String(Arrays.copyOfRange(data, 0, MAX_DATA_VIEW), Charset.forName("UTF-8")) + "...}}"; 
+					return new String(data, Charset.forName("UTF-8")); //"{{" +  new String(Arrays.copyOfRange(data, 0, MAX_DATA_VIEW), Charset.forName("UTF-8")) + "...}}"; 
 				}
 					return new String(this.data, Charset.forName("UTF-8"));
 				}

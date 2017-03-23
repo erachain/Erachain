@@ -1,5 +1,6 @@
 package gui.items.mails;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -204,6 +206,9 @@ public class Mail_Info extends javax.swing.JPanel {
    //     jTextArea_Messge.setLineWrap(true);
        //jTextArea_Messge.set_text(descript_Mesage());
         jTextArea_Messge.set_text(trans.viewData());
+        jTextArea_Messge.setPreferredSize(new Dimension(300,200));
+  //      jTextArea_Messge.setMaximumSize(new Dimension(600,800));
+        MenuPopupUtil.installContextMenu(jTextArea_Messge.text_pane);
         
     /* 
         StyledDocument doc = (StyledDocument) jTextArea_Messge.getDocument();
@@ -327,7 +332,7 @@ public class Mail_Info extends javax.swing.JPanel {
 		if(!trans.isEncrypted())
 			return;
 		
-		if(!encrypted)
+		if(encrypted)
 		{	
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
@@ -366,9 +371,8 @@ public class Mail_Info extends javax.swing.JPanel {
 			}
 			
 			try {
-				String str = (
+				jTextArea_Messge.set_text(
 						new String(AEScrypto.dataDecrypt(trans.getData(), privateKey, publicKey), "UTF-8"));
-				 jTextArea_Messge.set_text("{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
 				jButton1.setText(Lang.getInstance().translate("Encrypt Message"));
 				encrypted =!encrypted;
 			
