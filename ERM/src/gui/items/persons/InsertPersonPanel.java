@@ -36,6 +36,7 @@ import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import gui.PasswordPane;
 import gui.library.MButton;
 import gui.transaction.OnDealClick;
 import lang.Lang;
@@ -318,6 +319,24 @@ private void init(){
 
 			issueButton.setEnabled(false);
 			copyButton.setEnabled(false);
+
+			//CHECK IF WALLET UNLOCKED
+			if(!Controller.getInstance().isWalletUnlocked())
+			{
+				//ASK FOR PASSWORD
+				String password = PasswordPane.showUnlockWalletDialog(); 
+				if(!Controller.getInstance().unlockWallet(password))
+				{
+					//WRONG PASSWORD
+					JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+					
+					//ENABLE
+					issueButton.setEnabled(true);
+					copyButton.setEnabled(true);
+					
+					return;
+				}
+			}
 
 			//READ CREATOR
 			Account creatorAccount = (Account) cbxFrom.getSelectedItem();
