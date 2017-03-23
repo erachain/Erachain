@@ -109,6 +109,7 @@ public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
+	
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1001l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
