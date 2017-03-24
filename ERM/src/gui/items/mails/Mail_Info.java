@@ -259,7 +259,7 @@ public class Mail_Info extends javax.swing.JPanel {
         	}
         });
         
-        jTextArea_Messge.addMouseListener(new MouseAdapter() 
+        jTextArea_Messge.text_pane.addMouseListener(new MouseAdapter() 
 		{
 			public void mouseClicked(MouseEvent e) 
 			{
@@ -343,7 +343,7 @@ public class Mail_Info extends javax.swing.JPanel {
 					//WRONG PASSWORD
 					JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 					
-					encrypted =!encrypted;
+			//		encrypted =!encrypted;
 					
 					return;
 				}
