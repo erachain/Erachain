@@ -34,7 +34,7 @@ public class M_Accoutn_Text_Field  extends JTextField{
 	
 	public void set_account(Account account){
 		if(account.isPerson(DBSet.getInstance())){
-			this.setText( account.viewPerson());
+			this.setText( account.getPersonAsString());
 		}
 		else if (GenesisBlock.CREATOR.equals(account)) this.setText("GENESIS");
 		else
