@@ -261,7 +261,9 @@ public class ExchangeFrame extends JDialog
 	//		if(action == "Buy" || action =="To sell") this.setSize(900,800);
 			 int wH = (MainFrame.desktopPane.getWidth()- MainFrame.desktopPane.getWidth()*15/100);
 			 int hG = (MainFrame.desktopPane.getHeight()- MainFrame.desktopPane.getHeight()*15/100);
-			this.setSize(wH,hG);
+			 this.setMinimumSize(new Dimension(100,100));
+			this.setSize(new Dimension(wH,hG));
+			this.setPreferredSize(new Dimension(wH,hG));
 			this.setLocationRelativeTo(null);
 			this.setVisible(true);
 	        
