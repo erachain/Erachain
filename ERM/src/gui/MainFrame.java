@@ -16,8 +16,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -42,6 +45,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import controller.Controller;
+import core.wallet.Wallet;
 import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.documents.Main_Hash_Document_Frame;
@@ -61,12 +65,13 @@ import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
+import utils.ObserverMessage;
 import utils.SaveStrToFile;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame{
+public class MainFrame extends JFrame implements Observer{
 	
 private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
@@ -86,16 +91,11 @@ private JFrame parent;
 					 + " TS:" + Settings.getInstance().getGenesisStamp());
 		}
 		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
 		
+	
        
 		parent = MainFrame.this;
+		Controller.getInstance().addObserver(this);	
 		
 		// tool bar
 	//	JToolBar tb1 = new JToolBar(" РџР°РЅРµР»СЊ 1");
@@ -567,6 +567,52 @@ private JFrame parent;
       //  desktopPane.add(new AllPersonsFrame(this));
     //    desktopPane.add(new MainImprintsFrame());
         
+	}
+
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		
+		ObserverMessage message = (ObserverMessage) arg1;
+		if(message.getType() == ObserverMessage.NETWORK_STATUS)
+		{
+			int status = (int) message.getValue();
+			
+			if(status == Controller.STATUS_NO_CONNECTIONS)
+			{
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				this.setIconImages(icons);
+				
+			}
+			if(status == Controller.STATUS_SYNCHRONIZING)
+			{
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				this.setIconImages(icons);
+			}
+			if(status == Controller.STATUS_OK)
+			{
+				//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
+			}
+		}	
+		
+		
+		
+		// TODO Auto-generated method stub
+		
 	}
 }
 
