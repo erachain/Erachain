@@ -300,7 +300,7 @@ public class OrderPanel extends JPanel
 		superHintText.setFont(txtBuyingAmount.getFont());
 		superHintText.setText( "<html><body style='font-size: 100%'>&nbsp;<br>&nbsp;<br></body></html>" );
 		
-		superHintText.setPreferredSize(new Dimension(125, 40));
+	//	superHintText.setPreferredSize(new Dimension(125, 40));
 		
 		JPanel scrollPaneSuperHintText = new JPanel(new BorderLayout());
 		
@@ -320,7 +320,7 @@ public class OrderPanel extends JPanel
 		}
 			
 		
-		this.sellButton.setPreferredSize(new Dimension(125, 25));
+	//	this.sellButton.setPreferredSize(new Dimension(125, 25));
 		this.sellButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

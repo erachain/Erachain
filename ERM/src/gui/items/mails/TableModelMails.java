@@ -102,11 +102,11 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		case COLUMN_SENDER:
 
-			return tran.viewCreator();
+			return tran.getCreator().viewPerson();
 
 		case COLUMN_RECIEVER:
 
-			return tran.viewRecipient();
+			return tran.getRecipient().viewPerson();
 
 		case COLUMN_HEAD:
 
