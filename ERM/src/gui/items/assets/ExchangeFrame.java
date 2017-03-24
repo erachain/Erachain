@@ -2,7 +2,7 @@ package gui.items.assets;
 
 import lang.Lang;
 import utils.Pair;
-
+import gui.MainFrame;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -41,6 +41,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBSet;
+import gui.MainFrame;
 import gui.library.MTable;
 
 
@@ -128,7 +129,7 @@ public class ExchangeFrame extends JDialog
 			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 			icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 	//		this.setFrameIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png")));
-			
+			this.setIconImages(icons);
 			//CLOSE
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			
@@ -139,11 +140,7 @@ public class ExchangeFrame extends JDialog
 			 getContentPane().setLayout(new java.awt.GridBagLayout());
 			((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 	        
-			
-	       
-	      
-
-	// select panel  
+			// select panel  
 
 	      
 	        jSelect_Trade = new javax.swing.JPanel();
@@ -262,6 +259,9 @@ public class ExchangeFrame extends JDialog
 			this.pack();
 			this.setResizable(true);
 	//		if(action == "Buy" || action =="To sell") this.setSize(900,800);
+			 int wH = (MainFrame.desktopPane.getWidth()- MainFrame.desktopPane.getWidth()*15/100);
+			 int hG = (MainFrame.desktopPane.getHeight()- MainFrame.desktopPane.getHeight()*15/100);
+			this.setSize(wH,hG);
 			this.setLocationRelativeTo(null);
 			this.setVisible(true);
 	        
@@ -558,21 +558,7 @@ public class ExchangeFrame extends JDialog
 			jPanel_Trade.add(buyScrollPane, tableGBC);
 			
 			if (action == "Buy")buyScrollPane.setVisible(false);
-			
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
+	     
 	        addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
 
 	        jPanel_History.setLayout(new java.awt.GridBagLayout());
@@ -630,16 +616,8 @@ public class ExchangeFrame extends JDialog
 
 			////
 			jPanel_History.add(new JScrollPane(tradesTable), tableGBC);
-	        
-	                
-	        
 	        addTab(Lang.getInstance().translate("Trade History"), jPanel_History);
-
-	        
-		
-		
-		
-		
+	
 	}
 			
 	
