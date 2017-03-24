@@ -49,7 +49,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	private List<Transaction> r_Trans;
 	private boolean isEncrypted = true; 
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "Amount", "Asset", "Recipient", "Message", "Confirmation"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "Amount", "Asset", "Recipient", "Title", "Confirmation"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 
 	private SortableList<Tuple2<String, String>, Transaction> ss;
@@ -162,9 +162,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			
 		case COLUMN_MESSAGE:
 			
-			if (r_Tran.getType() != Transaction.SEND_ASSET_TRANSACTION) return "";
+			if (r_Tran.getType() != Transaction.SEND_ASSET_TRANSACTION) return Lang.getInstance().translate("Genesis Transaction");
 			
 			 R_Send rs = ((R_Send) r_Tran);
+			 if (rs == rs)return rs.getHead();
 			 if (!rs.isEncrypted()) return rs.viewData();
 			 if (this.isEncrypted) return rs.viewData();
 			 if(!Controller.getInstance().isWalletUnlocked()) return rs.viewData();		
