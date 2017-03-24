@@ -58,7 +58,7 @@ public class My_Loans_SplitPanel extends Split_Panel {
 			if (accountPanel.table.getSelectedRow() >= 0 )
 				account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
 			//info1.show_001(person);
-			rightPanel.jTable1.Search_Accoutnt_Transaction_From_Asset(account, asset);
+		//	rightPanel.jTable1.Search_Accoutnt_Transaction_From_Asset(account, asset);
 //			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();
 			// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
 			//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	

@@ -125,7 +125,11 @@ public class R_Send extends TransactionAmount {
 	
 	public String viewData()
 	{
+		
+		if (data == null)
+			return "";
 		if (this.isText()) {
+			
 			if (this.isEncrypted()) {
 				return "encrypted"; 				
 			} else {
