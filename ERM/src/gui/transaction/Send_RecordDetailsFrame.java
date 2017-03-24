@@ -2,6 +2,7 @@ package gui.transaction;
 // 30/03
 import gui.PasswordPane;
 import gui.library.MTextPane;
+import gui.library.M_Accoutn_Text_Field;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -65,17 +66,19 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		
 		//RECIPIENT
 		++detailGBC.gridy;
-		JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
+		M_Accoutn_Text_Field recipient = new M_Accoutn_Text_Field(r_Send.getRecipient());
+	//	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
 		recipient.setEditable(false);
-		MenuPopupUtil.installContextMenu(recipient);
+	//	MenuPopupUtil.installContextMenu(recipient);
 		this.add(recipient, detailGBC);		
 		
-		String personStr = r_Send.getRecipient().viewPerson();
+	/*	String personStr = r_Send.getRecipient().viewPerson();
 		if (personStr.length()>0) {
 			++labelGBC.gridy;
 			++detailGBC.gridy;
 			this.add(new JLabel(personStr), detailGBC);
 		}
+		*/
 		
 		if(r_Send.getHead() != null){
 			//LABEL MESSAGE
