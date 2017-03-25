@@ -57,12 +57,15 @@ public class MTable<U> extends JTable {
 	// set model
 		this.model = model;
 		setModel(this.model);
+	// view filter dialog
+	//	show_search(true);
+		
+		
 	// height row in table	
 		setRowHeight( (int) (getFontMetrics(getFont()).getHeight()));
 	// set renders
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		 search_Sorter = new TableRowSorter(this.model);
-			this.setRowSorter(search_Sorter);	
+		 
 			
 			
 			 items = new String[5];
@@ -200,12 +203,16 @@ public class MTable<U> extends JTable {
 	*/		
 		
 		
-	
+			show_search(true);
 	}
 	
 	public void  show_search(boolean bl){
 		
-		if (bl)this.getTableHeader().addMouseListener(mouseListener);	
+		if (bl){
+			search_Sorter = new TableRowSorter(this.model);
+			this.setRowSorter(search_Sorter);	
+			this.getTableHeader().addMouseListener(mouseListener);	
+		}
 		else this.getTableHeader().removeMouseListener(mouseListener);
 		
 	}
