@@ -19,9 +19,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -32,11 +30,10 @@ import org.mapdb.Fun.Tuple2;
 import com.toedter.calendar.JCalendar;
 
 import gui.items.persons.TableModelPersons;
-import gui.models.Renderer_Right;
 
 
 
-public class MTable extends JTable {
+public class MTable<U> extends JTable {
 
 	/**
 	 * 
@@ -45,7 +42,7 @@ public class MTable extends JTable {
 	
 	public TableModel model;
 	public TableRowSorter search_Sorter;
-	HashMap<Integer,Tuple2< Object,RowFilter<TableModel, Integer>>> filters;
+	HashMap<Integer,Tuple2<U,RowFilter<TableModel, Integer>>> filters;
 	MouseListener mouseListener;
 	private RowFilter<TableModel, Integer> filter;
 
@@ -79,8 +76,6 @@ public class MTable extends JTable {
 
 				
 
-				private TableCellRenderer rend;
-
 				@Override
 				public void mouseClicked(MouseEvent arg0) {
 					// TODO Auto-generated method stub
@@ -107,7 +102,6 @@ public class MTable extends JTable {
 				        Point p = arg0.getPoint();
 				        int col = getColumn(th, p);
 				        TableColumn column = th.getColumnModel().getColumn(col);
-				        if (rend == null)  rend = column.getHeaderRenderer();
 				        String ss = "****";
 						if (model.getColumnClass(col)== Integer.class ) {
 							ss  = "Number";
@@ -122,16 +116,10 @@ public class MTable extends JTable {
 				        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(), sss );
 				        	if(str != null)
 				        	{
-				        		if (!str.toString().equals(""))	{
-				        			column.setHeaderRenderer(new Renderer_Right());//.setHeaderValue("<HTML><B>" + column.getHeaderValue());
-				        			filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
-				        		}
-				        		else {
-				        			filters.remove(col);
-				        			column.setHeaderRenderer(null);
-				        		}
+				        		if (!str.toString().equals(""))	filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
+				        		else filters.remove(col);
 				        	}
-				   //     	else filters.clear();           
+				        	else filters.clear();           
 				        	
 				        	
 				      //  filters.put(2,RowFilter.regexFilter(".*Отп.*"));
@@ -149,16 +137,16 @@ public class MTable extends JTable {
 				        		if (!str.toString().equals(""))	filters.put(col,new Tuple2((Date)str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
 				        		else filters.remove(col);
 				        	}
-				 //       	else filters.clear();    
+				        	else filters.clear();    
 				        	
 				        	
 				        }
 				        String oldValue = (String)column.getHeaderValue() + " " + ss;
 				 //       Object value = showEditor(th, col, oldValue);
-				        Iterator<Tuple2<Object, RowFilter<TableModel, Integer>>> s = filters.values().iterator();
+				        Iterator<Tuple2<U, RowFilter<TableModel, Integer>>> s = filters.values().iterator();
 				        List <RowFilter<TableModel, Integer>> rowfolters = new ArrayList();
 				        while(s.hasNext()){
-				        	Tuple2<Object, RowFilter<TableModel, Integer>> a = s.next();
+				        	Tuple2<U, RowFilter<TableModel, Integer>> a = s.next();
 				        	rowfolters.add(a.b);
 				        }
 				        filter = RowFilter.andFilter(rowfolters);
