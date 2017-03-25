@@ -233,7 +233,7 @@ public class MTable<U> extends JTable {
 	//	RowFilter filter = RowFilter.regexFilter(".*" + "2" + ".*", 1);
 	//	((DefaultRowSorter) this.search_Sorter).setRowFilter(filter);
     //	 this.search_Sorter.setRowFilter(RowFilter.regexFilter(".*Create.*"));
-		
+		if (model.getRowCount()==0) return;
 		this.search_Sorter.setRowFilter(filter);
 		this.setRowSorter( this.search_Sorter);
 	//	this.model.fireTableDataChanged();

@@ -83,7 +83,7 @@ public class RecordsPanel extends  JPanel // JPanel
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new MTable(this.transactionsModel);
-		this.transactionsTable.show_search(true);
+	//	this.transactionsTable.show_search(true);
 		
 		//TRANSACTIONS SORTER
 	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
