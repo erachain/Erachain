@@ -1,6 +1,7 @@
 package gui.models;
 
 import java.awt.TrayIcon.MessageType;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Observable;
@@ -78,7 +79,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		return this.transactions.get(row).getB();
 	}
 	
-	
 	public Class<? extends Object> getColumnClass(int c)
 	{     // set column type
 		Object o = getValueAt(0, c);
@@ -130,8 +130,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		try 
-		{
+		//try 
+		//{
 			if(this.transactions == null || this.transactions.size() -1 < row)
 			{
 				return null;
@@ -143,11 +143,17 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				return null;
 			}
 			
+			Tuple2<String, String> addr1 = data.getA();
+			if (addr1 == null)
+				return null;
+			
 			String creator_address = data.getA().a;
 			//Account creator = new Account(data.getA().a);
 			//Account recipient = null; // = new Account(data.getA().b);
 			
 			Transaction transaction = data.getB();
+			if (transaction == null)
+				return null;
 			//creator = transaction.getCreator();
 			String itemName = "";
 			if (transaction instanceof TransactionAmount && transaction.getAbsKey() >0)
@@ -157,23 +163,33 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
 				if (item==null)
 					return null;
+				
 				itemName = item.toString();
 			} else if ( transaction instanceof GenesisTransferAssetTransaction)
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
 				//recipient = transGen.getRecipient();				
 				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+				if (item==null)
+					return null;
+				
 				itemName = item.toString();
 				creator_address = transGen.getRecipient().getAddress();
 			} else if ( transaction instanceof Issue_ItemRecord)
 			{
 				Issue_ItemRecord transIssue = (Issue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
+				if (item==null)
+					return null;
+
 				itemName = item.getShort();
 			} else if ( transaction instanceof GenesisIssue_ItemRecord)
 			{
 				GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)transaction;
 				ItemCls item = transIssue.getItem();
+				if (item==null)
+					return null;
+
 				itemName = item.getShort();
 			} else if (transaction instanceof R_SertifyPubKeys )
 			{
@@ -182,8 +198,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
 				if (item == null)
 					return null;
+				
 				itemName = item.toString();
-			} else {
+			} else if (transaction.viewItemName() != null) {
 				itemName = transaction.viewItemName();
 			}
 			
@@ -195,7 +212,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_TIMESTAMP:
 				
-				//return DateTimeFormat.timestamptoString(transaction.viewTimestamp()) + " " + transaction.getTimestamp();
 				DateFormat df = DateFormat.getDateTimeInstance (DateFormat.DEFAULT,DateFormat.DEFAULT);
 				return df.format(new Date(transaction.getTimestamp()));//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 							
@@ -205,28 +221,25 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				
 			case COLUMN_CREATOR:
 				
-				return transaction.viewCreator().toString();
+				return transaction.viewCreator();
 				
 			case COLUMN_ITEM:
 				return itemName;
 
 			case COLUMN_AMOUNT:
 								
-				/*
-				if (creator_address==null) return "";
-				
-				return NumberAsString.getInstance().numberAsString(
-						transaction.getAmount(creator_address));
-						*/
-				return transaction.getAmount();
+				BigDecimal amo = transaction.getAmount();
+				if (amo == null)
+					return BigDecimal.ZERO;
+				return amo;
 
 			case COLUMN_RECIPIENT:
 				
-				return transaction.viewRecipient().toString();
+				return transaction.viewRecipient();
 
 			case COLUMN_FEE:
 				
-				return transaction.getFee();			
+				return transaction.getFee();
 
 			case COLUMN_SIZE:
 				return transaction.viewSize(false);
@@ -234,11 +247,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			
 			return null;
 			
-		} catch (Exception e) {
+		//} catch (Exception e) {
 			//GUI ERROR
-			LOGGER.error(e.getMessage(),e);
-			return null;
-		}
+		//	LOGGER.error(e.getMessage(),e);
+		//	return null;
+		//}
 		
 	}
 

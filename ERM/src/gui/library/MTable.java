@@ -239,10 +239,6 @@ public class MTable<U> extends JTable {
         return retVal;
     }
     
-    
-  
-  
-   
   
    
 }
