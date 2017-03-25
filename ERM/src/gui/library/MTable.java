@@ -30,6 +30,7 @@ import org.mapdb.Fun.Tuple2;
 import com.toedter.calendar.JCalendar;
 
 import gui.items.persons.TableModelPersons;
+import gui.models.Renderer_Right;
 
 
 
@@ -116,10 +117,16 @@ public class MTable<U> extends JTable {
 				        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(), sss );
 				        	if(str != null)
 				        	{
-				        		if (!str.toString().equals(""))	filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
-				        		else filters.remove(col);
+				        		if (!str.toString().equals(""))	{
+				        			column.setHeaderRenderer(new Renderer_Right());
+				        			filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
+				        		}
+				        		else {
+				        			column.setHeaderRenderer(null);
+				        			filters.remove(col);
+				        		}
 				        	}
-				        	else filters.clear();           
+				         
 				        	
 				        	
 				      //  filters.put(2,RowFilter.regexFilter(".*Отп.*"));
@@ -134,10 +141,16 @@ public class MTable<U> extends JTable {
 				        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(),new JCalendar((Date) sss) );
 				        	if(str != null)
 				        	{
-				        		if (!str.toString().equals(""))	filters.put(col,new Tuple2((Date)str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
-				        		else filters.remove(col);
+				        		if (!str.toString().equals(""))	{
+				        			column.setHeaderRenderer(new Renderer_Right());
+				        			filters.put(col,new Tuple2((Date)str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
+				        		}
+				        		else {
+				        			column.setHeaderRenderer(null);
+				        			filters.remove(col);
+				        		}
 				        	}
-				        	else filters.clear();    
+				           
 				        	
 				        	
 				        }
