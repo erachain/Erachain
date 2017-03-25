@@ -1,6 +1,8 @@
 package gui.models;
 
 import java.awt.TrayIcon.MessageType;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -194,15 +196,16 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			case COLUMN_TIMESTAMP:
 				
 				//return DateTimeFormat.timestamptoString(transaction.viewTimestamp()) + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
-				
+				DateFormat df = DateFormat.getDateTimeInstance (DateFormat.DEFAULT,DateFormat.DEFAULT);
+				return df.format(new Date(transaction.getTimestamp()));//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
+							
 			case COLUMN_TYPE:
 				
 				return Lang.getInstance().translate(transaction.viewTypeName());
 				
 			case COLUMN_CREATOR:
 				
-				return transaction.viewCreator();
+				return transaction.viewCreator().toString();
 				
 			case COLUMN_ITEM:
 				return itemName;
@@ -215,15 +218,15 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				return NumberAsString.getInstance().numberAsString(
 						transaction.getAmount(creator_address));
 						*/
-				return transaction.viewAmount(creator_address);
+				return transaction.getAmount();
 
 			case COLUMN_RECIPIENT:
 				
-				return transaction.viewRecipient();
+				return transaction.viewRecipient().toString();
 
 			case COLUMN_FEE:
 				
-				return transaction.viewFee();			
+				return transaction.getFee();			
 
 			case COLUMN_SIZE:
 				return transaction.viewSize(false);

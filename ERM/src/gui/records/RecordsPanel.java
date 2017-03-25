@@ -83,15 +83,17 @@ public class RecordsPanel extends  JPanel // JPanel
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new MTable(this.transactionsModel);
+		this.transactionsTable.show_search(true);
 		
 		//TRANSACTIONS SORTER
-		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
-		transactionsTable.setRowSorter(sorter);
+	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
+	//	CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+	//	transactionsTable.setRowSorter(sorter);
+		transactionsTable.setAutoCreateRowSorter(true);
 		
 		//Custom renderer for the String column;
 		this.transactionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
