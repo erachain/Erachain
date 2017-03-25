@@ -106,7 +106,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object item = getValueAt(0, c);
-		return item==null? null : item.getClass();
+		return item==null? String.class: item.getClass();
     }
 	
 	public Transaction getItem(int row)
@@ -135,7 +135,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.r_Trans == null || row > this.r_Trans.size() - 1 )
+		if(this.r_Trans == null || row > this.r_Trans.size() - 1 || this.r_Trans.size() == 0 )
 		{
 			return null;
 		}
@@ -210,14 +210,14 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
+	//try
+	//	{
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
+	//	}
+	//	catch(Exception e)
+	//	{
 			//GUI ERROR
-		}
+	//	}
 	}
 	
 	@SuppressWarnings("unchecked")
