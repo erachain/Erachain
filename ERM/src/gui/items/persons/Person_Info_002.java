@@ -485,6 +485,8 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 		// vouch panel
 		jTabbedPane1.add(new Voush_Library_Panel(issue_record));
+		// vouch panel
+		jTabbedPane1.add(new Person_Owner_Panel(person));
 
 	}// </editor-fold>
 
