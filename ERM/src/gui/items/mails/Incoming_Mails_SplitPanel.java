@@ -71,7 +71,7 @@ import utils.TableMenuPopupUtil;
 		private TableModelMails incoming_Mails_Model;
 		private MTable inciming_Mail_Table;
 		private TableRowSorter my_Sorter;
-		private RunMenu my_run_menu;
+
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
@@ -241,31 +241,9 @@ import utils.TableMenuPopupUtil;
 			 Dimension size = MainFrame.desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-			
-		  
 		    
 		}
 	
-	
-	
-	
-	// listener search_tab run menu focus
-		class My_run_Menu_Focus_Listener implements WindowFocusListener{
-			@Override
-			public void windowGainedFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void windowLostFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				my_run_menu.setVisible(false);
-			}
-		};
-
-		
-
-		
-
 		class My_Tab_Listener implements ListSelectionListener {
 			
 			//@SuppressWarnings("deprecation")
@@ -304,7 +282,6 @@ import utils.TableMenuPopupUtil;
 			
 				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
 				((DefaultRowSorter)  my_Sorter).setRowFilter(filter);
-					
 				incoming_Mails_Model.fireTableDataChanged();
 
 			}
