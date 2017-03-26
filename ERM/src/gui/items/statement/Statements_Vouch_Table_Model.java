@@ -37,6 +37,7 @@ import database.SortableList;
 import database.TransactionFinalMap;
 import database.TransactionMap;
 import lang.Lang;
+import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -162,7 +163,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				// return
 				// DateTimeFormat.timestamptoString(transaction.getTimestamp())
 				// + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp(); // + " " +
+				return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " +
 													// transaction.getTimestamp()
 													// / 1000;
 

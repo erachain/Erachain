@@ -116,7 +116,7 @@ public class Mail_Info extends javax.swing.JPanel {
 
         jTextField_Data.setEditable(false);
         MenuPopupUtil.installContextMenu(jTextField_Data);
-        jTextField_Data.setText(DateTimeFormat.timestamptoString(trans.getTimestamp(), "dd-mm-yyyy", "0"));
+        jTextField_Data.setText(DateTimeFormat.timestamptoString(trans.getTimestamp()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;

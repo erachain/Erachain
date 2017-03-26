@@ -96,9 +96,9 @@ import utils.TableMenuPopupUtil;
 			inciming_Mail_Table = new MTable(incoming_Mails_Model);
 			inciming_Mail_Table.setAutoCreateRowSorter(true);
 			
-			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
-			columnModel.getColumn(1).setMaxWidth((100));
+		//	TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
+		//	columnModel.getColumn(0).setMaxWidth((100));
+		//	columnModel.getColumn(1).setMaxWidth((100));
 			//Custom renderer for the String column;
 					
 					
