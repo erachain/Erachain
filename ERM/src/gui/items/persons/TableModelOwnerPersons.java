@@ -146,14 +146,14 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-//		try
-//		{
+		try
+		{
 			this.syncUpdate(o, arg);
-//		}
-//		catch(Exception e)
-//		{
+		}
+		catch(Exception e)
+		{
 			//GUI ERROR
-//		}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
