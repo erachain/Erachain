@@ -49,6 +49,8 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
+import database.DBSet;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
@@ -59,6 +61,7 @@ import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemImprintsTableModel;
+import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 public class Search_Notes_Tab extends Split_Panel {
@@ -183,7 +186,7 @@ public class Search_Notes_Tab extends Split_Panel {
 		
 	
 	// MENU
-	JPopupMenu nameSalesMenu = new JPopupMenu();
+	JPopupMenu search_notes_menu = new JPopupMenu();
 	
 	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 	favorite.addActionListener(new ActionListener() {
@@ -195,23 +198,7 @@ public class Search_Notes_Tab extends Split_Panel {
 	});
 	
 	
-	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
-	sell.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int row = notesTable.getSelectedRow();
-			row = notesTable.convertRowIndexToModel(row);
-
-			 NoteCls note = tableModelNotes.getNote(row);
-		//	new AssetPairSelect(asset.getKey(), "To sell",  "");
-		}
-	});
-	
-	
-	
-	
-	
-	
-	nameSalesMenu.addPopupMenuListener(new PopupMenuListener(){
+	search_notes_menu.addPopupMenuListener(new PopupMenuListener(){
 
 		@Override
 		public void popupMenuCanceled(PopupMenuEvent arg0) {
@@ -248,52 +235,34 @@ public class Search_Notes_Tab extends Split_Panel {
 	}
 	
 	);
-	nameSalesMenu.add(favorite);
-	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
-	details.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int row = notesTable.getSelectedRow();
-			row = notesTable.convertRowIndexToModel(row);
-
-			NoteCls note = tableModelNotes.getNote(row);
-	//		new AssetFrame(asset);
-		}
-	});
-//	nameSalesMenu.add(details);
+	search_notes_menu.add(favorite);
 	
-	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
-	excahge.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int row = notesTable.getSelectedRow();
-			row = notesTable.convertRowIndexToModel(row);
-
-			NoteCls note = tableModelNotes.getNote(row);
-	//		new AssetPairSelect(asset.getKey(), "","");
-		}
-	});
-//	 nameSalesMenu.add(excahge);
+	JMenuItem vouch_Item= new JMenuItem(Lang.getInstance().translate("Vouch"));
+    
+	vouch_Item.addActionListener(new ActionListener(){
 	
-	
-	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
-	buy.addActionListener(new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent e) {
-			int row = notesTable.getSelectedRow();
-			row = notesTable.convertRowIndexToModel(row);
-
-			NoteCls note = tableModelNotes.getNote(row);
-	//		new AssetPairSelect(asset.getKey(), "Buy","");
+			
+			if (notesTable.getSelectedRow() < 0 )	return;
+				
+			
+			 NoteCls note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
+			if (note == null) return;
+			
+			Transaction trans = DBSet.getInstance().getTransactionFinalMap().get(DBSet.getInstance().getTransactionFinalMapSigns()
+								.get(note.getReference()));
+			
+			
+			VouchRecordDialog vouch_panel = new VouchRecordDialog(trans.getBlockHeight(DBSet.getInstance()),trans.getSeqNo(DBSet.getInstance()));
+		
 		}
 	});
 	
-//	nameSalesMenu.addSeparator();
-//	nameSalesMenu.add(buy);
 	
-//	nameSalesMenu.add(sell);
-//	nameSalesMenu.addSeparator();
-	
-	nameSalesMenu.add(favorite);
-
-	notesTable.setComponentPopupMenu(nameSalesMenu);
+	search_notes_menu.add(favorite);
+	search_notes_menu.add(vouch_Item);
+	notesTable.setComponentPopupMenu(search_notes_menu);
 	notesTable.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mousePressed(MouseEvent e) {
