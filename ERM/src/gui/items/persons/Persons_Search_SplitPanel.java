@@ -221,12 +221,11 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 			public void valueChanged(ListSelectionEvent arg0) {
 				PersonCls person = null;
 				if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
-				if (person != null) {
-					//Person_info_panel_001 info_panel = new Person_info_panel_001(person, false);
+				if (person == null) return;
 					Person_Info_002 info_panel = new Person_Info_002(person, true);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-				}
+				
 			}
 		}
 
