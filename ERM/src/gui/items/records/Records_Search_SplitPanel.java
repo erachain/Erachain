@@ -87,6 +87,7 @@ import utils.MenuPopupUtil;
 		    public Records_Search_SplitPanel() {
 		   
 		    	
+		    	this.searchToolBar_LeftPanel.setVisible(true);
 		    	jScrollPane4 = new  JScrollPane();
 		    	
 		    	this.setName(Lang.getInstance().translate("Search Records"));

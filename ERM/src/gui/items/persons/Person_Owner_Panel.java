@@ -47,7 +47,7 @@ public class Person_Owner_Panel extends JPanel {
 	@SuppressWarnings("rawtypes")
 	public  Person_Owner_Panel(PersonCls person) {
 
-		this.setName(Lang.getInstance().translate("My Persons"));
+		this.setName(Lang.getInstance().translate("Created person"));
 		
 		TableModelOwnerPersons person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
 		jTable_My_Persons = new MTable(person_Accounts_Model);

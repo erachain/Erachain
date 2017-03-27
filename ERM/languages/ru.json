@@ -164,7 +164,7 @@
 	"Create Status":"Создать Статус",
 	"Create Wallet":"Создать Кошелек",
 	"Create":"Создать",
-	
+	"Created person":"Созданные персоны",
 	"Creation date:":"Дата создания:",
 	"Creator:":"Создатель:",
 	"Creator":"Создатель",
@@ -665,6 +665,7 @@
 	"Vote":"Голосование",
 	"Voting will be enabled at ":"Голосование будет включено в ",
 	"Voting":"Голосование",
+	"Vouched for":"Поручился за",
 	"Waiting...":"Подождите...",
 	"wallet already exists":"кошелек уже существует",
 	"Wallet dir:":"Папка кошелька",
