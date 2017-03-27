@@ -253,6 +253,7 @@ import utils.TableMenuPopupUtil;
 				R_Send mail = null;
 				if (inciming_Mail_Table.getSelectedRow() >= 0 )mail = (R_Send)incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
 				//info1.show_001(person);
+				if (mail == null) return;
 				Mail_Info info_panel = new Mail_Info(mail);
 			
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
