@@ -33,6 +33,12 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 		Controller.getInstance().addObserver(this);
 	}
 	
+	public Class<? extends Object> getColumnClass(int c)
+	{     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? String.class: item.getClass();
+    }
+	
 	@Override
 	public SortableList<byte[], Transaction> getSortableList() 
 	{

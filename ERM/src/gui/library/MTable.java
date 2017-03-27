@@ -89,66 +89,7 @@ public class MTable<U> extends JTable {
 				@Override
 				public void mousePressed(MouseEvent arg0) {
 					// TODO Auto-generated method stub
-					if(arg0.getButton() == arg0.BUTTON3) {
-				    	JTableHeader th = (JTableHeader)arg0.getSource();
-				        Point p = arg0.getPoint();
-				        int col = getColumn(th, p);
-				        TableColumn column = th.getColumnModel().getColumn(col);
-				        String ss = "****";
-						if (model.getColumnClass(col)== Integer.class ) {
-							ss  = "Number";
-						}
-				        if (model.getColumnClass(col) == String.class)
-				        {
-				     // Диалоговое окно с полем ввода, инициализируемое initialSelectionValue
-				        	String sss = "";
-				        	if (filters.get(col) != null){
-				        	    	if (filters.get(col).a != null) sss = filters.get(col).a.toString();
-				        	}
-				        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(), sss );
-				        	if(str != null)
-				        	{
-				        		if (!str.toString().equals(""))	{
-				        			column.setHeaderRenderer(new Renderer_Right());
-				        			filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
-				        		}
-				        		else {
-				        			column.setHeaderRenderer(null);
-				        			filters.remove(col);
-				        		}
-				        	}
-				        }
-						
-				        if (model.getColumnClass(col) == Date.class){
-				        	Object sss = null;
-				        	if (filters.get(col) != null){
-				        	    	if (filters.get(col).a != null) sss = filters.get(col).a;
-				        	}
-				        	Object str = JOptionPane.showInputDialog (th, "Data col. = " + column.getHeaderValue(),"data" );
-				        	if(str != null)
-				        	{
-				        		if (!str.toString().equals(""))	{
-				        			column.setHeaderRenderer(new Renderer_Right());
-				        			filters.put(col,new Tuple2((Date)str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
-				        		}
-				        		else {
-				        			column.setHeaderRenderer(null);
-				        			filters.remove(col);
-				        		}
-				        	}
-				        }
-				        //       Object value = showEditor(th, col, oldValue);
-				        Iterator<Tuple2<U, RowFilter<TableModel, Integer>>> s = filters.values().iterator();
-				        List <RowFilter<TableModel, Integer>> rowfolters = new ArrayList();
-				        while(s.hasNext()){
-				        	Tuple2<U, RowFilter<TableModel, Integer>> a = s.next();
-				        	rowfolters.add(a.b);
-				        }
-				        filter = RowFilter.andFilter(rowfolters);
-				//        column.setHeaderValue("<HTML><B>" + value);
-				        set_Filter();
-				        th.resizeAndRepaint();
-				    	}	
+					 mouse_Presset(arg0);
 				}
 
 				@Override
@@ -233,5 +174,79 @@ public class MTable<U> extends JTable {
     }
     
   
+    private void mouse_Presset(MouseEvent arg0){
+	  if(arg0.getButton() == arg0.BUTTON3) {
+	    	JTableHeader th = (JTableHeader)arg0.getSource();
+	        Point p = arg0.getPoint();
+	        int col = getColumn(th, p);
+	        TableColumn column = th.getColumnModel().getColumn(col);
+	        String ss = "****";
+			if (model.getColumnClass(col)== Integer.class ) {
+				ss  = "Number";
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			}
+	        if (model.getColumnClass(col) == String.class)
+	        {
+	     // Диалоговое окно с полем ввода, инициализируемое initialSelectionValue
+	        	String sss = "";
+	        	if (filters.get(col) != null){
+	        	    	if (filters.get(col).a != null) sss = filters.get(col).a.toString();
+	        	}
+	        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(), sss );
+	        	if(str != null)
+	        	{
+	        		if (!str.toString().equals(""))	{
+	        			column.setHeaderRenderer(new Renderer_Right());
+	        			filters.put(col,new Tuple2(str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
+	        		}
+	        		else {
+	        			column.setHeaderRenderer(null);
+	        			filters.remove(col);
+	        		}
+	        	}
+	        }
+			
+	        if (model.getColumnClass(col) == Date.class){
+	        	Object sss = null;
+	        	if (filters.get(col) != null){
+	        	    	if (filters.get(col).a != null) sss = filters.get(col).a;
+	        	}
+	        	Object str = JOptionPane.showInputDialog (th, "Data col. = " + column.getHeaderValue(),"data" );
+	        	if(str != null)
+	        	{
+	        		if (!str.toString().equals(""))	{
+	        			column.setHeaderRenderer(new Renderer_Right());
+	        			filters.put(col,new Tuple2((Date)str, RowFilter.regexFilter(".*"+  str.toString()  +".*",col)));
+	        		}
+	        		else {
+	        			column.setHeaderRenderer(null);
+	        			filters.remove(col);
+	        		}
+	        	}
+	        }
+	        //       Object value = showEditor(th, col, oldValue);
+	        Iterator<Tuple2<U, RowFilter<TableModel, Integer>>> s = filters.values().iterator();
+	        List <RowFilter<TableModel, Integer>> rowfolters = new ArrayList();
+	        while(s.hasNext()){
+	        	Tuple2<U, RowFilter<TableModel, Integer>> a = s.next();
+	        	rowfolters.add(a.b);
+	        }
+	        filter = RowFilter.andFilter(rowfolters);
+	//        column.setHeaderValue("<HTML><B>" + value);
+	        set_Filter();
+	        th.resizeAndRepaint();
+	    	}	
+	  
+	  
+	  
+  }
    
 }

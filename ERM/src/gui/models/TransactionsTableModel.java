@@ -46,29 +46,14 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	public TransactionsTableModel()
 	{
 		Controller.getInstance().addObserver(this);
-//		SortableList<byte[], Transaction> a = this.transactions;
-		
-	//	TransactionFinalMap table = DBSet.getInstance().getTransactionFinalMap();
-		
-		
-		
-	//	 byte[] block_key = DBSet.getInstance().getBlockHeightsMap().get((long) blockNo);
-	//	 Block block = DBSet.getInstance().getBlockMap().get(block_key);
-	//	 transactions = block.getTransactions();
-	//	 Transaction signs = DBSet.getInstance().getTransactionFinalMap().getTransaction(21452, 1);
 
-//		for(Tuple2<Integer, Integer> seq: signs.b)
-//		{
-			// tran.add(table.getTransaction(seq.a, seq.b));
-//		}
-		
 	}
 	
-//	@Override
-//	public SortableList<byte[], Transaction> getSortableList() 
-//	{
-//		return this.transactions;
-//	}
+	public Class<? extends Object> getColumnClass(int c)
+	{     // set column type
+		Object item = getValueAt(0, c);
+		return item==null? String.class: item.getClass();
+    }
 	
 	public void setBlockNumber(String string){
 		

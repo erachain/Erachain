@@ -194,7 +194,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 			case COLUMN_CREATOR:
 
-				return (transaction.getCreator());
+				return transaction.getCreator().getPersonAsString();
 				
 			case COLUMN_HEIGHT:
 				
