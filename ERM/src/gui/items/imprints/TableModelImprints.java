@@ -3,6 +3,8 @@ package gui.items.imprints;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import controller.Controller;
 import core.item.imprints.ImprintCls;
 import utils.NumberAsString;
@@ -48,7 +50,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	    }
 	
 	public ImprintCls getImprint(int row)

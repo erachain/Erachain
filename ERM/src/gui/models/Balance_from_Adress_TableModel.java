@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -93,13 +94,10 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	}
 	
 	
-//	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	     
-		
-//		Class<? extends Object> a = getValueAt(0, c).getClass();
-		
-//		return getValueAt(0, c).getClass();
-//	    }
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+	   	Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
+	    }
 	
 	
 	public AssetCls getAsset(int row)

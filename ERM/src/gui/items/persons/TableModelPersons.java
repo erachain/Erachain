@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
@@ -53,7 +55,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
      }
 	
 	// читаем колонки которые изменяем высоту	   

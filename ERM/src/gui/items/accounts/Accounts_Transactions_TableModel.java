@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.mapdb.Fun.Tuple2;
@@ -105,8 +106,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? String.class: item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	public Transaction getItem(int row)

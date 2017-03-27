@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple2;
@@ -87,7 +88,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 	public Class<? extends Object> getColumnClass(int c) { // set column type
 		Object o = getValueAt(0, c);
-		return o == null ? null : o.getClass();
+		return o==null?Null.class:o.getClass();
 	}
 
 	// читаем колонки которые изменяем высоту

@@ -7,6 +7,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -69,7 +70,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	   }
 // читаем колонки которые изменяем высоту	   
 	public Boolean[] get_Column_AutoHeight(){

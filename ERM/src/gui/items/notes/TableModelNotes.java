@@ -3,6 +3,8 @@ package gui.items.notes;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import controller.Controller;
 import core.item.notes.NoteCls;
 import utils.NumberAsString;
@@ -37,7 +39,7 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	    }
 	
 	// читаем колонки которые изменяем высоту	   

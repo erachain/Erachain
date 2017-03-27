@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.apache.log4j.Logger;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
@@ -51,8 +53,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public Class<? extends Object> getColumnClass(int c)
 	{     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? String.class: item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	public void setBlockNumber(String string){

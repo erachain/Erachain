@@ -3,6 +3,8 @@ package gui.models;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
@@ -38,7 +40,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	    }
 	
 	// читаем колонки которые изменяем высоту	   

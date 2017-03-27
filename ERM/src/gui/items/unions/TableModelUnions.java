@@ -3,6 +3,8 @@ package gui.items.unions;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import controller.Controller;
 import core.item.unions.UnionCls;
 import utils.NumberAsString;
@@ -39,7 +41,7 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
      }
 	// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){

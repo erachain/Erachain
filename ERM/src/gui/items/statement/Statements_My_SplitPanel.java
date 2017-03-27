@@ -115,9 +115,7 @@ import gui.library.MTable;
 				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 )
 					statement =  my_Statements_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				
-				if (statement == null)
-					return;
-				
+				if (statement == null)	return;
 				Statement_Info info_panel = new Statement_Info(statement);
 				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

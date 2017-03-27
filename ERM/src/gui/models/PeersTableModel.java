@@ -8,6 +8,7 @@ import java.util.TimerTask;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -67,8 +68,8 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 	
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? null : item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	// С‡РёС‚Р°РµРј РєРѕР»РѕРЅРєРё РєРѕС‚РѕСЂС‹Рµ РёР·РјРµРЅСЏРµРј РІС‹СЃРѕС‚Сѓ	   

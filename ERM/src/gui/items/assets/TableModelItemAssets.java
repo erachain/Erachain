@@ -3,6 +3,8 @@ package gui.items.assets;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
 import database.SortableList;
@@ -52,7 +54,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	    }
 	
 	public AssetCls getAsset(int row)

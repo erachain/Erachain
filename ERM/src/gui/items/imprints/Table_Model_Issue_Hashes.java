@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
+import javax.validation.constraints.Null;
 
 import lang.Lang;
 
@@ -28,7 +29,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	   }
 	
 	

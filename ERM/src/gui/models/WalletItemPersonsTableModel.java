@@ -3,6 +3,8 @@ package gui.models;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
@@ -46,8 +48,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? null : item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	public PersonCls getItem(int row)
