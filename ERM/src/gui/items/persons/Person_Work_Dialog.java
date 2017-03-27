@@ -44,6 +44,7 @@ public class Person_Work_Dialog extends JDialog {
     public Person_Work_Dialog(PersonCls person) {
         super();
         this.setModal(true);
+        
         getContentPane().setLayout(new java.awt.GridLayout(0, 1));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
       //  setAlwaysOnTop(true);
@@ -63,6 +64,7 @@ public class Person_Work_Dialog extends JDialog {
    
   		  	@SuppressWarnings("unused")
 			PersonSetStatusDialog fm = new PersonSetStatusDialog( person);	
+  		  	dispose();
     	}});
     	   	
     	jButton2= new MButton(Lang.getInstance().translate("Attest Public Key for Person"), 3);
@@ -73,7 +75,8 @@ public class Person_Work_Dialog extends JDialog {
    
   
     		@SuppressWarnings("unused")
-			PersonConfirmDialog fm = new PersonConfirmDialog(person, person.getOwner());		
+			PersonConfirmDialog fm = new PersonConfirmDialog(person, person.getOwner());	
+    		dispose();
     		}});
     	
  
@@ -89,7 +92,7 @@ public class Person_Work_Dialog extends JDialog {
 			int blockNo = transaction.getBlockHeight(DBSet.getInstance());
 			int recNo = transaction.getSeqNo(DBSet.getInstance());
     		new VouchRecordDialog(blockNo, recNo);	
-  		
+    		dispose();
   		}});
     	
 	
@@ -107,7 +110,7 @@ public class Person_Work_Dialog extends JDialog {
   				} else {
   					Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
   				}
-  	  			
+  				dispose();	
     		}});
   	    	
   	    	
@@ -123,7 +126,7 @@ public class Person_Work_Dialog extends JDialog {
   				} else {
   					Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
   				}
-  	  			
+  				dispose();	
     		}});
   	    	
     	}
