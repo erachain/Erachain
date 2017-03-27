@@ -166,12 +166,12 @@ public abstract class Transaction {
 	public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 2;
 	public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
 	public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
-	public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5;
+	public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
 	public static final int GENESIS_SEND_ASSET_TRANSACTION = 6;
-	public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7;
-	public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8;
-	public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;
-	public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;
+	public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7; //
+	public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8; // нет в гуи
+	public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;//
+	public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;//
 	// ISSUE ITEMS
 	public static final int ISSUE_ASSET_TRANSACTION = 21;
 	public static final int ISSUE_IMPRINT_TRANSACTION = 22;
@@ -179,21 +179,21 @@ public abstract class Transaction {
 	public static final int ISSUE_PERSON_TRANSACTION = 24;
 	public static final int ISSUE_STATUS_TRANSACTION = 25;
 	public static final int ISSUE_UNION_TRANSACTION = 26;
-	public static final int ISSUE_STATEMENT_TRANSACTION = 27;
+	public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
 
 	// SEND ASSET
 	public static final int SEND_ASSET_TRANSACTION = 31;
 	// RENT ASSET
-	public static final int RENT_ASSET_TRANSACTION = 32;
+	public static final int RENT_ASSET_TRANSACTION = 32; //
 	// HOLD ASSET
-	public static final int HOLD_ASSET_TRANSACTION = 33;
+	public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
 	
 	// OTHER
 	public static final int SIGN_NOTE_TRANSACTION = 35;
 	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 36;
 	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
 	public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
-	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39;
+	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in gui
 	
 	// confirms other transactions
 	// NOT EDIT - fkr CONCORCIUM = 40 !!!
