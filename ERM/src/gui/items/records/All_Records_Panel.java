@@ -193,10 +193,6 @@ public class All_Records_Panel extends JPanel{
 	//	this.add(new JLabel(Lang.getInstance().translate("Search") + ":"), searchLabelGBC);
 	//	this.add(txtSearch, searchGBC);
 		
-		records_Table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		records_Table.setDefaultRenderer(String.class, new Renderer_Left(records_Table.getFontMetrics(records_Table.getFont()),this.records_model.get_Column_AutoHeight())); // set renderer
-		records_Table.setDefaultRenderer(PublicKeyAccount.class, new Renderer_Left(records_Table.getFontMetrics(records_Table.getFont()),this.records_model.get_Column_AutoHeight())); // set renderer
-		records_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer		
 		
 		
 		

@@ -40,10 +40,7 @@ public class Accounts_Library_Panel extends JPanel {
 		PersonAccountsModel person_Accounts_Model = new PersonAccountsModel(person.getKey());
 		jTable_Accounts = new MTable(person_Accounts_Model);
 
-		jTable_Accounts.setDefaultRenderer(String.class,
-				new Renderer_Left(jTable_Accounts.getFontMetrics(jTable_Accounts.getFont()),
-						person_Accounts_Model.get_Column_AutoHeight())); // set
-																			// renderer
+		
 		
 		TableColumn to_Date_Column = jTable_Accounts.getColumnModel().getColumn(PersonAccountsModel.COLUMN_TO_DATE);
 		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
@@ -99,6 +96,27 @@ public class Accounts_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copyPublicKey);
 
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		menu_copyName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Accounts.getSelectedRow();
+				row = jTable_Accounts.convertRowIndexToModel(row);
+
+	
+				@SuppressWarnings("static-access")
+				StringSelection value = new StringSelection((String) person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_CREATOR_NAME));
+				clipboard.setContents(value, null);
+				
+			}
+		});
+		menu.add(menu_copyName);
+
+		
+		
+		
 		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

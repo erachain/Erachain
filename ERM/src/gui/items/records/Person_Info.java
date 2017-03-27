@@ -50,10 +50,10 @@ public class Person_Info extends JTextPane {
 		}
 	
 		message = "<b>" + message + "</b> : " + person.getName();
-		date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+		date_birthday =  person.getBirthdayStr();
 		message += " (" + date_birthday;
-		if ( person.getBirthday() < person.getDeathday())
-			message += " - " + formatDate.format(new Date(Long.valueOf(person.getDeathday())));
+		if ( person.getBirthday()/10 < person.getDeathday()/10)
+			message += " - " + person.getDeathdayStr();
 		message += ")";
 		message = "<div>" + message + "</div>";
 
@@ -105,11 +105,17 @@ public class Person_Info extends JTextPane {
 				
 				dte = dates.a;
 				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
-				else from_date_str = formatDate.format( new Date(dte));
+				else {
+					//from_date_str = formatDate.format( new Date(dte));
+					from_date_str = utils.DateTimeFormat.timestamptoString(dte);					
+				}
 				
 				dte = dates.b;
 				if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
-				else to_date_str = formatDate.format( new Date(dte));
+				else {
+					//to_date_str = formatDate.format( new Date(dte));
+					to_date_str = utils.DateTimeFormat.timestamptoString(dte);
+				}
 				
 				message += from_date_str + " - " + to_date_str + "</div";
 

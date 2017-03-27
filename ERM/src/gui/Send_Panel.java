@@ -1,6 +1,7 @@
 package gui;
 
 import gui.items.assets.AssetsComboBoxModel;
+import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
@@ -75,7 +76,7 @@ public class Send_Panel extends JPanel
 	public JTextArea txtMessage;
 	private JCheckBox encrypted;
 	private JCheckBox isText;
-	private JButton sendButton;
+	private MButton sendButton;
 	private AccountsComboBoxModel accountsModel;
 	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
@@ -359,7 +360,7 @@ public class Send_Panel extends JPanel
 		txtAmountGBC.gridy = y;
 		
 		txtAmount = new JTextField("0.00000000");
-		txtAmount.setPreferredSize(new Dimension(130,22));
+	//	txtAmount.setPreferredSize(new Dimension(130,22));
 		this.add(txtAmount, txtAmountGBC);
 		
        
@@ -387,7 +388,7 @@ public class Send_Panel extends JPanel
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
-		txtFeePow.setPreferredSize(new Dimension(130,22));
+//		txtFeePow.setPreferredSize(new Dimension(130,22));
 		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
@@ -410,8 +411,8 @@ public class Send_Panel extends JPanel
 		buttonGBC.gridx = 0;
 		buttonGBC.gridy = y;
         
-		sendButton = new JButton(Lang.getInstance().translate("Send"));
-        sendButton.setPreferredSize(new Dimension(80, 25));
+		sendButton = new MButton(Lang.getInstance().translate("Send"), 1.2);
+   //     sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -428,8 +429,7 @@ public class Send_Panel extends JPanel
     	table = new Send_TableModel();
     	
     	table.setTableHeader(null);
-    	table.setSelectionBackground(new Color(209, 232, 255, 255));
-    	table.setEditingColumn(0);
+       	table.setEditingColumn(0);
     	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(100, 100));
@@ -448,7 +448,7 @@ public class Send_Panel extends JPanel
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 		
-        add(scrollPane, messagesGBC);
+  //      add(scrollPane, messagesGBC);
  
 		//BUTTON DECRYPTALL
     	decryptButton.addActionListener(new ActionListener()
@@ -757,9 +757,33 @@ public class Send_Panel extends JPanel
 		if (head.getBytes(StandardCharsets.UTF_8).length>256){
 			
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			this.sendButton.setEnabled(true);
 			return;
 			
 		}
+		/*		
+		
+		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+		 String text = "<HTML>";
+		    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Creator") +":&nbsp;"  + sender.getAddress()+"<br>";
+		    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Amount") +":&nbsp;"+ amount.toString()+"<br>";
+		  
+	
+		
+		int s = JOptionPane.showConfirmDialog(new JFrame(), text, Lang.getInstance().translate("Send"),  JOptionPane.YES_NO_OPTION);
+		
+	//	JOptionPane.OK_OPTION
+		if (s!= JOptionPane.OK_OPTION)	{
+			
+			this.sendButton.setEnabled(true);
+			
+			return;
+		}
+		
+*/
+		
+		
+		
 		
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key, amount, head, messageBytes, isTextByte, encrypted);

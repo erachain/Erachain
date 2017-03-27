@@ -1,7 +1,6 @@
 package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.Person_info_panel_001;
 import gui.library.MTable;
 import gui.models.AccountsTableModel;
 import gui.models.Renderer_Left;
@@ -110,9 +109,6 @@ public class Credits_Panel extends JPanel // implements ItemListener
 	//	sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
 	//	sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 		
-		// render
-		table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
 		
 		//ON FAVORITES CHANGE
 		cbxFavorites.addItemListener(new ItemListener(){

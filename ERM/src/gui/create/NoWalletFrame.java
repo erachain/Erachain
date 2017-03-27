@@ -25,6 +25,8 @@ import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import core.item.notes.NoteCls;
+import database.DBSet;
 
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
@@ -93,6 +95,7 @@ public class NoWalletFrame extends JFrame {
         
       	//ADD OPTIONS
       	this.createButton = new JRadioButton(Lang.getInstance().translate("Create a new wallet."));
+      	this.createButton.setSelected(true);
       	this.add(this.createButton, optionsGBC);
       		
       	optionsGBC.gridy = 3;
@@ -113,7 +116,7 @@ public class NoWalletFrame extends JFrame {
 		        onNextClick();
 		    }
 		});	
-        nextButton.setPreferredSize(new Dimension(80, 25));
+ //       nextButton.setPreferredSize(new Dimension(80, 25));
     	this.add(nextButton, buttonGBC);
     	
     	//BUTTON CANCEL
@@ -127,7 +130,7 @@ public class NoWalletFrame extends JFrame {
 		        onCancelClick();
 		    }
 		});
-        cancelButton.setPreferredSize(new Dimension(80, 25));
+ //       cancelButton.setPreferredSize(new Dimension(80, 25));
     	this.add(cancelButton, buttonGBC);
         
     	//CLOSE NICELY
@@ -142,7 +145,7 @@ public class NoWalletFrame extends JFrame {
     	
         //CALCULATE HEIGHT WIDTH
       	this.pack();
-      	this.setSize(500, this.getHeight());
+  //    	this.setSize(500, this.getHeight());
       	
       	this.setResizable(false);
 		this.setLocationRelativeTo(null);
@@ -159,18 +162,25 @@ public class NoWalletFrame extends JFrame {
 
 	public void onNextClick()
 	{
-		if(createButton.isSelected())
+        
+		NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+        if (note == null) {
+        	// USE default LICENSE
+	        note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+        }
+
+        if(createButton.isSelected())
 		{
 			//OPEN CREATE WALLET FRAME
 			this.setVisible(false);
-			new License_JFrame(true, this, true);			
+        	new License_JFrame(note, true, this, true);
 		}
 		
 		if(recoverButton.isSelected())
 		{
 			//OPEN RECOVER WALLET FRAME
 			this.setVisible(false);
-			new License_JFrame(true, this, false);	
+			new License_JFrame(note, true, this, false);	
 		}
 	}
 	

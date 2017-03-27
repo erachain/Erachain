@@ -52,7 +52,6 @@ import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.Table_Formats;
-import gui.items.persons.Person_info_panel_001;
 
 import gui.items.unions.TableModelUnions;
 import gui.library.MTable;
@@ -98,12 +97,7 @@ public class Search_Notes_Tab extends Split_Panel {
 //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 //	CoreRowSorter sorter = new CoreRowSorter(tableModelItemAssets, indexes);
 //	assetsTable.setRowSorter(sorter);
-	
-	//Custom renderer for the String column;
-	notesTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	notesTable.setDefaultRenderer(String.class, new Renderer_Left(notesTable.getFontMetrics(notesTable.getFont()),tableModelNotes.get_Column_AutoHeight())); // set renderer
-	notesTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-	// column #1
+		// column #1
 		TableColumn column1 = notesTable.getColumnModel().getColumn(tableModelNotes.COLUMN_KEY);//.COLUMN_CONFIRMED);
 		column1.setMinWidth(50);
 		column1.setMaxWidth(100);
@@ -433,8 +427,10 @@ if(note.getKey() >= NoteCls.INITIAL_FAVORITES)
 class search_listener implements ListSelectionListener  {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			NoteCls note = null;
-			if (notesTable.getSelectedRow() >= 0 ) note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
+			if (notesTable.getSelectedRow() < 0 )
+				return;
+
+			NoteCls note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
 			Info_Notes info_Note = new Info_Notes(note);
 			info_Note.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 			jScrollPane_jPanel_RightPanel.setViewportView(info_Note);

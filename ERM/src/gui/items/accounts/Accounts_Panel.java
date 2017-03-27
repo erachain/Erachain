@@ -1,7 +1,6 @@
 package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.Person_info_panel_001;
 import gui.items.persons.TableModelPersons;
 import gui.library.MTable;
 import gui.models.AccountsTableModel;
@@ -116,10 +115,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		
 		// render
 		
-		table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-		table.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
-		table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
-		
+	
 		// column size
 		
 		TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);	

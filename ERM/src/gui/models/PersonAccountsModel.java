@@ -34,6 +34,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_TO_DATE = 1;
 	public static final int COLUMN_CREATOR = 2;
 	public static final int COLUMN_ADDRESS = 0;
+	public static final int COLUMN_CREATOR_NAME = 30;
 //	public static final int COLUMN_CONFIRMED = 3;
 	private static final HashSet<Account> Account = null;
 	
@@ -162,8 +163,8 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 									
 		case COLUMN_TO_DATE:
 			
-			return  formatDate.format( new Date(value.a)).toString();
-			
+			//return  formatDate.format( new Date(value.a)).toString();
+			return  utils.DateTimeFormat.timestamptoString(value.a);
 		
 		case COLUMN_CREATOR:
 			
@@ -172,7 +173,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			if (trans == null)
 				return null;
 			
-			return trans.getCreator().getPersonAsString_01(true);
+			return trans.getCreator().getPersonAsString();
 			
 		case 3:
 			if (trans == null)
@@ -180,6 +181,14 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			
 			if (trans.getCreator().getPerson()== null) return null;
 			return trans.getCreator().getPerson().b;
+		
+		case COLUMN_CREATOR_NAME:
+			if (trans == null)
+				return null;
+			
+			if (trans.getCreator().getPerson()== null) return null;
+			return trans.getCreator().getPerson().b.getName();
+		
 		}
 		
 		

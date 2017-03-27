@@ -41,7 +41,7 @@ public class Split_Panel extends javax.swing.JPanel {
 
        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
-        
+       searchToolBar_LeftPanel.setVisible(false); 
         
      
      		

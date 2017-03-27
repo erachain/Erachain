@@ -61,7 +61,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private PublicKeyAccount publisher;
 
 	public Person_Info_002(PersonCls person, boolean full) {
-		initComponents(person, full);
+		if (person != null)	initComponents(person, full);
 	}
 
 	/**
@@ -295,15 +295,18 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			descript =descript+Lang.getInstance().translate("Male");
 		if (person.getGender() == 1)
 			descript =descript+Lang.getInstance().translate("Female");
-		long ss = person.getDeathday();
-		long aa = person.getBirthday();
-		if (person.getDeathday()/10 != person.getBirthday()/10){
-			descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
-			
+		long bi = person.getBirthday();
+		long de = person.getDeathday();
+		String biStr = person.getBirthdayStr();
+		if (de/10 > bi/10){
+			//descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
+			descript =descript+"\n"+ biStr + " - "+ person.getDeathdayStr();			
 			
 		}else{
 			
-			descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";	
+			//descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
+			descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
+			
 			
 		}
 		
@@ -326,7 +329,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		int gridy = 8;
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
-			jLabel_Owner.setText(Lang.getInstance().translate("Owner") + ":");
+			jLabel_Owner.setText(Lang.getInstance().translate("Creator of data") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy++;
@@ -482,6 +485,8 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 		// vouch panel
 		jTabbedPane1.add(new Voush_Library_Panel(issue_record));
+		// vouch panel
+		jTabbedPane1.add(new Person_Owner_Panel(person));
 
 	}// </editor-fold>
 

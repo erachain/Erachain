@@ -94,7 +94,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		case COLUMN_DATA:
 			
 
-			return new Date(tran.getTimestamp()).toString();//DateTimeFormat.timestamptoString(tran.getTimestamp(), "dd-mm-yyyy", "0");
+			return DateTimeFormat.timestamptoString(tran.getTimestamp());
 
 	//	case COLUMN_CONFIRM:
 
@@ -102,11 +102,11 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		case COLUMN_SENDER:
 
-			return tran.viewCreator();
+			return tran.getCreator().viewPerson();
 
 		case COLUMN_RECIEVER:
 
-			return tran.viewRecipient();
+			return tran.getRecipient().viewPerson();
 
 		case COLUMN_HEAD:
 

@@ -11,6 +11,7 @@ import javax.swing.JTable;
 import com.github.rjeschke.txtmark.Processor;
 
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import gui.library.MTable;
 import gui.library.MTextPane;
@@ -162,7 +163,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel2.add(jLabel4, gridBagConstraints);
 
-        Account creator = asset.getOwner();
+        PublicKeyAccount creator = asset.getOwner();
         
         jTextField_Creator = new M_Accoutn_Text_Field(creator);
         
@@ -231,12 +232,7 @@ this.setVisible(false);
         balancesTableModel.setAsset(asset);
   		final MTable  jTable1 = new MTable(balancesTableModel);
     
-  	//Custom renderer for the String column;
-  		jTable1.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-  		jTable1.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-  		
+  	
   		
   
 	

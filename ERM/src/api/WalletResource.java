@@ -16,6 +16,8 @@ import org.json.simple.JSONValue;
 import utils.APIUtils;
 import controller.Controller;
 import core.crypto.Base58;
+import core.item.notes.NoteCls;
+import database.DBSet;
 
 @Path("wallet")
 @Produces(MediaType.APPLICATION_JSON)
@@ -156,7 +158,7 @@ public class WalletResource {
 			}
 			else
 			{
-				return String.valueOf(Controller.getInstance().createWallet(seedBytes, password, amount));
+				return String.valueOf(Controller.getInstance().createWallet(Controller.getInstance().getWalletLicense(), seedBytes, password, amount));
 			}
 		}
 		catch(NullPointerException | ClassCastException e)

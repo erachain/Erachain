@@ -19,6 +19,8 @@ import api.ApiClient;
 import controller.Controller;
 import core.BlockChain;
 import core.item.assets.AssetCls;
+import core.item.notes.NoteCls;
+import database.DBSet;
 import settings.Settings;
 import utils.SysTray;
 
@@ -109,12 +111,19 @@ public class Start {
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
-							
+
+							//Controller.getInstance().setWalletLicense(0); // TEST
 							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
-							new License_JFrame(true);
-							Controller.getInstance().setWalletLicense(Controller.LICENSE_KEY);
+						        //ItemCls.NOTE_TYPE
+						        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+						        if (note == null) {
+						        	// USE default LICENSE
+							        note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+						        }
+								new License_JFrame(note);
+								Controller.getInstance().setWalletLicense(note.getKey());
 							}
 						}
 				} catch(Exception e1) {

@@ -27,7 +27,6 @@ import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.items.persons.Person_info_panel_001;
 import gui.items.unions.TableModelUnions;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
@@ -54,10 +53,6 @@ public Search_Imprints_Tab(){
 	this.tableModelImprints = new TableModelImprints();
 	final MTable imprintsTable = new MTable(this.tableModelImprints);
 
-//Custom renderer for the String column;
-	imprintsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	imprintsTable.setDefaultRenderer(String.class, new Renderer_Left(imprintsTable.getFontMetrics(imprintsTable.getFont()),tableModelImprints.get_Column_AutoHeight())); // set renderer
-	imprintsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
 //CHECKBOX FOR FAVORITE
 //	TableColumn favoriteColumn = imprintsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
 //	favoriteColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));

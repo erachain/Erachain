@@ -25,12 +25,13 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	public static final boolean DEVELOP_USE = true;
-	
+		
 	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
 	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;
 	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9047;
 	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9048;
 
+	//public static final String TIME_ZONE = "GMT+3";
 	//
 	public static final int MAX_ORPHAN = 30; // max orphan blocks in chain
 	public static final int TARGET_COUNT = 100;
@@ -54,6 +55,10 @@ public class BlockChain
 	public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
+	public static final String[] WIPED_RECORDS = new String[]{
+			"2yTFTetbUrpZzTU3Y1kRSg3nfdetJDC2diwLJTGosnG7sScTkGaFudrTf6iyCkTfUDjP2rXP7pR1o5Y8M4DuwLe3",
+			};
+
 	// CHAIN
 	public static final int CONFIRMS_HARD = 3; // for reference by signature 
 	// MAX orphan CHAIN
@@ -62,7 +67,7 @@ public class BlockChain
 	//TESTNET 
 												//   1486444444444l
 												//	 1487844444444
-	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1488126173111l:1487844793333l;
+	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1490075950111l:1487844793333l;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -88,7 +93,10 @@ public class BlockChain
 	// need RIGHTS for PERSON account
 	public static final BigDecimal MINOR_ERM_BALANCE_BD = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
-	public static final int GIFTED_COMPU_AMOUNT = 256 * FEE_PER_BYTE;
+	public static final int GIFTED_COMPU_AMOUNT = FEE_PER_BYTE<<8;
+	public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
+	public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = GIFTED_COMPU_AMOUNT<<3;
+	public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
 	static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private GenesisBlock genesisBlock;

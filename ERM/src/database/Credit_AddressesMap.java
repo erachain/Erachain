@@ -16,9 +16,9 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-//import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple3;
 
+import com.google.common.primitives.SignedBytes;
 import com.google.common.primitives.UnsignedBytes;
 
 import core.transaction.Transaction;
@@ -27,7 +27,7 @@ import database.DBSet;
 import network.Peer;
 
 // 
-// account.address Creditor + asset key + account.address Debtor -> sum
+// account.address Creditor + asset key + account.address Debtor -> sum + Int Int (Block + seeqNo trunsaction
 public class Credit_AddressesMap extends DBMap<Tuple3<String, Long, String>, BigDecimal> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -49,7 +49,13 @@ public class Credit_AddressesMap extends DBMap<Tuple3<String, Long, String>, Big
 	protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) 
 	{
 		//OPEN MAP
-		return database.getTreeMap("credit_debt");
+		return database.createTreeMap("credit_debt")
+    		.keySerializer(BTreeKeySerializer.TUPLE3)
+    		//.comparator(UnsignedBytes.lexicographicalComparator())
+			//.comparator(Fun.COMPARATOR)
+			//.comparator(Fun.COMPARABLE_ARRAY_COMPARATOR)
+            //.comparator(SignedBytes.lexicographicalComparator())
+			.makeOrGet();
 	}
 
 	@Override

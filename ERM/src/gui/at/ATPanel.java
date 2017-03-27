@@ -156,6 +156,9 @@ public class ATPanel extends JPanel
 			public void actionPerformed(ActionEvent e) 
 			{
 				int row = atsTable.getSelectedRow();
+		        if (row < 0)
+		        	return;
+		        
 				row = atsTable.convertRowIndexToModel(row);
 
 				Account account = new Account(Base58.encode(atsTableModel.getAT(row).getId()));

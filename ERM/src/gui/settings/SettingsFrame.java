@@ -18,6 +18,7 @@ import java.util.List;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -37,7 +38,7 @@ import utils.SaveStrToFile;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 
 @SuppressWarnings("serial")
-public class SettingsFrame extends JFrame{
+public class SettingsFrame extends JDialog{
 	static Logger LOGGER = Logger.getLogger(SettingsFrame.class.getName());
 
 	public JSONObject settingsJSONbuf;
@@ -47,8 +48,9 @@ public class SettingsFrame extends JFrame{
 	{
 		
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Settings"));
-		
+		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Settings"));
+		setModal(true);
+		setResizable(false);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -57,7 +59,7 @@ public class SettingsFrame extends JFrame{
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		this.setIconImages(icons);
 		
-		setResizable(false);
+		
 
 		settingsJSONbuf = new JSONObject();
 		settingsJSONbuf = Settings.getInstance().Dump(); 

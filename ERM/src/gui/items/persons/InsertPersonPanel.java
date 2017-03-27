@@ -10,6 +10,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.util.TimeZone;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import javax.swing.UIManager;
 import com.toedter.calendar.JDateChooser;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -34,9 +36,11 @@ import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import gui.PasswordPane;
 import gui.library.MButton;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import settings.Settings;
 import utils.Pair;
 
 public class InsertPersonPanel extends IssuePersonPanel{
@@ -52,8 +56,6 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	protected JTextField txtGenderTxt;
 	protected JTextField txtBirthdayTxt;
 	protected JTextField txtDeathdayTxt;
-	
-	
 	
 	protected MButton trans_Button;
     protected javax.swing.JLabel label_Sign;
@@ -77,7 +79,7 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		
 	}
 	
-	 public String getClipboardContents() {
+	public String getClipboardContents() {
 	    String result = "";
 	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 	    //odd: the Object param of getContents is not currently used
@@ -107,16 +109,10 @@ private void init(){
 	txtBirthdayTxt = new javax.swing.JTextField();
 	txtDeathdayTxt = new javax.swing.JTextField();
 	
-	
-	
-	
-	
 	iconLabel = new javax.swing.JLabel();
 	label_Sign= new javax.swing.JLabel();
 	label_public_key= new javax.swing.JLabel();
 	label_info= new javax.swing.JLabel();
-	
-	
 	
 	//txtBirthday = new javax.swing.JTextField();
 	//txtDeathday = new javax.swing.JTextField();
@@ -263,11 +259,19 @@ private void init(){
  			txtName.setText(person.getName());
  			iconLabel.setIcon(new ImageIcon(person.getImage()));
 
- 			txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
+
+ 	        // SET ONE TIME ZONE for Birthday 
+ 			TimeZone tz  = TimeZone.getDefault();
+ 			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+ 			///txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
+ 			txtBirthdayTxt.setText(person.getBirthdayStr());
  			long dayTimestamp = person.getDeathday();
- 			if ( dayTimestamp > person.getBirthday()) {
- 				txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
+ 			if ( dayTimestamp/10 > person.getBirthday()/10) {
+ 				//txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
+ 				txtDeathdayTxt.setText(person.getDeathdayStr());
  			}
+ 			TimeZone.setDefault(tz);
  
  			txtareaDescription.setText(person.getDescription()==null?"":person.getDescription());
 
@@ -315,6 +319,24 @@ private void init(){
 
 			issueButton.setEnabled(false);
 			copyButton.setEnabled(false);
+
+			//CHECK IF WALLET UNLOCKED
+			if(!Controller.getInstance().isWalletUnlocked())
+			{
+				//ASK FOR PASSWORD
+				String password = PasswordPane.showUnlockWalletDialog(); 
+				if(!Controller.getInstance().unlockWallet(password))
+				{
+					//WRONG PASSWORD
+					JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+					
+					//ENABLE
+					issueButton.setEnabled(true);
+					copyButton.setEnabled(true);
+					
+					return;
+				}
+			}
 
 			//READ CREATOR
 			Account creatorAccount = (Account) cbxFrom.getSelectedItem();

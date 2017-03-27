@@ -20,6 +20,7 @@ import database.DBSet;
 import database.Issue_ItemMap;
 import database.Item_Map;
 import database.NameMap;
+import settings.Settings;
 import database.ItemPersonMap;
 import utils.DateTimeFormat;
 import utils.NameUtils;
@@ -113,6 +114,12 @@ public abstract class PersonCls extends ItemCls {
 	}
 	public long getDeathday() {
 		return this.deathday;
+	}
+	public String getBirthdayStr() {
+		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
+	}
+	public String getDeathdayStr() {
+		return utils.DateTimeFormat.timestamptoString(this.deathday, Settings.getInstance().getBirthTimeFormat(), "UTC");
 	}
 	
 	public byte getGender() {

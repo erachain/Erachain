@@ -49,7 +49,6 @@ public Statuses_Library_Panel(PersonCls person){
 	   PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
        jTable_Statuses = new MTable(statusModel);
        
-       jTable_Statuses.setDefaultRenderer(String.class, new Renderer_Left(jTable_Statuses.getFontMetrics(jTable_Statuses.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
        //CHECKBOX FOR FAVORITE
        		TableColumn to_Date_Column1 = jTable_Statuses.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
        		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
@@ -82,6 +81,28 @@ public Statuses_Library_Panel(PersonCls person){
     
    	JPopupMenu menu = new JPopupMenu();
 
+   	JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+	menu_copyName.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			// StringSelection value = new
+			// StringSelection(person.getCreator().getAddress().toString());
+			int row = jTable_Statuses.getSelectedRow();
+			row = jTable_Statuses.convertRowIndexToModel(row);
+
+
+			@SuppressWarnings("static-access")
+			StringSelection value = new StringSelection((String) statusModel.getValueAt(row, statusModel.COLUMN_CREATOR_NAME));
+			clipboard.setContents(value, null);
+			
+		}
+	});
+	menu.add(menu_copyName);
+
+   	
+   	
+   	
+   	
 	JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
 	copy_Creator_Address.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {

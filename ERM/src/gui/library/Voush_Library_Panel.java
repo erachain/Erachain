@@ -6,15 +6,20 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.account.Account;
@@ -44,21 +49,45 @@ public class Voush_Library_Panel extends JPanel {
 		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
 		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
-		TableColumn col_data = column_mod.getColumn(model.COLUMN_TIMESTAMP);
+		TableColumn col_data = column_mod.getColumn(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);
 		col_data.setMinWidth(50);
 		col_data.setMaxWidth(200);
 		col_data.setPreferredWidth(120);// .setWidth(30);
 
-		jTable_Vouches.setDefaultRenderer(Account.class, new Renderer_Right());
-		jTable_Vouches.setDefaultRenderer(String.class, new Renderer_Left(
-		jTable_Vouches.getFontMetrics(jTable_Vouches.getFont()), model.get_Column_AutoHeight())); // set renderer
 
-		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( model.COLUMN_TIMESTAMP);	
+		TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn( Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);	
    		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
    		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
    		Date_Column.setMinWidth(rr+1);
    		Date_Column.setMaxWidth(rr*10);
    		Date_Column.setPreferredWidth(rr+5);//.setWidth(30);
+   		
+   		TableColumn height_Column = jTable_Vouches.getColumnModel().getColumn( Statements_Vouch_Table_Model.COLUMN_HEIGHT);	
+   		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
+   		rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("002222222222"));	
+   		height_Column.setMinWidth(rr+1);
+   		height_Column.setMaxWidth(rr*10);
+   		height_Column.setPreferredWidth(rr+5);//.setWidth(30);
+   		
+   		jTable_Vouches.setAutoCreateRowSorter(true);
+   		
+   		TableRowSorter sorter=new TableRowSorter(model); //Создаем сортировщик
+        //sorter.setSortable(0, true); //Указываем, что сортировать будем в первой колонке
+        //sorter.setSortable(1, true); // а в других нет
+        //sorter.setSortable(2, true);
+        //ArrayList<SortKey> keys=new ArrayList<SortKey>(); // создаем коллецию ключей сортировки
+        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //Записываем два ключа !!! (если задать
+        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //один раз, то сортировщик по-умолчанию
+                                                                              //DefaultRowSorter от которого происходит
+                                                                              //TableRowSorter автоматически добавит
+                                                                             //SortOrder.ASCENDING
+        //sorter.setSortKeys(keys);                                   //Добавляем ключи к сортировщику
+   		if (model.getRowCount() > 0 && sorter.isSortable(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP)) {
+   	        sorter.toggleSortOrder(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP); //Сортируем первую колонку
+   		}
+        sorter.setSortsOnUpdates(true);                         //Указываем автоматически сортировать
+                                                                            //при изменении модели данных
+        jTable_Vouches.setRowSorter(sorter);   
    		
 		
 		// jPanel_Tab_Vouch = new javax.swing.JPanel();
@@ -81,6 +110,27 @@ public class Voush_Library_Panel extends JPanel {
 		
 
 		JPopupMenu menu = new JPopupMenu();
+		
+		
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		menu_copyName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Vouches.getSelectedRow();
+				row = jTable_Vouches.convertRowIndexToModel(row);
+
+
+				@SuppressWarnings("static-access")
+				StringSelection value = new StringSelection((String) model.getValueAt(row, model.COLUMN_CREATOR_NAME));
+				clipboard.setContents(value, null);
+				
+			}
+		});
+		menu.add(menu_copyName);
+
+		
 
 		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
@@ -89,7 +139,8 @@ public class Voush_Library_Panel extends JPanel {
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection( ((Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR)).getAddress());
+				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
+				StringSelection value = new StringSelection(public_Account.getAddress());
 				clipboard.setContents(value, null);
 			}
 		});
@@ -104,9 +155,7 @@ public class Voush_Library_Panel extends JPanel {
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
-				byte[] publick_Key = Controller.getInstance()
-						.getPublicKeyByAddress(((Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR)).getAddress());
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
 			}

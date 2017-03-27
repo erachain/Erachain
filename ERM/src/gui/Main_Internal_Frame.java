@@ -76,7 +76,7 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 6);
         getContentPane().add(jToolBar, gridBagConstraints);
 
-        jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
+  //      jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -86,9 +86,9 @@ public class Main_Internal_Frame extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         getContentPane().add(jTabbedPane, gridBagConstraints);
 
-        status_jPanel.setMaximumSize(new java.awt.Dimension(32767, 22));
-        status_jPanel.setMinimumSize(new java.awt.Dimension(100, 22));
-        status_jPanel.setPreferredSize(new java.awt.Dimension(495, 22));
+    //    status_jPanel.setMaximumSize(new java.awt.Dimension(32767, 22));
+    //    status_jPanel.setMinimumSize(new java.awt.Dimension(100, 22));
+    //    status_jPanel.setPreferredSize(new java.awt.Dimension(495, 22));
 
         //jLabel_status_jPanel.setText("jLabel1");
 

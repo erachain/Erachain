@@ -90,10 +90,12 @@ public class Mail_Send_Panel extends JPanel
 	private JLabel messageLabel;
 	public JTextField txt_Title;
 	int y;
+	PersonCls person;
 	
 	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
-		
+		this.person =person;
+		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
 		y=0;
 		this.setName(Lang.getInstance().translate("Send Mail"));
 		if (asset == null)
@@ -205,6 +207,7 @@ public class Mail_Send_Panel extends JPanel
 			
 			Accounts_ComboBox_Model accounts_To_Model = new Accounts_ComboBox_Model(person.getKey());
 			this.cbx_To = new JComboBox(accounts_To_Model);
+			if (accounts_To_Model.getSize() !=0) {
 			this.add(this.cbx_To, txtToGBC);
 		 	txtTo.setText(cbx_To.getSelectedItem().toString());
 			Account account1 = new Account(txtTo.getText());
@@ -221,6 +224,12 @@ public class Mail_Send_Panel extends JPanel
 
 				    }
 				});	
+		}else {
+			
+			this.txtTo.setText("has no Addresses"); 	
+			sendButton.setEnabled(false);
+			
+		}
 		}
 		else {
 			
@@ -466,7 +475,7 @@ public class Mail_Send_Panel extends JPanel
 		buttonGBC.gridx =2;
 		buttonGBC.gridy = y;
         
-		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
+		
   //      sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
@@ -482,8 +491,7 @@ public class Mail_Send_Panel extends JPanel
     	table = new Send_TableModel();
     	
     	table.setTableHeader(null);
-    	table.setSelectionBackground(new Color(209, 232, 255, 255));
-    	table.setEditingColumn(0);
+       	table.setEditingColumn(0);
     	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(100, 100));
@@ -564,11 +572,19 @@ public class Mail_Send_Panel extends JPanel
 			return;
 		}
 		
+		if (txtTo.getText().equals("has no Addresses")){
+			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Addresses"));
+			return;
+		}
+		
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
 			return;
 		}
+		
+		
+		
 		
 		Account account = null;
 		Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
@@ -598,6 +614,7 @@ public class Mail_Send_Panel extends JPanel
 		{
 			encrypted.setEnabled(true);
 		}
+		
 	}
 	
 	public void onSendClick()

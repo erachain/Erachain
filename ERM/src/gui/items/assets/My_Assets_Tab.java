@@ -88,11 +88,7 @@ public class My_Assets_Tab extends Split_Panel {
 //	TableColumn favoriteColumn = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);
 //	favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 	
-	//Custom renderer for the String column;
-	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()),assetsModel.get_Column_AutoHeight())); // set renderer
-	table.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-
+	
 // column #1
 	TableColumn column1 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
 	column1.setMinWidth(1);
@@ -213,7 +209,8 @@ public class My_Assets_Tab extends Split_Panel {
 
 			AssetCls asset = assetsModel.getAsset(row);
 		//	String account = assetsModel..getAccount(row);
-			AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+		//	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+			new ExchangeFrame(asset,null, "To sell", "");
 			}
 			
 		}
@@ -227,7 +224,8 @@ public class My_Assets_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = assetsModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "","");
+		//	new AssetPairSelect(asset.getKey(), "","");
+			new ExchangeFrame(asset,null, "", "");
 		}
 	});
 	assetsMenu.add(excahge);
@@ -240,7 +238,8 @@ public class My_Assets_Tab extends Split_Panel {
 			row = table.convertRowIndexToModel(row);
 
 			AssetCls asset = assetsModel.getAsset(row);
-			new AssetPairSelect(asset.getKey(), "Buy","");
+		//	new AssetPairSelect(asset.getKey(), "Buy","");
+			new ExchangeFrame(asset,null,  "Buy", "");	
 		}
 	});
 	
@@ -367,7 +366,8 @@ public class My_Assets_Tab extends Split_Panel {
 			{
 				row = table.convertRowIndexToModel(row);
 				AssetCls asset = assetsModel.getAsset(row);
-				new AssetPairSelect(asset.getKey(), "","");
+	//			new AssetPairSelect(asset.getKey(), "","");
+				new ExchangeFrame(asset,null,  "", "");	
 		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)

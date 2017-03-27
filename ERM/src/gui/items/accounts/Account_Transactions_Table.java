@@ -475,10 +475,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		
 		if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION){
 			
-			 Transaction messagetx = transaction;
-			
-			
-			
+			Transaction messagetx = transaction;
 			messageBufs.add(pos, new MessageBuf(
 					null, //messagetx.getData(), 
 					false , //messagetx.isEncrypted(),
@@ -494,37 +491,27 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					account
 			));
 		
-		
-		
-		
-		
-		
-		
-		
+		} else if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+			R_Send messagetx = (R_Send)transaction;				
+			messageBufs.add(pos, new MessageBuf(
+					messagetx.getData(), 
+					// TODO MAKE VIEW DATA
+					// TODO DELE THIS CLASS - USE transaction instead
+					//messagetx.viewData(),
+					messagetx.isEncrypted(),
+					messagetx.getCreator(), //.asPerson(),
+					messagetx.getRecipient(), //.asPerson(),
+					messagetx.getTimestamp(),
+					messagetx.getAmount(),
+					messagetx.getKey(),
+					messagetx.getFee(),
+					messagetx.getSignature(),
+					messagetx.getCreator().getPublicKey(),
+					messagetx.isText(),
+					account
+				));
+				
 		}
-		
-R_Send messagetx = null;
-if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
-	messagetx = (R_Send)transaction;
-		
-		
-		
-		messageBufs.add(pos, new MessageBuf(
-				messagetx.getData(), 
-				messagetx.isEncrypted(),
-				messagetx.getCreator(), //.asPerson(),
-				messagetx.getRecipient(), //.asPerson(),
-				messagetx.getTimestamp(),
-				messagetx.getAmount(),
-				messagetx.getKey(),
-				messagetx.getFee(),
-				messagetx.getSignature(),
-				messagetx.getCreator().getPublicKey(),
-				messagetx.isText(),
-				account
-		));
-		
-}
 	}
 	
 	public void cryptoCloseAll()
@@ -708,10 +695,12 @@ if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
 		{
 			return this.rawMessage;
 		}
+		
 		public boolean getEncrypted()
 		{
 			return this.encrypted;
 		}
+		
 		public String getDecrMessage()
 		{
 			if (this.rawMessage == null) return "";

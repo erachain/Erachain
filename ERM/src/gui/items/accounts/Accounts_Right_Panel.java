@@ -2,9 +2,12 @@ package gui.items.accounts;
 
 import javax.swing.JPanel;
 
+import gui.library.MTable;
+
 public class Accounts_Right_Panel extends JPanel {
 
-    /**
+   public Accounts_Transactions_TableModel table_Model;
+	/**
      * Creates new form НовыйJPanel
      */
     public Accounts_Right_Panel() {
@@ -32,7 +35,8 @@ public class Accounts_Right_Panel extends JPanel {
         jMenu5 = new javax.swing.JMenu();
         jToggleButton2 = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new Account_Transactions_Table();
+        table_Model = new Accounts_Transactions_TableModel();
+        jTable1 = new MTable(table_Model);
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -87,7 +91,7 @@ public class Accounts_Right_Panel extends JPanel {
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
-    public Account_Transactions_Table jTable1;
+    public MTable jTable1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     // End of variables declaration                   

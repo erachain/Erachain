@@ -19,6 +19,7 @@ import database.DBSet;
 import database.HashesSignsMap;
 import database.SortableList;
 import lang.Lang;
+import utils.DateTimeFormat;
 
 public class Model_Hashes_info extends AbstractTableModel {
 
@@ -112,7 +113,7 @@ public class Model_Hashes_info extends AbstractTableModel {
 		{
 		case COLUMN_KEY:
 			
-			return new Date(tt.getTimestamp());
+			return DateTimeFormat.timestamptoString(tt.getTimestamp());
 		
 		case COLUMN_NAME:
 			

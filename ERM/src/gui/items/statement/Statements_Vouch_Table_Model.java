@@ -35,7 +35,9 @@ import database.DBMap;
 import database.DBSet;
 import database.SortableList;
 import database.TransactionFinalMap;
+import database.TransactionMap;
 import lang.Lang;
+import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -51,12 +53,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public static final int COLUMN_CREATOR = 1;
 	// public static final int COLUMN_BODY = 2;
 	// public static final int COLUMN_AMOUNT = 2;
-	// public static final int COLUMN_FEE = 3;
+	 public static final int COLUMN_HEIGHT = 2;
+	 public static final int COLUMN_CREATOR_NAME =30;
 	List<Transaction> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator" });// ,
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });// ,
 																											// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
 	// private Map<byte[], BlockingQueue<Block>> blocks;
@@ -77,6 +80,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		transactions = new ArrayList<Transaction>();
 		// transactions = read_Sign_Accoutns();
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DBSet.getInstance().getTransactionMap().addObserver(this);
 		DBSet.getInstance().getVouchRecordMap().addObserver(this);
 
 	}
@@ -113,17 +117,31 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// TODO Auto-generated method stub
 		if (transactions == null)
 			return 0;
-		int c = 0;
-		for (Transaction a : this.transactions) {
-			if (a != null)
-				++c;
-		}
-		return c; // transactions.size();
+		
+		return transactions.size();
 	}
 	
-	public String get_No_Trancaction(int row){
+	public String get_No_Trancaction(int row) {
 		
-		return this.transactions.get(row).viewHeightSeq(DBSet.getInstance());
+		if (this.transactions == null || this.transactions.size() <= row) {
+			return null;
+		}
+
+		Transaction transaction = this.transactions.get(row);
+		if (transaction == null)
+			return null;
+
+		return transaction.viewHeightSeq(DBSet.getInstance());
+		
+	}
+
+	public Transaction getTrancaction(int row) {
+		
+		if (this.transactions == null || this.transactions.size() <= row) {
+			return null;
+		}
+
+		return this.transactions.get(row);
 		
 	}
 
@@ -131,11 +149,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
 		try {
-			if (this.transactions == null || this.transactions.size() - 1 < row) {
+			if (this.transactions == null || this.transactions.size() <= row) {
 				return null;
 			}
 
 			Transaction transaction = this.transactions.get(row);
+			if (transaction == null)
+				return null;
 
 			// R_Vouch i;
 			switch (column) {
@@ -144,7 +164,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				// return
 				// DateTimeFormat.timestamptoString(transaction.getTimestamp())
 				// + " " + transaction.getTimestamp();
-				return transaction.viewTimestamp(); // + " " +
+				return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " +
 													// transaction.getTimestamp()
 													// / 1000;
 
@@ -174,7 +194,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 			case COLUMN_CREATOR:
 
-				return (transaction.getCreator());
+				return transaction.getCreator().getPersonAsString();
+				
+			case COLUMN_HEIGHT:
+				
+				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
+				
+			case COLUMN_CREATOR_NAME:
+				return	((Account)transaction.getCreator()).getPerson().b.getName();
 			}
 
 			return null;
@@ -199,41 +226,69 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 	public synchronized void syncUpdate(Observable o, Object arg) {
 		message = (ObserverMessage) arg;
-		// System.out.println( message.getType());
 
-		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-			if (this.transactions.size() == 0) {
+			// CHECK IF NEW LIST
+			if (this.transactions == null || this.transactions.size() == 0) {
 				transactions = read_Sign_Accoutns();
 				this.fireTableDataChanged();
 			}
-
+		} 
+		
+		if (message.getType() == ObserverMessage.ADD_VOUCH_TYPE) {
+			// CHECK IF NEW LIST
+		
+				transactions = read_Sign_Accoutns();
+				this.fireTableDataChanged();
+			
+		} 
+		
+		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		{
+			//CHECK IF NEW LIST
+			
+			SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
+			Iterator<Pair<byte[], Transaction>> s = ss.iterator();
+			
+			boolean fire = false;
+			while (s.hasNext()){
+				Pair<byte[], Transaction> a = s.next();
+				Transaction t = a.getB();
+				if (t.getType()== Transaction.VOUCH_TRANSACTION ){
+					R_Vouch tt = (R_Vouch)t;
+					if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
+						if (!this.transactions.contains(tt)){
+							this.transactions.add(tt);
+							fire = true;
+						}
+					}
+				}
+			}
+			
+			if (fire)
+				this.fireTableDataChanged();
 		}
-
-		// CHECK IF LIST UPDATED
+		
 		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-
-		) {
+				) {
 			Transaction ss = (Transaction) message.getValue();
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;
-				if (ss1.getVouchHeight() == blockNo && ss1.getSeqNo(DBSet.getInstance()) == recNo)
-
+				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
 					if (!this.transactions.contains(ss)){
 						this.transactions.add(ss);
 						this.fireTableDataChanged();
 					}
+				}
 			}
-
-			
 		}
 	}
 
 	private List<Transaction> read_Sign_Accoutns() {
-		List<Transaction> tran = new ArrayList<Transaction>();
+		List<Transaction> trans = new ArrayList<Transaction>();
 		// ArrayList<Transaction> db_transactions;
 		// db_transactions = new ArrayList<Transaction>();
 		// tran = new ArrayList<Transaction>();
@@ -270,13 +325,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 					Integer seg = ll.b;
 
 					Transaction kk = table.getTransaction(bl, seg);
-					if (!tran.contains(kk))
-						tran.add(kk);
+					if (!trans.contains(kk))
+						trans.add(kk);
 				}
 			}
 
 		}
-		return tran;
+		return trans;
 	}
 
 }

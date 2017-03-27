@@ -17,6 +17,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBMap;
@@ -40,9 +41,9 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
-	private AssetCls asset;
 	private Account account;
-	long asset_Key;
+	private long asset_Key = 1l;
+	private AssetCls asset = core.block.GenesisBlock.makeAsset(asset_Key);
 	List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> cred ;
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	private List<Transaction> transactions_Asset;
@@ -51,21 +52,13 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	@SuppressWarnings("unchecked")
 	public Model_Account_Transactions()
 	{
-		 this.transactions_Asset = new ArrayList <Transaction>();
+		this.transactions_Asset = new ArrayList <Transaction>();
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-	
-		
-		
-		 cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
-			account = new Account("");
-			asset_Key=1;	
-		
-			
-		
+		cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
+		account = new Account("");
 		
 		Controller.getInstance().addWalletListener(this);
 		Controller.getInstance().addObserver(this);
-//		int a = 1;
 		
 	}
 	
@@ -100,15 +93,13 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	
 	public void setParam(AssetCls asset, Account account) 
 	{
-	 if (account != null) this.account = account;
-	if (asset !=null){
-		asset_Key = asset.getKey();
-		this.asset = asset;
-	}	
-		
-			
-			
-			List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
+		if (account != null) this.account = account;
+		if (asset !=null) {
+			this.asset = asset;
+			asset_Key = asset.getKey();
+		}
+
+		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
 			
 			
 		this.transactions_Asset.clear();;
@@ -277,12 +268,8 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				cred.clear();
 				for (PublicKeyAccount account:this.publicKeyAccounts){
-					
-					
-					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(),asset_Key));
-					 cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), asset_Key));	
-						
-						
+					cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+					//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));	
 					}
 				
 				

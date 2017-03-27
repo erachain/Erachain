@@ -288,29 +288,29 @@ public class Block {
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
-		int inDay = BlockChain.BLOCKS_PER_DAY;
+		int inDay30 = BlockChain.BLOCKS_PER_DAY*30;
 
 		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
-		BigDecimal two = new BigDecimal(2);
 		int height = this.getHeightByParent(db);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 2 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 4 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 8 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 16 * inDay)
-			minFee = minFee.divide(two).setScale(8);
-		if (height > BlockChain.GENERATING_MIN_BLOCK_TIME * 32 * inDay)
-			minFee = minFee.divide(two).setScale(8);
+		if (height < inDay30<<1)
+			;
+		else if (height < inDay30<<2)
+			minFee = minFee.divide(new BigDecimal(2)).setScale(8);
+		else if (height < inDay30<<3)
+			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
+		else if (height < inDay30<<4)
+			minFee = minFee.divide(new BigDecimal(8)).setScale(8);
+		else if (height < inDay30<<5)
+			minFee = minFee.divide(new BigDecimal(16)).setScale(8);
+		else
+			minFee = minFee.divide(new BigDecimal(64)).setScale(8);
 			
 		if ( fee.compareTo(minFee) < 0) 
 			fee = minFee;
 
 		return fee;
 	}
+	
 	public BigDecimal getTotalFee() {
 		return getTotalFee(DBSet.getInstance());
 	}
@@ -1105,65 +1105,68 @@ public class Block {
 
 			for(Transaction transaction: this.transactions)
 			{
-				//CHECK IF NOT GENESISTRANSACTION
-				if(transaction.getCreator() == null)
-					 // ALL GENESIS transaction
-					return false;
-				
-				if(!transaction.isSignatureValid()) {
-					// 
-					LOGGER.error("*** Block[" + height
-					+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
-					+ transaction.viewFullTypeName() + "]"
-					+ "invalid code: " + transaction.isValid(fork, null));
-					return false;
-				}
+				if (!transaction.isWiped()) {
+					// NOT WIPERD
 	
-	
-				//CHECK IF VALID
-				if ( transaction instanceof DeployATTransaction)
-				{
-					Integer min = 0;
-					if ( db.getBlockMap().getParentList() != null )
-					{
-						min = AT_API_Platform_Impl.getForkHeight(db);
-					}
-	
-					DeployATTransaction atTx = (DeployATTransaction)transaction;
-					if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
-					{
-						LOGGER.error("*** Block[" + height + "].atTx invalid");
+					//CHECK IF NOT GENESISTRANSACTION
+					if(transaction.getCreator() == null)
+						 // ALL GENESIS transaction
 						return false;
-					}
-				}
-				else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
-				{
-					LOGGER.error("*** Block[" + height
+					
+					if(!transaction.isSignatureValid()) {
+						// 
+						LOGGER.error("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
 						+ "invalid code: " + transaction.isValid(fork, null));
-					return false;
-				}
-	
-				//CHECK TIMESTAMP AND DEADLINE
-				long transactionTimestamp = transaction.getTimestamp();
-				if( transactionTimestamp > timestampEnd
-						|| transaction.getDeadline() <= timestampBeg)
-				{
-					LOGGER.error("*** Block[" + height + "].TX.timestamp invalid");
-					return false;
-				}
-	
-				
-				try{
-					//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-					transaction.process(fork, this, false);
+						return false;
+					}
+		
+		
+					//CHECK IF VALID
+					if ( transaction instanceof DeployATTransaction)
+					{
+						Integer min = 0;
+						if ( db.getBlockMap().getParentList() != null )
+						{
+							min = AT_API_Platform_Impl.getForkHeight(db);
+						}
+		
+						DeployATTransaction atTx = (DeployATTransaction)transaction;
+						if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
+						{
+							LOGGER.error("*** Block[" + height + "].atTx invalid");
+							return false;
+						}
+					}
+					else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
+					{
+						LOGGER.error("*** Block[" + height
+							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+							+ transaction.viewFullTypeName() + "]"
+							+ "invalid code: " + transaction.isValid(fork, null));
+						return false;
+					}
+		
+					//CHECK TIMESTAMP AND DEADLINE
+					long transactionTimestamp = transaction.getTimestamp();
+					if( transactionTimestamp > timestampEnd
+							|| transaction.getDeadline() <= timestampBeg)
+					{
+						LOGGER.error("*** Block[" + height + "].TX.timestamp invalid");
+						return false;
+					}
+		
 					
-				} catch (Exception e) {
-                    LOGGER.error("*** Block[" + height + "].TX.process ERROR", e);
-                    return false;                    
+					try{
+						//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
+						transaction.process(fork, this, false);
+						
+					} catch (Exception e) {
+	                    LOGGER.error("*** Block[" + height + "].TX.process ERROR", e);
+	                    return false;                    
+					}
 				}
-				
 				transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
 			}
 			
@@ -1191,7 +1194,9 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//PROCESS
-			transaction.process(dbSet, this, false);
+			if (!transaction.isWiped()) {
+				transaction.process(dbSet, this, false);
+			}
 
 			//SET PARENT
 			dbSet.getTransactionRef_BlockRef_Map().set(transaction, this);
@@ -1381,7 +1386,9 @@ public class Block {
 		for(int i=transactions.size() -1; i>=0; i--)
 		{
 			Transaction transaction = transactions.get(i);
-			transaction.orphan(db, false);
+			if (!transaction.isWiped()) {
+					transaction.orphan(db, false);
+			}
 		}
 	}
 

@@ -178,7 +178,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         add(jLabel4, gridBagConstraints);
 
         birthday_jTextField.setEditable(false);
-        birthday_jTextField.setText(new Date (person.getBirthday())+"");
+        birthday_jTextField.setText(person.getBirthdayStr());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -203,13 +203,13 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
 
         deathday_jTextField.setEditable(false);
         Long end = person.getDeathday();
-        if (end == null || end <= person.getBirthday()){
+        if (end == null || end/10 <= person.getBirthday()/10){
         	deathday_jTextField.setText( "-");
         deathday_jTextField.setVisible(false);
         jLabel5.setVisible(false);
         }
         else
-        	deathday_jTextField.setText( new Date (end)+"");
+        	deathday_jTextField.setText(person.getDeathdayStr());
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -409,7 +409,6 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
         jTable1.setModel(statusModel);
         
-        jTable1.setDefaultRenderer(String.class, new Renderer_Left(jTable1.getFontMetrics(jTable1.getFont()),statusModel.get_Column_AutoHeight())); // set renderer
         //CHECKBOX FOR FAVORITE
         		TableColumn to_Date_Column1 = jTable1.getColumnModel().getColumn( PersonStatusesModel.COLUMN_PERIOD);	
         		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
@@ -454,8 +453,7 @@ public class Person_info_panel_001 extends javax.swing.JPanel {
         
         jTable2.setModel(personModel);
         
-        jTable2.setDefaultRenderer(String.class, new Renderer_Left(jTable2.getFontMetrics(jTable2.getFont()),personModel.get_Column_AutoHeight())); // set renderer
-      //CHECKBOX FOR FAVORITE
+     //CHECKBOX FOR FAVORITE
       		TableColumn to_Date_Column = jTable2.getColumnModel().getColumn( PersonAccountsModel.COLUMN_TO_DATE);	
       		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
       		to_Date_Column.setMinWidth(50);

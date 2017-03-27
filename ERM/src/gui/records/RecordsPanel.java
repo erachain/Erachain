@@ -83,24 +83,19 @@ public class RecordsPanel extends  JPanel // JPanel
 		//TRANSACTIONS
 		this.transactionsModel = new WalletTransactionsTableModel();
 		this.transactionsTable = new MTable(this.transactionsModel);
+	//	this.transactionsTable.show_search(true);
 		
 		//TRANSACTIONS SORTER
-		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
-		indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
-		CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
-		transactionsTable.setRowSorter(sorter);
+	//	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_CONFIRMATIONS, TransactionMap.TIMESTAMP_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_CREATOR, TransactionMap.ADDRESS_INDEX);
+	//	indexes.put(WalletTransactionsTableModel.COLUMN_AMOUNT, TransactionMap.AMOUNT_INDEX);
+	//	CoreRowSorter sorter = new CoreRowSorter(transactionsModel, indexes);
+	//	transactionsTable.setRowSorter(sorter);
+		transactionsTable.setAutoCreateRowSorter(true);
 		
 		//Custom renderer for the String column;
-		//RenderingHints.
-		this.transactionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(String.class, new Renderer_Left(this.transactionsTable.getFontMetrics(this.transactionsTable.getFont()),transactionsModel.get_Column_AutoHeight())); // set renderer
-		this.transactionsTable.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-		this.transactionsTable.setDefaultRenderer(Double.class, new Renderer_Right()); // set renderer
-		this.transactionsTable.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-		
 		this.transactionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 		TableColumn column_Size = this.transactionsTable.getColumnModel().getColumn(WalletTransactionsTableModel.COLUMN_SIZE);

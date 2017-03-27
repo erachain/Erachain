@@ -68,7 +68,7 @@ import utils.TableMenuPopupUtil;
 		private TableModelMails incoming_Mails_Model;
 		private MTable inciming_Mail_Table;
 		private TableRowSorter my_Sorter;
-		private RunMenu my_run_menu;
+
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
@@ -93,15 +93,11 @@ import utils.TableMenuPopupUtil;
 			inciming_Mail_Table = new MTable(incoming_Mails_Model);
 			inciming_Mail_Table.setAutoCreateRowSorter(true);
 			
-			TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
-			columnModel.getColumn(1).setMaxWidth((100));
+	//		TableColumnModel columnModel = inciming_Mail_Table.getColumnModel(); // read column model
+	//		columnModel.getColumn(0).setMaxWidth((100));
+	//		columnModel.getColumn(1).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			inciming_Mail_Table.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-			inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Right()); // set renderer
-		//	inciming_Mail_Table.setDefaultRenderer(String.class, new Renderer_Left(inciming_Mail_Table.getFontMetrics(inciming_Mail_Table.getFont()),incoming_Mails_Model.get_Column_AutoHeight())); // set renderer
-					
+				
 					
 		//	my_Sorter = new TableRowSorter(incoming_Mails_Model);
 		//	inciming_Mail_Table.setRowSorter(my_Sorter);
@@ -185,31 +181,7 @@ import utils.TableMenuPopupUtil;
 			 Dimension size = MainFrame.desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-			
-		  
-		    
 		}
-	
-	
-	
-	
-	// listener search_tab run menu focus
-		class My_run_Menu_Focus_Listener implements WindowFocusListener{
-			@Override
-			public void windowGainedFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void windowLostFocus(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				my_run_menu.setVisible(false);
-			}
-		};
-
-		
-
-		
-
 		class My_Tab_Listener implements ListSelectionListener {
 			
 			//@SuppressWarnings("deprecation")
@@ -217,11 +189,12 @@ import utils.TableMenuPopupUtil;
 			public void valueChanged(ListSelectionEvent arg0) {
 				
 				
-				R_Send mail = null;
-				if (inciming_Mail_Table.getSelectedRow() >= 0 )mail = (R_Send)incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
-				//info1.show_001(person);
+				if (inciming_Mail_Table.getSelectedRow() < 0 )
+					return;
+					
+				R_Send mail = (R_Send)incoming_Mails_Model.getTransaction(inciming_Mail_Table.convertRowIndexToModel(inciming_Mail_Table.getSelectedRow()));
+				if (mail == null) return;
 				Mail_Info info_panel = new Mail_Info(mail);
-			
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				
 			}

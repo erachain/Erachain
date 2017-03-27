@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,7 +32,7 @@ import core.item.assets.Order;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class CancelOrderFrame extends JFrame
+public class CancelOrderFrame extends JDialog
 {
 	private Order order;
 	private JTextField txtFeePow;
@@ -39,9 +40,11 @@ public class CancelOrderFrame extends JFrame
 	
 	public CancelOrderFrame(Order order)
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Order"));
-		
+		//super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Order"));
+		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Order"));
 		this.order = order;
+	//	setAlwaysOnTop(true);
+		setModal(true);
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

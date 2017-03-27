@@ -11,6 +11,7 @@ import java.util.List;
 import lang.Lang;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -19,14 +20,15 @@ import javax.swing.border.EmptyBorder;
 import core.item.assets.Order;
 
 @SuppressWarnings("serial")
-public class TradesFrame extends JFrame{
+public class TradesFrame extends JDialog{
 	
 	private OrderTradesTableModel tradesTableModel;
 
 	public TradesFrame(Order order) {
 		
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
-		
+		//super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
+		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
+		setModal(true);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));

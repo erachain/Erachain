@@ -91,7 +91,7 @@ import utils.MenuPopupUtil;
 		    	
 		    	this.setName(Lang.getInstance().translate("Search Records"));
 		    	
-		    	this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert Height Block")+":");
+		    	this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert Height Block or Block-SeqNo")+":");
 		    	this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert Address")+":"));
 		    	sender_address = new JTextField();
 		    	sender_address.setToolTipText("");
@@ -113,15 +113,7 @@ import utils.MenuPopupUtil;
 						
 					}
 		    		
-		    		
-		    		
-		    		
-		    		
 		    	});
-		    	
-		    	
-		    	
-		    	
 		    	
 		    	this.button1_ToolBar_LeftPanel.setVisible(false);
 		    	this.button2_ToolBar_LeftPanel.setVisible(false);
@@ -141,14 +133,9 @@ import utils.MenuPopupUtil;
 					public void actionPerformed(ActionEvent arg0) {
 						// TODO Auto-generated method stub
 						sender_address.setText("");
-						transactionsTableModel.Set_Block_Namber(searchTextField_SearchToolBar_LeftPanel.getText());
+						transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
 					
 					}
-		    		
-		    		
-		    		
-		    		
-		    		
 		    		
 		    	});
 		    	
@@ -178,13 +165,6 @@ import utils.MenuPopupUtil;
 				
 				this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
 				
-				this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Object.class, new Renderer_Right()); // set renderer
-				//this.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-				
-				
-				
-				
-				
 				this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 				
 				//TRANSACTIONS SORTER
@@ -212,127 +192,86 @@ import utils.MenuPopupUtil;
 					    }
 					}
 				});
-				
-			
 		    	
-		    	
-		    	
-		    	
-		    	
-		    	this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);	
-		    	
+		    	this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		    	
 		    	
 		    }
 		    
 		    
 		    
-		 // listener select row	 
-			 class search_listener implements ListSelectionListener  {
-					@Override
-					public void valueChanged(ListSelectionEvent arg0) {
-							String dateAlive;
-											String date_birthday;
-											String message; 
-							// устанавливаем формат даты
-											SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-							//создаем объект персоны
-											UnionCls union;
-						Transaction voting = null;
-						if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
-							voting = (Transaction) transactionsTableModel.getTransaction(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+	 // listener select row	 
+	 class search_listener implements ListSelectionListener  {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				String dateAlive;
+				String date_birthday;
+				String message; 
+				// устанавливаем формат даты
+				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+				//создаем объект персоны
+				UnionCls union;
+				Transaction voting = null;
+				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ) {
+					voting = (Transaction) transactionsTableModel.getTransaction(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 						
-					//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
-						
-		//				votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
-					//	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-						//jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
-		//				jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
-						//jSplitPanel.setRightComponent(votingDetailsPanel);
-						
-						
-										
-											     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-												  
-												 JPanel panel = new JPanel();
-											        panel.setLayout(new GridBagLayout());
-											      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-													
-													//TABLE GBC
-													GridBagConstraints tableGBC = new GridBagConstraints();
-													tableGBC.fill = GridBagConstraints.BOTH; 
-													tableGBC.anchor = GridBagConstraints.FIRST_LINE_START;
-													tableGBC.weightx = 1;
-													tableGBC.weighty = 1;
-													tableGBC.gridx = 0;	
-													tableGBC.gridy= 0;	
-												//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
-													panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);
-													
-													  
-											        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DBSet.getInstance()),voting.getSeqNo(DBSet.getInstance()));
-											        GridBagConstraints gridBagConstraints = null;
-											        if (signs != null){
-											  	    
-											        
-											       
-											  	  
-											  	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
-											        gridBagConstraints = new java.awt.GridBagConstraints();
-											        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-											        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-											        gridBagConstraints.weightx = 0.1;
-											        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
-											        gridBagConstraints.gridx = 0;
-											        gridBagConstraints.gridy = 1;
-											        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
-											  	  
-											  	  
-											  											
-													
-												        gridBagConstraints = new java.awt.GridBagConstraints();
-												        gridBagConstraints.gridx = 0;
-												        gridBagConstraints.gridy = 2;
-												        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-												        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-												        gridBagConstraints.weightx = 1.0;
-												        gridBagConstraints.weighty = 1.0;
-												        panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
-													
-											        }
-												     
-												        
-												        
-												        
-													
-													
-												
-											        jScrollPane_jPanel_RightPanel.setViewportView( panel);
-												
-												 
-											}
-										}
-											
-						
-						
-						
-						
-						
-						
-						
-									
-			
-						
-						
-					
+			//	Person_info_panel_001 info_panel = new Person_info_panel_001(voting, false);
 				
-				}
-			 
-			 
-			 
+			//	votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls)allVotingsPanel.cbxAssets.getSelectedItem());
+			//	votingDetailsPanel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				//jScrollPane_jPanel_RightPanel.setHorizontalScrollBar(null);
+			//	jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
+				//jSplitPanel.setRightComponent(votingDetailsPanel);
+				
+				
+								
+		     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+				  
+				JPanel panel = new JPanel();
+		        panel.setLayout(new GridBagLayout());
+		      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+				
+				//TABLE GBC
+				GridBagConstraints tableGBC = new GridBagConstraints();
+				tableGBC.fill = GridBagConstraints.BOTH; 
+				tableGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+				tableGBC.weightx = 1;
+				tableGBC.weighty = 1;
+				tableGBC.gridx = 0;	
+				tableGBC.gridy= 0;	
+			//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
+				panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);						
+				  
+		        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DBSet.getInstance()),voting.getSeqNo(DBSet.getInstance()));
+		        GridBagConstraints gridBagConstraints = null;
+		        if (signs != null) {
+			  	  
+				  	JLabel  jLabelTitlt_Table_Sign = new JLabel(Lang.getInstance().translate("Signatures")+":");
+			        gridBagConstraints = new java.awt.GridBagConstraints();
+			        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+			        gridBagConstraints.weightx = 0.1;
+			        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
+			        gridBagConstraints.gridx = 0;
+			        gridBagConstraints.gridy = 1;
+			        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
+			  	  
+			  	  
+			  											
+					
+			        gridBagConstraints = new java.awt.GridBagConstraints();
+			        gridBagConstraints.gridx = 0;
+			        gridBagConstraints.gridy = 2;
+			        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+			        gridBagConstraints.weightx = 1.0;
+			        gridBagConstraints.weighty = 1.0;
+			        panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
+				
+		        }
+			     
+		        jScrollPane_jPanel_RightPanel.setViewportView( panel);
 
-		   
+			}
+		}
 	}
-
-
-
-
+}

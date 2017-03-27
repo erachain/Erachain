@@ -1,6 +1,7 @@
 package gui.items.assets;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -10,6 +11,9 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
@@ -29,6 +33,7 @@ import lang.Lang;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -40,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
@@ -59,16 +65,17 @@ import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 
 @SuppressWarnings("serial")
-public class AssetPairSelect extends JFrame{
+public class AssetPairSelect extends JDialog{
 	
 	public AssetPairSelectTableModel assetPairSelectTableModel;
 	 AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
 	 RowSorter sorter;
+	 public AssetCls pairAsset;
 
 	public AssetPairSelect(long key, String action, String account) {
 		
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
-		
+	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -79,7 +86,7 @@ public class AssetPairSelect extends JFrame{
 		
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+		this.setModal(true);
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
@@ -116,9 +123,28 @@ public class AssetPairSelect extends JFrame{
 		tableGBC.gridy = 1;	
 		
 		
-		pair_Panel.button1_ToolBar_LeftPanel.setVisible(false);
-		pair_Panel.button2_ToolBar_LeftPanel.setVisible(false);
+		pair_Panel.button1_ToolBar_LeftPanel.setVisible(true);
+		pair_Panel.button1_ToolBar_LeftPanel.setEnabled(false);
+		pair_Panel.button1_ToolBar_LeftPanel.setFocusable(true);
+		pair_Panel.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Next"));
+		pair_Panel.button1_ToolBar_LeftPanel.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				selectAsset();
+				 
+			}
+				
+					
+		});
 		
+		
+		pair_Panel.button2_ToolBar_LeftPanel.setVisible(false);
+		pair_Panel.searth_My_JCheckBox_LeftPanel.setVisible(false);
+		pair_Panel.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+		pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
+		pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 		
 		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
 				
@@ -133,14 +159,29 @@ public class AssetPairSelect extends JFrame{
 	    pair_Panel.jTable_jScrollPanel_LeftPanel = assetsPairTable;
 		
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setIntercellSpacing(new java.awt.Dimension(2, 2));
+	    
+	    pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
+			@SuppressWarnings({ "unused" })
+			@Override
+				public void valueChanged(ListSelectionEvent arg0) {
+					
+						if (pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+							AssetPairSelectTableModel tableModelAssets1 =  (AssetPairSelectTableModel) pair_Panel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+						Object asset = tableModelAssets1.getAsset(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+					
+						pair_Panel.jScrollPane_jPanel_RightPanel.setViewportView(new AssetDetailsPanel001((AssetCls) asset));
+						pair_Panel.button1_ToolBar_LeftPanel.setEnabled(true);
+						 
+					}
+				}
+			});	
+	    
+	    
+	    
 
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	  //Custom renderer for the String column;
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Integer.class, new Renderer_Right()); // set renderer
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(String.class, new Renderer_Left(pair_Panel.jTable_jScrollPanel_LeftPanel.getFontMetrics(pair_Panel.jTable_jScrollPanel_LeftPanel.getFont()),assetPairSelectTableModel.get_Column_AutoHeight() )); // set renderer
-	    pair_Panel.jTable_jScrollPanel_LeftPanel.setDefaultRenderer(Boolean.class, new Renderer_Boolean()); // set renderer
-
+	   
 	    
 		 // column #1
 			TableColumn column1 = pair_Panel.jTable_jScrollPanel_LeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
@@ -184,6 +225,8 @@ public class AssetPairSelect extends JFrame{
 	    pair_Panel.jTable_jScrollPanel_LeftPanel .setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 	    
 	    pair_Panel.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
+			
+
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					JTable target = (JTable)e.getSource();
@@ -191,10 +234,17 @@ public class AssetPairSelect extends JFrame{
 
 					if(row < assetPairSelectTableModel.assets.size())
 					{
-						new ExchangeFrame(
+						// Container ss = getParent();
+						//if (getParent().getClass().getName() == "11")
+					/*	new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);
-						((JFrame) (pair_Panel.getTopLevelAncestor())).dispose();
+						( ((Window) pair_Panel.getTopLevelAncestor())).dispose();
+					*/
+						
+						selectAsset();
+					//	pairAsset = (AssetCls) assetPairSelectTableModel.assets.get(row);
+						
 					}
 				}
 			}
@@ -241,15 +291,25 @@ public class AssetPairSelect extends JFrame{
 	    
 	    
 	    Dimension size = MainFrame.desktopPane.getSize();
-	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.width/2.5));
 	    this.add(pair_Panel, labelGBC);
 		//PACK
 		this.pack();
-		this.setSize(1000, this.getHeight());
+		this.setSize( size.width-(size.width/8), size.height-(size.width/8));
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
+private void selectAsset(){
+	if (pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 ){
+		AssetPairSelectTableModel tableModelAssets1 =  (AssetPairSelectTableModel) pair_Panel.jTable_jScrollPanel_LeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTable_jScrollPanel_LeftPanel.getModel();
+		pairAsset = tableModelAssets1.getAsset(pair_Panel.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(pair_Panel.jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+		dispose();
+	}
+	
+	
+	
+}
 	
 
 }

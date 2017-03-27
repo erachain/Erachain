@@ -397,7 +397,7 @@ public class Issue_Statement_Panel extends JPanel
     	table = new Statements_Table_Model();
     	
     	table.setTableHeader(null);
-    	table.setSelectionBackground(new Color(209, 232, 255, 255));
+    	
     	table.setEditingColumn(0);
     	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	JScrollPane scrollPane = new JScrollPane(table);

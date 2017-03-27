@@ -61,7 +61,7 @@ public class Settings {
 	
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
-	public static final int DEFAULT_ACCOUNTS = 3;
+	public static final int DEFAULT_ACCOUNTS = 1;
 	
 	//WEB
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
@@ -89,8 +89,9 @@ public class Settings {
 	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
 
 	//DATE FORMAT
-	private static final String DEFAULT_TIME_ZONE = "";
-	private static final String DEFAULT_TIME_FORMAT = "";
+	private static final String DEFAULT_TIME_ZONE = ""; //"GMT+3";
+	private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+	private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
 	
 	private static final boolean DEFAULT_NS_UPDATE = false;
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
@@ -790,6 +791,17 @@ public class Settings {
 		
 		return DEFAULT_TIME_FORMAT;
 	}
+
+	// birth
+	public String getBirthTimeFormat()
+	{
+		if(this.settingsJSON.containsKey("birthTimeformat")) {
+			return (String) this.settingsJSON.get("birthTimeformat");
+		}
+		
+		return DEFAULT_BIRTH_TIME_FORMAT;
+	}
+	
 
 	public boolean isSysTrayEnabled() {
 		if(this.settingsJSON.containsKey("systray"))

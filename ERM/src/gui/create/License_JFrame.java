@@ -21,7 +21,11 @@ import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
+import core.BlockChain;
+import core.block.GenesisBlock;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
@@ -34,20 +38,32 @@ public class License_JFrame extends JDialog {
 	boolean needAccept;
 	NoWalletFrame parent;
 	boolean goCreateWallet;
+	NoteCls note;
 
-    public License_JFrame(boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+	static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
+
+    public License_JFrame(NoteCls note, boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+    	this.note = note;
     	this.needAccept = needAccept;
     	this.parent = parent;
     	this.goCreateWallet = goCreateWallet;
     	initComponents();
     }
-    public License_JFrame(boolean needAccept) {
+    public License_JFrame(NoteCls note, boolean needAccept) {
+    	this.note = note;
     	this.needAccept = needAccept;
     	initComponents();
     }
+
+    public License_JFrame(NoteCls note) {
+    	this.note = note;
+    	needAccept = true;
+        initComponents();
+    }
     	
     public License_JFrame() {
-    	//ICON		
+    	this.note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.getInstance().getWalletLicense());
+    	needAccept = false;
         initComponents();
     }
 
@@ -79,7 +95,7 @@ public class License_JFrame extends JDialog {
 
   //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle(Lang.getInstance().translate("License"));
-        setMinimumSize(new java.awt.Dimension(600, 550));
+        setMinimumSize(new java.awt.Dimension(800, 550));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jCheckBox1.setText(Lang.getInstance().translate("I accept"));
@@ -151,8 +167,32 @@ public class License_JFrame extends JDialog {
 				}
 			}
         });
-        
+    /*    
        
+      jTextArea1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            	if (!needAccept){
+            	
+            	setVisible(false);
+                dispose();
+            	}
+            }
+        });
+        
+      jTextArea1.addKeyListener(new KeyAdapter() {
+		    public void keyPressed(KeyEvent e) {
+		    	if (!needAccept){
+            	
+		    	setVisible(false);
+                dispose();
+		    	}
+		    }
+		});
+        
+     */  
+        
+        
         
       //CLOSE NICELY
         this.addWindowListener(new WindowAdapter()
@@ -169,10 +209,6 @@ public class License_JFrame extends JDialog {
             }
         });
         
-        
-        //ItemCls.NOTE_TYPE
-        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
-
         // jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setEditable(false);
@@ -225,8 +261,9 @@ public class License_JFrame extends JDialog {
 
         
    //     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        if(!needAccept)
-        	this.setUndecorated(true);
+  //      if(!needAccept)
+    	this.setUndecorated(false);
+        if (needAccept)	this.setUndecorated(true);
         
         pack();
         this.setLocationRelativeTo(null);

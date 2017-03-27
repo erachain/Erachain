@@ -96,20 +96,17 @@ import gui.models.Renderer_Boolean;
 			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
 			
-			//Custom renderer for the String column;
-			my_Person_table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-			my_Person_table.setDefaultRenderer(String.class, new Renderer_Left(my_Person_table.getFontMetrics(my_Person_table.getFont()),my_PersonsModel.get_Column_AutoHeight())); // set renderer
 					
 					
-			my_Sorter = new TableRowSorter(my_PersonsModel);
-			my_Person_table.setRowSorter(my_Sorter);
-			my_Person_table.getRowSorter();
-			if (my_PersonsModel.getRowCount() > 0) my_PersonsModel.fireTableDataChanged();
+	//		my_Sorter = new TableRowSorter(my_PersonsModel);
+	//		my_Person_table.setRowSorter(my_Sorter);
+	//		my_Person_table.getRowSorter();
+	//		if (my_PersonsModel.getRowCount() > 0) my_PersonsModel.fireTableDataChanged();
 			
 			//CHECKBOX FOR CONFIRMED
 			TableColumn confirmedColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
 			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			confirmedColumn.setCellRenderer(new Renderer_Boolean());
+			
 			confirmedColumn.setMinWidth(50);
 			confirmedColumn.setMaxWidth(50);
 			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
@@ -118,7 +115,7 @@ import gui.models.Renderer_Boolean;
 			//CHECKBOX FOR FAVORITE
 			TableColumn favoriteColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
 			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			favoriteColumn.setCellRenderer(new Renderer_Boolean());
+			
 			favoriteColumn.setMinWidth(50);
 			favoriteColumn.setMaxWidth(50);
 			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
@@ -186,13 +183,8 @@ import gui.models.Renderer_Boolean;
 			public void valueChanged(ListSelectionEvent arg0) {
 				
 				PersonCls person = null;
-				if (my_Person_table.getSelectedRow() >= 0 )person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
-				//info1.show_001(person);
-				
-				// PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-				//my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());	
-				////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-				
+				if (my_Person_table.getSelectedRow() >= 0 )	person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
+				if (person == null) return;
 				Person_Info_002 info_panel = new Person_Info_002(person, false);
 				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

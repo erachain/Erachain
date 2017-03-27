@@ -30,14 +30,14 @@ import javax.swing.JLabel;
         Boolean[] column_auto_Height;
     
        //   FontMetrics fontMetrics = table.getFontMetrics(table.getFont()); 
-        public Renderer_Left(FontMetrics fontMetrics1, Boolean[] col_Auto_Height ){
-        	fontMetrics=fontMetrics1;	
+        public Renderer_Left(){
+        //	fontMetrics=fontMetrics1;	
         	 setOpaque(true);
         	 setBackground(new Color(255, 255, 220));
         	 setVerticalAlignment(TOP);
         	 setHorizontalAlignment(JLabel.LEFT);//.RIGHT);
              setHorizontalTextPosition(JLabel.LEFT);//.RIGHT);
-             column_auto_Height = col_Auto_Height;
+       //      column_auto_Height = col_Auto_Height;
         }
         
         @Override

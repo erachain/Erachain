@@ -1626,7 +1626,8 @@ if ( asset_1 == null) {
 			
 		
 		output.put("name", person.getName());
-		output.put("birthday", df.format(new Date(person.getBirthday())).toString());
+		////////output.put("birthday", df.format(new Date(person.getBirthday())).toString());
+		output.put("birthday", person.getBirthdayStr());
 		output.put("description", Processor.process(person.getDescription()));
 		
 		String gender = Lang.getInstance().translate_from_langObj("Man",langObj);
@@ -1742,10 +1743,8 @@ if ( asset_1 == null) {
 			my_Person_JSON.put("key", item.getKey());
 			my_Person_JSON.put("name",item.getName());
 			
-			
-			
-			
 			my_Person_JSON.put("date", df.format(new Date(my_Issue_Person.getTimestamp())).toString());//new Date(my_Issue_Person.getTimestamp().toString()));
+			///my_Person_JSON.put("date", utils.DateTimeFormat.timestamptoString(my_Issue_Person.getTimestamp()));
 			my_Persons_JSON.put(i, my_Person_JSON);
 			i++;
 		}
@@ -1820,6 +1819,8 @@ if ( asset_1 == null) {
 			blockJSON.put("key", person.getKey());
 			blockJSON.put("name", person.getName());
 			blockJSON.put("creator",person.getOwner().getAddress());
+			String img = Base64.encodeBase64String(person.getImage());
+			blockJSON.put("img",img);
 			
 	
 		/*	

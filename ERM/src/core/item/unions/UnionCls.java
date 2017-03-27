@@ -20,6 +20,7 @@ import core.transaction.Transaction;
 import database.DBSet;
 import database.Issue_ItemMap;
 import database.Item_Map;
+import settings.Settings;
 import utils.ByteArrayUtils;
 import utils.DateTimeFormat;
 import database.ItemUnionMap;
@@ -55,6 +56,9 @@ public abstract class UnionCls extends ItemCls{
 	
 	public long getBirthday() {
 		return this.birthday;
+	}
+	public String getBirthdayStr() {
+		return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
 	}
 	public long getParent() {
 		return this.parent;

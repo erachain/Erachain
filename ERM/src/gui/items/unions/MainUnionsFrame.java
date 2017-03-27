@@ -79,12 +79,9 @@ public MainUnionsFrame (){
 		final MTable unionsTable = new MTable(this.tableModelUnions);
 		TableColumnModel columnModel = unionsTable.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
-//Custom renderer for the String column;
-		unionsTable.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-		unionsTable.setDefaultRenderer(String.class, new Renderer_Left(unionsTable.getFontMetrics(unionsTable.getFont()),tableModelUnions.get_Column_AutoHeight())); // set renderer
 //CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = unionsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
-		favoriteColumn.setCellRenderer(new Renderer_Boolean());
+	
 		favoriteColumn.setMinWidth(50);
 		favoriteColumn.setMaxWidth(50);
 		favoriteColumn.setPreferredWidth(50);
@@ -194,22 +191,18 @@ public MainUnionsFrame (){
 	columnModel = tableUnion.getColumnModel(); // read column model
 	columnModel.getColumn(0).setMaxWidth((100));
 //Custom renderer for the String column;
-	tableUnion.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	tableUnion.setDefaultRenderer(String.class, new Renderer_Left(tableUnion.getFontMetrics(tableUnion.getFont()),unionsModel.get_Column_AutoHeight())); // set renderer
 	TableRowSorter<WalletItemUnionsTableModel> sorter1 = new TableRowSorter<WalletItemUnionsTableModel>(unionsModel);
 	tableUnion.setRowSorter(sorter1);
 	tableUnion.getRowSorter();
 	//unionsModel.fireTableDataChanged();
 //CHECKBOX FOR CONFIRMED
 	TableColumn confirmedColumn = tableUnion.getColumnModel().getColumn(WalletItemUnionsTableModel.COLUMN_CONFIRMED);
-	confirmedColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));
 	confirmedColumn.setMinWidth(50);
 	confirmedColumn.setMaxWidth(50);
 	confirmedColumn.setPreferredWidth(50);
 //CHECKBOX FOR FAVORITE
 	favoriteColumn = tableUnion.getColumnModel().getColumn(WalletItemUnionsTableModel.COLUMN_FAVORITE);
 //favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-	favoriteColumn.setCellRenderer(new Renderer_Boolean()); //unionsTable.getDefaultRenderer(Boolean.class));
 	favoriteColumn.setMinWidth(50);
 	favoriteColumn.setMaxWidth(50);
 	favoriteColumn.setPreferredWidth(50);//.setWidth(30);

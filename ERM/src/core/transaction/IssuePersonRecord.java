@@ -110,7 +110,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		if (person.getHairСolor().getBytes(StandardCharsets.UTF_8).length >255) return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
 		//int ii = Math.abs(person.getHeight());
 		//if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
-		if (person.getHeight() < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
+		if (person.getHeight() > 255) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
 		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
 				|| person.getImage().length > MAX_IMAGE_LENGTH) {
