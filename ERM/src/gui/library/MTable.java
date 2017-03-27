@@ -67,19 +67,7 @@ public class MTable<U> extends JTable {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		 
 			
-			
-			 items = new String[5];
-		        for(int j = 0; j < items.length; j++)
-		        {
-		            items[j] = "item " + j;
-		        }
-			
-			
-			
 			mouseListener = new MouseListener(){
-
-				
-
 				@Override
 				public void mouseClicked(MouseEvent arg0) {
 					// TODO Auto-generated method stub
@@ -129,19 +117,14 @@ public class MTable<U> extends JTable {
 				        			filters.remove(col);
 				        		}
 				        	}
-				         
-				        	
-				        	
-				      //  filters.put(2,RowFilter.regexFilter(".*Отп.*"));
 				        }
 						
 				        if (model.getColumnClass(col) == Date.class){
-				        	ss = "Date";
 				        	Object sss = null;
 				        	if (filters.get(col) != null){
 				        	    	if (filters.get(col).a != null) sss = filters.get(col).a;
 				        	}
-				        	Object str = JOptionPane.showInputDialog (th, "filter col. = " + column.getHeaderValue(),new JCalendar((Date) sss) );
+				        	Object str = JOptionPane.showInputDialog (th, "Data col. = " + column.getHeaderValue(),"data" );
 				        	if(str != null)
 				        	{
 				        		if (!str.toString().equals(""))	{
@@ -153,12 +136,8 @@ public class MTable<U> extends JTable {
 				        			filters.remove(col);
 				        		}
 				        	}
-				           
-				        	
-				        	
 				        }
-				        String oldValue = (String)column.getHeaderValue() + " " + ss;
-				 //       Object value = showEditor(th, col, oldValue);
+				        //       Object value = showEditor(th, col, oldValue);
 				        Iterator<Tuple2<U, RowFilter<TableModel, Integer>>> s = filters.values().iterator();
 				        List <RowFilter<TableModel, Integer>> rowfolters = new ArrayList();
 				        while(s.hasNext()){
@@ -203,9 +182,9 @@ public class MTable<U> extends JTable {
 	*/		
 		
 		
-			show_search(true);
+	show_search(true);
 	}
-	
+// Filter from Column on/off	
 	public void  show_search(boolean bl){
 		
 		if (bl){
@@ -217,8 +196,7 @@ public class MTable<U> extends JTable {
 		
 	}
 
-
-  
+// get nom Column fro mouse cursor coordinates 
     private int getColumn(JTableHeader th, Point p)
     {
         TableColumnModel model = th.getColumnModel();
@@ -227,22 +205,17 @@ public class MTable<U> extends JTable {
                 return col;
         return -1;
     }
+    // set Filter from list filters
     @SuppressWarnings("unchecked")
 	private void set_Filter(){
 
-	//	RowFilter filter = RowFilter.regexFilter(".*" + "2" + ".*", 1);
-	//	((DefaultRowSorter) this.search_Sorter).setRowFilter(filter);
-    //	 this.search_Sorter.setRowFilter(RowFilter.regexFilter(".*Create.*"));
+	
 		if (model.getRowCount()==0) return;
 		this.search_Sorter.setRowFilter(filter);
 		this.setRowSorter( this.search_Sorter);
-	//	this.model.fireTableDataChanged();
-    	
-    	
-    	
-    	
-    }
-    
+	   	}
+   
+    // show filter dialog
     public Object showEditor(Component parent, int col, String currentValue)
     {
         items[0] = currentValue;
