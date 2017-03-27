@@ -233,10 +233,7 @@ public class Search_Notes_Tab extends Split_Panel {
 			row = notesTable.convertRowIndexToModel(row);
 			NoteCls note = tableModelNotes.getNote(row);
 			
-			//IF ASSET CONFIRMED AND NOT ERM
-			if(note.getKey() >= AssetCls.INITIAL_FAVORITES)
-			{
-				favorite.setVisible(true);
+							favorite.setVisible(true);
 				//CHECK IF FAVORITES
 				if(Controller.getInstance().isItemFavorite(note))
 				{
@@ -246,52 +243,12 @@ public class Search_Notes_Tab extends Split_Panel {
 				{
 					favorite.setText(Lang.getInstance().translate("Add Favorite"));
 				}
-				/*	
-				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-				this.favoritesButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						onFavoriteClick();
-					}
-				});	
-				this.add(this.favoritesButton, labelGBC);
-				*/
-			} else {
-				
-				favorite.setVisible(false);
 			}
-		//	sell.setVisible(false);
-		//	boolean a = Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress());
-		//	if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
-		//	{
-		//		sell.setVisible(true);
-		//	}
-			
-	
-		
-		
-		
-		
-		}
 		
 	}
 	
 	);
-	
-	
-	
-	
-
-	
-	
 	nameSalesMenu.add(favorite);
-	
-	
-	
-	
-	
-	
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
