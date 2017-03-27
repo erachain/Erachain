@@ -96,6 +96,27 @@ public class Accounts_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copyPublicKey);
 
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		menu_copyName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_Accounts.getSelectedRow();
+				row = jTable_Accounts.convertRowIndexToModel(row);
+
+	
+				@SuppressWarnings("static-access")
+				StringSelection value = new StringSelection((String) person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_CREATOR_NAME));
+				clipboard.setContents(value, null);
+				
+			}
+		});
+		menu.add(menu_copyName);
+
+		
+		
+		
 		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

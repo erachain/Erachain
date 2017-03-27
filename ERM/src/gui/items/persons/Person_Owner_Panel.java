@@ -6,6 +6,9 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -15,11 +18,14 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MTable;
@@ -38,6 +44,7 @@ public class Person_Owner_Panel extends JPanel {
 	private JScrollPane jScrollPane_Tab_My_Persons;
 	private GridBagConstraints gridBagConstraints;
 
+	@SuppressWarnings("rawtypes")
 	public  Person_Owner_Panel(PersonCls person) {
 
 		this.setName(Lang.getInstance().translate("My Persons"));
@@ -61,87 +68,44 @@ public class Person_Owner_Panel extends JPanel {
 
 		JPopupMenu menu = new JPopupMenu();
 
-		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
-		copyAddress.addActionListener(new ActionListener() {
+		JMenuItem copyKey = new JMenuItem(Lang.getInstance().translate("Copy Key"));
+		copyKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable_My_Persons.getSelectedRow();
 				row = jTable_My_Persons.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-	//			StringSelection value = new StringSelection(person_Accounts_Model.getAccount_String(row));
-	//			clipboard.setContents(value, null);
-			}
-		});
-		menu.add(copyAddress);
-
-		JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
-		menu_copyPublicKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-
-	/*			byte[] publick_Key = Controller.getInstance()
-						.getPublicKeyByAddress(person_Accounts_Model.getAccount_String(row));
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-				StringSelection value = new StringSelection(public_Account.getBase58());
-				clipboard.setContents(value, null);
-				*/
-			}
-		});
-		menu.add(menu_copyPublicKey);
-
-		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
-		copy_Creator_Address.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		//		StringSelection value = new StringSelection(person_Accounts_Model.get_Creator_Account(row));
-		//		clipboard.setContents(value, null);
-			}
-		});
-		menu.add(copy_Creator_Address);
-
-		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
-		menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-/*
-				byte[] publick_Key = Controller.getInstance()
-						.getPublicKeyByAddress(person_Accounts_Model.get_Creator_Account(row));
-				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
-				StringSelection value = new StringSelection(public_Account.getBase58());
-				clipboard.setContents(value, null);
-				*/
-			}
-		});
-		menu.add(menu_copy_Creator_PublicKey);
-		
-		JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy No.Transaction"));
-		menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-
 				
-	//			StringSelection value = new StringSelection(person_Accounts_Model.get_No_Trancaction(row));
-	//			clipboard.setContents(value, null);
+				
+				Object a = person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_KEY).toString();
+				StringSelection value = new StringSelection(person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_KEY).toString());
+				clipboard.setContents(value, null);
 			}
 		});
-		menu.add(menu_copy_Block_PublicKey);
+		menu.add(copyKey);
 
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Name"));
+		menu_copyName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				// StringSelection value = new
+				// StringSelection(person.getCreator().getAddress().toString());
+				int row = jTable_My_Persons.getSelectedRow();
+				row = jTable_My_Persons.convertRowIndexToModel(row);
 
+	
+				@SuppressWarnings("static-access")
+				StringSelection value = new StringSelection((String) person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_NAME));
+				clipboard.setContents(value, null);
+				
+			}
+		});
+		menu.add(menu_copyName);
+
+		
+	
+		
+	
 
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
@@ -149,9 +113,7 @@ public class Person_Owner_Panel extends JPanel {
 
 				int row = jTable_My_Persons.getSelectedRow();
 				row = jTable_My_Persons.convertRowIndexToModel(row);
-		//		Account account = person_Accounts_Model.getAccount(row);
-
-		//		new Account_Send_Dialog(null, null, account, null);
+				new Account_Send_Dialog(null, null,null, person_Accounts_Model.getPerson(row));
 
 			}
 		});
@@ -165,7 +127,7 @@ public class Person_Owner_Panel extends JPanel {
 				row = jTable_My_Persons.convertRowIndexToModel(row);
 	//			Account account = person_Accounts_Model.getAccount(row);
 
-	//			new Mail_Send_Dialog(null, null, account, null);
+				new Mail_Send_Dialog(null, null, null, person_Accounts_Model.getPerson(row));
 
 			}
 		});

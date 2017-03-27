@@ -83,19 +83,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 // для прозрачности
      int alpha =255;
      int alpha_int;
-	
-	
 	public Persons_Search_SplitPanel(){
-	
-		
-		
 		setName(Lang.getInstance().translate("Search Persons"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
-		
 	// not show buttons
 		jToolBar_RightPanel.setVisible(false);
 		toolBar_LeftPanel.setVisible(false);
-		
 // not show My filter
 		searth_My_JCheckBox_LeftPanel.setVisible(false);
 		
@@ -144,25 +137,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
     	    		
     				PersonCls person = search_Table_Model.getPerson(row);
-    	  			
-    	  			
-    	  			TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-    				if (addresses.isEmpty()) {
-    					
-    				} else {
-    					Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
-    				}
-    	  			
-    	  
-    	    //		@SuppressWarnings("unused")
-    		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-    	    		}});
-    	    	menu.add(vsend_Coins_Item);
+    	  			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+    				}});
     	    	
-    	   
-    	      	JMenuItem send_Mail_Item= new JMenuItem(Lang.getInstance().translate("Send Mail"));
-    	  
-    	      	send_Mail_Item.addActionListener(new ActionListener(){
+    	    	menu.add(vsend_Coins_Item);
+    	    	JMenuItem send_Mail_Item= new JMenuItem(Lang.getInstance().translate("Send Mail"));
+    	    	send_Mail_Item.addActionListener(new ActionListener(){
     	  		@Override
     	    	public void actionPerformed(ActionEvent e) {
     	   
@@ -171,43 +151,11 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
     	    		
     				PersonCls person = search_Table_Model.getPerson(row);
-    	  			
-    	  		
-    				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
-    				if (addresses.isEmpty()) {
-    					
-    				} else {
-    					Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
-    				}
-    	  			
-    	  			
-    	  			
-    	  			
-    	  			
-    	    //		@SuppressWarnings("unused")
-    		//		PersonConfirmDialog fm = new PersonConfirmDialog(search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));		
-    	    		}});
+    	  				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+    				}});
     	    	
     	    	menu.add(send_Mail_Item);
-    	    	
-    		
-    		
-    		
-    		
-    		
-    	    	TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
-    		
-    		
-    		
-    		
-    		
-    		
-    		
-    		
-		
-
-	   
-
+   	    	TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
 	}
 // set favorite Search	
 	void favorite_all(JTable personsTable){

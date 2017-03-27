@@ -61,7 +61,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	private PublicKeyAccount publisher;
 
 	public Person_Info_002(PersonCls person, boolean full) {
-		initComponents(person, full);
+		if (person != null)	initComponents(person, full);
 	}
 
 	/**

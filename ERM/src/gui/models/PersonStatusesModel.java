@@ -43,6 +43,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	public static final int COLUMN_STATUS_NAME = 0;
 	public static final int COLUMN_PERIOD = 1;
 	public static final int COLUMN_MAKER = 2;
+	public static final int COLUMN_CREATOR_NAME =30;
 	
 	TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
 	List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
@@ -78,9 +79,6 @@ public String get_No_Trancaction(int row){
 		
 	Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
  return 	value.b.d +"-"+ value.b.e;
-	
-
-		
 	}
 
 public Account get_Creator_Account(int row){
@@ -207,6 +205,13 @@ public Account get_Creator_Account(int row){
 			recNo = value.b.e;
 			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
 			return record==null?"":((Account)record.getCreator()).getPersonAsString();
+			
+		case COLUMN_CREATOR_NAME:
+		
+			block = value.b.d;
+			recNo = value.b.e;
+			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			return record==null?"":((Account)record.getCreator()).getPerson().b.getName();
 
 		
 

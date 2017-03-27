@@ -54,6 +54,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	// public static final int COLUMN_BODY = 2;
 	// public static final int COLUMN_AMOUNT = 2;
 	 public static final int COLUMN_HEIGHT = 2;
+	 public static final int COLUMN_CREATOR_NAME =30;
 	List<Transaction> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
@@ -198,6 +199,9 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			case COLUMN_HEIGHT:
 				
 				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
+				
+			case COLUMN_CREATOR_NAME:
+				return	((Account)transaction.getCreator()).getPerson().b.getName();
 			}
 
 			return null;

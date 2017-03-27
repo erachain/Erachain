@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JInternalFrame;
@@ -89,9 +90,12 @@ public class Account_Send_Panel extends JPanel
 	protected JLabel messageLabel;
 	int y;
 	private JTextField txt_Title;
+	PersonCls person;
 	
 	public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
+		this.person = person;
+		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
 		y=0;
 		if (asset == null)
 		{
@@ -196,6 +200,7 @@ public class Account_Send_Panel extends JPanel
 				if (person !=null){
 					
 					Accounts_ComboBox_Model accounts_To_Model = new Accounts_ComboBox_Model(person.getKey());
+					if (accounts_To_Model.getSize() !=0) {
 					this.cbx_To = new JComboBox(accounts_To_Model);
 					this.add(this.cbx_To, txtToGBC);
 				 	txtTo.setText(cbx_To.getSelectedItem().toString());
@@ -213,6 +218,13 @@ public class Account_Send_Panel extends JPanel
 
 						    }
 						});	
+					}
+					else {
+						
+						this.txtTo.setText("has no Addresses"); 	
+						sendButton.setEnabled(false);
+						
+					}
 				}
 				else {
 					
@@ -424,6 +436,7 @@ public class Account_Send_Panel extends JPanel
 		feetxtGBC.anchor = GridBagConstraints.NORTH;
 		feetxtGBC.gridx = 3;	
 		feetxtGBC.gridy = y;
+		feetxtGBC.gridwidth = 2;
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
@@ -439,6 +452,7 @@ public class Account_Send_Panel extends JPanel
 		decryptAllGBC.gridx = 3;
 		decryptAllGBC.gridy = ++y;
 		MButton decryptButton = new MButton(Lang.getInstance().translate("Decrypt All"),2);
+		decryptButton.setVisible(false);
     	this.add(decryptButton, decryptAllGBC);
 		
 		
@@ -450,7 +464,7 @@ public class Account_Send_Panel extends JPanel
 		buttonGBC.gridx = 1;
 		buttonGBC.gridy = y;
         
-		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
+		
      //   sendButton.setPreferredSize(new Dimension(80, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
@@ -491,14 +505,7 @@ public class Account_Send_Panel extends JPanel
 		
    //     add(scrollPane, messagesGBC);
  
-		//BUTTON DECRYPTALL
-    	decryptButton.addActionListener(new ActionListener()
-    	{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		    	((Send_TableModel) table).CryptoOpenBoxAll();
-		    }
-		});	
+		
 
         //CONTEXT MENU
 		MenuPopupUtil.installContextMenu(txtTo);
@@ -550,6 +557,10 @@ public class Account_Send_Panel extends JPanel
 			txtRecDetails.setText("");
 			return;
 		}
+		if (txtTo.getText().equals("has no Addresses")){
+			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Addresses"));
+			return;
+		}
 		
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
@@ -558,6 +569,9 @@ public class Account_Send_Panel extends JPanel
 		}
 		
 		//READ RECIPIENT
+		
+		
+		
 		Tuple2<Account, String> resultAccount = Account.tryMakeAccount(txtTo.getText());
 		Account account = resultAccount.a;
 		if (account == null) {
@@ -565,6 +579,7 @@ public class Account_Send_Panel extends JPanel
 		} else {
 				txtRecDetails.setText(account.toString(asset.getKey()));
 		}
+		
 		
 		if(false && account!=null && account.getAddress().startsWith(wrongFirstCharOfAddress))
 		{
@@ -576,6 +591,7 @@ public class Account_Send_Panel extends JPanel
 		{
 			encrypted.setEnabled(true);
 		}
+		
 	}
 	
 	public void onSendClick()

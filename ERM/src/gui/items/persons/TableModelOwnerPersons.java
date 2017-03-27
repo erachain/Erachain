@@ -38,7 +38,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 //	private SortableList<Long, PersonCls> persons;
 	private  List<Pair<U,PersonCls>> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday","Address"});//, "Publisher", "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday"});//, "Publisher", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	private SortableList<Tuple2<String, String>, PersonCls> persons_S_List;
 	
@@ -125,9 +125,9 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 			
 			return person.getName();
 		
-		case COLUMN_ADDRESS:
+	//	case COLUMN_ADDRESS:
 			
-			return person.getOwner().getPersonAsString();
+	//		return person.getOwner().getPersonAsString();
 			
 		
 		
