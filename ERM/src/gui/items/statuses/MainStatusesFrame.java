@@ -58,6 +58,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	private static final long serialVersionUID = 1L;
 	private TableModelItemStatuses tableModelItemStatuses;
 	final MTable statusesTable ;
+	private WalletItemStatusesTableModel statusesModel;
+	private MTable table;
 	
 
 	
@@ -187,6 +189,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			public void valueChanged(ListSelectionEvent arg0) {
 				StatusCls status = null;
 				if (statusesTable.getSelectedRow() >= 0 ) status = tableModelItemStatuses.getStatus(statusesTable.convertRowIndexToModel(statusesTable.getSelectedRow()));
+				if (status == null) return;
 				info.show_001(status);
 				MainStatusesFrame.itemAll = status;
 				
@@ -202,9 +205,10 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			
 			
 		search_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info);
+		
 		// MENU
-	/*					
-		JPopupMenu all_Statuses_Table_menu = new JPopupMenu();
+						
+		JPopupMenu search_Statuses_Table_menu = new JPopupMenu();
 		
 		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 		favorite.addActionListener(new ActionListener() {
@@ -215,21 +219,50 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			}
 		});
 		
+		search_Statuses_Table_menu.add(favorite);
 		
-		
-		
-		/*
-		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
-		details.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				StatusCls status = tableModelItemStatuses.getStatus(statusesTable.getSelectedRow());
-				//new StatusDetailsFrame(status);
-			}
-		});
-		all_Statuses_Table_menu.add(details);
-*/
-		
+		search_Statuses_Table_menu.addPopupMenuListener(new PopupMenuListener(){
 
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				int row = statusesTable.getSelectedRow();
+				row = statusesTable.convertRowIndexToModel(row);
+				 StatusCls status = tableModelItemStatuses.getStatus(row);
+				
+					favorite.setVisible(true);
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(status))
+					{
+						favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+					}
+					else
+					{
+						favorite.setText(Lang.getInstance().translate("Add Favorite"));
+					}
+					
+			}
+			
+		}
+		
+		);
+		
+		
+		 search_Status_SplitPanel.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(search_Statuses_Table_menu);
+				
 
   	// My statuses		
 			
@@ -243,8 +276,8 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	my_Status_SplitPanel.jButton2_jToolBar_RightPanel.setVisible(false);
 	
 	//TABLE
-			final WalletItemStatusesTableModel statusesModel = new WalletItemStatusesTableModel();
-			final MTable table = new MTable(statusesModel);
+			 statusesModel = new WalletItemStatusesTableModel();
+			 table = new MTable(statusesModel);
 			
 			columnModel = table.getColumnModel(); // read column model
 				columnModel.getColumn(0).setMaxWidth((100));
@@ -336,6 +369,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 				public void valueChanged(ListSelectionEvent arg0) {
 					StatusCls status =null;
 					if (table.getSelectedRow() >= 0 )status = statusesModel.getItem(table.convertRowIndexToModel(table.getSelectedRow()));
+					if (status == null)return;
 					info1.show_001(status);
 					MainStatusesFrame.itemMy = status;
 
@@ -344,12 +378,69 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 					my_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
 				}
 			});
-
-
-
 			my_Status_SplitPanel.jScrollPane_jPanel_RightPanel.setViewportView(info1);
 	
-		
+			// MENU
+			
+			JPopupMenu my_Statuses_Table_menu = new JPopupMenu();
+			
+			JMenuItem my_favorite = new JMenuItem(Lang.getInstance().translate(""));
+			my_favorite.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					
+					favorite_set( table );
+					
+				}
+			});
+			
+			my_Statuses_Table_menu.add(my_favorite);
+			
+			my_Statuses_Table_menu.addPopupMenuListener(new PopupMenuListener(){
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+					// TODO Auto-generated method stub
+					
+					int row = table.getSelectedRow();
+					row = table.convertRowIndexToModel(row);
+					 StatusCls status = statusesModel.getItem(row);
+					
+						my_favorite.setVisible(true);
+						//CHECK IF FAVORITES
+						if(Controller.getInstance().isItemFavorite(status))
+						{
+							my_favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+						}
+						else
+						{
+							my_favorite.setText(Lang.getInstance().translate("Add Favorite"));
+						}
+						
+				}
+				
+			}
+			
+			);
+			
+			
+			my_Status_SplitPanel.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
+					
+			
+			
+			
+			
 			
 	// issue status
 			
