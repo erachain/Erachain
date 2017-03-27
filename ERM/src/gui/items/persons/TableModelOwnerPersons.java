@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.item.persons.PersonCls;
+import core.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.Pair;
 import database.DBSet;
@@ -194,6 +195,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	@SuppressWarnings("unchecked")
 	private void get_List(){
 		persons.clear();
+		
 		for(Pair<Tuple2<String, String>, PersonCls> pp1:persons_S_List){
 			String creator = pp1.getB().getOwner().getAddress();
 			for (String ad:addresses.keySet()){
