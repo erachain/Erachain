@@ -46,8 +46,8 @@ public class Votings_Search_SplitPanel extends Split_Panel {
 		public void valueChanged(ListSelectionEvent arg0) {
 			Poll voting = null;
 			if (allVotingsPanel.pollsTable.getSelectedRow() >= 0)
-				voting = allVotingsPanel.pollsTableModel.getPoll(
-						allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
+				voting = allVotingsPanel.pollsTableModel.getPoll(allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
+			if (voting == null) return;
 			votingDetailsPanel = new VotingDetailPanel(voting, (AssetCls) allVotingsPanel.cbxAssets.getSelectedItem());
 			jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
 		}

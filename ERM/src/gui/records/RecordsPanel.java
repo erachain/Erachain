@@ -178,6 +178,7 @@ public class RecordsPanel extends  JPanel // JPanel
 							        
 							        //GET TRANSACTION
 							        Transaction transaction = transactionsModel.getTransaction(row);
+							        if (transaction == null)return;
 							      //SHOW DETAIL SCREEN OF TRANSACTION
 							     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 								  

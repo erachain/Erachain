@@ -76,6 +76,7 @@ import lang.Lang;
 			public void valueChanged(ListSelectionEvent arg0) {
 				Poll voting =null;
 				if (my_Voting_table.getSelectedRow() >= 0 )voting  = my_Voting_Model.getPoll(my_Voting_table.convertRowIndexToModel(my_Voting_table.getSelectedRow()));
+				if (voting == null)return;
 				VotingDetailPanel votingDetailsPanel = new VotingDetailPanel(voting, Controller.getInstance().getAsset(AssetCls.FEE_KEY));
 					jScrollPane_jPanel_RightPanel.setViewportView(votingDetailsPanel);
 			}

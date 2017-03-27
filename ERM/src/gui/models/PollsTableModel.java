@@ -1,7 +1,10 @@
 package gui.models;
 
+import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.validation.constraints.Null;
 
 import controller.Controller;
 import core.item.assets.AssetCls;
@@ -34,6 +37,11 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 		this.asset = asset;
 		this.fireTableDataChanged();
 	}
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
+    }
 	
 	@Override
 	public SortableList<String, Poll> getSortableList() {
@@ -94,7 +102,11 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 			
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(poll.getTotalVotes(this.asset.getKey(DBSet.getInstance())));
+			BigDecimal amo = poll.getTotalVotes(this.asset.getKey(DBSet.getInstance()));
+			if (amo == null)
+				return BigDecimal.ZERO;
+			return amo;
+			
 			
 		}
 		
