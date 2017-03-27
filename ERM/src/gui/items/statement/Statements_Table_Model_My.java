@@ -324,7 +324,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		transactions.clear();
 		// база данных	
 		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
+			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
 			{
 				transactions.add(transaction);
 			}
