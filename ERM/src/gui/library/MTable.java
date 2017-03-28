@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.DefaultRowSorter;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -394,8 +395,7 @@ public class MTable<U, T> extends JTable {
 				if (str != null) {
 					if (!str.toString().equals("")) {
 						column.setHeaderRenderer(new Renderer_Right());
-						filters.put(col,
-								new Tuple2((Date) str, RowFilter.regexFilter(".*" + str.toString() + ".*", col)));
+						filters.put(col, new Tuple2(new Tuple3(str, RowFilter.regexFilter(".*" + str.toString() + ".*", col),null), new Tuple3(null,null,null)));
 					} else {
 						column.setHeaderRenderer(null);
 						filters.remove(col);
@@ -403,8 +403,46 @@ public class MTable<U, T> extends JTable {
 				}
 			}
 			
+			if (model.getColumnClass(col)==Boolean.class){
 			
+			//	String resultString = (String) JOptionPane.showInputDialog(null, "Input an answer", "Input", JOptionPane.QUESTION_MESSAGE, flag, listArr, "Cuatro");	
+				JCheckBox   rememberChk = new JCheckBox("Do not show this message again.");
+				if(filters.get(col) != null){
+					if(filters.get(col).a!=null){
+						if(filters.get(col).a.a !=null){
+	//			 cx = filters.get(col).a.a;
+				rememberChk.setSelected((boolean) filters.get(col).a.a);
+						}
+					}
+				}
+				String            msg = "Are you sure you want to disconnect the selected products?"; 
+
+				Object[]        msgContent = {msg, rememberChk}; 
+
+				int     n    =  JOptionPane.showConfirmDialog ( th,  msgContent,  "Title", JOptionPane.OK_CANCEL_OPTION); 
+
+				boolean remember = rememberChk.isSelected(); 
+			//	if (n != 0) {
+				if (n == 2) {	column.setHeaderRenderer(null);
+				filters.remove(col);
+			}else if (n ==0){				
+				
+				if (rememberChk.isSelected()) {
+						column.setHeaderRenderer(new Renderer_Right());
+						filters.remove(col);
+						filters.put(col, new Tuple2(new Tuple3(true, RowFilter.regexFilter(".*true.*", col),null), new Tuple3(null,null,null)));
+					} else {
+						column.setHeaderRenderer(new Renderer_Right());
+						filters.remove(col);
+						filters.put(col, new Tuple2(new Tuple3(false, RowFilter.regexFilter(".*false.*", col),null), new Tuple3(null,null,null)));
+					}
+					
+					
+		//		}
+				
 			
+			}
+			}
 			
 			// Object value = showEditor(th, col, oldValue);
 			Iterator<Tuple2<Tuple3<U, RowFilter<TableModel, T>, ComparisonType>, Tuple3<U, RowFilter<TableModel, T>, ComparisonType>>> s = filters.values().iterator();
@@ -424,20 +462,5 @@ public class MTable<U, T> extends JTable {
 
 	}
 	
-	private void show_Dialog(Integer col, TableColumn column, Class u_Class){
-		
-		
-		
-									
-		
-		
-		
-		
-		
-		
-		
-	}
 	
-	
-
 }
