@@ -86,7 +86,7 @@ import gui.library.MTable;
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/		// SET VIDEO			
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = new MTable<Object>(my_Statements_Model); //my_Statements_table;
+			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 	
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
