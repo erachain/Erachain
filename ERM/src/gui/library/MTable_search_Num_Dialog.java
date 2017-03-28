@@ -7,6 +7,8 @@ package gui.library;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.math.BigDecimal;
 
 import javax.swing.RowFilter;
@@ -36,10 +38,20 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
 	
 	private Tuple4<ComparisonType,String,ComparisonType,String> ansver;
 	Class class_1;
+	private ComparisonType old_First_If_Comp;
+	private ComparisonType old_Secind_If_Comp;
+	private String old_First_If_Txt;
+	private String old_Second_If_Txt;
+	
+	
 	
     public MTable_search_Num_Dialog(TableColumn column, Class class1, ComparisonType first_IF_Com, String first_IF_Txt, ComparisonType second_IF_Com, String second_IF_Txt) {
         super();
         
+        old_First_If_Comp = first_IF_Com;
+        old_Secind_If_Comp = second_IF_Com;
+        old_First_If_Txt = first_IF_Txt;
+        old_Second_If_Txt = second_IF_Txt;
         
        setModal(true);
         class_1 = class1;
@@ -99,7 +111,7 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
         jButton_Close.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
+				cansel_1();
 				dispose();
 			}
         	});
@@ -115,6 +127,8 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
 			     jFormattedTextField_First_IF.setText("");
 			     jComboBox_First_IF.setSelectedIndex(0);
 			     jComboBox_Second_IF.setSelectedIndex(0);
+			    
+			     
 			}
         	});
         jButton_OK.setText(Lang.getInstance().translate("OK"));
@@ -135,9 +149,58 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
 			}
         	});
         
+        this.addWindowListener(new WindowListener(){
+
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				cansel_1();
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        	
+        	
+        	
+        });
+        
         this.setLocationRelativeTo(null);
-        setVisible(true);
-        setModal(true);
+      //  setVisible(true);
+     //   setModal(true);
         
         
     }
@@ -281,7 +344,7 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(9, 8, 9, 8);
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
-        jLabel_Bootom.setText("jLabel2");
+        jLabel_Bootom.setText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -297,6 +360,16 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
     public Tuple4<ComparisonType, String, ComparisonType, String> get_Ansver(){
     	return ansver;
     }
+    
+    private void cansel_1(){
+    	// TODO Auto-generated method stub
+		String fI= (old_First_If_Txt.equals(""))? null:new String(old_First_If_Txt.replace(",", "."));
+		String sI = (old_Second_If_Txt.equals(""))?null:new String(old_Second_If_Txt.replace(",", "."));
+		 ansver = new Tuple4(old_First_If_Comp,fI,old_Secind_If_Comp,sI);
+    	
+    	
+    }
+   
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton_Close;

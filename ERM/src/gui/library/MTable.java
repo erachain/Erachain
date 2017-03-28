@@ -34,6 +34,7 @@ import org.mapdb.Fun.Tuple4;
 
 import com.toedter.calendar.JCalendar;
 
+import gui.MainFrame;
 import gui.items.persons.TableModelPersons;
 import gui.models.Renderer_Right;
 import lang.Lang;
@@ -225,6 +226,14 @@ public class MTable<U, T> extends JTable {
 							String first_S = (first.a == null)?"":(String)first.a;
 							String second_S = (second.a == null)?"":(String)second.a;
 							MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,BigDecimal.class,first.c,first_S,second.c,second_S);
+							 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
+							 if( MainFrame.desktopPane.getX() > x)x=MainFrame.desktopPane.getX(); 
+							 int y = arg0.getYOnScreen()-dialog.getHeight();
+							 if (MainFrame.desktopPane.getY()>y)y = MainFrame.desktopPane.getY();
+							dialog.setLocation(x, y);
+							dialog.setVisible(true);
+							
+							
 							pp = dialog.get_Ansver();
 					//обнуляем фильтр и устанавливаем рендер по умолчанию			
 							filters.remove(col);
@@ -269,11 +278,17 @@ public class MTable<U, T> extends JTable {
 				String first_S = (first.a == null)?"":(String)first.a;
 				String second_S = (second.a == null)?"":(String)second.a;
 				MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,Long.class,first.c,first_S,second.c,second_S);
+				 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
+				 if( MainFrame.desktopPane.getX() > x)x=MainFrame.desktopPane.getX(); 
+				 int y = arg0.getYOnScreen()-dialog.getHeight();
+				 if (MainFrame.desktopPane.getY()>y)y = MainFrame.desktopPane.getY();
+				dialog.setLocation(x, y);
+				dialog.setVisible(true);
 				pp = dialog.get_Ansver();
 		//обнуляем фильтр и устанавливаем рендер по умолчанию			
 				filters.remove(col);
 				column.setHeaderRenderer(null);
-				if (pp == null) return;
+				
 				if (pp.b != null) {
 					//если есть данные то устанавливаем рендер		
 								column.setHeaderRenderer(new Renderer_Right());
@@ -318,11 +333,17 @@ public class MTable<U, T> extends JTable {
 					String first_S = (first.a == null)?"":(String)first.a;
 					String second_S = (second.a == null)?"":(String)second.a;
 					MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,Integer.class,first.c,first_S,second.c,second_S);
+					 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
+					 if( MainFrame.desktopPane.getX() > x)x=MainFrame.desktopPane.getX(); 
+					 int y = arg0.getYOnScreen()-dialog.getHeight();
+					 if (MainFrame.desktopPane.getY()>y)y = MainFrame.desktopPane.getY();
+					dialog.setLocation(x, y);
+					dialog.setVisible(true);
 					pp = dialog.get_Ansver();
 			//обнуляем фильтр и устанавливаем рендер по умолчанию			
 					filters.remove(col);
 					column.setHeaderRenderer(null);
-					if (pp == null) return;
+					
 					if (pp.b != null) {
 						//если есть данные то устанавливаем рендер		
 									column.setHeaderRenderer(new Renderer_Right());
