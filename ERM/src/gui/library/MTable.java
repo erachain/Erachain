@@ -373,7 +373,7 @@ public class MTable<U, T> extends JTable {
 					if (filters.get(col).a != null)
 						sss = filters.get(col).a.a.toString();
 				}
-				str = JOptionPane.showInputDialog(th, "filter col. = " + column.getHeaderValue(), sss);
+				str = JOptionPane.showInputDialog(th, Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString(), sss);
 				if (str != null) {
 					if (!str.toString().equals("")) {
 						column.setHeaderRenderer(new Renderer_Right());
@@ -391,7 +391,7 @@ public class MTable<U, T> extends JTable {
 					if (filters.get(col).a != null)
 						sss = filters.get(col).a;
 				}
-				str = JOptionPane.showInputDialog(th, "Data col. = " + column.getHeaderValue(), "data");
+				str = JOptionPane.showInputDialog(th, Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString(), "data");
 				if (str != null) {
 					if (!str.toString().equals("")) {
 						column.setHeaderRenderer(new Renderer_Right());
@@ -406,7 +406,7 @@ public class MTable<U, T> extends JTable {
 			if (model.getColumnClass(col)==Boolean.class){
 			
 			//	String resultString = (String) JOptionPane.showInputDialog(null, "Input an answer", "Input", JOptionPane.QUESTION_MESSAGE, flag, listArr, "Cuatro");	
-				JCheckBox   rememberChk = new JCheckBox("Do not show this message again.");
+				JCheckBox   rememberChk = new JCheckBox(Lang.getInstance().translate("Filter"));
 				if(filters.get(col) != null){
 					if(filters.get(col).a!=null){
 						if(filters.get(col).a.a !=null){
@@ -415,11 +415,11 @@ public class MTable<U, T> extends JTable {
 						}
 					}
 				}
-				String            msg = "Are you sure you want to disconnect the selected products?"; 
+				String            msg = Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString();
 
 				Object[]        msgContent = {msg, rememberChk}; 
 
-				int     n    =  JOptionPane.showConfirmDialog ( th,  msgContent,  "Title", JOptionPane.OK_CANCEL_OPTION); 
+				int     n    =  JOptionPane.showConfirmDialog ( th,  msgContent,  Lang.getInstance().translate("Filter"), JOptionPane.OK_CANCEL_OPTION); 
 
 				boolean remember = rememberChk.isSelected(); 
 			//	if (n != 0) {

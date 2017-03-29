@@ -53,6 +53,7 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
         old_First_If_Txt = first_IF_Txt;
         old_Second_If_Txt = second_IF_Txt;
         
+        setTitle(Lang.getInstance().translate("Filter"));
        setModal(true);
         class_1 = class1;
         String ss="";
@@ -106,7 +107,7 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
         jComboBox_Second_IF.setSelectedIndex(ind);
         jFormattedTextField_Second_IF.setText(second_IF_Txt);
         
-        jLabel_Title.setText(Lang.getInstance().translate("Serch from column")+":"+ column.getHeaderValue().toString());
+        jLabel_Title.setText(Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString());
         jButton_Close.setText(Lang.getInstance().translate("Cancel"));
         jButton_Close.addActionListener(new ActionListener(){
 			@Override
@@ -230,45 +231,30 @@ public class MTable_search_Num_Dialog extends javax.swing.JDialog {
         
              
      //   jComboBox_First_IF.setModel(new javax.swing.DefaultComboBoxModel<ComparisonType,String>(Lang.getInstance().translate(new String[] { "EQUAL", "BEFORE", "AFTER", "NOT_EQUAL" })));
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.EQUAL, "EQUAL" ) );
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.AFTER, "AFTER" ) );
-     //   jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, "BEFORE" ) );
-        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.NOT_EQUAL, "NOT_EQUAL" ) );
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.EQUAL, Lang.getInstance().translate("EQUAL") ) );
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.AFTER, Lang.getInstance().translate("AFTER") ) );
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, Lang.getInstance().translate("BEFORE") ) );
+        jComboBox_First_IF.addItem(new Item(RowFilter.ComparisonType.NOT_EQUAL, Lang.getInstance().translate("NOT EQUAL" )) );
         jComboBox_First_IF.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 								
-				if (((Item)jComboBox_First_IF.getSelectedItem()).description == new Item(RowFilter.ComparisonType.BEFORE, "BEFORE" ).description 
-						|| ((Item)jComboBox_First_IF.getSelectedItem()).description==new Item(RowFilter.ComparisonType.AFTER, "AFTER" ).description){
-							if (((Item)jComboBox_First_IF.getSelectedItem()).description==(new Item(RowFilter.ComparisonType.BEFORE, "BEFORE" ).description)) {
-								jComboBox_Second_IF.removeAllItems();
-								jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.AFTER, "AFTER" ) );
-								jComboBox_Second_IF.setSelectedItem(RowFilter.ComparisonType.AFTER);
-								
-					}else{
+				if (((Item)jComboBox_First_IF.getSelectedItem()).description==new Item(RowFilter.ComparisonType.AFTER, Lang.getInstance().translate("AFTER") ).description){
+							
 						jComboBox_Second_IF.removeAllItems();
-						jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE, "BEFORE" ) );
+						jComboBox_Second_IF.addItem(new Item(RowFilter.ComparisonType.BEFORE,Lang.getInstance().translate("BEFORE") ) );
 						jComboBox_Second_IF.setSelectedItem(RowFilter.ComparisonType.BEFORE);
-						
-					}
-							jComboBox_Second_IF.setVisible(true);
-							jFormattedTextField_Second_IF.setVisible(true);			
-					
+						jComboBox_Second_IF.setVisible(true);
+						jFormattedTextField_Second_IF.setVisible(true);			
 				}else{
 					jComboBox_Second_IF.setVisible(false);
-		            jFormattedTextField_Second_IF.setVisible(false);	
-					
+					jFormattedTextField_Second_IF.setVisible(false);	
 					
 				}
-					
+        	
 			}
-        	
-        	
-        	
-        	
-        	
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

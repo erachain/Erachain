@@ -111,7 +111,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 
 		case COLUMN_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(asset.getTotalQuantity());
+			return asset.getTotalQuantity();
 			
 		case COLUMN_DIVISIBLE:
 			

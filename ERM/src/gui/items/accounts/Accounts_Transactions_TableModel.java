@@ -1,5 +1,6 @@
 package gui.items.accounts;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -151,11 +152,11 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		
 			
 		case COLUMN_AMOUNT:
-			if (r_Tran.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)		return NumberAsString.getInstance().numberAsString(r_Tran.getAmount());
-			if (r_Tran.getCreator().getAddress().equals(this.sender.getAddress())) return "-" + NumberAsString.getInstance().numberAsString(r_Tran.getAmount());
-			return NumberAsString.getInstance().numberAsString(r_Tran.getAmount());
+			if (r_Tran.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)		return r_Tran.getAmount();
+			if (r_Tran.getCreator().getAddress().equals(this.sender.getAddress())) return r_Tran.getAmount().multiply(new BigDecimal(-1));
+			return r_Tran.getAmount();
 		case COLUMN_ASSET:
-			return Controller.getInstance().getAsset(r_Tran.getAssetKey());
+			return Controller.getInstance().getAsset(r_Tran.getAssetKey()).toString();
 		case COLUMN_RECIPIENT:
 			return r_Tran.viewRecipient();
 		case COLUMN_CONFIRM:
