@@ -129,7 +129,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		// create Hashs
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String str = JOptionPane.showInputDialog(null, "Insert Hash", "Add", JOptionPane.INFORMATION_MESSAGE);
+			String str = JOptionPane.showInputDialog(null, Lang.getInstance().translate("Insert Hash"), Lang.getInstance().translate("Add"), JOptionPane.INFORMATION_MESSAGE);
 			hashes_Table_Model.addRow(new Object[]{str, "Add"});
 			hashes_Table_Model.fireTableDataChanged();
 		}
@@ -299,7 +299,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         
         
-        attached_Files_Model = new javax.swing.table.DefaultTableModel(new Object [][] { {null,null}}, new String [] {Lang.getInstance().translate("Path"), "Data"});
+        attached_Files_Model = new javax.swing.table.DefaultTableModel(new Object [][][] { {null,null, null}}, new String [] {Lang.getInstance().translate("Path"), "Data", "Size"});
         attached_Files_Model.removeRow(0);
         jTable_Attached_Files = new MTable(attached_Files_Model);
         jTable_Attached_Files.setAlignmentX(0.0F);
@@ -893,7 +893,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 					}
 
 					
-					attached_Files_Model.addRow(new Object[] { file_name, fileInArray});
+					attached_Files_Model.addRow(new Object[] { file_name.toString(), fileInArray, new Integer(fileInArray.length)});
 			
 
 				}
