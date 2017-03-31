@@ -15,7 +15,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 		super(new Object[] { Lang.getInstance().translate("Hash 32 bytes"),
 				Lang.getInstance().translate("Description") }, rows);
 		
-		this.addRow(new Object[]{"", ""});
+	//	this.addRow(new Object[]{"", ""});
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 				//CHECK IF LAST ROW
 				if(row == this.getRowCount()-1)
 				{
-					this.addRow(new Object[]{"", ""});
+			//		this.addRow(new Object[]{"", ""});
 				}
 				
 				super.setValueAt(aValue, row, column);
@@ -58,7 +58,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 			//CHECK IF LAST ROW
 			if(row == this.getRowCount()-1)
 			{
-				this.addRow(new Object[]{"", ""});
+			//	this.addRow(new Object[]{"", ""});
 			}
 		}
 	}
@@ -73,7 +73,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 			
 			if(value.length() > column)
 			{
-				values.add(value);
+		//		values.add(value);
 			}
 		}
 		

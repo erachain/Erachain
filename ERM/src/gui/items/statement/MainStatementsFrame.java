@@ -47,6 +47,8 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 // для прозрачности
      int alpha =255;
      int alpha_int;
+
+	private Issue_Document_Panel iss2;
 	
 	
 	public MainStatementsFrame(){
@@ -70,11 +72,13 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 	
 		
 // issue Person
-		  JScrollPane Issue_Statement_Panel = new JScrollPane();
+		 Issue_Statement_Panel Issue_Statement_Panel = new Issue_Statement_Panel(null, null);
 		  Issue_Statement_Panel.setName(Lang.getInstance().translate("Issue Statement"));
-		  Issue_Statement_Panel.add(new Issue_Statement_Panel(null, null));
-		  Issue_Statement_Panel.setViewportView(new Issue_Statement_Panel(null, null));
+		  
 	
+// issue2
+		  iss2 = new Issue_Document_Panel();
+		  iss2.setName(Lang.getInstance().translate("Issue Statement"));
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 		
@@ -82,6 +86,7 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 		
 		this.jTabbedPane.add(search_Statements_SplitPanel);
 		this.jTabbedPane.add(Issue_Statement_Panel);
+		this.jTabbedPane.add(iss2);
 		
 		this.pack();
 		//	this.setSize(800,600);

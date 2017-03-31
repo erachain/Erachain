@@ -88,15 +88,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		jLabel1 = new javax.swing.JLabel();
 		jTextField1 = new javax.swing.JTextField();
 		jPanel_Image = new javax.swing.JPanel();
-		new javax.swing.JLabel();
-		new javax.swing.JLabel();
-		new javax.swing.JScrollPane();
-		new javax.swing.JTable();
-		new javax.swing.JLabel();
-		new javax.swing.JScrollPane();
-		new javax.swing.JTable();
+		
 		jLabel_Owner = new javax.swing.JLabel();
-		new javax.swing.JLabel();
+		
 	//	jTextField_Owner = new javax.swing.JTextField();
 		new javax.swing.JTextField();
 		jLabel_Owner_Sign = new javax.swing.JLabel();
