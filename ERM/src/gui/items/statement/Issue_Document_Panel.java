@@ -130,6 +130,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String str = JOptionPane.showInputDialog(null, Lang.getInstance().translate("Insert Hash"), Lang.getInstance().translate("Add"), JOptionPane.INFORMATION_MESSAGE);
+			if (str == null || str =="" || str.equals("")) return;
 			hashes_Table_Model.addRow(new Object[]{str, "Add"});
 			hashes_Table_Model.fireTableDataChanged();
 		}

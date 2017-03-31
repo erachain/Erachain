@@ -33,6 +33,18 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 	   }
 	
 	
+	
+	public Object getValueAt(int row, int col){
+		
+		if (this.getRowCount()<row || this.getRowCount() ==0 )return null;
+		
+		
+		return super.getValueAt(row, col);
+		
+		
+		
+	}
+	
 	@Override 
 	public void setValueAt(Object aValue, int row, int column)
 	{
