@@ -174,7 +174,7 @@ public class VouchRecordDialog extends JDialog  {
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Record has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Record has been certified") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		
@@ -284,7 +284,7 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
 	        getContentPane().add(jLabel_RecordInfo, gridBagConstraints);
 
-	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Address")+":");
+	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Account")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;

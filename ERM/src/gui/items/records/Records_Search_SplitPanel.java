@@ -93,7 +93,7 @@ import utils.MenuPopupUtil;
 		    	this.setName(Lang.getInstance().translate("Search Records"));
 		    	
 		    	this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert Height Block or Block-SeqNo")+":");
-		    	this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert Address")+":"));
+		    	this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Insert Account")+":"));
 		    	sender_address = new JTextField();
 		    	sender_address.setToolTipText("");
 		    	sender_address.setAlignmentX(1.0F);

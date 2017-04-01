@@ -109,17 +109,17 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	   // setPreferredSize(new Dimension(400, 600));
 	    
 		
-		    jLabel_Addition1.setText(Lang.getInstance().translate("Additional")+"1:");
-		    jLabel_Addition2.setText(Lang.getInstance().translate("Additional")+"2:");
-		    jLabel_Address.setText(Lang.getInstance().translate("Your Address")+":");
+		    jLabel_Address.setText(Lang.getInstance().translate("Your Account")+":");
 		    jLabel_Data_From.setText(Lang.getInstance().translate("From Date")+":");
 		    jLabel_Data_To.setText(" "+Lang.getInstance().translate("To Date")+":");
-		    jLabel_Param1.setText(Lang.getInstance().translate("Parameter")+" 1:");
-		    jLabel_Param2.setText(Lang.getInstance().translate("Parameter")+" 2:");
-		    jLabel_Parent_record.setText(Lang.getInstance().translate("Parent Records")+":");
+		    jLabel_Param1.setText("%1 (" + Lang.getInstance().translate("integer")+") :");
+		    jLabel_Param2.setText("%2 (" + Lang.getInstance().translate("integer")+") :");
+		    jLabel_Addition1.setText("%3 (" + Lang.getInstance().translate("string")+"):");
+		    jLabel_Addition2.setText("%4 (" + Lang.getInstance().translate("string")+"):");
+		    jLabel_Parent_record.setText(Lang.getInstance().translate("Parent Record")+":");
 		    jLabel_Status.setText(Lang.getInstance().translate("Status")+":");
 		    jLabel_Title.setText(Lang.getInstance().translate("Information about the person")+":");
-		    jLabel__Description.setText(Lang.getInstance().translate("Description")+":");;
+		    jLabel__Description.setText("%D (" + Lang.getInstance().translate("text")+") :");;
 		    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power")+ " (0..6):");
 		    
 		   

@@ -66,7 +66,7 @@ public class OnDealClick
 		switch(error)
 		{
 		case Transaction.INVALID_ADDRESS:
-			mess = "Invalid address";
+			mess = "Invalid Account";
 			break;
 		case Transaction.NEGATIVE_AMOUNT:
 			mess = "Negative amount";
@@ -95,7 +95,7 @@ public class OnDealClick
 			mess = "Invalid timestamp";
 			break;
 		case Transaction.INVALID_MAKER_ADDRESS:
-			mess = "Invalid maker address";
+			mess = "Invalid maker Account";
 			break;
 		case Transaction.INVALID_PUBLIC_KEY:
 			mess = "Invalid public key";

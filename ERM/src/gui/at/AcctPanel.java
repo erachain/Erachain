@@ -171,7 +171,7 @@ public class AcctPanel extends JPanel
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
 
-		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copyAddress.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 

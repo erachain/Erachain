@@ -98,7 +98,7 @@ public class Person_Work_Dialog extends JDialog {
 	
 		PersonAccountsModel person_Accounts_Model = new PersonAccountsModel(person.getKey());
     	if (person_Accounts_Model.getRowCount() > 0) {
-  	    	jButton4 =new MButton(Lang.getInstance().translate("Send Coins to Person"), 3);
+  	    	jButton4 =new MButton(Lang.getInstance().translate("Send Asset to Person"), 3);
   	    	getContentPane().add(jButton4);
   	    	jButton4.addActionListener(new ActionListener(){
   	  		@Override

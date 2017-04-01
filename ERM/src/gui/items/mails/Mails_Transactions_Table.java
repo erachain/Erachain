@@ -193,7 +193,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		});
 		menu.add(copyAllMessages);
 
-		JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Address"));
+		JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
 		copySender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -213,7 +213,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		});
 		menu.add(copySender);
 				
-		JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Address"));
+		JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Account"));
 		copyRecipient.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
