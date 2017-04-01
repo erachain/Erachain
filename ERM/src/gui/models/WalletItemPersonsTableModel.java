@@ -8,6 +8,7 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
+import utils.Pair;
 import controller.Controller;
 import core.item.persons.PersonCls;
 import database.DBSet;
@@ -54,7 +55,11 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	public PersonCls getItem(int row)
 	{
-		return this.persons.get(row).getB();
+		Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
+		if (personRes == null)
+			return null;
+		
+		return personRes.getB();
 	}
 	
 	@Override
@@ -83,7 +88,11 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 			return null;
 		}
 		
-		PersonCls person = this.persons.get(row).getB();
+		Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
+		if (personRes == null)
+			return null;
+		
+		PersonCls person = personRes.getB();
 		
 		switch(column)
 		{

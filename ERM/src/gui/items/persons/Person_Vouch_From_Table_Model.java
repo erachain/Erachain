@@ -212,7 +212,8 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 				Transaction t = a.getB();
 				if (t.getType()== Transaction.CERTIFY_PUB_KEYS_TRANSACTION ){
 					R_SertifyPubKeys tt = (R_SertifyPubKeys)t;
-					if (tt.getCreator().getPerson().b.getKey() == person.getKey()) {
+					Tuple2<Integer, PersonCls> personRes = tt.getCreator().getPerson();
+					if (personRes!= null && personRes.b.getKey() == person.getKey()) {
 						if (!this.transactions.contains(tt)){
 							this.transactions.add(tt);
 							fire = true;
@@ -235,7 +236,8 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 			Transaction ss = (Transaction) message.getValue();
 			if (ss.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION) {
 				R_SertifyPubKeys ss1 = (R_SertifyPubKeys) ss;
-				if (ss1.getCreator().getPerson().b.getKey() == person.getKey()) {
+				Tuple2<Integer, PersonCls> personRes = ss1.getCreator().getPerson();
+				if (personRes != null && personRes.b.getKey() == person.getKey()) {
 					if (!this.transactions.contains(ss1)){
 						this.transactions.add(ss1);
 						this.fireTableDataChanged();
