@@ -7,15 +7,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.AbstractButton;
 import javax.swing.JComboBox;
@@ -48,6 +53,7 @@ import gui.transaction.OnDealClick;
 import lang.Lang;
 import utils.Compressor_ZIP;
 import utils.Converter;
+import utils.GZIP;
 import utils.Pair;
 
 /*
@@ -57,8 +63,8 @@ import utils.Pair;
 */
 /*
   взять имя файлов 					attached_Files_Model.getValueAt(row,0);
-  взять признак орхивирования		attached_Files_Model.getValueAt(row,1);
-  взять содержимое файлов. Если ZIP то зашифрованный, если нет то не зашифрованный 		attached_Files_Model.getValueAt(row,4);
+  взять признак орхивирования		attached_Files_Model.getValueAt(row,2);
+  взять содержимое файлов. Если ZIP то зашифрованный, если нет то не зашифрованный 		attached_Files_Model.getValueAt(row,5);
   
   взять хэш 						hashes_Table_Model.getValueAt(row,0);
   взять описапние хэш				hashes_Table_Model.getValueAt(row,1);
@@ -191,11 +197,11 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     
     TableColumnModel at_F_Col_M = jTable_Attached_Files.getColumnModel();
     
-    TableColumn col = at_F_Col_M.getColumn(1);
+    TableColumn col = at_F_Col_M.getColumn(2);
     col.setMinWidth(50);
     col.setPreferredWidth(60);
     col.setMaxWidth(100);
-    col = at_F_Col_M.getColumn(2);
+    col = at_F_Col_M.getColumn(3);
     col.setMinWidth(150);
     col.setPreferredWidth(160);
     col.setMaxWidth(200);
@@ -219,19 +225,39 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
 			{
 				
-				if (jTable_Attached_Files.getSelectedColumn() == 1){
+				if (jTable_Attached_Files.getSelectedColumn() == 2){
 					row = jTable_Attached_Files.convertRowIndexToModel(row);
-					attached_Files_Model.setValueAt(new Boolean(!(boolean) attached_Files_Model.getValueAt(row, 1)), row, 1);
-					if (new Boolean((boolean)attached_Files_Model.getValueAt(row,1))) {
+					attached_Files_Model.setValueAt(new Boolean(!(boolean) attached_Files_Model.getValueAt(row, 2)), row, 2);
+					if (new Boolean((boolean)attached_Files_Model.getValueAt(row,2))) {
 					 Compressor_ZIP zip = new Compressor_ZIP();
-					attached_Files_Model.setValueAt(zip.compress((byte[]) attached_Files_Model.getValueAt(row, 3))	, row, 4); 	
+					attached_Files_Model.setValueAt(zip.compress((byte[]) attached_Files_Model.getValueAt(row, 4))	, row, 5); 	
+					
+					byte[] z1 = null ;
+					try {
+						attached_Files_Model.setValueAt(GZIP.GZIPcompress( (byte[]) attached_Files_Model.getValueAt(row, 4)), row, 5);
+						z1 = (byte[]) attached_Files_Model.getValueAt(row, 4);
+						
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				// read & un Zip info
+					byte[] z2 = null ;
+					try {
+		//				z2 = GZIP.GZIPdecompress_b((byte[]) attached_Files_Model.getValueAt(row, 5));
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					z2 = z2;
+					
 					}else{
-						attached_Files_Model.setValueAt(attached_Files_Model.getValueAt(row, 3), row, 4); 
+						attached_Files_Model.setValueAt(attached_Files_Model.getValueAt(row, 4), row, 5); 
 						
 					}
 			//		AssetCls asset = tableModelItemAssets.getAsset(row);
 			//		favorite_set( assetsTable);	
-					attached_Files_Model.setValueAt(((byte[])attached_Files_Model.getValueAt(row, 4)).length,row,2);
+					attached_Files_Model.setValueAt(((byte[])attached_Files_Model.getValueAt(row, 5)).length,row,3);
 					
 					
 				}
@@ -245,7 +271,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     jTable_Attached_Files.addMouseMotionListener(new MouseMotionListener() {
  	    public void mouseMoved(MouseEvent e) {
  	       
- 	        if(jTable_Attached_Files.columnAtPoint(e.getPoint())==1)
+ 	        if(jTable_Attached_Files.columnAtPoint(e.getPoint())==2)
  	        {
  	     
  	        	jTable_Attached_Files.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -386,8 +412,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         attached_Files_Model =new Attache_Files_Model(); // new javax.swing.table.DefaultTableModel(new Object [][][][][] { {null,null, null, null,null}}, new String [] {Lang.getInstance().translate("Path"), "Data","ZIP?", "Size/Zip Size", "www"});
     //    attached_Files_Model.removeRow(0);
         jTable_Attached_Files = new MTable(attached_Files_Model);
+        jTable_Attached_Files.removeColumn(jTable_Attached_Files.getColumnModel().getColumn(5));
         jTable_Attached_Files.removeColumn(jTable_Attached_Files.getColumnModel().getColumn(4));
-        jTable_Attached_Files.removeColumn(jTable_Attached_Files.getColumnModel().getColumn(3));
               
         jTable_Attached_Files.setAlignmentX(0.0F);
         jTable_Attached_Files.setAlignmentY(0.0F);
@@ -952,6 +978,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 					String file_name = patch.getPath();
 					File file = new File(patch.getPath());
+					
+					
 
 					// преобразуем в байты
 					long file_len = file.length();
@@ -980,7 +1008,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 					}
 
 					
-					attached_Files_Model.addRow(new Object[] { file_name.toString(), new Boolean(false), new Integer(fileInArray.length), fileInArray, null});
+					attached_Files_Model.addRow(new Object[] {patch.getName().toString(), patch.getPath().substring(0, patch.getPath().length()-patch.getName().length()), new Boolean(false), new Integer(fileInArray.length), fileInArray, null});
 			
 
 				}
@@ -1042,12 +1070,12 @@ class Attache_Files_Model extends DefaultTableModel{
     
 	public Attache_Files_Model()
     {
-      super(new Object[] {Lang.getInstance().translate("Path"),"ZIP?", "Size/Zip Size"}, 0);
+      super(new Object[] {Lang.getInstance().translate("Name"),Lang.getInstance().translate("Path"),"ZIP?", "Size/Zip Size"}, 0);
    
     }
     
    public int getColumnCount(){
-	return 5;
+	return 6;
    }
 	
 	@Override
