@@ -23,6 +23,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.validation.constraints.Null;
 
 import controller.Controller;
@@ -54,12 +56,12 @@ import utils.Pair;
  * and open the template in the editor.
 */
 /*
-  взять имя файлов 			attached_Files_Model.getValueAt(row,0);
+  взять имя файлов 					attached_Files_Model.getValueAt(row,0);
   взять признак орхивирования		attached_Files_Model.getValueAt(row,1);
   взять содержимое файлов. Если ZIP то зашифрованный, если нет то не зашифрованный 		attached_Files_Model.getValueAt(row,4);
   
-  взять хэш 					hashes_Table_Model.getValueAt(row,0);
-  взять описапние хэш			hashes_Table_Model.getValueAt(row,1);
+  взять хэш 						hashes_Table_Model.getValueAt(row,0);
+  взять описапние хэш				hashes_Table_Model.getValueAt(row,1);
  
  */
 
@@ -186,6 +188,18 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			}
 		}
 	});
+    
+    TableColumnModel at_F_Col_M = jTable_Attached_Files.getColumnModel();
+    
+    TableColumn col = at_F_Col_M.getColumn(1);
+    col.setMinWidth(50);
+    col.setPreferredWidth(60);
+    col.setMaxWidth(100);
+    col = at_F_Col_M.getColumn(2);
+    col.setMinWidth(150);
+    col.setPreferredWidth(160);
+    col.setMaxWidth(200);
+    
     
     jTable_Attached_Files.addMouseListener(new MouseAdapter() {
 		@Override
