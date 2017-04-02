@@ -21,10 +21,10 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 	@Override
 	public boolean isCellEditable(int row, int column)
 	{
-		if (column == 0) {
-			return true;			
-		}
-		return true;
+	//	if (column == 0) {
+	//		return true;			
+	//	}
+		return false;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type

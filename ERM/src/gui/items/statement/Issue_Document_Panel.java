@@ -1,7 +1,12 @@
 package gui.items.statement;
 
+import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,9 +30,12 @@ import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.transaction.Transaction;
 import gui.PasswordPane;
+import gui.items.assets.ExchangeFrame;
+import gui.items.assets.TableModelItemAssets;
 import gui.items.imprints.Table_Model_Issue_Hashes;
 import gui.items.notes.ComboBoxModelItemsNotes;
 import gui.library.MButton;
@@ -36,6 +44,7 @@ import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import utils.Compressor_ZIP;
 import utils.Converter;
 import utils.Pair;
 
@@ -43,12 +52,15 @@ import utils.Pair;
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
-
- * взять имя файлов 			attached_Files_Model.getValueAt(row,0);
- * взять содержимое файлов 		attached_Files_Model.getValueAt(row,1);
- * взять хэши 					hashes_Table_Model.getValueAt(row,0);
- *
- *
+*/
+/*
+  взять имя файлов 			attached_Files_Model.getValueAt(row,0);
+  взять признак орхивирования		attached_Files_Model.getValueAt(row,1);
+  взять содержимое файлов. Если ZIP то зашифрованный, если нет то не зашифрованный 		attached_Files_Model.getValueAt(row,4);
+  
+  взять хэш 					hashes_Table_Model.getValueAt(row,0);
+  взять описапние хэш			hashes_Table_Model.getValueAt(row,1);
+ 
  */
 
 
@@ -175,6 +187,63 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 	});
     
+    jTable_Attached_Files.addMouseListener(new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			Point p = e.getPoint();
+			int row = jTable_Attached_Files.rowAtPoint(p);
+			jTable_Attached_Files.setRowSelectionInterval(row, row);
+			
+			if(e.getClickCount() == 2)
+			{
+			//	row = assetsTable.convertRowIndexToModel(row);
+			//	AssetCls asset = tableModelItemAssets.getAsset(row);
+			//	new AssetPairSelect(asset.getKey(), "","");
+			//	new ExchangeFrame(asset,null, "", "");
+		//		new AssetFrame(asset);
+			}
+			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+			{
+				
+				if (jTable_Attached_Files.getSelectedColumn() == 1){
+					row = jTable_Attached_Files.convertRowIndexToModel(row);
+					attached_Files_Model.setValueAt(new Boolean(!(boolean) attached_Files_Model.getValueAt(row, 1)), row, 1);
+					if (new Boolean((boolean)attached_Files_Model.getValueAt(row,1))) {
+					 Compressor_ZIP zip = new Compressor_ZIP();
+					attached_Files_Model.setValueAt(zip.compress((byte[]) attached_Files_Model.getValueAt(row, 3))	, row, 4); 	
+					}else{
+						attached_Files_Model.setValueAt(attached_Files_Model.getValueAt(row, 3), row, 4); 
+						
+					}
+			//		AssetCls asset = tableModelItemAssets.getAsset(row);
+			//		favorite_set( assetsTable);	
+					attached_Files_Model.setValueAt(((byte[])attached_Files_Model.getValueAt(row, 4)).length,row,2);
+					
+					
+				}
+				
+				
+			}
+		}
+	});
+    
+ // hand cursor  for Favorite column
+    jTable_Attached_Files.addMouseMotionListener(new MouseMotionListener() {
+ 	    public void mouseMoved(MouseEvent e) {
+ 	       
+ 	        if(jTable_Attached_Files.columnAtPoint(e.getPoint())==1)
+ 	        {
+ 	     
+ 	        	jTable_Attached_Files.setCursor(new Cursor(Cursor.HAND_CURSOR));
+ 	        } else {
+ 	        	jTable_Attached_Files.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+ 	        }
+ 	    }
+
+ 	    public void mouseDragged(MouseEvent e) {
+ 	    }
+ 	});
+ 	
     
     
     }
@@ -300,9 +369,12 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         
         
-        attached_Files_Model = new javax.swing.table.DefaultTableModel(new Object [][][] { {null,null, null}}, new String [] {Lang.getInstance().translate("Path"), "Data", "Size"});
-        attached_Files_Model.removeRow(0);
+        attached_Files_Model =new Attache_Files_Model(); // new javax.swing.table.DefaultTableModel(new Object [][][][][] { {null,null, null, null,null}}, new String [] {Lang.getInstance().translate("Path"), "Data","ZIP?", "Size/Zip Size", "www"});
+    //    attached_Files_Model.removeRow(0);
         jTable_Attached_Files = new MTable(attached_Files_Model);
+        jTable_Attached_Files.removeColumn(jTable_Attached_Files.getColumnModel().getColumn(4));
+        jTable_Attached_Files.removeColumn(jTable_Attached_Files.getColumnModel().getColumn(3));
+              
         jTable_Attached_Files.setAlignmentX(0.0F);
         jTable_Attached_Files.setAlignmentY(0.0F);
         jScrollPane_Attached_Files_Table.setViewportView(jTable_Attached_Files);
@@ -894,7 +966,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 					}
 
 					
-					attached_Files_Model.addRow(new Object[] { file_name.toString(), fileInArray, new Integer(fileInArray.length)});
+					attached_Files_Model.addRow(new Object[] { file_name.toString(), new Boolean(false), new Integer(fileInArray.length), fileInArray, null});
 			
 
 				}
@@ -951,5 +1023,39 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JTextPane jTextPane_Message_Private;
     private javax.swing.JTextPane jTextPane_Message_Public;
     // End of variables declaration                   
+}
+class Attache_Files_Model extends DefaultTableModel{
+    
+	public Attache_Files_Model()
+    {
+      super(new Object[] {Lang.getInstance().translate("Path"),"ZIP?", "Size/Zip Size"}, 0);
+   
+    }
+    
+   public int getColumnCount(){
+	return 5;
+   }
+	
+	@Override
+    public boolean isCellEditable(int row, int column)
+    {
+        return new Boolean(null);
+    } 
+    public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
+	   }
+	
+    public Object getValueAt(int row, int col){
+    	
+    	
+    	if (this.getRowCount()<row || this.getRowCount() ==0 )return null;
+	return super.getValueAt(row, col);
+    	
+    	
+    }
+   
+	
+	
 }
 
