@@ -26,10 +26,10 @@ public class BlockChain
 	//public static final int START_LEVEL = 1;
 	public static final boolean DEVELOP_USE = true;
 		
-	public static final int TESTNET_PORT = DEVELOP_USE?9085:9045;
-	public static final int MAINNET_PORT = DEVELOP_USE?9086:9046;
-	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9087:9047;
-	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9088:9048;
+	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
+	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;
+	public static final int DEFAULT_WEB_PORT = DEVELOP_USE?9067:9047;
+	public static final int DEFAULT_RPC_PORT = DEVELOP_USE?9068:9048;
 
 	//public static final String TIME_ZONE = "GMT+3";
 	//
