@@ -1,6 +1,7 @@
 package gui.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -66,6 +67,12 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		try {
 			block_No = Integer.parseInt(string);
 		} catch (NumberFormatException e) {
+			transactions = new ArrayList<>();
+			Transaction transaction = core.transaction.R_Vouch.getVouchingRecord(DBSet.getInstance(), string);
+			if (transaction != null) {
+				transactions.add(transaction);
+			}
+			this.fireTableDataChanged();
 			return;
 		}
 		
