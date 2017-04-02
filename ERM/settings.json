@@ -2,12 +2,11 @@
   "weballowed":[
     "127.0.0.1"
   ],
-  "LookAndFell":"System",
+  "LookAndFell":"Other",
   "rpcallowed":[
     "127.0.0.1"
   ],
   "font_size":"16",
-  "lang":"ru.json",
-  "knownpeers":[],
-  "font_name":"Arial"
+  "theme":"Forest",
+   "font_name":"Arial"
 }
