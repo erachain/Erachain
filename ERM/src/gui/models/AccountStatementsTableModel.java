@@ -6,6 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -39,7 +40,8 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 	
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-	       return getValueAt(0, c).getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
 	   }
 	   
 	

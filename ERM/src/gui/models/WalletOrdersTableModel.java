@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.mapdb.Fun.Tuple2;
 
 import utils.DateTimeFormat;
@@ -42,8 +44,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? null : item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	public Order getOrder(int row)

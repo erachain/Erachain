@@ -32,9 +32,6 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.Block_View_Panel;
-import gui.items.accounts.Account_Send_Dialog;
-import gui.items.mails.Mail_Send_Dialog;
 import gui.library.Accounts_Library_Panel;
 import gui.library.MButton;
 import gui.library.M_Accoutn_Text_Field;
@@ -88,15 +85,9 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		jLabel1 = new javax.swing.JLabel();
 		jTextField1 = new javax.swing.JTextField();
 		jPanel_Image = new javax.swing.JPanel();
-		new javax.swing.JLabel();
-		new javax.swing.JLabel();
-		new javax.swing.JScrollPane();
-		new javax.swing.JTable();
-		new javax.swing.JLabel();
-		new javax.swing.JScrollPane();
-		new javax.swing.JTable();
+		
 		jLabel_Owner = new javax.swing.JLabel();
-		new javax.swing.JLabel();
+		
 	//	jTextField_Owner = new javax.swing.JTextField();
 		new javax.swing.JTextField();
 		jLabel_Owner_Sign = new javax.swing.JLabel();
@@ -485,8 +476,10 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 		// vouch panel
 		jTabbedPane1.add(new Voush_Library_Panel(issue_record));
-		// vouch panel
+		// created person panel
 		jTabbedPane1.add(new Person_Owner_Panel(person));
+		// vouched person
+		jTabbedPane1.add(new Person_Vouched_Panel(person));
 
 	}// </editor-fold>
 

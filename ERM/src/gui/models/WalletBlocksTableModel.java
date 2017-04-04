@@ -2,6 +2,8 @@ package gui.models;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.validation.constraints.Null;
+
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
@@ -45,8 +47,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? null : item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	// читаем колонки которые изменяем высоту	   

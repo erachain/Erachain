@@ -1,9 +1,12 @@
 package gui.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.mapdb.DB;
@@ -51,8 +54,8 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public Class<? extends Object> getColumnClass(int c)
 	{     // set column type
-		Object item = getValueAt(0, c);
-		return item==null? String.class: item.getClass();
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
     }
 	
 	public void setBlockNumber(String string){
@@ -64,6 +67,12 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		try {
 			block_No = Integer.parseInt(string);
 		} catch (NumberFormatException e) {
+			transactions = new ArrayList<>();
+			Transaction transaction = core.transaction.R_Vouch.getVouchingRecord(DBSet.getInstance(), string);
+			if (transaction != null) {
+				transactions.add(transaction);
+			}
+			this.fireTableDataChanged();
 			return;
 		}
 		

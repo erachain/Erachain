@@ -212,7 +212,7 @@ public class Mail_Send_Panel extends JPanel
 		 	txtTo.setText(cbx_To.getSelectedItem().toString());
 			Account account1 = new Account(txtTo.getText());
 			txtRecDetails.setText(account1.toString());
-			toLabel.setText(Lang.getInstance().translate("SeLect Adress To: "));
+			toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
 			cbx_To.addActionListener (new ActionListener () {
 				    public void actionPerformed(ActionEvent e) {
 				    	String str = (String) cbx_To.getSelectedItem();
@@ -226,7 +226,7 @@ public class Mail_Send_Panel extends JPanel
 				});	
 		}else {
 			
-			this.txtTo.setText("has no Addresses"); 	
+			this.txtTo.setText("has no Accounts"); 	
 			sendButton.setEnabled(false);
 			
 		}
@@ -573,7 +573,7 @@ public class Mail_Send_Panel extends JPanel
 		}
 		
 		if (txtTo.getText().equals("has no Addresses")){
-			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Addresses"));
+			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Accounts"));
 			return;
 		}
 		

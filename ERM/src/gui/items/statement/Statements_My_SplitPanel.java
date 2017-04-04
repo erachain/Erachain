@@ -86,7 +86,7 @@ import gui.library.MTable;
 			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
 			*/		// SET VIDEO			
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = new MTable<Object>(my_Statements_Model); //my_Statements_table;
+			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 	
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
@@ -115,9 +115,7 @@ import gui.library.MTable;
 				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0 )
 					statement =  my_Statements_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				
-				if (statement == null)
-					return;
-				
+				if (statement == null)	return;
 				Statement_Info info_panel = new Statement_Info(statement);
 				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

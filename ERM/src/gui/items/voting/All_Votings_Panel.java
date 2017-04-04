@@ -35,6 +35,7 @@ import core.voting.Poll;
 import database.PollMap;
 import gui.CoreRowSorter;
 import gui.items.ComboBoxModelItemsAll;
+import gui.library.MTable;
 import gui.models.PollsTableModel;
 import lang.Lang;
 
@@ -43,7 +44,7 @@ public class All_Votings_Panel extends JPanel{
 
 	public PollsTableModel pollsTableModel;
 	public JComboBox<ItemCls> cbxAssets;
-	public JTable pollsTable;
+	public MTable pollsTable;
 	
 	public All_Votings_Panel() 
 	{
@@ -117,7 +118,7 @@ public class All_Votings_Panel extends JPanel{
 
 		//CREATE TABLE
 		this.pollsTableModel = new PollsTableModel();
-		pollsTable = new JTable(this.pollsTableModel);
+		pollsTable = new MTable(this.pollsTableModel);
 				
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

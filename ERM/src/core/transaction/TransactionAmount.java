@@ -360,15 +360,11 @@ public abstract class TransactionAmount extends Transaction {
 						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
-						if (amount.compareTo(balance1) > 0) {
+						BigDecimal balance = this.creator.getBalance(db, absKey, actionType);
+						if (amount.compareTo(balance) > 0) {
 							return NO_BALANCE;
 						}
 							
-					}
-					BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
-					if (amount.compareTo(balance1) > 0) {
-						return NO_BALANCE;
 					}
 				} else {
 					// PRODUCE - SPEND

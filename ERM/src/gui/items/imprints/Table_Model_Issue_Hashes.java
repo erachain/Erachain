@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
+import javax.validation.constraints.Null;
 
 import lang.Lang;
 
@@ -14,23 +15,35 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 		super(new Object[] { Lang.getInstance().translate("Hash 32 bytes"),
 				Lang.getInstance().translate("Description") }, rows);
 		
-		this.addRow(new Object[]{"", ""});
+	//	this.addRow(new Object[]{"", ""});
 	}
 
 	@Override
 	public boolean isCellEditable(int row, int column)
 	{
-		if (column == 0) {
-			return true;			
-		}
-		return true;
+	//	if (column == 0) {
+	//		return true;			
+	//	}
+		return false;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	   }
 	
+	
+	
+	public Object getValueAt(int row, int col){
+		
+		if (this.getRowCount()<row || this.getRowCount() ==0 )return null;
+		
+		
+		return super.getValueAt(row, col);
+		
+		
+		
+	}
 	
 	@Override 
 	public void setValueAt(Object aValue, int row, int column)
@@ -44,7 +57,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 				//CHECK IF LAST ROW
 				if(row == this.getRowCount()-1)
 				{
-					this.addRow(new Object[]{"", ""});
+			//		this.addRow(new Object[]{"", ""});
 				}
 				
 				super.setValueAt(aValue, row, column);
@@ -57,7 +70,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 			//CHECK IF LAST ROW
 			if(row == this.getRowCount()-1)
 			{
-				this.addRow(new Object[]{"", ""});
+			//	this.addRow(new Object[]{"", ""});
 			}
 		}
 	}
@@ -72,7 +85,7 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 			
 			if(value.length() > column)
 			{
-				values.add(value);
+		//		values.add(value);
 			}
 		}
 		

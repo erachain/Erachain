@@ -1,7 +1,10 @@
 package gui.models;
 
+import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -30,6 +33,11 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 	{
 		Controller.getInstance().addWalletListener(this);
 	}
+	
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
+    }
 	
 	@Override
 	public SortableList<Tuple2<String, String>, Poll> getSortableList() {
@@ -86,7 +94,11 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 			
 		case COLUMN_TOTAL_VOTES:
 			
-			return poll.getTotalVotes().toPlainString();
+			BigDecimal amo = poll.getTotalVotes();
+			if (amo == null)
+				return BigDecimal.ZERO;
+			return amo;
+		
 			
 		case COLUMN_CONFIRMED:
 			

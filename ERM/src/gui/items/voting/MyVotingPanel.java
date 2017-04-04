@@ -1,6 +1,7 @@
 package gui.items.voting;
 
 import gui.CoreRowSorter;
+import gui.library.MTable;
 import gui.models.WalletPollsTableModel;
 import gui.voting.PollFrame;
 import lang.Lang;
@@ -60,7 +61,7 @@ public class MyVotingPanel extends JPanel
 		
 		//TABLE
 		final WalletPollsTableModel pollsModel = new WalletPollsTableModel();
-		final JTable table = new JTable(pollsModel);
+		final MTable table = new MTable(pollsModel);
 		
 		//POLLS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();

@@ -1,4 +1,4 @@
-package gui.items.statement;
+package gui.items.persons;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -28,6 +28,8 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
@@ -42,7 +44,7 @@ import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
+public class Person_Vouch_From_Table_Model extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -56,17 +58,14 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	// public static final int COLUMN_AMOUNT = 2;
 	 public static final int COLUMN_HEIGHT = 2;
 	 public static final int COLUMN_CREATOR_NAME =30;
-	List<Transaction> transactions;
+	List<R_SertifyPubKeys> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
 	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });// ,
 																											// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
-	// private Map<byte[], BlockingQueue<Block>> blocks;
-	// private Transaction transaction;
-	private int blockNo;
-	private int recNo;
+	PersonCls person;
 
 	TransactionFinalMap table;
 
@@ -74,15 +73,16 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 
 	private String sss;
 
-	public Statements_Vouch_Table_Model(Transaction transaction) {
-		table = DBSet.getInstance().getTransactionFinalMap();
-		blockNo = transaction.getBlockHeight(DBSet.getInstance());
-		recNo = transaction.getSeqNo(DBSet.getInstance());
-		transactions = new ArrayList<Transaction>();
+	private boolean fire;
+
+	public Person_Vouch_From_Table_Model(PersonCls person) {
+		fire = false;
+		this.person=person;
+		transactions = new ArrayList<R_SertifyPubKeys>();
 		// transactions = read_Sign_Accoutns();
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
 		DBSet.getInstance().getTransactionMap().addObserver(this);
-		DBSet.getInstance().getVouchRecordMap().addObserver(this);
+		
 
 	}
 
@@ -150,9 +150,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
 		try {
-			if (this.transactions == null || this.transactions.size() <= row) {
-				return null;
-			}
+			if (this.transactions == null || this.transactions.size() == 0) return null;
 
 			Transaction transaction = this.transactions.get(row);
 			if (transaction == null)
@@ -162,37 +160,9 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			switch (column) {
 			case COLUMN_TIMESTAMP:
 
-				// return
-				// DateTimeFormat.timestamptoString(transaction.getTimestamp())
-				// + " " + transaction.getTimestamp();
+				
 				return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " +
-													// transaction.getTimestamp()
-													// / 1000;
-
-			/*
-			 * case COLUMN_TYPE:
-			 * 
-			 * //return Lang.transactionTypes[transaction.getType()]; return
-			 * Lang.getInstance().translate(transaction.viewTypeName());
-			 */
-
-			// case COLUMN_BODY:
-
-			// i = (R_Vouch)transaction;
-
-			// return new String( i.getData(), Charset.forName("UTF-8") )
-			// ;//transaction.viewReference();//.viewProperies();
-
-			// case COLUMN_AMOUNT:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
-
-			// case COLUMN_FEE:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getFee());
-
+													
 			case COLUMN_CREATOR:
 
 				return transaction.getCreator().getPersonAsString();
@@ -228,36 +198,22 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public synchronized void syncUpdate(Observable o, Object arg) {
 		message = (ObserverMessage) arg;
 
-		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-			// CHECK IF NEW LIST
-			if (this.transactions == null || this.transactions.size() == 0) {
-				transactions = read_Sign_Accoutns();
-				this.fireTableDataChanged();
-			}
-		} 
-		
-		if (message.getType() == ObserverMessage.ADD_VOUCH_TYPE) {
-			// CHECK IF NEW LIST
-		
-				transactions = read_Sign_Accoutns();
-				this.fireTableDataChanged();
-			
-		} 
 		
 		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
 		{
 			//CHECK IF NEW LIST
-			
+		
 			SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
 			Iterator<Pair<byte[], Transaction>> s = ss.iterator();
-			
-			boolean fire = false;
+			if (this.transactions.size() == 0){
+				
 			while (s.hasNext()){
 				Pair<byte[], Transaction> a = s.next();
 				Transaction t = a.getB();
-				if (t.getType()== Transaction.VOUCH_TRANSACTION ){
-					R_Vouch tt = (R_Vouch)t;
-					if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
+				if (t.getType()== Transaction.CERTIFY_PUB_KEYS_TRANSACTION ){
+					R_SertifyPubKeys tt = (R_SertifyPubKeys)t;
+					Tuple2<Integer, PersonCls> personRes = tt.getCreator().getPerson();
+					if (personRes!= null && personRes.b.getKey() == person.getKey()) {
 						if (!this.transactions.contains(tt)){
 							this.transactions.add(tt);
 							fire = true;
@@ -266,8 +222,10 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				}
 			}
 			
-			if (fire)
+			if (!fire)
 				this.fireTableDataChanged();
+			fire = true;
+			}
 		}
 		
 		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
@@ -276,11 +234,12 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 				) {
 			Transaction ss = (Transaction) message.getValue();
-			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
-				R_Vouch ss1 = (R_Vouch) ss;
-				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
-					if (!this.transactions.contains(ss)){
-						this.transactions.add(ss);
+			if (ss.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION) {
+				R_SertifyPubKeys ss1 = (R_SertifyPubKeys) ss;
+				Tuple2<Integer, PersonCls> personRes = ss1.getCreator().getPerson();
+				if (personRes != null && personRes.b.getKey() == person.getKey()) {
+					if (!this.transactions.contains(ss1)){
+						this.transactions.add(ss1);
 						this.fireTableDataChanged();
 					}
 				}
@@ -288,51 +247,6 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		}
 	}
 
-	private List<Transaction> read_Sign_Accoutns() {
-		List<Transaction> trans = new ArrayList<Transaction>();
-		// ArrayList<Transaction> db_transactions;
-		// db_transactions = new ArrayList<Transaction>();
-		// tran = new ArrayList<Transaction>();
-		// база данных
-		// DBSet dbSet = DBSet.getInstance();
-
-		/*
-		 * Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs =
-		 * DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
-		 * 
-		 * 
-		 * if (signs == null) return null; for(Tuple2<Integer, Integer> seq:
-		 * signs.b) {
-		 * 
-		 * Transaction kk = table.getTransaction(seq.a, seq.b); if
-		 * (!tran.contains(kk)) tran.add(kk); }
-		 */
-
-		@SuppressWarnings("unchecked")
-		SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> rec = (SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message
-				.getValue();
-
-		Iterator<Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>> ss = rec
-				.iterator();
-		while (ss.hasNext()) {
-			Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a = (Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) ss
-					.next();
-			// block
-			if (a.getA().a == blockNo && a.getA().b == recNo) {
-				List<Tuple2<Integer, Integer>> ff = a.getB().b;
-
-				for (Tuple2<Integer, Integer> ll : ff) {
-					Integer bl = ll.a;
-					Integer seg = ll.b;
-
-					Transaction kk = table.getTransaction(bl, seg);
-					if (!trans.contains(kk))
-						trans.add(kk);
-				}
-			}
-
-		}
-		return trans;
-	}
+	
 
 }

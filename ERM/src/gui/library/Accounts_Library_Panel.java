@@ -65,7 +65,7 @@ public class Accounts_Library_Panel extends JPanel {
 
 		JPopupMenu menu = new JPopupMenu();
 
-		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copyAddress.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable_Accounts.getSelectedRow();
@@ -117,7 +117,7 @@ public class Accounts_Library_Panel extends JPanel {
 		
 		
 		
-		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Address"));
+		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable_Accounts.getSelectedRow();
@@ -166,7 +166,7 @@ public class Accounts_Library_Panel extends JPanel {
 
 
 
-		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send"));
+		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 

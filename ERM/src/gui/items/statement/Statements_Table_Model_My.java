@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple5;
@@ -58,96 +59,10 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 	
 	public Statements_Table_Model_My(){
-	//	transactions = new ArrayList<Transaction>();
-		
 	
-/*
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
-			{
-				transactions.add(transaction);
-			}
-		}
-		
-		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-		}
-	*/	
-	//	Pair<Block, List<Transaction>> result = Controller.getInstance().scanTransactions(null, 0, 0, 0, 0, null);
-			
-	
-	
-//	GenesisBlock block = new GenesisBlock();
-			
-		//FOR ALL TRANSACTIONS IN BLOCK
-//	List<Transaction> transactions = block.getTransactions();
-	
-	//BlockChain blockChain = new BlockChain(null);
-	//Block lastBlock = blockChain.getLastBlock();
-	
-	
-	//blockChain.getBlock(0)
-	
-	//	private DBSet dbSet;
-		
-			
-			//CREATE GENESIS BLOCK
-		//	genesisBlock = new GenesisBlock();
-		//	genesisTimestamp = genesisBlock.getTimestamp(null);
 		transactions = new ArrayList<Transaction>();
 		Controller.getInstance().addObserver(this);	
-		transactions = read_Statement();	
-/*		// база данных	
-				DBSet dbSet = DBSet.getInstance();
-		// читаем все блоки
-			SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
-		// проходим по блокам
-			for(Pair<byte[], Block> list: lists)
-			{
-				
-		// читаем транзакции из блока
-				db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
-		// проходим по транзакциям
-				for (Transaction transaction:db_transactions){
-		// если ноте то пишем в transactions			
-				 if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)	transactions.add(transaction);	
-				
-				}
-			}
-*/				
-		
-	//	this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
-	
-	//
-		
-		
-		
-	//	List<Pair<Account, Block>> blocks = Controller.getInstance().getLastBlocks();
-	//	JSONArray array = new JSONArray();
-	/*	
-		for(Pair<Account, Block> block: blocks)
-		{
-			array.add(block.getB());
-			List<Transaction> transactions = block.getTransactions()
-		}
-		
-	
-		
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION);
-			{
-				transactions.add(transaction);
-			}
-		}
-		
-		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(null, Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
-		}
-		
-		
-	*/		
-		
-		int a = 10;
+		transactions = read_Statement();
 	
 	}
 	
@@ -155,7 +70,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 		public Class<? extends Object> getColumnClass(int c) {     // set column type
 			Object o = getValueAt(0, c);
-			return o==null?null:o.getClass();
+			return o==null?Null.class:o.getClass();
 		}
 	
 		// читаем колонки которые изменяем высоту	   
@@ -201,10 +116,9 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	@Override
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
-		try
-		{
-			if(this.transactions == null || this.transactions.size() < 0
-					|| this.transactions.size() -1 < row)
+//		try
+//		{
+			if(this.transactions == null || this.transactions.size() == 0)
 			{
 				return null;
 			}
@@ -259,24 +173,24 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			return null;
 			
-		} catch (Exception e) {
+	//	} catch (Exception e) {
 	//		LOGGER.error(e.getMessage(),e);
-			return null;
-		}
+	//		return null;
+	//	}
 	}
 	
 	
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
+		//try
+	//	{
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
+	//	}
+	//	catch(Exception e)
+	//	{
 			//GUI ERROR
-		}
+	//	}
 	}
 	
 	public synchronized void syncUpdate(Observable o, Object arg)

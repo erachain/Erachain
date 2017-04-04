@@ -113,7 +113,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1001l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
-	private static final String version = "3.02.02";
+	private static final String version = "3.03.01";
 	private static final String buildTime = "2017-03-21 19:33:33 UTC";
 	private static long buildTimestamp;
 	

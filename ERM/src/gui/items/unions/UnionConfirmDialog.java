@@ -205,7 +205,7 @@ public class UnionConfirmDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
 	        getContentPane().add(jLabel_UnionInfo, gridBagConstraints);
 
-	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Address")+":");
+	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Account")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;
@@ -254,7 +254,7 @@ public class UnionConfirmDialog extends JDialog  {
 				}
 	        });
 	        
-	        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert firsr Address"));
+	        jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert firsr Account"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 6;
@@ -329,7 +329,7 @@ public class UnionConfirmDialog extends JDialog  {
 				}
 	        });
 	        
-	        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Address"));
+	        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Account"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 4;
 	        gridBagConstraints.gridy = 10;

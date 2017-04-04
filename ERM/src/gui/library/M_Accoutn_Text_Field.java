@@ -44,7 +44,7 @@ public class M_Accoutn_Text_Field  extends JTextField{
 	
 		// menu 
 		JPopupMenu creator_Meny = new JPopupMenu();
-		JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Address"));
+		JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copy_Creator_Address1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 	
@@ -81,7 +81,7 @@ public class M_Accoutn_Text_Field  extends JTextField{
 		}
 		creator_Meny.add(copyPublicKey);
 	
-		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Coins"));
+		JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Asset"));
 		Send_Coins_Crator.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new Account_Send_Dialog(null, null, account, null);

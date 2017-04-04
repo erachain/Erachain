@@ -29,6 +29,7 @@ import core.crypto.Base58;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.MainFrame;
 import gui.library.MButton;
 //import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
@@ -81,11 +82,11 @@ public class VouchRecordDialog extends JDialog  {
 			this.setTitle(Lang.getInstance().translate("Vouch Record"));
 			this.setResizable(true);
 			this.setModal(true);
-
-	//    setPreferredSize(new Dimension(500, 600));
+			
+	    setPreferredSize(new Dimension(MainFrame.desktopPane.getWidth()-100,MainFrame.desktopPane.getHeight()-100));
 		//PACK
 		this.pack();
-        this.setResizable(false);
+ //       this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 	    //MainFrame.this.add(comp, constraints).setFocusable(false);
@@ -173,7 +174,7 @@ public class VouchRecordDialog extends JDialog  {
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Record has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Record has been certified") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		
@@ -283,7 +284,7 @@ public class VouchRecordDialog extends JDialog  {
 	        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
 	        getContentPane().add(jLabel_RecordInfo, gridBagConstraints);
 
-	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Address")+":");
+	        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Account")+":");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;

@@ -149,10 +149,11 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				if (search_Table.getSelectedRow() < 0 )
-					return;
+				if (search_Table.getSelectedRow() < 0 )	return;
 					
+				
 				Transaction statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+				if (statement == null) return;
 				VouchRecordDialog vouch_panel = new VouchRecordDialog(statement.getBlockHeight(DBSet.getInstance()),statement.getSeqNo(DBSet.getInstance()));
 			
 			}

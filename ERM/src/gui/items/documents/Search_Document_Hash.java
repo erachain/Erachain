@@ -47,7 +47,7 @@ public class Search_Document_Hash extends Split_Panel {
 	
 	public Search_Document_Hash(){
 		
-		
+		this.searchToolBar_LeftPanel.setVisible(true);
 		 model_Hashs = new Model_Hashes_info();
 			Table_Hash = new JTable(model_Hashs);	
 			

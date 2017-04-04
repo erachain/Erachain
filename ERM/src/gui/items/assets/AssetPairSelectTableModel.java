@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple6;
@@ -92,7 +93,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 	     
 		Object o = getValueAt(0, c);
-		return o==null?null:o.getClass();
+		return o==null?Null.class:o.getClass();
 	    }
 	
 	public AssetCls getAsset(int row){

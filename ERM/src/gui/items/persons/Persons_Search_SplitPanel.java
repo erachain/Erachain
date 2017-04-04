@@ -126,7 +126,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 
 	
     	    	
-    	    	JMenuItem vsend_Coins_Item= new JMenuItem(Lang.getInstance().translate("Send"));
+    	    	JMenuItem vsend_Coins_Item= new JMenuItem(Lang.getInstance().translate("Send Asset"));
     	    
     	    	vsend_Coins_Item.addActionListener(new ActionListener(){
     	  		@Override

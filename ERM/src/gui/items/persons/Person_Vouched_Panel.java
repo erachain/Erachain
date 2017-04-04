@@ -1,4 +1,4 @@
-package gui.library;
+package gui.items.persons;
 
 import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
@@ -24,17 +24,19 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.library.MTable;
 import gui.models.PersonStatusesModel;
 import gui.models.Renderer_Left;
 import gui.models.Renderer_Right;
 import lang.Lang;
 import utils.TableMenuPopupUtil;
 
-public class Voush_Library_Panel extends JPanel {
+public class Person_Vouched_Panel extends JPanel {
 
 	/**
 	 * view VOUSH PANEL
@@ -43,10 +45,10 @@ public class Voush_Library_Panel extends JPanel {
 	private JScrollPane jScrollPane_Tab_Vouches;
 	private GridBagConstraints gridBagConstraints;
 
-	public Voush_Library_Panel(Transaction transaction) {
+	public Person_Vouched_Panel(PersonCls person) {
 
-		this.setName(Lang.getInstance().translate("Certified"));
-		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
+		this.setName(Lang.getInstance().translate("Vouched for"));
+		 Person_Vouch_From_Table_Model model = new Person_Vouch_From_Table_Model(person);
 		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
 		TableColumn col_data = column_mod.getColumn(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);
