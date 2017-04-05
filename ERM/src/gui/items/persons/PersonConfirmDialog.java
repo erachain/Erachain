@@ -92,29 +92,33 @@ public class PersonConfirmDialog extends JDialog  {
 			return;
 		}
 		
+		PublicKeyAccount account = new PublicKeyAccount(toValue);
+		// SHOW PubKey for BANK
+		String personDetails = "+" + account.getBase32() + "<br>";
+
 		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
-			pubKeyDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
+			pubKeyDetails.setText("<html>" + personDetails
+					+ Lang.getInstance().translate("Status must be OK to show public key details.")
+					+  "</html>");
 			return;
 		}
 		
-		PublicKeyAccount account = new PublicKeyAccount(toValue); 
 		// SHOW account for FEE asset
-		String personDetails;
 		Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DBSet.getInstance());
 		
 		if (addressDuration == null) {
-			personDetails = Lang.getInstance().translate("Not personalized yet");
+			personDetails += "<b>" + Lang.getInstance().translate("Ready for personalize") + "</b>";
 		} else {
 			// TEST TIME and EXPIRE TIME
 			long current_time = NTP.getTime();
 			
 			// TEST TIME and EXPIRE TIME
 			int daysLeft = addressDuration.b - (int)(current_time / (long)86400000);	
-			if (daysLeft < 0 ) personDetails = Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
-			else personDetails = Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
+			if (daysLeft < 0 ) personDetails += Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%", ""+daysLeft);
+			else personDetails += Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%", ""+daysLeft);
 
-			personDetails = personDetails + "<br>" + Lang.getInstance().translate("Person is still alive");
+			personDetails += "<br>" + Lang.getInstance().translate("Person is still alive");
 			
 		}
 		pubKeyDetails.setText("<html>" + personDetails  + "<br>" +  account.toString(Transaction.FEE_KEY) +  "</html>");
