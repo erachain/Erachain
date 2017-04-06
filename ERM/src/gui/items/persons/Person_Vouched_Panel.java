@@ -113,7 +113,7 @@ public class Person_Vouched_Panel extends JPanel {
 
 		JPopupMenu menu = new JPopupMenu();
 		
-		
+		/*
 		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 		menu_copyName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -131,6 +131,7 @@ public class Person_Vouched_Panel extends JPanel {
 			}
 		});
 		menu.add(menu_copyName);
+		*/
 
 		
 

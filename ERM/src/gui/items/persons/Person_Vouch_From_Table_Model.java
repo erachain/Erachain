@@ -57,7 +57,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 	// public static final int COLUMN_BODY = 2;
 	// public static final int COLUMN_AMOUNT = 2;
 	 public static final int COLUMN_HEIGHT = 2;
-	 public static final int COLUMN_CREATOR_NAME =30;
+	 //public static final int COLUMN_CREATOR_NAME =30;
 	List<R_SertifyPubKeys> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
@@ -165,14 +165,14 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 													
 			case COLUMN_CREATOR:
 
-				return transaction.getCreator().getPersonAsString();
+				return ((R_SertifyPubKeys)transaction).getSertifiedPublicKeys().get(0).getPersonAsString();
 				
 			case COLUMN_HEIGHT:
 				
 				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
 				
-			case COLUMN_CREATOR_NAME:
-				return	((Account)transaction.getCreator()).getPerson().b.getName();
+			//case COLUMN_CREATOR_NAME:
+				//return	((Account)transaction.getCreator()).getPerson().b.getName();
 			}
 
 			return null;
