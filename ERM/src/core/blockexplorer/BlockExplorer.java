@@ -3709,6 +3709,19 @@ if ( asset_1 == null) {
 	//	output.put("assetNames", assetNames.getMap());
 		
 	//	output.put("totalBalance", assetsJSON);
+		
+		output.put("label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
+		output.put("label_Block_version", Lang.getInstance().translate_from_langObj("Block version", langObj));
+		output.put("label_Transactions_count", Lang.getInstance().translate_from_langObj("Transactions count", langObj));
+		output.put("label_Total_Amount", Lang.getInstance().translate_from_langObj("Total Amount", langObj));
+		output.put("label_Total_AT_Amount", Lang.getInstance().translate_from_langObj("Total AT Amount", langObj));
+		output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
+		output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
+		output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));
+		output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));
+		output.put("label_Including", Lang.getInstance().translate_from_langObj("Including", langObj));
+		output.put("label_Signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
+		
 
 		return output;
 	}
