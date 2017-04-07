@@ -2637,6 +2637,7 @@ if ( asset_1 == null) {
 				
 		// Transactions view
 		output.put("Transactions", Transactions_JSON(tt));
+		
 		output.put("type", "standardAccount");
 				
 		int a = 1;
@@ -3576,6 +3577,9 @@ if ( asset_1 == null) {
 			txsTypeCount[transaction.getType() - 1] ++;
 		}
 
+		// Transactions view
+		output.put("Transactions", Transactions_JSON(block.getTransactions()));
+		
 		int txsCount = all.size();
 
 		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight(DBSet.getInstance()));
@@ -3661,14 +3665,17 @@ if ( asset_1 == null) {
 		Map assetsJSON=new LinkedHashMap();
 
 		int counter = 0;
-		for(Object unit: all)
-		{
-			counter ++;
+		
+	//	for(Object unit: all)
+	//	{
+	//		counter ++;
 
-			output.put(counter, jsonUnitPrint(unit, assetNames));
-		}
+	//		output.put(counter, jsonUnitPrint(unit, assetNames));
+	//	}
 
 
+		
+		
 		{
 			Map transactionJSON = new LinkedHashMap();
 			Map transactionDataJSON = new LinkedHashMap();

@@ -1198,6 +1198,18 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
+	
+	@Path("index/libs/js/explorerTransactionsTable.js")
+	@GET
+	public Response explorerTransactionsTable() {
+		File file = new File("web/libs/js/explorerTransactionsTable.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerTransactionsTable").build();
+		} else {
+			return error404(request, null);
+		}
+	}
 
 	@Path("index/libs/js/third-party/ZeroClipboard.min.js")
 	@GET

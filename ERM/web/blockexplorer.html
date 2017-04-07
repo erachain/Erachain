@@ -9,6 +9,7 @@
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
 	<script src="/index/libs/js/explorerStatements.js"></script>
+	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 	<style type="text/css">
@@ -1302,6 +1303,9 @@ function mainQuery(data) {
 			
 			
 			output += '</table><br><br>';
+			
+			output += transactions_Table(data);
+			/*
 			output += data.Transactions.label_transactions_table + ':<br>';
 			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
@@ -1321,7 +1325,7 @@ function mainQuery(data) {
 			
 			}
 			output +='</table></td></tr></table>';
-			/*
+			
 			if(data.countTx.hasOwnProperty('txsCount'))
 			{
 				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
@@ -1455,7 +1459,9 @@ function mainQuery(data) {
 				output += '<a style="font-size: 9px;" href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
 				output += '<br><br>';
 			}
+			output += transactions_Table(data);
 			
+		return output;
 		}
 		
 		
@@ -3906,7 +3912,7 @@ function Lang_setting(){
 			}
 		}
 		if (k==0){
-			search += 'lang='+val;
+			search += '&lang='+val;
 		}
     }else{
 		search += 'lang='+val;
