@@ -1684,12 +1684,12 @@ if ( asset_1 == null) {
 		
 		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
 		rowCount = personModel.getRowCount();
-		Map accountJSON=new LinkedHashMap();
+		
 		
 		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
 		if (rowCount >0){
 		for (int i = 0; i<rowCount; i++){
-			
+			Map accountJSON=new LinkedHashMap();
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
 			accountJSON.put("data", personModel.getValueAt(i, 1));
 				PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
@@ -1714,12 +1714,8 @@ if ( asset_1 == null) {
 			String acc = personModel.getValueAt(i, 0).toString();
 			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
 		
-//			trans.addAll(tt); // "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"
+
 		}
-		}else{
-			accountJSON.put("creator", "");
-			accountJSON.put("creator_name", "");
-			accountJSON.put("creator_key", "");	
 		}
 		output.put("accounts", accountsJSON);
 		
