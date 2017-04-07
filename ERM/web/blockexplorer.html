@@ -3315,7 +3315,7 @@ function search(data)
 
 	if(data.foundCount == 1)
 	{
-		document.location.href = foundOne;
+		document.location.href = foundOne + get_lang();
 		return null;
 	}
 	
@@ -3510,7 +3510,7 @@ function getQueryParams(name) {
 }
 
 function buttonSearch() {
-   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value);
+   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() ;
 }
 
 function start() {
