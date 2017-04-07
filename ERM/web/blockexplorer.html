@@ -1510,12 +1510,12 @@ function mainQuery(data) {
 		
 		if(data.type == 'transaction')
 		{
-			url = '?tx=' + data[1].transaction.signature;
-			urlstart = url;
+	//		url = '?tx=' + data[1].transaction.signature;
+	//		urlstart = url;
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			output += '<font size="+1">Standard Transaction</font><br>';
-			
-			
+			output += data.Json ;
+			return output;
 		}
 
 		if(data.type == 'unconfirmed')
@@ -3071,7 +3071,7 @@ function mainQuery(data) {
 						
 						output += '</table><br>';
 					}
-				}
+				} 
 			}
 		
 		//	if(data.type == 'standardAccount' || data.type == 'at')

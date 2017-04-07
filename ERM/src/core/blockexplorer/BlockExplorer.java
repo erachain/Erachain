@@ -3509,7 +3509,8 @@ if ( asset_1 == null) {
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
-			all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
+			output.put("Json", transaction.toJson().toString());
+		/*	all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
 
 			if(transaction instanceof CreateOrderTransaction)
 			{
@@ -3532,7 +3533,7 @@ if ( asset_1 == null) {
 		}
 
 		int size = all.size();
-
+	
 		output.put("start", size);
 		output.put("end", 1);
 
@@ -3540,9 +3541,9 @@ if ( asset_1 == null) {
 		for (BlExpUnit unit : all) {
 			output.put(size - counter, jsonUnitPrint(unit.getUnit(), assetNames));
 			counter ++;
-		}
+*/		}
 		
-		output.put("assetNames", assetNames.getMap());
+//		output.put("assetNames", assetNames.getMap());
 
 		return output;
 	}
