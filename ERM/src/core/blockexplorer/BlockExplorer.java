@@ -2061,6 +2061,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "trade");
 			transactionJSON.put("trade", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		if (unit instanceof Transaction)
@@ -2232,6 +2233,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "transaction");
 			transactionJSON.put("transaction", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		if (unit instanceof Block)
@@ -2263,6 +2265,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "block");
 			transactionJSON.put("block", transactionDataJSON);
+			return transactionJSON;
 
 		}
 
@@ -2285,6 +2288,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "atTransaction");
 			transactionJSON.put("atTransaction", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		return transactionJSON;
@@ -3649,9 +3653,9 @@ if ( asset_1 == null) {
 			output.put(counter + 1, transactionJSON);
 		}
 
-		output.put("assetNames", assetNames.getMap());
+	//	output.put("assetNames", assetNames.getMap());
 		
-		output.put("totalBalance", assetsJSON);
+	//	output.put("totalBalance", assetsJSON);
 
 		return output;
 	}

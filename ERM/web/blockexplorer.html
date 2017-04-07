@@ -373,6 +373,7 @@ function getAssetName2(assetKey, assetName) {
 }
 function addCommas(str)
 {
+	if(str == null) return "";
 	strbuf = str.toString();
 	if( strbuf.indexOf('.') == -1)
 	{
@@ -3085,6 +3086,7 @@ function uintToString(uintArray) {
 
 function htmlFilter(str)
 {
+if (str == null) return "";
 	return str
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
