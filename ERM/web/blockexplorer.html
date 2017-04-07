@@ -1290,21 +1290,34 @@ function mainQuery(data) {
 			output += '<br>';
 			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
 			output += '<br><br>';
+			output += data.Balance.label_Balance_table + ':<br>';
+			output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Balance.label_asset_key+'<td><b>'+ data.Balance.label_asset_name+'<td><b>'+data.Balance.label_Balance_A+'<td><b>'+data.Balance.label_Balance_B+'<td><b>'+ data.Balance.label_Balance_C +'</tr>';
+			for (key in data.Balance.balances){
+			output += '<tr><td><a href ="?asset='+data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+			output +='<td><a href="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+			output +='<td>' + data.Balance.balances[key].balance_A + '<td>'+data.Balance.balances[key].balance_B + '<td>'+data.Balance.balances[key].balance_C;
+			
+			}
+			
+			
+			output += '</table><br><br>';
+			output += data.Transactions.label_transactions_table + ':<br>';
 			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
-			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_signature+'<td><b>'+data.label_type_transaction+'<td><b>'+data.label_reference+'<td><b>'+ data.label_date+'<td><b>'+data.label_creator+'<td><b>'+data.label_size+'<td><b>'+data.label_fee+'<td><b>'+ data.label_confirmations+'</tr>';
-			for (key in data.transaction){
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+ data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+data.Transactions.label_reference+'<td><b>'+ data.Transactions.label_date+'<td><b>'+data.Transactions.label_creator+'<td><b>'+data.Transactions.label_size+'<td><b>'+data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
+			for (key in data.Transactions.transactions){
 			
 			
-			output += '<tr><td><a href ="?block='+data.transaction[key].block+get_lang()+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'" title = "'+ data.transaction[key].signature  +get_lang()+'">'+data.transaction[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.transaction[key].signature+get_lang()+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
-			if (data.transaction[key].creator_key == '-'){
-			output += '<td>'+data.transaction[key].creator+'</a>'; 
-			}else if (data.transaction[key].creator_key == '+'){
-			output += '<td><a href ="?addr='+data.transaction[key].creator+get_lang()+'">'+data.transaction[key].creator+'</a>';
+			output += '<tr><td><a href ="?block='+data.Transactions.transactions[key].block+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+ data.Transactions.transactions[key].seq+'</a><td><a href="?tx='+data.Transactions.transactions[key].signature+'" title = "'+ data.Transactions.transactions[key].signature  +get_lang()+'">'+data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+'</a><td>'+data.Transactions.transactions[key].reference+'<td>'+data.Transactions.transactions[key].date;
+			if (data.Transactions.transactions[key].creator_key == '-'){
+			output += '<td>'+data.Transactions.transactions[key].creator+'</a>'; 
+			}else if (data.Transactions.transactions[key].creator_key == '+'){
+			output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
 			}else{
-			output += '<td><a href ="?person='+data.transaction[key].creator_key+get_lang()+'">'+data.transaction[key].creator+'</a>';
+			output += '<td><a href ="?person='+data.Transactions.transactions[key].creator_key+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
 			}
-			output += '<td>'+ data.transaction[key].size +'<td>'+ data.transaction[key].fee +'<td>'+ data.transaction[key].confirmations + '</td></tr>';
+			output += '<td>'+ data.Transactions.transactions[key].size +'<td>'+ data.Transactions.transactions[key].fee +'<td>'+ data.Transactions.transactions[key].confirmations + '</td></tr>';
 			
 			}
 			output +='</table></td></tr></table>';
