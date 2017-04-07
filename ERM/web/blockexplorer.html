@@ -20,7 +20,7 @@
       padding-bottom: 10px;
       border-bottom: 1px solid #eee;
       }
-      .navbar-fixed-top {
+      .navbar-fixed-top { 
       border: 0;
       z-index: 9999;
       }
@@ -1286,11 +1286,21 @@ function mainQuery(data) {
 
 		if(data.type == 'standardAccount')
 		{
-			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			
-			output += '<br>';
-			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			if (data.person_key != -10){
+			
+			output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">'; 
+			output +='<td><font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
+			
+			}else{
+			
 			output += '<br><br>';
+			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			}
+			output +='</table>';
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			output += data.Balance.label_Balance_table + ':<br>';
 			output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Balance.label_asset_key+'<td><b>'+ data.Balance.label_asset_name+'<td><b>'+data.Balance.label_Balance_A+'<td><b>'+data.Balance.label_Balance_B+'<td><b>'+ data.Balance.label_Balance_C +'</tr>';

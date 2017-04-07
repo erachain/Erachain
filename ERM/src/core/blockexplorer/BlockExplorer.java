@@ -2138,7 +2138,9 @@ if ( asset_1 == null) {
 				bal.put("balance_A", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A));
 				bal.put("balance_B", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B));
 				bal.put("balance_C", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C));
-				bal_Assets.put(idr, bal);
+				if (!(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A).equals("0.00000000")
+						&& balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B).equals("0.00000000")
+						&& balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C).equals("0.00000000")))bal_Assets.put(idr, bal);
 				}
 				
 				output.put("balances", bal_Assets);
@@ -2631,6 +2633,18 @@ if ( asset_1 == null) {
 		LinkedHashMap output = new LinkedHashMap();
 		LinkedHashMap transactionsJSON = new LinkedHashMap();	
 		output.put("account", addresses.get(0));
+		
+		Account acc = new Account(addresses.get(0));
+		Long person_key = (long) -10;
+		Tuple2<Integer, PersonCls> pp = acc.getPerson();
+		
+		if (pp != null){
+			output.put("label_person_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+			output.put("person_Img",  Base64.encodeBase64String(pp.b.getImage()));
+			output.put("Person_Name", pp.b.getName());
+			person_key = pp.b.getKey();
+		}
+		output.put("person_key", person_key);
 		
 		// balance assets from
 		output.put("Balance", Balance_JSON(new Account(addresses.get(0))));
