@@ -101,7 +101,7 @@ import utils.ReverseComparator;
 public class BlockExplorer
 {
 	private JSONObject langObj;
-	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
+	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class); 
 	private static BlockExplorer blockExplorer;
 	private Locale local = new Locale("ru","RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ Р Т‘Р В°РЎвЂљРЎвЂ№
 	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
@@ -504,7 +504,7 @@ public class BlockExplorer
 					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
 				}
 
-//				output.put("lastBlock", jsonQueryLastBlock());
+				output.put("lastBlock", jsonQueryLastBlock());
 
 				output.putAll(jsonQueryPersons(start));
 
@@ -515,7 +515,7 @@ public class BlockExplorer
 			if(info.getQueryParameters().containsKey("person"))
 			{
 				
-
+				output.put("lastBlock", jsonQueryLastBlock());
 				output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -532,7 +532,7 @@ public class BlockExplorer
 					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
 				}
 
-//				output.put("lastBlock", jsonQueryLastBlock());
+				output.put("lastBlock", jsonQueryLastBlock());
 
 				output.putAll(jsonQueryStatements(start));
 
@@ -543,7 +543,7 @@ public class BlockExplorer
 			if(info.getQueryParameters().containsKey("statement"))
 			{
 				
-
+				output.put("lastBlock", jsonQueryLastBlock());
 				output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),info.getQueryParameters().getFirst("Seg_No")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -1915,7 +1915,16 @@ if ( asset_1 == null) {
 
 		output.put("timezone", Settings.getInstance().getTimeZone());
 		output.put("timeformat", Settings.getInstance().getTimeFormat());
-
+		output.put("label_hour", Lang.getInstance().translate_from_langObj("hour", langObj));
+		output.put("label_hours", Lang.getInstance().translate_from_langObj("hours", langObj));
+		output.put("label_mins", Lang.getInstance().translate_from_langObj("mins", langObj));
+		output.put("label_min", Lang.getInstance().translate_from_langObj("min", langObj));
+		output.put("label_secs", Lang.getInstance().translate_from_langObj("secs", langObj));
+		output.put("label_ago", Lang.getInstance().translate_from_langObj("ago", langObj));
+		output.put("label_Last_processed_block", Lang.getInstance().translate_from_langObj("Last processed block", langObj));
+		
+		
+		
 		return output;
 	}
 
@@ -2674,6 +2683,7 @@ if ( asset_1 == null) {
 			person_key = pp.b.getKey();
 		}
 		output.put("person_key", person_key);
+		output.put("label_account", Lang.getInstance().translate_from_langObj("Account",langObj));
 		
 		// balance assets from
 		output.put("Balance", Balance_JSON(new Account(addresses.get(0))));

@@ -315,7 +315,7 @@ return output;
 }
 
 
-function secToFine(time) {
+function secToFine(time, lastBlock) {
 	time = Math.floor( time/1000 );
 	
 	var mins = ~~(time / 60);
@@ -329,10 +329,10 @@ function secToFine(time) {
 	ret = "";
 
 	if (hrs > 0)
-		ret += "" + hrs + (hrs > 1 ? "hours " : " hour ");
+		ret += " " + hrs + " " + (hrs > 1 ? lastBlock.label_hours : lastBlock.label_hour);
 
-	ret += "" + mins + (mins > 1 ? " mins " : " min ");
-	ret += "" + secs + ' secs';
+	ret += " " + mins + " " + (mins > 1 ? lastBlock.label_mins  : lastBlock.label_min);
+	ret += " " + secs + " " + lastBlock.label_secs;
 	return ret;
 }
 
@@ -1291,13 +1291,13 @@ function mainQuery(data) {
 			if (data.person_key != -10){
 			
 			output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">'; 
-			output +='<td><font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +='<td><font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
 			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
 			
 			}else{
 			
 			output += '<br><br>';
-			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +='<font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
 			}
 			output +='</table>';
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
@@ -3355,8 +3355,8 @@ function lastBlock(lastBlock)
 		return "";
 	
 	var output = '';
-	output += ': <a href=?block='+lastBlock.height+get_lang()+'>' + lastBlock.height + '</a>';
-	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp) + ' ago'+ ') ';
+	output += lastBlock.label_Last_processed_block + ': <a href=?block='+lastBlock.height+get_lang()+'>' + lastBlock.height + '</a>';
+	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' +  lastBlock.label_ago + ') ';
 	output += '<br><br>';
 	
 	return output;
