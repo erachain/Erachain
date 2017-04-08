@@ -833,33 +833,33 @@ function asset(data)
 	
 	output += '<table width="1280" border=0><tr><td align=left><br>';
 	
-	output += '<a href="?assets'+get_lang()+'"><h3 style="display:inline;">Assets</h3></a>';
+	output += '<h3 style="display:inline;">'+ data.asset.label_Asset+ ':</h3>';
 	
-	output += '<h3 style="display:inline;"> | </h3>';
+	//output += '<h3 style="display:inline;"> | </h3>';
 	
 	output += '<a href="?asset='+data.asset.this.key+get_lang()+'"><h3 style="display:inline;">';
 	output += getAssetName2(data.asset.this.key, data.asset.this.name)+'</h3></a>';
 	
 	output += '<br><br>';
 	
-	output += '<b>Key:</b> ' + data.asset.this.key;
+	output += '<b>'+ data.asset.label_Key + ':</b> ' + data.asset.this.key;
 	
 	output += '<br><br>';
 	
-	output += '<b>Owner:</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
+	output += '<b>' + data.asset.label_Creator + ':</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
 	
 	output += '<br><br>';
 	
 	
-	output += '<b>Description:</b> ' + htmlFilter(wordwrap(data.asset.this.description, 80, '\n', true));
+	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(data.asset.this.description, 80, '\n', true);
 	
 	output += '<br><br>';
 	
-	output += '<b>Divisible:</b> ' + data.asset.this.isDivisible;
+	output += '<b>'   + data.asset.label_Divisible + ':</b> ' + data.asset.this.isDivisible;
 		
 	output += '<br><br>';
 	
-	output += '<b>Quantity:</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	
+	output += '<b> ' +data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	
 	
 	output += '<br><br>';
 	
@@ -872,17 +872,17 @@ function asset(data)
 		assetUrl = '';
 	}	
 	
-	output += '<b>Holders:</b> <a href=?top=allnotzero'+assetUrl+get_lang()+'>View</a>';
+	output += '<b>' +data.asset.label_Holders +':</b> <a href=?top=allnotzero'+assetUrl+get_lang()+'>'+ data.asset.label_View + '</a>';
 		
 	output += '<br><br>';
 	
-	output += '<h3>Available pairs</h3>';
+	output += '<h3>'+   data.asset.label_Available_pairs +'</h3>';
 	
 	output += '<table border="0" cellspacing="10" class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-	output += '<td><b>Pair</b></td><td><b>Orders<br>Count</b></td>';
-	output += '<td><b>Open Orders Volume</b></td>';
-	output += '<td><b>Trades<br>Count</b></td><td><b>Trades Volume</b></td>';
-	output += '<td><b>Description</b></td></tr>';
+	output += '<td><b>'+ data.asset.label_Pair+'</b></td><td><b>'+ data.asset.label_Orders_Count+'</b></td>';
+	output += '<td><b>'+  data.asset.label_Open_Orders_Volume +'</b></td>';
+	output += '<td><b>' + data.asset.label_Trades_Count +  '</b></td><td><b>'+ data.asset.label_Trades_Volume +'</b></td>';
+	output += '<td><b>'+data.asset.label_Description+'</b></td></tr>';
 	
 	for(key in data.asset.pairs) {
 		output += '<tr>';
@@ -935,7 +935,7 @@ function asset(data)
 		
 		output += '<td>' + htmlFilter(data.asset.pairs[key].description);
 	}
-	output += '<tr><td><b>Total:';
+	output += '<tr><td><b>'+ data.asset.label_Total+':';
 	output += '<td>' + data.asset.totalOpenOrdersCount;
 	output += '<td>'+addCommas(data.asset.totalOrdersVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 	output += '<td>' + data.asset.totalTradesCount;

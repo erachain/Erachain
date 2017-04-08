@@ -1244,7 +1244,9 @@ if ( asset_1 == null) {
 		assetJSON.put("description", Processor.process(asset.getDescription()));
 		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
-		assetJSON.put("isDivisible", asset.isDivisible());
+		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
+		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
+		assetJSON.put("isDivisible",divis );
 
 		
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
@@ -1310,6 +1312,22 @@ if ( asset_1 == null) {
 		}
 
 		output.put("pairs", pairsJSON);
+		output.put("label_Asset", Lang.getInstance().translate_from_langObj("Asset", langObj));
+		output.put("label_Key", Lang.getInstance().translate_from_langObj("Key", langObj));
+		output.put("label_Creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("label_Description", Lang.getInstance().translate_from_langObj("Description", langObj));
+		output.put("label_Divisible", Lang.getInstance().translate_from_langObj("Divisible", langObj));
+		output.put("label_Quantity", Lang.getInstance().translate_from_langObj("Quantity", langObj));
+		output.put("label_Holders", Lang.getInstance().translate_from_langObj("Holders", langObj));
+		output.put("label_Available_pairs", Lang.getInstance().translate_from_langObj("Available pairs", langObj));
+		output.put("label_Pair", Lang.getInstance().translate_from_langObj("Pair", langObj));
+		output.put("label_Orders_Count", Lang.getInstance().translate_from_langObj("Orders Count", langObj));
+		output.put("label_Open_Orders_Volume", Lang.getInstance().translate_from_langObj("Open Orders Volume", langObj));
+		output.put("label_Trades_Count", Lang.getInstance().translate_from_langObj("Trades Count", langObj));
+		output.put("label_Trades_Volume", Lang.getInstance().translate_from_langObj("Trades Volume", langObj));
+		output.put("label_Total", Lang.getInstance().translate_from_langObj("Total", langObj));
+		output.put("label_View", Lang.getInstance().translate_from_langObj("View", langObj));
+		
 
 		return output;
 	}
