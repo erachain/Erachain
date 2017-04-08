@@ -1562,17 +1562,17 @@ if ( asset_1 == null) {
 		
 		// TODO translate_web(
 		
-		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
-		output.put("Label_Height", "Height");
-		output.put("Label_Time", "Time");
-		output.put("Label_Generator", "Creator");
-		output.put("Label_Gen_balance", "Gen.Balance");
-		output.put("Label_TXs", "TXs");
-		output.put("Label_Fee", "Fee");
-		output.put("Label_AT_Amount", "AT_Amount");
-		output.put("Label_Amount", "Amount");
-		output.put("Label_Later", "Later");
-		output.put("Label_Previous", "Previous");
+		output.put("Label_Unconfirmed_transactions",Lang.getInstance().translate_from_langObj("Unconfirmed transactions", langObj));
+		output.put("Label_Height", Lang.getInstance().translate_from_langObj("Height", langObj)); 
+		output.put("Label_Time", Lang.getInstance().translate_from_langObj("Time", langObj));
+		output.put("Label_Generator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("Label_Gen_balance", Lang.getInstance().translate_from_langObj("Gen.Balance", langObj));
+		output.put("Label_TXs",  Lang.getInstance().translate_from_langObj("TXs", langObj)); 
+		output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Height", langObj));
+		output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
+		output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
+		output.put("Label_Previous",  Lang.getInstance().translate_from_langObj("Previous", langObj));
 		
 		int counter = start; 
 
