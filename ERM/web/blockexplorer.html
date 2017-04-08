@@ -590,7 +590,7 @@ function topRichest(data)
 	table += '</table>';
 	
 	output += table;
-	
+/*	
 	if(data.assetKey != 0)
 	{
 		assetUrl = '&asset='+data.assetKey;
@@ -609,7 +609,7 @@ function topRichest(data)
 		assetstxt += '<a href=?top=100&asset='+key+get_lang()+'>'+'(' + key + ')' + data.assets[key] + '</a>' + ', ';
 	}
 	output += assetstxt.slice(0, -2) + '</font>';
-	
+	*/
 	return output;
 }		
 
@@ -806,7 +806,7 @@ function assets(data)
 		table += '<td>' + data.assets[key].operations;
 	
 		table += '<td>' + htmlFilter(data.assets[key].description);
-		table += '<td>' + htmlFilter(data.assets[key].owner);
+		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
 		table += '<td>' + htmlFilter(data.assets[key].isMovable);
 		table += '<td>' +data.assets[key].quantity;
 		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
@@ -3465,10 +3465,10 @@ var output = '';
 	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
 	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
 	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td><td style ="padding-left:20px">'; 
+	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>'; 
 	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key + get_lang() + '>'+data[i].name +'</a>';
 	//output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
-	output += '<td>'+data[i].creator;
+	output += '<td><a href=?addr='+data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
 	}
 	
 	output += '<tr><td colspan=4>';
