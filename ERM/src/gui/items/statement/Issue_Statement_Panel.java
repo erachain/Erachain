@@ -174,9 +174,10 @@ public class Issue_Statement_Panel extends JPanel
 		txtReceiverGBC.weightx = 0;	
 		txtReceiverGBC.gridx = 0;
       	txtReceiverGBC.gridy = gridy++;
+      	txtReceiverGBC.weighty = 0.3;
 
         this.txtRecDetails = new JTextArea();
-        this.txtRecDetails.setRows(6);
+   //     this.txtRecDetails.setRows(6);
       	txtRecDetails.setEditable(false);
         //this.txtRecDetails.setColumns(25);
 
@@ -207,9 +208,10 @@ public class Issue_Statement_Panel extends JPanel
 		txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtMessageGBC.gridx = 0;
         txtMessageGBC.gridy = gridy++;
+        txtMessageGBC.weighty = 0.3;
         
         this.txtMessage = new JTextArea();
-        this.txtMessage.setRows(4);
+  //      this.txtMessage.setRows(4);
         this.txtMessage.setColumns(25);
         //this.txtMessage.setBorder(this.txtFrom.getBorder());
 
