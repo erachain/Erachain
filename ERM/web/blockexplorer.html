@@ -953,7 +953,7 @@ function trades(data)
 	
 	output += '<table width="1180" border=0><tr><td align=left><br>';
 	
-	output += '<a href="?assets"'+get_lang()+'><h3 style="display:inline;">Assets</h3></a>';
+	output += '<a href="?assets"'+get_lang()+'><h3 style="display:inline;">'+data.label_Trades+'</h3></a>';
 	
 	output += '<h3 style="display:inline;"> | </h3>';
 	
@@ -964,9 +964,9 @@ function trades(data)
 	output += '<br><br>';
 	
 	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="600">';
-	output += '<h4>Sell Orders</h4></td><td width="10">&nbsp;<td width="600"><h4>Buy Orders</h4></td></tr>';
+	output += '<h4>'+ data.label_Sell_Orders+'</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+'</h4></td></tr>';
 	output += '<tr valign="top"><td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>Price</b></td><td width="190"><b>Amount</b></td><td width="190"><b>Total</b></td></tr>';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
 	for(key in data.sells) {
 	
@@ -983,13 +983,13 @@ function trades(data)
 	
 	output += '<tr bgcolor="#f9f9f9">';
 	
-	output += '<td colspan=2><b>Total:<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td colspan=2><b>'+ data.label_Total+':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
 	output += '</table>';
 	
 	output += '<td width="10">&nbsp;<td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>Price</b></td><td width="190"><b>Amount</b></td><td width="190"><b>Total</b></td></tr>';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
 	for(key in data.buys) {
 		
@@ -1006,18 +1006,18 @@ function trades(data)
 
 	output += '<tr bgcolor="#f9f9f9">';
 	
-	output += '<td colspan=2><b>Total:<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td colspan=2><b>'+data.label_Total+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
 	output += '</table>';
 	
 	output += '<tr><td colspan=3 width="100%" align=center>';
 	
-	output += '<h4 style="text-align: left;">Trade History</h4>';
+	output += '<h4 style="text-align: left;">'+ data.label_Trade_History+'</h4>';
 	
 	output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>Timestamp<td align=center><b>Type</b></td>';
-	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>Price</b></td>';
+	output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>'+ data.label_Date  +'<td align=center><b>'+ data.label_Type +'</b></td>';
+	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>'+ data.label_Price +'</b></td>';
 	
 	output += '<td><b><a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName)+'</b></td></tr>';
 	
@@ -1116,10 +1116,10 @@ function trades(data)
 	
 	output += '</table>';
 	
-	output += '<b>Trade Volume:</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<b>'+ data.label_Trade_Volume +':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
-	output += '<br><br><b>Go To: <a href=?asset=' + data.assetHave + get_lang()+'>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
+	output += '<br><br><b>'+ data.label_Go_To +': <a href=?asset=' + data.assetHave + get_lang()+'>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
 	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName) + '</a>';
 	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+'&asset='+data.assetHave+get_lang()+'>'+ getAssetName2(data.assetWant, data.assetWantName) + '/' + getAssetName2(data.assetHave, data.assetHaveName);
 	output += '</b>';

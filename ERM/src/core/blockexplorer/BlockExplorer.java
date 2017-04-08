@@ -1480,14 +1480,14 @@ if ( asset_1 == null) {
 			tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
 			if(orderInitiator.getHave() == have)
 			{
-				tradeJSON.put("type", "sell");
+				tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Sell", langObj));
 				tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
 				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
 			}
 			else
 			{
-				tradeJSON.put("type", "buy");
+				tradeJSON.put("type",Lang.getInstance().translate_from_langObj("Buy", langObj));
 
 				tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
 				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
@@ -1506,6 +1506,21 @@ if ( asset_1 == null) {
 		output.put("tradeWantAmount", tradeWantAmount.toPlainString());
 		output.put("tradeHaveAmount", tradeHaveAmount.toPlainString());
 
+		output.put("label_Trades", Lang.getInstance().translate_from_langObj("Trades", langObj));
+		output.put("label_Price", Lang.getInstance().translate_from_langObj("Price", langObj));
+		output.put("label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+		output.put("label_Sell_Orders", Lang.getInstance().translate_from_langObj("Sell Orders", langObj));
+		output.put("label_Buy_Orders", Lang.getInstance().translate_from_langObj("Buy Orders", langObj));
+		output.put("label_Total", Lang.getInstance().translate_from_langObj("Total", langObj));
+		output.put("label_Trade_History", Lang.getInstance().translate_from_langObj("Trade History", langObj));
+		output.put("label_Date", Lang.getInstance().translate_from_langObj("Date", langObj));
+		output.put("label_Type", Lang.getInstance().translate_from_langObj("Type", langObj));
+		output.put("label_Trade_Volume", Lang.getInstance().translate_from_langObj("Trade Volume", langObj));
+		output.put("label_Go_To", Lang.getInstance().translate_from_langObj("Go To", langObj));
+		
+		
+		
+		
 		return output;
 	}
 
