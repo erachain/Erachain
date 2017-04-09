@@ -550,29 +550,29 @@ function topRichest(data)
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
 	output += '<tr><td align=center>';
 	
-	output += 'Total coins in the system: ' + 
+	output += data.Label_Total_coins_in_the_system +': ' + 
 		addCommas(data.allTotal) + ' '+ getAssetName(data.assetKey, data.assetName) + '<br>';
-	output += 'minus ' + addCommas(data.allinOrders) + 
-		' '+getAssetName(data.assetKey, data.assetName) + ' in order = ' + 
+	output += data.Label_minus + ' ' + addCommas(data.allinOrders) + 
+		' '+getAssetName(data.assetKey, data.assetName) + ' ' + data.Label_in_order + '= ' + 
 		addCommas(data.all) + ' ' + getAssetName(data.assetKey, data.assetName) + '<br>';
 	
 	
 	if(data.limit == -1)
 	{
 		buf = ''	
-		output += '<h3>'+'All non-empty '+getAssetName(data.assetKey, data.assetName)+' addresses ('+data.count+') </h2>';	
+		output += '<h3>'+ Label_All_non+ '</h2>';	
 	}
 	else if (data.limit == -2)
 	{
-		output += '<h3>'+'All '+getAssetName(data.assetKey, data.assetName)+' addresses ('+data.count+')</h2>';	
+		output += '<h3>'+ data.Label_All_accounts + '</h2>';	
 	}
 	else
 	{
-		output += '<h3>'+'Top '+data.limit+' '+getAssetName(data.assetKey, data.assetName)+' Richest</h2>';	
+		output += '<h3>'+ data.Label_Title + '</h2>';	
 	}
 	
 	
-	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
+	var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
 
 	for(key in data.top) {
 		table += '<tr>';		
@@ -585,7 +585,7 @@ function topRichest(data)
 		}
 		table += '<td>' + addCommas(data.top[key].balance);
 		table += '<td>' + addCommas(data.top[key].in_OWN);
-		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + " %";
+		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
 	}
 	table += '</table>';
 	
@@ -1524,6 +1524,8 @@ function mainQuery(data) {
 	//		urlstart = url;
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			output += '<font size="+1">Standard Transaction</font><br>';
+			
+			
 			output += data.Json ;
 			return output;
 		}

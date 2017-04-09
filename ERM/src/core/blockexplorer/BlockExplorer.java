@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -2016,6 +2017,12 @@ if ( asset_1 == null) {
 		output.put("Label_Table_Prop", Lang.getInstance().translate_from_langObj("Prop.",langObj));
 		output.put("Label_Table_person", Lang.getInstance().translate_from_langObj("Owner",langObj));
 		
+		output.put("Label_minus", Lang.getInstance().translate_from_langObj("minus",langObj));
+		output.put("Label_in_order", Lang.getInstance().translate_from_langObj("in order",langObj));
+		
+		
+		output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top",langObj));
+		output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top",langObj));
 		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
@@ -2026,7 +2033,11 @@ if ( asset_1 == null) {
 		output.put("count", couter);
 
 		output.put("top", balances);
-
+		output.put("Label_Title",(Lang.getInstance().translate_from_langObj("Top %limit% %assetName% Richest",langObj).replace("%limit%",String.valueOf(limit))).replace("%assetName%", asset.getName()));
+		output.put("Label_All_non", (Lang.getInstance().translate_from_langObj("All non-empty %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+		output.put("Label_All_accounts",(Lang.getInstance().translate_from_langObj("All %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+		output.put("Label_Total_coins_in_the_system", Lang.getInstance().translate_from_langObj("Total coins in the system", langObj));
+		
 		return output;
 	}	
 
@@ -3562,7 +3573,13 @@ if ( asset_1 == null) {
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+			List<Transaction>tt = new ArrayList<Transaction>();
+			tt.add(transaction);
+			output.put("transaction_Header",Transactions_JSON(tt));
 			output.put("Json", transaction.toJson().toString());
+			
+	//		output.put("",transaction);
+			
 		/*	all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
 
 			if(transaction instanceof CreateOrderTransaction)
