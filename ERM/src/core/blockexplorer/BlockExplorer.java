@@ -2111,16 +2111,21 @@ if ( asset_1 == null) {
 					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
 					transactionJSON.put("creator",trans.viewCreator());
 					
+					
 					if (trans.getCreator() == null){
 						transactionJSON.put("creator_key","-");
+						transactionJSON.put("creator_addr","");
 						}
-					else if (trans.getCreator().getPerson() == null){
+					else {
+						transactionJSON.put("creator_addr",trans.getCreator().getAddress());	
+					if (trans.getCreator().getPerson() == null){
 						transactionJSON.put("creator_key","+");
 						
 					}
 					else {
 						transactionJSON.put("creator_key",trans.getCreator().getPerson().b.getKey());
 						}
+					}
 					
 					transactionJSON.put("size",trans.viewSize(false));
 					transactionJSON.put("fee",trans.getFee());
@@ -3613,7 +3618,7 @@ if ( asset_1 == null) {
 			counter ++;
 */		}
 		
-//		output.put("assetNames", assetNames.getMap());
+		output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
 
 		return output;
 	}
