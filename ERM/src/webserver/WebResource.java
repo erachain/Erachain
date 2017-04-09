@@ -218,19 +218,14 @@ public class WebResource {
 		
 		if (lang !=null){
 			
-			langObj = Lang.getInstance().openLangFile(lang+".json");
+			langObj = Lang.openLangFile(lang+".json");
 			
 		
-					Elements el = doc.select("translate");
+			Elements el = doc.select("translate");
 			for (Element e:el){
-			e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
-				
-			}			
-		
-			
+				e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
+			}
 		}
-		
-		
 		
 		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
 		
