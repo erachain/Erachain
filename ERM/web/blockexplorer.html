@@ -1523,28 +1523,28 @@ function mainQuery(data) {
 	//		url = '?tx=' + data[1].transaction.signature;
 	//		urlstart = url;
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
-			output += '<font size="+1"> '+ data. Label_Transaction + ': '+  data.transaction_Header.transactions[0].type;
-			output += '       ('  + data.transaction_Header.label_block +': <a href=?block=' + data.transaction_Header.transactions[0].block + get_lang() + '>' + data.transaction_Header.transactions[0].block + '</a>'; 
+			output += '<font size="+1"> <b>'+ data. Label_Transaction + ': </b>'+  data.transaction_Header.transactions[0].type;
+			output += '       ('  + data.transaction_Header.label_block +': </b><a href=?block=' + data.transaction_Header.transactions[0].block + get_lang() + '>' + data.transaction_Header.transactions[0].block + '</a>'; 
 			output += ' - ' + data.transaction_Header.transactions[0].seq  +') </font><br>';
-			output += '   '  +  data.transaction_Header.label_confirmations       + ': ' + data.transaction_Header.transactions[0].confirmations; 
-			output += '   '  +  data.transaction_Header.label_fee       + ': ' + data.transaction_Header.transactions[0].fee; 
-			output += '   '  +  data.transaction_Header.label_date      + ': ' + data.transaction_Header.transactions[0].date;
-			output += '   '  +  data.transaction_Header.label_size       + ': ' + data.transaction_Header.transactions[0].size; 
-			output += '<br>' +  data.transaction_Header.label_signature + ': ' + data.transaction_Header.transactions[0].signature;
-			output += '   '  +  data.transaction_Header.label_reference + ': ' + data.transaction_Header.transactions[0].reference;
+			output += '<br><b>'  +  data.transaction_Header.label_confirmations       + ': </b>' + data.transaction_Header.transactions[0].confirmations; 
+			output += '<br><b>'  +  data.transaction_Header.label_date      + ': </b>' + data.transaction_Header.transactions[0].date;
+			output += '<br><b>'  +  data.transaction_Header.label_size       + ': </b>' + data.transaction_Header.transactions[0].size; 
+			output += '<br><b>' +  data.transaction_Header.label_signature + ': </b>' + data.transaction_Header.transactions[0].signature;
+			output += '<BR><b>'  +  data.transaction_Header.label_reference + ': </b>' + data.transaction_Header.transactions[0].reference;
 			output += '<br> ';
 			if (data.transaction_Header.transactions[0].creator_key != '-')
 			{
 				if (data.transaction_Header.transactions[0].creator_key == '+'){
-					output += data.transaction_Header.label_creator +': <a href=?addr='+  data.transaction_Header.transactions[0].creator_addr + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?addr='+  data.transaction_Header.transactions[0].creator_addr + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
 				}
 				else{
-					output += data.transaction_Header.label_creator +': <a href=?person='+  data.transaction_Header.transactions[0].creator_key + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?person='+  data.transaction_Header.transactions[0].creator_key + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
 				}
 			}
 			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
 			output += '<br>';	
-			output += data.Json ;
+			output += data.body + '<br>';
+		//	output += data.Json ;
 
 
 

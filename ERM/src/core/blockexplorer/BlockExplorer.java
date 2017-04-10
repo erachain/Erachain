@@ -105,7 +105,7 @@ public class BlockExplorer
 	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class); 
 	private static BlockExplorer blockExplorer;
 	private Locale local = new Locale("ru","RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ Р Т‘Р В°РЎвЂљРЎвЂ№
-	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
+	private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	private String lang; 
 	public static final String  LANG_DEFAULT = "en";
@@ -2108,7 +2108,7 @@ if ( asset_1 == null) {
 					transactionJSON.put("seq",trans.getSeqNo(db));
 					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
 					transactionJSON.put("reference",trans.getReference());
-					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
+					transactionJSON.put("date",DateTimeFormat.timestamptoString(trans.getTimestamp()));
 					transactionJSON.put("creator",trans.viewCreator());
 					
 					
@@ -2204,6 +2204,7 @@ if ( asset_1 == null) {
 				output.put("label_Balance_A",Lang.getInstance().translate_from_langObj("Balance",langObj)+" A");
 				output.put("label_Balance_B",Lang.getInstance().translate_from_langObj("Balance",langObj)+" B");
 				output.put("label_Balance_C",Lang.getInstance().translate_from_langObj("Balance",langObj)+" C");
+				
 				
 				return output;
 	
@@ -3581,6 +3582,7 @@ if ( asset_1 == null) {
 			List<Transaction>tt = new ArrayList<Transaction>();
 			tt.add(transaction);
 			output.put("transaction_Header",Transactions_JSON(tt));
+			output.put("body", WEB_Transactions_HTML.getInstance().get_HTML( tt.get(0), langObj));
 			output.put("Json", transaction.toJson().toString());
 			
 	//		output.put("",transaction);
