@@ -30,8 +30,10 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
@@ -41,6 +43,7 @@ import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
 import core.transaction.R_SertifyPubKeys;
+import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
@@ -49,6 +52,7 @@ import gui.MainFrame;
 import gui.PasswordPane;
 import lang.Lang;
 import utils.Converter;
+import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
 public class WEB_Transactions_HTML {
@@ -116,12 +120,62 @@ public class WEB_Transactions_HTML {
 			return out+ sign_Note_HTML(transaction, langObj);
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 			return out+ serttify_Pub_Key_HTML(transaction, langObj);
+		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
+			return out+ set_Status_HTML(transaction, langObj);
 
 		}
 
 		out += "<br>" +transaction.toJson();
 		return out;
 
+	}
+
+	private String set_Status_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		R_SetStatusToItem setStatusToItem = (R_SetStatusToItem)transaction;
+		ItemCls item = Controller.getInstance().getItem(setStatusToItem.getItemType(), setStatusToItem.getItemKey());
+		long status_key = setStatusToItem.getKey();
+		StatusCls status = Controller.getInstance().getItemStatus(status_key);
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Name", langObj) + ":</b> "
+					+ status.getName()+ "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + status.getDescription()+ "<br>";
+		long beginDate = setStatusToItem.getBeginDate();
+		long endDate = setStatusToItem.getEndDate();
+		out += "<b>" + Lang.getInstance().translate_from_langObj("From - To", langObj) + ":</b> "
+					+ (beginDate == Long.MIN_VALUE?"?":DateTimeFormat.timestamptoString(beginDate))
+					+ " - " + (endDate == Long.MAX_VALUE? "?":DateTimeFormat.timestamptoString(endDate)) + "<br>";
+		if (setStatusToItem.getValue1() != 0) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Value", langObj) + " 1:</b> "
+						+ setStatusToItem.getValue1() + "<br>";
+		}
+		if (setStatusToItem.getValue2() != 0) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Value", langObj) + " 2:</b> "
+						+ setStatusToItem.getValue2() + "<br>";
+		}
+		if (setStatusToItem.getData1() != null) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 1:</b> "
+						+ new String(setStatusToItem.getData1(), Charset.forName("UTF-8")) + "<br>";
+		}
+		if (setStatusToItem.getData2() != null) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 2:</b> "
+						+ new String(setStatusToItem.getData2(), Charset.forName("UTF-8")) + "<br>";
+		}
+		if (setStatusToItem.getRefParent() != 0l) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
+						+ setStatusToItem.viewRefParent() + "<br>";
+		}
+		if (setStatusToItem.getDescription() != null) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
+						+ new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
+		}
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Name", langObj) + ":</b> "
+					+ item.getItemTypeStr() + " - " + item.getItemSubType()
+					+ ": " + item.getName() + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Description", langObj) + ":</b> "
+					+ item.getDescription() + "<br>";
+		
+		return out;
 	}
 
 	private String serttify_Pub_Key_HTML(Transaction transaction, JSONObject langObj) {
