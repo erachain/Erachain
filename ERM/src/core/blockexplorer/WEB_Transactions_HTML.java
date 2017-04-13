@@ -40,6 +40,7 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
@@ -113,12 +114,32 @@ public class WEB_Transactions_HTML {
 			return out+ vouch_HTML(transaction, langObj);
 		case Transaction.SIGN_NOTE_TRANSACTION:
 			return out+ sign_Note_HTML(transaction, langObj);
+		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
+			return out+ serttify_Pub_Key_HTML(transaction, langObj);
 
 		}
 
 		out += "<br>" +transaction.toJson();
 		return out;
 
+	}
+
+	private String serttify_Pub_Key_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		 R_SertifyPubKeys record = (R_SertifyPubKeys) transaction;
+		PersonCls person;
+		person = Controller.getInstance().getPerson( record.getKey());
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?person="
+					+ person.getKey() + get_Lang(langObj) + ">" + person.getName() + "</a><br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("End Days", langObj) + ":</b> "
+					+ record.getAddDay() + "<br>";
+			int i = 0;
+			for (String address: record.getSertifiedPublicKeysB58())
+			{
+				out += "<b>   " + Lang.getInstance().translate_from_langObj("Account", langObj)  + " " + ++i + ":</b> "	+ address + "<br>";
+			}
+		return out;
 	}
 
 	private String sign_Note_HTML(Transaction transaction, JSONObject langObj) {
