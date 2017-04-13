@@ -122,12 +122,52 @@ public class WEB_Transactions_HTML {
 			return out+ serttify_Pub_Key_HTML(transaction, langObj);
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			return out+ set_Status_HTML(transaction, langObj);
+/*
+			public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
+			public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 2;
+			public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
+			public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
+			public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
+			public static final int GENESIS_SEND_ASSET_TRANSACTION = 6;
+			public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7; //
+			public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8; // нет в гуи
+			public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;//
+			public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;//
+			// ISSUE ITEMS
+			public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
+			// RENT ASSET
+			public static final int RENT_ASSET_TRANSACTION = 32; //
+			// HOLD ASSET
+			public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
+			
+			// OTHER
+			public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
+			public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in gui
 
+			public static final int HASHES_RECORD = 41;
+			
+			// exchange of assets
+			public static final int CREATE_ORDER_TRANSACTION = 50;
+			public static final int CANCEL_ORDER_TRANSACTION = 51;
+			// voting
+			public static final int CREATE_POLL_TRANSACTION = 61;
+			public static final int VOTE_ON_POLL_TRANSACTION = 62;
+			
+			public static final int RELEASE_PACK = 70;
+
+			// old
+			public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
+			public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
+			public static final int SELL_NAME_TRANSACTION = 8 + 130;
+			public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
+			public static final int BUY_NAME_TRANSACTION = 10 + 130;
+			public static final int ARBITRARY_TRANSACTION = 12 + 130;
+			public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
+			public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
+*/	
 		}
-
 		out += "<br>" +transaction.toJson();
 		return out;
-
 	}
 
 	private String set_Status_HTML(Transaction transaction, JSONObject langObj) {
