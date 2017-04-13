@@ -2042,7 +2042,7 @@ if ( asset_1 == null) {
 	}	
 
 	
-	private LinkedHashMap Transactions_JSON(List<Transaction> transactions){
+	public LinkedHashMap Transactions_JSON(List<Transaction> transactions){
 		
 		LinkedHashMap output = new LinkedHashMap();
 		DBSet db = DBSet.getInstance();
@@ -3581,7 +3581,7 @@ if ( asset_1 == null) {
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
 			List<Transaction>tt = new ArrayList<Transaction>();
 			tt.add(transaction);
-			output.put("transaction_Header",Transactions_JSON(tt));
+		//	output.put("transaction_Header",Transactions_JSON(tt));
 			output.put("body", WEB_Transactions_HTML.getInstance().get_HTML( tt.get(0), langObj));
 			output.put("Json", transaction.toJson().toString());
 			

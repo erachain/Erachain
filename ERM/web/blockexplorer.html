@@ -1523,7 +1523,7 @@ function mainQuery(data) {
 	//		url = '?tx=' + data[1].transaction.signature;
 	//		urlstart = url;
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
-			output += '<font size="+1"> <b>'+ data. Label_Transaction + ': </b>'+  data.transaction_Header.transactions[0].type;
+	/*		output += '<font size="+1"> <b>'+ data. Label_Transaction + ': </b>'+  data.transaction_Header.transactions[0].type;
 			output += '       ('  + data.transaction_Header.label_block +': </b><a href=?block=' + data.transaction_Header.transactions[0].block + get_lang() + '>' + data.transaction_Header.transactions[0].block + '</a>'; 
 			output += ' - ' + data.transaction_Header.transactions[0].seq  +') </font><br>';
 			output += '<br><b>'  +  data.transaction_Header.label_confirmations       + ': </b>' + data.transaction_Header.transactions[0].confirmations; 
@@ -1540,9 +1540,9 @@ function mainQuery(data) {
 				else{
 					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?person='+  data.transaction_Header.transactions[0].creator_key + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
 				}
-			}
+			} */
 			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
-			output += '<br>';	
+		//	output += '<br>';	
 			output += data.body + '<br>';
 		//	output += data.Json ;
 
