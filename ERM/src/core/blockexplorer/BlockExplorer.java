@@ -3583,7 +3583,7 @@ if ( asset_1 == null) {
 			tt.add(transaction);
 		//	output.put("transaction_Header",Transactions_JSON(tt));
 			output.put("body", WEB_Transactions_HTML.getInstance().get_HTML( tt.get(0), langObj));
-			output.put("Json", transaction.toJson().toString());
+	//		output.put("Json", transaction.toJson().toString());
 			
 	//		output.put("",transaction);
 			

@@ -116,7 +116,8 @@ public class WEB_Transactions_HTML {
 
 		}
 
-		return null;
+		out += "<br>" +transaction.toJson();
+		return out;
 
 	}
 
