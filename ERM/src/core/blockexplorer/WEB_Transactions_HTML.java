@@ -13,8 +13,13 @@ import com.github.rjeschke.txtmark.Processor;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.item.unions.UnionCls;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
+import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
+import core.transaction.IssueStatusRecord;
+import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import lang.Lang;
@@ -43,7 +48,14 @@ public class WEB_Transactions_HTML {
 				return issue_Asset_HTML(transaction, langObj);
 			case Transaction.ISSUE_PERSON_TRANSACTION:
 				return issue_Person_HTML(transaction, langObj);
-			
+			case Transaction.ISSUE_IMPRINT_TRANSACTION:
+				return issue_Imprint_HTML(transaction, langObj);
+			case Transaction.ISSUE_NOTE_TRANSACTION:
+				return issue_Note_HTML(transaction, langObj);
+			case Transaction.ISSUE_STATUS_TRANSACTION:
+				return issue_Status_HTML(transaction, langObj);
+			case Transaction.ISSUE_UNION_TRANSACTION:
+				return issue_Union_HTML (transaction, langObj);
 			
 			
 		}
@@ -51,6 +63,45 @@ public class WEB_Transactions_HTML {
 		
 		return null;
 		
+	}
+
+	private String issue_Union_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		IssueUnionRecord unionIssue = (IssueUnionRecord)transaction;
+		UnionCls union = (UnionCls)unionIssue.getItem();
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> " + unionIssue.getItem().getName() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " +unionIssue.getItem().getDescription() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Birthday", langObj) + ":</b> " + union.getBirthdayStr() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> " + String.valueOf(union.getParent()) +"<br>";
+		return out;
+	}
+
+	private String issue_Status_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		IssueStatusRecord statusIssue = (IssueStatusRecord)transaction;
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> " + statusIssue.getItem().getName() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " + statusIssue.getItem().getDescription() +"<br>";
+		return out;
+	}
+
+	private String issue_Note_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		IssueNoteRecord noteIssue = (IssueNoteRecord)transaction;
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> " + noteIssue.getItem().getName() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " + noteIssue.getItem().getDescription() +"<br>";
+		return out;
+	}
+
+	private String issue_Imprint_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		IssueImprintRecord imprintIssue = (IssueImprintRecord)transaction;
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> " + imprintIssue.getItem().getName() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " + imprintIssue.getItem().getDescription() +"<br>";
+		return out;
 	}
 
 	private String issue_Person_HTML(Transaction transaction, JSONObject langObj) {
@@ -66,11 +117,11 @@ public class WEB_Transactions_HTML {
 		out +="<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " + personIssue.getItem().getDescription() +"<br>";
 		if (person.getOwner().getPerson() != null){
-			out += "<b>" + Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?person=" +person.getOwner().getPerson().b.getKey()+ get_Lang(langObj) + ">" + person.getOwner().viewPerson() +"</a><br>";
+//			out += "<b>" + Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?person=" +person.getOwner().getPerson().b.getKey()+ get_Lang(langObj) + ">" + person.getOwner().viewPerson() +"</a><br>";
 		}else {
-		out += "<b>" +Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?addr=" + person.getOwner().getAddress() + get_Lang(langObj) + ">"  + person.getOwner().getAddress() +"</a><br>";
+//		out += "<b>" +Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?addr=" + person.getOwner().getAddress() + get_Lang(langObj) + ">"  + person.getOwner().getAddress() +"</a><br>";
 		}
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Public Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
+//		out += "<b>" + Lang.getInstance().translate_from_langObj("Public Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
 		return out;
 	}
 
