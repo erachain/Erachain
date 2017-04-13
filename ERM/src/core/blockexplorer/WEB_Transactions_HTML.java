@@ -2,16 +2,23 @@ package core.blockexplorer;
 
 import java.math.BigDecimal;
 
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import org.json.simple.JSONObject;
 
 import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssuePersonRecord;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 public class WEB_Transactions_HTML {
 	private static WEB_Transactions_HTML instance;
@@ -34,7 +41,8 @@ public class WEB_Transactions_HTML {
 				return r_Send_HTML(transaction, langObj);
 			case Transaction.ISSUE_ASSET_TRANSACTION:
 				return issue_Asset_HTML(transaction, langObj);
-			
+			case Transaction.ISSUE_PERSON_TRANSACTION:
+				return issue_Person_HTML(transaction, langObj);
 			
 			
 			
@@ -43,6 +51,27 @@ public class WEB_Transactions_HTML {
 		
 		return null;
 		
+	}
+
+	private String issue_Person_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		IssuePersonRecord personIssue = (IssuePersonRecord)transaction;
+		PersonCls person = (PersonCls)personIssue.getItem();
+		String out = "";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?person=" + person.getKey()+ get_Lang(langObj)+ ">" + personIssue.getItem().getName() +"</a><br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Birthday", langObj) + ":</b> " + person.getBirthdayStr() +"<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Gender", langObj) + ":</b> ";
+		if(person.getGender() == 0) out += Lang.getInstance().translate_from_langObj("Male", langObj);
+		if(person.getGender() == 1) out += Lang.getInstance().translate_from_langObj("Female", langObj);
+		out +="<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> " + personIssue.getItem().getDescription() +"<br>";
+		if (person.getOwner().getPerson() != null){
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?person=" +person.getOwner().getPerson().b.getKey()+ get_Lang(langObj) + ">" + person.getOwner().viewPerson() +"</a><br>";
+		}else {
+		out += "<b>" +Lang.getInstance().translate_from_langObj("Owner", langObj) + ":</b> <a href=?addr=" + person.getOwner().getAddress() + get_Lang(langObj) + ">"  + person.getOwner().getAddress() +"</a><br>";
+		}
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Public Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
+		return out;
 	}
 
 	private String issue_Asset_HTML(Transaction transaction, JSONObject langObj) {
