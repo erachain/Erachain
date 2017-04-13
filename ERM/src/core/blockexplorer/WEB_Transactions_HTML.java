@@ -71,8 +71,7 @@ public class WEB_Transactions_HTML {
 		List<Transaction>tt = new ArrayList<Transaction>();
 		tt.add(transaction);
 		LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(tt);
-		LinkedHashMap aa = (LinkedHashMap)json.get("transactions");
-		LinkedHashMap tras_json = (LinkedHashMap) aa.get(0);
+		LinkedHashMap tras_json = (LinkedHashMap)((LinkedHashMap)json.get("transactions")).get(0);
 		
 			String out = "<font size='+1'> <b>"+Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>"+ tras_json.get("type");
 			out += "       ("  + Lang.getInstance().translate_from_langObj("Block", langObj) +": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" +  tras_json.get("block") + "</a>"; 
@@ -94,10 +93,6 @@ public class WEB_Transactions_HTML {
 			}
 			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
 			out += "<br>";	
-		
-		
-		
-		
 		int type = transaction.getType();
 		switch (type) {
 		case Transaction.SEND_ASSET_TRANSACTION:
@@ -214,7 +209,7 @@ public class WEB_Transactions_HTML {
 					+ ": " + item.getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Description", langObj) + ":</b> "
 					+ item.getDescription() + "<br>";
-		
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + setStatusToItem.viewFee();
 		return out;
 	}
 
@@ -233,6 +228,7 @@ public class WEB_Transactions_HTML {
 			{
 				out += "<b>   " + Lang.getInstance().translate_from_langObj("Account", langObj)  + " " + ++i + ":</b> "	+ address + "<br>";
 			}
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + record.viewFee();
 		return out;
 	}
 
@@ -250,6 +246,7 @@ public class WEB_Transactions_HTML {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
 						+ ss + "<br>";
 			}	
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + r_Statement.viewFee();
 		return out;
 	}
 
@@ -263,6 +260,7 @@ public class WEB_Transactions_HTML {
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeq() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "+ get_HTML(record, langObj) + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + vouchRecord.viewFee();
 		// LABEL DESCRIPTION
 
 		return out;
@@ -281,6 +279,7 @@ public class WEB_Transactions_HTML {
 				+ union.getBirthdayStr() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
 				+ String.valueOf(union.getParent()) + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + unionIssue.viewFee();
 		return out;
 	}
 
@@ -292,6 +291,7 @@ public class WEB_Transactions_HTML {
 				+ statusIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ statusIssue.getItem().getDescription() + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + statusIssue.viewFee();
 		return out;
 	}
 
@@ -303,6 +303,7 @@ public class WEB_Transactions_HTML {
 				+ noteIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ noteIssue.getItem().getDescription() + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + noteIssue.viewFee();
 		return out;
 	}
 
@@ -314,6 +315,8 @@ public class WEB_Transactions_HTML {
 				+ imprintIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ imprintIssue.getItem().getDescription() + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + imprintIssue.viewFee();
+		
 		return out;
 	}
 
@@ -347,6 +350,7 @@ public class WEB_Transactions_HTML {
 		}
 		// out += "<b>" + Lang.getInstance().translate_from_langObj("Public
 		// Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + personIssue.viewFee();
 		return out;
 	}
 
@@ -366,6 +370,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ":</b> "
 				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isMovable() + "", langObj)
 				+ "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tr.viewFee();
 
 		return out;
 	}
