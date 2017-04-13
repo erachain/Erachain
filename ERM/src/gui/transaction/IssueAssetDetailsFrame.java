@@ -79,6 +79,18 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 		divisible.setSelected(((AssetCls)assetIssue.getItem()).isDivisible());
 		divisible.setEnabled(false);
 		this.add(divisible, detailGBC);	
+		
+		//LABEL movable
+				++labelGBC.gridy;
+				JLabel mavableLabel = new JLabel(Lang.getInstance().translate("Movable") + ":");
+				this.add(mavableLabel, labelGBC);
+						
+				//QUANTITY
+				++detailGBC.gridy;
+				JCheckBox movable = new JCheckBox();
+				movable.setSelected(((AssetCls)assetIssue.getItem()).isMovable());
+				movable.setEnabled(false);
+				this.add(movable, detailGBC);	
 				           
         //PACK
 	//	this.pack();
