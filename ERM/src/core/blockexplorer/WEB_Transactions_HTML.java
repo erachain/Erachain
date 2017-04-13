@@ -1,20 +1,34 @@
 package core.blockexplorer;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONObject;
 
 import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
@@ -26,11 +40,14 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
+import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.MainFrame;
+import gui.PasswordPane;
 import lang.Lang;
+import utils.Converter;
 import utils.MenuPopupUtil;
 
 public class WEB_Transactions_HTML {
@@ -94,11 +111,30 @@ public class WEB_Transactions_HTML {
 			return out+ issue_Union_HTML(transaction, langObj);
 		case Transaction.VOUCH_TRANSACTION:
 			return out+ vouch_HTML(transaction, langObj);
+		case Transaction.SIGN_NOTE_TRANSACTION:
+			return out+ sign_Note_HTML(transaction, langObj);
 
 		}
 
 		return null;
 
+	}
+
+	private String sign_Note_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		R_SignNote r_Statement = (R_SignNote)transaction;
+			if (r_Statement.getKey() > 0) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Key", langObj) + ":</b> "
+						+ Controller.getInstance().getNote( r_Statement.getKey()).toString() + "<br>";
+			}
+			if (r_Statement.getData() != null) {
+				String ss = (( r_Statement.isText() ) ? Processor.process(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
+				ss = "<div  style='word-wrap: break-word;'>" +ss;
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
+						+ ss + "<br>";
+			}	
+		return out;
 	}
 
 	private String vouch_HTML(Transaction transaction, JSONObject langObj) {
