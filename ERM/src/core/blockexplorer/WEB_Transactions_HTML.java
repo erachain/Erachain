@@ -434,10 +434,13 @@ public class WEB_Transactions_HTML {
 		R_Vouch vouchRecord = (R_Vouch) transaction;
 		Transaction record = DBSet.getInstance().getTransactionFinalMap().getTransaction(vouchRecord.getVouchHeight(),
 				vouchRecord.getVouchSeq());
-		out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
+		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
-				+ vouchRecord.getVouchSeq() + "</a><br>";
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "+ get_HTML(record, langObj) + "<br>";
+				+ vouchRecord.getVouchSeq() + "</a><br>"; */
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> ";
+		
+		out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td><td>";
+		out += "<td>"+ get_HTML(record, langObj) + "</table><br>";
 		// LABEL DESCRIPTION
 
 		return out;
