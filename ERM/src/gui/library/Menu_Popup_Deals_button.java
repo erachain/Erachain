@@ -69,7 +69,7 @@ public class Menu_Popup_Deals_button extends JButton{
 				        	public void actionPerformed(ActionEvent e)
 				        	{
 				        		// 
-				        		library.selectOrAdd(new Send_Frame(null, null), MainFrame.desktopPane.getAllFrames());
+				        		library.selectOrAdd(new Send_Frame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
 				        	}
 				        });
 				       dealsMenu.add(dealsMenuSendMessage);

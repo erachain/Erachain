@@ -77,7 +77,7 @@ public class Mails_Main_Frame extends Main_Internal_Frame {
 	setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
     this.setResizable(true);
     this.setVisible(true);
-    Dimension size = MainFrame.desktopPane.getSize();
+    Dimension size = MainFrame.getInstance().desktopPane.getSize();
     this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
  
 	

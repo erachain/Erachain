@@ -165,7 +165,7 @@ public MainNotesFrame(){
 	setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 	this.setResizable(true);
     this.setVisible(true);
-	Dimension size = MainFrame.desktopPane.getSize();
+	Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	
 //	my_Assets_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));

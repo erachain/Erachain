@@ -64,7 +64,7 @@ public class library {
 		}
 
 		if (k == -1) {
-			MainFrame.desktopPane.add(item);
+			MainFrame.getInstance().desktopPane.add(item);
 			try {
 				item.setSelected(true);
 			} catch (java.beans.PropertyVetoException e1) {

@@ -471,7 +471,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 	    this.setVisible(true);
 	    Rectangle k = this.getNormalBounds();
 	 //   this.setBounds(k);
-	    Dimension size = MainFrame.desktopPane.getSize();
+	    Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	 // setDividerLocation(700)
 	

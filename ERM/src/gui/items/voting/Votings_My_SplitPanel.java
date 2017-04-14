@@ -66,7 +66,7 @@ import lang.Lang;
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
 			// EVENTS on CURSOR
 			my_Voting_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
-			 Dimension size = MainFrame.desktopPane.getSize();
+			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		}

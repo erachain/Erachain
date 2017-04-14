@@ -61,7 +61,7 @@ public MainImprintsFrame(){
 	setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 	this.setResizable(true);
     this.setVisible(true);
-	Dimension size = MainFrame.desktopPane.getSize();
+	Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	search_Imprints_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	my_Imprints_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));	
