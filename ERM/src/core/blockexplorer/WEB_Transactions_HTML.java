@@ -97,6 +97,7 @@ public class WEB_Transactions_HTML {
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Size", langObj)        + ": </b>" + tras_json.get("size"); 
 			out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Signature", langObj)   + ": </b>" + tras_json.get("signature");
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" +  tras_json.get("reference");
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
 			out += "<br> ";
 			if ( tras_json.get("creator_key") != "-")
 			{
@@ -230,7 +231,7 @@ public class WEB_Transactions_HTML {
 		GenesisIssueNoteRecord noteIssue =(GenesisIssueNoteRecord)transaction;
 		NoteCls note = (NoteCls)noteIssue.getItem();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +note.getName();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + note.getDescription();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + Processor.process(note.getDescription());
 		return out;
 	}
 
@@ -275,7 +276,6 @@ public class WEB_Transactions_HTML {
 		VoteOnPollTransaction pollVote = (VoteOnPollTransaction)transaction;
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +pollVote.getPoll();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Option", langObj) + ": </b>" + String.valueOf(pollVote.getOption());
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + pollVote.viewFee();
 		return out;
 	}
 
@@ -286,7 +286,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 					+ pollCreation.getPoll().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-					+ pollCreation.getPoll().getDescription() + "<br>";
+					+ Processor.process(pollCreation.getPoll().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Options", langObj) + ":</b><br>";
 			
 			//OPTIONS
@@ -302,8 +302,7 @@ public class WEB_Transactions_HTML {
 			for (int i = 0; i<row_Count; i++){
 				out += "<Table><tr><td>" + table.getValueAt(i, 0) + "<td>" + table.getValueAt(i, 1) + "<td>" + table.getValueAt(i, 2) + "</tr> ";
 			}			
-		
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + pollCreation.viewFee();
+
 		return out;
 	}
 
@@ -312,7 +311,6 @@ public class WEB_Transactions_HTML {
 		String out = "";
 		CancelOrderTransaction orderCreation = (CancelOrderTransaction)transaction;
 		out += orderCreation.toJson();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + orderCreation.viewFee();
 		return out;
 	}
 
@@ -329,7 +327,6 @@ public class WEB_Transactions_HTML {
 					+ String.valueOf(order.getWantAsset().toString()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Price", langObj) + ":</b> "
 					+ order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString() + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + orderCreation.viewFee();
 		return out;
 	}
 
@@ -343,7 +340,6 @@ public class WEB_Transactions_HTML {
 					+ new String(r_Hashes.getData(), Charset.forName("UTF-8")) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("HASHES", langObj) + ":</b> "
 					+  String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + r_Hashes.viewFee();
 		return out;
 	}
 
@@ -356,7 +352,7 @@ public class WEB_Transactions_HTML {
 		StatusCls status = Controller.getInstance().getItemStatus(status_key);
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Name", langObj) + ":</b> "
 					+ status.getName()+ "<br>";
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + status.getDescription()+ "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + Processor.process(status.getDescription())+ "<br>";
 		long beginDate = setStatusToItem.getBeginDate();
 		long endDate = setStatusToItem.getEndDate();
 		out += "<b>" + Lang.getInstance().translate_from_langObj("From - To", langObj) + ":</b> "
@@ -372,11 +368,11 @@ public class WEB_Transactions_HTML {
 		}
 		if (setStatusToItem.getData1() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 1:</b> "
-						+ new String(setStatusToItem.getData1(), Charset.forName("UTF-8")) + "<br>";
+						+ Processor.process(new String(setStatusToItem.getData1(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		if (setStatusToItem.getData2() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 2:</b> "
-						+ new String(setStatusToItem.getData2(), Charset.forName("UTF-8")) + "<br>";
+						+ Processor.process(new String(setStatusToItem.getData2(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		if (setStatusToItem.getRefParent() != 0l) {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
@@ -384,14 +380,13 @@ public class WEB_Transactions_HTML {
 		}
 		if (setStatusToItem.getDescription() != null) {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-						+ new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
+						+ Processor.process( new String(setStatusToItem.getDescription(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Name", langObj) + ":</b> "
 					+ item.getItemTypeStr() + " - " + item.getItemSubType()
 					+ ": " + item.getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Description", langObj) + ":</b> "
-					+ item.getDescription() + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + setStatusToItem.viewFee();
+					+ Processor.process( item.getDescription()) + "<br>";
 		return out;
 	}
 
@@ -410,7 +405,6 @@ public class WEB_Transactions_HTML {
 			{
 				out += "<b>   " + Lang.getInstance().translate_from_langObj("Account", langObj)  + " " + ++i + ":</b> "	+ address + "<br>";
 			}
-			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + record.viewFee();
 		return out;
 	}
 
@@ -428,7 +422,6 @@ public class WEB_Transactions_HTML {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
 						+ ss + "<br>";
 			}	
-			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + r_Statement.viewFee();
 		return out;
 	}
 
@@ -442,7 +435,6 @@ public class WEB_Transactions_HTML {
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeq() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "+ get_HTML(record, langObj) + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + vouchRecord.viewFee();
 		// LABEL DESCRIPTION
 
 		return out;
@@ -456,12 +448,11 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ unionIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ unionIssue.getItem().getDescription() + "<br>";
+				+ Processor.process(unionIssue.getItem().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Birthday", langObj) + ":</b> "
 				+ union.getBirthdayStr() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
 				+ String.valueOf(union.getParent()) + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + unionIssue.viewFee();
 		return out;
 	}
 
@@ -472,8 +463,8 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ statusIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ statusIssue.getItem().getDescription() + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + statusIssue.viewFee();
+				+ Processor.process(statusIssue.getItem().getDescription()) + "<br>";
+
 		return out;
 	}
 
@@ -484,8 +475,8 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ noteIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ noteIssue.getItem().getDescription() + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + noteIssue.viewFee();
+				+ Processor.process(noteIssue.getItem().getDescription()) + "<br>";
+
 		return out;
 	}
 
@@ -496,8 +487,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ imprintIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ imprintIssue.getItem().getDescription() + "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + imprintIssue.viewFee();
+				+ Processor.process(imprintIssue.getItem().getDescription()) + "<br>";
 		
 		return out;
 	}
@@ -518,7 +508,7 @@ public class WEB_Transactions_HTML {
 			out += Lang.getInstance().translate_from_langObj("Female", langObj);
 		out += "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ personIssue.getItem().getDescription() + "<br>";
+				+ Processor.process(personIssue.getItem().getDescription()) + "<br>";
 		if (person.getOwner().getPerson() != null) {
 			// out += "<b>" + Lang.getInstance().translate_from_langObj("Owner",
 			// langObj) + ":</b> <a href=?person="
@@ -532,7 +522,6 @@ public class WEB_Transactions_HTML {
 		}
 		// out += "<b>" + Lang.getInstance().translate_from_langObj("Public
 		// Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + personIssue.viewFee();
 		return out;
 	}
 
@@ -543,7 +532,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
 				+ tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().getName() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ tr.getItem().getDescription() + "<br>";
+				+ Processor.process(tr.getItem().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
 				+ ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ":</b> "
@@ -552,7 +541,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ":</b> "
 				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isMovable() + "", langObj)
 				+ "<br>";
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tr.viewFee();
+		
 
 		return out;
 	}
@@ -573,19 +562,21 @@ public class WEB_Transactions_HTML {
 					+ tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getAddress()
 					+ "</a><br>";
 		}
-		if (!tr.getHead().equals(""))
-			out += "<b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + tr.getHead()
-					+ "<BR>";
-		if (!tr.viewData().equals(""))
-			out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> " + tr.viewData();
-
 		if (tr.getAmount() != null) {
 			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Amount", langObj) + ":</b> "
 					+ tr.getAmount().toPlainString() + " ("
 					+ Controller.getInstance().getAsset(tr.getAbsKey()).getName() + ")";
 		}
+		
+		if (!tr.getHead().equals(""))
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + Processor.process(tr.getHead())
+					+ "<BR>";
+		if (!tr.viewData().equals(""))
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> " + Processor.process(tr.viewData());
 
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tr.viewFee();
+		
+
+		
 		return out;
 
 	}
