@@ -64,6 +64,7 @@ import database.DBSet;
 import gui.Gui;
 import gui.MainFrame;
 import gui.PasswordPane;
+import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PollOptionsTableModel;
 import lang.Lang;
 import utils.BigDecimalStringComparator;
@@ -73,7 +74,9 @@ import utils.MenuPopupUtil;
 
 public class WEB_Transactions_HTML {
 	private static WEB_Transactions_HTML instance;
-
+	JSONObject langObj;
+	
+	
 	public static WEB_Transactions_HTML getInstance() {
 		if (instance == null) {
 			instance = new WEB_Transactions_HTML();
@@ -83,7 +86,7 @@ public class WEB_Transactions_HTML {
 	}
 
 	public String get_HTML(Transaction transaction, JSONObject langObj) {
-		
+		this.langObj = langObj;
 		List<Transaction>tt = new ArrayList<Transaction>();
 		tt.add(transaction);
 		LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(tt);
@@ -113,47 +116,47 @@ public class WEB_Transactions_HTML {
 		int type = transaction.getType();
 		switch (type) {
 		case Transaction.SEND_ASSET_TRANSACTION:
-			return out+ r_Send_HTML(transaction, langObj);
+			return out+ r_Send_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_ASSET_TRANSACTION:
-			return out+ issue_Asset_HTML(transaction, langObj);
+			return out+ issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_PERSON_TRANSACTION:
-			return out+ issue_Person_HTML(transaction, langObj);
+			return out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_IMPRINT_TRANSACTION:
-			return out+ issue_Imprint_HTML(transaction, langObj);
+			return out+ issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_NOTE_TRANSACTION:
-			return out+ issue_Note_HTML(transaction, langObj);
+			return out+ issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_STATUS_TRANSACTION:
-			return out+ issue_Status_HTML(transaction, langObj);
+			return out+ issue_Status_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.ISSUE_UNION_TRANSACTION:
-			return out+ issue_Union_HTML(transaction, langObj);
+			return out+ issue_Union_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.VOUCH_TRANSACTION:
-			return out+ vouch_HTML(transaction, langObj);
+			return out+ vouch_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.SIGN_NOTE_TRANSACTION:
-			return out+ sign_Note_HTML(transaction, langObj);
+			return out+ sign_Note_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-			return out+ serttify_Pub_Key_HTML(transaction, langObj);
+			return out+ serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-			return out+ set_Status_HTML(transaction, langObj);
+			return out+ set_Status_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.HASHES_RECORD:
-			return out+ hash_Record_HTML(transaction, langObj);
+			return out+ hash_Record_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.CREATE_ORDER_TRANSACTION:
-			return out+ create_Order_HTML(transaction, langObj);
+			return out+ create_Order_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.CANCEL_ORDER_TRANSACTION:
-			return out+ cancel_Order_HTML(transaction, langObj);
+			return out+ cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.CREATE_POLL_TRANSACTION:
-			return out+ create_Poll_HTML(transaction, langObj);
+			return out+ create_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.VOTE_ON_POLL_TRANSACTION:
-			return out+ vate_On_Poll_HTML(transaction, langObj);
+			return out+ vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-			return out+ genesis_Certify_Person_HTML(transaction, langObj);
+			return out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-			return out+ genesis_Issue_Asset_HTML(transaction, langObj);
+			return out+ genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
-			return out+ genesis_Issue_Note_HTML(transaction, langObj);
+			return out+ genesis_Issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-			return out+ genesis_Certify_Person_HTML(transaction, langObj);
+			return out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-			return out+ genesis_Send_Asset_HTML(transaction, langObj);
+			return out+ genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
 /*
 			
 			public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
@@ -588,4 +591,35 @@ public class WEB_Transactions_HTML {
 
 	}
 
+	private String get_Vouches(Transaction transaction ){
+		
+		
+		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
+		int row_count = model.getRowCount();
+		if(row_count == 0) return "";
+	String out = "<b>" + Lang.getInstance().translate_from_langObj("Certified", langObj) + ":</b> ";	
+	//langObj
+	
+	out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"+ Lang.getInstance().translate_from_langObj("Transaction", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Date", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Creator", langObj)+"</tr>";
+	for (int i = 0; i<row_count; i++){
+	out += "<tr>";
+	out += "<td><a href=?tx="+  Base58.encode(model.getTrancaction(i).getSignature())+ get_Lang(langObj) +  ">" + model.getTrancaction(i).getBlockHeight(DBSet.getInstance())+ "-" + model.getTrancaction(i).getSeqNo(DBSet.getInstance()) + "</a>";
+	out +="<td>" + model.getValueAt(i, 0);
+	out +="<td>";
+	Transaction tr = model.getTrancaction(i);
+	if (tr.getCreator().getPerson() != null) {
+		out += "<a href=?person="	+ tr.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
+				+ tr.getCreator().viewPerson() + "</a><br>";
+	} else {
+		out += "<a href=?addr="	+ tr.getCreator().getAddress() + get_Lang(langObj) + ">" + tr.getCreator().getAddress()
+				+ "</a><br>";
+	}
+	
+	
+	}
+	out += "</table>";
+	return out;	
+	}
+	
+	
 }
