@@ -15,10 +15,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.table.TableRowSorter;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONObject;
@@ -32,25 +34,39 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
+import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.unions.UnionCls;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.GenesisCertifyPersonRecord;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueNoteRecord;
+import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
 import core.transaction.IssueNoteRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
+import core.transaction.R_Hashes;
 import core.transaction.R_Send;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
+import core.transaction.VoteOnPollTransaction;
 import database.DBSet;
+import gui.Gui;
 import gui.MainFrame;
 import gui.PasswordPane;
+import gui.models.PollOptionsTableModel;
 import lang.Lang;
+import utils.BigDecimalStringComparator;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -117,36 +133,43 @@ public class WEB_Transactions_HTML {
 			return out+ serttify_Pub_Key_HTML(transaction, langObj);
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 			return out+ set_Status_HTML(transaction, langObj);
+		case Transaction.HASHES_RECORD:
+			return out+ hash_Record_HTML(transaction, langObj);
+		case Transaction.CREATE_ORDER_TRANSACTION:
+			return out+ create_Order_HTML(transaction, langObj);
+		case Transaction.CANCEL_ORDER_TRANSACTION:
+			return out+ cancel_Order_HTML(transaction, langObj);
+		case Transaction.CREATE_POLL_TRANSACTION:
+			return out+ create_Poll_HTML(transaction, langObj);
+		case Transaction.VOTE_ON_POLL_TRANSACTION:
+			return out+ vate_On_Poll_HTML(transaction, langObj);
+		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
+			return out+ genesis_Certify_Person_HTML(transaction, langObj);
+		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
+			return out+ genesis_Issue_Asset_HTML(transaction, langObj);
+		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+			return out+ genesis_Issue_Note_HTML(transaction, langObj);
+		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
+			return out+ genesis_Certify_Person_HTML(transaction, langObj);
+		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
+			return out+ genesis_Send_Asset_HTML(transaction, langObj);
 /*
-			public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
-			public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 2;
-			public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
+			
 			public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
 			public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
-			public static final int GENESIS_SEND_ASSET_TRANSACTION = 6;
 			public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7; //
-			public static final int GENESIS_CERTIFY_PERSON_TRANSACTION = 8; // нет в гуи
 			public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;//
 			public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;//
 			// ISSUE ITEMS
 			public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
 			// RENT ASSET
-			public static final int RENT_ASSET_TRANSACTION = 32; //
+			public static final int RENT_ASSET_TRANSACTION = 32; // not in gui
 			// HOLD ASSET
 			public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
 			
 			// OTHER
 			public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
 			public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in gui
-
-			public static final int HASHES_RECORD = 41;
-			
-			// exchange of assets
-			public static final int CREATE_ORDER_TRANSACTION = 50;
-			public static final int CANCEL_ORDER_TRANSACTION = 51;
-			// voting
-			public static final int CREATE_POLL_TRANSACTION = 61;
-			public static final int VOTE_ON_POLL_TRANSACTION = 62;
 			
 			public static final int RELEASE_PACK = 70;
 
@@ -162,6 +185,165 @@ public class WEB_Transactions_HTML {
 */	
 		}
 		out += "<br>" +transaction.toJson();
+		return out;
+	}
+
+	private String genesis_Send_Asset_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction)transaction;
+		boolean isCredit = false;
+			if (assetTransfer.getOwner() != null) {
+				if (assetTransfer.getOwner().getPerson() != null) {
+					out += "<b>" + Lang.getInstance().translate_from_langObj("Creditor", langObj) + ":</b> <a href=?person="
+							+ assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
+							+ assetTransfer.getOwner().viewPerson() + "</a><br>";
+				} else {
+					out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
+							+ assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
+							+ "</a><br>";
+				}
+			}
+			
+			if (assetTransfer.getRecipient().getPerson() != null) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?person="
+						+ assetTransfer.getRecipient().getPerson().b.getKey() + get_Lang(langObj) + ">"
+						+ assetTransfer.getRecipient().viewPerson() + "</a><br>";
+
+			} else {
+
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
+						+ assetTransfer.getRecipient().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getRecipient().getAddress()
+						+ "</a><br>";
+			}
+			
+			
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Asset", langObj) + ": </b>" +String.valueOf(Controller.getInstance()
+					.getAsset(assetTransfer.getAbsKey()).toString());
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj(isCredit?"Credit":"Amount", langObj) + ": </b>" +assetTransfer.getAmount().toPlainString();
+		return out;
+	}
+
+	private String genesis_Issue_Note_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		GenesisIssueNoteRecord noteIssue =(GenesisIssueNoteRecord)transaction;
+		NoteCls note = (NoteCls)noteIssue.getItem();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +note.getName();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + note.getDescription();
+		return out;
+	}
+
+	private String genesis_Issue_Asset_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		GenesisIssueAssetTransaction assetIssue =(GenesisIssueAssetTransaction)transaction;
+		AssetCls asset = (AssetCls)assetIssue.getItem();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +asset.getName();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" +asset.getDescription();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity().toString();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isDivisible()+"", langObj) ;
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isMovable()+"", langObj) ;
+		return out;
+	}
+
+	private String genesis_Certify_Person_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		GenesisCertifyPersonRecord record = (GenesisCertifyPersonRecord)transaction;
+		if (record.getRecipient().getPerson() != null) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?person="
+					+ record.getRecipient().getPerson().b.getKey() + get_Lang(langObj) + ">"
+					+ record.getRecipient().viewPerson() + "</a><br>";
+
+		} else {
+
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
+					+ record.getRecipient().getAddress() + get_Lang(langObj) + ">" + record.getRecipient().getAddress()
+					+ "</a><br>";
+		}
+		
+		
+		
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Person", langObj) + ": </b>" +String.valueOf(Controller.getInstance().getPerson(record.getKey()).toString());
+		return out;
+	}
+
+	private String vate_On_Poll_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		VoteOnPollTransaction pollVote = (VoteOnPollTransaction)transaction;
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +pollVote.getPoll();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Option", langObj) + ": </b>" + String.valueOf(pollVote.getOption());
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + pollVote.viewFee();
+		return out;
+	}
+
+	private String create_Poll_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		CreatePollTransaction pollCreation = (CreatePollTransaction)transaction;
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
+					+ pollCreation.getPoll().getName() + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
+					+ pollCreation.getPoll().getDescription() + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Options", langObj) + ":</b><br>";
+			
+			//OPTIONS
+
+			PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
+					Controller.getInstance().getAsset(AssetCls.FEE_KEY));
+			JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
+			
+			TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
+			sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
+			out += "<Table><tr><td>" + table.getColumnName(0) + "<td>" + table.getColumnName(1) + "<td>" + table.getColumnName(2) + "</tr> ";
+			int row_Count = table.getRowCount();
+			for (int i = 0; i<row_Count; i++){
+				out += "<Table><tr><td>" + table.getValueAt(i, 0) + "<td>" + table.getValueAt(i, 1) + "<td>" + table.getValueAt(i, 2) + "</tr> ";
+			}			
+		
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + pollCreation.viewFee();
+		return out;
+	}
+
+	private String cancel_Order_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		CancelOrderTransaction orderCreation = (CancelOrderTransaction)transaction;
+		out += orderCreation.toJson();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + orderCreation.viewFee();
+		return out;
+	}
+
+	private String create_Order_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		CreateOrderTransaction orderCreation = (CreateOrderTransaction)transaction;
+		Order order = orderCreation.getOrder();
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Have", langObj) + ":</b> "
+					+ order.getAmountHave().toPlainString() + " x "
+					+ String.valueOf(order.getHaveAsset().toString()) + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Want", langObj) + ":</b> "
+					+ order.getAmountWant().toPlainString() + " x "
+					+ String.valueOf(order.getWantAsset().toString()) + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Price", langObj) + ":</b> "
+					+ order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString() + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + orderCreation.viewFee();
+		return out;
+	}
+
+	private String hash_Record_HTML(Transaction transaction, JSONObject langObj) {
+		// TODO Auto-generated method stub
+		String out = "";
+		R_Hashes r_Hashes = (R_Hashes)transaction;
+		out += "<b>" + Lang.getInstance().translate_from_langObj("URL", langObj) + ":</b> "
+					+ new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
+					+ new String(r_Hashes.getData(), Charset.forName("UTF-8")) + "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("HASHES", langObj) + ":</b> "
+					+  String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + r_Hashes.viewFee();
 		return out;
 	}
 
