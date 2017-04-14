@@ -272,7 +272,25 @@ public class ApiErrorFactory
 	}
 
 	@SuppressWarnings("unchecked")
+	public JSONObject createErrorJSON(String error)
+	{
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("error", error);
+				
+		return jsonObject;
+	}
+
+	@SuppressWarnings("unchecked")
 	public WebApplicationException createError(int error)
+	{
+		//return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+		return new WebApplicationException(Response.status(Response.Status.OK).entity(
+				createErrorJSON(error).toJSONString()).build());
+	}
+
+	@SuppressWarnings("unchecked")
+	public WebApplicationException createError(String error)
 	{
 		//return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
 		return new WebApplicationException(Response.status(Response.Status.OK).entity(
