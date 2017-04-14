@@ -180,9 +180,6 @@ public class Voush_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copy_Block_PublicKey);
 
-		
-		
-		
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
