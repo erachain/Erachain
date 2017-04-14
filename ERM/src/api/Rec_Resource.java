@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
@@ -115,19 +116,28 @@ public class Rec_Resource {
 					ApiErrorFactory.ERROR_JSON).toString();
 		} 
 
+		PublicKeyAccount creator;
+		if (!PublicKeyAccount.isValidPublicKey(creatorStr)) {
+			return ApiErrorFactory.getInstance().createErrorJSON(Transaction.INVALID_CREATOR).toJSONString();				
+		}
+		creator = new PublicKeyAccount(Base58.decode(creatorStr));
+
 		byte feePow;
 		byte version;
 		long timestamp;
-		PublicKeyAccount creator;
+		int steep = 0;
 		
 		try {
-			feePow = jsonObject.containsKey("version")?(byte)jsonObject.get("version"):(byte)0;
-			version = jsonObject.containsKey("version")?(byte)jsonObject.get("version"):(byte)0;
-			timestamp = jsonObject.containsKey("timestamp")?(long)jsonObject.get("timestamp"):NTP.getTime();
-			creator = new PublicKeyAccount(Base58.decode(creatorStr));
+			Object ss = ((List)jsonObject.get("feePow")).get(0);
+			feePow = jsonObject.containsKey("feePow")?(byte)((List)jsonObject.get("feePow")).get(0):(byte)0;
+			steep++;
+			version = jsonObject.containsKey("version")?(byte)((List)jsonObject.get("version")).get(0):(byte)0;
+			steep++;
+			timestamp = jsonObject.containsKey("timestamp")?(long)((List)jsonObject.get("timestamp")).get(0):NTP.getTime();
+			steep++;
 		} catch (Exception e1) {
 			LOGGER.info(e1);
-			return e1.toString();
+			return e1.toString() + " on steep: " + steep;
 		} 
 		
 		DBSet dbSet = DBSet.getInstance();
@@ -208,23 +218,38 @@ public class Rec_Resource {
 			byte[] isText;
 			byte[] encryptMessage;
 			try {
-				recipient = new Account((String)jsonObject.get("recipient"));
-				key = (long)jsonObject.get("key");
-				amount = (BigDecimal)jsonObject.get("amount");
-				head = (String)jsonObject.get("head");
-				data = Base58.decode((String)jsonObject.get("data"));
-				if (jsonObject.containsKey("isText") && (int)jsonObject.get("isText")==0)
+				steep++;
+				if (!jsonObject.containsKey("recipient"))
+					return ApiErrorFactory.getInstance().createErrorJSON(Transaction.INVALID_ADDRESS).toJSONString();
+				String recipientStr = (String)((List)jsonObject.get("recipient")).get(0);
+				Tuple2<Account, String> recipientRes = Account.tryMakeAccount(recipientStr);
+				if (recipientRes.b != null) {
+					return ApiErrorFactory.getInstance().createErrorJSON(recipientRes.b).toJSONString();					
+				}
+				recipient = recipientRes.a;
+				
+				steep++;
+				key = (long)((List)jsonObject.get("key")).get(0);
+				steep++;
+				amount = (BigDecimal)((List)jsonObject.get("amount")).get(0);
+				steep++;
+				head = (String)((List)jsonObject.get("head")).get(0);
+				steep++;
+				data = Base58.decode((String)((List)jsonObject.get("data")).get(0));
+				
+				if (!jsonObject.containsKey("isText") && (int)((List)jsonObject.get("isText")).get(0)==0)
 					isText = new byte[]{0};
 				else
 					isText = new byte[]{1};
-				if (jsonObject.containsKey("encryptMessage") && (int)jsonObject.get("encryptMessage") == 0)
+				steep++;
+				if (!jsonObject.containsKey("encryptMessage") && (int)((List)jsonObject.get("encryptMessage")).get(0) == 0)
 					encryptMessage = new byte[]{0};
 				else
 					encryptMessage = new byte[]{1};
 				
 			} catch (Exception e1) {
 				LOGGER.info(e1);
-				return e1.toString();
+				return e1.toString() + " on steep: " + steep;
 			} 
 			R_Send record = new R_Send(version, creator,
 					(byte)feePow, recipient, key, amount, head,
@@ -232,7 +257,7 @@ public class Rec_Resource {
 
 			int error = record.isValid(dbSet, releaserReference);
 			if (error > 0)
-				return "error - " + error;
+				return "#error - " + error;
 			
 			return Base58.encode(record.toBytes(false, releaserReference));
 			
