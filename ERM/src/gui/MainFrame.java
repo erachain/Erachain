@@ -1,51 +1,28 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-
-import javax.swing.AbstractButton;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import controller.Controller;
-import core.wallet.Wallet;
 import gui.items.accounts.Main_Accounts_Frame;
 import gui.items.assets.MainAssetsFrame;
 import gui.items.documents.Main_Hash_Document_Frame;
@@ -61,7 +38,6 @@ import gui.items.unions.MainUnionsFrame;
 import gui.items.voting.MainVotingsFrame;
 import gui.library.Menu_Popup_Deals_button;
 import gui.library.Menu_Popup_File_button;
-import gui.records.RecordsFrame;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
@@ -73,13 +49,8 @@ import org.apache.commons.io.FileUtils;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements Observer{
 	
-private static final Color FFFF = null;
 public  JDesktopPane desktopPane;
 private static MainFrame instance;
-private JFrame parent;
-
-
-	
 public static MainFrame getInstance()
 {
 	if(instance == null)
@@ -92,7 +63,6 @@ public static MainFrame getInstance()
 
 
 
-	@SuppressWarnings("null")
 	private MainFrame()
 	{
 		
@@ -108,7 +78,6 @@ public static MainFrame getInstance()
 	
 	
        
-		parent = MainFrame.this;
 		Controller.getInstance().addObserver(this);	
 		
 		// tool bar
@@ -350,134 +319,60 @@ public static MainFrame getInstance()
 			}
 		});
 		Toolbar_Main.add(button8_MainToolBar);
-		
-		
-		
-		
-		
-		
-		
-				//add(tb1, BorderLayout.NORTH); 
-				add(Toolbar_Main, BorderLayout.NORTH);
-
-		
-
-		//MENU
-     //   Menu menu = new Menu(this);
-
-        //ADD MENU TO FRAME
-     //   this.setJMenuBar(menu);
-        
-     
-        // 
+		add(Toolbar_Main, BorderLayout.NORTH);
         addWindowListener(new WindowListener() {
-
 			@Override
 			public void windowActivated(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
-			@SuppressWarnings({ "unchecked", "unused" })
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
-			
-			
 			String json = null;
 			ArrayList<Frame_Class> frame_Classes = new ArrayList<Frame_Class>();
-			
 			JInternalFrame[] s = MainFrame.getInstance().desktopPane.getAllFrames();
-			
-			
-			
 			json = "{\"Main Frame\":" + "{"
 			+ "\"location_X\":\""+ e.getWindow().getLocation().x +"\","
 			+ "\"location_Y\":\""+ e.getWindow().getLocation().y +"\","
 			+ "\"width\":\""+ e.getWindow().getWidth() +"\","
 			+ "\"height\":\""+ e.getWindow().getHeight() +"\""
 			+ "}";
-			
-			
-			int s1 = e.getWindow().getX();
-			int s2 = e.getWindow().getWidth();
-			
-			
 			for (int i=MainFrame.getInstance().desktopPane.getAllFrames().length-1; i >= 0; i--) {
-			
-				
 				frame_Classes.add(new Frame_Class(s[i].getClass().getCanonicalName(),s[i].getLocation().x,s[i].getLocation().y,s[i].getSize().width,s[i].getSize().height));
-						
 			}
-			
 			if (!frame_Classes.isEmpty()){
-			
 				Gson gson = new Gson();
 				json = json +", \"Open Frames\": " + gson.toJson(frame_Classes) ; 
 			}
-			
 			json = json + "}";
 			try {
 				SaveStrToFile.saveJsonFine_not_Convert(Settings.getInstance().getGuiSettingPath(), json);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}	
-		
 		}
-
 			@Override
 			public void windowDeactivated(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void windowDeiconified(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void windowIconified(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void windowOpened(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
 				JInternalFrame object = null;
-				
-				
 				String stringFromInternet = "";
-				
-							
 				try {
 					stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 				JsonParser parser = new JsonParser(); 
-				
 				if (!stringFromInternet.isEmpty()){
-					
 					JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
-					
-					
-			//		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
-					
-			//		parent.setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
-			//		parent.setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));
-					
-				
 					JsonArray pItem = mainObject.getAsJsonArray("Open Frames");
 					if (pItem!=null && !pItem.isJsonNull()){
 						for (JsonElement user : pItem) {
@@ -492,7 +387,6 @@ public static MainFrame getInstance()
 								object.setSize(Integer.valueOf( userObject.get("size_X").toString()), Integer.valueOf(userObject.get("size_Y").toString()));
 								gui.library.library.selectOrAdd( object, MainFrame.getInstance().desktopPane.getAllFrames());
 							} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 						}
@@ -500,26 +394,8 @@ public static MainFrame getInstance()
 				}
 			} 
         	});
-        
-        
-        
-        // СЃРѕР·РґР°РµРј СЂР°Р±РѕС‡РёР№ СЃС‚РѕР» Swing
         desktopPane = new JDesktopPane();
-        //desktopPane.setBackground(new Color(255, 255, 255, 255));//Color.LIGHT_GRAY);
         desktopPane.setBackground(MainFrame.getFrames()[0].getBackground());
-
-        /*
-        JInternalFrame item = new AccountsFrame(this);
-        item.setVisible(true);
-		MainFrame.desktopPane.add(item);
-		try {
-			 item.setSelected(true);
-	        } catch (java.beans.PropertyVetoException e1) {}
-	        */
-
-
-      //  desktopPane.setSize(500, 300);
-        // РґРѕР±Р°РІР»СЏРµРј РµРіРѕ РІ С†РµРЅС‚СЂ РѕРєРЅР°
         add(desktopPane);
         
         // WALLET STATS
@@ -533,11 +409,6 @@ public static MainFrame getInstance()
             	new ClosingDialog();
             }
         });
-        
-   
-      //set location and size
-            
-        
         String stringFromInternet = "";
 		try {
 			stringFromInternet= FileUtils.readFileToString(new File(Settings.getInstance().getGuiSettingPath()));
@@ -545,23 +416,18 @@ public static MainFrame getInstance()
 			e1.printStackTrace();
 		}
 		JsonParser parser = new JsonParser(); 
-		
 		if (!stringFromInternet.isEmpty() && stringFromInternet != "" ){
 		JsonObject mainObject = parser.parse(stringFromInternet).getAsJsonObject();
-		
-		
 		JsonObject mainFrameJSON = mainObject.getAsJsonObject("Main Frame");
-		
 		setLocation(Integer.valueOf(mainFrameJSON.get("location_X").getAsString()), Integer.valueOf(mainFrameJSON.get("location_Y").getAsString()));
 		setSize(Integer.valueOf(mainFrameJSON.get("width").getAsString()), Integer.valueOf(mainFrameJSON.get("height").getAsString()));	
-    	
 		}
 		else{
 			 Toolkit kit = Toolkit.getDefaultToolkit();
 
 		        Dimension screens = kit.getScreenSize();
 
-		        int w,h;
+		        int w;
 
 		        w = screens.width;
 
@@ -571,17 +437,8 @@ public static MainFrame getInstance()
 		       	
 			
 		}
-        
-        
-        
-        //SHOW FRAME
-      //  this.pack();
-     //   this.setLocationRelativeTo(null);
-        this.setVisible(true);
-      //  desktopPane.add(new AllPersonsFrame(this));
-    //    desktopPane.add(new MainImprintsFrame());
-        
-	}
+         this.setVisible(true);
+ 	}
 
 
 	@Override
@@ -623,9 +480,6 @@ public static MainFrame getInstance()
 			}
 		}	
 		
-		
-		
-		// TODO Auto-generated method stub
 		
 	}
 }

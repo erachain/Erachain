@@ -25,7 +25,9 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.persons.PersonCls;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.items.statement.Statements_Vouch_Table_Model;
@@ -135,21 +137,20 @@ public class Person_Vouched_Panel extends JPanel {
 
 		
 
-		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
+		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
-				StringSelection value = new StringSelection(public_Account.getAddress());
+				StringSelection value = new StringSelection(model.get_Public_Account(row).getAddress());
 				clipboard.setContents(value, null);
 			}
 		});
 		menu.add(copy_Creator_Address);
 
-		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
+		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
 		menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -158,7 +159,7 @@ public class Person_Vouched_Panel extends JPanel {
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
-				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
+				PublicKeyAccount public_Account = model.get_Public_Account(row);
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
 			}
@@ -186,27 +187,26 @@ public class Person_Vouched_Panel extends JPanel {
 		
 		
 		
-		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
+		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Person"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
-				Account account = (Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR);
-
+				Account account =(Account) model.get_Public_Account(row);
 				new Account_Send_Dialog(null, null, account, null);
 
 			}
 		});
 		menu.add(Send_Coins_item_Menu);
 
-		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Creator"));
+		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Person"));
 		Send_Mail_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
-				Account account = (Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR);
+				Account account =(Account) model.get_Public_Account(row);
 
 			new Mail_Send_Dialog(null, null, account, null);
 

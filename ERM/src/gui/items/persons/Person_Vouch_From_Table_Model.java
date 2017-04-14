@@ -57,12 +57,14 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 	// public static final int COLUMN_BODY = 2;
 	// public static final int COLUMN_AMOUNT = 2;
 	 public static final int COLUMN_HEIGHT = 2;
+	
+	 
 	 //public static final int COLUMN_CREATOR_NAME =30;
 	List<R_SertifyPubKeys> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });// ,
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Persons", "Height" });// ,
 																											// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
 	PersonCls person;
@@ -122,6 +124,12 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		return transactions.size();
 	}
 	
+	public  PublicKeyAccount get_Public_Account(int row){
+		R_SertifyPubKeys transaction = this.transactions.get(row);
+		return transaction.getSertifiedPublicKeys().get(0);
+		
+	}
+	
 	public String get_No_Trancaction(int row) {
 		
 		if (this.transactions == null || this.transactions.size() <= row) {
@@ -152,7 +160,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		try {
 			if (this.transactions == null || this.transactions.size() == 0) return null;
 
-			Transaction transaction = this.transactions.get(row);
+			 R_SertifyPubKeys transaction = this.transactions.get(row);
 			if (transaction == null)
 				return null;
 
@@ -170,9 +178,8 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 			case COLUMN_HEIGHT:
 				
 				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
-				
-			//case COLUMN_CREATOR_NAME:
-				//return	((Account)transaction.getCreator()).getPerson().b.getName();
+			
+			
 			}
 
 			return null;
