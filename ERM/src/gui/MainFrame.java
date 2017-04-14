@@ -75,11 +75,25 @@ public class MainFrame extends JFrame implements Observer{
 	
 private static final Color FFFF = null;
 public static  JDesktopPane desktopPane;
+private static MainFrame instance;
 private JFrame parent;
 
 
+	
+public static MainFrame getInstance()
+{
+	if(instance == null)
+	{
+		instance = new MainFrame();
+	}
+	
+	return instance;
+}
+
+
+
 	@SuppressWarnings("null")
-	public MainFrame()
+	private MainFrame()
 	{
 		
 		//CREATE FRAME
