@@ -589,7 +589,7 @@ public class WEB_Transactions_HTML {
 			return "&lang=en";
 		return "&lang=" + langObj.get("_lang_ISO_");
 
-	}
+	} 
 
 	private String get_Vouches(Transaction transaction ){
 		
