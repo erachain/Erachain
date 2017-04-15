@@ -116,6 +116,16 @@ public class ApiClient {
 				"Errors: ."
 			},
 			{
+				"GET record/parse?data=Base58", 
+				"Parse record from RAWDATA in Base58.",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
+				"GET record/parsetest?data=Base58", 
+				"Parse record from RAWDATA without Signature",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
 				"GET record/getraw/<type>/<creator>", 
 				"Make record and return as RAWDATA in Base58.",
 				"Parameters: TYPE - type of record, CREATOR - PublicKey in Base58.",
