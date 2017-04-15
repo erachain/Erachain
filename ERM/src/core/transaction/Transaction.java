@@ -152,6 +152,8 @@ public abstract class Transaction {
 
 	public static final int INVALID_UPDATE_VALUE = 140;
 
+	public static final int INVALID_TRANSACTION_TYPE = 150;
+	
 	public static final int INVALID_BLOCK_HEIGHT = 200;
 	public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 201;
 
@@ -807,7 +809,8 @@ public abstract class Transaction {
 		}
 
 		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
+		if (withSign)
+			data = Bytes.concat(data, this.signature);
 		
 		return data;
 		
