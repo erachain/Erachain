@@ -1,10 +1,13 @@
-package api;
+package webserver;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JFrame;
@@ -31,6 +34,7 @@ import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 
+import api.ApiErrorFactory;
 import controller.Controller;
 import core.TransactionCreator;
 import core.account.Account;
@@ -80,23 +84,31 @@ import utils.APIUtils;
 import utils.Converter;
 import utils.Pair;
 
-@Path("record")
-@Produces(MediaType.APPLICATION_JSON)
-public class Rec_Resource {
-	
-    @Context
-    private UriInfo uriInfo;
-    
-	private static final Logger LOGGER = Logger
-			.getLogger(Rec_Resource.class);
+@Path("/")
+public class LightWallet {
 	
 	@Context
-	HttpServletRequest request;
+    private UriInfo uriInfo;
+	private HttpServletRequest request;
+    
+	private static final Logger LOGGER = Logger
+			.getLogger(LightWallet.class);
+
+	/*
+	@GET
+	public Response Default() {
+
+		// REDIRECT
+		return Response.status(302).header("Location", "lightwallet/main.html")
+				.build();
+	}
+	*/
 
 	/*@GET here defines, this method will process HTTP GET requests. */
 
 	@GET
-	public String getRecord()
+	@Path("lightwallet/test/")
+	public String test()
 	{
 		String text = "";
 		JSONArray help = new JSONArray();
@@ -117,14 +129,18 @@ public class Rec_Resource {
 		
 		help.add(item);
 		
+		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+		help.add(queryParameters);
+
+		
 		return help.toJSONString();
 	}
 
 	// short data without Signature
 	@GET
-	@Path("/parsetest/")
+	@Path("lightwallet/parsetest/")
 	// for test raw without Signature
-	// http://127.0.0.1:9068/record/parsetest?data=3RKre8zCEarLNq4CQ6njRmvjGURz7KFWhec3H9H3tebEeKQEGDTsvAFizKnFpJAGDAoRQCKH9pygBQsrWfbxwgfcuEAKbARh5p6Yk2ZvfJDReFzBJbUSUwUgtxsKm2ZXHR
+	// http://127.0.0.1:9047/lightwallet/parsetest?data=3RKre8zCEarLXoLgSdTcyWKHmCRzUs9urtZnWtoNCDDKu2h4sWTQxyvJa8N2AVB7M83CJQcNpA5BU5jsb9wciisZLSjB868nM9ozCmviVb63p9YTUNLhAwAhFgWCyBYnTH
 	//
 	public String parseShort() // throws JSONException
 	{
@@ -159,8 +175,8 @@ public class Rec_Resource {
 	}
 
 	@GET
-	@Path("/parse/")
-	// http://127.0.0.1:9068/record/parse?data=DPDnFCNvPk4kLMQcyEp8wTmzT53vcFpVPVhBA8VuHDH6ekAWJAEgZvtjtKGcXwsAKyNs5k2aCpziAmqEDjTigbnDjMeXRfbUDUJNmEJHwB2uPdboSszwsy3fckANUgPV8Ep9CN1fdTdq3QfYE7bbpeYWS2rsTNHb3a7nEV6jg2XJguavqhNSzVeyM6UrRtbiVciMvHFayUAMrE4L3CPjZjPEf
+	@Path("lightwallet/parse/")
+	// http://127.0.0.1:9047/lightwallet/parse?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	//
 	public String parse() // throws JSONException
 	{
@@ -189,14 +205,14 @@ public class Rec_Resource {
 	}
 
 	@GET
-	@Path("/getraw/{type}/{creator}")
+	@Path("lightwallet/getraw/{type}/{creator}")
 	//@Consumes(MediaType.APPLICATION_JSON)
 	//@Produces("application/json")
 	//
-	// get record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
-	// http://127.0.0.1:9068/record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&recipient=77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy&amount=123.0000123&key=1
+	// get lightwallet/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
+	// http://127.0.0.1:9047/lightwallet/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&recipient=77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy&amount=123.0000123&key=1
 	//
-	public String toBytes(@PathParam("type") int record_type,
+	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("creator") String creator) // throws JSONException
 	{
 
@@ -246,7 +262,8 @@ public class Rec_Resource {
 	}
 
 	@GET
-	@Path("/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}")
+	@Path("lightwallet/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}")
+	// http://127.0.0.1:9047/lightwallet/getraw/31/0/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF/0/2?amount=12.12345678
 	public String toBytes(@PathParam("type") int record_type,
 			@PathParam("version") int version,
 			@PathParam("creator") String creator,
@@ -268,7 +285,7 @@ public class Rec_Resource {
 
 	}
 
-	public static String toBytes(int record_type,	int version, int feePow, long timestamp, String creator, long reference,
+	public String toBytes(int record_type,	int version, int feePow, long timestamp, String creator, long reference,
 			MultivaluedMap<String, String> queryParameters) // throws JSONException
 	{
 
@@ -521,8 +538,40 @@ public class Rec_Resource {
 			
 	}
 	
+	@GET
+	@Path("lightwallet/broadcast")
+	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public String broadcastFromRaw1()
+	{
+		
+		int steep = 0;
+		try {
+			MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+			
+			steep++;
+			if (queryParameters.containsKey("data"))
+
+				steep++;
+				byte[] transactionBytes = Base58.decode(queryParameters.get("data").get(0));
+
+				steep++;
+				Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
+				if(result.getB() == Transaction.VALIDATE_OK) {
+					return result.getA().toJson().toJSONString();
+				} else {
+					return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
+				}
+
+		} catch (Exception e) {
+			//LOGGER.info(e);
+			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+		} 
+		
+	}
+
 	@POST
-	@Path("/broadcast")
+	@Path("lightwallet/broadcast")
+	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public String broadcastFromRaw(String rawDataBase58)
 	{
 		byte[] transactionBytes = Base58.decode(rawDataBase58);
