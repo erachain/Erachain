@@ -3,6 +3,7 @@ package api;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -121,7 +122,10 @@ public class Rec_Resource {
 
 	// short data without Signature
 	@GET
-	@Path("/parseshort/")
+	@Path("/parsetest/")
+	// for test raw without Signature
+	// http://127.0.0.1:9068/record/parsetest?data=3RKre8zCEarLNq4CQ6njRmvjGURz7KFWhec3H9H3tebEeKQEGDTsvAFizKnFpJAGDAoRQCKH9pygBQsrWfbxwgfcuEAKbARh5p6Yk2ZvfJDReFzBJbUSUwUgtxsKm2ZXHR
+	//
 	public String parseShort() // throws JSONException
 	{
 
@@ -141,17 +145,23 @@ public class Rec_Resource {
 			
 			String dataStr = queryParameters.get("data").get(0);
 			byte[] data = Base58.decode(dataStr);
-			data = Bytes.concat(data, new byte[64]);
+			int cut = 53;
+			byte[] dataTail = Arrays.copyOfRange(data, cut, data.length);
+			data = Bytes.concat(Arrays.copyOfRange(data, 0, cut), new byte[64], dataTail);
 			transaction = TransactionFactory.getInstance().parse(data, null);
+			JSONObject json = transaction.toJson();
+			json.put("raw", Base58.encode(data));
+			return json.toJSONString();
 		} catch (Exception e) {
 			return APIUtils.errorMess(-1, e.toString());
 		}
 
-		return transaction.toJson().toJSONString();
 	}
 
 	@GET
 	@Path("/parse/")
+	// http://127.0.0.1:9068/record/parse?data=DPDnFCNvPk4kLMQcyEp8wTmzT53vcFpVPVhBA8VuHDH6ekAWJAEgZvtjtKGcXwsAKyNs5k2aCpziAmqEDjTigbnDjMeXRfbUDUJNmEJHwB2uPdboSszwsy3fckANUgPV8Ep9CN1fdTdq3QfYE7bbpeYWS2rsTNHb3a7nEV6jg2XJguavqhNSzVeyM6UrRtbiVciMvHFayUAMrE4L3CPjZjPEf
+	//
 	public String parse() // throws JSONException
 	{
 
@@ -184,6 +194,7 @@ public class Rec_Resource {
 	//@Produces("application/json")
 	//
 	// get record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
+	// http://127.0.0.1:9068/record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&recipient=77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy&amount=123.0000123&key=1
 	//
 	public String toBytes(@PathParam("type") int record_type,
 			@PathParam("creator") String creator) // throws JSONException
@@ -512,7 +523,7 @@ public class Rec_Resource {
 	
 	@POST
 	@Path("/broadcast")
-	public String processRecordFromRaw(String rawDataBase58)
+	public String broadcastFromRaw(String rawDataBase58)
 	{
 		byte[] transactionBytes = Base58.decode(rawDataBase58);
 		
