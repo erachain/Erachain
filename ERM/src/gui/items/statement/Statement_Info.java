@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
 
+import core.blockexplorer.WEB_Transactions_HTML;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
@@ -15,6 +18,8 @@ import core.transaction.Transaction;
 import database.DBSet;
 import gui.library.MTextPane;
 import gui.library.Voush_Library_Panel;
+import gui.transaction.Rec_DetailsFrame;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 /*
@@ -83,7 +88,9 @@ public class Statement_Info extends javax.swing.JPanel {
 
 		setLayout(new java.awt.GridBagLayout());
 
-		jLabel_Title.setText(Lang.getInstance().translate("Statement"));
+		
+		JPanel pp = new Rec_DetailsFrame(transaction);
+		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -91,21 +98,39 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.weightx = 0.2;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
-		add(jLabel_Title, gridBagConstraints);
+		add(pp, gridBagConstraints);
+		
 
 		jSplitPane1.setBorder(null);
 		jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
 		jPanel1.setLayout(new java.awt.GridBagLayout());
-
+		int y = 0;
+		
+		
+		
+		
 		// jTextArea_Body.setColumns(20);
 		// jTextArea_Body.setRows(5);
 		// jScrollPane3.setViewportView(jTextArea_Body);
 	//	jScrollPane3.getViewport().add(jTextArea_Body);
+		jLabel_Title.setText(Lang.getInstance().translate("Statement"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = ++y;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		gridBagConstraints.weightx = 0.2;
+		gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
+		jPanel1.add(jLabel_Title, gridBagConstraints);
+		
+		
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		gridBagConstraints.gridy = ++y;
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);

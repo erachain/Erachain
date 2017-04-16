@@ -194,7 +194,7 @@ public class RecordsPanel extends  JPanel // JPanel
 									tableGBC.weighty = 1;
 									tableGBC.gridx = 0;	
 									tableGBC.gridy= 0;	
-									JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+								//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 									panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction),tableGBC);
 									  JLabel jLabel9 = new JLabel();
 										jLabel9.setText("");
