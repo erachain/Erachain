@@ -754,7 +754,7 @@ public abstract class Transaction {
 	{
 		
 		// use this.reference in any case and for Pack too
-		// nut not with SIGN
+		// but not with SIGN
 		boolean withSign = false;
 		byte[] data = this.toBytes( withSign, null );
 		if ( data == null ) return;

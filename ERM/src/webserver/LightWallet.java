@@ -285,7 +285,7 @@ public class LightWallet {
 
 	}
 
-	public String toBytes(int record_type,	int version, int feePow, long timestamp, String creator, long reference,
+	public static String toBytes(int record_type,	int version, int feePow, long timestamp, String creator, long reference,
 			MultivaluedMap<String, String> queryParameters) // throws JSONException
 	{
 
