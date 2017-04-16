@@ -22,6 +22,7 @@ public class WebService {
 		//CREATE CONFIG
 		Set<Class<?>> s = new HashSet<Class<?>>();
         s.add(WebResource.class);
+        s.add(LightWallet.class);
         
         ResourceConfig config = new ResourceConfig(s);
 		config.register(MultiPartFeature.class);

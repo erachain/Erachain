@@ -111,6 +111,40 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET record", 
+				"HELP.",
+				"Errors: ."
+			},
+			{
+				"GET record/parse?data=Base58", 
+				"Parse record from RAWDATA in Base58.",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
+				"GET record/parsetest?data=Base58", 
+				"Parse record from RAWDATA without Signature",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
+				"GET record/getraw/<type>/<creator>", 
+				"Make record and return as RAWDATA in Base58.",
+				"Parameters: TYPE - type of record, CREATOR - PublicKey in Base58.",
+				"Values - as need for that record.",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
+				"GET record/getraw/<type>/<version>/<creator>/<timestamp>/<feePow>", 
+				"Make record and return as RAWDATA in Base58.",
+				"Parameters: TYPE - type of record, VERSION - version of record, CREATOR - PublicKey in Base58, TIMESTAMP - long, feePow - int.",
+				"Values - as need for that record.",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
+				"POST record/broadcast <rawdata>", 
+				"Make record from RAWDATA, validate it and broadcast.",
+				"Errors: Transaction.ERRORS, JSON.ERRORS."
+			},
+			{
 				"GET transactions", 
 				"Returns an array of your accounts each with their 50 last transactions.",
 				"Errors: 201 - Wallet does not exist."

@@ -130,8 +130,15 @@ public class TransactionCreator
 				DBSet.getInstance().getTransactionMap().delete(transaction);
 			}
 		}
+		
 	}
 		
+	public long getReference(PublicKeyAccount creator)
+	{
+		this.checkUpdate();
+		return creator.getLastReference(this.fork);
+	}
+
 	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow)
 	{
 		//CHECK FOR UPDATES

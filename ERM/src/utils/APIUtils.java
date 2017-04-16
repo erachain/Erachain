@@ -30,6 +30,10 @@ public class APIUtils {
 
 	static Logger LOGGER = Logger.getLogger(APIUtils.class.getName());
 
+	public static String errorMess(int error, String message) {
+		return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
+	}
+
 	public static String processPayment(String password, String sender,
 			String feePowStr, String recipient, String assetKeyString, String amount,
 			String x, HttpServletRequest request) {
