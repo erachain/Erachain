@@ -2,7 +2,10 @@ package gui.items.statement;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JPanel;
 
@@ -59,8 +62,36 @@ public class Statement_Info extends javax.swing.JPanel {
 		statement = (R_SignNote) transaction;
 		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		//jTextArea_Body.setContentType("text/html");
-		jTextArea_Body.set_text(note.getName() + "\n\n" + note.getDescription() + "\n\n"
-				+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
+		String description = note.getDescription(); 
+		if (statement.isText() && !statement.isEncrypted()) {
+			List<String> vars = note.getVarNames();
+			if (vars != null && !vars.isEmpty()) {
+				// try replace variables
+				String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
+				String[] rows = dataVars.split("\n");
+				Map<String, String> varsArray = new HashMap<String, String>();
+				for (String row: rows) {
+					String[] var_Name_Value = row.split("=");
+					if (var_Name_Value.length == 2) {
+						varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+					}
+					
+				}
+				
+				for (Map.Entry<String, String> item : varsArray.entrySet()) {
+					//description.replaceAll("{{" + item.getKey() + "}}", (String)item.getValue());
+					description = description.replace("{{" + item.getKey() + "}}", (String)item.getValue());
+				}
+			}
+			
+			jTextArea_Body.set_text(note.getName() + "\n\n"
+					+ Processor.process(description) + "\n\n"
+					+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
+			
+		} else {
+			jTextArea_Body.set_text(note.getName() + "\n\n"
+					+ Processor.process(description));			
+		}
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
 

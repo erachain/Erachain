@@ -1,6 +1,11 @@
 package core.item.notes;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 //import database.DBMap;
@@ -24,6 +29,9 @@ public abstract class NoteCls extends ItemCls {
 	protected static final int PAPER = 3;
 
 	public static final int INITIAL_FAVORITES = 0;
+	
+	private List<String> variables;
+	private static Pattern varsPattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
 
 	public NoteCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
@@ -41,6 +49,20 @@ public abstract class NoteCls extends ItemCls {
 	public int getItemTypeInt() { return ItemCls.NOTE_TYPE; }
 	public String getItemTypeStr() { return "note"; }
 	
+	public List<String> getVarNames() {
+		if (variables != null)
+			return variables;
+		
+		variables = new ArrayList<String>();
+		Matcher matcher = varsPattern.matcher(description);
+		while (matcher.find()) {
+			String varName = matcher.group(1);
+			variables.add(varName);
+			//description = description.replace(matcher.group(), getImgHtml(url));
+		}
+		return variables;
+	}	
+
 	// DB
 	public Item_Map getDBMap(DBSet db)
 	{

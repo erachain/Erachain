@@ -2,8 +2,14 @@ package core.item.notes;
 
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
- import org.apache.log4j.Logger;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -28,7 +34,7 @@ public class Sample extends NoteCls {
 
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "sample"; }
-
+	
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Sample parse(byte[] data, boolean includeReference) throws Exception
