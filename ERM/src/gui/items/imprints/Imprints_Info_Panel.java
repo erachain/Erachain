@@ -99,7 +99,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START; 
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(Name_jTextField, gridBagConstraints);
 
