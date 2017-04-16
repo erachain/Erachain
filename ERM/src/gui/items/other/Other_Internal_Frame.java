@@ -40,7 +40,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 		
 		
 		
-	    Dimension size = MainFrame.desktopPane.getSize();
+	    Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	   
 		
 		this.setTitle(Lang.getInstance().translate("Network DashBoard"));

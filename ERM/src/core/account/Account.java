@@ -583,7 +583,10 @@ public class Account {
 	public String viewPerson() {
 		Tuple2<Integer, PersonCls> personRes = this.getPerson();
 		if (personRes == null) {
-			return "";
+			if (this.getAddress()!= null) {
+				return this.getAddress();
+				
+			}else {return "";}
 		} else {
 			String personStr = personChar(personRes) + personRes.b.toString();
 			return personStr;

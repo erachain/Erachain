@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -101,10 +102,10 @@ import utils.ReverseComparator;
 public class BlockExplorer
 {
 	private JSONObject langObj;
-	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
+	private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class); 
 	private static BlockExplorer blockExplorer;
 	private Locale local = new Locale("ru","RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ Р Т‘Р В°РЎвЂљРЎвЂ№
-	private DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
+	private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	private String lang; 
 	public static final String  LANG_DEFAULT = "en";
@@ -504,7 +505,7 @@ public class BlockExplorer
 					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
 				}
 
-//				output.put("lastBlock", jsonQueryLastBlock());
+				output.put("lastBlock", jsonQueryLastBlock());
 
 				output.putAll(jsonQueryPersons(start));
 
@@ -515,7 +516,7 @@ public class BlockExplorer
 			if(info.getQueryParameters().containsKey("person"))
 			{
 				
-
+				output.put("lastBlock", jsonQueryLastBlock());
 				output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -532,7 +533,7 @@ public class BlockExplorer
 					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
 				}
 
-//				output.put("lastBlock", jsonQueryLastBlock());
+				output.put("lastBlock", jsonQueryLastBlock());
 
 				output.putAll(jsonQueryStatements(start));
 
@@ -543,7 +544,7 @@ public class BlockExplorer
 			if(info.getQueryParameters().containsKey("statement"))
 			{
 				
-
+				output.put("lastBlock", jsonQueryLastBlock());
 				output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),info.getQueryParameters().getFirst("Seg_No")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -1244,7 +1245,9 @@ if ( asset_1 == null) {
 		assetJSON.put("description", Processor.process(asset.getDescription()));
 		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
-		assetJSON.put("isDivisible", asset.isDivisible());
+		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
+		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
+		assetJSON.put("isDivisible",divis );
 
 		
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
@@ -1310,6 +1313,22 @@ if ( asset_1 == null) {
 		}
 
 		output.put("pairs", pairsJSON);
+		output.put("label_Asset", Lang.getInstance().translate_from_langObj("Asset", langObj));
+		output.put("label_Key", Lang.getInstance().translate_from_langObj("Key", langObj));
+		output.put("label_Creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("label_Description", Lang.getInstance().translate_from_langObj("Description", langObj));
+		output.put("label_Divisible", Lang.getInstance().translate_from_langObj("Divisible", langObj));
+		output.put("label_Quantity", Lang.getInstance().translate_from_langObj("Quantity", langObj));
+		output.put("label_Holders", Lang.getInstance().translate_from_langObj("Holders", langObj));
+		output.put("label_Available_pairs", Lang.getInstance().translate_from_langObj("Available pairs", langObj));
+		output.put("label_Pair", Lang.getInstance().translate_from_langObj("Pair", langObj));
+		output.put("label_Orders_Count", Lang.getInstance().translate_from_langObj("Orders Count", langObj));
+		output.put("label_Open_Orders_Volume", Lang.getInstance().translate_from_langObj("Open Orders Volume", langObj));
+		output.put("label_Trades_Count", Lang.getInstance().translate_from_langObj("Trades Count", langObj));
+		output.put("label_Trades_Volume", Lang.getInstance().translate_from_langObj("Trades Volume", langObj));
+		output.put("label_Total", Lang.getInstance().translate_from_langObj("Total", langObj));
+		output.put("label_View", Lang.getInstance().translate_from_langObj("View", langObj));
+		
 
 		return output;
 	}
@@ -1462,14 +1481,14 @@ if ( asset_1 == null) {
 			tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
 			if(orderInitiator.getHave() == have)
 			{
-				tradeJSON.put("type", "sell");
+				tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Sell", langObj));
 				tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
 				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
 			}
 			else
 			{
-				tradeJSON.put("type", "buy");
+				tradeJSON.put("type",Lang.getInstance().translate_from_langObj("Buy", langObj));
 
 				tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
 				tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
@@ -1488,6 +1507,21 @@ if ( asset_1 == null) {
 		output.put("tradeWantAmount", tradeWantAmount.toPlainString());
 		output.put("tradeHaveAmount", tradeHaveAmount.toPlainString());
 
+		output.put("label_Trades", Lang.getInstance().translate_from_langObj("Trades", langObj));
+		output.put("label_Price", Lang.getInstance().translate_from_langObj("Price", langObj));
+		output.put("label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+		output.put("label_Sell_Orders", Lang.getInstance().translate_from_langObj("Sell Orders", langObj));
+		output.put("label_Buy_Orders", Lang.getInstance().translate_from_langObj("Buy Orders", langObj));
+		output.put("label_Total", Lang.getInstance().translate_from_langObj("Total", langObj));
+		output.put("label_Trade_History", Lang.getInstance().translate_from_langObj("Trade History", langObj));
+		output.put("label_Date", Lang.getInstance().translate_from_langObj("Date", langObj));
+		output.put("label_Type", Lang.getInstance().translate_from_langObj("Type", langObj));
+		output.put("label_Trade_Volume", Lang.getInstance().translate_from_langObj("Trade Volume", langObj));
+		output.put("label_Go_To", Lang.getInstance().translate_from_langObj("Go To", langObj));
+		
+		
+		
+		
 		return output;
 	}
 
@@ -1529,17 +1563,17 @@ if ( asset_1 == null) {
 		
 		// TODO translate_web(
 		
-		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
-		output.put("Label_Height", "Height");
-		output.put("Label_Time", "Time");
-		output.put("Label_Generator", "Creator");
-		output.put("Label_Gen_balance", "Gen.Balance");
-		output.put("Label_TXs", "TXs");
-		output.put("Label_Fee", "Fee");
-		output.put("Label_AT_Amount", "AT_Amount");
-		output.put("Label_Amount", "Amount");
-		output.put("Label_Later", "Later");
-		output.put("Label_Previous", "Previous");
+		output.put("Label_Unconfirmed_transactions",Lang.getInstance().translate_from_langObj("Unconfirmed transactions", langObj));
+		output.put("Label_Height", Lang.getInstance().translate_from_langObj("Height", langObj)); 
+		output.put("Label_Time", Lang.getInstance().translate_from_langObj("Time", langObj));
+		output.put("Label_Generator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("Label_Gen_balance", Lang.getInstance().translate_from_langObj("Gen.Balance", langObj));
+		output.put("Label_TXs",  Lang.getInstance().translate_from_langObj("TXs", langObj)); 
+		output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Height", langObj));
+		output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
+		output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
+		output.put("Label_Previous",  Lang.getInstance().translate_from_langObj("Previous", langObj));
 		
 		int counter = start; 
 
@@ -1684,12 +1718,12 @@ if ( asset_1 == null) {
 		
 		PersonAccountsModel personModel = new PersonAccountsModel(person.getKey());
 		rowCount = personModel.getRowCount();
-		Map accountJSON=new LinkedHashMap();
+		
 		
 		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
 		if (rowCount >0){
 		for (int i = 0; i<rowCount; i++){
-			
+			Map accountJSON=new LinkedHashMap();
 			accountJSON.put("adress", personModel.getValueAt(i, 0));
 			accountJSON.put("data", personModel.getValueAt(i, 1));
 				PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
@@ -1714,12 +1748,8 @@ if ( asset_1 == null) {
 			String acc = personModel.getValueAt(i, 0).toString();
 			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
 		
-//			trans.addAll(tt); // "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5"
+
 		}
-		}else{
-			accountJSON.put("creator", "");
-			accountJSON.put("creator_name", "");
-			accountJSON.put("creator_key", "");	
 		}
 		output.put("accounts", accountsJSON);
 		
@@ -1886,7 +1916,16 @@ if ( asset_1 == null) {
 
 		output.put("timezone", Settings.getInstance().getTimeZone());
 		output.put("timeformat", Settings.getInstance().getTimeFormat());
-
+		output.put("label_hour", Lang.getInstance().translate_from_langObj("hour", langObj));
+		output.put("label_hours", Lang.getInstance().translate_from_langObj("hours", langObj));
+		output.put("label_mins", Lang.getInstance().translate_from_langObj("mins", langObj));
+		output.put("label_min", Lang.getInstance().translate_from_langObj("min", langObj));
+		output.put("label_secs", Lang.getInstance().translate_from_langObj("secs", langObj));
+		output.put("label_ago", Lang.getInstance().translate_from_langObj("ago", langObj));
+		output.put("label_Last_processed_block", Lang.getInstance().translate_from_langObj("Last processed block", langObj));
+		
+		
+		
 		return output;
 	}
 
@@ -1978,6 +2017,12 @@ if ( asset_1 == null) {
 		output.put("Label_Table_Prop", Lang.getInstance().translate_from_langObj("Prop.",langObj));
 		output.put("Label_Table_person", Lang.getInstance().translate_from_langObj("Owner",langObj));
 		
+		output.put("Label_minus", Lang.getInstance().translate_from_langObj("minus",langObj));
+		output.put("Label_in_order", Lang.getInstance().translate_from_langObj("in order",langObj));
+		
+		
+		output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top",langObj));
+		output.put("Label_Top", Lang.getInstance().translate_from_langObj("Top",langObj));
 		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
@@ -1988,10 +2033,184 @@ if ( asset_1 == null) {
 		output.put("count", couter);
 
 		output.put("top", balances);
-
+		output.put("Label_Title",(Lang.getInstance().translate_from_langObj("Top %limit% %assetName% Richest",langObj).replace("%limit%",String.valueOf(limit))).replace("%assetName%", asset.getName()));
+		output.put("Label_All_non", (Lang.getInstance().translate_from_langObj("All non-empty %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+		output.put("Label_All_accounts",(Lang.getInstance().translate_from_langObj("All %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
+		output.put("Label_Total_coins_in_the_system", Lang.getInstance().translate_from_langObj("Total coins in the system", langObj));
+		
 		return output;
 	}	
 
+	
+	public LinkedHashMap Transactions_JSON(List<Transaction> transactions){
+		
+		LinkedHashMap output = new LinkedHashMap();
+		DBSet db = DBSet.getInstance();
+		int i1 = 0;
+		LinkedHashMap transactionsJSON = new LinkedHashMap();
+		for (Transaction trans:transactions){
+			LinkedHashMap transactionJSON = new LinkedHashMap();
+				
+					
+					String itemName = "-";
+					Long itemKey = new Long("-1");
+					if (trans instanceof TransactionAmount && trans.getAbsKey() >0)
+					{
+						TransactionAmount transAmo = (TransactionAmount)trans;
+						//recipient = transAmo.getRecipient();
+						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+						if (item==null){
+							itemName = "-";
+							itemKey = (long) -1;
+							
+						}
+						itemName = item.toString();
+						itemKey   = item.getKey();
+					} else if ( trans instanceof GenesisTransferAssetTransaction)
+					{
+						GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)trans;
+						//recipient = transGen.getRecipient();				
+						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+						itemName = item.toString();
+						itemKey  = item.getKey();
+					} else if ( trans instanceof Issue_ItemRecord)
+					{
+						Issue_ItemRecord transIssue = (Issue_ItemRecord)trans;
+						ItemCls item = transIssue.getItem();
+						itemName = item.getShort();
+						itemKey  = item.getKey();
+					} else if ( trans instanceof GenesisIssue_ItemRecord)
+					{
+						GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)trans;
+						ItemCls item = transIssue.getItem();
+						itemName = item.getShort();
+						itemKey  = item.getKey();
+					} else if (trans instanceof R_SertifyPubKeys )
+					{
+						R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)trans;
+						//recipient = transAmo.getRecipient();
+						ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+						if (item == null){
+							itemName = "-";
+							itemKey  = (long) -1;
+							
+						}
+						itemName = item.toString();
+						itemKey  = item.getKey();
+					} else {
+						itemName = trans.viewItemName();
+						itemKey  = (long) -1;
+					}
+					
+					// 
+					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
+					
+					transactionJSON.put("seq",trans.getSeqNo(db));
+					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
+					transactionJSON.put("reference",trans.getReference());
+					transactionJSON.put("date",DateTimeFormat.timestamptoString(trans.getTimestamp()));
+					transactionJSON.put("creator",trans.viewCreator());
+					
+					
+					if (trans.getCreator() == null){
+						transactionJSON.put("creator_key","-");
+						transactionJSON.put("creator_addr","");
+						}
+					else {
+						transactionJSON.put("creator_addr",trans.getCreator().getAddress());	
+					if (trans.getCreator().getPerson() == null){
+						transactionJSON.put("creator_key","+");
+						
+					}
+					else {
+						transactionJSON.put("creator_key",trans.getCreator().getPerson().b.getKey());
+						}
+					}
+					
+					transactionJSON.put("size",trans.viewSize(false));
+					transactionJSON.put("fee",trans.getFee());
+					transactionJSON.put("confirmations",trans.getConfirmations(db));
+					transactionJSON.put("type",Lang.getInstance().translate_from_langObj(trans.viewTypeName(),langObj));
+					
+					
+					String amount = "-";
+					if (trans.getAmount() != null) amount = trans.getAmount().toString();
+					
+					
+					transactionJSON.put("item_name",itemName);		
+					transactionJSON.put("item_key",itemKey);
+					
+					
+					transactionJSON.put("key",trans.getKey());
+					
+					if (trans.viewRecipient() == null){transactionJSON.put("recipient","-");}
+					else {transactionJSON.put("recipient",trans.viewRecipient());}
+					
+					transactionJSON.put("amount",amount);
+					
+					
+					transactionsJSON.put(i1, transactionJSON);
+					i1++;
+		}
+		
+		
+		output.put("transactions", transactionsJSON);
+		output.put("label_block",Lang.getInstance().translate_from_langObj("Block",langObj));
+		output.put("label_date",Lang.getInstance().translate_from_langObj("Date",langObj));
+		output.put("label_type_transaction",Lang.getInstance().translate_from_langObj("Type",langObj));
+		output.put("label_creator",Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("label_asset",Lang.getInstance().translate_from_langObj("Asset",langObj));
+		output.put("label_amount",Lang.getInstance().translate_from_langObj("Amount",langObj));
+		output.put("label_confirmations",Lang.getInstance().translate_from_langObj("Confirmations",langObj));
+		output.put("label_recipient",Lang.getInstance().translate_from_langObj("Recipient",langObj));
+		output.put("label_size",Lang.getInstance().translate_from_langObj("Size",langObj));
+		output.put("label_seq",Lang.getInstance().translate_from_langObj("Seq",langObj));
+		output.put("label_signature",Lang.getInstance().translate_from_langObj("Signature",langObj));
+		output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
+		output.put("label_fee",Lang.getInstance().translate_from_langObj("Fee",langObj));
+		output.put("label_transactions_table",Lang.getInstance().translate_from_langObj("Transactions",langObj));
+		
+		
+		
+		return output;
+		
+	}
+
+	@SuppressWarnings("static-access")
+	private LinkedHashMap Balance_JSON(Account account){
+		
+		// balance assets from
+			LinkedHashMap output = new LinkedHashMap();
+				 WEB_Balance_from_Adress_TableModel balanceTableModel = new WEB_Balance_from_Adress_TableModel(account);
+				int ad = balanceTableModel.getRowCount();
+				int idr;
+				Map bal_Assets = new LinkedHashMap();
+				if (ad > 0) for (idr=0; idr<ad; idr++){
+				Map bal = new LinkedHashMap();
+				bal.put("asset_key", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_KEY));
+				bal.put("asset_name", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME));
+				bal.put("balance_A", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A));
+				bal.put("balance_B", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B));
+				bal.put("balance_C", balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C));
+				if (!(balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_A).equals("0.00000000")
+						&& balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_B).equals("0.00000000")
+						&& balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_C).equals("0.00000000")))bal_Assets.put(idr, bal);
+				}
+				
+				output.put("balances", bal_Assets);
+				output.put("label_Balance_table",Lang.getInstance().translate_from_langObj("Balance",langObj));
+				output.put("label_asset_key",Lang.getInstance().translate_from_langObj("Key",langObj));
+				output.put("label_asset_name",Lang.getInstance().translate_from_langObj("Name",langObj));
+				output.put("label_Balance_A",Lang.getInstance().translate_from_langObj("Balance",langObj)+" A");
+				output.put("label_Balance_B",Lang.getInstance().translate_from_langObj("Balance",langObj)+" B");
+				output.put("label_Balance_C",Lang.getInstance().translate_from_langObj("Balance",langObj)+" C");
+				
+				
+				return output;
+	
+		
+	
+	}
 	// DBSet.getInstance()
 	public Map jsonUnitPrint(Object unit, AssetNames assetNames)
 	{
@@ -2061,6 +2280,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "trade");
 			transactionJSON.put("trade", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		if (unit instanceof Transaction)
@@ -2232,6 +2452,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "transaction");
 			transactionJSON.put("transaction", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		if (unit instanceof Block)
@@ -2263,6 +2484,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "block");
 			transactionJSON.put("block", transactionDataJSON);
+			return transactionJSON;
 
 		}
 
@@ -2285,6 +2507,7 @@ if ( asset_1 == null) {
 
 			transactionJSON.put("type", "atTransaction");
 			transactionJSON.put("atTransaction", transactionDataJSON);
+			return transactionJSON;
 		}
 
 		return transactionJSON;
@@ -2449,146 +2672,44 @@ if ( asset_1 == null) {
 	
 	
 	
-	@SuppressWarnings("serial")
+	@SuppressWarnings({ "serial", "static-access" })
 	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
 		DBSet db = DBSet.getInstance();
 		
 		List<Transaction> tt = db.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
 		
-		
-		
-		
-		
-
 		TreeSet<BlExpUnit> all = new TreeSet<>();
 	
 		addresses = new ArrayList<>(new LinkedHashSet<String>(addresses));
 
-		Map error = new LinkedHashMap();
+		LinkedHashMap error = new LinkedHashMap();
 		
-		Map output = new LinkedHashMap();
-		Map transactionsJSON = new LinkedHashMap();	
+		LinkedHashMap output = new LinkedHashMap();
+		LinkedHashMap transactionsJSON = new LinkedHashMap();	
 		output.put("account", addresses.get(0));
 		
-		int i1 = 0;
-		for (Transaction trans:tt){
-			Map transactionJSON = new LinkedHashMap();
-				
-					
-					String itemName = "-";
-					Long itemKey = new Long("-1");
-					if (trans instanceof TransactionAmount && trans.getAbsKey() >0)
-					{
-						TransactionAmount transAmo = (TransactionAmount)trans;
-						//recipient = transAmo.getRecipient();
-						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
-						if (item==null){
-							itemName = "-";
-							itemKey = (long) -1;
-							
-						}
-						itemName = item.toString();
-						itemKey   = item.getKey();
-					} else if ( trans instanceof GenesisTransferAssetTransaction)
-					{
-						GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)trans;
-						//recipient = transGen.getRecipient();				
-						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
-						itemName = item.toString();
-						itemKey  = item.getKey();
-					} else if ( trans instanceof Issue_ItemRecord)
-					{
-						Issue_ItemRecord transIssue = (Issue_ItemRecord)trans;
-						ItemCls item = transIssue.getItem();
-						itemName = item.getShort();
-						itemKey  = item.getKey();
-					} else if ( trans instanceof GenesisIssue_ItemRecord)
-					{
-						GenesisIssue_ItemRecord transIssue = (GenesisIssue_ItemRecord)trans;
-						ItemCls item = transIssue.getItem();
-						itemName = item.getShort();
-						itemKey  = item.getKey();
-					} else if (trans instanceof R_SertifyPubKeys )
-					{
-						R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)trans;
-						//recipient = transAmo.getRecipient();
-						ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
-						if (item == null){
-							itemName = "-";
-							itemKey  = (long) -1;
-							
-						}
-						itemName = item.toString();
-						itemKey  = item.getKey();
-					} else {
-						itemName = trans.viewItemName();
-						itemKey  = (long) -1;
-					}
-					
-					// 
-					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
-					
-					transactionJSON.put("seq",trans.getSeqNo(db));
-					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
-					transactionJSON.put("reference",trans.getReference());
-					transactionJSON.put("date",df.format(new Date(trans.getTimestamp())).toString());
-					transactionJSON.put("creator",trans.viewCreator());
-					
-					if (trans.getCreator() == null){
-						transactionJSON.put("creator_key","-");
-						}
-					else if (trans.getCreator().getPerson() == null){
-						transactionJSON.put("creator_key","+");
-						
-					}
-					else {
-						transactionJSON.put("creator_key",trans.getCreator().getPerson().b.getKey());
-						}
-					
-					transactionJSON.put("size",trans.viewSize(false));
-					transactionJSON.put("fee",trans.getFee());
-					transactionJSON.put("confirmations",trans.getConfirmations(db));
-					transactionJSON.put("type",Lang.getInstance().translate_from_langObj(trans.viewTypeName(),langObj));
-					
-					
-					String amount = "-";
-					if (trans.getAmount() != null) amount = trans.getAmount().toString();
-					
-					
-					transactionJSON.put("item_name",itemName);		
-					transactionJSON.put("item_key",itemKey);
-					
-					
-					transactionJSON.put("key",trans.getKey());
-					
-					if (trans.viewRecipient() == null){transactionJSON.put("recipient","-");}
-					else {transactionJSON.put("recipient",trans.viewRecipient());}
-					
-					transactionJSON.put("amount",amount);
-					
-					
-					transactionsJSON.put(i1, transactionJSON);
-					i1++;
+		Account acc = new Account(addresses.get(0));
+		Long person_key = (long) -10;
+		Tuple2<Integer, PersonCls> pp = acc.getPerson();
+		
+		if (pp != null){
+			output.put("label_person_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+			output.put("person_Img",  Base64.encodeBase64String(pp.b.getImage()));
+			output.put("Person_Name", pp.b.getName());
+			person_key = pp.b.getKey();
 		}
+		output.put("person_key", person_key);
+		output.put("label_account", Lang.getInstance().translate_from_langObj("Account",langObj));
 		
-		output.put("transaction", transactionsJSON);
+		// balance assets from
+		output.put("Balance", Balance_JSON(new Account(addresses.get(0))));
+				
+		// Transactions view
+		output.put("Transactions", Transactions_JSON(tt));
+		
 		output.put("type", "standardAccount");
-		output.put("label_block",Lang.getInstance().translate_from_langObj("Block",langObj));
-		output.put("label_date",Lang.getInstance().translate_from_langObj("Date",langObj));
-		output.put("label_type_transaction",Lang.getInstance().translate_from_langObj("Type",langObj));
-		output.put("label_creator",Lang.getInstance().translate_from_langObj("Creator",langObj));
-		output.put("label_asset",Lang.getInstance().translate_from_langObj("Asset",langObj));
-		output.put("label_amount",Lang.getInstance().translate_from_langObj("Amount",langObj));
-		output.put("label_confirmations",Lang.getInstance().translate_from_langObj("Confirmations",langObj));
-		output.put("label_recipient",Lang.getInstance().translate_from_langObj("Recipient",langObj));
-		output.put("label_size",Lang.getInstance().translate_from_langObj("Size",langObj));
-		output.put("label_seq",Lang.getInstance().translate_from_langObj("Seq",langObj));
-		output.put("label_signature",Lang.getInstance().translate_from_langObj("Signature",langObj));
-		output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
-		output.put("label_fee",Lang.getInstance().translate_from_langObj("Fee",langObj));
-		
-		
+				
 		int a = 1;
 		if (a ==1) return output;
 
@@ -3458,7 +3579,15 @@ if ( asset_1 == null) {
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
-			all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
+			List<Transaction>tt = new ArrayList<Transaction>();
+			tt.add(transaction);
+		//	output.put("transaction_Header",Transactions_JSON(tt));
+			output.put("body", WEB_Transactions_HTML.getInstance().get_HTML( tt.get(0), langObj));
+	//		output.put("Json", transaction.toJson().toString());
+			
+	//		output.put("",transaction);
+			
+		/*	all.add( new BlExpUnit( transaction.getBlock(db).getHeight(db), transaction.getSeqNo(db), transaction));
 
 			if(transaction instanceof CreateOrderTransaction)
 			{
@@ -3481,7 +3610,7 @@ if ( asset_1 == null) {
 		}
 
 		int size = all.size();
-
+	
 		output.put("start", size);
 		output.put("end", 1);
 
@@ -3489,9 +3618,9 @@ if ( asset_1 == null) {
 		for (BlExpUnit unit : all) {
 			output.put(size - counter, jsonUnitPrint(unit.getUnit(), assetNames));
 			counter ++;
-		}
+*/		}
 		
-		output.put("assetNames", assetNames.getMap());
+		output.put("Label_Transaction", Lang.getInstance().translate_from_langObj("Transaction", langObj));
 
 		return output;
 	}
@@ -3526,6 +3655,9 @@ if ( asset_1 == null) {
 			txsTypeCount[transaction.getType() - 1] ++;
 		}
 
+		// Transactions view
+		output.put("Transactions", Transactions_JSON(block.getTransactions()));
+		
 		int txsCount = all.size();
 
 		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight(DBSet.getInstance()));
@@ -3611,14 +3743,17 @@ if ( asset_1 == null) {
 		Map assetsJSON=new LinkedHashMap();
 
 		int counter = 0;
-		for(Object unit: all)
-		{
-			counter ++;
+		
+	//	for(Object unit: all)
+	//	{
+	//		counter ++;
 
-			output.put(counter, jsonUnitPrint(unit, assetNames));
-		}
+	//		output.put(counter, jsonUnitPrint(unit, assetNames));
+	//	}
 
 
+		
+		
 		{
 			Map transactionJSON = new LinkedHashMap();
 			Map transactionDataJSON = new LinkedHashMap();
@@ -3649,9 +3784,22 @@ if ( asset_1 == null) {
 			output.put(counter + 1, transactionJSON);
 		}
 
-		output.put("assetNames", assetNames.getMap());
+	//	output.put("assetNames", assetNames.getMap());
 		
-		output.put("totalBalance", assetsJSON);
+	//	output.put("totalBalance", assetsJSON);
+		
+		output.put("label_block", Lang.getInstance().translate_from_langObj("Block", langObj));
+		output.put("label_Block_version", Lang.getInstance().translate_from_langObj("Block version", langObj));
+		output.put("label_Transactions_count", Lang.getInstance().translate_from_langObj("Transactions count", langObj));
+		output.put("label_Total_Amount", Lang.getInstance().translate_from_langObj("Total Amount", langObj));
+		output.put("label_Total_AT_Amount", Lang.getInstance().translate_from_langObj("Total AT Amount", langObj));
+		output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
+		output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
+		output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));
+		output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));
+		output.put("label_Including", Lang.getInstance().translate_from_langObj("Including", langObj));
+		output.put("label_Signature", Lang.getInstance().translate_from_langObj("Signature", langObj));
+		
 
 		return output;
 	}

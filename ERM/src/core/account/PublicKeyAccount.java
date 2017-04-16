@@ -70,6 +70,10 @@ public class PublicKeyAccount extends Account {
 	{
 		return Base58.encode(publicKey);
 	}
+	public String getBase32()
+	{
+		return Base32.encode(publicKey);
+	}
 
 	//CHECK IF IS VALID PUBLIC KEY and MAKE NEW
 	public static boolean isValidPublicKey(byte[] publicKey)

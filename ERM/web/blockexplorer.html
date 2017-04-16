@@ -9,6 +9,7 @@
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
 	<script src="/index/libs/js/explorerStatements.js"></script>
+	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 	<style type="text/css">
@@ -19,7 +20,7 @@
       padding-bottom: 10px;
       border-bottom: 1px solid #eee;
       }
-      .navbar-fixed-top {
+      .navbar-fixed-top { 
       border: 0;
       z-index: 9999;
       }
@@ -314,7 +315,7 @@ return output;
 }
 
 
-function secToFine(time) {
+function secToFine(time, lastBlock) {
 	time = Math.floor( time/1000 );
 	
 	var mins = ~~(time / 60);
@@ -328,10 +329,10 @@ function secToFine(time) {
 	ret = "";
 
 	if (hrs > 0)
-		ret += "" + hrs + (hrs > 1 ? "hours " : " hour ");
+		ret += " " + hrs + " " + (hrs > 1 ? lastBlock.label_hours : lastBlock.label_hour);
 
-	ret += "" + mins + (mins > 1 ? " mins " : " min ");
-	ret += "" + secs + ' secs';
+	ret += " " + mins + " " + (mins > 1 ? lastBlock.label_mins  : lastBlock.label_min);
+	ret += " " + secs + " " + lastBlock.label_secs;
 	return ret;
 }
 
@@ -373,6 +374,7 @@ function getAssetName2(assetKey, assetName) {
 }
 function addCommas(str)
 {
+	if(str == null) return "";
 	strbuf = str.toString();
 	if( strbuf.indexOf('.') == -1)
 	{
@@ -548,29 +550,29 @@ function topRichest(data)
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
 	output += '<tr><td align=center>';
 	
-	output += 'Total coins in the system: ' + 
+	output += data.Label_Total_coins_in_the_system +': ' + 
 		addCommas(data.allTotal) + ' '+ getAssetName(data.assetKey, data.assetName) + '<br>';
-	output += 'minus ' + addCommas(data.allinOrders) + 
-		' '+getAssetName(data.assetKey, data.assetName) + ' in order = ' + 
+	output += data.Label_minus + ' ' + addCommas(data.allinOrders) + 
+		' '+getAssetName(data.assetKey, data.assetName) + ' ' + data.Label_in_order + '= ' + 
 		addCommas(data.all) + ' ' + getAssetName(data.assetKey, data.assetName) + '<br>';
 	
 	
 	if(data.limit == -1)
 	{
 		buf = ''	
-		output += '<h3>'+'All non-empty '+getAssetName(data.assetKey, data.assetName)+' addresses ('+data.count+') </h2>';	
+		output += '<h3>'+ Label_All_non+ '</h2>';	
 	}
 	else if (data.limit == -2)
 	{
-		output += '<h3>'+'All '+getAssetName(data.assetKey, data.assetName)+' addresses ('+data.count+')</h2>';	
+		output += '<h3>'+ data.Label_All_accounts + '</h2>';	
 	}
 	else
 	{
-		output += '<h3>'+'Top '+data.limit+' '+getAssetName(data.assetKey, data.assetName)+' Richest</h2>';	
+		output += '<h3>'+ data.Label_Title + '</h2>';	
 	}
 	
 	
-	var table = '<table id=top100 BORDER=0 width="10%" cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
+	var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
 
 	for(key in data.top) {
 		table += '<tr>';		
@@ -583,12 +585,12 @@ function topRichest(data)
 		}
 		table += '<td>' + addCommas(data.top[key].balance);
 		table += '<td>' + addCommas(data.top[key].in_OWN);
-		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + " %";
+		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
 	}
 	table += '</table>';
 	
 	output += table;
-	
+/*	
 	if(data.assetKey != 0)
 	{
 		assetUrl = '&asset='+data.assetKey;
@@ -607,7 +609,7 @@ function topRichest(data)
 		assetstxt += '<a href=?top=100&asset='+key+get_lang()+'>'+'(' + key + ')' + data.assets[key] + '</a>' + ', ';
 	}
 	output += assetstxt.slice(0, -2) + '</font>';
-	
+	*/
 	return output;
 }		
 
@@ -804,7 +806,7 @@ function assets(data)
 		table += '<td>' + data.assets[key].operations;
 	
 		table += '<td>' + htmlFilter(data.assets[key].description);
-		table += '<td>' + htmlFilter(data.assets[key].owner);
+		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
 		table += '<td>' + htmlFilter(data.assets[key].isMovable);
 		table += '<td>' +data.assets[key].quantity;
 		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
@@ -831,33 +833,33 @@ function asset(data)
 	
 	output += '<table width="1280" border=0><tr><td align=left><br>';
 	
-	output += '<a href="?assets'+get_lang()+'"><h3 style="display:inline;">Assets</h3></a>';
+	output += '<h3 style="display:inline;">'+ data.asset.label_Asset+ ':</h3>';
 	
-	output += '<h3 style="display:inline;"> | </h3>';
+	//output += '<h3 style="display:inline;"> | </h3>';
 	
 	output += '<a href="?asset='+data.asset.this.key+get_lang()+'"><h3 style="display:inline;">';
 	output += getAssetName2(data.asset.this.key, data.asset.this.name)+'</h3></a>';
 	
 	output += '<br><br>';
 	
-	output += '<b>Key:</b> ' + data.asset.this.key;
+	output += '<b>'+ data.asset.label_Key + ':</b> ' + data.asset.this.key;
 	
 	output += '<br><br>';
 	
-	output += '<b>Owner:</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
+	output += '<b>' + data.asset.label_Creator + ':</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
 	
 	output += '<br><br>';
 	
 	
-	output += '<b>Description:</b> ' + htmlFilter(wordwrap(data.asset.this.description, 80, '\n', true));
+	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(data.asset.this.description, 80, '\n', true);
 	
 	output += '<br><br>';
 	
-	output += '<b>Divisible:</b> ' + data.asset.this.isDivisible;
+	output += '<b>'   + data.asset.label_Divisible + ':</b> ' + data.asset.this.isDivisible;
 		
 	output += '<br><br>';
 	
-	output += '<b>Quantity:</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	
+	output += '<b> ' +data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	
 	
 	output += '<br><br>';
 	
@@ -870,17 +872,17 @@ function asset(data)
 		assetUrl = '';
 	}	
 	
-	output += '<b>Holders:</b> <a href=?top=allnotzero'+assetUrl+get_lang()+'>View</a>';
+	output += '<b>' +data.asset.label_Holders +':</b> <a href=?top=allnotzero'+assetUrl+get_lang()+'>'+ data.asset.label_View + '</a>';
 		
 	output += '<br><br>';
 	
-	output += '<h3>Available pairs</h3>';
+	output += '<h3>'+   data.asset.label_Available_pairs +'</h3>';
 	
 	output += '<table border="0" cellspacing="10" class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-	output += '<td><b>Pair</b></td><td><b>Orders<br>Count</b></td>';
-	output += '<td><b>Open Orders Volume</b></td>';
-	output += '<td><b>Trades<br>Count</b></td><td><b>Trades Volume</b></td>';
-	output += '<td><b>Description</b></td></tr>';
+	output += '<td><b>'+ data.asset.label_Pair+'</b></td><td><b>'+ data.asset.label_Orders_Count+'</b></td>';
+	output += '<td><b>'+  data.asset.label_Open_Orders_Volume +'</b></td>';
+	output += '<td><b>' + data.asset.label_Trades_Count +  '</b></td><td><b>'+ data.asset.label_Trades_Volume +'</b></td>';
+	output += '<td><b>'+data.asset.label_Description+'</b></td></tr>';
 	
 	for(key in data.asset.pairs) {
 		output += '<tr>';
@@ -933,7 +935,7 @@ function asset(data)
 		
 		output += '<td>' + htmlFilter(data.asset.pairs[key].description);
 	}
-	output += '<tr><td><b>Total:';
+	output += '<tr><td><b>'+ data.asset.label_Total+':';
 	output += '<td>' + data.asset.totalOpenOrdersCount;
 	output += '<td>'+addCommas(data.asset.totalOrdersVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 	output += '<td>' + data.asset.totalTradesCount;
@@ -951,7 +953,7 @@ function trades(data)
 	
 	output += '<table width="1180" border=0><tr><td align=left><br>';
 	
-	output += '<a href="?assets"'+get_lang()+'><h3 style="display:inline;">Assets</h3></a>';
+	output += '<a href="?assets"'+get_lang()+'><h3 style="display:inline;">'+data.label_Trades+'</h3></a>';
 	
 	output += '<h3 style="display:inline;"> | </h3>';
 	
@@ -962,9 +964,9 @@ function trades(data)
 	output += '<br><br>';
 	
 	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="600">';
-	output += '<h4>Sell Orders</h4></td><td width="10">&nbsp;<td width="600"><h4>Buy Orders</h4></td></tr>';
+	output += '<h4>'+ data.label_Sell_Orders+'</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+'</h4></td></tr>';
 	output += '<tr valign="top"><td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>Price</b></td><td width="190"><b>Amount</b></td><td width="190"><b>Total</b></td></tr>';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
 	for(key in data.sells) {
 	
@@ -981,13 +983,13 @@ function trades(data)
 	
 	output += '<tr bgcolor="#f9f9f9">';
 	
-	output += '<td colspan=2><b>Total:<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td colspan=2><b>'+ data.label_Total+':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
 	output += '</table>';
 	
 	output += '<td width="10">&nbsp;<td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>Price</b></td><td width="190"><b>Amount</b></td><td width="190"><b>Total</b></td></tr>';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
 	for(key in data.buys) {
 		
@@ -1004,18 +1006,18 @@ function trades(data)
 
 	output += '<tr bgcolor="#f9f9f9">';
 	
-	output += '<td colspan=2><b>Total:<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td colspan=2><b>'+data.label_Total+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
 	output += '</table>';
 	
 	output += '<tr><td colspan=3 width="100%" align=center>';
 	
-	output += '<h4 style="text-align: left;">Trade History</h4>';
+	output += '<h4 style="text-align: left;">'+ data.label_Trade_History+'</h4>';
 	
 	output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>Timestamp<td align=center><b>Type</b></td>';
-	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>Price</b></td>';
+	output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>'+ data.label_Date  +'<td align=center><b>'+ data.label_Type +'</b></td>';
+	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>'+ data.label_Price +'</b></td>';
 	
 	output += '<td><b><a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName)+'</b></td></tr>';
 	
@@ -1114,10 +1116,10 @@ function trades(data)
 	
 	output += '</table>';
 	
-	output += '<b>Trade Volume:</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<b>'+ data.label_Trade_Volume +':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
-	output += '<br><br><b>Go To: <a href=?asset=' + data.assetHave + get_lang()+'>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
+	output += '<br><br><b>'+ data.label_Go_To +': <a href=?asset=' + data.assetHave + get_lang()+'>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
 	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName) + '</a>';
 	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+'&asset='+data.assetHave+get_lang()+'>'+ getAssetName2(data.assetWant, data.assetWantName) + '/' + getAssetName2(data.assetHave, data.assetHaveName);
 	output += '</b>';
@@ -1284,30 +1286,56 @@ function mainQuery(data) {
 
 		if(data.type == 'standardAccount')
 		{
-			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			
-			output += '<br>';
-			output +='<font size="+1">Standard Account: <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			if (data.person_key != -10){
+			
+			output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">'; 
+			output +='<td><font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
+			
+			}else{
+			
 			output += '<br><br>';
+			output +='<font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			}
+			output +='</table>';
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += data.Balance.label_Balance_table + ':<br>';
+			output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Balance.label_asset_key+'<td><b>'+ data.Balance.label_asset_name+'<td><b>'+data.Balance.label_Balance_A+'<td><b>'+data.Balance.label_Balance_B+'<td><b>'+ data.Balance.label_Balance_C +'</tr>';
+			for (key in data.Balance.balances){
+			output += '<tr><td><a href ="?asset='+data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+			output +='<td><a href="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+			output +='<td>' + data.Balance.balances[key].balance_A + '<td>'+data.Balance.balances[key].balance_B + '<td>'+data.Balance.balances[key].balance_C;
+			
+			}
+			
+			
+			output += '</table><br><br>';
+			
+			output += transactions_Table(data);
+			/*
+			output += data.Transactions.label_transactions_table + ':<br>';
 			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
-			output += '<tr bgcolor="f1f1f1"><td><b>'+data.label_block+'<td><b>'+ data.label_signature+'<td><b>'+data.label_type_transaction+'<td><b>'+data.label_reference+'<td><b>'+ data.label_date+'<td><b>'+data.label_creator+'<td><b>'+data.label_size+'<td><b>'+data.label_fee+'<td><b>'+ data.label_confirmations+'</tr>';
-			for (key in data.transaction){
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+ data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+data.Transactions.label_reference+'<td><b>'+ data.Transactions.label_date+'<td><b>'+data.Transactions.label_creator+'<td><b>'+data.Transactions.label_size+'<td><b>'+data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
+			for (key in data.Transactions.transactions){
 			
 			
-			output += '<tr><td><a href ="?block='+data.transaction[key].block+get_lang()+'">'+ data.transaction[key].block +'-'+ data.transaction[key].seq+'</a><td><a href="?tx='+data.transaction[key].signature+'" title = "'+ data.transaction[key].signature  +get_lang()+'">'+data.transaction[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.transaction[key].signature+get_lang()+'">'+data.transaction[key].type+'</a><td>'+data.transaction[key].reference+'<td>'+data.transaction[key].date;
-			if (data.transaction[key].creator_key == '-'){
-			output += '<td>'+data.transaction[key].creator+'</a>'; 
-			}else if (data.transaction[key].creator_key == '+'){
-			output += '<td><a href ="?addr='+data.transaction[key].creator+get_lang()+'">'+data.transaction[key].creator+'</a>';
+			output += '<tr><td><a href ="?block='+data.Transactions.transactions[key].block+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+ data.Transactions.transactions[key].seq+'</a><td><a href="?tx='+data.Transactions.transactions[key].signature+'" title = "'+ data.Transactions.transactions[key].signature  +get_lang()+'">'+data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+'</a><td>'+data.Transactions.transactions[key].reference+'<td>'+data.Transactions.transactions[key].date;
+			if (data.Transactions.transactions[key].creator_key == '-'){
+			output += '<td>'+data.Transactions.transactions[key].creator+'</a>'; 
+			}else if (data.Transactions.transactions[key].creator_key == '+'){
+			output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
 			}else{
-			output += '<td><a href ="?person='+data.transaction[key].creator_key+get_lang()+'">'+data.transaction[key].creator+'</a>';
+			output += '<td><a href ="?person='+data.Transactions.transactions[key].creator_key+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
 			}
-			output += '<td>'+ data.transaction[key].size +'<td>'+ data.transaction[key].fee +'<td>'+ data.transaction[key].confirmations + '</td></tr>';
+			output += '<td>'+ data.Transactions.transactions[key].size +'<td>'+ data.Transactions.transactions[key].fee +'<td>'+ data.Transactions.transactions[key].confirmations + '</td></tr>';
 			
 			}
 			output +='</table></td></tr></table>';
-			/*
+			
 			if(data.countTx.hasOwnProperty('txsCount'))
 			{
 				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
@@ -1377,7 +1405,7 @@ function mainQuery(data) {
 			urlstart = url;
 			
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
-			output += '<font size="+1">Block Height: ';
+			output += '<font size="+1">' + data.label_block + ': ';
 			if(data.hasOwnProperty('parentBlockSignature'))
 			{
 				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight-1)+get_lang()+'"><b>&lt;</b></a> ';
@@ -1390,11 +1418,11 @@ function mainQuery(data) {
 			output += '</font>';
 			output += '<br><br>';
 
-			output += 'Block version: <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
+			output += data.label_Block_version + ': <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
 			
 			if(data.countTx.hasOwnProperty('txsCount'))
 			{
-				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
+				output += data.label_Transactions_count +': ' + data.countTx.txsCount + '<br>' + data.label_Including + ':<br>';
 
 				for(key in data.countTx.txsTypesCount) {
 					output += '&nbsp;&nbsp;&nbsp;'
@@ -1404,7 +1432,7 @@ function mainQuery(data) {
 			}
 			else
 			{
-				output += 'Transactions count: 0<br>';
+				output += data.label_Transactions_count +': 0<br>';
 			}
 			
 			if(data.countTx.tradesCount > 0)
@@ -1417,31 +1445,34 @@ function mainQuery(data) {
 				output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
 			}
 
-			output += '<br>Total Amount: '+ data.totalAmount + ' ERM';
-			output += '<br>Total AT Amount: '+ data.totalATAmount + ' ERM';
-			output += '<br>Total Fee: '+ data.totalFee + ' ERM';
+			output += '<br>' + data.label_Total_Amount+': '+ data.totalAmount ;
+			output += '<br>' + data.label_Total_AT_Amount+':'+ data.totalATAmount ;
+			output += '<br>' + data.label_Total_Fee+': '+ data.totalFee ;
 			
 			
 			output += '<br><br>';
 			
 			if(data.hasOwnProperty('parentBlockSignature'))
 			{
-				output += 'Parent block '+(data.blockHeight-1)+', signature: ';
-				output += '<a style="font-size: 9px;" href=?block='+ data.parentBlockSignature + get_lang()+'>' + data.parentBlockSignature + '</a>';
+				
+				output += data.label_Parent_block +': '+ (data.blockHeight-1) + ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.parentBlockSignature + get_lang()+'>' + data.parentBlockSignature + '</a>';
 				output += '<br><br>';
 			}
 			
-			output += '<b>Current block '+(data.blockHeight)+', signature:</b> '
-			output += '<a style="font-size: 9px;" href=?block='+ data.blockSignature + get_lang()+'>' + data.blockSignature + '</a>';
+			output += '<b>' + data.label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.label_Signature + ':</b> ';
+			output += '<a  href=?block='+ data.blockSignature + get_lang()+'>' + data.blockSignature + '</a>';
 			output += '<br><br>';
 			
 			if(data.hasOwnProperty('childBlockSignature'))
 			{
-				output += 'Child block '+(data.blockHeight+1)+', signature: ';
-				output += '<a style="font-size: 9px;" href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
+				output += data.label_Child_block +': '+(data.blockHeight+1)+ ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
 				output += '<br><br>';
 			}
+			output += transactions_Table(data);
 			
+		return output;
 		}
 		
 		
@@ -1489,12 +1520,37 @@ function mainQuery(data) {
 		
 		if(data.type == 'transaction')
 		{
-			url = '?tx=' + data[1].transaction.signature;
-			urlstart = url;
+	//		url = '?tx=' + data[1].transaction.signature;
+	//		urlstart = url;
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
-			output += '<font size="+1">Standard Transaction</font><br>';
-			
-			
+	/*		output += '<font size="+1"> <b>'+ data. Label_Transaction + ': </b>'+  data.transaction_Header.transactions[0].type;
+			output += '       ('  + data.transaction_Header.label_block +': </b><a href=?block=' + data.transaction_Header.transactions[0].block + get_lang() + '>' + data.transaction_Header.transactions[0].block + '</a>'; 
+			output += ' - ' + data.transaction_Header.transactions[0].seq  +') </font><br>';
+			output += '<br><b>'  +  data.transaction_Header.label_confirmations       + ': </b>' + data.transaction_Header.transactions[0].confirmations; 
+			output += '<br><b>'  +  data.transaction_Header.label_date      + ': </b>' + data.transaction_Header.transactions[0].date;
+			output += '<br><b>'  +  data.transaction_Header.label_size       + ': </b>' + data.transaction_Header.transactions[0].size; 
+			output += '<br><b>' +  data.transaction_Header.label_signature + ': </b>' + data.transaction_Header.transactions[0].signature;
+			output += '<BR><b>'  +  data.transaction_Header.label_reference + ': </b>' + data.transaction_Header.transactions[0].reference;
+			output += '<br> ';
+			if (data.transaction_Header.transactions[0].creator_key != '-')
+			{
+				if (data.transaction_Header.transactions[0].creator_key == '+'){
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?addr='+  data.transaction_Header.transactions[0].creator_addr + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+				}
+				else{
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?person='+  data.transaction_Header.transactions[0].creator_key + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+				}
+			} */
+			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
+		//	output += '<br>';	
+			output += data.body + '<br>';
+		//	output += data.Json ;
+
+
+
+
+
+			return output;
 		}
 
 		if(data.type == 'unconfirmed')
@@ -3050,7 +3106,7 @@ function mainQuery(data) {
 						
 						output += '</table><br>';
 					}
-				}
+				} 
 			}
 		
 		//	if(data.type == 'standardAccount' || data.type == 'at')
@@ -3085,6 +3141,7 @@ function uintToString(uintArray) {
 
 function htmlFilter(str)
 {
+if (str == null) return "";
 	return str
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
@@ -3294,7 +3351,7 @@ function search(data)
 
 	if(data.foundCount == 1)
 	{
-		document.location.href = foundOne;
+		document.location.href = foundOne + get_lang();
 		return null;
 	}
 	
@@ -3323,8 +3380,8 @@ function lastBlock(lastBlock)
 		return "";
 	
 	var output = '';
-	output += ': <a href=?block='+lastBlock.height+get_lang()+'>' + lastBlock.height + '</a>';
-	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp) + ' ago'+ ') ';
+	output += lastBlock.label_Last_processed_block + ': <a href=?block='+lastBlock.height+get_lang()+'>' + lastBlock.height + '</a>';
+	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' +  lastBlock.label_ago + ') ';
 	output += '<br><br>';
 	
 	return output;
@@ -3346,7 +3403,7 @@ function parseUrlQuery() {
 function person(data)
 {
 
-output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
 output += '<tr><td align=left>';
 output += '<table><tr><td>';
 
@@ -3433,10 +3490,10 @@ var output = '';
 	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
 	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
 	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td><td style ="padding-left:20px">'; 
+	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>'; 
 	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key + get_lang() + '>'+data[i].name +'</a>';
 	//output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
-	output += '<td>'+data[i].creator;
+	output += '<td><a href=?addr='+data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
 	}
 	
 	output += '<tr><td colspan=4>';
@@ -3489,7 +3546,7 @@ function getQueryParams(name) {
 }
 
 function buttonSearch() {
-   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value);
+   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() ;
 }
 
 function start() {
@@ -3501,7 +3558,7 @@ function start() {
 	if (params['lang'] == null) params['lang']="en";
 //document.getElementById('menuBlocks').innerHTML = '<a href="#?lang=111'+params['lang'] +'" id=home2>Blocks</a>'
 	
-	document.getElementById('home').href = document.location.pathname;
+//	document.getElementById('home').href = document.location.pathname;
 	document.getElementById('home2').href = document.location.pathname +'?lang='+ params['lang'] ;
 	
 	document.getElementById('menu_top_100').href ='?top=100&lang='+ params['lang'] ;
@@ -3833,6 +3890,16 @@ function start() {
 		return;
 	}
 	
+	if(params.hasOwnProperty('startPerson'))
+	{
+		asyncAjax('blockexplorer.json?persons&start=' + params['startBlock']+'&lang='+params['lang'], 'persons');
+
+		document.title = title + ' - Start from ' + params['startPerson'] + ' persons';
+		
+		return;
+	}
+	
+	
 	if(params.hasOwnProperty('person'))
 	{
 		asyncAjax('blockexplorer.json?person=' + params['person']+'&lang='+params['lang'], 'person');
@@ -3891,7 +3958,7 @@ function Lang_setting(){
 			}
 		}
 		if (k==0){
-			search += 'lang='+val;
+			search += '&lang='+val;
 		}
     }else{
 		search += 'lang='+val;
@@ -3915,10 +3982,10 @@ function Lang_setting(){
           	<a href="http://ARONICLE.com" class="navbar-brand"><img src="img/logo_header.png" style="height:35px" alt="" class="logo-header"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a id=home href=''>BlockExplorer</a></li>
+       <!--    <ul class="nav navbar-nav navbar-right">
+           <li><a id=home href=''>BlockExplorer</a></li>
 			
-			<li class="dropdown"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle"><span class="glyphicon glyphicon-th"></span></a>
+		<li class="dropdown"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle"><span class="glyphicon glyphicon-th"></span></a> 
           <div role="menu" class="dropdown-menu">
             <div class="menu-grid">
               <div class="list">
@@ -3939,7 +4006,7 @@ function Lang_setting(){
           </div>
         </li>
             
-          </ul>
+          </ul>-->
           <div class="navbar-form navbar-left">
             <div class="input-group">
               <label for="name" class="sr-only">Search</label>
@@ -3959,7 +4026,7 @@ function Lang_setting(){
           <div class="container">
             <div class="row" id="main-menu" >
               <ul role="tablist" class="nav nav-tabs">
-                <li id=menuBlocks><a href="#" id=home2>Blocks</a></li>
+                <li id=menuBlocks><a href="#" id=home2><translate>Blocks</translate></a></li>
 				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100><translate>Top 100 Richest</translate></a></li>
 				<li id=menuPersons><a href="?persons" id =menu_percons><translate>Persons</translate></a></li>
 				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>

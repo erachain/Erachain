@@ -139,7 +139,7 @@ public class Voush_Library_Panel extends JPanel {
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
+				PublicKeyAccount public_Account = model.get_Public_Account(row);
 				StringSelection value = new StringSelection(public_Account.getAddress());
 				clipboard.setContents(value, null);
 			}
@@ -155,7 +155,7 @@ public class Voush_Library_Panel extends JPanel {
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
 
-				PublicKeyAccount public_Account = model.getTrancaction(row).getCreator();
+				PublicKeyAccount public_Account = model.get_Public_Account(row);
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
 			}
@@ -180,16 +180,13 @@ public class Voush_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copy_Block_PublicKey);
 
-		
-		
-		
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
-				Account account = (Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR);
+				Account account = (Account) model.get_Public_Account(row);
 
 				new Account_Send_Dialog(null, null, account, null);
 
@@ -203,7 +200,7 @@ public class Voush_Library_Panel extends JPanel {
 
 				int row = jTable_Vouches.getSelectedRow();
 				row = jTable_Vouches.convertRowIndexToModel(row);
-				Account account = (Account)jTable_Vouches.getValueAt(row, model.COLUMN_CREATOR);
+				Account account = (Account)model.get_Public_Account(row);
 
 			new Mail_Send_Dialog(null, null, account, null);
 

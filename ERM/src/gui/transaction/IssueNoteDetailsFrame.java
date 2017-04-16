@@ -16,6 +16,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import core.crypto.Base58;
 import core.item.notes.NoteCls;
 import core.transaction.IssueNoteRecord;
@@ -49,7 +51,7 @@ public class IssueNoteDetailsFrame extends Rec_DetailsFrame
 				
 		//DESCRIPTION
 		++detailGBC.gridy;
-		JTextArea txtAreaDescription = new JTextArea(noteIssue.getItem().getDescription());
+		JTextArea txtAreaDescription = new JTextArea(Processor.process(noteIssue.getItem().getDescription()));
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);

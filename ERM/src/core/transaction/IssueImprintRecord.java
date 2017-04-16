@@ -195,7 +195,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 
 	@Override
 	public int calcBaseFee() {		
-		return calcCommonFee() >>3;
+		return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * 4;
 	}
 
 

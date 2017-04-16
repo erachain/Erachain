@@ -39,6 +39,7 @@ public class ApiService {
 		//s.add(CalcFeeResource.class);
 		s.add(NameStorageResource.class);
 	//	s.add(Rec_MessageResource.class);
+		s.add(Rec_Resource.class);
 		s.add(Rec_HashesResource.class);
 		s.add(AssetsResource.class);
 		s.add(Rec_StatementResource.class);

@@ -290,7 +290,7 @@ public class AssetPairSelect extends JDialog{
 	    
 	    
 	    
-	    Dimension size = MainFrame.desktopPane.getSize();
+	    Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	    pair_Panel.jSplitPanel.setDividerLocation((int)(size.width/2.5));
 	    this.add(pair_Panel, labelGBC);
 		//PACK

@@ -98,7 +98,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         this.jLabel_Transaction_Title.setText(Lang.getInstance().translate("My Transactions"));
         this.jLabel_My_Block_Title.setText(Lang.getInstance().translate("My Generated Blocks"));
         
-        Dimension size = MainFrame.desktopPane.getSize();
+        Dimension size = MainFrame.getInstance().desktopPane.getSize();
         //this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	    //split_generated_Block.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
         int splitP2_Div_LOC = (int)((size.getHeight()-100)*.15);

@@ -2,12 +2,18 @@ package gui.items.statement;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.swing.JPanel;
 
 import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
 
+import core.blockexplorer.WEB_Transactions_HTML;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
@@ -15,6 +21,8 @@ import core.transaction.Transaction;
 import database.DBSet;
 import gui.library.MTextPane;
 import gui.library.Voush_Library_Panel;
+import gui.transaction.Rec_DetailsFrame;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 /*
@@ -54,8 +62,36 @@ public class Statement_Info extends javax.swing.JPanel {
 		statement = (R_SignNote) transaction;
 		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		//jTextArea_Body.setContentType("text/html");
-		jTextArea_Body.set_text(note.getName() + "\n\n" + note.getDescription() + "\n\n"
-				+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
+		String description = note.getDescription(); 
+		if (statement.isText() && !statement.isEncrypted()) {
+			List<String> vars = note.getVarNames();
+			if (vars != null && !vars.isEmpty()) {
+				// try replace variables
+				String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
+				String[] rows = dataVars.split("\n");
+				Map<String, String> varsArray = new HashMap<String, String>();
+				for (String row: rows) {
+					String[] var_Name_Value = row.split("=");
+					if (var_Name_Value.length == 2) {
+						varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+					}
+					
+				}
+				
+				for (Map.Entry<String, String> item : varsArray.entrySet()) {
+					//description.replaceAll("{{" + item.getKey() + "}}", (String)item.getValue());
+					description = description.replace("{{" + item.getKey() + "}}", (String)item.getValue());
+				}
+			}
+			
+			jTextArea_Body.set_text(note.getName() + "\n\n"
+					+ Processor.process(description) + "\n\n"
+					+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
+			
+		} else {
+			jTextArea_Body.set_text(note.getName() + "\n\n"
+					+ Processor.process(description));			
+		}
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
 
@@ -83,7 +119,9 @@ public class Statement_Info extends javax.swing.JPanel {
 
 		setLayout(new java.awt.GridBagLayout());
 
-		jLabel_Title.setText(Lang.getInstance().translate("Statement"));
+		
+		JPanel pp = new Rec_DetailsFrame(transaction);
+		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -91,21 +129,39 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.weightx = 0.2;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
-		add(jLabel_Title, gridBagConstraints);
+		add(pp, gridBagConstraints);
+		
 
 		jSplitPane1.setBorder(null);
 		jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
 		jPanel1.setLayout(new java.awt.GridBagLayout());
-
+		int y = 0;
+		
+		
+		
+		
 		// jTextArea_Body.setColumns(20);
 		// jTextArea_Body.setRows(5);
 		// jScrollPane3.setViewportView(jTextArea_Body);
 	//	jScrollPane3.getViewport().add(jTextArea_Body);
+		jLabel_Title.setText(Lang.getInstance().translate("Statement"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = ++y;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		gridBagConstraints.weightx = 0.2;
+		gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
+		jPanel1.add(jLabel_Title, gridBagConstraints);
+		
+		
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		gridBagConstraints.gridy = ++y;
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);

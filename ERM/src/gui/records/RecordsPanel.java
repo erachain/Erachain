@@ -144,7 +144,7 @@ public class RecordsPanel extends  JPanel // JPanel
 		record_stpit.jToolBar_RightPanel.setVisible(false);
 		record_stpit.searchToolBar_LeftPanel.setVisible(false);
 		
-		Dimension size = MainFrame.desktopPane.getSize();
+		Dimension size = MainFrame.getInstance().desktopPane.getSize();
 		this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		
@@ -194,7 +194,7 @@ public class RecordsPanel extends  JPanel // JPanel
 									tableGBC.weighty = 1;
 									tableGBC.gridx = 0;	
 									tableGBC.gridy= 0;	
-									JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+								//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 									panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction),tableGBC);
 									  JLabel jLabel9 = new JLabel();
 										jLabel9.setText("");

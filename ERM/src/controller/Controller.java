@@ -74,6 +74,7 @@ import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
 import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 import core.voting.Poll;
 import core.voting.PollOption;
 import core.wallet.Wallet;
@@ -113,7 +114,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1001l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ERM4-DEVELOP":"ERM4";
-	private static final String version = "3.03.01";
+	private static final String version = "3.03.02";
 	private static final String buildTime = "2017-03-21 19:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -2270,7 +2271,30 @@ public class Controller extends Observable {
 			return this.transactionCreator.createTransactionFromRaw(rawData);
 		}
 	}
-	
+
+	public Pair<Transaction, Integer> lightCreateTransactionFromRaw(
+			byte[] rawData) {
+		
+		//CREATE TRANSACTION FROM RAW
+		Transaction transaction;
+		try {
+			transaction = TransactionFactory.getInstance().parse(rawData, null);
+		} catch (Exception e) {
+			return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
+		}
+
+		//CHECK IF RECORD VALID
+		if (!transaction.isSignatureValid()) 
+			return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
+			
+		int valid = this.transactionCreator.afterCreate(transaction, false);
+		if (valid != Transaction.VALIDATE_OK)
+			return new Pair<Transaction, Integer>(null, valid);
+			
+		return new Pair<Transaction, Integer>(transaction, valid);
+		
+	}
+
 	public Transaction issueAsset(PrivateKeyAccount creator,
 			String name, String description, boolean movable, long quantity, byte scale, boolean divisible,
 			int feePow) {

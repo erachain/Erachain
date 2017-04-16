@@ -55,6 +55,7 @@ import org.jsoup.select.Elements;
 import com.google.common.base.Charsets;
 import com.mitchellbosecke.pebble.error.PebbleException;
 
+import api.ApiErrorFactory;
 import api.BlogPostResource;
 import api.NameStorageResource;
 import controller.Controller;
@@ -82,12 +83,15 @@ import core.web.blog.BlogEntry;
 import database.DBSet;
 import database.NameMap;
 import lang.Lang;
+import ntp.NTP;
 import settings.Settings;
+import utils.APIUtils;
 import utils.AccountBalanceComparator;
 import utils.BlogUtils;
 import utils.DiffHelper;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
+import webserver.wrapper.WebAccount;
 import utils.Pair;
 import utils.PebbleHelper;
 import utils.Corekeys;
@@ -97,11 +101,12 @@ import utils.UpdateUtil;
 
 @Path("/")
 public class WebResource {
+	
 	@Context
 	HttpServletRequest request;
-
 	
 	private static final Logger LOGGER = Logger.getLogger(WebResource.class);
+	
 	@GET
 	public Response Default() {
 
@@ -218,25 +223,19 @@ public class WebResource {
 		
 		if (lang !=null){
 			
-			langObj = Lang.getInstance().openLangFile(lang+".json");
+			langObj = Lang.openLangFile(lang+".json");
 			
 		
-					Elements el = doc.select("translate");
+			Elements el = doc.select("translate");
 			for (Element e:el){
-			e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
-				
-			}			
-		
-			
+				e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
+			}
 		}
-		
-		
 		
 		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
 		
-		
 	}
-
+	
 	@Path("index/blogsearch.html")
 	@GET
 	public Response doBlogSearch() {
@@ -1194,6 +1193,18 @@ public class WebResource {
 
 		if (file.exists()) {
 			return Response.ok(file, "text/explorerStatements").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/explorerTransactionsTable.js")
+	@GET
+	public Response explorerTransactionsTable() {
+		File file = new File("web/libs/js/explorerTransactionsTable.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerTransactionsTable").build();
 		} else {
 			return error404(request, null);
 		}

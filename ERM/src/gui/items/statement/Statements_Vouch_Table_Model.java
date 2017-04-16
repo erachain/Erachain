@@ -28,6 +28,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
@@ -56,7 +57,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	// public static final int COLUMN_AMOUNT = 2;
 	 public static final int COLUMN_HEIGHT = 2;
 	 public static final int COLUMN_CREATOR_NAME =30;
-	List<Transaction> transactions;
+	List<R_Vouch> transactions;
 
 	// private SortableList<byte[], Transaction> transactions;
 
@@ -78,7 +79,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		table = DBSet.getInstance().getTransactionFinalMap();
 		blockNo = transaction.getBlockHeight(DBSet.getInstance());
 		recNo = transaction.getSeqNo(DBSet.getInstance());
-		transactions = new ArrayList<Transaction>();
+		transactions = new ArrayList<R_Vouch>();
 		// transactions = read_Sign_Accoutns();
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
 		DBSet.getInstance().getTransactionMap().addObserver(this);
@@ -112,6 +113,13 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public String getColumnName(int index) {
 		return this.columnNames[index];
 	}
+	
+	public  PublicKeyAccount get_Public_Account(int row){
+		R_Vouch transaction = this.transactions.get(row);
+		return transaction.getCreator();
+		
+	}
+	
 
 	@Override
 	public int getRowCount() {
@@ -154,7 +162,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 				return null;
 			}
 
-			Transaction transaction = this.transactions.get(row);
+			R_Vouch transaction = this.transactions.get(row);
 			if (transaction == null)
 				return null;
 
@@ -275,7 +283,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 				) {
-			Transaction ss = (Transaction) message.getValue();
+			R_Vouch ss = (R_Vouch) message.getValue();
 			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
 				R_Vouch ss1 = (R_Vouch) ss;
 				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
@@ -288,8 +296,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		}
 	}
 
-	private List<Transaction> read_Sign_Accoutns() {
-		List<Transaction> trans = new ArrayList<Transaction>();
+	private List<R_Vouch> read_Sign_Accoutns() {
+		List<R_Vouch> trans = new ArrayList<R_Vouch>();
 		// ArrayList<Transaction> db_transactions;
 		// db_transactions = new ArrayList<Transaction>();
 		// tran = new ArrayList<Transaction>();
@@ -325,7 +333,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 					Integer bl = ll.a;
 					Integer seg = ll.b;
 
-					Transaction kk = table.getTransaction(bl, seg);
+					R_Vouch kk = (R_Vouch) table.getTransaction(bl, seg);
 					if (!trans.contains(kk))
 						trans.add(kk);
 				}

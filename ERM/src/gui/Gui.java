@@ -63,7 +63,7 @@ public class Gui extends JFrame{
         	new NoWalletFrame(this);
         } else if (Settings.getInstance().isGuiEnabled())
     	{
-    		mainframe =	new MainFrame();
+    		mainframe =	MainFrame.getInstance();
     		mainframe.setVisible(true);
     	}
         
@@ -80,7 +80,7 @@ public class Gui extends JFrame{
 		SysTray.getInstance().sendMessage(Lang.getInstance().translate("Wallet Initialized"),
 				Lang.getInstance().translate("Your wallet is initialized"), MessageType.INFO);
 		if (Settings.getInstance().isGuiEnabled())
-			mainframe = new MainFrame();
+			mainframe = MainFrame.getInstance();
 	}
 	
 	public void bringtoFront()

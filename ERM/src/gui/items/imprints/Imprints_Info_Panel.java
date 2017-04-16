@@ -4,6 +4,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import core.item.imprints.ImprintCls;
 import gui.library.MTable;
 import gui.models.BalancesTableModel;
@@ -97,7 +99,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START; 
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(Name_jTextField, gridBagConstraints);
 
@@ -111,7 +113,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         add(description_jLabel, gridBagConstraints);
         
         description_jTextArea.setEditable(false);
-        description_jTextArea.setText(imprint.getDescription());
+        description_jTextArea.setText(Processor.process(imprint.getDescription()));
         description_jTextArea.setColumns(20);
         description_jTextArea.setRows(5);
         jScrollPane1.setViewportView(description_jTextArea);
