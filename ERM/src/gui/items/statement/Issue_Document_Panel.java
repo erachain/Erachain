@@ -114,7 +114,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				// TODO Auto-generated method stub
 				EventType i = arg0.getEventType();
 				 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-				 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, "Set Param", jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+				 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, Lang.getInstance().translate("Insert") + " "+arg0.getDescription(), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
 				 if (str==null || str.equals("")) return;
 				 jTextPane_Message_Public.pars.replace("{{"+ arg0.getDescription()+"}}", str);
 				 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
