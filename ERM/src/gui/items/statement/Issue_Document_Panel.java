@@ -4,6 +4,8 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -39,6 +41,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
+import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import gui.PasswordPane;
 import gui.items.assets.ExchangeFrame;
@@ -83,12 +86,14 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
     private Table_Model_Issue_Hashes hashes_Table_Model;
 	private DefaultTableModel attached_Files_Model;
+	protected NoteCls sel_note;
 
 	/**
      * Creates new form Issue_Document_Panel
      */
     public Issue_Document_Panel() {
-    	 jTextPane_Message_Public = new MImprintEDIT_Pane("");
+    	jTextPane_Message_Public = new MImprintEDIT_Pane();
+    	
         initComponents();
        
     jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
@@ -197,6 +202,25 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			}
 		}
 	});
+ // combo Template
+     
+   jComboBox_Template.addItemListener(new ItemListener(){
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			// TODO Auto-generated method stub
+		
+			
+			if(e.getStateChange() == ItemEvent.SELECTED) 
+			{		
+				sel_note = (NoteCls) jComboBox_Template.getSelectedItem();
+				jTextPane_Message_Public.setText(sel_note.getDescription());
+			} 	
+			
+			
+		}
+	});
+	
     
     TableColumnModel at_F_Col_M = jTable_Attached_Files.getColumnModel();
     

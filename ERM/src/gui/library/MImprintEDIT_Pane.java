@@ -23,13 +23,15 @@ public class MImprintEDIT_Pane extends JTextPane {
 	private JTextPane th;
 	private String text;
 	
-
-	public MImprintEDIT_Pane(String text1){
+	public MImprintEDIT_Pane(){
+		
+	}
+	public void setText(String text1){
 	
 		th = this;
 		this.text = text1;
 		pars = new HashMap<String, String>();
-		this.text = "werwe{{parametr_1}}  kgjdflkgdlfk  {{parametr_2}} cxvxvxcvxc {{parametr_1}}";
+	//	this.text = "werwe{{parametr_1}}  kgjdflkgdlfk  {{parametr_2}} cxvxvxcvxc {{parametr_1}}";
 	//
 		
 	
@@ -52,7 +54,7 @@ public class MImprintEDIT_Pane extends JTextPane {
 		});
 		setContentType("text/html");
 		setEditable(false);
-		setText(init_String(this.text, true));
+		setText(init_String(text, true));
 	
 		
 	}
