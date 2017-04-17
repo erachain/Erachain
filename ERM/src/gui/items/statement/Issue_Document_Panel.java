@@ -46,6 +46,7 @@ import gui.items.assets.TableModelItemAssets;
 import gui.items.imprints.Table_Model_Issue_Hashes;
 import gui.items.notes.ComboBoxModelItemsNotes;
 import gui.library.MButton;
+import gui.library.MImprintEDIT_Pane;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
@@ -87,7 +88,9 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
      * Creates new form Issue_Document_Panel
      */
     public Issue_Document_Panel() {
+    	 jTextPane_Message_Public = new MImprintEDIT_Pane("");
         initComponents();
+       
     jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
     jLabel_Title_Message.setText(Lang.getInstance().translate("Title") + ":");
     jTextField_Title_Message.setText("");
@@ -301,7 +304,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jTabbedPane_Message = new javax.swing.JTabbedPane();
         jPanel_Message_Public = new javax.swing.JPanel();
         jScrollPane_Message_Public_TextPane = new javax.swing.JScrollPane();
-        jTextPane_Message_Public = new javax.swing.JTextPane();
+       
         jCheckBox_Message_Public = new javax.swing.JCheckBox();
         jPanel_Message_Private = new javax.swing.JPanel();
         jScrollPane_Message_Private_TextPane = new javax.swing.JScrollPane();
@@ -1063,7 +1066,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Fee_Work;
     private javax.swing.JTextField jTextField_Title_Message;
     private javax.swing.JTextPane jTextPane_Message_Private;
-    private javax.swing.JTextPane jTextPane_Message_Public;
+    private MImprintEDIT_Pane jTextPane_Message_Public;
     // End of variables declaration                   
 }
 class Attache_Files_Model extends DefaultTableModel{
