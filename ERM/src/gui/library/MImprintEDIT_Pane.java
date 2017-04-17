@@ -8,7 +8,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 
 
@@ -19,48 +21,26 @@ public class MImprintEDIT_Pane extends JTextPane {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	HashMap<String, String> pars;
-	private JTextPane th;
-	private String text;
+	public HashMap<String, String> pars;
+	public JTextPane th;
+	public String text;
 	
 	public MImprintEDIT_Pane(){
-		
-	}
-	public void setText(String text1){
-	
-		th = this;
-		this.text = text1;
 		pars = new HashMap<String, String>();
-	//	this.text = "werwe{{parametr_1}}  kgjdflkgdlfk  {{parametr_2}} cxvxvxcvxc {{parametr_1}}";
-	//
-		
-	
-		addHyperlinkListener(new HyperlinkListener(){
-
-			@Override
-			public void hyperlinkUpdate(HyperlinkEvent arg0) {
-				// TODO Auto-generated method stub
-				 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-				 String str = JOptionPane.showInputDialog(th, "Set Param", pars.get("{{"+ arg0.getDescription()+"}}"));
-				 if (str==null || str.equals("")) return;
-				 pars.replace("{{"+ arg0.getDescription()+"}}", str);
-				 setText(init_String(text, false));
-			
-			}
-			
-			
-			
-			
-		});
+		th = this;
 		setContentType("text/html");
 		setEditable(false);
+		
+	}
+	public void set_Text(String text1){
+	this.text = text1;
 		setText(init_String(text, true));
 	
 		
 	}
 	
 		
-	private String init_String(String text, boolean first){
+	public String init_String(String text, boolean first){
 		Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
 	
 	 String out = text;  // переводим в маркдаун
@@ -72,8 +52,18 @@ public class MImprintEDIT_Pane extends JTextPane {
 		out = out.replace(m.group(), "<A href=" + m.group(1)  +">" + pars.get(m.group())+ "</a>");
 		
 	}
-
-	return out;
+	int font_saze = UIManager.getFont("Label.font").getSize();
+	return "<head><style>" 
+			+ " h1{ font-size: " + font_saze + "px;  } " 
+			+ " h2{ font-size: " + font_saze + "px;  }"
+			+ " h3{ font-size: " + font_saze + "px;  }" 
+			+ " h4{ font-size: " + font_saze + "px;  }"
+			+ " h5{ font-size: " + font_saze + "px;  }" 
+			+ " body{ font-family:"
+			+ UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px;"
+			+ "word-wrap:break-word;}"
+			+ "</style> </head><body>" + out + "</body>";
+	
 	}
 	// TODO Auto-generated method stub
 	public HashMap<String, String> get_Params(){
