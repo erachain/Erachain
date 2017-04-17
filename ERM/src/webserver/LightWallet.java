@@ -33,6 +33,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 
 import api.ApiErrorFactory;
 import controller.Controller;
@@ -140,7 +141,7 @@ public class LightWallet {
 	@GET
 	@Path("lightwallet/parsetest/")
 	// for test raw without Signature
-	// http://127.0.0.1:9047/lightwallet/parsetest?data=3RKre8zCEarLXoLgSdTcyWKHmCRzUs9urtZnWtoNCDDKu2h4sWTQxyvJa8N2AVB7M83CJQcNpA5BU5jsb9wciisZLSjB868nM9ozCmviVb63p9YTUNLhAwAhFgWCyBYnTH
+	// http://127.0.0.1:9047/lightwallet/parsetest?data=GqEobyneRFcbLSrNnvQtYiL2QNnRGehvZoMRKPe3A6Uxzav61PXFo3ir8UPBtGiYDMXx6Ngv6yMa1ENUqZP88ew8QXNvawJ1La7QV67vhAy4Rkc3szs79Gt144UtwZnBULCxHhs
 	//
 	public String parseShort() // throws JSONException
 	{
@@ -256,21 +257,24 @@ public class LightWallet {
 			return APIUtils.errorMess(-steep, e1.toString() + " on steep: " + steep);
 		} 
 		
+		// TODO add PORT
+		///int port = Controller.getInstance().getNetworkPort();
+		///data = Bytes.concat(data, Ints.toByteArray(port));
 
-		return toBytes(record_type,	version, feePow, timestamp, creator, reference, queryParameters);
+		return toBytes(record_type, version, feePow, timestamp, creator, reference, queryParameters);
 
 	}
 
 	@GET
-	@Path("lightwallet/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}")
+	@Path("lightwallet/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}/{reference}/")
 	// http://127.0.0.1:9047/lightwallet/getraw/31/0/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF/0/2?amount=12.12345678
-	public String toBytes(@PathParam("type") int record_type,
+	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("version") int version,
 			@PathParam("creator") String creator,
 			@PathParam("timestamp") long timestamp,
 			@PathParam("feePow") int feePow,
 			@PathParam("reference") long reference
-			) // throws JSONException
+			)
 	{
 
 		if (uriInfo == null) {
@@ -316,70 +320,86 @@ public class LightWallet {
 
 		
 		try {
+			
+			Transaction record = null;
+			
 			switch(record_type)
 			{
 			case Transaction.SIGN_NOTE_TRANSACTION:
 				
 				//PARSE PAYMENT TRANSACTION
 				//return R_SignNote.Parse(data, releaserReference);
+				break;
 			
 			case Transaction.REGISTER_NAME_TRANSACTION:
 				
 				//PARSE REGISTER NAME TRANSACTION
 				//return RegisterNameTransaction.Parse(data);
+				break;
 				
 			case Transaction.UPDATE_NAME_TRANSACTION:
 				
 				//PARSE UPDATE NAME TRANSACTION
 				//return UpdateNameTransaction.Parse(data);
+				break;
 				
 			case Transaction.SELL_NAME_TRANSACTION:
 				
 				//PARSE SELL NAME TRANSACTION
 				//return SellNameTransaction.Parse(data);
+				break;
 				
 			case Transaction.CANCEL_SELL_NAME_TRANSACTION:
 				
 				//PARSE CANCEL SELL NAME TRANSACTION
 				//return CancelSellNameTransaction.Parse(data);
+				break;
 				
 			case Transaction.BUY_NAME_TRANSACTION:
 				
 				//PARSE CANCEL SELL NAME TRANSACTION
 				//return BuyNameTransaction.Parse(data);	
+				break;
 				
 			case Transaction.CREATE_POLL_TRANSACTION:
 				
 				//PARSE CREATE POLL TRANSACTION
 				//return CreatePollTransaction.Parse(data);	
+				break;
 				
 			case Transaction.VOTE_ON_POLL_TRANSACTION:
 				
 				//PARSE CREATE POLL VOTE
 				//return VoteOnPollTransaction.Parse(data, releaserReference);		
+				break;
 				
 			case Transaction.ARBITRARY_TRANSACTION:
 				
 				//PARSE ARBITRARY TRANSACTION
 				//return ArbitraryTransaction.Parse(data);			
+				break;
 						
 			case Transaction.CREATE_ORDER_TRANSACTION:
 				
 				//PARSE ORDER CREATION TRANSACTION
 				//return CreateOrderTransaction.Parse(data, releaserReference);	
+				break;
 				
 			case Transaction.CANCEL_ORDER_TRANSACTION:
 				
 				//PARSE ORDER CANCEL
 				//return CancelOrderTransaction.Parse(data, releaserReference);	
+				break;
 				
 			case Transaction.MULTI_PAYMENT_TRANSACTION:
 				
 				//PARSE MULTI PAYMENT
 				//return MultiPaymentTransaction.Parse(data, releaserReference);		
+				break;
 			
 			case Transaction.DEPLOY_AT_TRANSACTION:
 				//return DeployATTransaction.Parse(data);
+				break;
 	
 			case Transaction.SEND_ASSET_TRANSACTION:
 	
@@ -436,105 +456,122 @@ public class LightWallet {
 					//LOGGER.info(e1);
 					return APIUtils.errorMess(-steep, e1.toString() + " on steep: " + steep);
 				} 
-				R_Send record = new R_Send((byte)version, creatorPK,
+				record = new R_Send((byte)version, creatorPK,
 						(byte)feePow, recipient, key, amount, head,
 						data, isText, encryptMessage, timestamp, reference);
-	
-				/*
-				int error = Controller.getInstance().getTransactionCreator().afterCreate(record, false);
-				if (error != Transaction.VALIDATE_OK)
-					return APIUtils.errorMess(error, gui.transaction.OnDealClick.resultMess(error));
-					*/
-				
-				return Base58.encode(record.toBytes(false, null));
+					
+				break;
 				
 			case Transaction.HASHES_RECORD:
 	
 				// PARSE ACCOUNTING TRANSACTION V3
 				//return R_Hashes.Parse(data, releaserReference);
+				break;
 					
 			case Transaction.VOUCH_TRANSACTION:
 				
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_Vouch.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 				
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_SetStatusToItem.Parse(data, releaserReference);
+				break;
 				
 			case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
 				
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_SetUnionToItem.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 				
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_SertifyPubKeys.Parse(data, releaserReference);			
+				break;
 				
 			case Transaction.ISSUE_ASSET_TRANSACTION:
 				
 				//PARSE ISSUE ASSET TRANSACTION
 				//return IssueAssetTransaction.Parse(data, releaserReference);
+				break;
 				
 			case Transaction.ISSUE_IMPRINT_TRANSACTION:
 				
 				//PARSE ISSUE IMPRINT TRANSACTION
 				//return IssueImprintRecord.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.ISSUE_NOTE_TRANSACTION:
 				
 				//PARSE ISSUE NOTE TRANSACTION
 				//return IssueNoteRecord.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.ISSUE_PERSON_TRANSACTION:
 				
 				//PARSE ISSUE PERSON TRANSACTION
 				//return IssuePersonRecord.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.ISSUE_STATUS_TRANSACTION:
 				
 				//PARSE ISSUE NOTE TRANSACTION
 				//return IssueStatusRecord.Parse(data, releaserReference);
+				break;
 	
 			case Transaction.ISSUE_UNION_TRANSACTION:
 				
 				//PARSE ISSUE NOTE TRANSACTION
 				//return IssueUnionRecord.Parse(data, releaserReference);
+				break;
 				
 			case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
 				
 				//PARSE TRANSFER ASSET TRANSACTION
 				//return GenesisTransferAssetTransaction.Parse(data);	
+				break;
 			
 			case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
 				
 				//PARSE ISSUE PERSON TRANSACTION
 				//return GenesisIssuePersonRecord.Parse(data);
+				break;
 	
 			case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
 				
 				//PARSE ISSUE NOTE TRANSACTION
 				//return GenesisIssueNoteRecord.Parse(data);
+				break;
 	
 			case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
 				
 				//PARSE ISSUE STATUS TRANSACTION
 				//return GenesisIssueStatusRecord.Parse(data);
+				break;
 	
 			case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 				
 				//PARSE GENESIS TRANSACTION
 				//return GenesisIssueAssetTransaction.Parse(data);
-				
-			}
+				break;
+
+			default:
+				return APIUtils.errorMess(Transaction.INVALID_TRANSACTION_TYPE, "Invalid transaction type: " + record_type);
+
+			}  
+
+			// all test a not valid for main test
+			// all other network must be invalid here!
+			int port = Controller.getInstance().getNetworkPort();
+			return Base58.encode(Bytes.concat(record.toBytes(false, null), Ints.toByteArray(port)));
+			
 		} catch (Exception e) {
 			//LOGGER.info(e);
 			return APIUtils.errorMess(-steep, e.toString() + " on steep: " + steep);
 		} 
-
-		return APIUtils.errorMess(Transaction.INVALID_TRANSACTION_TYPE, "Invalid transaction type: " + record_type);
 			
 	}
 	
