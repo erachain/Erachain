@@ -1295,6 +1295,9 @@ public class Controller extends Observable {
 		// CREATE MESSAGE
  		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
+		if (HWeight == null)
+			return;
+		
 		Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
 		
 		// BROADCAST MESSAGE		
@@ -1357,6 +1360,9 @@ public class Controller extends Observable {
 			return true;
 		
 		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeight(dbSet, false);
+		if (thisHW == null)
+			return true;
+		
 		if (maxHW.a > thisHW.a ) {
 			return false;
 		} else if (maxHW.a < thisHW.a)
@@ -1451,7 +1457,7 @@ public class Controller extends Observable {
 						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
 					}
 				}
-			} while (!this.isUpToDate());
+			} while (!dbSet.isStoped() && !this.isUpToDate());
 			
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -1524,6 +1530,9 @@ public class Controller extends Observable {
 	*/
 
 	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight() {
+		
+		if (this.dbSet.isStoped())
+			return null;
 		
 		Tuple2<Integer, Long> myHWeight = this.getMyHWeight(false);
 		int height = myHWeight.a;
@@ -1947,6 +1956,9 @@ public class Controller extends Observable {
 
 	public int getMyHeight() {
 		// need for TESTs
+		if (this.dbSet.isStoped())
+			return -1;
+		
 		return this.blockChain != null? this.blockChain.getHWeight(dbSet, false).a: -1;
 	}
 
