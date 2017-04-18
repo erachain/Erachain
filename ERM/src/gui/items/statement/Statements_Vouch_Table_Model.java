@@ -283,8 +283,9 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 				) {
-			R_Vouch ss = (R_Vouch) message.getValue();
-			if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
+			Transaction t = (Transaction) message.getValue();
+			if (t.getType()== Transaction.VOUCH_TRANSACTION ){
+			R_Vouch ss = (R_Vouch) t;
 				R_Vouch ss1 = (R_Vouch) ss;
 				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
 					if (!this.transactions.contains(ss)){
@@ -293,6 +294,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 					}
 				}
 			}
+			
 		}
 	}
 
