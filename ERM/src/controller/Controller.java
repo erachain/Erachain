@@ -2299,7 +2299,8 @@ public class Controller extends Observable {
 		if (!transaction.isSignatureValid()) 
 			return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
 			
-		int valid = this.transactionCreator.afterCreate(transaction, false);
+		//CHECK FOR UPDATES
+		int valid = this.transactionCreator.afterCreateRaw(transaction, false);
 		if (valid != Transaction.VALIDATE_OK)
 			return new Pair<Transaction, Integer>(null, valid);
 			
