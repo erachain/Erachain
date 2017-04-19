@@ -559,10 +559,10 @@ public class GenesisBlock extends Block{
 		case (int)NoteCls.LICENSE_KEY:
 			String license = "";
 			try {
-				//FileInputStream fis = new FileInputStream("Aronicle License ERM4.txt");
+				//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
 				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 				//Reader in = new BufferedReader(isr);
-				File file = new File("Aronicle License ERM4.txt");
+				File file = new File("AronicleLicenseERA.txt");
 				//READ SETTINS JSON FILE
 				List<String> lines = Files.readLines(file, Charsets.UTF_8);
 				

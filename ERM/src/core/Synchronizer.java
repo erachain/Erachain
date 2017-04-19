@@ -237,7 +237,7 @@ public class Synchronizer
 				
 		// FIND HEADERS for common CHAIN
 		if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
-			LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
+			LOGGER.info("Synchronizing from peer: " + peer.toString() + ":"
 					+ peer.getAddress().getHostAddress() + ", ping: " + peer.getPing());			
 		}
 		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);

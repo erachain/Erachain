@@ -1,5 +1,5 @@
 @ECHO OFF
-set app=ERM4
+set app=ERA
 
 IF EXIST java (
 	start "%app%" java -Xms512m -Xmx1024m -jar %app%.jar

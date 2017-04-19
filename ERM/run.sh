@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar ERM4.jar
+java -jar ERA.jar
