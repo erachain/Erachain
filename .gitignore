@@ -1,5 +1,7 @@
 ﻿*.class
 
-ERM/settings.json
-ERM/*.jar
+
+ERA/settings.json
+ERA/*.jar
+
 *.jar
