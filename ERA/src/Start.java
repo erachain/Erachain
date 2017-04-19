@@ -31,7 +31,7 @@ public class Start {
 	public static void main(String args[]) throws IOException
 	{	
 		
-		//
+		////
 		File log4j = new File("log4j.properties");
 		if(log4j.exists())
 		{
