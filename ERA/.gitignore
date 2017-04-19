@@ -3,9 +3,8 @@
 /wallet*
 /bin/
 /ACCOUNTS.txt
-/ERA.jar
-/ERA-DEVELOP.jar
-/ERA.iml
+/*.jar
+/*.iml
 *.iml
 
 log.txt
@@ -13,4 +12,4 @@ log.txt.*
 settings.json
 gui_settings.json
 *.zip
-*.theme
+/*.theme
