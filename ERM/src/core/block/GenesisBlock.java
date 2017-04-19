@@ -562,7 +562,7 @@ public class GenesisBlock extends Block{
 				//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
 				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 				//Reader in = new BufferedReader(isr);
-				File file = new File("AronicleLicenseERA.txt");
+				File file = new File("Aronicle License ERA.txt");
 				//READ SETTINS JSON FILE
 				List<String> lines = Files.readLines(file, Charsets.UTF_8);
 				

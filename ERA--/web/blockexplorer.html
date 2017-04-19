@@ -1,0 +1,4073 @@
+<!DOCTYPE html>
+<html style='height:100%'>
+	<head>
+	<title>ERM BlockExplorer</title>
+	<link href="/index/libs/bootstrap/3/css/theme.css" rel="stylesheet">
+    <script src="/index/libs/jquery/jquery.2.js"></script>
+	<script src="/index/libs/bootstrap/3/js/bootstrap.min.js"></script>
+	<link href="/index/libs/css/style.css" rel="stylesheet">
+	<script src="/index/libs/js/sidebar.js"></script>
+	<script src="/index/libs/js/common.js"></script>
+	<script src="/index/libs/js/explorerStatements.js"></script>
+	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
+	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
+	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
+	<style type="text/css">
+      body {
+      padding-top: 50px;
+      }
+      .sub-header {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      }
+      .navbar-fixed-top { 
+      border: 0;
+      z-index: 9999;
+      }
+      .sidebar {
+      display: none;
+      }
+      @media (min-width: 768px) {
+      .sidebar {
+      position: fixed;
+      top: 51px;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: block;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background-color: #f5f5f5;
+      border-right: 1px solid #eee;
+      }
+      }
+      .nav-sidebar {
+      margin-right: -21px;
+      margin-bottom: 20px;
+      margin-left: -20px;
+      }
+      .nav-sidebar > li > a {
+      padding-right: 20px;
+      padding-left: 20px;
+      }
+      .nav-sidebar > .active > a,
+      .nav-sidebar > .active > a:hover,
+      .nav-sidebar > .active > a:focus {
+      color: #fff;
+      background-color: #428bca;
+      }
+      .main {
+      padding-top: 20px;
+      }
+      .main-tabs {
+      width: 100%;
+      padding-top: 15px;
+      padding-left: 0px;
+      padding-right: 0px;
+      background-color: lightgray;
+      }
+      img.logo-header {
+      background-color: transparent;
+      height: 100%;
+      }
+      .col-lg-8 {
+      padding-left: 0px;
+      }
+      @media (min-width: 768px) {
+      .main {
+      padding-right: 40px;
+      }
+      }
+      .main .page-header {
+      margin-top: 0;
+      }
+      .placeholders {
+      margin-bottom: 30px;
+      text-align: center;
+      }
+      .placeholders h4 {
+      margin-bottom: 0;
+      }
+      .placeholder {
+      margin-bottom: 20px;
+      }
+      .placeholder img {
+      display: inline-block;
+      border-radius: 50%;
+      }
+      .r-t {
+      margin: 0px;
+      }
+      .r-l {
+      margin: 0px;
+      }
+      span.label.label-default {
+      background-color: #fff;
+      color: lightgray;
+      font-size: 90%;
+      line-height: 1;
+      }
+      span.label.label-default a {
+      color: #ddd;
+      text-decoration: none;
+      }
+      a.r-l:hover,
+      a.r-l:focus {
+      color: #6467FF;
+      text-decoration: none;
+      }
+      .navbar-header {
+      width: 110px;
+      }
+	  
+	  a.anchor {
+		display: block;
+		position: relative;
+		top: -64px;
+		visibility: hidden;
+	}
+	</style>
+	<script type="text/javascript">
+	
+var loading = true;
+var params;
+
+function getXmlHttp(){
+	var xmlhttp;
+	try {
+		xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+	} catch (e) {
+		try {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		} catch (E) {
+			xmlhttp = false;
+		}
+	}
+	if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+		xmlhttp = new XMLHttpRequest();
+	}
+	return xmlhttp;
+}
+
+function getResponseJson (url){
+	var xmlhttp = getXmlHttp()
+	xmlhttp.open('GET', url, false);
+	xmlhttp.send(null);
+	
+	if (xmlhttp.readyState == 4) {
+		if(xmlhttp.status == 200) {
+			return JSON.parse(xmlhttp.responseText);
+		}
+	}
+}
+
+function asyncAjax (url, type){
+	var xmlhttp = getXmlHttp()
+	xmlhttp.open('GET', url, true);
+	
+	loading = true;
+	setTimeout(function() {if(loading){document.getElementById('loading').style.display = 'block'; }}, 250);
+	
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4) {
+			if(xmlhttp.status == 200) {
+				var data = JSON.parse(xmlhttp.responseText);
+				
+				
+				
+				
+		
+	
+		
+	/*
+				
+		$(home2).text(data.id_home2);
+	$(menu_top_100).text(data.id_menu_top_100);
+	$(menu_percons).text(data.id_menu_percons);
+	$(menu_pals_asset).text(data.id_menu_pals_asset);
+	$(menu_assets).text(data.id_menu_assets);
+	$(menu_aTs).text(data.id_menu_aTs);			
+				
+	*/			
+				
+				
+				document.getElementById('Langs').innerHTML = langs(data);
+
+				if(type == 'blocks')
+				{
+					document.getElementById('main').innerHTML = blocks(data);
+				}
+				
+				if(type == 'peers')
+				{
+					document.getElementById('main').innerHTML = peers(data);
+				}
+				
+				if(type == 'statements')
+				{
+					document.getElementById('main').innerHTML = statements(data);
+				}
+				
+				if(type == 'statement')
+				{
+					document.getElementById('main').innerHTML = statement(data);
+				}
+				
+				
+				if(type == 'topRichest')
+				{
+					document.getElementById('main').innerHTML = topRichest(data);
+				}
+				
+				if (type == 'persons')
+				
+				{
+					document.getElementById('main').innerHTML = persons(data);
+				
+				}
+				
+				if (type == 'person')
+				
+				{
+					document.getElementById('main').innerHTML = person(data);
+				
+				}
+				
+				
+				if(type == 'mainQuery')
+				{
+					document.getElementById('main').innerHTML = mainQuery(data);
+					genFilterUrlForAll();
+					genFilterUrl();
+					//document.getElementById(window.location.hash.replace( '#', '' )).scrollIntoView(true);
+					if(window.location.hash)
+					{
+						window.location.href = window.location.hash;
+					}
+				}
+				
+				if(type == 'aTs')
+				{
+				
+					document.getElementById('main').innerHTML = aTs(data)
+				}
+				
+				if(type == 'polls')
+				{
+					document.getElementById('main').innerHTML = oppa();
+					document.getElementById('main').innerHTML = polls(data)
+				}
+				
+				if(type == 'poll')
+				{
+					document.getElementById('main').innerHTML = poll(data)
+
+				}
+				
+				if(type == 'assets')
+				{
+					document.getElementById('main').innerHTML = assets(data)
+				}
+				
+				if(type == 'asset')
+				{
+					document.getElementById('main').innerHTML = asset(data)
+				}
+				
+				if(type == 'trades')
+				{
+					document.getElementById('main').innerHTML = trades(data)
+				}
+				
+				if(type == 'search')
+				{
+					document.getElementById('main').innerHTML = search(data)
+				}
+				
+				document.getElementById('loading').style.display = 'none';
+				loading = false;
+
+			}
+		}
+	};
+	xmlhttp.send(null);
+}
+
+function langs(data){
+ //key =0;
+ output ='';
+ for(key in data.Lang) {
+	
+	output +='	<option value ="'+ data.Lang[key].ISO +'"'; 
+	a = params['lang'];
+	b = data.Lang[key].ISO;
+  if(a == b){
+  
+  
+	output += ' selected ';
+  }
+  output += '>'+data.Lang[key].name+'</option>';
+  
+ }
+
+return output;
+}
+
+
+function secToFine(time, lastBlock) {
+	time = Math.floor( time/1000 );
+	
+	var mins = ~~(time / 60);
+	var secs = time % 60;
+
+	// Hours, minutes and seconds
+	var hrs = ~~(time / 3600);
+	var mins = ~~((time % 3600) / 60);
+	var secs = time % 60;
+	
+	ret = "";
+
+	if (hrs > 0)
+		ret += " " + hrs + " " + (hrs > 1 ? lastBlock.label_hours : lastBlock.label_hour);
+
+	ret += " " + mins + " " + (mins > 1 ? lastBlock.label_mins  : lastBlock.label_min);
+	ret += " " + secs + " " + lastBlock.label_secs;
+	return ret;
+}
+
+function getAssetNameMini(assetKey, assetName) {
+	if(assetName.length > 4)
+	{
+		return '<abbr title="' + '(' + assetKey + ') ' + assetName + '"><a  href=?asset='+assetKey+get_lang()+' ><font size=-2 color=black>' + getAssetName(assetKey, assetName.substr(0, 4))+ '</font></a></abbr>';
+	}
+	else
+	{
+		return '<a class=without href=?asset='+assetKey+get_lang()+'><font size=-2 color=black>' + getAssetName(assetKey, assetName)+ '</font></a>';
+	}
+}
+
+function getAssetNameMiniGrey(assetKey, assetName) {
+	if(assetName.length > 4)
+	{
+		return '<abbr title="' + '(' + assetKey + ') ' + assetName + '"><a class=without href=?asset='+assetKey+get_lang()+'><font size=-2 color=#e0e0e0>' + getAssetName(assetKey, assetName.substr(0, 4))+ '</font></a></abbr>';
+	}
+	else
+	{
+		return '<a class=without href=?asset='+assetKey+get_lang()+'><font size=-2 color=#e0e0e0>' + getAssetName(assetKey, assetName)+ '</font></a>';
+	}
+}
+
+function getAssetName(assetKey, assetName) {
+	if(assetKey == 2)
+	{
+		return htmlFilter(assetName);
+	}
+	else
+	{
+		return '(' + assetKey + ')' + htmlFilter(assetName);
+	}
+}
+
+function getAssetName2(assetKey, assetName) {
+	return '(' + assetKey + ')' + htmlFilter(assetName);
+}
+function addCommas(str)
+{
+	if(str == null) return "";
+	strbuf = str.toString();
+	if( strbuf.indexOf('.') == -1)
+	{
+		return strbuf.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1,');
+	}
+	return strbuf.replace(/(\d)(?=(\d\d\d)+([^\d]))/g, '$1,');
+}
+
+function aTs (data)
+{
+	var output = '';
+	
+	output += lastBlock(data.lastBlock);
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="680">';
+	output += '<tr><td>'; 
+	
+	output += '<center><h3>AT Accounts</h3>';
+		
+	for(key in data.aTs) {
+		
+		output += '<table class="table table-striped" style="border: 1px solid #ddd;"><tr bgcolor="f1f1f1"><td>';
+		
+		output += '<table width="100%">';
+		
+		output += '<tr><td> ';
+		
+		output += '<b><a href=?addr='+key+get_lang()+'>'+key+'</a></td>';
+		
+		output += '<td align=right>';
+
+		if(data.aTs[key].accountBalance != '0.00000000')
+		{
+			output += '<b>';
+		}
+		output += addCommas(data.aTs[key].accountBalance) + ' ERM';
+		
+		output += '</table>';
+		
+		output += '<tr><td>';
+		output += '<table width="100%"><tr>'
+
+		output += '<td>';
+		output += '<b>Name: </b>' + data.aTs[key].name;
+		output += '<br><b>Creator:</b> <a href=?addr='+data.aTs[key].creator+get_lang()+'>'+data.aTs[key].creator+'</a>';
+		output += '<br><b>AT Type:</b> ' + data.aTs[key].type;
+		
+		output += '<br><b>Description:</b> ' + htmlFilter(wordwrap(data.aTs[key].description, 80, '\n', true));
+		output += '<br><b>Tags:</b> ' + htmlFilter(wordwrap(data.aTs[key].tags, 80, '\n', true));
+		//output += '<br><b>Dead:</b> ' + data.aTs[key].state.dead;
+		//output += '<br><b>Frozen:</b> ' + data.aTs[key].state.frozen;
+		output += '</td>';
+		
+		output += '</tr></table>';
+		
+		output += '</table>';
+		
+	}
+
+	return output;
+}
+
+function blocks(data)
+{
+	var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<tr><td align=left>';
+	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr><td><b>'+ data.Label_Height +' <td><b>'+data.Label_Time+'<td><b>'+ data.Label_Generator +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount; 
+
+	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
+	for(var i = data.maxHeight; i >= minHeight; i--)
+	{
+		output += '<tr>';
+		output += '<td><a href=?block='+i+get_lang()+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+get_lang()+'>'+data[i].generator;
+		output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
+		output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
+	}
+	
+	output += '<tr><td colspan=4>';
+	if(data.maxHeight != data.lastBlock.height)
+	{
+		if(data.lastBlock.height < data.maxHeight + 21)
+		{
+			output += '<a href=?startBlock='+(data.lastBlock.height)+get_lang()+'>'+data.Label_Later;
+		}
+		else
+		{
+			output += '<a href=?startBlock='+(data.maxHeight+21)+get_lang()+'>'+data.Label_Later;
+		}
+	}
+	
+	output += '<td colspan=4 align=right>';
+	if(minHeight > 1) {
+		output += '<a href=?startBlock='+(data.maxHeight-21)+get_lang()+'>'+data.Label_Previous;
+	}
+	
+	return output;
+}
+
+
+function peers(data)
+{
+	var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<tr><td align=left>';
+//	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr><td><b>'+ data.Label_No+'<td><b>'+ data.Label_IP +' <td><b>'+data.Label_Height+'<td><b>'+ data.Label_Ping_mc +'<td><b>'+data.Label_Reliable+'<td><b>'+data.Label_Initiator+'<td><b>'+data.Label_Finding_ago+'<td><b>'+data.Label_Online_Time+'<td><b>'+data.Label_Version; 
+
+	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
+	for(var i  in data.Peers)
+	{
+		output += '<tr><td>'+ i;
+		output += '<td>'+ data.Peers[i].IP+'<td>'+data.Peers[i].Height+'<td>'+data.Peers[i].Ping_mc;
+		output += '<td>'+ data.Peers[i].Reliable+'<td>'+data.Peers[i].Initiator;
+		output += '<td>'+ data.Peers[i].Finding_ago+'<td>'+data.Peers[i].Online_Time +'<td>'+data.Peers[i].Version;
+	}
+	
+	output += '<tr><td colspan=4>';
+//	if(data.rowCount != data.lastBlock.height)
+//	{
+//		if(data.rowCount < data.start + 20)
+//		{
+//			output += '<a href=?startBlock='+(data.lastBlock.height)+get_lang()+'>'+data.Label_Later;
+//		}
+//		else
+//		{
+//			output += '<a href=?startBlock='+(data.maxHeight+21)+get_lang()+'>'+data.Label_Later;
+//		}
+//	}
+	
+//	output += '<td colspan=4 align=right>';
+//	if(minHeight > 1) {
+//		output += '<a href=?startBlock='+(data.maxHeight-21)+get_lang()+'>'+data.Label_Previous;
+//	}
+	
+	return output;
+}
+
+
+
+
+
+
+
+		
+function topRichest(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
+	output += '<tr><td align=center>';
+	
+	output += data.Label_Total_coins_in_the_system +': ' + 
+		addCommas(data.allTotal) + ' '+ getAssetName(data.assetKey, data.assetName) + '<br>';
+	output += data.Label_minus + ' ' + addCommas(data.allinOrders) + 
+		' '+getAssetName(data.assetKey, data.assetName) + ' ' + data.Label_in_order + '= ' + 
+		addCommas(data.all) + ' ' + getAssetName(data.assetKey, data.assetName) + '<br>';
+	
+	
+	if(data.limit == -1)
+	{
+		buf = ''	
+		output += '<h3>'+ data.Label_All_non+ '</h2>';	
+	}
+	else if (data.limit == -2)
+	{
+		output += '<h3>'+ data.Label_All_accounts + '</h2>';	
+	}
+	else
+	{
+		output += '<h3>'+ data.Label_Title + '</h2>';	
+	}
+	
+	
+	var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>'+ data.Label_Table_Account+'<td><b>'+data.Label_Table_person+'<td><b>'+data.Label_Table_Balance + '<td><b>'+ data.Label_Table_in_OWN  +'<td><b>'+data.Label_Table_Prop; 
+
+	for(key in data.top) {
+		table += '<tr>';		
+		table += '<td>'+ key + '<td>' + '<a href="?addr='+data.top[key].address+get_lang()+'">' + data.top[key].address + '</a>';
+		
+		if (data.top[key].person_key !='-'){
+		table += '<td><a href="?person='+data.top[key].person_key+get_lang()+'">' + data.top[key].person+ '</a>';
+		}else{
+		table += '<td>' + data.top[key].person;
+		}
+		table += '<td>' + addCommas(data.top[key].balance);
+		table += '<td>' + addCommas(data.top[key].in_OWN);
+		table += '<td>' +  ((data.top[key].in_OWN / data.allTotal) * 100).toFixed(2) + "%";
+	}
+	table += '</table>';
+	
+	output += table;
+/*	
+	if(data.assetKey != 0)
+	{
+		assetUrl = '&asset='+data.assetKey;
+	}
+	else
+	{
+		assetUrl = '';
+	}	
+	
+	output += '<br><a href=?top=100'+assetUrl+get_lang()+'>Top 100</a> | <a href=?top=250'+assetUrl+get_lang()+'>Top 250</a> | <a href=?top=all'+assetUrl+get_lang()+'>All addresses</a> | <a href=?top=allnotzero'+assetUrl+get_lang()+'>All non-empty addresses';
+	
+	output += '<br><br><font size=-2>';
+	
+	var assetstxt = "";
+	for(key in data.assets) {
+		assetstxt += '<a href=?top=100&asset='+key+get_lang()+'>'+'(' + key + ')' + data.assets[key] + '</a>' + ', ';
+	}
+	output += assetstxt.slice(0, -2) + '</font>';
+	*/
+	return output;
+}		
+
+
+
+function polls11(a){
+window.location="/index/blockexplorer.html?polls& asset="+ a.value;
+
+
+
+}	
+
+function oppa(){
+var output= '';
+output += '<select name="SelectMyLove" id = "aa" onChange="polls11(this)"; >';
+	output +=' <option value="1" selected>1</option>';
+	output +=' <option value="6">6</option> </select>';
+	
+	return output;
+}
+	
+function polls(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	output += '<h3>Polls</h3>';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		output += '<br><h5>' + data.error + '</h5>';
+		
+		return output;
+	}
+	
+	
+	
+	var table = '<table id=top100 BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;">';
+	
+	table += '<tr><td><b>Poll<td><b>Votes<td><b>Asset';//<td><b>View'; 
+	
+	asset_key =  document.getElementById("aa").options.selectedIndex;
+	 dat=data;
+	for(key in data.pools) {
+		table += '<tr>';
+		
+		table += '<td>' +  htmlFilter(key);
+		if(data.pools[key].new)
+		{
+			table += ' <b>New!</b>';
+		}
+		table += '<td>' + addCommas(data.pools[key].totalVotes);
+		
+// select
+		table += '<td><select style="0" onchange="Onselect(dat,this.options[this.selectedIndex].value)">';
+	
+	table += '<option>Выберите актив</option>';
+	a=0;	
+	for (a in data.assets){	
+		table += '<option>'+ data.assets[a].name +'</option>';
+		
+  	}
+	table +='</select></td>';
+// переход		
+//	table += '<td>' + '<a href=?poll='+encodeURIComponent(key)+'&asset='+encodeURIComponent(asset_key)+'>>></a>';
+	
+	
+	}
+	
+	
+	table += '</table>';
+	
+	output += table;
+	
+		
+	return output;
+}		
+function Onselect(data,a){
+
+for (c in data.assets){
+ if ( a == data.assets[c].name) {document.location='?poll='+encodeURIComponent(key)+'&asset='+c;} 
+}
+}
+
+function poll(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+
+	if(data.hasOwnProperty('error'))
+	{
+		output += '<br><h5>' + data.error + '</h5>';
+		
+		return output;
+	}
+	
+	output += '<table width="" border=0><tr><td align=left><br>';
+	
+	output += '<font size=+1><b>Poll:</b> <a href=?poll='+encodeURIComponent(data.pool.name)+get_lang()+'>'+htmlFilter(data.pool.name)+'</a></font><br><br>';
+	
+	
+	output += '<b>Description:</b><br>'+htmlFilter(wordwrap(data.pool.description, 100, '\n', true))+'<br><br>';
+
+	output += '<b>Creator:</b> <a href=?addr='+data.pool.creator+get_lang()+'>'+data.pool.creator+'</a><br><br>';
+	
+	if(data.pool.hasOwnProperty('dateTime'))
+	{
+		output += '<b>Creation date:</b> ' + data.pool.dateTime + '<br><br>';
+	}
+	
+	output += '<table border="0" cellspacing="5" class="table">';
+	output += '<tr><td><b>Option</b></td><td><b>Votes</b></td><td width="390"><b>% of total</b></td></tr>';
+
+	for(key in data.pool.options) {
+		output += '<tr>';
+		output += '<td>'+htmlFilter(key);
+		output += '<td>'+addCommas(data.pool.options[key]);
+		
+		if(data.pool.totalVotes!='0.00000000')
+		{
+			procent = data.pool.options[key]/data.pool.totalVotes;	
+			procentRound = (procent*100).toFixed(2);
+			width = Math.round(procent * 300);
+		}
+		else
+		{
+			procentRound = '0';
+			width = 0;
+		}
+		
+		output += '<td><img src=img/bar_left.gif border=0 height=11 width=2><img src=img/bar.gif border=0 height=11 width='+width+'><img src=img/bar_right.gif border=0 height=11 width=2> ['+procentRound+'%]';
+	}
+
+	//output += '<tr><td colspan="3"></td></tr>';
+	output += '<tr><td><b>All Votes:</b></td><td align="left" colspan="2">';
+	output += addCommas(data.pool.totalVotes);
+	output += '</td></tr></tbody></table>';
+	
+	output += '<br>';
+	
+	output += '<table border="0" cellspacing="5" class="table table-condensed">';
+	output += '<tr><td><b>Address</b></td><td><b>Option</b></td><td><b>Votes</b></td></tr>';
+	
+	for(key in data.pool.votes) {
+		output += '<tr>';
+		output += '<td>'+'<a href=?addr='+key+get_lang()+'>'+key+'</a>';
+		output += '<td>'+htmlFilter(data.pool.votes[key].option);
+		output += '<td>'+addCommas(data.pool.votes[key].votes);
+	}
+	output += '</table>';
+	
+	
+	
+	
+	return output;
+}	
+
+function assets(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table width="1280" border=0><tr><td align=left><br>';
+	
+	output += '<a href="?assets"'+ get_lang()+'><h3 style="display:inline;">'+data.label_Title+'</h3></a>';
+	
+	output += '<br><br>';
+	
+	// style="background: #f4f4f4;"
+	
+	var table = '<table width=100% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+	table += '<td><b>'+data.label_table_key+'<td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
+	table += '<td><b>'+ data.label_table_asset_movable+'<td><b>'+data.label_table_asset_amount+'<td><b>'+data.label_table_asset_divisible;
+
+	for(key in data.assets) {
+		table += '<tr>';
+		table += '<td>' + key;
+		
+		table += '<td>' + '<a href=?asset='+encodeURIComponent(key)+get_lang()+'>' + htmlFilter(data.assets[key].name) + '</a>';
+		
+		table += '<td>' + data.assets[key].operations;
+	
+		table += '<td>' + htmlFilter(data.assets[key].description);
+		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
+		table += '<td>' + htmlFilter(data.assets[key].isMovable);
+		table += '<td>' +data.assets[key].quantity;
+		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
+	}
+	table += '</table>';
+
+	output += table;
+		
+	return output;
+}		
+
+function asset(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+
+	if(data.hasOwnProperty('error'))
+	{
+		output += '<br><h5>' + data.error + '</h5>';
+		
+		return output;
+	}
+	
+	output += '<table width="1280" border=0><tr><td align=left><br>';
+	
+	output += '<h3 style="display:inline;">'+ data.asset.label_Asset+ ':</h3>';
+	
+	//output += '<h3 style="display:inline;"> | </h3>';
+	
+	output += '<a href="?asset='+data.asset.this.key+get_lang()+'"><h3 style="display:inline;">';
+	output += getAssetName2(data.asset.this.key, data.asset.this.name)+'</h3></a>';
+	
+	output += '<br><br>';
+	
+	output += '<b>'+ data.asset.label_Key + ':</b> ' + data.asset.this.key;
+	
+	output += '<br><br>';
+	
+	output += '<b>' + data.asset.label_Creator + ':</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
+	
+	output += '<br><br>';
+	
+	
+	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(data.asset.this.description, 80, '\n', true);
+	
+	output += '<br><br>';
+	
+	output += '<b>'   + data.asset.label_Divisible + ':</b> ' + data.asset.this.isDivisible;
+		
+	output += '<br><br>';
+	
+	output += '<b> ' +data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	
+	
+	output += '<br><br>';
+	
+	if(data.asset.this.key != 0)
+	{
+		assetUrl = '&asset='+data.asset.this.key;
+	}
+	else
+	{
+		assetUrl = '';
+	}	
+	
+	output += '<b>' +data.asset.label_Holders +':</b> <a href=?top=allnotzero'+assetUrl+get_lang()+'>'+ data.asset.label_View + '</a>';
+		
+	output += '<br><br>';
+	
+	output += '<h3>'+   data.asset.label_Available_pairs +'</h3>';
+	
+	output += '<table border="0" cellspacing="10" class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+	output += '<td><b>'+ data.asset.label_Pair+'</b></td><td><b>'+ data.asset.label_Orders_Count+'</b></td>';
+	output += '<td><b>'+  data.asset.label_Open_Orders_Volume +'</b></td>';
+	output += '<td><b>' + data.asset.label_Trades_Count +  '</b></td><td><b>'+ data.asset.label_Trades_Volume +'</b></td>';
+	output += '<td><b>'+data.asset.label_Description+'</b></td></tr>';
+	
+	for(key in data.asset.pairs) {
+		output += '<tr>';
+		
+		output += '<td><b>';
+		output += '<a href="?asset='+data.asset.this.key+'&asset='+key+get_lang()+'">';
+		output += getAssetName2(data.asset.this.key, data.asset.this.name);
+		output += '/' + getAssetName2(key, data.asset.pairs[key].assetName);
+		
+		output += '<td>' + data.asset.pairs[key].openOrdersCount;
+		
+		output += '<td nowrap>';
+		if(data.asset.pairs[key].ordersPriceVolume == '0.00000000')
+		{
+			output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName) + '</font>';
+		}
+		else
+		{
+			output += '<font color=black>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName) + '</font>';
+		}
+		
+		if(data.asset.pairs[key].ordersAmountVolume == '0.00000000')
+		{
+			output += '<br><font color=#e0e0e0>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name) + '</font>';
+		}
+		else
+		{
+			output += '<br><font color=black>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name) + '</font>';
+		}
+		
+		output += '<td>' + data.asset.pairs[key].tradesCount;
+		
+		output += '<td nowrap>';
+		if(data.asset.pairs[key].tradeAmountVolume == '0.00000000')
+		{
+			output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName);
+		}
+		else
+		{
+			output += '<font color=black>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
+		}
+		if(data.asset.pairs[key].tradesPriceVolume == '0.00000000')
+		{
+			output += '<br><font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name);
+		}
+		else
+		{
+			output += '<br><font color=black>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+		}
+		
+		output += '<td>' + htmlFilter(data.asset.pairs[key].description);
+	}
+	output += '<tr><td><b>'+ data.asset.label_Total+':';
+	output += '<td>' + data.asset.totalOpenOrdersCount;
+	output += '<td>'+addCommas(data.asset.totalOrdersVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+	output += '<td>' + data.asset.totalTradesCount;
+	output += '<td>'+addCommas(data.asset.totalTradesVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+	output += '<td>';
+
+	return output;
+}
+
+function trades(data)
+{
+	var output = "";
+	
+	output += lastBlock(data.lastBlock);
+	
+	output += '<table width="1180" border=0><tr><td align=left><br>';
+	
+	output += '<a href="?assets"'+get_lang()+'><h3 style="display:inline;">'+data.label_Trades+'</h3></a>';
+	
+	output += '<h3 style="display:inline;"> | </h3>';
+	
+	output += '<a href="?trades='+data.assetHave+'-'+data.assetWant+get_lang()+'"><h3 style="display:inline;">';
+	output += getAssetName2(data.assetHave, data.assetHaveName)+'/';
+	output += getAssetName2(data.assetWant, data.assetWantName)+'</h3></a>';
+	
+	output += '<br><br>';
+	
+	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="600">';
+	output += '<h4>'+ data.label_Sell_Orders+'</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+'</h4></td></tr>';
+	output += '<tr valign="top"><td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
+	
+	for(key in data.sells) {
+	
+		if(!data.sells[key].good)
+			continue;
+			
+		output += '<tr>';
+		
+		output += '<td><a href=?tx='+key+get_lang()+'>#';
+		output += '<td>' + addCommas(data.sells[key].price) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+		output += '<td>' + addCommas(data.sells[key].amount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+		output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+	}
+	
+	output += '<tr bgcolor="#f9f9f9">';
+	
+	output += '<td colspan=2><b>'+ data.label_Total+':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+	
+	output += '</table>';
+	
+	output += '<td width="10">&nbsp;<td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
+	
+	for(key in data.buys) {
+		
+		if(!data.buys[key].good)
+			continue;
+		
+		output += '<tr>';
+	
+		output += '<td><a href=?tx='+key+get_lang()+'>#';
+		output += '<td>' + addCommas(data.buys[key].buyingPrice) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+		output += '<td>' + addCommas(data.buys[key].buyingAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+		output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+	}
+
+	output += '<tr bgcolor="#f9f9f9">';
+	
+	output += '<td colspan=2><b>'+data.label_Total+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+	
+	output += '</table>';
+	
+	output += '<tr><td colspan=3 width="100%" align=center>';
+	
+	output += '<h4 style="text-align: left;">'+ data.label_Trade_History+'</h4>';
+	
+	output += '<table border="0" cellspacing="3" cellpadding="5" width="100%" class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr bgcolor="e0e0e0"><td align=center><b>tx<td align=center><b>'+ data.label_Date  +'<td align=center><b>'+ data.label_Type +'</b></td>';
+	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>'+ data.label_Price +'</b></td>';
+	
+	output += '<td><b><a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName)+'</b></td></tr>';
+	
+	for(key in data.trades) {
+		output += '<tr>';
+			
+		output += '<td align=center><a href=?trade='+data.trades[key].initiatorTxSignature+'/'+data.trades[key].targetTxSignature+get_lang()+'>#';
+		output += '<td align=center>' + data.trades[key].dateTime;
+		output += '<td align=center>' + data.trades[key].type;
+		
+		
+		if(data.trades[key].type == 'sell')
+		{
+			output += '<td align=right style="line-height: 150%;">';
+
+			if(data.trades[key].initiatorCreator == data.assetHaveOwner)
+			{
+				output += ' <b>&#9654;</b> ';
+			}
+			
+			if(data.trades[key].initiatorCreator == data.assetWantOwner)
+			{
+				output += ' <b>&#9655;</b> ';
+			}
+			output += '<a href=?addr='+data.trades[key].initiatorCreator+'>' + data.trades[key].initiatorCreator + '</a>';
+			output += '<br>';
+			output += addCommas(data.trades[key].price);
+			output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+			output += ' <img src=img/grright.png style="vertical-align: middle;">';
+
+			output += '<td align=center>' + addCommas(data.trades[key].realReversePrice);
+			
+			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+		
+			output += '<td style="line-height: 150%;">';
+			output += '<a href=?addr='+data.trades[key].targetCreator+'>' + data.trades[key].targetCreator + '</a>';
+			
+			if(data.trades[key].targetCreator == data.assetHaveOwner)
+			{
+				output += ' <b>&#9664;</b> ';
+			}
+			if(data.trades[key].targetCreator == data.assetWantOwner)
+			{
+				output += ' <b>&#9665;</b> ';
+			}
+			
+			output += '<br>';
+			output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
+			output += addCommas(data.trades[key].amount);
+			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+
+		}
+		else
+		{
+			output += '<td align=right style="line-height: 150%;">';
+
+			if(data.trades[key].targetCreator == data.assetHaveOwner)
+			{
+				output += ' <b>&#9654;</b> ';
+			}
+			
+			if(data.trades[key].targetCreator == data.assetWantOwner)
+			{
+				output += ' <b>&#9655;</b> ';
+			}
+			output += '<a href=?addr='+data.trades[key].targetCreator+'>' + data.trades[key].targetCreator + '</a>';
+			output += '<br>';
+			output += addCommas(data.trades[key].amount);
+			output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+			output += ' <img src=img/grright.png style="vertical-align: middle;">';
+
+			output += '<td align=center>' + addCommas(data.trades[key].realPrice);
+			
+			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+		
+			output += '<td style="line-height: 150%;">';
+			output += '<a href=?addr='+data.trades[key].initiatorCreator+'>' + data.trades[key].initiatorCreator + '</a>';
+			
+			if(data.trades[key].initiatorCreator == data.assetHaveOwner)
+			{
+				output += ' <b>&#9664;</b> ';
+			}
+			if(data.trades[key].initiatorCreator == data.assetWantOwner)
+			{
+				output += ' <b>&#9665;</b> ';
+			}
+			
+			output += '<br>';
+			output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
+			output += addCommas(data.trades[key].price);
+			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);		
+		}
+	}
+	
+	output += '</table>';
+	
+	output += '</table>';
+	
+	output += '<b>'+ data.label_Trade_Volume +':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+	
+	output += '<br><br><b>'+ data.label_Go_To +': <a href=?asset=' + data.assetHave + get_lang()+'>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
+	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName) + '</a>';
+	output += '&nbsp;&nbsp;<a href=?asset='+data.assetWant+'&asset='+data.assetHave+get_lang()+'>'+ getAssetName2(data.assetWant, data.assetWantName) + '/' + getAssetName2(data.assetHave, data.assetHaveName);
+	output += '</b>';
+	
+	return output;
+}
+
+function isFilter(param) {
+	
+	return filters.hasOwnProperty(param);
+}
+
+function delPrm(Url,Prm) {
+	var a=Url.split('?');
+	var re = new RegExp('(\\?|&)'+Prm+'=[^&]+','g');
+	Url=('?'+a[1]).replace(re,'');
+	Url=Url.replace(/^&|\?/,'');
+	var dlm=(Url=='')? '': '?';
+	return a[0]+dlm+Url;
+};
+
+function genFilterUrlForAll() {
+	elementShowOnly = document.getElementsByClassName('showOnly');
+
+	urlBuf = location.href.replace(location.hash, '');
+	urlBuf = delPrm(urlBuf, 'showWithout');
+	urlBuf = delPrm(urlBuf, 'showOnly');
+	
+	for (var i = 0; i < elementShowOnly.length; i++)
+	{
+		elementShowOnly[i].href = urlBuf + '&showOnly=' + elementShowOnly[i].id;
+	}
+
+
+	elementTypes = document.getElementsByName('types');
+	
+	if(params.hasOwnProperty('showOnly'))
+	{
+		showOnlyArray = params['showOnly'].split(',');
+		
+		for (var i = 0; i < elementTypes.length; i++)
+		{
+			for (var k = 0; k < showOnlyArray.length; k++)
+			{
+				elementTypes[i].checked = false;
+				if(elementTypes[i].value == showOnlyArray[k])
+				{
+					elementTypes[i].checked = true;
+				}
+			}
+		}
+	}
+	else if(params.hasOwnProperty('showWithout'))
+	{
+		showWithoutArray = params['showWithout'].split(',');
+
+		for (var i = 0; i < elementTypes.length; i++)
+		{
+			elementTypes[i].checked = true;
+			for (var k = 0; k < showWithoutArray.length; k++)
+			{
+				if(elementTypes[i].value == showWithoutArray[k])
+				{
+					elementTypes[i].checked = false;
+				}
+			}
+		}
+
+	}
+}
+
+function genFilterUrl() {
+	
+	if(document.getElementById("showWithout") === null)
+	{
+		return 0;
+	}
+	
+	elementTypes = document.getElementsByName('types');
+	
+	var typesArray = [];
+	
+	for (var i = 0; i < elementTypes.length; i++)
+	{
+		if(!elementTypes[i].checked)
+		{
+			typesArray.push(elementTypes[i].value);
+		}
+	}
+	
+	urlBuf = location.href.replace(location.hash, '');
+	urlBuf = delPrm(urlBuf, 'showWithout');
+	urlBuf = delPrm(urlBuf, 'showOnly');
+	
+	document.getElementById("showWithout").href = urlBuf;
+
+	if(typesArray.length>0)
+	{
+		document.getElementById("showWithout").href += '&showWithout='+typesArray.join(',');
+	}
+
+	document.getElementById("cancelFilter").href = urlBuf;
+}
+
+function mainQuery(data) {
+	
+	var output = '';
+	var transactionTypes = ["", "Genesis", "Payment", "Name Registration", "Name Update", "Name Sale", "Cancel Name Sale", "Name Purchase", "Poll Creation", "Poll Vote", "Arbitrary Transaction", "Asset Issue", "Asset Transfer", "Order Creation", "Cancel Order", "Multi Payment", "Deploy AT", "Message",
+		"", ""];
+	transactionTypes[31] = "Send Record";
+	transactionTypes[21] = "Issue Asset Record";
+	transactionTypes[41] = "Hashes Record";
+
+	output += lastBlock(data.lastBlock);
+	
+	//try {
+	
+		if(data.type == 'standardAccount' || data.type == 'at')
+		{
+			if(data.withoutBlocks)
+			{
+				withoutBlocks = '&withoutBlocks';
+			}
+			else
+			{
+				withoutBlocks = '';
+			}
+	
+			if(data.showOnly)
+			{
+				showOnly = '&showOnly=' + data.showOnly;
+			}
+			else
+			{
+				showOnly = '';
+			}
+
+			if(data.showWithout)
+			{
+				showWithout = '&showWithout=' + data.showWithout;
+			}
+			else
+			{
+				showWithout = '';
+			}
+			
+			if(data.allOnOnePage)
+			{
+				allOnOnePage = '&allOnOnePage';
+			}
+			else
+			{
+				allOnOnePage = '';
+			}
+			
+			urlstart = '?addr=' + data.address+'&start=' + data.start + withoutBlocks + allOnOnePage + showOnly + showWithout;
+			url = '?addr=' + data.address + withoutBlocks + allOnOnePage + showOnly + showWithout;
+		}
+		
+		if(data.hasOwnProperty('error'))
+		{
+			return '<h2>' + data.error + '</h2>';
+		}
+
+		if(data.type == 'standardAccount')
+		{
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			if (data.person_key != -10){
+			
+			output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">'; 
+			output +='<td><font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
+			
+			}else{
+			
+			output += '<br><br>';
+			output +='<font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
+			}
+			output +='</table>';
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += data.Balance.label_Balance_table + ':<br>';
+			output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Balance.label_asset_key+'<td><b>'+ data.Balance.label_asset_name+'<td><b>'+data.Balance.label_Balance_A+'<td><b>'+data.Balance.label_Balance_B+'<td><b>'+ data.Balance.label_Balance_C +'</tr>';
+			for (key in data.Balance.balances){
+			output += '<tr><td><a href ="?asset='+data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
+			output +='<td><a href="?asset=' + data.Balance.balances[key].asset_key + get_lang() + '">' + data.Balance.balances[key].asset_name + '</a>';
+			output +='<td>' + data.Balance.balances[key].balance_A + '<td>'+data.Balance.balances[key].balance_B + '<td>'+data.Balance.balances[key].balance_C;
+			
+			}
+			
+			
+			output += '</table><br><br>';
+			
+			output += transactions_Table(data);
+			/*
+			output += data.Transactions.label_transactions_table + ':<br>';
+			output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+			
+			output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+ data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+data.Transactions.label_reference+'<td><b>'+ data.Transactions.label_date+'<td><b>'+data.Transactions.label_creator+'<td><b>'+data.Transactions.label_size+'<td><b>'+data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
+			for (key in data.Transactions.transactions){
+			
+			
+			output += '<tr><td><a href ="?block='+data.Transactions.transactions[key].block+get_lang()+'">'+ data.Transactions.transactions[key].block +'-'+ data.Transactions.transactions[key].seq+'</a><td><a href="?tx='+data.Transactions.transactions[key].signature+'" title = "'+ data.Transactions.transactions[key].signature  +get_lang()+'">'+data.Transactions.transactions[key].signature.slice(0, 11)+'...</a><td><a href="?tx='+data.Transactions.transactions[key].signature+get_lang()+'">'+data.Transactions.transactions[key].type+'</a><td>'+data.Transactions.transactions[key].reference+'<td>'+data.Transactions.transactions[key].date;
+			if (data.Transactions.transactions[key].creator_key == '-'){
+			output += '<td>'+data.Transactions.transactions[key].creator+'</a>'; 
+			}else if (data.Transactions.transactions[key].creator_key == '+'){
+			output += '<td><a href ="?addr='+data.Transactions.transactions[key].creator+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
+			}else{
+			output += '<td><a href ="?person='+data.Transactions.transactions[key].creator_key+get_lang()+'">'+data.Transactions.transactions[key].creator+'</a>';
+			}
+			output += '<td>'+ data.Transactions.transactions[key].size +'<td>'+ data.Transactions.transactions[key].fee +'<td>'+ data.Transactions.transactions[key].confirmations + '</td></tr>';
+			
+			}
+			output +='</table></td></tr></table>';
+			
+			if(data.countTx.hasOwnProperty('txsCount'))
+			{
+				output += 'Transactions count: ' + data.countTx.txsCount + '<br>Including:<br>';
+
+				for(key in data.countTx.txsTypesCount) {
+					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value='+key+'><a class=showOnly id='+key+' href=#>'
+						+transactionTypes[key]+': '
+						+data.countTx.txsTypesCount[key]+ '</a></div>\n';
+				}
+			}
+			else
+			{
+				output += 'Transactions count: 0<br>';
+			}
+			
+			if(data.countTx.hasOwnProperty('allCount') && data.countTx.allCount>0)
+			{
+				output += '<br><div style="display:inline-block; position: absolute; padding-left: 7px; width: 20px; font-weight:bold;">+</div>';
+				
+				if(data.countTx.tradesCount > 0)
+				{
+					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=trades><a class=showOnly id=trades href=#>Trades: ' + data.countTx.tradesCount + '</a></div>\n';
+				}
+				
+//				if(data.countTx.aTTxsCount > 0)
+//				{
+//					output += '<div style="display:inline-block; padding-left: 20px; width: 200px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=aTTxs><a class=showOnly id=aTTxs href=#>AT Transactions: ' + data.countTx.aTTxsCount + '</a></div>\n';
+//				}
+				
+				if(data.countTx.blocksCount > 0)
+				{
+//					output += '<div style="display:inline-block; padding-left: 20px; width: 500px;"><input onchange=\'genFilterUrl();\' type=checkbox name=\'types\' checked=checked value=blocks><a class=showOnly id=blocks href=#>Generated blocks: '+data.countTx.blocksCount + '</a>, including total fee: '+addCommas(data.totalBalance.totalGeneratedFee)+' ERM</div>';
+				}
+
+				output += '<br>';
+				output += '<div style="display:inline-block; padding-left: 20px;"><a id=showWithout href=><b>Apply filter</b></a></div>';
+				output += '<div style="display:inline-block; padding-left: 20px;"><a id=cancelFilter href=><b>Cancel filter</b></a></div>';
+				output += '<br>';
+			}
+			
+			
+//			output += '<br>Total Received: ' + addCommas(data.totalBalance.receivedERM) + ' ERM';
+			
+//			output += '<br>Total Send: ' + addCommas(data.totalBalance.sendERM) + ' ERM'+'<br>';
+			output += '<br>';
+
+			
+			output += '<font size=+1><b>Total balance:<br>';
+			
+			var totalBalance = "";
+			for(key in data.totalBalance) {
+				if(isFinite(key))
+				{
+					totalBalance += '&nbsp;&nbsp;' + addCommas(data.totalBalance[key].amount);
+					totalBalance += ' <a href=?asset='+key+'>'+getAssetName(key, data.totalBalance[key].assetName) + '</a>';
+					totalBalance += '<br>';
+				}
+			}
+
+			output += totalBalance+ '</font></b><br>';
+*/
+		}
+
+		if(data.type == 'block')
+		{
+			url = '?block=' + data.blockHeight;
+			urlstart = url;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">' + data.label_block + ': ';
+			if(data.hasOwnProperty('parentBlockSignature'))
+			{
+				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight-1)+get_lang()+'"><b>&lt;</b></a> ';
+			}
+			output += '<a href="?block='+data.blockHeight+get_lang()+'">'+data.blockHeight+'</a> ';
+			if(data.hasOwnProperty('childBlockSignature'))
+			{
+				output += '<a style="text-decoration: none" href="?block='+(data.blockHeight+1)+get_lang()+'"><b>&gt;</b></a>';
+			}
+			output += '</font>';
+			output += '<br><br>';
+
+			output += data.label_Block_version + ': <span title="v1 - from 1 block (2014-05-16 13:34:34 UTC)\nv2 - from 99000 block (2015-05-17 11:13:40 UTC)\nv3 - from 2016-02-15 19:00:00 UTC">' + data.version + '</span><br><br>';
+			
+			if(data.countTx.hasOwnProperty('txsCount'))
+			{
+				output += data.label_Transactions_count +': ' + data.countTx.txsCount + '<br>' + data.label_Including + ':<br>';
+
+				for(key in data.countTx.txsTypesCount) {
+					output += '&nbsp;&nbsp;&nbsp;'
+					+transactionTypes[key]+': '
+					+data.countTx.txsTypesCount[key]+ '<br>\n';
+				}
+			}
+			else
+			{
+				output += data.label_Transactions_count +': 0<br>';
+			}
+			
+			if(data.countTx.tradesCount > 0)
+			{
+				output += '<br>+ Trades: ' + data.countTx.tradesCount + '<br>\n';
+			}
+			
+			if(data.countTx.aTTxsCount > 0)
+			{
+				output += '<br>+ AT Transactions: ' + data.countTx.aTTxsCount + '<br>\n';
+			}
+
+			output += '<br>' + data.label_Total_Amount+': '+ data.totalAmount ;
+			output += '<br>' + data.label_Total_AT_Amount+':'+ data.totalATAmount ;
+			output += '<br>' + data.label_Total_Fee+': '+ data.totalFee ;
+			
+			
+			output += '<br><br>';
+			
+			if(data.hasOwnProperty('parentBlockSignature'))
+			{
+				
+				output += data.label_Parent_block +': '+ (data.blockHeight-1) + ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.parentBlockSignature + get_lang()+'>' + data.parentBlockSignature + '</a>';
+				output += '<br><br>';
+			}
+			
+			output += '<b>' + data.label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.label_Signature + ':</b> ';
+			output += '<a  href=?block='+ data.blockSignature + get_lang()+'>' + data.blockSignature + '</a>';
+			output += '<br><br>';
+			
+			if(data.hasOwnProperty('childBlockSignature'))
+			{
+				output += data.label_Child_block +': '+(data.blockHeight+1)+ ',   ' + data.label_Signature + ': ';
+				output += '<a  href=?block='+ data.childBlockSignature + get_lang()+'>' + data.childBlockSignature + '</a>';
+				output += '<br><br>';
+			}
+			output += transactions_Table(data);
+			
+		return output;
+		}
+		
+		
+			if(data.type == 'person')
+		{
+			if(data.allOnOnePage)
+			{
+				allOnOnePage = '&allOnOnePage';
+			}
+			else
+			{
+				allOnOnePage = '';
+			}
+			
+			urlstart = '?person=' + data.name+'&start=' + data.start + allOnOnePage;
+			url = '?person=' + data.name + allOnOnePage;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Person: <a href=?name='+encodeURIComponent(data.name)+get_lang()+'>' + htmlFilter(data.name) + '</a></font>';
+			
+			output += '<br><br>';
+		}
+	
+		
+		
+		if(data.type == 'name')
+		{
+			if(data.allOnOnePage)
+			{
+				allOnOnePage = '&allOnOnePage';
+			}
+			else
+			{
+				allOnOnePage = '';
+			}
+			
+			urlstart = '?name=' + data.name+'&start=' + data.start + allOnOnePage;
+			url = '?name=' + data.name + allOnOnePage;
+			
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Name: <a href=?name='+encodeURIComponent(data.name)+get_lang()+'>' + htmlFilter(data.name) + '</a></font>';
+			
+			output += '<br><br>';
+		}
+		
+		if(data.type == 'transaction')
+		{
+	//		url = '?tx=' + data[1].transaction.signature;
+	//		urlstart = url;
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+	/*		output += '<font size="+1"> <b>'+ data. Label_Transaction + ': </b>'+  data.transaction_Header.transactions[0].type;
+			output += '       ('  + data.transaction_Header.label_block +': </b><a href=?block=' + data.transaction_Header.transactions[0].block + get_lang() + '>' + data.transaction_Header.transactions[0].block + '</a>'; 
+			output += ' - ' + data.transaction_Header.transactions[0].seq  +') </font><br>';
+			output += '<br><b>'  +  data.transaction_Header.label_confirmations       + ': </b>' + data.transaction_Header.transactions[0].confirmations; 
+			output += '<br><b>'  +  data.transaction_Header.label_date      + ': </b>' + data.transaction_Header.transactions[0].date;
+			output += '<br><b>'  +  data.transaction_Header.label_size       + ': </b>' + data.transaction_Header.transactions[0].size; 
+			output += '<br><b>' +  data.transaction_Header.label_signature + ': </b>' + data.transaction_Header.transactions[0].signature;
+			output += '<BR><b>'  +  data.transaction_Header.label_reference + ': </b>' + data.transaction_Header.transactions[0].reference;
+			output += '<br> ';
+			if (data.transaction_Header.transactions[0].creator_key != '-')
+			{
+				if (data.transaction_Header.transactions[0].creator_key == '+'){
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?addr='+  data.transaction_Header.transactions[0].creator_addr + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+				}
+				else{
+					output += '<b>' + data.transaction_Header.label_creator +': </b><a href=?person='+  data.transaction_Header.transactions[0].creator_key + get_lang()+ '>' + data.transaction_Header.transactions[0].creator + '</a>';
+				}
+			} */
+			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
+		//	output += '<br>';	
+			output += data.body + '<br>';
+		//	output += data.Json ;
+
+
+
+
+
+			return output;
+		}
+
+		if(data.type == 'unconfirmed')
+		{
+			url = '?unconfirmed';
+			urlstart = url;
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Unconfirmed Transactions</font><br><br>';
+			output += 'Transactions count: ' + data.start + '<br>';
+
+		}
+		
+		if(data.type == 'atTransaction')
+		{
+			url = '?atTx=' + data.atTransaction;
+			urlstart = url;
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Automated Transaction</font><br>';
+		}
+
+
+		if(data.type == 'at')
+		{
+			output += '<table width="1280" border=0><tr><td align=left>';	
+			output += '<br><font size="+1">AT Account: <a href=?addr='+data.address+get_lang()+'>' + data.address + '</a></font>';
+
+			output += '<table width="100%" border=0><tr><td valign=top align=left rowspan=2>';	
+			output += '<br><b>Creator:</b> <a href=?addr='+data.at.creator+get_lang()+'>' + data.at.creator + '</a>';
+			output += '<br><br><b>AT Type:</b> ' + data.at.type;
+			output += '<br><br><b>Description:</b> ' + htmlFilter(wordwrap(data.at.description, 80, '\n', true));
+			output += '<br><br><b>Tags:</b> ' + htmlFilter(wordwrap(data.at.tags, 80, '\n', true));
+			output += '<br><br><b>Min Activation Amount:</b> ' + data.at.minActivation + ' ERM';
+			output += '<br><br><b>Dead:</b> ' + data.at.state.dead;
+			output += '<br><br><b>Frozen:</b> ' + data.at.state.frozen;
+			
+			output += '<td><br><b>Code:</b><pre>';
+			if(data.at.state.machineCode != '')
+			{
+				output += wordwrap(data.at.state.machineCode, 100, '<br>', true);
+			}
+			else
+			{
+				output += '<b>No</b>';
+			}
+			output += '<tr>';
+			output += '<td><b>Data:</b><pre>';
+			if(data.at.state.machineData != '')
+			{
+				output += wordwrap(data.at.state.machineData, 100, '<br>', true);
+			}
+			else
+			{
+				output += '<b>No</b>';
+			}
+			output += '</table>';
+			output += '<br><br><font size="+1"><b>Balance:</b> '+addCommas(data.at.accountBalance)+' ERM</font>';
+			output += '<br><br>';
+		}						
+		
+		if(data.type == 'trade')
+		{
+			url = '?trade=' + data.trade;
+			urlstart = url;
+			output +=  '<table width="1280" border=0><tr><td align=left>';	
+			output += '<font size="+1">Trade</font><br>';
+		}
+		
+		//if(data.type == 'standardAccount' || data.type == 'at')
+		if( data.type == 'at')
+		{
+			output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
+		}	
+		
+		if(data.type == 'name')
+		{
+			output += pagesOld(data.countTx.allCount, data.txOnPage, data.start, data.end, url, data.allOnOnePage);
+		}
+			
+		output += '<br>';
+		
+		{
+			for (var i = data.start; i >= data.end; i--)
+			{
+				if(!data.hasOwnProperty(i))
+				{
+					continue;
+				}
+				
+				output += '<a class="anchor" id='+i+' name='+i+'></a>';
+				
+				if(data[i].type == 'block') // block
+				{
+					output += '<table width=100%><tr><td>';
+					
+					output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+
+					if(data.type == 'block')
+					{
+						output += '<tr><td><a class=without href='+ urlstart + get_lang()+'>##</a>&nbsp;&nbsp;';
+					}
+					else
+					{
+						output += '<tr><td><a class=without href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+					}
+					
+					output += '<a href=?block='+data[i].block.signature+get_lang()+'>'+data[i].block.signature.substr(0, 80)+'...'+'</a></td>';
+					
+					output += '<td align=right width=250>Height: <a href=?block='+data[i].block.height+get_lang()+'>'+data[i].block.height+'</a>';
+					output += ' / confirmations: '+data[i].block.confirmations+'</td>';
+						
+					output += '<td align=right width=200>'+data[i].block.dateTime+'</td></tr></table>';
+					
+					output += '<tr><td>';
+					output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+					output += '<b>Action</b></td><td width="290"><b>Generator</b></td><td><b>Fee</b></td>';
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td width=180><b>Balance</b></td>';
+					}
+					output += '</tr>';
+					output += '<tr><td align="center"><img src="img/00_generating.png"><br><font size="-2">Generating</font></td>';
+					if(data[i].type == 'block')
+					{
+						output += '<td><a href=?addr='+data[i].block.generator+get_lang()+'>'+data[i].block.generator+'</a>';
+					}
+					else
+					{
+						output += '<td><font color="dimgray">'+data[i].block.generator+'</font></td>';
+					}
+					output += '<td>'+addCommas(data[i].block.fee)+' <font size="-2">COMPU</font>'+'</td>';
+					
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td>'+printBalance(data[i].balance)+'</td>';
+					}
+					
+					output += '</tr></table>';
+					
+					output += '</table>';
+				}
+			
+				if(data[i].type == 'trade') // Trade
+				{
+					output += '<table width="100%"><tr><td>';
+					
+					output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+					output += '<tr><td><a class=without href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+					output += '<a href=?trade='+data[i].trade.initiatorTxSignature+'/'+data[i].trade.targetTxSignature+get_lang()+'>';
+					output += (data[i].trade.initiatorTxSignature+'/'+data[i].trade.targetTxSignature).substr(0, 100)+'...</a></td>';
+					output += '<td align=right width=250>Height: <a href=?block='+data[i].trade.height+get_lang()+'>'+data[i].trade.height+'</a>';
+					output += ' / confirmations: '+data[i].trade.confirmations+'</td>';
+					output += '<td align=right width=200>'+data[i].trade.dateTime+'</td></tr></table>';
+					
+					output += '<tr><td>';
+					output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+					
+					output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td width="290"><b>Buyer</b></td>';
+					output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td><td width=135><b>Price</b></td>';
+					
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td width=180><b>Balance</b></td>';
+					}
+					output += '</tr>';
+						
+					output += '<tr><td align="center">';
+					
+					output += '<img src=img/asset_trade.png>';
+					
+					output += '<br><font size="-2">Asset Trade</font></td>';
+					
+					var img1 = '';
+					var img2 = '';
+					
+					if(data[i].trade.targetCreator == data.address)
+					{
+						output += '<td><font color="dimgray">'+data[i].trade.targetCreator+'</font>';
+						img1 = 'img/redright.png';
+					}
+					else
+					{
+						output += '<td><a href=?addr='+data[i].trade.targetCreator+get_lang()+'>'+data[i].trade.targetCreator+'</a>';
+						img1 = 'img/grright.png';
+					}
+					
+					if(data[i].trade.targetCreator == data[i].trade.initiatorCreator)
+					{
+						img1 = 'img/grright.png';
+					}
+					
+					output += '<p>';
+					
+					output += addCommas(data[i].trade.amount) + ' ' + getAssetNameMini(data[i].trade.initiatorWant, data[i].trade.wantName);
+					
+					output += ' <img src='+img1+' style="vertical-align: middle;">';
+					
+					output += '</p>';
+					
+					output += '</td>';
+					
+					if(data[i].trade.initiatorCreator == data.address)
+					{
+						output += '<td><font color="dimgray">'+data[i].trade.initiatorCreator+'</font><br>';
+						img2 = 'img/redleft.png';
+					}
+					else
+					{
+						output += '<td><a href=?addr='+data[i].trade.initiatorCreator+get_lang()+'>'+data[i].trade.initiatorCreator+'</a>';
+						img2 = 'img/grleft.png';
+					}
+
+					if(data[i].trade.targetCreator == data[i].trade.initiatorCreator)
+					{
+						img2 = 'img/grleft.png';
+					}
+					
+					output += '<p>';
+					output += '<img src='+img2+' style="vertical-align: middle;"> ';
+					
+					output += '' + addCommas(data[i].trade.price) + ' ' + getAssetNameMini(data[i].trade.initiatorHave, data[i].trade.haveName);
+					
+					output += '</p>';
+					output += '</td>';
+					
+					output += '<td>' + ' <a href=?asset='+data[i].trade.initiatorWant+get_lang()+'>'+getAssetName(data[i].trade.initiatorWant, data[i].trade.wantName) + '</a>';
+
+					output += '<td>' + ' <a href=?asset='+data[i].trade.initiatorHave+get_lang()+'>'+getAssetName(data[i].trade.initiatorHave, data[i].trade.haveName) + '</a>';
+					
+					output += '<td>' + addCommas(data[i].trade.realPrice);
+					output += '<br>'+getAssetNameMini(data[i].trade.initiatorHave, data[i].trade.haveName);
+					output += '/'+getAssetNameMini(data[i].trade.initiatorWant, data[i].trade.wantName);
+					
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td>' + printBalance(data[i].balance) + '</td>';
+					}
+					
+					output += '</tr></table>';
+					
+					output += '</table>';
+				}
+
+				if(data[i].type == 'atTransaction') // Automated Transaction
+				{
+					output += '<table width="100%"><tr><td>';
+					
+					output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+					
+					output += '<tr><td><a class=without href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a> ';
+					
+					output += '<a href=?atTx='+data[i].atTransaction.blockHeight+':'+data[i].atTransaction.seq+get_lang()+'>';
+					output += data[i].atTransaction.blockHeight+':'+data[i].atTransaction.seq + '</a></td>';
+					output += '<td align=right width=250>';
+					if(data.type != 'block')
+					{
+						output += 'Height: <a href=?block='+data[i].atTransaction.blockHeight+get_lang()+'>'+data[i].atTransaction.blockHeight+'</a>';
+						output += ' / confirmations: '+data[i].atTransaction.confirmations;
+					}
+					output += '</td>';
+					output += '<td align=right width=200>'+data[i].atTransaction.dateTime+'</td></tr></table>';
+					
+					output += '<tr><td>';
+
+					output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+					output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+					output += '<td><b>Recipient</b></td><td><b>Seq</b></td>';
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td width=180><b>Balance</b></td>';
+					}
+					output += '</tr>';
+					output += '<tr><td align="center" rowspan=2>';
+					
+					if(data[i].attransaction.creator == data.address)
+					{
+						output += '<img src=img/at_tx_out.png>';
+					}
+					else
+					{
+						output += '<img src=img/at_tx_in.png>';
+					}
+					output += '<br><font size="-2">Automated Transaction</font></td>';
+					
+					if(data[i].attransaction.creator == data.address)
+					{
+						output += '<td rowspan=2><font color="dimgray">'+data[i].attransaction.creator+'</font></td>';
+					}
+					else
+					{
+						output += '<td rowspan=2><a href=?addr='+data[i].attransaction.creator+get_lang()+'>'+data[i].attransaction.creator+'</a></td>';
+					}
+					output += '<td>'+addCommas(data[i].atTransaction.amount)+' <font size="-2">ERM</font>';
+					
+					if(data[i].atTransaction.recipient == data.address)
+					{
+						output += '<td><font color="dimgray">'+data[i].atTransaction.recipient+'</font></td>';
+					}
+					else
+					{
+						if(data[i].atTransaction.recipient == '11111111111111111111111111')
+						{
+							output += '<td>11111111111111111111111111<br>';
+							output += '(generator of <a href=?block='+data[i].atTransaction.blockHeight+get_lang()+'>'+ data[i].atTransaction.blockHeight +'</a> block: ';
+							output += '<a href=?addr='+data[i].atTransaction.generatorAddress+get_lang()+'>'+data[i].atTransaction.generatorAddress+'</a>)' ;
+						}
+						else
+						{						
+							output += '<td><a href=?addr='+data[i].atTransaction.recipient+get_lang()+'>'+data[i].atTransaction.recipient+'</font></td>';
+						}
+					}
+					
+					output += '<td>'+data[i].atTransaction.seq;
+					
+					if(data[i].hasOwnProperty('balance'))
+					{
+						output += '<td rowspan=2>'+printBalance(data[i].balance)+'</td>';
+					}
+					output += '</tr>';
+						
+					var message = data[i].atTransaction.message;
+					if(message == '')
+					{
+						message = '<b>no</b>';
+					}
+					output += '<tr><td colspan=3><b>Message:</b> ' + wordwrap(message, 80, '<br>', true);
+					
+					output += '</table>';
+					
+					output += '</table>';
+				}
+					
+				////// TRANSACTIONS ////////
+				if(data[i].type == 'transaction')
+				{
+
+					if(data[i].transaction.type == 1) // GENESIS_ISSUE_ASSET_TRANSACTION
+					{
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Recipient</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/01_genesis.jpg>';
+						output += '<br><font size="-2">Genesis</font></td>';
+						
+						output += '<td>Genesis</td>';
+						
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						if(data[i].transaction.recipient == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.recipient+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.recipient+get_lang()+'>'+data[i].transaction.recipient+'</font></td>';
+						}
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						
+						output += '</tr></table>';
+						
+						output += '</table>';
+						
+					} else if(data[i].transaction.type == 6) // GENESIS_SEND_ASSET_TRANSACTION
+					{
+					
+					} else if(data[i].transaction.type == 2) // Payment
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Recipient</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/02_payment_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/02_payment_in.png>';
+						}
+						output += '<br><font size="-2">Payment</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						if(data[i].transaction.recipient == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.recipient+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.recipient+get_lang()+'>'+data[i].transaction.recipient+'</font></td>';
+						}
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table>';
+						
+					} else if(data[i].transaction.type == 3) // Name registration
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
+						output += '<td><b>Name:</b> <a href="?name='+encodeURIComponent(data[i].transaction.name)+get_lang()+'">'+htmlFilter(data[i].transaction.name)+'</a></td>';
+						output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(data[i].transaction.name) + get_lang()+'>http://'+ document.location.host + '/' + htmlFilter(data[i].transaction.name) +'</a></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/03_name_registration.png>';
+						output += '<br><font size="-2">Name Registration</font></td>';
+						
+						if(data[i].transaction.owner == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.owner+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.owner+get_lang()+'>'+data[i].transaction.owner+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font>';
+						
+						output += '<td colspan=2><b>';
+						if(data[i].transaction.сompressed)
+						{
+							output += 'Compressed';
+						}
+						output += ' Value:</b><pre style="width: 95%;">'+htmlFilter(wordwrap(data[i].transaction.value, 80, '\n', true))+'</pre>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 4) // Name Update
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a> ';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+						output += '<b>Action</b></td><td width="290"><b>New Owner</b></td><td width=100><b>Fee</b></td>';
+						output += '<td><b>Name:</b> <a href="?name='+encodeURIComponent(data[i].transaction.name)+get_lang()+'">'+htmlFilter(data[i].transaction.name)+'</a></td>';
+						output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(data[i].transaction.name) + get_lang()+'>http://'+ document.location.host + '/' + htmlFilter(data[i].transaction.name) +'</a></td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/04_name_update.png>';
+						output += '<br><font size="-2">Name Update</font></td>';
+						
+						if(data[i].transaction.newOwner == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.newOwner+'</font>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.newOwner+get_lang()+'>'+data[i].transaction.newOwner+'</a>';
+						}
+						output += '<br><font color="e5e5e5">'+data[i].transaction.owner+'</font>';
+						
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font>';
+						
+						output += '<td colspan=2><b>New ';
+						if(data[i].transaction.сompressed)
+						{
+							output += 'Compressed';
+						}
+						output += ' Value:</b><pre style="width: 95%;">'+htmlFilter(wordwrap(data[i].transaction.newValue, 80, '\n', true))+'</pre>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 5) // Name to Sale
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+ '>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
+						output += '<td width=200><b>Price</b></td><td><b>Name</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/05_name_sale.png>';
+						output += '<br><font size="-2">Name to Sale</font></td>';
+						
+						if(data[i].transaction.owner == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.owner+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.owner+get_lang()+'>'+data[i].transaction.owner+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+get_lang()+'">' + htmlFilter(data[i].transaction.name) + '</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 6) // Cancel Name Sale
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+						output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=200><b>Fee</b></td>';
+						output += '<td><b>Name</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/06_cancel_name_sale.png>';
+						output += '<br><font size="-2">Cancel Name Sale</font></td>';
+						
+						if(data[i].transaction.owner == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.owner+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.owner+get_lang()+'>'+data[i].transaction.owner+'</a></td>';
+						}
+						
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+get_lang()+'">' + htmlFilter(data[i].transaction.name) + '</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 7) // Name Purchase
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td><b>Name</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Buyer</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.seller == data.address)
+						{
+							output += '<img src=img/07_name_purchase_in.png>';
+							output += '<br><font size="-2">Name Selling</font></td>';
+						}
+						else
+						{
+							output += '<img src=img/07_name_purchase_out.png>';
+							output += '<br><font size="-2">Name Buying</font></td>';
+						}
+						
+						if(data[i].transaction.seller == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.seller+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.seller+get_lang()+'>'+data[i].transaction.seller+'</a></td>';
+						}
+						
+						output += '<td><a href="?name='+encodeURIComponent(data[i].transaction.name)+get_lang()+'">'+htmlFilter(data[i].transaction.name)+'</a></td>';
+						
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						if(data[i].transaction.buyer == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.buyer+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.buyer+get_lang()+'>'+data[i].transaction.buyer+'</font></td>';
+						}
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 8) // Poll Creation
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+ '>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=100><b>Fee</b></td>';
+						output += '<td><b>Poll</b></td><td><b>Options</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top" rowspan=2>';
+						
+						output += '<img src=img/08_poll_creation.jpg>';
+						output += '<br><font size="-2">Poll Creation</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td rowspan=2><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td rowspan=2><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td rowspan=2>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+
+						output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.name) + get_lang()+'">'+htmlFilter(data[i].transaction.name)+'</a></td>';
+						
+						output += '<td><ul>';
+						
+						for(key in data[i].transaction.options) {
+							output += '<li>' + htmlFilter(data[i].transaction.options[key]) + '</li>';
+						}
+						output += '</ul></td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr>';
+						output += '<tr><td colspan=2><b>Description:</b> ' + htmlFilter(data[i].transaction.description);
+						output += '</table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 9) // Poll Vote
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=100><b>Fee</b></td>';
+						output += '<td><b>Poll</b></td><td><b>Option</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/09_poll_vote.jpg>';
+						output += '<br><font size="-2">Poll Vote</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td><a href="?poll=' + encodeURIComponent(data[i].transaction.poll) + get_lang()+'">'+htmlFilter(data[i].transaction.poll)+'</a></td>';
+						
+						output += '<td>'+htmlFilter(data[i].transaction.optionString)+'</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 10) // Arbitrary Transaction
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=150><b>Fee:</b> '+addCommas(data[i].transaction.fee) + ' <font size="-2">ERM</font>'+'</td>';
+						output += '<td><b>Data Base58</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td rowspan=3 align="center" valign="top">';
+						
+						output += '<img src=img/10_arbitrary_transaction.png>';
+						output += '<br><font size="-2">Arbitrary Transaction</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td><b>Service:</b> '+data[i].transaction.service+'</td>';
+						
+						
+						dataText = uintToString(Base58.decode(data[i].transaction.data));
+
+						dataText = dataText.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g, '&quot;');
+						
+						output += '<td rowspan=3><abbr title="'+dataText+'"><pre>'+wordwrap(data[i].transaction.data, 70, '\n', true)+'</pre></abbr>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td rowspan=3>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr>';
+						
+						if(data[i].transaction.hasOwnProperty('payments'))
+						{
+							assetsAmounts = data[i].transaction.assetsAmounts;
+
+							output += '<tr><td colspan=2><b>Payments:</b><br>';
+							payments = data[i].transaction.payments;
+							for(key in payments) {
+								output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset, 
+									assetsAmounts[payments[key].asset].name) + ' -> ';					
+								if(payments[key].recipient == data.address)
+								{
+									output += '<font color="dimgray">'+payments[key].recipient+'</font>';
+								}
+								else
+								{
+									output += '<a href=?addr=' + payments[key].recipient + get_lang()+'>' + payments[key].recipient + '</font></a>';
+								}
+								output += '<br>';
+							}
+							
+							output += '<tr><td colspan=2 height=99%><b>Amount:</b><br>';
+							
+							for(key in assetsAmounts) {
+								output += addCommas(assetsAmounts[key].amount)+' '+getAssetNameMini(key, assetsAmounts[key].name)+'<br>';
+							}
+						}
+						
+						output += '</table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 21) // ISSUE_ASSET_TRANSACTION
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+						
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td>';
+						output += '<td width="100"><b>Fee</b></td><td><b>Name:</b> ';
+						
+						if(data[i].transaction.asset!='0') {
+							output += '<a href=?asset='+data[i].transaction.asset+get_lang()+'>'+htmlFilter(data[i].transaction.assetName)+'</a>'
+						} else {
+							output += htmlFilter(data[i].transaction.assetName);
+						}
+						
+						output += '</td><td><b>Key</b><td align=center><b>Quantity</b><td><b>Divisible</b>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/11_asset_issue.png>';
+						output += '<br><font size="-2">Asset Issue</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td><b>Description:</b> '+htmlFilter(data[i].transaction.description)+'</td>';
+						
+						output += '<td align=center>'+data[i].transaction.asset+'</td>';
+						output += '<td align=center>'+addCommas(data[i].transaction.quantity)+'</td>';
+						output += '<td align=center>'+data[i].transaction.divisible+'</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+						
+					} else if(data[i].transaction.type == 31) // SEND_ASSET_TRANSACTION
+					{
+
+						////////////////////// MESSAGE ////////////////
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+ get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+ get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/12_asset_transfer_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/12_asset_transfer_in.png>';
+						}
+						
+						output += '<br><font size="-2">Asset Transfer</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.amount);
+						//output += ' ' + getAssetNameMini(data[i].transaction.asset, data[i].transaction.assetName);
+						
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font></td>';
+						
+						output += '<td>' + ' <a href=?asset='+data[i].transaction.asset+get_lang()+'>'+getAssetName(data[i].transaction.asset, data[i].transaction.assetName) + '</a>';
+						
+						if(data[i].transaction.recipient == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.recipient+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.recipient+get_lang()+'>'+data[i].transaction.recipient+'</font></td>';
+						}
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						
+						output += '<td>'+data[i].transaction.isText+'</td>';
+						output += '<td>'+data[i].transaction.encrypted+'</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td rowspan=2>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr>';
+						
+						output += '<tr><td colspan=5><b>Message:</b> <pre>';
+						
+						if(!data[i].transaction.isText)
+						{
+							output += '<b>base58:</b> ';
+						}
+						
+						if(data[i].transaction.encrypted)
+						{
+							output += '<font color=red>encrypted</font>';
+						}
+						else
+						{
+							output += wordwrap(data[i].transaction.data, 120, '\n', true);
+						}
+												
+						output += '</pre></td>';
+						
+						output += '</table>';
+						
+						output += '</table><br>';
+					
+					
+					} else if(data[i].transaction.type == 41) // HASHES_RECORD
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
+
+						if(data[i].hasOwnProperty('data'))
+						{
+							output += '<td width=180><b>Description</b></td>';
+						}
+						output += '</tr>';
+						
+						
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/12_asset_transfer_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/12_asset_transfer_in.png>';
+						}
+						
+						output += '<br><font size="-2">Hashes Record</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td> fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font></td>';
+
+						output += '</tr>';
+						output += '</table>';
+
+						if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 0) {
+							output += '<tr><td width="100%"><b>';
+							output += data[i].transaction.url;
+							output += '</b></td></tr>';
+						}
+						output += '<tr><td width="100%">';
+						output += data[i].transaction.data;
+						output += '</td></tr>';
+
+						output += '<tr><td width="100%">';
+						
+						for (key in data[i].transaction.hashes) {
+							if (data[i].transaction.hasOwnProperty("url") && data[i].transaction.url.length > 10) {
+								output += ' <b>' + key + '</b>:<a target="blank" href="' + data[i].transaction.url + '/' + data[i].transaction.hashes[key] + get_lang()+'">' + data[i].transaction.hashes[key] + '</a>';
+							} else {
+								output += ' <b>' + key + '</b>:' + data[i].transaction.hashes[key];
+							}
+						}
+						
+						output += '</td></tr>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 13) // Asset order creation
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Сreator</b></td><td width=100><b>Fee</b></td>';
+						output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td>';
+						output += '<td width=135><b>Price</b></td><td width=135><b>Amount</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/13_order_creation.png>';
+						output += '<br><font size="-2">Order Creation</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td>' + ' <a href=?asset='+data[i].transaction.order.have+get_lang()+'>'+getAssetName(data[i].transaction.order.have, data[i].transaction.haveName) + '</a>';
+						
+						output += '<td>' + ' <a href=?asset='+data[i].transaction.order.want+get_lang()+'>'+getAssetName(data[i].transaction.order.want, data[i].transaction.wantName) + '</a>';
+						
+						output += '<td>'+addCommas(data[i].transaction.order.price);
+						
+						output += '<br>'+getAssetNameMini(data[i].transaction.order.want, data[i].transaction.wantName);
+						output += '/'+getAssetNameMini(data[i].transaction.order.have, data[i].transaction.haveName);
+						
+						output += '<td>'+addCommas(data[i].transaction.order.amount);
+						
+						output += ' '+getAssetNameMini(data[i].transaction.order.have, data[i].transaction.haveName);
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 14) // Asset cancel order
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Сreator</b></td><td width=100><b>Fee</b></td>';
+						output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td>';
+						output += '<td width=135><b>Price</b></td><td width=135><b>Amount<font size=-2> left from <a href=?order='+data[i].transaction.order+get_lang()+'>order</a></b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						output += '<img src=img/14_cancel_order.png>';
+						output += '<br><font size="-2">Cancel Order</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td>' + ' <a href=?asset='+data[i].transaction.orderSource.have+get_lang()+'>'+getAssetName(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName) + '</a>';
+						
+						output += '<td>' + ' <a href=?asset='+data[i].transaction.orderSource.want+get_lang()+'>'+getAssetName(data[i].transaction.orderSource.want, data[i].transaction.orderSource.wantName) + '</a>';
+						
+						output += '<td>'+addCommas(data[i].transaction.orderSource.price);
+						
+						output += '<br>'+getAssetNameMini(data[i].transaction.orderSource.want, data[i].transaction.orderSource.wantName);
+						output += '/'+getAssetNameMini(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName);
+						
+						output += '<td>'+addCommas(data[i].transaction.orderSource.amountLeft);
+						
+						output += ' '+getAssetNameMini(data[i].transaction.orderSource.have, data[i].transaction.orderSource.haveName);
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 15) // Multi Payment
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+ '>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+ get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+ get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Recipient</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/15_multi_payment_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/15_multi_payment_in.png>';
+						}
+						output += '<br><font size="-2">Multi Payment</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+ get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						
+						output += '<td>';
+						
+						assetsAmounts = data[i].transaction.assetsAmounts;
+						for(key in assetsAmounts) {
+							output += addCommas(assetsAmounts[key].amount)+' '+getAssetNameMini(key, assetsAmounts[key].name)+'<br>';
+						}
+						
+						output += 'fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+
+						output += '<td>';
+						payments = data[i].transaction.payments;
+						for(key in payments) {
+							output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset, 
+								assetsAmounts[payments[key].asset].assetName) + ' -> ';					
+							if(payments[key].recipient == data.address)
+							{
+								output += '<font color="dimgray">'+payments[key].recipient+'</font>';
+							}
+							else
+							{
+								output += '<a href=?addr=' + payments[key].recipient + get_lang()+'>' + payments[key].recipient + '</font></a>';
+							}
+							output += '<br>';
+						}
+						output += '</td>';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					
+					} else if(data[i].transaction.type == 16) // Deploy AT
+					{
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Creator</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Values';
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top" rowspan=2>';
+						
+						output += '<img src=img/16_deploy_at.png>';
+						output += '<br><font size="-2">Deploy AT</font></td>';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<td><font color="dimgray">'+data[i].transaction.creator+'</font></td>';
+						}
+						else
+						{
+							output += '<td><a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a></td>';
+						}
+						output += '<td>'+addCommas(data[i].transaction.amount)+' <font size="-2">ERM</font>';
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">ERM</font></td>';
+						
+						output += '<td><b>Name: </b>' + data[i].transaction.name;
+						if(data[i].transaction.atAddress == data.address)
+						{
+							output += '<br><b>AT Address: </b> <font color="dimgray">' + data[i].transaction.atAddress + '</font>';
+						}
+						else
+						{
+							output += '<br><b>AT Address: </b><a href=?addr='+data[i].transaction.atAddress+get_lang()+'>' + data[i].transaction.atAddress + '</a>';
+						}
+						output += '<br><b>AT Type:</b> ' + data[i].transaction.atType;
+						output += '<br><b>Description:</b> ' + data[i].transaction.description;
+						output += '<br><b>Tags:</b> ' + data[i].transaction.tags;
+						output += '</td>';
+						
+						
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td rowspan=2>' + printBalance(data[i].balance) + '</td>';
+						}
+						output += '</tr>';
+						
+						
+						output += '<tr><td colspan=3><b>Creation Bytes:</b><pre>' + wordwrap(data[i].transaction.creationBytes, 138, '\n', true);
+						
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+						
+					} else {
+						output += '<table width="100%"><tr><td>';
+						
+						output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
+						
+						output += '<tr><td><a href='+ urlstart + '#' + i + get_lang()+'>#' + i + '</a>&nbsp;&nbsp;';
+						
+						output += '<a href=?tx='+data[i].transaction.signature+get_lang()+'>'+data[i].transaction.signature+'</a></td>';
+						output += '<td align=right width=250>';
+						if(data[i].transaction.hasOwnProperty('blockHeight'))
+						{
+							output += 'Height: <a href=?block='+data[i].transaction.blockHeight+get_lang()+'>'+data[i].transaction.blockHeight+'</a>';
+							output += ' / confirmations: '+data[i].transaction.confirmations;
+						}
+						output += '</td>';
+						output += '<td align=right width=200>'+data[i].transaction.dateTime+'</td></tr></table>';
+						
+						output += '<tr><td>';
+						output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+
+						output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
+						output += '<td><b>Asset</b></td><td><b>Recipient</b></td>';
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td width=180><b>Balance</b></td>';
+						}
+						output += '</tr>';
+						output += '<tr><td align="center" valign="top">';
+						
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<img src=img/12_asset_transfer_out.png>';
+						}
+						else
+						{
+							output += '<img src=img/12_asset_transfer_in.png>';
+						}
+						
+						output += '<td>';
+						if(data[i].transaction.creator == data.address)
+						{
+							output += '<font color="dimgray">'+data[i].transaction.creator+'</font>';
+						}
+						else
+						{
+							output += '<a href=?addr='+data[i].transaction.creator+get_lang()+'>'+data[i].transaction.creator+'</a>';
+						}
+						output += '<br><font>' + data[i].transaction.record_type + '</font>';						
+						output += '<br>fee: '+addCommas(data[i].transaction.fee)+' <font size="-2">COMPU</font>';
+						output += '</td>';
+																		
+						if(data[i].hasOwnProperty('balance'))
+						{
+							output += '<td>'+printBalance(data[i].balance)+'</td>';
+						}
+						output += '</tr></table>';
+						
+						output += '</table><br>';
+					}
+				} 
+			}
+		
+		//	if(data.type == 'standardAccount' || data.type == 'at')
+		if(data.type == 'at')
+			{
+				output += pages(data.pages, data.start, data.end, url, data.allOnOnePage);
+			}
+			
+			if(data.type == 'name')
+			{
+				output += pagesOld(data.countTx.allCount, data.txOnPage, data.start, data.end, url, data.allOnOnePage);
+			}
+			
+			output +=  '</table>';
+		}
+
+	//} catch(e) {
+	//	output += "<h1>ERROR<br>"+e+"</h1>";
+	//}
+	
+	return output;
+}
+
+function uintToString(uintArray) {
+    var encodedString = String.fromCharCode.apply(null, uintArray);
+	try {
+		return decodeURIComponent(escape(encodedString));
+	} catch (e)	{
+		return encodedString;
+	}
+}
+
+function htmlFilter(str)
+{
+if (str == null) return "";
+	return str
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/\n/g, "<br>");
+}
+	
+function pages(datapages, datastart, dataend, url, dataallOnOnePage)
+{
+	var pages = '';
+	
+	if(datapages.length == 0)
+	{
+		return pages;
+	}
+	
+	pages += '<table width="100%"><tr><td>Pages: ';
+	
+/*	if(datastart <  parseInt(datapages[0].replace( 'start_', '')))
+	{
+		var start;
+		for (var i = datapages.length/2-1; i >= 0 ; i--)
+		{
+			start = parseInt(datapages[i*2].replace( 'start_', ''));
+			if(start > datastart)
+			{
+				break;
+			}
+		}
+		pages += '<a class=without style="font-size: 15px;" href=' + url + '&start=' + start + get_lang()+'>«</a> ';
+	}
+*/	
+	for (var i = 0; i < datapages.length/2; i++)
+	{
+		start = parseInt(datapages[i*2].replace( 'start_', ''));
+		end = parseInt(datapages[i*2+1].replace( 'end_', ''));
+		
+		if(datastart == start && dataend == end && !allOnOnePage)
+		{
+			pages += '<b><nobr>['+ start + '-' + end + ']</nobr></b> ';
+		}
+		else
+		{
+			buf = "";
+			if((datastart >= end) && (dataend <= start))
+			{
+				buf = " style='font-weight: bold;'";
+			}
+			
+			pages += '<nobr><a class=without'+buf+' href='+url.replace( '&allOnOnePage', '')+'&start='+start+get_lang()+'>'+ start +'-' + end +'</a></nobr> ';
+		}
+	}
+	
+/* if(dataend >  parseInt(datapages[datapages.length-1].replace( 'end_', '')))
+	{
+		var start;
+		for (var i = 0; i < datapages.length/2; i++)
+		{
+			start = parseInt(datapages[i*2].replace( 'start_', ''));
+			if(start < datastart)
+			{
+				break;
+			}
+		}
+		pages += '<a class=without style="font-size: 15px;" href=' + url + '&start=' + start +get_lang()+ '>»</a> ';
+	}
+*/	
+	if(allOnOnePage)
+	{
+		pages += '&nbsp;<b><nobr>[All on one page]</nobr></b>';
+	}
+	else
+	{
+		pages += '&nbsp;<a class=without href=' + url.replace( '&allOnOnePage', '') + '&allOnOnePage' + get_lang()+'>All on one page</a>';
+	}
+	
+	pages +=  '</table>';
+		
+	return pages;
+}
+
+function pagesOld(dataallCount, datatxOnPage, datastart, dataend, url, allOnOnePage)
+{
+	var pages = '';
+	var start = 0;
+	var end = 0;
+	var k = 0;
+	pages += '<table width="100%"><tr><td>Pages: ';
+	
+	if(datastart < dataallCount)
+	{
+		pages += '<a class=without style="font-size: 15px;" href=' + url + '&start=' + ( datastart + datatxOnPage + 1 ) + get_lang()+'>«</a> ';
+	}
+		
+	do {
+		k++;
+		if(k == 1)
+		{
+			start = dataallCount;
+		}
+		else
+		{
+			start = end - 1;
+		}
+		
+		if(start > datatxOnPage)
+		{
+			end = start - datatxOnPage;
+		}
+		else
+		{
+			end = 1;
+		}
+		
+		if(datastart <= start && datastart >= end && !allOnOnePage)
+		{
+			pages += '<b><nobr>['+ start + '-' + end + ']</nobr></b> ';
+		}
+		else
+		{
+			pages += '<nobr><a class=without href='+url.replace( '&allOnOnePage', '')+'&start='+start+get_lang()+'>'+ start +'-' + end +'</a></nobr> ';
+		}
+	} while (end > 1)
+	
+	if(dataend > 1)
+	{
+		pages += ' <a class=without style="font-size: 15px;" href=' + url + '&start=' + ( dataend - 1 ) + get_lang()+'>»</a>';
+	}
+	
+	if(allOnOnePage)
+	{
+		pages += '&nbsp;<b><nobr>[All on one page]</nobr></b>';
+	}
+	else
+	{
+		pages += '&nbsp;<a class=without href=' + url.replace( '&allOnOnePage', '') + '&allOnOnePage' + get_lang()+'>All on one page</a>';
+	}
+	
+	pages +=  '</table>';
+		
+	return pages;
+}	
+	
+function printBalance(balance)
+{
+	var output = '';
+	for(key in balance)
+	{
+		output += ''+addCommas(balance[key].amount)+' '+ getAssetNameMini(key, balance[key].assetName) +'<br>';
+	}	
+	return output;
+}
+
+function search(data)
+{
+	var output = "";
+
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+		
+	var foundList = "";
+	var foundOne = "";
+	
+	for(key in data.foundList) {
+		switch (data.foundList[key]) {
+			case 'standardAccount':
+				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">Standard Account: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?addr='+encodeURIComponent(data.query);
+				break
+			case 'atAccount':
+				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">AT Account: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?addr='+encodeURIComponent(data.query);
+				break
+			case 'transactionSignature':
+				foundList += '<li><a href="?tx='+encodeURIComponent(data.query)+get_lang()+'">Transaction: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?tx='+encodeURIComponent(data.query);
+				break
+			case 'blockSignature':
+			case 'blockHeight':
+			case 'blockLast':
+				foundList += '<li><a href="?block='+encodeURIComponent(data.query)+get_lang()+'">Block: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?block='+encodeURIComponent(data.query);
+				break
+			case 'name':
+				foundList += '<li><a href="?name='+encodeURIComponent(data.query)+get_lang()+'">Name: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?name='+encodeURIComponent(data.query);
+				break	
+			case 'asset':
+				foundList += '<li><a href="?asset='+encodeURIComponent(data.query)+get_lang()+'">Asset: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?asset='+encodeURIComponent(data.query);
+				break	
+			case 'pool':
+				foundList += '<li><a href="?pool='+encodeURIComponent(data.query)+get_lang()+'">Pool: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?pool='+encodeURIComponent(data.query);
+				break	
+			case 'trade':
+				foundList += '<li><a href="?trade='+encodeURIComponent(data.query)+get_lang()+'">Trade: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?trade='+encodeURIComponent(data.query);
+				break	
+			case 'atTx':
+				foundList += '<li><a href="?atTx='+encodeURIComponent(data.query)+get_lang()+'">AT Transaction: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?atTx='+encodeURIComponent(data.query);
+				break	
+		}
+	}
+
+	if(data.foundCount == 1)
+	{
+		document.location.href = foundOne + get_lang();
+		return null;
+	}
+	
+	output += lastBlock(data.lastBlock);
+	
+	if(data.foundCount == 0)
+	{
+		output += "<h2>Search no results</h2>";
+	}
+	else 
+	{
+		output += '<table width="" border=0><tr><td align=left>';
+		output += "<h2>Search results:</h2>";
+		output += "<ul>";
+		output += foundList;
+		output += "</ul>";
+		
+	}
+	
+	return output;
+}
+
+function lastBlock(lastBlock)
+{
+	if(lastBlock === undefined)
+		return "";
+	
+	var output = '';
+	output += lastBlock.label_Last_processed_block + ': <a href=?block='+lastBlock.height+get_lang()+'>' + lastBlock.height + '</a>';
+	output += ' (' + lastBlock.dateTime +', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' +  lastBlock.label_ago + ') ';
+	output += '<br><br>';
+	
+	return output;
+}
+	
+function parseUrlQuery() {
+    var data = {};
+    if(document.location.search) {
+        var pair = (location.search.substr(1)).split('&');
+        for(var i = 0; i < pair.length; i ++) {
+            var param = pair[i].split('=');
+            data[param[0]] = param[1];
+        }
+    }
+    return data;
+}
+
+
+function person(data)
+{
+
+output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+output += '<tr><td align=left>';
+output += '<table><tr><td>';
+
+
+output += '<img src="data:image/gif;base64,' + data.img+ '"/></td><td style ="padding-left:20px">'; 
+output += 	data.Label_key+ ':  &nbsp&nbsp<b>' + data.key +'</b><br>';
+output +=   data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+output +=   data.Label_creator + ': &nbsp&nbsp<a href ="?person='+ data.creator_key+get_lang()+'"><b> ' + data.creator + '</b></a><br>';
+output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
+output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
+output +=   '</table>';
+//output = + '<br> img:' + data.img;
+
+
+//statuses
+output += '<br>'+ data.Label_statuses +':';
+output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_Status_table_status+'<td><b>'+data.Label_Status_table_data+'<td><b>'+ data.Label_accounts_table_creator + '<tr>'; 
+
+key =0;
+for(key in data.statuses) {
+output += '<tr ><td >'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+get_lang()+'">'+ data.statuses[key].status_creator  +'</a><tr>';
+
+key ++;
+}
+output += '</table><br>';
+
+
+// accounts
+
+output +='<br>' + data.Label_accounts + ':';
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+data.Label_accounts_table_adress+'<td><b>'+data.Label_accounts_table_data+ '<td><b>'+ data.Label_accounts_table_creator+'<tr>'; 
+
+key =0;
+for(key in data.accounts) {
+output += '<tr><td><a href = "?addr='+data.accounts[key].adress+get_lang()+'">'+data.accounts[key].adress+'</a><td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+get_lang()+'">'+ data.accounts[key].creator  +'</a><tr>';
+
+key ++;
+}
+output += '</table><br>';
+
+//my p3ersons
+output +='<br>' + data.Label_My_Persons + ':';
+output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'+ data.Label_accounts_table_data +'<td><b>'+data.Label_My_Person_key+'<td><b>'+data.Label_My_Persons_Name+ '<tr>'; 
+
+
+key =0;
+for(key in data.My_Persons){
+
+output += '<tr><td>'+data.My_Persons[key].date+'<td>'+ data.My_Persons[key].key +'<td><a href ="?person='+data.My_Persons[key].key+get_lang()+'">'+ data.My_Persons[key].name  +'</a><tr>';
+}
+
+output += '</table><br>';
+output += '</table><br>';
+
+return output;
+}
+
+
+function persons(data)
+{
+
+var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
+	output += '<tr><td align=left>';
+	output += '<a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>.';
+	
+	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+	output += '<tr><td><td><b>'+ data.Label_key +' <td><b>'+data.Label_name+'<td><b>'+ data.Label_creator; // +'<td><b>'+data.Label_Gen_balance+'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_AT_Amount+'<td><b>'+data.Label_Amount; 
+
+	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
+	row = data.row;
+	for(var i = 0; i < row; i++)
+	{
+		output += '<tr>';
+	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
+	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
+	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
+	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>'; 
+	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key + get_lang() + '>'+data[i].name +'</a>';
+	//output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
+	output += '<td><a href=?addr='+data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
+	}
+	
+	output += '<tr><td colspan=4>';
+/*	if(data.maxHeight != data.lastBlock.height)
+	{
+		if(data.lastBlock.height < data.maxHeight + 21)
+		{
+			output += '<a href=?startBlock='+(data.lastBlock.height)+'>'+data.Label_Later;
+		}
+		else
+		{
+			output += '<a href=?startBlock='+(data.maxHeight+21)+'>'+data.Label_Later;
+		}
+	}
+	
+	output += '<td colspan=4 align=right>';
+	if(minHeight > 1) {
+		output += '<a href=?startBlock='+(data.maxHeight-21)+'>'+data.Label_Previous;
+	}
+*/	
+	return output;
+
+
+
+}
+function get_lang(){
+
+// получаем индекс выбранного элемента
+  	 var selind = document.getElementById("Langs").options.selectedIndex;
+   var txt= document.getElementById("Langs").options[selind].text;
+   var val= document.getElementById("Langs").options[selind].value;
+
+return '&lang='+document.getElementById("Langs").options[selind].value;
+}
+
+function getQueryParams(name) {
+   qs = location.search;
+
+   var params = [];
+   var tokens;
+   var re = /[?&]?([^=]+)=([^&]*)/g;
+
+   while (tokens = re.exec(qs))
+   { 
+       if (decodeURIComponent(tokens[1]) == name)
+       params.push(decodeURIComponent(tokens[2]));
+   }
+
+   return params;
+}
+
+function buttonSearch() {
+   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() ;
+}
+
+function start() {
+    
+	params = parseUrlQuery();
+	
+	
+	document.getElementById('main').innerHTML = '';
+	if (params['lang'] == null) params['lang']="en";
+//document.getElementById('menuBlocks').innerHTML = '<a href="#?lang=111'+params['lang'] +'" id=home2>Blocks</a>'
+	
+//	document.getElementById('home').href = document.location.pathname;
+	document.getElementById('home2').href = document.location.pathname +'?lang='+ params['lang'] ;
+	
+	document.getElementById('menu_top_100').href ='?top=100&lang='+ params['lang'] ;
+	document.getElementById('menu_percons').href ='?persons&lang='+ params['lang'] ;
+	document.getElementById('menu_pals_asset').href ='?polls&asset=1&lang='+ params['lang'] ;
+	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
+	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
+	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
+	document.getElementById('menu_statements').href ='?statements&lang='+ params['lang'] ;
+	
+	
+				
+	
+	document.getElementById('menuBlocks').setAttribute('class', '');
+	document.getElementById('menuTop100Richest').setAttribute('class', '');
+	document.getElementById('menuPolls').setAttribute('class', '');
+	document.getElementById('menuAssets').setAttribute('class', '');
+	document.getElementById('menuATs').setAttribute('class', '');
+	
+
+	
+	var title = 'Aronicle BlockExplorer';
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	if(params.hasOwnProperty('aTs'))
+	{
+		asyncAjax('blockexplorer.json?aTs'+'&lang='+params['lang'], 'aTs')
+		
+		document.title = title + ' - AT';
+	
+		document.getElementById('menuATs').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('polls'))
+	{
+		asyncAjax('blockexplorer.json?polls& asset = ' +params['asset']+'&lang='+params['lang'], 'polls')
+		
+		document.title = title + ' - Polls';
+		
+		document.getElementById('menuPolls').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('assets'))
+	{
+		asyncAjax('blockexplorer.json?assets'+'&lang='+params['lang'], 'assets')
+		
+		document.title = title + ' - Assets';
+		
+		document.getElementById('menuAssets').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('top'))
+	{
+		if(isFinite(params['top']))
+		{
+			limit = params['top'];
+		}
+		else if(params['top'] == 'allnotzero')
+		{
+			limit = -1;
+		}
+		else if(params['top'] == 'all')
+		{
+			limit = -2;
+		}
+		else
+		{
+			limit = 100;
+		}
+		
+		if(params.hasOwnProperty('asset') && isFinite(params['asset']))
+		{
+			asset = params['asset'];
+		}
+		else
+		{
+			asset = 1;
+		}
+		
+		asyncAjax('blockexplorer.json?top='+limit+'&asset='+asset+'&lang='+params['lang'], 'topRichest')
+		
+		document.title = title + ' - Top ' + limit;
+	
+		document.getElementById('menuTop100Richest').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('addr'))
+	{
+		if(params.hasOwnProperty('start') && isFinite(params['start']))
+		{
+			start = params['start'];
+		}
+		else
+		{
+			start = 0; // -1
+		}
+		
+		if(params.hasOwnProperty('showOnly'))
+		{
+			showOnly = '&showOnly=' + params['showOnly'];
+		}
+		else
+		{
+			showOnly = '';
+		}
+		
+		if(params.hasOwnProperty('showWithout'))
+		{
+			showWithout = '&showWithout=' + params['showWithout'];
+		}
+		else
+		{
+			showWithout = '';
+		}
+		
+		if(params.hasOwnProperty('withoutBlocks'))
+		{
+			withoutBlocks = '&withoutBlocks=' + params['withoutBlocks'];
+		}
+		else
+		{
+			withoutBlocks = '';
+		}
+		
+		if(params.hasOwnProperty('allOnOnePage'))
+		{
+			allonOnePage = '&allOnOnePage';
+		}
+		else
+		{
+			allonOnePage = '';
+		}
+		
+		asyncAjax('blockexplorer.json?addr=' + params['addr'] + '&start=' + start + showOnly + showWithout + allonOnePage + withoutBlocks +'&lang='+params['lang'], 'mainQuery');
+		
+		if(params['addr'].substring(0, 1) == 'A')
+		{
+			document.title = title + ' - AT Address - ' + params['addr'];
+		}
+		else if(params['addr'].substring(0, 1) == 'Q')
+		{
+			document.title = title + ' - Address - ' + params['addr'];
+		}
+		
+		document.getElementById('q').value = decodeURIComponent(params['addr']);
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('name'))
+	{
+		if(params.hasOwnProperty('start') && isFinite(params['start']))
+		{
+			start = params['start'];
+		}
+		else
+		{
+			start = 0;
+		}
+		
+		if(params.hasOwnProperty('allOnOnePage'))
+		{
+			allonOnePage = '&allOnOnePage';
+		}
+		else
+		{
+			allonOnePage = '';
+		}
+		
+		if(params.hasOwnProperty('showOnly'))
+		{
+			showOnly = '&showOnly=' + params['showOnly'];
+		}
+		else
+		{
+			showOnly = '';
+		}
+		
+		if(params.hasOwnProperty('showWithout'))
+		{
+			showWithout = '&showWithout=' + params['showWithout'];
+		}
+		else
+		{
+			showWithout = '';
+		}
+		
+		asyncAjax('blockexplorer.json?name=' + params['name'] + '&start=' + start + allonOnePage + showOnly + showWithout+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - Name - ' + decodeURIComponent (params['name']);
+		
+		document.getElementById('q').value = decodeURIComponent(params['name']);
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('tx'))
+	{
+		asyncAjax('blockexplorer.json?tx=' + params['tx']+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - Transaction - ' + params['tx'];
+		
+		document.getElementById('q').value = decodeURIComponent(params['tx']);
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('trade'))
+	{
+		asyncAjax('blockexplorer.json?trade=' + params['trade']+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - Trade - ' + params['trade'];
+		
+		document.getElementById('q').value = decodeURIComponent(params['trade']);
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('atTx'))
+	{
+		
+		asyncAjax('blockexplorer.json?atTx=' + params['atTx']+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - AT TX - ' + params['atTx'];
+		
+		document.getElementById('q').value = decodeURIComponent(params['atTx']);
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('poll'))
+	{
+		asyncAjax('blockexplorer.json?poll=' + params['poll']+'& asset=' +params['asset']+'&lang='+params['lang'], 'poll');
+		
+		document.title = title + ' - Poll - ' + decodeURIComponent(params['poll']);
+		
+		document.getElementById('q').value = decodeURIComponent(params['poll']);
+		
+		document.getElementById('menuPolls').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('asset'))
+	{
+		var assets = getQueryParams('asset');
+		if(assets.length == 2)
+		{
+			asyncAjax('blockexplorer.json?asset=' + assets[0] + '&asset='+assets[1]+'&lang='+params['lang'], 'trades');
+			
+			document.title = title + ' - Trades - ' + assets[0] + ' - '+ assets[1];
+		}
+		else
+		{
+			asyncAjax('blockexplorer.json?asset=' + params['asset']+'&lang='+params['lang'], 'asset');
+			
+			document.title = title + ' - Asset - ' + params['asset'];
+			
+			document.getElementById('q').value = decodeURIComponent(params['asset']);
+		}
+		
+		document.getElementById('menuAssets').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('block'))
+	{
+		
+		asyncAjax('blockexplorer.json?block=' + params['block']+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - Block - ' + params['block'];
+		
+		document.getElementById('q').value = decodeURIComponent(params['block']);
+		
+		return;
+	}
+	
+	
+	
+	if(params.hasOwnProperty('unconfirmed'))
+	{
+		
+		asyncAjax('blockexplorer.json?unconfirmed'+'&lang='+params['lang'], 'mainQuery');
+		
+		document.title = title + ' - Unconfirmed Transactions';
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('startBlock'))
+	{
+		asyncAjax('blockexplorer.json?blocks&start=' + params['startBlock']+'&lang='+params['lang'], 'blocks');
+
+		document.title = title + ' - Start from ' + params['startBlock'] + ' block';
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('q'))
+	{
+		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang'], 'search');
+
+		document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
+		document.getElementById('q').value = params['q'];
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('persons'))
+	{
+		asyncAjax('blockexplorer.json?persons'+'&lang='+params['lang'] , 'persons');
+		document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
+		return;
+	}
+	
+	if(params.hasOwnProperty('startPerson'))
+	{
+		asyncAjax('blockexplorer.json?persons&start=' + params['startBlock']+'&lang='+params['lang'], 'persons');
+
+		document.title = title + ' - Start from ' + params['startPerson'] + ' persons';
+		
+		return;
+	}
+	
+	
+	if(params.hasOwnProperty('person'))
+	{
+		asyncAjax('blockexplorer.json?person=' + params['person']+'&lang='+params['lang'], 'person');
+		document.title = title ;
+		return;
+	}
+	
+	if(params.hasOwnProperty('peers'))
+	{
+		asyncAjax('blockexplorer.json?peers&lang='+params['lang'], 'peers');
+		document.title = title ;
+		return;
+	}	
+	if(params.hasOwnProperty('statements'))
+	{
+		asyncAjax('blockexplorer.json?statements&lang='+params['lang'], 'statements');
+		document.title = title ;
+		return;
+	}	
+	
+	if(params.hasOwnProperty('statement'))
+	{
+		asyncAjax('blockexplorer.json?statement=' + params['statement']+'&Seg_No=' + params['Seg_No']+'&lang='+params['lang'], 'statement');
+		document.title = title ;
+		return;
+	}
+	
+	asyncAjax('blockexplorer.json?blocks'+'&lang='+params['lang'], 'blocks');
+	
+	document.title = title;
+	
+	document.getElementById('menuBlocks').setAttribute('class', 'active');
+}
+
+function Lang_setting(){
+  var data = {};
+  var k =0;
+  a = document.location;
+  b = document.location.search;
+  search = "?";
+  var n = document.getElementById("Langs").options.selectedIndex;
+  var val = document.getElementById("Langs").options[n].value;
+    if(document.location.search) {
+        var pair = (location.search.substr(1)).split('&');
+        for(var i = 0; i < pair.length; i ++) {
+			if (i!=0) {search +='&';}
+            var param = pair[i].split('=');
+			if (param[0] =='lang'){
+			k=1;
+			
+			search += 'lang=' + val;
+			}
+            else{
+			search += param[0] + '=' + param[1];
+			
+			}
+		}
+		if (k==0){
+			search += '&lang='+val;
+		}
+    }else{
+		search += 'lang='+val;
+	}
+
+	url = document.location.origin + document.location.pathname+search;
+	document.location.href = document.location.origin + document.location.pathname+search;
+	}
+
+	</script>
+</head>
+<body onload='start()' topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0" style='height:100%'>
+	<div align="center" style='height:100%'>
+<table width="100%" height=85% cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td valign="top" align="" colspan="3" height="1" nowrap>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" class="navbar-toggle collapsed"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+          	<a href="http://ARONICLE.com" class="navbar-brand"><img src="img/logo_header.png" style="height:35px" alt="" class="logo-header"></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+       <!--    <ul class="nav navbar-nav navbar-right">
+           <li><a id=home href=''>BlockExplorer</a></li>
+			
+		<li class="dropdown"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle"><span class="glyphicon glyphicon-th"></span></a> 
+          <div role="menu" class="dropdown-menu">
+            <div class="menu-grid">
+              <div class="list">
+                <div class="row">
+					<div class="col-sm-4 col-xs-6"><a href="/index/webdirectory.html">
+                      <div class="menu"><span class="glyphicon glyphicon-globe"></span><a href="/index/webdirectory.html">Webdirectory</a></div></a></div>
+					<div class="col-sm-4 col-xs-6"><a href="/index/blogdirectory.html">
+                      <div class="menu"><span class="glyphicon glyphicon-list"></span><a href="/index/blogdirectory.html">Blogdirectory</a></div></a></div>
+                  <div class="col-sm-4 col-xs-6"><a href="/index/blog.html">
+                      <div class="menu"><span class="glyphicon glyphicon-edit"></span><a href="/index/blog.html">Blog</a></div></a></div>
+                  <div class="col-sm-4 col-xs-6"><a href="/index/namestorage.html">
+                      <div class="menu"><span class="glyphicon glyphicon-file"></span><a href="/index/namestorage.html">NameStorage</a></div></a></div>
+					<div class="col-sm-4 col-xs-6"><a href="/index/hashtag.html?hashtag=ERM">
+                      <div class="menu"><span class="glyphicon glyphicon-fire"></span><a href="/index/hashtag.html?hashtag=ERM">Hashtag</a></div></a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+            
+          </ul>-->
+          <div class="navbar-form navbar-left">
+            <div class="input-group">
+              <label for="name" class="sr-only">Search</label>
+              <input id="q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
+                <button id="button" type="button" value="!searchval!" class="btn btn-link" onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
+            </div>
+			 <select id ="Langs" OnChange="Lang_setting()">
+			 </select>
+		   </div>
+        </div>
+      </div>
+    </nav>
+	
+ <div class="container-fluid">
+      <div class="row">
+        <div class="main-tabs">
+          <div class="container">
+            <div class="row" id="main-menu" >
+              <ul role="tablist" class="nav nav-tabs">
+                <li id=menuBlocks><a href="#" id=home2><translate>Blocks</translate></a></li>
+				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100><translate>Top 100 Richest</translate></a></li>
+				<li id=menuPersons><a href="?persons" id =menu_percons><translate>Persons</translate></a></li>
+				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
+				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
+				<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	
+				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
+				<li id=menustatements><a href="?statements" id=menu_statements><translate>Statements</translate></a></li>		
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</td>
+</tr>
+<tr>
+<td colspan="3" valign="top" align="center" width="100%">
+
+<br> 
+
+<div id="loading" style='display:none;'><img src="img/loading.gif" alt="Banner" /></div>
+
+<div id='main'></div>
+
+</td>
+</tr>
+</table>
+
+
+<table border="0" height=15% width="100%" cellspacing=0 cellpadding=0>
+<tr valign="bottom">
+<td align="center" style='padding-top:15px; padding-bottom:5px;'>
+<a href=http://ARONICLE.com>
+	<img border="0" src="img/logo_bottom.png" height="50">
+	<b><span style="font-size:40px;text-shadow:1px 1px 2px black, 0em 0em 0em #00F1FF;"><span style="color:chartreuse;">ERM</span><span style="color:gold;">4</span></b>
+</a>
+</td>
+</tr>
+</table>
+
+</table>
+</body>
+
+</html>

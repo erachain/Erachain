@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ERM Web Server">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>ERM Namestorage</title>
+    <link href="/index/libs/bootstrap/3/css/theme.css" rel="stylesheet">
+    <link href="/index/libs/css/style.css" rel="stylesheet">
+    <link href="/index/libs/css/sidebar.css" rel="stylesheet">
+    <!-- <link href="/index/libs/css/timeline.css" rel="stylesheet"> -->
+    <style type="text/css">
+      .media:first-child {
+      margin-top: 0;
+      padding-left: 20px;
+      padding-top: 20px;
+      padding-right: 20px;
+      }
+      .media-object {
+      height: 74px;
+      }
+      .media-heading {
+      margin-top: 20px;
+      margin-bottom: 5px;
+      }
+      p.post-header {
+      padding-bottom: 0px !important;
+      font-size: 15px;
+      }
+      p.post-content {
+      padding-top: 0px !important;
+      }
+      body {
+      padding-top: 50px;
+      }
+      .sub-header {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      }
+      .navbar-fixed-top {
+      border: 0;
+      z-index: 9999;
+      }
+      .sidebar {
+      display: none;
+      }
+      @media (min-width: 768px) {
+      .sidebar {
+      position: fixed;
+      top: 51px;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: block;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background-color: #f5f5f5;
+      border-right: 1px solid #eee;
+      }
+      }
+      .nav-sidebar {
+      margin-right: -21px;
+      margin-bottom: 20px;
+      margin-left: -20px;
+      }
+      .nav-sidebar > li > a {
+      padding-right: 20px;
+      padding-left: 20px;
+      }
+      .nav-sidebar > .active > a,
+      .nav-sidebar > .active > a:hover,
+      .nav-sidebar > .active > a:focus {
+      color: #fff;
+      background-color: #428bca;
+      }
+      .main {
+      padding-top: 0px;
+      }
+      .main-tabs {
+      width: 100%;
+      padding-top: 15px;
+      padding-left: 0px;
+      padding-right: 0px;
+      background-color: lightgray;
+      display: none;
+      }
+      img.logo-header {
+      background-color: transparent;
+      height: 100%;
+      }
+      .col-lg-8 {
+      padding-left: 0px;
+      }
+      @media (min-width: 768px) {
+      .main {
+      padding-right: 40px;
+      }
+      }
+      .main .page-header {
+      margin-top: 0;
+      }
+      .placeholders {
+      margin-bottom: 30px;
+      text-align: center;
+      }
+      .placeholders h4 {
+      margin-bottom: 0;
+      }
+      .placeholder {
+      margin-bottom: 20px;
+      }
+      .placeholder img {
+      display: inline-block;
+      border-radius: 50%;
+      }
+      .r-t {
+      margin: 0px;
+      }
+      .r-l {
+      margin: 0px;
+      }
+      span.label.label-default {
+      background-color: #fff;
+      color: lightgray;
+      font-size: 90%;
+      line-height: 1;
+      }
+      span.label.label-default a {
+      color: #ddd;
+      text-decoration: none;
+      }
+      a.r-l:hover,
+      a.r-l:focus {
+      color: #6467FF;
+      text-decoration: none;
+      }
+      .navbar-header {
+      width: 110px;
+      }
+      .modal-dialog.modal-lg {
+      padding-top: 100px;
+      }
+      .modal-content {
+      height: 620px;
+      /*width: 700px;*/
+      }
+      .tl-profile {
+      border: 1px solid #ddd;
+      -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+      margin-top: 40px;
+      }
+      .tl-profile img.tl-image-lg{
+      z-index: 0;
+      width: 100%;
+      margin-bottom: 10px;
+      }
+      .tl-image-profile
+      {
+      margin: -90px 10px 0px 50px;
+      z-index: 9;
+      width: 21%;
+      margin-bottom: 20px;
+      }
+      @media (max-width:768px)
+      {
+      .tl-profile-text>h1{
+      font-weight: 700;
+      font-size:16px;
+      }
+      .tl-image-profile
+      {
+      margin: -45px 10px 0px 25px;
+      z-index: 9;
+      width: 20%;
+      }
+      }
+      .profile-options
+      {
+      width:100%;
+      font-size: 20px;
+      }
+      .co-tabs {
+      border-bottom: 3px solid #6467ff;
+      margin-right: 10px;
+      }
+      ul.co-lists.list-unstyled {
+      text-align: center;
+      }
+      li.co-top {
+      font-size: 10px;
+      }
+      li.co-bottom {
+      font-size: 15px;
+      }
+      .po-tabs
+      {
+      border: 1px solid #ddd;
+      }
+      li.po-tabs a
+      {
+      color: #ddd;
+      }
+      li.po-tabs a:hover
+      {
+      color: #6467ff;
+      text-decoration: none;
+      }
+      #apimessage {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      z-index: 9999;
+      }
+      span.glyphicon.glyphicon-edit {
+      font-size: 17px;
+      top: -2px;
+      left: -6px;
+      }
+      button.btn.btn-lg.btn-primary {
+      height: 37px;
+      width: 37px;
+      }
+      .modal-dialog.modal-lg {
+      top: -50px;
+      }
+      .menu-grid span.glyphicon.glyphicon-edit {
+      left: 2px;
+      }
+      .panel.panel {
+      margin-top: 40px;
+      }
+      h4.comdetails.pull.left.text-muted {
+      font-size: 14px;
+      }
+      .comptions.btn-group {
+      margin: 12.5px;
+      }
+      textarea#clipboard_before {
+      display: none;
+      }
+      textarea#clipboard_change {
+      display: none;
+      }
+      textarea#clipboard_after {
+      display: none;
+      }
+      ul.list-inline.panitems {
+      margin-bottom: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    {{navbar}}
+    <div class="container">
+      <div class="row">
+          {{apimessage}}<div id=apimessage></div>
+          <br>
+         <div class="form-horizontal">
+          <!-- <fieldset> -->
+			<div id=result></div>
+            	{{result}}
+            <div class="form-group">
+            <label for="title" class="col-lg-2 control-label">Name</label>
+            <div class="col-lg-10">
+              <input id="name-select" type="text" placeholder="Name" class="form-control">
+            </div>
+            <label for="title" class="col-lg-2 control-label">Max Amount</label>
+            <div class="col-lg-10">
+              <input id="amount" type="text" placeholder="Amount (Optional/Default 20)" class="form-control">
+            </div>
+          </div>
+          </div>
+      <div class="panel-group" id="accordion">
+    	{% for txhistory in history %}
+    	{% set counter = loop.index  %}
+        <div class="panel panel">
+            <div class="panel-heading">
+              <ul class="list-inline panitems">
+                <li><ul class="list-unstyled">
+                    <li><p class="panel-title pull left">{% autoescape true%}{{txhistory.getAllKeys()}}{% endautoescape%}</p></li>
+                  <li><h4 class="comdetails  pull left text-muted">updated on {{txhistory.getCreationTime()}}<br>signature: {{txhistory.getSignature()}}  </h4></li></ul>
+                </li>
+                  <li class="pull-right"><h4 class="panel-title pull-right">
+                    <div class="comptions btn-group ">
+                      <!-- <button id="copybefore"class="btn btn-default" type="button" data-toggle="tooltip" data-placement="bottom" title="Copy before" data-clipboard-target="clipboard_before"><i class="glyphicon glyphicon-indent-right"></i></button>
+                      <button id="copychange"class="btn btn-default" type="button" data-toggle="tooltip" data-placement="bottom" title="Copy change" data-clipboard-target="clipboard_change"><i class="glyphicon glyphicon-flash"></i></button>
+                      <button id="copyafter"class="btn btn-default" type="button" data-toggle="tooltip" data-placement="bottom" title="Copy after" data-clipboard-target="clipboard_after"><i class="glyphicon glyphicon-indent-left"></i></button>
+                      {% autoescape true%}{% for ke in commits %}
+                      <textarea id="clipboard_before" name="clipboard_before" readonly>{{ke.getBefore()}}</textarea>
+                      <textarea id="clipboard_change" name="clipboard_change" readonly>{{ke.getChange()}}</textarea>
+                      <textarea id="clipboard_after" name="clipboard_after" readonly>{{ke.getAfter()}}</textarea>
+                      {% endfor %}{% endautoescape%} -->
+                      </div>
+                      <div class="comptions btn-group "><a data-toggle="collapse" data-parent="#accordion" href="#collapse-{{counter}}">
+                        <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-fullscreen"></i></button>
+                    </a></div>
+                </h4></li>
+              </ul>
+            </div>
+            <div id="collapse-{{ counter }}" class="panel-collapse collapse" name="collapse-{{ counter }}">
+              {% autoescape true%}
+            {% for ke in txhistory.getKeyValueHistoryList() %}
+                <div class="panel-body">
+                  {% if txhistory.getKeyValueHistoryList().size > 1 %}
+				  KEY:
+				  <pre>{{ke.getKey()}}</pre>
+				  {% endif %}
+				  BEFORE:
+                  <pre>{{ke.getBefore()}}</pre>
+                  CHANGE ({{ke.getChangekey()}}):
+                  <pre>{{ke.getChange()}}</pre>
+                  Unified Diff:
+                  <pre>{{ke.getDiff()}}</pre>
+                  After:
+                  <pre>{{ke.getAfter()}}</pre>
+                </div>
+	        {% endfor %}
+              {% endautoescape%}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+      </div>
+    </div>
+  </div>
+    <script src="/index/libs/jquery/jquery.2.js"></script>
+    <script src="/index/libs/bootstrap/3/js/bootstrap.min.js"></script>
+    <script src="/index/libs/js/third-party/ZeroClipboard.min.js"></script>
+    <script type="text/javascript">
+        {% for ke in commits %}
+        var client = new ZeroClipboard( document.getElementById("copybefore") );
+        var client = new ZeroClipboard( document.getElementById("copychange") );
+        var client = new ZeroClipboard( document.getElementById("copyafter") );
+        {% endfor %}
+
+        // client.on( "ready", function( readyEvent ) {
+          // alert( "ZeroClipboard SWF is ready!" );
+
+          // client.on( "aftercopy", function( event ) {
+            // `this` === `client`
+            // `event.target` === the element that was clicked
+        //     event.target.style.display = "none";
+        //     alert("Copied text to clipboard: " + event.data["text/plain"] );
+        //   } );
+        // } );
+
+
+      $(function(){
+      // bind change event to select
+      $('#name-select').on('change', function () {
+              window.location = '/index/namestoragehistory.html?name=' + $('#name-select').val() + "&amount=" + $('#amount').val(); // redirect
+          return false;
+      });
+    });
+      $(function(){
+      // bind change event to select
+      $('#amount').on('change', function () {
+              window.location = '/index/namestoragehistory.html?name=' + $('#name-select').val() + "&amount=" + $('#amount').val(); // redirect
+          return false;
+      });
+    });
+
+    	$(document).ready(function() {
+       	 var searchval;
+			$("#name-select").val('{{name}}');
+			$("#amount").val('{{amount}}');
+		  });
+
+    </script>
+  </body>
+</html>

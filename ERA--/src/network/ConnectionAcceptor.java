@@ -1,0 +1,116 @@
+package network;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+ import org.apache.log4j.Logger;
+
+import controller.Controller;
+import core.transaction.Transaction;
+import database.DBSet;
+import gui.status.WalletStatus;
+import lang.Lang;
+import ntp.NTP;
+import settings.Settings;
+
+public class ConnectionAcceptor extends Thread{
+
+	private ConnectionCallback callback;
+	
+	private ServerSocket socket;
+	
+	private boolean isRun;
+	
+	static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());
+	
+	public ConnectionAcceptor(ConnectionCallback callback)
+	{
+		this.callback = callback;
+	}
+	
+	public void run()
+	{
+		this.isRun = true;
+		while(isRun)
+		{
+			try
+			{	
+				
+				Thread.sleep(10);	
+
+				if(socket == null)
+				{
+					//START LISTENING
+					socket = new ServerSocket(Controller.getInstance().getNetworkPort()); 
+				}
+				
+				
+				//CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
+				if(Settings.getInstance().getMaxConnections() <= callback.getActivePeers(false).size())
+				{
+					//IF SOCKET IS OPEN CLOSE IT
+					if(!socket.isClosed())
+					{
+						socket.close();
+					}
+					
+					Thread.sleep(50);
+				}
+				else
+				{		
+					//REOPEN SOCKET
+					if(socket.isClosed())
+					{
+						socket = new ServerSocket(Controller.getInstance().getNetworkPort()); 
+					}
+					
+					//ACCEPT CONNECTION
+					Socket connectionSocket = socket.accept();
+					
+					//CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
+					if(
+							/*connectionSocket.getInetAddress().isSiteLocalAddress() 
+							 * || connectionSocket.getInetAddress().isAnyLocalAddress() 
+							 * || connectionSocket.getInetAddress().isLoopbackAddress() 
+							 *  */
+							
+							/*
+							(
+									(NTP.getTime() < Transaction.getPOWFIX_RELEASE() ) 
+									&& 
+									callback.isConnectedTo(connectionSocket.getInetAddress())
+							)
+							||
+							*/
+							DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
+							)
+						
+					{
+						//DO NOT CONNECT TO OURSELF/EXISTING CONNECTION
+						// or BANNED
+						connectionSocket.close();
+					}
+					else
+					{
+						
+						if (!this.isRun)
+							return;
+
+						//CREATE PEER
+						////new Peer(callback, connectionSocket);
+						callback.startPeer(connectionSocket);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				LOGGER.info(e.getMessage(),e);
+				LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
+			}
+		}
+	}
+	
+	public void halt()
+	{
+		this.isRun = false;
+	}
+}
