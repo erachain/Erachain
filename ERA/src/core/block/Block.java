@@ -954,13 +954,20 @@ public class Block {
 
 	public boolean isSignatureValid()
 	{
+		
+		if (this.version == 0) {
+			// genesis block
+			GenesisBlock gb = (GenesisBlock)this;
+			return gb.isSignatureValid();
+		}
 		//VALIDATE BLOCK SIGNATURE
 		byte[] data = this.toBytesForSign();
 
 		if(!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data))
 		{
-			LOGGER.error("Block signature not valid "
-					+ this.toString());
+			LOGGER.error("Block signature not valid"
+					+ ", Creator:" + this.creator.getAddress()
+					+ ", SIGN: " + Base58.encode(this.signature));
 			return false;
 		}
 

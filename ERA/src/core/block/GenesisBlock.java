@@ -575,7 +575,8 @@ public class GenesisBlock extends Block{
 			}
 		
 			return new Note(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
-					+ " \"" + Controller.APP_NAME + "\"", icon, image,
+					//+ " \"" + Controller.APP_NAME + "\"", icon, image,
+					+ " \"ERM4\"", icon, image,
 					license
 					);
 		case (int)NoteCls.MARRIAGE_KEY:
