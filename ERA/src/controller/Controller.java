@@ -58,6 +58,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -1125,7 +1126,12 @@ public class Controller extends Observable {
 
 
 				// ASK BLOCK FROM BLOCKCHAIN
-				newBlock = blockMessage.getBlock();
+				if (newBlockHeight == 1) {
+					// genesis block
+					newBlock = (GenesisBlock) blockMessage.getBlock();
+				} else 
+					newBlock = blockMessage.getBlock();
+				
 				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
 				LOGGER.debug(" received new chain Block " + newBlock.toString(dbSet));
 
