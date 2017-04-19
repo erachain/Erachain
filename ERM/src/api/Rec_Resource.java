@@ -196,7 +196,7 @@ public class Rec_Resource {
 	// get record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&timestamp=123123243&version=3&recipient=7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL&amount=123.0000123&key=12
 	// http://127.0.0.1:9068/record/getraw/31/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF?feePow=2&recipient=77QnJnSbS9EeGBa2LPZFZKVwjPwzeAxjmy&amount=123.0000123&key=1
 	//
-	public String toBytes(@PathParam("type") int record_type,
+	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("creator") String creator) // throws JSONException
 	{
 
@@ -247,7 +247,7 @@ public class Rec_Resource {
 
 	@GET
 	@Path("/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}")
-	public String toBytes(@PathParam("type") int record_type,
+	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("version") int version,
 			@PathParam("creator") String creator,
 			@PathParam("timestamp") long timestamp,

@@ -4,6 +4,10 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -18,7 +22,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -27,10 +33,18 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JSplitPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.validation.constraints.Null;
+
+import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
 import core.BlockChain;
@@ -39,6 +53,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
+import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import gui.PasswordPane;
 import gui.items.assets.ExchangeFrame;
@@ -46,6 +61,7 @@ import gui.items.assets.TableModelItemAssets;
 import gui.items.imprints.Table_Model_Issue_Hashes;
 import gui.items.notes.ComboBoxModelItemsNotes;
 import gui.library.MButton;
+import gui.library.MImprintEDIT_Pane;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
@@ -82,12 +98,42 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
     private Table_Model_Issue_Hashes hashes_Table_Model;
 	private DefaultTableModel attached_Files_Model;
+	private DefaultTableModel params_Template_Model;
+	protected NoteCls sel_note;
+	public JSplitPane sp_pan;
 
 	/**
      * Creates new form Issue_Document_Panel
      */
     public Issue_Document_Panel() {
+    	jTextPane_Message_Public = new MImprintEDIT_Pane();
+    	jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener(){
+
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent arg0) {
+				// TODO Auto-generated method stub
+				EventType i = arg0.getEventType();
+				 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
+				 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, Lang.getInstance().translate("Insert") + " "+arg0.getDescription(), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+				 if (str==null || str.equals("")) return;
+				 jTextPane_Message_Public.pars.replace("{{"+ arg0.getDescription()+"}}", str);
+				 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
+				 for ( int i1=0; i1 < params_Template_Model.getRowCount(); i1++){
+					 if (arg0.getDescription().equals(params_Template_Model.getValueAt(i1, 0))) params_Template_Model.setValueAt(str, i1, 1);
+					 
+    		
+    		
+    	}
+			
+			}
+			
+			
+			
+			
+		});
+    	
         initComponents();
+       
     jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
     jLabel_Title_Message.setText(Lang.getInstance().translate("Title") + ":");
     jTextField_Title_Message.setText("");
@@ -194,6 +240,44 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			}
 		}
 	});
+ // combo Template
+     
+   jComboBox_Template.addItemListener(new ItemListener(){
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			// TODO Auto-generated method stub
+		
+			
+			if(e.getStateChange() == ItemEvent.SELECTED) 
+			{		
+				sel_note = (NoteCls) jComboBox_Template.getSelectedItem();
+				String ww = Processor.process(sel_note.getDescription().replace("\n\n", "\n").replace("\n", "  \n"));
+				
+				int ee = params_Template_Model.getRowCount()-1;
+				int ccc;
+				for (ccc = params_Template_Model.getRowCount()-1; ccc>=0; ccc--){
+					params_Template_Model.removeRow(ccc);
+					
+				}
+				jTextPane_Message_Public.pars.clear();
+				jTextPane_Message_Public.set_Text(ww);
+				HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
+				Set<String> sk = ss.keySet();
+				
+				for (String s:sk){
+					ss.get(s);
+					params_Template_Model.addRow(new Object[] { s, ss.get(s)});
+							
+				}
+				
+				
+			} 	
+			
+			
+		}
+	});
+	
     
     TableColumnModel at_F_Col_M = jTable_Attached_Files.getColumnModel();
     
@@ -301,7 +385,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jTabbedPane_Message = new javax.swing.JTabbedPane();
         jPanel_Message_Public = new javax.swing.JPanel();
         jScrollPane_Message_Public_TextPane = new javax.swing.JScrollPane();
-        jTextPane_Message_Public = new javax.swing.JTextPane();
+        jScrollPane_Params_Template_Public_TextPane = new javax.swing.JScrollPane();
         jCheckBox_Message_Public = new javax.swing.JCheckBox();
         jPanel_Message_Private = new javax.swing.JPanel();
         jScrollPane_Message_Private_TextPane = new javax.swing.JScrollPane();
@@ -336,6 +420,26 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jButton_Clear = new MButton();
         jButton_Work_OK1 = new MButton();
         jButton_Input_Hashes_From_File_Other_Hashes= new MButton();
+        
+        params_Template_Model = new Params_Template_Model();
+        jTable_Params_Message_Public = new MTable(params_Template_Model);
+        params_Template_Model.addTableModelListener(new TableModelListener(){
+
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				// TODO Auto-generated method stub
+	
+			if (arg0.getType() != 0 && arg0.getColumn()<0 ) return;
+			System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
+			String dd = params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()).toString();
+			System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
+			
+			 jTextPane_Message_Public.pars.replace("{{"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +"}}",(String) params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
+			 System.out.print("\n");
+				System.out.print(jTextPane_Message_Public.pars);
+			 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
+			arg0=arg0;
+			}});
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 0, 0};
@@ -345,13 +449,20 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jPanel_Message_Public.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
-
+        sp_pan = new JSplitPane();
+        sp_pan.setLeftComponent(jScrollPane_Message_Public_TextPane);
+        
+        jScrollPane_Params_Template_Public_TextPane.setViewportView(jTable_Params_Message_Public);
+        sp_pan.setRightComponent(jScrollPane_Params_Template_Public_TextPane);
+        
+        
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        jPanel_Message_Public.add(jScrollPane_Message_Public_TextPane, gridBagConstraints);
+        jPanel_Message_Public.add(sp_pan, gridBagConstraints);
 
         jCheckBox_Message_Public.setText("Text");
         jCheckBox_Message_Public.addActionListener(new java.awt.event.ActionListener() {
@@ -1056,6 +1167,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane_Hashes_Files_Tale;
     private javax.swing.JScrollPane jScrollPane_Message_Private_TextPane;
     private javax.swing.JScrollPane jScrollPane_Message_Public_TextPane;
+    private javax.swing.JScrollPane jScrollPane_Params_Template_Public_TextPane;
     private javax.swing.JTabbedPane jTabbedPane_Message;
     private javax.swing.JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
@@ -1063,7 +1175,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Fee_Work;
     private javax.swing.JTextField jTextField_Title_Message;
     private javax.swing.JTextPane jTextPane_Message_Private;
-    private javax.swing.JTextPane jTextPane_Message_Public;
+    private MImprintEDIT_Pane jTextPane_Message_Public;
+    public MTable jTable_Params_Message_Public;
     // End of variables declaration                   
 }
 class Attache_Files_Model extends DefaultTableModel{
@@ -1091,11 +1204,48 @@ class Attache_Files_Model extends DefaultTableModel{
     public Object getValueAt(int row, int col){
     	
     	
-    	if (this.getRowCount()<row || this.getRowCount() ==0 )return null;
+    	if (this.getRowCount()<row || this.getRowCount() ==0 || col <0 || row <0)return null;
 	return super.getValueAt(row, col);
     	
     	
     }
+}
+    class Params_Template_Model extends DefaultTableModel{
+        
+    	/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public Params_Template_Model()
+        {
+          super(new Object[] {Lang.getInstance().translate("Name"),Lang.getInstance().translate("=")}, 0);
+       
+        }
+        
+       public int getColumnCount(){
+    	return 2;
+       }
+    	
+    	@Override
+        public boolean isCellEditable(int row, int column)
+        {
+           if (column ==1) return true;
+    		return new Boolean(null);
+        } 
+        public Class<? extends Object> getColumnClass(int c) {     // set column type
+    		Object o = getValueAt(0, c);
+    		return o==null?Null.class:o.getClass();
+    	   }
+    	
+        public Object getValueAt(int row, int col){
+        	
+        	
+        	if (this.getRowCount()<row || this.getRowCount() ==0 || col <0 || row <0)return null;
+    	return super.getValueAt(row, col);
+        	
+        	
+        }
    
 	
 	

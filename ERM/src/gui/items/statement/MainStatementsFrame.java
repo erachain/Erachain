@@ -103,6 +103,8 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	    search_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	 	my_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
+	 	iss2.sp_pan.setDividerLocation((int)(size.getWidth()/2));
+	 	
 	}
 
 // set favorine My

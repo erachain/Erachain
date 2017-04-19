@@ -67,7 +67,7 @@ public class BlockChain
 	//TESTNET 
 												//   1486444444444l
 												//	 1487844444444
-	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1491058085111l:1487844793333l;
+	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1492402331111l:1487844793333l;
 
 	//public static final int FEE_MIN_BYTES = 200;
 	public static final int FEE_PER_BYTE = 64;
@@ -201,6 +201,9 @@ public class BlockChain
 	}
 
 	public Tuple2<Integer, Long> getHWeight(DBSet dbSet, boolean withWinBuffer) {
+		
+		if (dbSet.isStoped())
+			return null;
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();

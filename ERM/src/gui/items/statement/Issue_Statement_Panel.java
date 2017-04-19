@@ -53,6 +53,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import gui.items.notes.ComboBoxModelItemsNotes;
+import gui.library.MButton;
 import gui.library.My_JFileChooser;
 import utils.Compressor_ZIP;
 import utils.Converter;
@@ -118,7 +119,7 @@ public class Issue_Statement_Panel extends JPanel
 		favoritesGBC.gridy = gridy++;	
 		JLabel label_Title = new JLabel(Lang.getInstance().translate("Issue Statement"));
 		label_Title.setHorizontalAlignment(SwingConstants.CENTER);
-      	this.add(label_Title, favoritesGBC);
+  //    	this.add(label_Title, favoritesGBC);
 		
 		
 		
@@ -234,7 +235,7 @@ public class Issue_Statement_Panel extends JPanel
 
 		final JLabel isTextLabel = new JLabel(Lang.getInstance().translate("Text Message") + ":");
       	isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-      	this.add(isTextLabel, labelIsTextGBC);
+  //    	this.add(isTextLabel, labelIsTextGBC);
      	
       	
         //TEXT ISTEXT
@@ -243,22 +244,22 @@ public class Issue_Statement_Panel extends JPanel
 		isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;   
 		isChkTextGBC.anchor = GridBagConstraints.NORTHWEST;
 		isChkTextGBC.weightx = 0;	
-		isChkTextGBC.gridx = 1;
-		isChkTextGBC.gridy = gridy++;
+		isChkTextGBC.gridx = 0;
+		isChkTextGBC.gridy = gridy;
         
-		isText = new JCheckBox();
+		isText = new JCheckBox(Lang.getInstance().translate("Text Message"));
         isText.setSelected(true);
         this.add(isText, isChkTextGBC);
         
         
-        //BUTTON PACK
+       //BUTTON PACK
         GridBagConstraints buttonPBC = new GridBagConstraints();
         buttonPBC.insets = new Insets(15,5,5,5);
         buttonPBC.fill = GridBagConstraints.HORIZONTAL;  
         buttonPBC.anchor = GridBagConstraints.NORTHEAST;
         buttonPBC.gridx = 2;
         buttonPBC.gridy = gridy;
-
+/* 
 		file_Button = new JButton(Lang.getInstance().translate("Insert File"));
 		file_Button.setPreferredSize(new Dimension(160, 25));
 		file_Button.setSize(new Dimension(160, 25));
@@ -270,6 +271,7 @@ public class Issue_Statement_Panel extends JPanel
 		        Include_File();
 		    }
 		});	
+        */
         //LABEL ENCRYPTED
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
 		labelEncGBC.insets = new Insets(5,5,5,5);
@@ -282,7 +284,7 @@ public class Issue_Statement_Panel extends JPanel
 		
 		JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
 		//encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		this.add(encLabel, labelEncGBC);
+	//	this.add(encLabel, labelEncGBC);
 		
         //ENCRYPTED CHECKBOX
 		GridBagConstraints ChkEncGBC = new GridBagConstraints();
@@ -290,10 +292,10 @@ public class Issue_Statement_Panel extends JPanel
 		ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;   
 		ChkEncGBC.anchor = GridBagConstraints.NORTHWEST;
 		ChkEncGBC.weightx = 0;	
-		ChkEncGBC.gridx = 1;
+		ChkEncGBC.gridx = 2;
 		ChkEncGBC.gridy = gridy++;
 		
-		encrypted = new JCheckBox();
+		encrypted = new JCheckBox(Lang.getInstance().translate("Encrypt Message"));
 		encrypted.setSelected(true);
 		this.add(encrypted, ChkEncGBC);
 		
@@ -362,7 +364,7 @@ public class Issue_Statement_Panel extends JPanel
 		buttonGBC.gridx = 0;
 		buttonGBC.gridy = gridy;
         
-		sendButton = new JButton(Lang.getInstance().translate("Sign and Send"));
+		sendButton = new MButton(Lang.getInstance().translate("Sign and Send"), 1);
         sendButton.setPreferredSize(new Dimension(160, 25));
     	sendButton.addActionListener(new ActionListener()
 		{
@@ -381,7 +383,7 @@ public class Issue_Statement_Panel extends JPanel
         buttonPBC.gridx = 2;
         buttonPBC.gridy = gridy;
 
-		packButton = new JButton(Lang.getInstance().translate("Sign and Pack"));
+		packButton = new MButton(Lang.getInstance().translate("Sign and Pack"), 1);
 		packButton.setPreferredSize(new Dimension(160, 25));
 		packButton.setSize(new Dimension(160, 25));
 		packButton.addActionListener(new ActionListener()

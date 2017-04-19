@@ -767,6 +767,11 @@ public class TransactionCreator
 		//RETURN
 		return valid;
 	}
-	
+
+	public Integer afterCreateRaw(Transaction transaction, boolean asPack)
+	{
+		this.checkUpdate();
+		return this.afterCreate(transaction, asPack);
+	}
 	
 }
