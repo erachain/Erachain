@@ -3,7 +3,7 @@
 /wallet*
 /bin/
 /ACCOUNTS.txt
-/*.jar
+/ERA.jar
 /ERA.iml
 *.iml
 
