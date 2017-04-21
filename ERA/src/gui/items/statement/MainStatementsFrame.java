@@ -77,8 +77,10 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 		  
 	
 // issue2
+		 
 		  iss2 = new Issue_Document_Panel();
 		  iss2.setName(Lang.getInstance().translate("Issue Statement"));
+		  
 ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 		
@@ -86,8 +88,10 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 		
 		this.jTabbedPane.add(search_Statements_SplitPanel);
 		this.jTabbedPane.add(Issue_Statement_Panel);
-		this.jTabbedPane.add(iss2);
 		
+		if (core.BlockChain.DEVELOP_USE){
+			this.jTabbedPane.add(iss2);
+		 }
 		this.pack();
 		//	this.setSize(800,600);
 		this.setMaximizable(true);
